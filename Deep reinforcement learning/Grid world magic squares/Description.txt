@@ -1,0 +1,12 @@
+GRID WORLD ENVIRONMENT
+
+- This is a text-based environment
+- The agent navigates from top left corner to bottom right of the map
+- There are 2 magic squares that enable the agent to teleport across the map
+- The purpose of the magic squares is to test if the agent can learn the shortcut
+- The agent get a -1 reward for making a step, and 0 reward for reaching destination
+- The purpose of the reward function is for the agent to maximize rewards by minimizing penalties
+- To find out the terminal state and find out if the agent is attempting illegal move:
+    + stateSpace: contains a list of all states, except for terminal state
+    + stateSpacePlus: contanins a list of all states, including terminal state
+- The agent will be trained with Q-Learning.
