@@ -168,7 +168,6 @@ def collision_with_self(snake_position):
 	else:
 		return 0
 
-
 class SnekEnv(gymnasium.Env):
 	def __init__(self):
 		super(SnekEnv, self).__init__()
@@ -248,10 +247,13 @@ class SnekEnv(gymnasium.Env):
 
 		observation = [head_x, head_y, apple_delta_x, apple_delta_y, snake_length] + list(self.prev_actions)
 		observation = np.array(observation)
+		if observation.dtype != np.float32:
+			observation = observation.astype(np.float32)
 
-		return observation, self.reward, self.done, info
+		return observation, self.reward, self.done, False, info
 
-	def reset(self):
+	def reset(self,seed=None):
+		super().reset(seed=seed)
 		self.img = np.zeros((500,500,3),dtype='uint8')
 		# Initial Snake and Apple position
 		self.snake_position = [[250,250],[240,250],[230,250]]
@@ -279,6 +281,8 @@ class SnekEnv(gymnasium.Env):
 		# create observation:
 		observation = [head_x, head_y, apple_delta_x, apple_delta_y, snake_length] + list(self.prev_actions)
 		observation = np.array(observation)
+		if observation.dtype != np.float32:
+			observation = observation.astype(np.float32)
 		info = {}
 		
 		return observation, info
