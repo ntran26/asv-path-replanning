@@ -28,4 +28,4 @@ class PathFollowEnv(gym.Env):
         new_pos = np.array(self.position)
         # 0: left 1m/s | 1: straight 1m/s | 2: right 1m/s
         # 3: left 2m/s | 4: straight 2m/s | 5: right 2m/s
-
+        
