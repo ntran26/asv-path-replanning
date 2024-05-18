@@ -165,6 +165,7 @@ model = PPO("MlpPolicy", env, verbose=1)
 
 # Train the model
 for episode in range(total_episodes):
+    print(episode)
     obs = env.reset()
     done = False
     while not done:
