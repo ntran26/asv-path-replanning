@@ -1,7 +1,7 @@
 import pygame
 import numpy as np
 
-class ASVVisualization:
+class Visualization:
     def __init__(self, width, height, path):
         self.width = width
         self.height = height
@@ -38,5 +38,5 @@ for x in range(START[0], 100-10):
 for y in range(START[1], 100-10):
     path.append((100-10, y))
 
-visualization = ASVVisualization(100, 100, path)
+visualization = Visualization(100, 100, path)
 visualization.run_visualization()

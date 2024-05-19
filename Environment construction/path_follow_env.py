@@ -5,14 +5,10 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv
-import cv2
+import pygame
 
 START = (5,5)
 GOAL = (90,90)
-
-# Create a VideoWriter object
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out = cv2.VideoWriter('training_video.avi', fourcc, 20.0, (600, 600))
 
 class PathFollowEnv(gym.Env):
     metadata = {"render_modes": ["human"], "render_fps": 30}
@@ -152,8 +148,6 @@ class PathFollowEnv(gym.Env):
 
         plt.show()
 
-
-
 env = PathFollowEnv(render_mode='human')
 
 # Wrap the environment for vectorized training
@@ -172,15 +166,7 @@ for episode in range(total_episodes):
         action, _ = model.predict(obs, deterministic=True)
         obs, reward, done, info = env.step(action)
         # Render the environment
-        img = env.render(mode='human')
-        if img is not None:
-            img_bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-            # img_resized = cv2.resize(img_bgr, (600, 600))
-            out.write(img_bgr)
-
-out.release()
-cv2.destroyAllWindows()
-env.close()
+        env.render(mode='human')
 
 # Save the model
 model.save("path_following_model")
