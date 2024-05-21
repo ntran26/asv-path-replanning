@@ -34,7 +34,7 @@ class ASVVisualization:
                 p = (START[0]+step*100,START[1])
                 pts.append(p)
                 pygame.draw.circle(self.screen, WHITE, p, 5)
-
+                # bottom horizontal line
                 p = (START[0]+step*100,self.height-50)
                 pts.append(p)
                 pygame.draw.circle(self.screen, WHITE, p, 5)
@@ -42,22 +42,10 @@ class ASVVisualization:
                 p = (START[0]+step*100,self.height-50)
                 pts.append(p)
                 pygame.draw.circle(self.screen, WHITE, p, 5)
- 
+                # top horizontal line
                 p = (START[0]+step*100,START[1])
                 pts.append(p)
                 pygame.draw.circle(self.screen, WHITE, p, 5)
-        
-        # # Define a function to add new points to the path
-        # def add_points(path, start, end, axis):
-        #     if axis == 'x':
-        #         for x in range(start[0], end[0]):
-        #             new_point = np.array([[x, start[1]]])
-        #             path = np.append(path, new_point, axis=0)
-        #     elif axis == 'y':
-        #         for y in range(start[1], end[1]):
-        #             new_point = np.array([[start[0], y]])
-        #             path = np.append(path, new_point, axis=0)
-        #     return path
         
         path = np.empty((0, 2), int)
 
@@ -67,96 +55,83 @@ class ASVVisualization:
             new_point = np.array([[p0[0], y]])
             path = np.append(path, new_point, axis=0)
         for x in range(p1[0], p2[0]):
-            new_point = np.array([[x, p3[1]]])
+            new_point = np.array([[x, p1[1]]])
             path = np.append(path, new_point, axis=0)
         for y in range(p3[1], p2[1]):
-            new_point = np.array([[p2[0], y]])
+            new_point = np.array([[p2[0], self.height-y]])      # invert vertical line
             path = np.append(path, new_point, axis=0)
         for x in range(p3[0], p4[0]):
-            new_point = np.array([[x, p2[1]]])
+            new_point = np.array([[x, p3[1]]])
             path = np.append(path, new_point, axis=0)
         
         for y in range(p4[1], p5[1]):
             new_point = np.array([[p4[0], y]])
             path = np.append(path, new_point, axis=0)
         for x in range(p5[0], p6[0]):
-            new_point = np.array([[x, p3[1]]])
+            new_point = np.array([[x, p5[1]]])
             path = np.append(path, new_point, axis=0)
         for y in range(p7[1], p6[1]):
-            new_point = np.array([[p6[0], y]])
+            new_point = np.array([[p6[0], self.height-y]])
             path = np.append(path, new_point, axis=0)
         for x in range(p7[0], p8[0]):
-            new_point = np.array([[x, p6[1]]])
+            new_point = np.array([[x, p7[1]]])
             path = np.append(path, new_point, axis=0)
 
         for y in range(p8[1], p9[1]):
             new_point = np.array([[p8[0], y]])
             path = np.append(path, new_point, axis=0)
         for x in range(p9[0], p10[0]):
-            new_point = np.array([[x, p3[1]]])
+            new_point = np.array([[x, p9[1]]])
             path = np.append(path, new_point, axis=0)
         for y in range(p11[1], p10[1]):
-            new_point = np.array([[p10[0], y]])
+            new_point = np.array([[p10[0], self.height-y]])
             path = np.append(path, new_point, axis=0)
         for x in range(p11[0], p12[0]):
-            new_point = np.array([[x, p10[1]]])
+            new_point = np.array([[x, p11[1]]])
             path = np.append(path, new_point, axis=0)
 
         for y in range(p12[1], p13[1]):
             new_point = np.array([[p12[0], y]])
             path = np.append(path, new_point, axis=0)
         for x in range(p13[0], p14[0]):
-            new_point = np.array([[x, p3[1]]])
+            new_point = np.array([[x, p13[1]]])
             path = np.append(path, new_point, axis=0)
         for y in range(p15[1], p14[1]):
-            new_point = np.array([[p14[0], y]])
+            new_point = np.array([[p14[0], self.height-y]])
             path = np.append(path, new_point, axis=0)
         for x in range(p15[0], p16[0]):
-            new_point = np.array([[x, p14[1]]])
+            new_point = np.array([[x, p15[1]]])
             path = np.append(path, new_point, axis=0)
         
         for y in range(p16[1], p17[1]):
             new_point = np.array([[p16[0], y]])
             path = np.append(path, new_point, axis=0)
 
-        # # Add points to the path using the function
-        # path = add_points(path, p0, p1, 'y')
-        # path = add_points(path, p1, p2, 'x')
-        # path = add_points(path, p3, p2, 'y')
-        # path = add_points(path, p3, p4, 'x')
-
-        # path = add_points(path, p4, p5, 'y')
-        # path = add_points(path, p5, p6, 'x')
-        # path = add_points(path, p7, p6, 'y')
-        # path = add_points(path, p7, p8, 'x')
-
-        # path = add_points(path, p8, p9, 'y')
-        # path = add_points(path, p9, p10, 'x')
-        # path = add_points(path, p11, p10, 'y')
-        # path = add_points(path, p11, p12, 'x')
-
-        # path = add_points(path, p12, p13, 'y')
-        # path = add_points(path, p13, p14, 'x')
-        # path = add_points(path, p15, p14, 'y')
-        # path = add_points(path, p15, p16, 'x')
-
-        # path = add_points(path, p16, p17, 'y')
-
         for point in path:
-            pygame.draw.circle(self.screen, GREEN, (int(point[0]), self.height - int(point[1])), 1)
+            # flipped_y = self.height - int(point[1])  # Flip the y-coordinate
+            pygame.draw.circle(self.screen, GREEN, (int(point[0]), int(point[1])), 1)
 
+        self.path = path
         df = pd.DataFrame(path)
         df.to_csv("path.csv")
         pygame.display.update()  # Update the display
 
     def run_visualization(self):
         running = True
+        index = 0
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
             self.draw_path()
-            self.clock.tick(60)  # Limit to 60 frames per second
+
+            # Animate the dot
+            if index < len(self.path):
+                pygame.draw.circle(self.screen, BLUE, (self.path[index][0], self.path[index][1]), 5)
+                index += 10
+
+            pygame.display.update()
+            # self.clock.tick(60)  # Limit to 60 frames per second
         pygame.quit()
 
 visualization = ASVVisualization(WIDTH, HEIGHT)
