@@ -8,6 +8,8 @@ WHITE = (255,255,255)
 RED = (255,0,0)
 GREEN = (0,255,0)
 BLUE = (0,0,255)
+YELLOW = (255,255,0)
+CYAN = (0,255,255)
 
 # Define map dimensions
 WIDTH = 900
@@ -108,12 +110,68 @@ class ASVVisualization:
             path = np.append(path, new_point, axis=0)
 
         for point in path:
-            # flipped_y = self.height - int(point[1])  # Flip the y-coordinate
             pygame.draw.circle(self.screen, GREEN, (int(point[0]), int(point[1])), 1)
 
         self.path = path
-        df = pd.DataFrame(path)
-        df.to_csv("path.csv")
+
+        num_step = 30
+        # Turn right
+        self.heading = 90
+        self.speed = 2
+        self.position = np.array(START, dtype=float) 
+        self.step = 0
+        pos = np.empty((0, 2), int)
+
+        while self.step < num_step:
+            self.position = np.array([self.position[0] + self.speed*np.cos(np.radians(self.heading)),
+                                      self.position[1] + self.speed*np.sin(np.radians(self.heading))], dtype = float)
+            # pygame.draw.circle(self.screen, BLUE, self.position, 1)
+            pos = np.vstack([pos, self.position])
+            self.step += 1
+            self.heading += 5
+
+        for point in pos:
+            pygame.draw.circle(self.screen, BLUE, (int(point[0]), int(point[1])), 1)
+
+        # Go straight
+        self.heading = 90
+        self.speed = 2
+        self.position = np.array(START, dtype=float) 
+        self.step = 0
+        pos = np.empty((0, 2), int)
+
+        while self.step < num_step:
+            self.position = np.array([self.position[0] + self.speed*np.cos(np.radians(self.heading)),
+                                      self.position[1] + self.speed*np.sin(np.radians(self.heading))], dtype = float)
+            # pygame.draw.circle(self.screen, BLUE, self.position, 1)
+            pos = np.vstack([pos, self.position])
+            self.step += 1
+
+        for point in pos:
+            pygame.draw.circle(self.screen, YELLOW, (int(point[0]), int(point[1])), 1)
+
+        # Turn left
+        self.heading = 90
+        self.speed = 2
+        self.position = np.array(START, dtype=float) 
+        self.step = 0
+        pos = np.empty((0, 2), int)
+
+        while self.step < num_step:
+            self.position = np.array([
+                                        self.position[0] + self.speed*np.cos(np.radians(self.heading)),
+                                        self.position[1] + self.speed*np.sin(np.radians(self.heading))
+                                        ], dtype = float)
+            # pygame.draw.circle(self.screen, BLUE, self.position, 1)
+            pos = np.vstack([pos, self.position])
+            self.step += 1
+            self.heading -= 5
+        
+        for point in pos:
+            pygame.draw.circle(self.screen, RED, (int(point[0]), int(point[1])), 1)
+
+        # df = pd.DataFrame(path)
+        # df.to_csv("path.csv")
         pygame.display.update()  # Update the display
 
     def run_visualization(self):
@@ -125,10 +183,10 @@ class ASVVisualization:
                     running = False
             self.draw_path()
 
-            # Animate the dot
-            if index < len(self.path):
-                pygame.draw.circle(self.screen, BLUE, (self.path[index][0], self.path[index][1]), 5)
-                index += 10
+            # # Animate the dot
+            # if index < len(self.path):
+            #     pygame.draw.circle(self.screen, BLUE, (self.path[index][0], self.path[index][1]), 5)
+            #     index += 10
 
             pygame.display.update()
             # self.clock.tick(60)  # Limit to 60 frames per second
