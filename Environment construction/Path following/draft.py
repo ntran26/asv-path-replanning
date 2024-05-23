@@ -149,34 +149,34 @@ class ASVEnv(gymnasium.Env):
 # Register the environment
 gymnasium.envs.registration.register(id='ASVEnv-v0', entry_point=ASVEnv, kwargs={'render_mode': 'human'})
 
-# Create the environment
-env = gymnasium.make('ASVEnv-v0', render_mode='human')
+# # Create the environment
+# env = gymnasium.make('ASVEnv-v0', render_mode='human')
 
-# Check if the environment follows the gym interface
-check_env(env, warn=True)
+# # Check if the environment follows the gym interface
+# check_env(env, warn=True)
 
-# Train with PPO
-env = DummyVecEnv([lambda: env])  # Wrap the environment
-# Create a callback for saving models
-checkpoint_callback = CheckpointCallback(save_freq=50000, save_path='./models/', name_prefix='ppo_asv_model')
+# # Train with PPO
+# env = DummyVecEnv([lambda: env])  # Wrap the environment
+# # Create a callback for saving models
+# checkpoint_callback = CheckpointCallback(save_freq=50000, save_path='./models/', name_prefix='ppo_asv_model')
 
-# Create the PPO model
-model = PPO('MlpPolicy', env, verbose=1)
+# # Create the PPO model
+# model = PPO('MlpPolicy', env, verbose=1)
 
-# Train the model
-model.learn(total_timesteps=1000000, callback=checkpoint_callback)
+# # Train the model
+# model.learn(total_timesteps=1000000, callback=checkpoint_callback)
 
-# Save the final model
-model.save("ppo_asv_model_final")
+# # Save the final model
+# model.save("ppo_asv_model_final")
 
-# Load the model for evaluation
-model = PPO.load("ppo_asv_model_final")
+# # Load the model for evaluation
+# model = PPO.load("ppo_asv_model_final")
 
-# Evaluate the trained model
-obs = env.reset()
-for _ in range(30000):
-    action, _states = model.predict(obs)
-    obs, rewards, dones, info = env.step(action)
-    env.render()
+# # Evaluate the trained model
+# obs = env.reset()
+# for _ in range(30000):
+#     action, _states = model.predict(obs)
+#     obs, rewards, dones, info = env.step(action)
+#     env.render()
 
 

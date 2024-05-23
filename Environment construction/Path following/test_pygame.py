@@ -12,8 +12,8 @@ YELLOW = (255,255,0)
 CYAN = (0,255,255)
 
 # Define map dimensions
-WIDTH = 600
-HEIGHT = 400
+WIDTH = 300
+HEIGHT = 200
 START = (50, 50)
 STEP = 100
 
@@ -51,7 +51,7 @@ class ASVVisualization:
         
         path = np.empty((0, 2), int)
 
-        p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11 = pts[:12]
+        p0, p1, p2, p3, p4, p5 = pts[:6]
 
         for y in range(p0[1], p1[1]):
             new_point = np.array([[p0[0], y]])
@@ -69,25 +69,25 @@ class ASVVisualization:
         for y in range(p4[1], p5[1]):
             new_point = np.array([[p4[0], y]])
             path = np.append(path, new_point, axis=0)
-        for x in range(p5[0], p6[0]):
-            new_point = np.array([[x, p5[1]]])
-            path = np.append(path, new_point, axis=0)
-        for y in range(p7[1], p6[1]):
-            new_point = np.array([[p6[0], self.height-y]])
-            path = np.append(path, new_point, axis=0)
-        for x in range(p7[0], p8[0]):
-            new_point = np.array([[x, p7[1]]])
-            path = np.append(path, new_point, axis=0)
+        # for x in range(p5[0], p6[0]):
+        #     new_point = np.array([[x, p5[1]]])
+        #     path = np.append(path, new_point, axis=0)
+        # for y in range(p7[1], p6[1]):
+        #     new_point = np.array([[p6[0], self.height-y]])
+        #     path = np.append(path, new_point, axis=0)
+        # for x in range(p7[0], p8[0]):
+        #     new_point = np.array([[x, p7[1]]])
+        #     path = np.append(path, new_point, axis=0)
 
-        for y in range(p8[1], p9[1]):
-            new_point = np.array([[p8[0], y]])
-            path = np.append(path, new_point, axis=0)
-        for x in range(p9[0], p10[0]):
-            new_point = np.array([[x, p9[1]]])
-            path = np.append(path, new_point, axis=0)
-        for y in range(p11[1], p10[1]):
-            new_point = np.array([[p10[0], self.height-y]])
-            path = np.append(path, new_point, axis=0)
+        # for y in range(p8[1], p9[1]):
+        #     new_point = np.array([[p8[0], y]])
+        #     path = np.append(path, new_point, axis=0)
+        # for x in range(p9[0], p10[0]):
+        #     new_point = np.array([[x, p9[1]]])
+        #     path = np.append(path, new_point, axis=0)
+        # for y in range(p11[1], p10[1]):
+        #     new_point = np.array([[p10[0], self.height-y]])
+        #     path = np.append(path, new_point, axis=0)
         # for x in range(p11[0], p12[0]):
         #     new_point = np.array([[x, p11[1]]])
         #     path = np.append(path, new_point, axis=0)
