@@ -138,8 +138,8 @@ class ASVEnv(gymnasium.Env):
         if on_green_path:
             reward = -1  # Small negative reward for staying on path
         else:
-            reward = -10  # Larger negative reward for being off path
-        
+            reward = -50  # Larger negative reward for being off path
+
         # Check if the ASV has reached the end of the path (goal)
         if self.position[0] >= self.path[-1, 0]:
             reward = 0  # Zero reward upon reaching the end
@@ -157,15 +157,14 @@ check_env(env, warn=True)
 
 # Train with PPO
 env = DummyVecEnv([lambda: env])  # Wrap the environment
-
 # Create a callback for saving models
-checkpoint_callback = CheckpointCallback(save_freq=1000, save_path='./models/', name_prefix='ppo_asv_model')
+checkpoint_callback = CheckpointCallback(save_freq=50000, save_path='./models/', name_prefix='ppo_asv_model')
 
 # Create the PPO model
 model = PPO('MlpPolicy', env, verbose=1)
 
 # Train the model
-model.learn(total_timesteps=10000, callback=checkpoint_callback)
+model.learn(total_timesteps=1000000, callback=checkpoint_callback)
 
 # Save the final model
 model.save("ppo_asv_model_final")
@@ -180,4 +179,4 @@ for _ in range(30000):
     obs, rewards, dones, info = env.step(action)
     env.render()
 
-env.close()
+
