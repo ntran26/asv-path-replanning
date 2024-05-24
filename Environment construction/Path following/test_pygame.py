@@ -15,7 +15,7 @@ CYAN = (0,255,255)
 WIDTH = 300
 HEIGHT = 200
 START = (50, 50)
-STEP = 100
+STEP = 50
 
 class ASVVisualization:
     def __init__(self, width, height):
@@ -23,11 +23,16 @@ class ASVVisualization:
         self.height = height
         # self.path = path
         pygame.init()
-        self.screen = pygame.display.set_mode((self.width, self.height))
+        # self.screen = pygame.display.set_mode((self.width, self.height))
+        self.screen = pygame.display.set_mode((600,400))
+        self.surface = pygame.Surface((self.width, self.height))
+        # window = pygame.Surface((600,400))
+        # window.blit(image, rect)
         self.clock = pygame.time.Clock()
 
     def draw_path(self):      
         self.screen.fill(BLACK)  # Fill the screen     
+        self.step = STEP
 
         pts = []
         i = int(self.width / 100)
@@ -168,9 +173,6 @@ class ASVVisualization:
         for point in pos:
             pygame.draw.circle(self.screen, RED, (int(point[0]), int(point[1])), 1)
 
-
-
-
         num_step = 60
         # Turn right
         self.heading = 0
@@ -227,7 +229,6 @@ class ASVVisualization:
 
         # df = pd.DataFrame(path)
         # df.to_csv("path.csv")
-        pygame.display.update()  # Update the display
 
     def run_visualization(self):
         running = True
