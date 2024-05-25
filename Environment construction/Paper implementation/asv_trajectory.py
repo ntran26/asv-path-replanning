@@ -118,12 +118,9 @@ class asv_visualization:
             return self.agent_left, self.agent_right, self.agent_straight,
 
         ani = FuncAnimation(fig, update, frames=STEP+1, init_func=init, blit=True, interval=200, repeat=True)
-        # ani_right = FuncAnimation(fig, update_right, frames=len(self.right_path), init_func=init, blit=True, interval=200, repeat=False)
-        # ani_straight = FuncAnimation(fig, update_straight, frames=len(self.straight_path), init_func=init, blit=True, interval=200, repeat=False)
 
         # plt.grid(True)
         plt.show()
-
 
 visualization = asv_visualization(WIDTH, HEIGHT)
 visualization.draw_path()

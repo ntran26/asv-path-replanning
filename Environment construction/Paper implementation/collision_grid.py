@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
+from matplotlib.animation import FuncAnimation, FFMpegWriter
 
 # Define colors
 BLACK = (0, 0, 0)
@@ -12,7 +12,7 @@ BLUE = (0, 0, 1)
 
 RADIUS = 120
 SQUARE_SIZE = 12
-SPEED = 2
+SPEED = 1
 
 OBSTACLE_RADIUS = SQUARE_SIZE
 # OBSTACLE_RADIUS = int(SQUARE_SIZE/2)
@@ -29,7 +29,7 @@ def generate_grid(radius, square_size, center):
     return grid
 
 def plot_grid(radius, start_pos, goal_pos, static_obstacles, moving_obstacles):
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+    fig, (ax2, ax1) = plt.subplots(1, 2, figsize=(12, 6))
     ax1.set_aspect('equal')  # set equal aspect ratio
     ax2.set_aspect('equal')
 
@@ -61,6 +61,7 @@ def plot_grid(radius, start_pos, goal_pos, static_obstacles, moving_obstacles):
             path.append((x,y))
     squares = []
 
+    # Initialize variables for animation
     def init():
         asv1.set_data([], [])
         asv2.set_data([], [])
@@ -74,13 +75,14 @@ def plot_grid(radius, start_pos, goal_pos, static_obstacles, moving_obstacles):
             squares.append(rect)
         return asv1, asv2, observation_horizon1, observation_horizon2, *squares
     
+    # Reset locations of the grid squares
     def reset():
         for rect in squares:
             rect.remove()
         squares.clear()
 
+    # Main animation loop to update the frame
     def update(frame):
-        t = frame/100  # Moving speed
         pos = path[frame]
         # x = agent_pos[0] + (goal_pos[0] - agent_pos[0]) * t
         # y = agent_pos[1] + (goal_pos[1] - agent_pos[1]) * t
@@ -109,6 +111,12 @@ def plot_grid(radius, start_pos, goal_pos, static_obstacles, moving_obstacles):
     ax1.set_ylim(-radius - 100, radius + 200)
     ax2.set_xlim(-radius - 100, radius + 100)
     ax2.set_ylim(-radius - 100, radius + 200)
+
+    # # Write to mp4 file
+    # FFwriter = FFMpegWriter(fps=10)
+    # ani.save("Environment construction/Paper implementation/animation.mp4", writer=FFwriter)
+
+    # Show plot
     plt.show()
 
 # Agent position (center of the grid)

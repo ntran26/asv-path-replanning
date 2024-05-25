@@ -1,122 +1,145 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation, FFMpegWriter
 
-# Define Object class
-class Object:
-    def __init__(self, x, y, weight):
-        self.x = x
-        self.y = y
-        self.weight = weight
+# Define colors
+BLACK = (0, 0, 0)
+WHITE = (1, 1, 1)
+RED = (1, 0, 0)
+GREEN = (0, 1, 0)
+YELLOW = (1, 1, 0)
+BLUE = (0, 0, 1)
 
-# Naive algorithm for filling the grid
-def naive_fill_grid(grid, objects, dc):
-    fill_grid = []
-    for i in range(len(grid)):
-        fill_grid.append([])
-        for j in range(len(objects)):
-            x = grid[i][0]
-            y = grid[i][1]
-            m = objects[j].x
-            n = objects[j].y
-            if x - dc / 2 <= m <= x + dc / 2 and y - dc / 2 <= n <= y + dc / 2:
-                fill_grid[i].append(objects[j].weight)
-    return fill_grid
+RADIUS = 120
+SQUARE_SIZE = 12
+SPEED = 2
+OBSTACLE_RADIUS = SQUARE_SIZE
 
-# Optimized algorithm for filling the grid
-def closest_multiple(n, mult):
-    return int((n + mult / 2) / mult) * mult
+# Define map dimensions
+WIDTH = 50
+HEIGHT = 50
+START = (0, 0)
+TURN_RATE = 5
+INITIAL_HEADING = 90
+STEP = 60
 
-def optimized_fill_grid(grid_dict, objects, dc):
-    for i in range(len(objects)):
-        m = objects[i].x
-        n = objects[i].y
-        m = closest_multiple(abs(m), dc) * (1 if m >= 0 else -1)
-        n = closest_multiple(abs(n), dc) * (1 if n >= 0 else -1)
-        if (m, n) not in grid_dict:
-            grid_dict[(m, n)] = []
-        grid_dict[(m, n)].append(objects[i].weight)
-    return grid_dict
+class asv_visualization:
+    # Initialize environment
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+        self.start_pos = START
 
-# Generate the grid
-def generate_grid(radius, square_size):
-    half_size = square_size / 2
-    x = np.arange(-radius, radius + square_size, square_size)
-    y = np.arange(-radius, radius + square_size, square_size)
-    grid = []
-    for i in x:
-        for j in y:
-            if np.sqrt(i**2 + j**2) <= radius:
-                grid.append((i + half_size, j + half_size))
-    return grid
+    # Generate grid function
+    def generate_grid(self, radius, square_size, center):
+        half_size = square_size / 2
+        x = np.arange(-radius, radius, square_size)
+        y = np.arange(-radius, radius, square_size)
+        grid = []
+        for i in x:
+            for j in y:
+                if np.sqrt(i**2 + j**2) <= radius:
+                    grid.append((center[0] + i + half_size, center[1] + j + half_size))
+        return grid
 
-# Plot the grid and objects
-def plot_grid(grid, radius, agent_pos, goal_pos, static_obstacles, moving_obstacles, square_size):
-    fig, axs = plt.subplots(1, 2, figsize=(15, 7))
-    
-    for ax in axs:
-        ax.set_aspect('equal')  # set equal aspect ratio
+    # Main function to create and draw ASV trajectory
+    def draw_path(self):
+        # Turn left
+        self.step = 0
+        self.heading = INITIAL_HEADING
+        self.speed = 1
+        self.left_path = [START]
+        self.left_heading = [INITIAL_HEADING]
+        self.position = START
 
-        # Draw grid
-        for (cx, cy) in grid:
-            rect = plt.Rectangle((cx - square_size / 2, cy - square_size / 2), square_size, square_size,
-                                 edgecolor='gray', facecolor='none')
-            ax.add_patch(rect)
+        while self.step < STEP:
+            self.position = (self.position[0] + self.speed * np.cos(np.radians(self.heading)),
+                             self.position[1] + self.speed * np.sin(np.radians(self.heading)))
+            self.left_path.append(self.position)
+            self.left_heading.append(self.heading)
+            self.step += 1
+            self.heading += TURN_RATE
 
-        # Draw observation horizon
-        circle = plt.Circle((0, 0), radius, color='r', fill=False, linestyle='--')
-        ax.add_patch(circle)
+        # Initialize figure and axes
+        fig, (ax2, ax1) = plt.subplots(1, 2, figsize=(12, 6))
+        ax1.set_aspect('equal')
+        ax2.set_aspect('equal')
 
-        # Draw agent
-        ax.plot(agent_pos[0], agent_pos[1], 'bo', label='Agent')
+        self.agent_1, = ax1.plot([], [], marker='^', color=BLUE)
+        self.agent_2, = ax2.plot([], [], marker='^', color=BLUE)
+        observation_horizon1 = plt.Circle(START, RADIUS, color='r', fill=False)
+        observation_horizon2 = plt.Circle(START, RADIUS, color='r', fill=False)
+        ax1.add_patch(observation_horizon1)
+        ax2.add_patch(observation_horizon2)
 
-        # Draw goal
-        ax.plot(goal_pos[0], goal_pos[1], 'go', label='Goal')
-
-        # Draw static obstacles
+        # Define and plot obstacles
+        static_obstacles = [(-30, -40), (70, -60)]
+        moving_obstacles = [(10, 20), (40, 80), (50, 150)]
         for (x, y) in static_obstacles:
-            ax.plot(x, y, 'yo', label='Static Obstacle')
-
-        # Draw moving obstacles
+            ax2.plot(x, y, 'yo')
         for (x, y) in moving_obstacles:
-            ax.plot(x, y, 'ro', label='Moving Obstacle')
+            ax2.plot(x, y, 'ro')
 
-    axs[0].set_title('Plot 1')
-    axs[1].set_title('Plot 2')
+        squares = []
 
-    for ax in axs:
-        ax.legend()
-        ax.set_xlim(-radius, radius)
-        ax.set_ylim(-radius, radius)
+        # Initialize animation variables
+        def init():
+            self.agent_1.set_data([], [])
+            self.agent_2.set_data([], [])
+            observation_horizon1.center = START
+            observation_horizon2.center = START
+            grid = self.generate_grid(RADIUS, SQUARE_SIZE, START)
+            for (cx, cy) in grid:
+                rect = plt.Rectangle((cx - SQUARE_SIZE/2, cy - SQUARE_SIZE/2), SQUARE_SIZE, SQUARE_SIZE,
+                                     edgecolor='gray', facecolor='none')
+                ax1.add_patch(rect)
+                squares.append(rect)
+            return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *squares
 
-    plt.show()
+        # Reset locations of the grid squares
+        def reset():
+            for rect in squares:
+                rect.remove()
+            squares.clear()
 
+        # Main animation loop to update the frame
+        def update(frame):
+            pos = self.left_path[frame]
+            heading = self.left_heading[frame]
 
-# Parameters
-radius = 120  # Observation horizon radius
-square_size = 15  # Size of each grid square
+            self.agent_1.set_data(pos[0], pos[1])
+            self.agent_1.set_marker(3, 0, heading - INITIAL_HEADING)
 
-# Generate grid
-grid = generate_grid(radius, square_size)
+            self.agent_2.set_data(pos[0], pos[1])
+            self.agent_2.set_marker(3, 0, heading - INITIAL_HEADING)
 
-# Agent position (center of the grid)
-agent_pos = (0, 0)
+            observation_horizon1.center = (pos[0], pos[1])
+            observation_horizon2.center = (pos[0], pos[1])
 
-# Example positions
-goal_pos = (50, 50)
-static_obstacles = [Object(-30, -40, 1), Object(70, -60, 1)]
-moving_obstacles = [Object(10, 20, 1), Object(40, 80, 1)]
+            reset()  # remove previous grid squares
 
-# Using naive algorithm
-naive_result = naive_fill_grid(grid, static_obstacles + moving_obstacles, square_size)
-print("Naive Algorithm Result:")
-for row in naive_result:
-    print(row)
+            # Draw new grid squares
+            grid = self.generate_grid(RADIUS, SQUARE_SIZE, (pos[0], pos[1]))
+            for (cx, cy) in grid:
+                is_collision = any(np.sqrt((cx - ox) ** 2 + (cy - oy) ** 2) < (SQUARE_SIZE / 2 + OBSTACLE_RADIUS)
+                                   for ox, oy in static_obstacles + moving_obstacles)
+                color = 'red' if is_collision else 'none'
+                rect = plt.Rectangle((cx - SQUARE_SIZE / 2, cy - SQUARE_SIZE / 2), SQUARE_SIZE, SQUARE_SIZE,
+                                     edgecolor='gray', facecolor=color)
+                ax1.add_patch(rect)
+                squares.append(rect)
 
-# Using optimized algorithm
-optimized_result = optimized_fill_grid({}, static_obstacles + moving_obstacles, square_size)
-print("\nOptimized Algorithm Result:")
-for key, value in optimized_result.items():
-    print(f"Grid {key}: {value}")
+            return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *squares
 
-# Plot the grid and objects
-plot_grid(grid, radius, agent_pos, goal_pos, [(o.x, o.y) for o in static_obstacles], [(o.x, o.y) for o in moving_obstacles], square_size)
+        ani = FuncAnimation(fig, update, frames=len(self.left_path), init_func=init, blit=True, interval=200, repeat=False)
+        ax1.set_xlim(-RADIUS - 50, RADIUS + 50)
+        ax1.set_ylim(-RADIUS - 50, RADIUS + 50)
+        ax2.set_xlim(-RADIUS - 50, RADIUS + 50)
+        ax2.set_ylim(-RADIUS - 50, RADIUS + 50)
+
+        # Show plot
+        plt.show()
+
+# Create visualization
+visualization = asv_visualization(WIDTH, HEIGHT)
+visualization.draw_path()
