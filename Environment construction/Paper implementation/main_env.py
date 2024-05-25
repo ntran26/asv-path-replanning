@@ -72,6 +72,10 @@ class asv_visualization:
         ax1.add_patch(observation_horizon1)
         ax2.add_patch(observation_horizon2)
 
+        # Plot the path
+        path_array = np.array(self.left_path)
+        ax1.plot(path_array[:,0], path_array[:,1], '-', color=RED)
+
         # Define and plot obstacles
         static_obstacles = [(-30, -40), (70, -60)]
         moving_obstacles = [(10, 20), (40, 80), (50, 150)]
@@ -108,10 +112,10 @@ class asv_visualization:
             heading = self.left_heading[frame]
 
             self.agent_1.set_data(pos[0], pos[1])
-            self.agent_1.set_marker(3, 0, heading - INITIAL_HEADING)
+            # self.agent_1.set_marker(3, 0, heading - INITIAL_HEADING)
 
             self.agent_2.set_data(pos[0], pos[1])
-            self.agent_2.set_marker(3, 0, heading - INITIAL_HEADING)
+            # self.agent_2.set_marker(3, 0, heading - INITIAL_HEADING)
 
             observation_horizon1.center = (pos[0], pos[1])
             observation_horizon2.center = (pos[0], pos[1])
