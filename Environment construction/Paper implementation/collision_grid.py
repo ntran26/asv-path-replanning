@@ -14,6 +14,9 @@ RADIUS = 120
 SQUARE_SIZE = 12
 SPEED = 2
 
+OBSTACLE_RADIUS = SQUARE_SIZE
+# OBSTACLE_RADIUS = int(SQUARE_SIZE/2)
+
 def generate_grid(radius, square_size, center):
     half_size = square_size / 2
     x = np.arange(-radius, radius, square_size)
@@ -38,17 +41,17 @@ def plot_grid(radius, start_pos, goal_pos, static_obstacles, moving_obstacles):
     ax2.add_patch(observation_horizon2)
 
     # Draw goal
-    ax1.plot(goal_pos[0], goal_pos[1], 'go')
-    ax2.plot(goal_pos[0], goal_pos[1], 'go')
+    ax1.plot(goal_pos[0], goal_pos[1], 'o', color=GREEN)
+    ax2.plot(goal_pos[0], goal_pos[1], 'o', color=GREEN)
     
     # Draw static obstacles
     for (x, y) in static_obstacles:
-        ax1.plot(x, y, 'yo')
+        # ax1.plot(x, y, 'yo')
         ax2.plot(x, y, 'yo')
     
     # Draw moving obstacles
     for (x, y) in moving_obstacles:
-        ax1.plot(x, y, 'ro')
+        # ax1.plot(x, y, 'ro')
         ax2.plot(x, y, 'ro')
     
     # Create path from start to goal
@@ -90,8 +93,12 @@ def plot_grid(radius, start_pos, goal_pos, static_obstacles, moving_obstacles):
         # Draw new grid squares
         grid = generate_grid(radius, SQUARE_SIZE, (pos[0], pos[1]))
         for (cx, cy) in grid:
+            # Check for collision with obstacles
+            is_collision = any(np.sqrt((cx - ox)**2 + (cy - oy)**2) < (SQUARE_SIZE/2 + OBSTACLE_RADIUS)
+                                for ox, oy in static_obstacles + moving_obstacles)
+            color = 'red' if is_collision else 'none'
             rect = plt.Rectangle((cx - SQUARE_SIZE / 2, cy - SQUARE_SIZE / 2), SQUARE_SIZE, SQUARE_SIZE,
-                                 edgecolor='gray', facecolor='none')
+                                edgecolor='gray', facecolor=color)
             ax1.add_patch(rect)
             squares.append(rect)
 
@@ -99,18 +106,18 @@ def plot_grid(radius, start_pos, goal_pos, static_obstacles, moving_obstacles):
 
     ani = FuncAnimation(fig, update, frames=len(path), init_func=init, blit=True, interval=100, repeat=False)
     ax1.set_xlim(-radius - 100, radius + 100)
-    ax1.set_ylim(-radius - 100, radius + 100)
+    ax1.set_ylim(-radius - 100, radius + 200)
     ax2.set_xlim(-radius - 100, radius + 100)
-    ax2.set_ylim(-radius - 100, radius + 100)
+    ax2.set_ylim(-radius - 100, radius + 200)
     plt.show()
 
 # Agent position (center of the grid)
 start_pos = (0, 0)
 
 # Example positions 
-goal_pos = (0, 70)
+goal_pos = (0, 150)
 static_obstacles = [(-30, -40), (70, -60)]
-moving_obstacles = [(10, 20), (40, 80)]
+moving_obstacles = [(10, 20), (40, 80), (50,150)]
 
 # Plot the grid and objects with animation
 plot_grid(RADIUS, start_pos, goal_pos, static_obstacles, moving_obstacles)
