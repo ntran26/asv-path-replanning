@@ -13,7 +13,7 @@ BLUE = (0, 0, 1)
 RADIUS = 120
 SQUARE_SIZE = 12
 SPEED = 2
-OBSTACLE_RADIUS = SQUARE_SIZE
+OBSTACLE_RADIUS = SQUARE_SIZE/2
 
 # Define map dimensions
 WIDTH = 50
@@ -61,7 +61,7 @@ class asv_visualization:
             self.heading += TURN_RATE
 
         # Initialize figure and axes
-        fig, (ax2, ax1) = plt.subplots(1, 2, figsize=(12, 6))
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
         ax1.set_aspect('equal')
         ax2.set_aspect('equal')
 
@@ -80,9 +80,9 @@ class asv_visualization:
         static_obstacles = [(-30, -40), (70, -60)]
         moving_obstacles = [(10, 20), (40, 80), (50, 150)]
         for (x, y) in static_obstacles:
-            ax2.plot(x, y, 'yo')
+            ax1.plot(x, y, 'yo')
         for (x, y) in moving_obstacles:
-            ax2.plot(x, y, 'ro')
+            ax1.plot(x, y, 'ro')
 
         squares = []
 
@@ -111,11 +111,12 @@ class asv_visualization:
             pos = self.left_path[frame]
             heading = self.left_heading[frame]
 
+            # Update the line segment as part of the plot
             self.agent_1.set_data(pos[0], pos[1])
-            # self.agent_1.set_marker(3, 0, heading - INITIAL_HEADING)
-
+            self.agent_1.set_marker((3, 0, heading - INITIAL_HEADING))
+            
             self.agent_2.set_data(pos[0], pos[1])
-            # self.agent_2.set_marker(3, 0, heading - INITIAL_HEADING)
+            self.agent_2.set_marker((3, 0, heading - INITIAL_HEADING))
 
             observation_horizon1.center = (pos[0], pos[1])
             observation_horizon2.center = (pos[0], pos[1])
@@ -130,7 +131,7 @@ class asv_visualization:
                 color = 'red' if is_collision else 'none'
                 rect = plt.Rectangle((cx - SQUARE_SIZE / 2, cy - SQUARE_SIZE / 2), SQUARE_SIZE, SQUARE_SIZE,
                                      edgecolor='gray', facecolor=color)
-                ax1.add_patch(rect)
+                ax2.add_patch(rect)
                 squares.append(rect)
 
             return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *squares
@@ -142,6 +143,7 @@ class asv_visualization:
         ax2.set_ylim(-RADIUS - 50, RADIUS + 50)
 
         # Show plot
+        ax1.grid(True)
         plt.show()
 
 # Create visualization
