@@ -69,16 +69,16 @@ class asv_visualization:
 
         # Define and obstacles
         static_obstacles = [(-30, -40), (70, -60)]
-        moving_obstacles = [(10, 20), (50, 150)]
-        moving_obstacle = (40, 80)
+        # moving_obstacles = [(10, 20), (50, 150)]
+        moving_obstacle = [(40, 80)]
 
         # Create moving osbtacle trajectory
         self.step_count = 0
         self.speed = self.speed+5
         self.current_heading = self.heading
-        self.obstacle_path = [(moving_obstacle[0], moving_obstacle[1])]
+        self.obstacle_path = [(moving_obstacle[0][0], moving_obstacle[0][1])]
         self.obstacle_heading = [self.heading]
-        self.obstacle_position = (moving_obstacle[0], moving_obstacle[1])
+        self.obstacle_position = (moving_obstacle[0][0], moving_obstacle[0][1])
 
         while self.step_count < self.step:
             self.obstacle_position = (self.obstacle_position[0] + self.speed * np.cos(np.radians(self.current_heading)),
@@ -160,7 +160,7 @@ class asv_visualization:
             for (cx, cy) in grid:
                 # Check for obstacles in the second plot
                 is_collision = any(np.sqrt((cx - ox)**2 + (cy - oy)**2) < (SQUARE_SIZE/2 + OBSTACLE_RADIUS)
-                                   for ox, oy in static_obstacles + moving_obstacles)
+                                   for ox, oy in static_obstacles)
                 if not is_collision:
                     is_collision = np.sqrt((cx - obstacle_pos[0])**2 + (cy - obstacle_pos[1])**2) \
                                     < (SQUARE_SIZE/2 + OBSTACLE_RADIUS)
