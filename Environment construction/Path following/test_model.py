@@ -11,7 +11,7 @@ gymnasium.envs.registration.register(id='ASVEnv-v0', entry_point=ASVEnv, kwargs=
 env = gymnasium.make('ASVEnv-v0', render_mode='human')
 
 # Load the trained model from the specified path
-model_path = "models/ppo_asv_model_1000000_steps.zip"
+model_path = "ppo_asv_model_final.zip"
 model = PPO.load(model_path)
 model = PPO.load("ppo_asv_model_final")
 
