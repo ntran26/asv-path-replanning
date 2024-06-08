@@ -10,8 +10,8 @@ GREEN = (0, 1, 0)
 YELLOW = (1, 1, 0)
 BLUE = (0, 0, 1)
 
-RADIUS = 120
-SQUARE_SIZE = 12
+RADIUS = 100
+SQUARE_SIZE = 10
 SPEED = 2
 OBSTACLE_RADIUS = SQUARE_SIZE/3
 
@@ -56,7 +56,18 @@ class asv_visualization:
         self.left_heading = [self.heading]
         self.position = self.start_pos
 
-        # Turn left
+        # # Turn left
+        # while self.step_count < self.step:
+        #     self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
+        #                      self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
+        #     # Append new position and heading angle to list
+        #     self.left_path.append(self.position)
+        #     self.left_heading.append(self.current_heading)
+        #     # Update new heading angle and step count
+        #     self.current_heading += self.turn_rate
+        #     self.step_count += 1
+
+        # Go straight
         while self.step_count < self.step:
             self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
                              self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
@@ -64,48 +75,11 @@ class asv_visualization:
             self.left_path.append(self.position)
             self.left_heading.append(self.current_heading)
             # Update new heading angle and step count
-            self.current_heading += self.turn_rate
+            self.current_heading = self.current_heading
             self.step_count += 1
 
         # Define and obstacles
-        static_obstacles = [(-30, -40), (70, -60)]
-        # moving_obstacles = [(10, 20), (50, 150)]
-        moving_obstacle = [(40, 80), (50, -50)]
-
-        # Create moving osbtacle trajectory
-        self.step_count = 0
-        self.speed = self.speed+5
-        self.current_heading = self.heading
-        self.obstacle_path = [(moving_obstacle[0][0], moving_obstacle[0][1])]
-        self.obstacle_heading = [self.heading]
-        self.obstacle_position = (moving_obstacle[0][0], moving_obstacle[0][1])
-
-        while self.step_count < self.step:
-            self.obstacle_position = (self.obstacle_position[0] + self.speed * np.cos(np.radians(self.current_heading)),
-                                      self.obstacle_position[1] + self.speed * np.sin(np.radians(self.current_heading)))
-            # Append new position and heading angle to list
-            self.obstacle_path.append(self.obstacle_position)
-            self.obstacle_heading.append(self.current_heading)
-            # Update new heading angle and step count
-            self.current_heading += self.turn_rate
-            self.step_count += 1
-        
-        self.step_count = 0
-        self.speed = self.speed
-        self.current_heading = self.heading
-        self.obstacle_path_2 = [(moving_obstacle[1][0], moving_obstacle[1][1])]
-        self.obstacle_heading_2 = [self.heading]
-        self.obstacle_position_2 = (moving_obstacle[1][0], moving_obstacle[1][1])
-
-        while self.step_count < self.step:
-            self.obstacle_position_2 = (self.obstacle_position_2[0] + self.speed * np.cos(np.radians(self.current_heading)),
-                                        self.obstacle_position_2[1] + self.speed * np.sin(np.radians(self.current_heading)))
-            # Append new position and heading angle to list
-            self.obstacle_path_2.append(self.obstacle_position_2)
-            self.obstacle_heading_2.append(self.current_heading)
-            # Update new heading angle and step count
-            self.current_heading = self.current_heading
-            self.step_count += 1        
+        static_obstacles = [(-30, -40), (70, -60)]      
 
         # Initialize figure and axes
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
@@ -126,8 +100,6 @@ class asv_visualization:
         # Plot obstacles
         for (x, y) in static_obstacles:
             ax1.plot(x, y, marker='o', color=RED)
-        self.moving_obstacle, = ax1.plot([], [], marker='o', color=RED)
-        self.moving_obstacle_2, = ax1.plot([], [], marker='o', color=RED)
 
         # Empty list to store the collision grid coordinates
         squares = []
@@ -136,8 +108,6 @@ class asv_visualization:
         def init():
             self.agent_1.set_data([], [])           # agent in the first plot
             self.agent_2.set_data([], [])           # agent in the second plot
-            self.moving_obstacle.set_data([], [])   # moving obstacle
-            self.moving_obstacle_2.set_data([], [])   # moving obstacle 2
             observation_horizon1.center = START
             observation_horizon2.center = START
             grid = self.generate_grid(RADIUS, SQUARE_SIZE, START)
@@ -146,7 +116,7 @@ class asv_visualization:
                                      edgecolor='gray', facecolor='none')
                 ax1.add_patch(rect)
                 squares.append(rect)
-            return self.agent_1, self.agent_2, self.moving_obstacle, self.moving_obstacle_2, observation_horizon1, observation_horizon2, *squares
+            return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *squares
 
         # Reset locations of the grid squares
         def reset():
@@ -158,8 +128,6 @@ class asv_visualization:
         def update(frame):
             agent_pos = self.left_path[frame]
             heading = self.left_heading[frame]
-            obstacle_pos = self.obstacle_path[frame]
-            obstacle_pos_2 = self.obstacle_path_2[frame]
 
             # Update the line segment as part of the plot
             self.agent_1.set_data(agent_pos[0], agent_pos[1])
@@ -169,17 +137,6 @@ class asv_visualization:
             self.agent_2.set_marker((3, 0, heading - INITIAL_HEADING))
 
             # Check if the obstacle is within the radius
-            distance_to_obstacle = np.sqrt((agent_pos[0] - obstacle_pos[0])**2 + (agent_pos[1] - obstacle_pos[1])**2)
-            if distance_to_obstacle <= RADIUS:
-                self.moving_obstacle.set_data(obstacle_pos[0], obstacle_pos[1])
-            else:
-                self.moving_obstacle.set_data([], [])
-
-            distance_to_obstacle_2 = np.sqrt((agent_pos[0] - obstacle_pos_2[0])**2 + (agent_pos[1] - obstacle_pos_2[1])**2)
-            if distance_to_obstacle_2 <= RADIUS:
-                self.moving_obstacle_2.set_data(obstacle_pos_2[0], obstacle_pos_2[1])
-            else:
-                self.moving_obstacle_2.set_data([], [])
             
             # Check if the static obstacle is within the radius
 
@@ -194,20 +151,15 @@ class asv_visualization:
                 # Check for obstacles in the second plot
                 is_collision = any(np.sqrt((cx - ox)**2 + (cy - oy)**2) < (SQUARE_SIZE/2 + OBSTACLE_RADIUS)
                                    for ox, oy in static_obstacles)
-                if not is_collision:
-                    is_collision = np.sqrt((cx - obstacle_pos[0])**2 + (cy - obstacle_pos[1])**2) \
-                                    < (SQUARE_SIZE/2 + OBSTACLE_RADIUS)
-                    is_collision_2 = np.sqrt((cx - obstacle_pos_2[0])**2 + (cy - obstacle_pos_2[1])**2) \
-                                    < (SQUARE_SIZE/2 + OBSTACLE_RADIUS)
                 # Change the color of the grid if there is obstacle
-                color = 'red' if is_collision or is_collision_2 else 'none'
+                color = 'red' if is_collision else 'none'
                 rect = plt.Rectangle((cx - SQUARE_SIZE/2, cy - SQUARE_SIZE/2), SQUARE_SIZE, SQUARE_SIZE,
                                      edgecolor='gray', facecolor=color)
                 # Update the collision grid on the second plot
                 ax2.add_patch(rect)
                 squares.append(rect)
 
-            return self.agent_1, self.agent_2, self.moving_obstacle, self.moving_obstacle_2, observation_horizon1, observation_horizon2, *squares
+            return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *squares
 
         ani = FuncAnimation(fig, update, frames=len(self.left_path), init_func=init, blit=True, interval=200, repeat=False)
         ax1.set_xlim(-RADIUS - 50, RADIUS + 50)
