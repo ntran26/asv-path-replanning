@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv
-import pygame
 
 START = (5,5)
 GOAL = (90,90)

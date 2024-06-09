@@ -136,8 +136,6 @@ class asv_visualization:
             self.agent_2.set_data(agent_pos[0], agent_pos[1])
             self.agent_2.set_marker((3, 0, heading - INITIAL_HEADING))
 
-            # Check if the obstacle is within the radius
-            
             # Check if the static obstacle is within the radius
 
             observation_horizon1.center = (agent_pos[0], agent_pos[1])
