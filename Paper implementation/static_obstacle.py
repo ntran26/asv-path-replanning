@@ -72,10 +72,10 @@ class asv_visualization:
         static_obstacles = [(-30, -40), (70, -60), (70, 70), (0, 150)]      
 
         # Initialize figure and axes
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+        fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18, 6))
         ax1.set_aspect('equal')
         ax2.set_aspect('equal')
-        # ax3.set_aspect('equal')
+        ax3.set_aspect('equal')
 
         self.agent_1, = ax1.plot([], [], marker='^', color=BLUE)
         self.agent_2, = ax2.plot([], [], marker='^', color=BLUE)
@@ -83,7 +83,8 @@ class asv_visualization:
         observation_horizon2 = plt.Circle(START, RADIUS, color='r', fill=False)
         observation_horizon3 = plt.Circle(START, RADIUS, color='r', fill=False)
         ax1.add_patch(observation_horizon1)
-        ax2.add_patch(observation_horizon1)
+        ax2.add_patch(observation_horizon2)
+        ax3.add_patch(observation_horizon3)
 
         # Generate the path
         self.path = []
