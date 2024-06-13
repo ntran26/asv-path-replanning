@@ -91,8 +91,6 @@ class asv_visualization:
         for y in range(START[1], GOAL[1]+1):
             self.path.append((START[0], y))
 
-        print(self.path)
-
         # Plot the path
         path_array = np.array(self.path)
         ax1.plot(path_array[:,0], path_array[:,1], '-', color=GREEN)
@@ -102,7 +100,8 @@ class asv_visualization:
             ax1.plot(x, y, marker='o', color=RED)
 
         # Empty list to store the collision grid coordinates
-        squares = []
+        squares_ax2 = []
+        squares_ax3 = []
 
         # Initialize animation variables
         def init():
@@ -110,19 +109,25 @@ class asv_visualization:
             self.agent_2.set_data([], [])           # agent in the second plot
             observation_horizon1.center = START
             observation_horizon2.center = START
+            observation_horizon3.center = START
             grid = self.generate_grid(RADIUS, SQUARE_SIZE, START)
             for (cx, cy) in grid:
                 rect = plt.Rectangle((cx - SQUARE_SIZE/2, cy - SQUARE_SIZE/2), SQUARE_SIZE, SQUARE_SIZE,
                                      edgecolor='gray', facecolor='none')
                 ax1.add_patch(rect)
-                squares.append(rect)
-            return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *squares
+                squares_ax2.append(rect)
+
+                rect_static = plt.Rectangle((cx - SQUARE_SIZE / 2, cy - SQUARE_SIZE / 2), SQUARE_SIZE, SQUARE_SIZE,
+                                            edgecolor='gray', facecolor='none')
+                ax3.add_patch(rect_static)
+                squares_ax3.append(rect_static)
+            return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, observation_horizon3, *squares_ax2, *squares_ax3
 
         # Reset locations of the grid squares
         def reset():
-            for rect in squares:
+            for rect in squares_ax2:
                 rect.remove()
-            squares.clear()
+            squares_ax2.clear()
 
         # Main animation loop to update the frame
         def update(frame):
@@ -155,7 +160,7 @@ class asv_visualization:
                                      edgecolor='gray', facecolor=color)
                 # Update the collision grid on the second plot
                 ax2.add_patch(rect)
-                squares.append(rect)
+                squares_ax2.append(rect)
             
             for (cx, cy) in grid:
                 is_path = any(np.sqrt((cx - ox)**2 + (cy - oy)**2) < (SQUARE_SIZE/2 + OBSTACLE_RADIUS)
@@ -166,15 +171,33 @@ class asv_visualization:
                                      edgecolor='gray', facecolor=color)
                 # Update the collision grid
                 ax2.add_patch(rect)
-                squares.append(rect)
+                squares_ax2.append(rect)
 
-            return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *squares
+            # Update the grid squares in ax3 based on ax2
+            for rect_static in squares_ax3:
+                cx, cy = rect_static.get_xy()
+                cx += SQUARE_SIZE / 2
+                cy += SQUARE_SIZE / 2
+                is_collision = any(np.sqrt((cx - ox) ** 2 + (cy - oy) ** 2) < (SQUARE_SIZE / 2 + OBSTACLE_RADIUS)
+                                   for ox, oy in static_obstacles)
+                is_path = any(np.sqrt((cx - ox) ** 2 + (cy - oy) ** 2) < (SQUARE_SIZE / 2 + OBSTACLE_RADIUS)
+                              for ox, oy in self.path)
+                if is_collision:
+                    rect_static.set_facecolor('red')
+                elif is_path:
+                    rect_static.set_facecolor('green')
+                else:
+                    rect_static.set_facecolor('none')
+
+            return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *squares_ax2, *squares_ax3
 
         ani = FuncAnimation(fig, update, frames=len(self.left_path), init_func=init, blit=True, interval=200, repeat=False)
         ax1.set_xlim(-RADIUS - 50, RADIUS + 50)
         ax1.set_ylim(-RADIUS - 50, RADIUS + 200)
         ax2.set_xlim(-RADIUS - 50, RADIUS + 50)
         ax2.set_ylim(-RADIUS - 50, RADIUS + 200)
+        ax3.set_xlim(-RADIUS - 50, RADIUS + 50)
+        ax3.set_ylim(-RADIUS - 50, RADIUS + 50)
 
         # # Write to mp4 file
         # FFwriter = FFMpegWriter(fps=5)
