@@ -46,8 +46,8 @@ class StaticObsEnv(gym.Env):
         self.speed = 1
 
         # Observation space and action space
-        self.action_space = spaces.Discrete(6)
-        self.observation_space = spaces.Box(0, self.width, shape=(4,), dtype=np.float32)
+        self.action_space = spaces.Discrete(3)
+        self.observation_space = spaces.Box(low=0, high=self.width, shape=(4,), dtype=np.float32)
 
         # Draw the path
     
@@ -82,5 +82,5 @@ class StaticObsEnv(gym.Env):
     def render(self):
         return
     
-    
+
 
