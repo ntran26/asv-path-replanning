@@ -81,7 +81,7 @@ class asv_visualization:
             boundary.append((100, y))   # right boundary 
 
         # Initialize figure and axes
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 8))
         ax1.set_aspect('equal')
         ax2.set_aspect('equal')
 
