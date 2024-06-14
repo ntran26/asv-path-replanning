@@ -37,8 +37,8 @@ class asv_visualization:
 
     # Generate grid function
     def generate_grid(self, radius, square_size, center):
-        x = np.arange(-radius, radius, square_size)
-        y = np.arange(-radius, radius, square_size)
+        x = np.arange(-radius + square_size, radius, square_size)
+        y = np.arange(-radius + square_size, radius, square_size)
         grid = []
         for i in x:
             for j in y:
@@ -92,10 +92,8 @@ class asv_visualization:
         ax2.add_patch(observation_horizon2)
 
         # Plot the boundary
-        OBSTACLE_SIZE = 3
         for (x, y) in boundary:
-            boundary_line = plt.Rectangle((x - OBSTACLE_SIZE / 2, y - OBSTACLE_SIZE / 2), OBSTACLE_SIZE, OBSTACLE_SIZE,
-                                              edgecolor='black', facecolor='black')
+            boundary_line = plt.Rectangle((x, y), 1, 1, edgecolor='black', facecolor='black')
             ax1.add_patch(boundary_line)
 
         # Generate the path
