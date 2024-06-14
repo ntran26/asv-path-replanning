@@ -12,7 +12,7 @@ BLUE = (0, 0, 1)
 
 RADIUS = 100
 SQUARE_SIZE = 10
-SPEED = 2
+SPEED = 10
 OBSTACLE_RADIUS = SQUARE_SIZE/3
 
 # Define map dimensions
@@ -22,7 +22,7 @@ START = (0, 0)
 GOAL = (0, 200)
 TURN_RATE = 5
 INITIAL_HEADING = 90
-STEP = 100
+STEP = 200/SPEED
 
 class asv_visualization:
     # Initialize environment
@@ -34,6 +34,7 @@ class asv_visualization:
         self.turn_rate = TURN_RATE
         self.start_pos = START
         self.step = STEP
+        self.goal = GOAL
 
     # Generate grid function
     def generate_grid(self, radius, square_size, center):
@@ -68,7 +69,7 @@ class asv_visualization:
             self.step_count += 1
 
         # Define and obstacles
-        static_obstacles = [(-30, -40), (70, -60), (70, 70), (0, 150)]  
+        static_obstacles = [(-30, -40), (70, -60), (70, 70), (0, 150)]
 
         # Define boundary
         boundary = []
@@ -90,6 +91,9 @@ class asv_visualization:
         observation_horizon2 = plt.Circle(START, RADIUS, color='r', fill=False)
         ax1.add_patch(observation_horizon1)
         ax2.add_patch(observation_horizon2)
+
+        # Plot goal point
+        ax1.plot(0, 200, marker='o', color=YELLOW)
 
         # Plot the boundary
         for (x, y) in boundary:
@@ -154,18 +158,23 @@ class asv_visualization:
             # Draw new grid squares
             grid = self.generate_grid(RADIUS, SQUARE_SIZE, (agent_pos[0], agent_pos[1]))
             for (cx, cy) in grid:
-                # Check for obstacles and path in the second plot
+                # Check for obstacles, path and goal in the second plot
                 is_collision = any(np.sqrt((cx - ox) ** 2 + (cy - oy) ** 2) < (SQUARE_SIZE / 2 + OBSTACLE_RADIUS)
                                    for ox, oy in static_obstacles + boundary)
                 is_path = any(np.sqrt((cx - px) ** 2 + (cy - py) ** 2) < (SQUARE_SIZE / 2 + OBSTACLE_RADIUS)
                               for px, py in self.path)
+                is_goal = np.sqrt((cx - self.goal[0]) ** 2 + (cy - self.goal[1]) ** 2) < (SQUARE_SIZE / 2 + OBSTACLE_RADIUS)
                 # Change the color of the grid if there is an obstacle or path
-                if is_collision and is_path:
-                    color = 'red'
+                if is_collision and is_path:    # if obstacle and path overlap, set the grid as obstacle
+                    color = RED
+                elif is_goal and is_path:       # if goal point and path overlap, set the grid as goal
+                    color = YELLOW
+                elif is_goal:
+                    color = YELLOW
                 elif is_path:
-                    color = 'green'
+                    color = GREEN
                 elif is_collision:
-                    color = 'red'
+                    color = RED
                 else:
                     color = 'none'
                 rect = plt.Rectangle((cx - SQUARE_SIZE/2, cy - SQUARE_SIZE/2), SQUARE_SIZE, SQUARE_SIZE,
