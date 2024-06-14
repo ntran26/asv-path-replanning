@@ -37,14 +37,13 @@ class asv_visualization:
 
     # Generate grid function
     def generate_grid(self, radius, square_size, center):
-        half_size = square_size / 2
         x = np.arange(-radius, radius, square_size)
         y = np.arange(-radius, radius, square_size)
         grid = []
         for i in x:
             for j in y:
                 if np.sqrt(i**2 + j**2) <= radius:
-                    grid.append((center[0] + i + half_size, center[1] + j + half_size))
+                    grid.append((center[0] + i, center[1] + j))
         return grid
 
     # Main function to create and draw ASV trajectory
