@@ -43,14 +43,18 @@ class StaticObsEnv(gym.Env):
         # ASV parameters
         self.position = START
         self.heading = INITIAL_HEADING
-        self.speed = 1
+        self.turn_rate = TURN_RATE
+        self.speed = SPEED
 
         # Observation space and action space
         self.action_space = spaces.Discrete(3)
         self.observation_space = spaces.Box(low=0, high=self.width, shape=(4,), dtype=np.float32)
 
         # Draw the path
-    
+        self.path = []
+        for y in range(START[1], GOAL[1]+1):
+            self.path.append((START[0], y))
+
     # Reset function
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)

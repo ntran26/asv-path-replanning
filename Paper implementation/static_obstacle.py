@@ -69,22 +69,35 @@ class asv_visualization:
             self.step_count += 1
 
         # Define and obstacles
-        static_obstacles = [(-30, -40), (70, -60), (70, 70), (0, 150)]      
+        static_obstacles = [(-30, -40), (70, -60), (70, 70), (0, 150)]  
+
+        # Define boundary
+        boundary = []
+        for x in range(-100, 100 + 1):
+            boundary.append((x, -50))  # lower boundary
+            boundary.append((x, 250))  # upper boundary 
+        for y in range(-50, 250 + 1):
+            boundary.append((-100, y))  # left boundary
+            boundary.append((100, y))   # right boundary 
 
         # Initialize figure and axes
-        fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18, 6))
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
         ax1.set_aspect('equal')
         ax2.set_aspect('equal')
-        ax3.set_aspect('equal')
 
         self.agent_1, = ax1.plot([], [], marker='^', color=BLUE)
         self.agent_2, = ax2.plot([], [], marker='^', color=BLUE)
         observation_horizon1 = plt.Circle(START, RADIUS, color='r', fill=False)
         observation_horizon2 = plt.Circle(START, RADIUS, color='r', fill=False)
-        observation_horizon3 = plt.Circle(START, RADIUS, color='r', fill=False)
         ax1.add_patch(observation_horizon1)
         ax2.add_patch(observation_horizon2)
-        ax3.add_patch(observation_horizon3)
+
+        # Plot the boundary
+        OBSTACLE_SIZE = 3
+        for (x, y) in boundary:
+            boundary_line = plt.Rectangle((x - OBSTACLE_SIZE / 2, y - OBSTACLE_SIZE / 2), OBSTACLE_SIZE, OBSTACLE_SIZE,
+                                              edgecolor='black', facecolor='black')
+            ax1.add_patch(boundary_line)
 
         # Generate the path
         self.path = []
@@ -101,7 +114,6 @@ class asv_visualization:
 
         # Empty list to store the collision grid coordinates
         squares_ax2 = []
-        squares_ax3 = []
 
         # Initialize animation variables
         def init():
@@ -109,19 +121,13 @@ class asv_visualization:
             self.agent_2.set_data([], [])           # agent in the second plot
             observation_horizon1.center = START
             observation_horizon2.center = START
-            observation_horizon3.center = START
             grid = self.generate_grid(RADIUS, SQUARE_SIZE, START)
             for (cx, cy) in grid:
                 rect = plt.Rectangle((cx - SQUARE_SIZE/2, cy - SQUARE_SIZE/2), SQUARE_SIZE, SQUARE_SIZE,
                                      edgecolor='gray', facecolor='none')
                 ax1.add_patch(rect)
                 squares_ax2.append(rect)
-
-                rect_static = plt.Rectangle((cx - SQUARE_SIZE / 2, cy - SQUARE_SIZE / 2), SQUARE_SIZE, SQUARE_SIZE,
-                                            edgecolor='gray', facecolor='none')
-                ax3.add_patch(rect_static)
-                squares_ax3.append(rect_static)
-            return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, observation_horizon3, *squares_ax2, *squares_ax3
+            return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *squares_ax2
 
         # Reset locations of the grid squares
         def reset():
@@ -151,53 +157,33 @@ class asv_visualization:
             # Draw new grid squares
             grid = self.generate_grid(RADIUS, SQUARE_SIZE, (agent_pos[0], agent_pos[1]))
             for (cx, cy) in grid:
-                # Check for obstacles in the second plot
-                is_collision = any(np.sqrt((cx - ox)**2 + (cy - oy)**2) < (SQUARE_SIZE/2 + OBSTACLE_RADIUS)
-                                   for ox, oy in static_obstacles)
-                # Change the color of the grid if there is obstacle
-                color = 'red' if is_collision else 'none'
+                # Check for obstacles and path in the second plot
+                is_collision = any(np.sqrt((cx - ox) ** 2 + (cy - oy) ** 2) < (SQUARE_SIZE / 2 + OBSTACLE_RADIUS)
+                                   for ox, oy in static_obstacles + boundary)
+                is_path = any(np.sqrt((cx - px) ** 2 + (cy - py) ** 2) < (SQUARE_SIZE / 2 + OBSTACLE_RADIUS)
+                              for px, py in self.path)
+                # Change the color of the grid if there is an obstacle or path
+                if is_collision and is_path:
+                    color = 'red'
+                elif is_path:
+                    color = 'green'
+                elif is_collision:
+                    color = 'red'
+                else:
+                    color = 'none'
                 rect = plt.Rectangle((cx - SQUARE_SIZE/2, cy - SQUARE_SIZE/2), SQUARE_SIZE, SQUARE_SIZE,
                                      edgecolor='gray', facecolor=color)
                 # Update the collision grid on the second plot
                 ax2.add_patch(rect)
                 squares_ax2.append(rect)
-            
-            for (cx, cy) in grid:
-                is_path = any(np.sqrt((cx - ox)**2 + (cy - oy)**2) < (SQUARE_SIZE/2 + OBSTACLE_RADIUS)
-                              for ox, oy in self.path)
-                # Change the color of the grid if there is path
-                color = 'green' if is_path else 'none'
-                rect = plt.Rectangle((cx - SQUARE_SIZE/2, cy - SQUARE_SIZE/2), SQUARE_SIZE, SQUARE_SIZE,
-                                     edgecolor='gray', facecolor=color)
-                # Update the collision grid
-                ax2.add_patch(rect)
-                squares_ax2.append(rect)
 
-            # Update the grid squares in ax3 based on ax2
-            for rect_static in squares_ax3:
-                cx, cy = rect_static.get_xy()
-                cx += SQUARE_SIZE / 2
-                cy += SQUARE_SIZE / 2
-                is_collision = any(np.sqrt((cx - ox) ** 2 + (cy - oy) ** 2) < (SQUARE_SIZE / 2 + OBSTACLE_RADIUS)
-                                   for ox, oy in static_obstacles)
-                is_path = any(np.sqrt((cx - ox) ** 2 + (cy - oy) ** 2) < (SQUARE_SIZE / 2 + OBSTACLE_RADIUS)
-                              for ox, oy in self.path)
-                if is_collision:
-                    rect_static.set_facecolor('red')
-                elif is_path:
-                    rect_static.set_facecolor('green')
-                else:
-                    rect_static.set_facecolor('none')
-
-            return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *squares_ax2, *squares_ax3
+            return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *squares_ax2
 
         ani = FuncAnimation(fig, update, frames=len(self.left_path), init_func=init, blit=True, interval=200, repeat=False)
         ax1.set_xlim(-RADIUS - 50, RADIUS + 50)
         ax1.set_ylim(-RADIUS - 50, RADIUS + 200)
         ax2.set_xlim(-RADIUS - 50, RADIUS + 50)
         ax2.set_ylim(-RADIUS - 50, RADIUS + 200)
-        ax3.set_xlim(-RADIUS - 50, RADIUS + 50)
-        ax3.set_ylim(-RADIUS - 50, RADIUS + 50)
 
         # # Write to mp4 file
         # FFwriter = FFMpegWriter(fps=5)
