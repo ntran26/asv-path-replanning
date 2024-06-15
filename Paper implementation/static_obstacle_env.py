@@ -30,6 +30,12 @@ OBSTACLE_RADIUS = SQUARE_SIZE/3
 START = (0, 0)
 GOAL = (0, 300)
 
+# Define state
+FREE_STATE = 0
+COLLISION_STATE = 1
+PATH_STATE = 2
+GOAL_STATE = 3
+
 class StaticObsEnv(gym.Env):
     metadata = {"render_modes": ["human"], "render_fps": 10}
     def __init__(self, render_mode='human'):
@@ -43,27 +49,69 @@ class StaticObsEnv(gym.Env):
         self.square_size = SQUARE_SIZE
 
         # ASV parameters
-        self.position = START
+        self.start_pos = np.array(START)
+        self.goal = np.array(GOAL)
         self.heading = INITIAL_HEADING
         self.turn_rate = TURN_RATE
         self.speed = SPEED
+        self.step_count = 0
 
         # Observation space and action space
         self.action_space = spaces.Discrete(3)
         grid_shape = (2 * self.observation_radius // self.square_size,) * 2
         self.observation_space = spaces.Box(low=0, high=3, shape=grid_shape, dtype=np.int32)
 
-        # Draw the path
-        self.path = []
-        for y in range(START[1], GOAL[1]+1):
-            self.path.append((START[0], y))
+        self.reset()
+    
+    def generate_static_obstacles(self, num):
+        obstacles = []
+        for _ in range(num):
+            pos = np.random.randint(-100, 100, size=2)
+            obstacles.append(pos)
+        return obstacles
+
+    def generate_path(self):
+        path = []
+        for y in range(self.start_pos[1], self.goal_pos[1]):
+            path.append()
+        return path
+    
+    def get_observation(self):
+        grid_size = 2 * self.observation_radius // self.square_size
+        grid = np.zeros((grid_size, grid_size), dtype=np.int32)
+
+        # Populate the grid with static obstacles
+        for obstacle in self.static_obstacles:
+            if np.linalg.norm(obstacle - self.position) <= self.observation_radius:
+                obs_pos = ((obstacle - self.position + self.observation_radius) // self.square_size).astype(int)
+                grid[obs_pos[0], obs_pos[1]] = COLLISION_STATE
+        
+        # Populate the grid with path
+        path = self._generate_path()
+        for px, py in path:
+            if 0 <= px < grid_size and 0 <= py < grid_size:
+                if grid[px, py] == 0:   # Don't overwrite obstacles
+                    grid[px, py] = PATH_STATE
+
+        # Populate the grid with goal
+        if np.linalg.norm(self.goal - self.position) <= self.observation_radius:
+            goal_pos = ((self.goal - self.position + self.observation_radius) // self.square_size).astype(int)
+            grid[goal_pos[0], goal_pos[1]] = GOAL_STATE
+        
+        return grid
 
     # Reset function
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
 
-        # return observation, {}
-        return 
+        self.position = self.start_pos.copy()
+        self.heading = INITIAL_HEADING
+        self.speed = SPEED
+        self.step_count = 0
+
+        self.static_obstacles = self.generate_static_obstacles(num=4)
+
+        return self.get_observation(), {}
     
     # Check if the ASV is on path
     def is_on_path(self, position):

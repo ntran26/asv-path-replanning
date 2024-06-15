@@ -1,136 +1,210 @@
+import gym
+from gym import spaces
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle, Circle, Arrow
 from matplotlib.animation import FuncAnimation
 
-class ShipNavigationEnv:
-    def __init__(self, grid_size=350, horizon=120, square_size=15):
-        self.grid_size = grid_size
-        self.horizon = horizon
-        self.square_size = square_size
+# Constants
+RADIUS = 100
+SQUARE_SIZE = 10
+SPEED = 10
+OBSTACLE_RADIUS = SQUARE_SIZE / 3
+WIDTH = 50
+HEIGHT = 50
+START = (0, 0)
+GOAL = (0, 200)
+TURN_RATE = 5
+INITIAL_HEADING = 90
+STEP = 200 / SPEED
+
+# Define colors for visualization
+COLOR_FREE = 0
+COLOR_OBSTACLE = 1
+COLOR_PATH = 2
+COLOR_GOAL = 3
+
+class ASVEnv(gym.Env):
+    def __init__(self):
+        super(ASVEnv, self).__init__()
+        self.width = WIDTH
+        self.height = HEIGHT
+        self.heading = INITIAL_HEADING
+        self.speed = SPEED
+        self.turn_rate = TURN_RATE
+        self.start_pos = np.array(START)
+        self.goal = np.array(GOAL)
+        self.observation_radius = RADIUS
+        self.square_size = SQUARE_SIZE
+        self.max_steps = int(STEP)
+        self.step_count = 0
         
-        self.agent_pos = np.array([self.grid_size // 2, self.grid_size // 2])
-        self.agent_dir = 0  # Direction in degrees
-        self.agent_speed = 1  # Speed in m/s
-        self.goal = np.random.randint(20, self.grid_size - 20, size=2)
+        # Define action and observation space
+        self.action_space = spaces.Discrete(5)  # accelerate, decelerate, turn left, turn right, do nothing
+        grid_shape = (2 * self.observation_radius // self.square_size,) * 2
+        self.observation_space = spaces.Box(low=0, high=3, shape=grid_shape, dtype=np.int32)
         
-        self.static_obstacles = self._generate_obstacles(num=3)
-        self.moving_obstacles = self._generate_obstacles(num=3, moving=True)
+        # Initialize global map and obstacles
+        self._initialize_global_map()
+        self.reset()
+
+    def _initialize_global_map(self):
+        self.global_map = np.zeros((self.width, self.height), dtype=np.int32)
         
-    def _generate_obstacles(self, num, moving=False):
+        # Add path to the global map
+        for y in range(START[1], GOAL[1] + 1):
+            self.global_map[START[0], y] = COLOR_PATH
+
+        # Add goal to the global map
+        self.global_map[GOAL[0], GOAL[1]] = COLOR_GOAL
+
+    def _generate_static_obstacles(self, num):
         obstacles = []
         for _ in range(num):
-            pos = np.random.randint(20, self.grid_size - 20, size=2)
-            if moving:
-                direction = np.random.randint(0, 360)
-                speed = np.random.uniform(0.5, 2)
-                obstacles.append([pos, direction, speed])
-            else:
-                obstacles.append(pos)
+            pos = np.random.randint(-100, 100, size=2)
+            obstacles.append(pos)
         return obstacles
+
+    def _generate_dynamic_obstacles(self, num):
+        obstacles = []
+        for _ in range(num):
+            pos = np.random.randint(-100, 100, size=2)
+            direction = np.random.randint(0, 360)
+            speed = np.random.uniform(1, 3)
+            obstacles.append([pos, direction, speed])
+        return obstacles
+
+    def reset(self):
+        self.position = self.start_pos.copy()
+        self.heading = INITIAL_HEADING
+        self.speed = SPEED
+        self.step_count = 0
+        
+        # Generate new obstacle positions
+        self.static_obstacles = self._generate_static_obstacles(num=4)
+        self.dynamic_obstacles = self._generate_dynamic_obstacles(num=3)
+
+        # Add static obstacles to the global map
+        for obstacle in self.static_obstacles:
+            if 0 <= obstacle[0] < self.width and 0 <= obstacle[1] < self.height:
+                self.global_map[obstacle[0], obstacle[1]] = COLOR_OBSTACLE
+        
+        return self._get_observation()
 
     def step(self, action):
         if action == 0:  # Accelerate
-            self.agent_speed = min(self.agent_speed + 0.5, 5)
+            self.speed = min(self.speed + 0.5, 5)
         elif action == 1:  # Decelerate
-            self.agent_speed = max(self.agent_speed - 0.5, 1)
+            self.speed = max(self.speed - 0.5, 1)
         elif action == 2:  # Turn left
-            self.agent_dir = (self.agent_dir - 5) % 360
+            self.heading = (self.heading - 5) % 360
         elif action == 3:  # Turn right
-            self.agent_dir = (self.agent_dir + 5) % 360
+            self.heading = (self.heading + 5) % 360
         
-        self.agent_pos[0] += self.agent_speed * np.cos(np.deg2rad(self.agent_dir))
-        self.agent_pos[1] += self.agent_speed * np.sin(np.deg2rad(self.agent_dir))
+        self.position[0] += self.speed * np.cos(np.radians(self.heading))
+        self.position[1] += self.speed * np.sin(np.radians(self.heading))
         
-        self._move_obstacles()
+        self._move_dynamic_obstacles()
         
-        return self._check_collision()
+        done, reward = self._check_done()
+        self.step_count += 1
+        
+        obs = self._get_observation()
+        return obs, reward, done, {}
 
-    def _move_obstacles(self):
-        for obstacle in self.moving_obstacles:
+    def _move_dynamic_obstacles(self):
+        for obstacle in self.dynamic_obstacles:
             pos, direction, speed = obstacle
-            pos[0] += speed * np.cos(np.deg2rad(direction))
-            pos[1] += speed * np.sin(np.deg2rad(direction))
-            if pos[0] < 0 or pos[0] > self.grid_size or pos[1] < 0 or pos[1] > self.grid_size:
-                pos[:] = np.random.randint(20, self.grid_size - 20, size=2)
+            pos[0] += speed * np.cos(np.radians(direction))
+            pos[1] += speed * np.sin(np.radians(direction))
+            if pos[0] < -100 or pos[0] > 100 or pos[1] < -50 or pos[1] > 250:
+                pos[:] = np.random.randint(-100, 100, size=2)
                 direction = np.random.randint(0, 360)
 
-    def _check_collision(self):
-        if np.linalg.norm(self.goal - self.agent_pos) <= 13:
-            return True, "Goal"
+    def _check_done(self):
+        if np.linalg.norm(self.goal - self.position) <= 13:
+            return True, 100  # Goal reached
         for obstacle in self.static_obstacles:
-            if np.linalg.norm(obstacle - self.agent_pos) <= 15:
-                return True, "Static Obstacle"
-        for pos, _, _ in self.moving_obstacles:
-            if np.linalg.norm(pos - self.agent_pos) <= 15:
-                return True, "Moving Obstacle"
-        return False, None
-
-    def reset(self):
-        self.agent_pos = np.array([self.grid_size // 2, self.grid_size // 2])
-        self.agent_dir = 0
-        self.agent_speed = 1
-        self.goal = np.random.randint(20, self.grid_size - 20, size=2)
-        self.static_obstacles = self._generate_obstacles(num=3)
-        self.moving_obstacles = self._generate_obstacles(num=3, moving=True)
-        return self._get_observation()
+            if np.linalg.norm(obstacle - self.position) <= 15:
+                return True, -100  # Collision with static obstacle
+        for pos, _, _ in self.dynamic_obstacles:
+            if np.linalg.norm(pos - self.position) <= 15:
+                return True, -100  # Collision with dynamic obstacle
+        if self.step_count >= self.max_steps:
+            return True, -10  # Max steps reached
+        return False, -1  # Default penalty
 
     def _get_observation(self):
-        # Generate a collision grid based on the current state
-        grid = np.zeros((2 * self.horizon // self.square_size, 2 * self.horizon // self.square_size))
-        for obstacle in self.static_obstacles:
-            x, y = obstacle
-            if self._within_horizon(x, y):
-                grid[self._grid_index(x, y)] = 1
-        for pos, dir, speed in self.moving_obstacles:
-            x, y = pos
-            if self._within_horizon(x, y):
-                grid[self._grid_index(x, y)] = 1
-        return grid.flatten()
-
-    def _within_horizon(self, x, y):
-        return np.linalg.norm([x - self.agent_pos[0], y - self.agent_pos[1]]) <= self.horizon
-
-    def _grid_index(self, x, y):
-        gx = (x - self.agent_pos[0] + self.horizon) // self.square_size
-        gy = (y - self.agent_pos[1] + self.horizon) // self.square_size
-        return int(gx), int(gy)
-
-    def render(self, ax):
-        ax.clear()
-        ax.set_xlim(0, self.grid_size)
-        ax.set_ylim(0, self.grid_size)
+        grid_size = 2 * self.observation_radius // self.square_size
+        grid = np.zeros((grid_size, grid_size), dtype=np.int32)
         
-        for obstacle in self.static_obstacles:
-            ax.add_patch(Rectangle(obstacle - 5, 10, 10, color='blue'))
+        # Agent's position on the global map
+        agent_pos_on_global = self.position // self.square_size
+
+        for i in range(grid_size):
+            for j in range(grid_size):
+                global_i = int(agent_pos_on_global[0] - grid_size // 2 + i)
+                global_j = int(agent_pos_on_global[1] - grid_size // 2 + j)
+                if 0 <= global_i < self.width and 0 <= global_j < self.height:
+                    grid[i, j] = self.global_map[global_i, global_j]
         
-        for pos, _, _ in self.moving_obstacles:
-            ax.add_patch(Rectangle(pos - 5, 10, 10, color='red'))
-        
-        ax.scatter(self.goal[0], self.goal[1], color='green', s=100)
-        ax.scatter(self.agent_pos[0], self.agent_pos[1], color='black', s=100)
-        ax.arrow(self.agent_pos[0], self.agent_pos[1], 10 * np.cos(np.deg2rad(self.agent_dir)), 10 * np.sin(np.deg2rad(self.agent_dir)), head_width=5, head_length=10, fc='black', ec='black')
+        return grid
 
-# Initialize the environment
-env = ShipNavigationEnv()
-done = False
+    def render(self, mode='human'):
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 8))
+        ax1.set_aspect('equal')
+        ax2.set_aspect('equal')
 
-# Set up the plot
-fig, ax = plt.subplots(figsize=(8, 8))
+        # Plot global map
+        for i in range(self.width):
+            for j in range(self.height):
+                color = 'white'
+                if self.global_map[i, j] == COLOR_OBSTACLE:
+                    color = 'red'
+                elif self.global_map[i, j] == COLOR_PATH:
+                    color = 'green'
+                elif self.global_map[i, j] == COLOR_GOAL:
+                    color = 'yellow'
+                ax1.add_patch(plt.Rectangle((i, j), 1, 1, edgecolor='gray', facecolor=color, alpha=0.5))
 
-# Function to update the plot
-def update(frame):
-    global done
-    if not done:
-        action = np.random.choice([0, 1, 2, 3])  # Random action for demonstration
-        done, reason = env.step(action)
-        env.render(ax)
-        ax.set_title(f"Episode in progress")
-    else:
-        ax.set_title(f"Episode finished")
+        # Plot agent on the global map
+        ax1.add_patch(plt.Circle(self.position / self.square_size, OBSTACLE_RADIUS, color='blue'))
 
-# Create animation
-ani = FuncAnimation(fig, update, frames=range(200), repeat=False)
+        # Plot dynamic obstacles on the global map
+        for pos, _, _ in self.dynamic_obstacles:
+            ax1.add_patch(plt.Circle(pos / self.square_size, OBSTACLE_RADIUS, color='red'))
 
-# Display the animation
-plt.show()
+        # Plot observation grid
+        grid = self._get_observation()
+        grid_size = grid.shape[0]
+        for i in range(grid_size):
+            for j in range(grid_size):
+                color = 'white'
+                if grid[i, j] == COLOR_OBSTACLE:
+                    color = 'red'
+                elif grid[i, j] == COLOR_PATH:
+                    color = 'green'
+                elif grid[i, j] == COLOR_GOAL:
+                    color = 'yellow'
+                ax2.add_patch(plt.Rectangle((i * self.square_size - self.observation_radius,
+                                             j * self.square_size - self.observation_radius),
+                                            self.square_size, self.square_size, edgecolor='gray', facecolor=color, alpha=0.5))
+
+        plt.xlim(-self.observation_radius - 50, self.observation_radius + 50)
+        plt.ylim(-self.observation_radius - 50, self.observation_radius + 200)
+        plt.show()
+
+# Example usage
+env = ASVEnv()
+obs = env.reset()
+
+# Display initial observation
+env.render()
+
+# Test the environment with random actions
+for _ in range(100):
+    action = env.action_space.sample()
+    obs, reward, done, info = env.step(action)
+    env.render()
+    if done:
+        print(f"Episode finished with reward: {reward}")
+        obs = env.reset()
