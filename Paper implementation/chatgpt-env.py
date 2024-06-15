@@ -7,7 +7,7 @@ from matplotlib.animation import FuncAnimation
 # Constants
 RADIUS = 100
 SQUARE_SIZE = 10
-SPEED = 10
+SPEED = 2
 OBSTACLE_RADIUS = SQUARE_SIZE / 3
 WIDTH = 50
 HEIGHT = 50
@@ -15,7 +15,7 @@ START = (0, 0)
 GOAL = (0, 200)
 TURN_RATE = 5
 INITIAL_HEADING = 90
-STEP = 200 / SPEED
+STEP = 200
 
 # Define colors for visualization
 COLOR_FREE = 0

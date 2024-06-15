@@ -37,6 +37,10 @@ This directory focuses on recreating the methods for constructing environment an
         + Boundaries around the map are set to keep the ASV from straying off the map
         + The ASV's observation radius is 100m
         + The distance from start to goal point is 300m
+    - There will be a global map and a local map:
+        + Global map: Show every obstacles, path, goal point, ASV and observation radius
+        + Local map: Only show the ASV, observation radius and collision grid (this will be the
+          observation space)
     - Observation space: The observation radius as boundary, along with coordinates of the obstacles in collision grid
     - State space: Location of the ASV, speed and heading angle
     - Action space: 3 actions with the same speed of 1
