@@ -39,6 +39,8 @@ class StaticObsEnv(gym.Env):
         self.width = WIDTH
         self.height = HEIGHT
         self.boundary = [(0,0), (0,self.height), (self.width,self.height), (self.width,0), (0,0)]
+        self.observation_radius = RADIUS
+        self.square_size = SQUARE_SIZE
 
         # ASV parameters
         self.position = START
@@ -48,7 +50,8 @@ class StaticObsEnv(gym.Env):
 
         # Observation space and action space
         self.action_space = spaces.Discrete(3)
-        self.observation_space = spaces.Box(low=0, high=self.width, shape=(4,), dtype=np.float32)
+        grid_shape = (2 * self.observation_radius // self.square_size,) * 2
+        self.observation_space = spaces.Box(low=0, high=3, shape=grid_shape, dtype=np.int32)
 
         # Draw the path
         self.path = []

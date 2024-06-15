@@ -164,17 +164,13 @@ class asv_visualization:
                 is_path = any(np.sqrt((cx - px) ** 2 + (cy - py) ** 2) < (SQUARE_SIZE / 2 + OBSTACLE_RADIUS)
                               for px, py in self.path)
                 is_goal = np.sqrt((cx - self.goal[0]) ** 2 + (cy - self.goal[1]) ** 2) < (SQUARE_SIZE / 2 + OBSTACLE_RADIUS)
-                # Change the color of the grid if there is an obstacle or path
-                if is_collision and is_path:    # if obstacle and path overlap, set the grid as obstacle
+                # Change the color of the grid if there is an obstacle or path                
+                if is_collision:
                     color = RED
-                elif is_goal and is_path:       # if goal point and path overlap, set the grid as goal
-                    color = YELLOW
                 elif is_goal:
                     color = YELLOW
                 elif is_path:
                     color = GREEN
-                elif is_collision:
-                    color = RED
                 else:
                     color = 'none'
                 rect = plt.Rectangle((cx - SQUARE_SIZE/2, cy - SQUARE_SIZE/2), SQUARE_SIZE, SQUARE_SIZE,
