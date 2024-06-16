@@ -12,7 +12,7 @@ BLUE = (0, 0, 1)
 
 RADIUS = 100
 SQUARE_SIZE = 10
-SPEED = 10
+SPEED = 2
 OBSTACLE_RADIUS = SQUARE_SIZE/3
 
 # Define map dimensions
@@ -81,6 +81,7 @@ class asv_visualization:
             boundary.append((100, y))   # right boundary 
 
         # Initialize figure and axes
+        # ax1: global map   ax2: local map
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 8))
         ax1.set_aspect('equal')
         ax2.set_aspect('equal')
@@ -187,9 +188,9 @@ class asv_visualization:
         ax2.set_xlim(-RADIUS - 50, RADIUS + 50)
         ax2.set_ylim(-RADIUS - 50, RADIUS + 200)
 
-        # # Write to mp4 file
-        # FFwriter = FFMpegWriter(fps=5)
-        # ani.save("Environment construction/Paper implementation/animation.mp4", writer=FFwriter)
+        # Write to mp4 file
+        FFwriter = FFMpegWriter(fps=5)
+        ani.save("Paper implementation/static_obstacle.mp4", writer=FFwriter)
 
         # Show plot
         ax1.grid(True)
