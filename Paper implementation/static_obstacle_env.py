@@ -111,6 +111,11 @@ class StaticObsEnv(gym.Env):
 
         self.static_obstacles = self.generate_static_obstacles(num=4)
 
+        # Add static obstacles to the global map
+        for obstacle in self.static_obstacles:
+            if 0 <= obstacle[0] < self.width and 0 <= obstacle[1] < self.height:
+                self.global_map[obstacle[0], obstacle[1]] = COLLISION_STATE
+
         return self.get_observation(), {}
     
     # Check if the ASV is on path
