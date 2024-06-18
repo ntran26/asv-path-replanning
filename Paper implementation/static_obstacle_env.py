@@ -50,7 +50,7 @@ class StaticObsEnv(gym.Env):
 
         # ASV parameters
         self.start_pos = np.array(START)
-        self.goal = np.array(GOAL)
+        self.goal_pos = np.array(GOAL)
         self.heading = INITIAL_HEADING
         self.turn_rate = TURN_RATE
         self.speed = SPEED
@@ -63,18 +63,22 @@ class StaticObsEnv(gym.Env):
 
         self.reset()
     
+    def init_global_map(self):
+        self.global_map = np.zeros((self.width, self.height), dtype=np.int32)
+
+        # Create and add path to the global map
+        for y in range(self.start_pos[1], self.goal_pos[1]):
+            self.global_map[self.start_pos[0], y] = PATH_STATE
+        
+        # Add goal point to the global map
+        self.global_map[self.goal_pos[0], self.goal_pos[1]] = GOAL_STATE
+
     def generate_static_obstacles(self, num):
         obstacles = []
         for _ in range(num):
             pos = np.random.randint(-100, 100, size=2)
             obstacles.append(pos)
         return obstacles
-
-    def generate_path(self):
-        path = []
-        for y in range(self.start_pos[1], self.goal_pos[1]):
-            path.append()
-        return path
     
     def get_observation(self):
         grid_size = 2 * self.observation_radius // self.square_size
