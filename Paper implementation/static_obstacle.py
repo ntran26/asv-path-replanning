@@ -16,8 +16,8 @@ SPEED = 2
 OBSTACLE_RADIUS = SQUARE_SIZE/3
 
 # Define map dimensions
-WIDTH = 50
-HEIGHT = 50
+WIDTH = 200
+HEIGHT = 300
 START = (0, 0)
 GOAL = (0, 200)
 TURN_RATE = 5

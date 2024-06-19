@@ -7,15 +7,15 @@ from matplotlib.animation import FuncAnimation
 # Constants
 RADIUS = 100
 SQUARE_SIZE = 10
-SPEED = 2
+SPEED = 10
 OBSTACLE_RADIUS = SQUARE_SIZE / 3
-WIDTH = 50
-HEIGHT = 50
+WIDTH = 200
+HEIGHT = 300 
 START = (0, 0)
 GOAL = (0, 200)
 TURN_RATE = 5
 INITIAL_HEADING = 90
-STEP = 200
+STEP = 200 / SPEED
 
 # Define colors for visualization
 COLOR_FREE = 0
@@ -52,7 +52,8 @@ class ASVEnv(gym.Env):
         
         # Add path to the global map
         for y in range(START[1], GOAL[1] + 1):
-            self.global_map[START[0], y] = COLOR_PATH
+            if 0 <= y < self.height:
+                self.global_map[START[0], y] = COLOR_PATH
 
         # Add goal to the global map
         self.global_map[GOAL[0], GOAL[1]] = COLOR_GOAL
@@ -60,14 +61,14 @@ class ASVEnv(gym.Env):
     def _generate_static_obstacles(self, num):
         obstacles = []
         for _ in range(num):
-            pos = np.random.randint(-100, 100, size=2)
+            pos = np.random.randint(0, [self.width, self.height])
             obstacles.append(pos)
         return obstacles
 
     def _generate_dynamic_obstacles(self, num):
         obstacles = []
         for _ in range(num):
-            pos = np.random.randint(-100, 100, size=2)
+            pos = np.random.randint(0, [self.width, self.height])
             direction = np.random.randint(0, 360)
             speed = np.random.uniform(1, 3)
             obstacles.append([pos, direction, speed])
@@ -84,9 +85,13 @@ class ASVEnv(gym.Env):
         self.dynamic_obstacles = self._generate_dynamic_obstacles(num=3)
 
         # Add static obstacles to the global map
+        self.global_map.fill(COLOR_FREE)
         for obstacle in self.static_obstacles:
             if 0 <= obstacle[0] < self.width and 0 <= obstacle[1] < self.height:
                 self.global_map[obstacle[0], obstacle[1]] = COLOR_OBSTACLE
+        
+        # Add path and goal back to the global map
+        self._initialize_global_map()
         
         return self._get_observation()
 
@@ -116,8 +121,8 @@ class ASVEnv(gym.Env):
             pos, direction, speed = obstacle
             pos[0] += speed * np.cos(np.radians(direction))
             pos[1] += speed * np.sin(np.radians(direction))
-            if pos[0] < -100 or pos[0] > 100 or pos[1] < -50 or pos[1] > 250:
-                pos[:] = np.random.randint(-100, 100, size=2)
+            if pos[0] < 0 or pos[0] >= self.width or pos[1] < 0 or pos[1] >= self.height:
+                pos[:] = np.random.randint(0, [self.width, self.height])
                 direction = np.random.randint(0, 360)
 
     def _check_done(self):
@@ -150,9 +155,14 @@ class ASVEnv(gym.Env):
         return grid
 
     def render(self, mode='human'):
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 8))
-        ax1.set_aspect('equal')
-        ax2.set_aspect('equal')
+        if not hasattr(self, 'fig'):
+            self.fig, self.axs = plt.subplots(1, 2, figsize=(12, 8))
+            self.ax1, self.ax2 = self.axs
+            self.ax1.set_aspect('equal')
+            self.ax2.set_aspect('equal')
+
+        self.ax1.clear()
+        self.ax2.clear()
 
         # Plot global map
         for i in range(self.width):
@@ -164,14 +174,14 @@ class ASVEnv(gym.Env):
                     color = 'green'
                 elif self.global_map[i, j] == COLOR_GOAL:
                     color = 'yellow'
-                ax1.add_patch(plt.Rectangle((i, j), 1, 1, edgecolor='gray', facecolor=color, alpha=0.5))
+                self.ax1.add_patch(plt.Rectangle((i, j), 1, 1, edgecolor='gray', facecolor=color, alpha=0.5))
 
         # Plot agent on the global map
-        ax1.add_patch(plt.Circle(self.position / self.square_size, OBSTACLE_RADIUS, color='blue'))
+        self.ax1.add_patch(plt.Circle(self.position / self.square_size, OBSTACLE_RADIUS, color='blue'))
 
         # Plot dynamic obstacles on the global map
         for pos, _, _ in self.dynamic_obstacles:
-            ax1.add_patch(plt.Circle(pos / self.square_size, OBSTACLE_RADIUS, color='red'))
+            self.ax1.add_patch(plt.Circle(pos / self.square_size, OBSTACLE_RADIUS, color='red'))
 
         # Plot observation grid
         grid = self._get_observation()
@@ -185,13 +195,17 @@ class ASVEnv(gym.Env):
                     color = 'green'
                 elif grid[i, j] == COLOR_GOAL:
                     color = 'yellow'
-                ax2.add_patch(plt.Rectangle((i * self.square_size - self.observation_radius,
-                                             j * self.square_size - self.observation_radius),
-                                            self.square_size, self.square_size, edgecolor='gray', facecolor=color, alpha=0.5))
+                self.ax2.add_patch(plt.Rectangle((i * self.square_size - self.observation_radius,
+                                                  j * self.square_size - self.observation_radius),
+                                                 self.square_size, self.square_size, edgecolor='gray', facecolor=color, alpha=0.5))
 
-        plt.xlim(-self.observation_radius - 50, self.observation_radius + 50)
-        plt.ylim(-self.observation_radius - 50, self.observation_radius + 200)
-        plt.show()
+        self.ax1.set_xlim(-0.5, self.width - 0.5)
+        self.ax1.set_ylim(-0.5, self.height - 0.5)
+        self.ax2.set_xlim(-self.observation_radius // self.square_size, self.observation_radius // self.square_size)
+        self.ax2.set_ylim(-self.observation_radius // self.square_size, self.observation_radius // self.square_size)
+
+        plt.draw()
+        plt.pause(0.001)
 
 # Example usage
 env = ASVEnv()
@@ -200,11 +214,14 @@ obs = env.reset()
 # Display initial observation
 env.render()
 
-# Test the environment with random actions
-for _ in range(100):
-    action = env.action_space.sample()
+# Create the animation function
+def animate(i):
+    action = env.action_space.sample()  # Sample a random action
     obs, reward, done, info = env.step(action)
     env.render()
     if done:
-        print(f"Episode finished with reward: {reward}")
-        obs = env.reset()
+        env.reset()
+
+# Create and start the animation
+ani = FuncAnimation(plt.gcf(), animate, frames=200, interval=200, repeat=False)
+plt.show()
