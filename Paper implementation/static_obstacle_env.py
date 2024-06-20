@@ -140,6 +140,15 @@ class StaticObsEnv(gym.Env):
     
     # Step function
     def step(self, action):
+        if action == 0:     # Turn left
+            self.heading += 5
+        if action == 1:     # Turn right
+            self.heading -= 5
+        if action == 2:     # Go straight
+            self.heading = self.heading
+        # Update ASV position
+        self.position[0] += self.speed * np.cos(np.radians(self.heading))
+        self.position[1] += self.speed * np.sin(np.radians(self.heading))
         return
     
     # Render function
