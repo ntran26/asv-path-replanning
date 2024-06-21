@@ -73,6 +73,15 @@ class StaticObsEnv(gym.Env):
         # Add goal point to the global map
         self.global_map[self.goal_pos[0], self.goal_pos[1]] = GOAL_STATE
 
+        # Add boundary to the global map
+        self.boundary = []
+        for x in range(-100, 100 + 1):
+            self.boundary.append((x, -50))  # lower boundary
+            self.boundary.append((x, 250))  # upper boundary 
+        for y in range(-50, 250 + 1):
+            self.boundary.append((-100, y))  # left boundary
+            self.boundary.append((100, y))   # right boundary
+
     def generate_static_obstacles(self, num):
         obstacles = []
         for _ in range(num):
