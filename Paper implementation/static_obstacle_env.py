@@ -73,7 +73,7 @@ class StaticObsEnv(gym.Env):
         # Add goal point to the global map
         self.global_map[self.goal_pos[0], self.goal_pos[1]] = GOAL_STATE
 
-        # Create boundary and add to the global map
+        # Create boundary
         self.boundary = []
         for x in range(-100, 100 + 1):
             self.boundary.append((x, -50))  # lower boundary
