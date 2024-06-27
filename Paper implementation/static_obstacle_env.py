@@ -32,9 +32,9 @@ GOAL = (0, 300)
 
 # Define state
 FREE_STATE = 0
-COLLISION_STATE = 1
-PATH_STATE = 2
-GOAL_STATE = 3
+PATH_STATE = 1
+GOAL_STATE = 2
+COLLISION_STATE = 3
 
 class StaticObsEnv(gym.Env):
     metadata = {"render_modes": ["human"], "render_fps": 10}
