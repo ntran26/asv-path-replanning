@@ -188,9 +188,9 @@ class asv_visualization:
         ax2.set_xlim(-RADIUS - 50, RADIUS + 50)
         ax2.set_ylim(-RADIUS - 50, RADIUS + 200)
 
-        # Write to mp4 file
-        FFwriter = FFMpegWriter(fps=5)
-        ani.save("Paper implementation/static_obstacle.mp4", writer=FFwriter)
+        # # Write to mp4 file
+        # FFwriter = FFMpegWriter(fps=5)
+        # ani.save("Paper implementation/static_obstacle.mp4", writer=FFwriter)
 
         # Show plot
         ax1.grid(True)
