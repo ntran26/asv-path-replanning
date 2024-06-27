@@ -9,8 +9,8 @@ RADIUS = 100
 SQUARE_SIZE = 10
 SPEED = 10
 OBSTACLE_RADIUS = SQUARE_SIZE / 3
-WIDTH = 200
-HEIGHT = 300 
+WIDTH = 50
+HEIGHT = 250  # Adjusted height to accommodate the goal
 START = (0, 0)
 GOAL = (0, 200)
 TURN_RATE = 5
@@ -19,9 +19,9 @@ STEP = 200 / SPEED
 
 # Define colors for visualization
 COLOR_FREE = 0
-COLOR_OBSTACLE = 1
-COLOR_PATH = 2
-COLOR_GOAL = 3
+COLOR_PATH = 1
+COLOR_GOAL = 2
+COLOR_OBSTACLE = 3
 
 class ASVEnv(gym.Env):
     def __init__(self):
@@ -37,6 +37,7 @@ class ASVEnv(gym.Env):
         self.square_size = SQUARE_SIZE
         self.max_steps = int(STEP)
         self.step_count = 0
+        self.taken_steps = []  # To store the agent's taken steps
         
         # Define action and observation space
         self.action_space = spaces.Discrete(5)  # accelerate, decelerate, turn left, turn right, do nothing
@@ -79,6 +80,7 @@ class ASVEnv(gym.Env):
         self.heading = INITIAL_HEADING
         self.speed = SPEED
         self.step_count = 0
+        self.taken_steps = [self.start_pos.tolist()]
         
         # Generate new obstacle positions
         self.static_obstacles = self._generate_static_obstacles(num=4)
@@ -110,6 +112,8 @@ class ASVEnv(gym.Env):
         
         self._move_dynamic_obstacles()
         
+        self.taken_steps.append(self.position.tolist())
+        
         done, reward = self._check_done()
         self.step_count += 1
         
@@ -127,7 +131,7 @@ class ASVEnv(gym.Env):
 
     def _check_done(self):
         if np.linalg.norm(self.goal - self.position) <= 13:
-            return True, 100  # Goal reached
+            return True, 50  # Goal reached
         for obstacle in self.static_obstacles:
             if np.linalg.norm(obstacle - self.position) <= 15:
                 return True, -100  # Collision with static obstacle
@@ -136,7 +140,7 @@ class ASVEnv(gym.Env):
                 return True, -100  # Collision with dynamic obstacle
         if self.step_count >= self.max_steps:
             return True, -10  # Max steps reached
-        return False, -1  # Default penalty
+        return False, -10  # Default penalty for each step
 
     def _get_observation(self):
         grid_size = 2 * self.observation_radius // self.square_size
@@ -176,7 +180,11 @@ class ASVEnv(gym.Env):
                     color = 'yellow'
                 self.ax1.add_patch(plt.Rectangle((i, j), 1, 1, edgecolor='gray', facecolor=color, alpha=0.5))
 
-        # Plot agent on the global map
+        # Plot agent's taken steps on the global map
+        for step in self.taken_steps:
+            self.ax1.add_patch(plt.Circle(np.array(step) / self.square_size, OBSTACLE_RADIUS, color='blue', alpha=0.3))
+
+        # Plot current position of the agent on the global map
         self.ax1.add_patch(plt.Circle(self.position / self.square_size, OBSTACLE_RADIUS, color='blue'))
 
         # Plot dynamic obstacles on the global map
