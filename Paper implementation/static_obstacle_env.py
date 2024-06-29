@@ -144,7 +144,7 @@ class StaticObsEnv(gym.Env):
         return
     
     # Calculate reward of the step
-    def calculat_reward(self, position):
+    def calculate_reward(self, position):
         return
     
     # Step function
@@ -161,7 +161,8 @@ class StaticObsEnv(gym.Env):
         return
     
     # Render function
-    def render(self):
+    def render(self, mode='human'):
+
         return
     
 
