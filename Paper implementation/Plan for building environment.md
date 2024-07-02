@@ -27,3 +27,7 @@ TO BE DISPLAYED:
 - GLOBAL MAP plotted on the right
 - LOCAL MAP plotted on the left
 - Preferably, both maps should be running at the same time for real-time observation
+
+Reset condition:
+- When the agent hit an obstacle or boundary
+- When the agent reach the goal
