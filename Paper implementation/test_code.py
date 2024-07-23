@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.animation as animation
 
-
 class PathFollowingEnv(gym.Env):
     def __init__(self):
         self.map_width = 20
@@ -74,7 +73,6 @@ def update(frame):
     action = env.action_space.sample()  # Take a random action
     observation, reward, done, _ = env.step(action)
     return env.agent_marker,
-
 
 ani = animation.FuncAnimation(env.fig, update, frames=50, blit=True)
 
