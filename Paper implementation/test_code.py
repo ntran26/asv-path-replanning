@@ -84,12 +84,15 @@ class asv_visualization:
         fig, ax = plt.subplots(1, figsize=(6,8))
         ax.set_aspect('equal')
 
+        # Plot agent and observation radius
         self.agent, = ax.plot([], [], marker='^', color=BLUE)
         observation_horizon = plt.Circle(START, RADIUS, color='r', fill=False)
         ax.add_patch(observation_horizon)
 
+        # Plot goal point
         ax.plot(0,200, marker='o', color=YELLOW)
 
+        # Plot boundary
         for (x,y) in boundary:
             boundary_line = plt.Rectangle((x, y), 1, 1, edgecolor='black', facecolor='black')
             ax.add_patch(boundary_line)
