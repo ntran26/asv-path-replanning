@@ -165,9 +165,21 @@ class asv_visualization:
                     color = 'none'
                 rect = plt.Rectangle((cx - SQUARE_SIZE/2, cy - SQUARE_SIZE/2), SQUARE_SIZE, SQUARE_SIZE,
                                      edgecolor='gray', facecolor=color)
-                # Update the collision grid on the second plot
+                
+                # Update the collision grid
                 ax.add_patch(rect)
                 squares_ax.append(rect)
+
+                # Update the state of the ASV
+                if (agent_pos[0] - SQUARE_SIZE/2 <= cx <= agent_pos[0] + SQUARE_SIZE/2) and (agent_pos[1] - SQUARE_SIZE/2 <= cy <= agent_pos[1] + SQUARE_SIZE/2):
+                    if color == RED:
+                        print("Collide")
+                    elif color == YELLOW:
+                        print("Goal")
+                    elif color == GREEN:
+                        print("On Path")
+                    elif color == WHITE:
+                        print("Free Space")
 
             return self.agent, observation_horizon, *squares_ax
 
