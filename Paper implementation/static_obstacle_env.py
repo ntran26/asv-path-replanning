@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.animation import FuncAnimation
 
+#                               ---------- CONFIGURATION ----------
+
 # Define colors
 BLACK = (0, 0, 0)
 WHITE = (1, 1, 1)
@@ -35,15 +37,25 @@ TURN_RATE = 5
 INITIAL_HEADING = 90
 STEP = 200 / SPEED
 
+# Map boundaries
+X_LOW = -100
+X_HIGH = 100
+Y_LOW = -50
+Y_HIGH = 250
+
 # Define states of the grid cell
 FREE_STATE = 0
 PATH_STATE = 1
 GOAL_STATE = 2
 COLLISION_STATE = 3
 
+#                               ---------- MAIN LOOP ----------
+
 class ASVEnv(gym.Env):
     def __init__(self):
         super(ASVEnv, self).__init__()
+
+        # Initialize parameters
         self.width = WIDTH
         self.height = HEIGHT
         self.heading = INITIAL_HEADING
@@ -67,57 +79,67 @@ class ASVEnv(gym.Env):
         self.reset()
     
     def init_global_map(self):
+        # Initialize the dimension of the map
         self.global_map = np.zeros((self.width, self.height), dtype=np.int32)
+
+        # Fill the map with free space
+        self.global_map.fill(FREE_STATE)
+
+        # Create boundary
+        self.boundary = []
+        for x in range(X_LOW, X_HIGH + 1):
+            self.boundary.append((x, Y_LOW))  # lower boundary
+            self.boundary.append((x, Y_HIGH))  # upper boundary 
+        for y in range(Y_LOW, Y_HIGH + 1):
+            self.boundary.append((X_LOW, y))  # left boundary
+            self.boundary.append((X_HIGH, y))   # right boundary
+
+        # Define boundary as COLLISION_STATE
+        for bound in self.boundary:
+            self.global_map[bound[0], bound[1]] = COLLISION_STATE
+
+        # Generate new obstacle positions
+        self.static_obstacles = self.generate_static_obstacles(num=4)
+
+        # Define obstacles as COLLISION_STATE
+        for obstacle in self.static_obstacles:
+            if 0 <= obstacle[0] < self.width and 0 <= obstacle[1] < self.height:
+                self.global_map[obstacle[0], obstacle[1]] = COLLISION_STATE
         
-        # Add path to the global map
+        # Create a path to follow on the map. If there is an obstacle overlap on the path, define as obstacle
         for y in range(START[1], GOAL[1] + 1):
-            if 0 <= y < self.height:
+            if 0 <= y < self.height and self.global_map[START[0], y] != COLLISION_STATE:
                 self.global_map[START[0], y] = PATH_STATE
 
         # Add goal to the global map
         self.global_map[GOAL[0], GOAL[1]] = GOAL_STATE
 
-        # # Create boundary
-        # self.boundary = []
-        # for x in range(-100, 100 + 1):
-        #     self.boundary.append((x, -50))  # lower boundary
-        #     self.boundary.append((x, 250))  # upper boundary 
-        # for y in range(-50, 250 + 1):
-        #     self.boundary.append((-100, y))  # left boundary
-        #     self.boundary.append((100, y))   # right boundary
-
+    # Function to generate obstacles randomly **within the boundary**
     def generate_static_obstacles(self, num):
-        obstacles = []
+        obstacles = [(0, 50), (0, 100)]         # Set 2 obstacles on the path
         for _ in range(num):
-            pos = np.random.randint(0, [self.width, self.height])
+            pos = np.random.randint(0, [self.width, self.height])   # ***to be adjusted***
             obstacles.append(pos)
         return obstacles
 
     # Reset function
     def reset(self):
+        # Re-initialize the map and states
+        self.init_global_map()
+
+        # Re-initialize variables
         self.position = self.start_pos.copy()
         self.heading = INITIAL_HEADING
         self.speed = SPEED
         self.step_count = 0
         self.taken_steps = [self.start_pos.tolist()]
         
-        # Generate new obstacle positions
-        self.static_obstacles = self.generate_static_obstacles(num=4)
-
-        # Add static obstacles to the global map
-        self.global_map.fill(FREE_STATE)
-        for obstacle in self.static_obstacles:
-            if 0 <= obstacle[0] < self.width and 0 <= obstacle[1] < self.height:
-                self.global_map[obstacle[0], obstacle[1]] = COLLISION_STATE
-        
-        # Add path and goal back to the global map
-        self.init_global_map()
-        
         return self.get_observation()
     
     # Check if the ASV is on path
     def is_on_path(self, position):
-        return
+        x, y = position // self.square_size
+        return self.global_map[int(x), int(y)] == PATH_STATE
     
     # Check if the ASV is on the map
     def is_valid_pos(self, position):

@@ -24,6 +24,12 @@ TURN_RATE = 5
 INITIAL_HEADING = 90
 STEP = 200/SPEED
 
+# Map boundaries
+X_LOW = -100
+X_HIGH = 100
+Y_LOW = -50
+Y_HIGH = 250
+
 # Define states of the grid cell
 FREE_STATE = 0
 PATH_STATE = 1
@@ -75,16 +81,16 @@ class asv_visualization:
             self.step_count += 1
 
         # Define and obstacles
-        static_obstacles = [(-30, -40), (70, -60), (70, 70), (0, 150)]
+        static_obstacles = [(-30, -40), (70, -60), (70, 70), (0, 150), (0, 30), (0, 70)]
 
         # Define boundary
         boundary = []
-        for x in range(-100, 100 + 1):
-            boundary.append((x, -50))  # lower boundary
-            boundary.append((x, 250))  # upper boundary 
-        for y in range(-50, 250 + 1):
-            boundary.append((-100, y))  # left boundary
-            boundary.append((100, y))   # right boundary 
+        for x in range(X_LOW, X_HIGH + 1):
+            self.boundary.append((x, Y_LOW))  # lower boundary
+            self.boundary.append((x, Y_HIGH))  # upper boundary 
+        for y in range(Y_LOW, Y_HIGH + 1):
+            self.boundary.append((X_LOW, y))  # left boundary
+            self.boundary.append((X_HIGH, y))   # right boundary
 
         # Initialize figure and axes
         fig, ax = plt.subplots(1, figsize=(6,8))
