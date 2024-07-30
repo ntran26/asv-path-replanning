@@ -86,11 +86,11 @@ class asv_visualization:
         # Define boundary
         boundary = []
         for x in range(X_LOW, X_HIGH + 1):
-            self.boundary.append((x, Y_LOW))  # lower boundary
-            self.boundary.append((x, Y_HIGH))  # upper boundary 
+            boundary.append((x, Y_LOW))  # lower boundary
+            boundary.append((x, Y_HIGH))  # upper boundary 
         for y in range(Y_LOW, Y_HIGH + 1):
-            self.boundary.append((X_LOW, y))  # left boundary
-            self.boundary.append((X_HIGH, y))   # right boundary
+            boundary.append((X_LOW, y))  # left boundary
+            boundary.append((X_HIGH, y))   # right boundary
 
         # Initialize figure and axes
         fig, ax = plt.subplots(1, figsize=(6,8))

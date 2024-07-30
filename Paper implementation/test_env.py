@@ -36,6 +36,12 @@ TURN_RATE = 5
 INITIAL_HEADING = 90
 STEP = 200 / SPEED
 
+# Map boundaries
+X_LOW = -100
+X_HIGH = 100
+Y_LOW = -50
+Y_HIGH = 250
+
 # Define states of the grid cell
 FREE_STATE = 0
 PATH_STATE = 1

@@ -31,17 +31,17 @@ OBSTACLE_RADIUS = SQUARE_SIZE / 3
 # Map dimensions
 WIDTH = 200
 HEIGHT = 300
-START = (0, 0)
-GOAL = (0, 200)
+START = (100, 30)
+GOAL = (100, 200)
 TURN_RATE = 5
 INITIAL_HEADING = 90
 STEP = 200 / SPEED
 
 # Map boundaries
-X_LOW = -100
-X_HIGH = 100
-Y_LOW = -50
-Y_HIGH = 250
+X_LOW = 0
+X_HIGH = 200
+Y_LOW = 0
+Y_HIGH = 300
 
 # Define states of the grid cell
 FREE_STATE = 0
@@ -116,7 +116,7 @@ class ASVEnv(gym.Env):
 
     # Function to generate obstacles randomly **within the boundary**
     def generate_static_obstacles(self, num):
-        obstacles = [(0, 50), (0, 100)]         # Set 2 obstacles on the path
+        obstacles = [(100, 70), (100, 100)]         # Set 2 obstacles on the path
         for _ in range(num):
             pos = np.random.randint(0, [self.width, self.height])   # ***to be adjusted***
             obstacles.append(pos)
@@ -141,13 +141,20 @@ class ASVEnv(gym.Env):
         x, y = position // self.square_size
         return self.global_map[int(x), int(y)] == PATH_STATE
     
-    # Check if the ASV is on the map
-    def is_valid_pos(self, position):
-        return
+    # Check if the ASV is on the free space
+    def is_free_pos(self, position):
+        x, y = position // self.square_size
+        return self.global_map[int(x), int(y)] == FREE_STATE
     
     # Check if the ASV reached the goal
     def is_goal(self, position):
-        return
+        x, y = position // self.square_size
+        return self.global_map[int(x), int(y)] == GOAL_STATE
+    
+    # Check if there is collision
+    def is_collision(self, position):
+        x, y = position // self.square_size
+        return self.global_map[int(x), int(y)] == COLLISION_STATE
     
     # Step function
     def step(self, action):
@@ -162,25 +169,35 @@ class ASVEnv(gym.Env):
         self.position[0] += self.speed * np.cos(np.radians(self.heading))
         self.position[1] += self.speed * np.sin(np.radians(self.heading))
         
+        # Record ASV path and number of steps taken
         self.taken_steps.append(self.position.tolist())
-        
         self.step_count += 1
-        done, reward = self._check_done()
+
+        # Check if the session is terminate and calculate reward
+        done, reward = self.check_done()
         
-        obs = self._get_observation()
+        obs = self.get_observation()
         return obs, reward, done, {}
     
+    # Terminate condition and reward calculation
     def check_done(self):
-        if np.linalg.norm(self.goal - self.position) <= 13:
-            return True, 0  # Goal reached
-        for obstacle in self.static_obstacles:
-            if np.linalg.norm(obstacle - self.position) <= 15:
-                return True, 0  # Collision with static obstacle
-        if self.step_count >= self.max_steps:
-            return True, 0  # Max steps reached
-        return False, 0  # Default
+        if self.is_free_pos(self.position):
+            return False, -2        # On free space
+        if self.is_on_path(self.position):
+            return False, 0         # On path
+        if self.is_collision(self.position):
+            return True, -100       # Collide with obstacles or boundary
+        if self.is_goal(self.position):
+            return True, 50         # Goal reached
+        
+        # if self.step_count >= self.max_steps:
+        #     return True, -10  # Max steps reached
 
+        return False, -1    # Default penalty for each step
+    
+    # Update the observation space
     def get_observation(self):
+        # Define number of grids and grid size
         grid_size = 2 * self.observation_radius // self.square_size
         grid = np.zeros((grid_size, grid_size), dtype=np.int32)
         
@@ -226,8 +243,8 @@ class ASVEnv(gym.Env):
         obs_circle = plt.Circle(self.position / self.square_size, self.observation_radius / self.square_size, color='blue', fill=False)
         self.ax.add_patch(obs_circle)
 
-        self.ax.set_xlim(-0.5, self.width - 0.5)
-        self.ax.set_ylim(-0.5, self.height - 0.5)
+        self.ax.set_xlim(-RADIUS - 50, RADIUS + 50)
+        self.ax.set_ylim(-RADIUS - 50, RADIUS + 200)
 
         plt.draw()
         plt.pause(0.001)
