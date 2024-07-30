@@ -24,6 +24,12 @@ TURN_RATE = 5
 INITIAL_HEADING = 90
 STEP = 200/SPEED
 
+# Define states of the grid cell
+FREE_STATE = 0
+PATH_STATE = 1
+GOAL_STATE = 2
+COLLISION_STATE = 3
+
 class asv_visualization:
     # Initialize environment
     def __init__(self, width, height):
@@ -170,15 +176,24 @@ class asv_visualization:
                 ax.add_patch(rect)
                 squares_ax.append(rect)
 
-                # Update the state of the ASV
+                # Update the state of the ASV based on color of the cell
                 if (agent_pos[0] - SQUARE_SIZE/2 <= cx <= agent_pos[0] + SQUARE_SIZE/2) and (agent_pos[1] - SQUARE_SIZE/2 <= cy <= agent_pos[1] + SQUARE_SIZE/2):
                     if color == RED:
-                        print("Collide")
+                        STATE = COLLISION_STATE
                     elif color == YELLOW:
-                        print("Goal")
+                        STATE = GOAL_STATE
                     elif color == GREEN:
-                        print("On Path")
+                        STATE = PATH_STATE
                     elif color == WHITE:
+                        STATE = FREE_STATE
+                    
+                    if STATE == COLLISION_STATE:
+                        print("Collide")
+                    elif STATE == GOAL_STATE:
+                        print("Reached Goal")
+                    elif STATE == PATH_STATE:
+                        print("On Path")
+                    elif STATE == FREE_STATE:
                         print("Free Space")
 
             return self.agent, observation_horizon, *squares_ax
