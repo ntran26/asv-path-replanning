@@ -18,8 +18,8 @@ OBSTACLE_RADIUS = SQUARE_SIZE/3
 # Define map dimensions
 WIDTH = 200
 HEIGHT = 300
-START = (0, 0)
-GOAL = (0, 200)
+START = (50, 50)
+GOAL = (50, 200)
 TURN_RATE = 5
 INITIAL_HEADING = 90
 STEP = 200/SPEED
@@ -35,6 +35,7 @@ class asv_visualization:
         self.start_pos = START
         self.step = STEP
         self.goal = GOAL
+        self.grid_dict = {}
 
     # Generate grid function
     def generate_grid(self, radius, square_size, center):
@@ -46,6 +47,14 @@ class asv_visualization:
                 if np.sqrt(i**2 + j**2) <= radius:
                     grid.append((center[0] + i, center[1] + j))
         return grid
+    
+    # Generate static obstacles
+    def generate_static_obstacles(self, num):
+        obstacles = [np.array([50, 70]), np.array([50, 100])]         # Set 2 obstacles on the path
+        for _ in range(num):
+            pos = np.random.randint(0, [100, 250])
+            obstacles.append(pos)
+        return obstacles
 
     # Main function to create and draw ASV trajectory
     def draw_path(self):
@@ -69,15 +78,15 @@ class asv_visualization:
             self.step_count += 1
 
         # Define and obstacles
-        static_obstacles = [(-30, -40), (70, -60), (70, 70), (0, 150)]
+        static_obstacles = self.generate_static_obstacles(3)
 
         # Define boundary
         boundary = []
-        for x in range(-100, 100 + 1):
-            boundary.append((x, -50))  # lower boundary
+        for x in range(0, 100 + 1):
+            boundary.append((x, 0))  # lower boundary
             boundary.append((x, 250))  # upper boundary 
-        for y in range(-50, 250 + 1):
-            boundary.append((-100, y))  # left boundary
+        for y in range(0, 250 + 1):
+            boundary.append((0, y))  # left boundary
             boundary.append((100, y))   # right boundary 
 
         # Initialize figure and axes
@@ -89,12 +98,12 @@ class asv_visualization:
         self.agent_1, = ax1.plot([], [], marker='^', color=BLUE)
         self.agent_2, = ax2.plot([], [], marker='^', color=BLUE)
         observation_horizon1 = plt.Circle(START, RADIUS, color='r', fill=False)
-        observation_horizon2 = plt.Circle(START, RADIUS, color='r', fill=False)
+        observation_horizon2 = plt.Circle((0,0), RADIUS, color='r', fill=False)
         ax1.add_patch(observation_horizon1)
         ax2.add_patch(observation_horizon2)
 
         # Plot goal point
-        ax1.plot(0, 200, marker='o', color=YELLOW)
+        ax1.plot(GOAL[0], GOAL[1], marker='o', color=YELLOW)
 
         # Plot the boundary
         for (x, y) in boundary:
@@ -122,12 +131,12 @@ class asv_visualization:
             self.agent_1.set_data([], [])           # agent in the first plot
             self.agent_2.set_data([], [])           # agent in the second plot
             observation_horizon1.center = START
-            observation_horizon2.center = START
-            grid = self.generate_grid(RADIUS, SQUARE_SIZE, START)
+            observation_horizon2.center = (0,0)
+            grid = self.generate_grid(RADIUS, SQUARE_SIZE, (START[0],START[1]))
             for (cx, cy) in grid:
                 rect = plt.Rectangle((cx - SQUARE_SIZE/2, cy - SQUARE_SIZE/2), SQUARE_SIZE, SQUARE_SIZE,
                                      edgecolor='gray', facecolor='none')
-                ax1.add_patch(rect)
+                ax2.add_patch(rect)
                 squares_ax2.append(rect)
             return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *squares_ax2
 
@@ -146,13 +155,13 @@ class asv_visualization:
             self.agent_1.set_data(agent_pos[0], agent_pos[1])
             self.agent_1.set_marker((3, 0, heading - INITIAL_HEADING))
             
-            self.agent_2.set_data(agent_pos[0], agent_pos[1])
+            self.agent_2.set_data(0,0)
             self.agent_2.set_marker((3, 0, heading - INITIAL_HEADING))
 
             # Check if the static obstacle is within the radius
 
             observation_horizon1.center = (agent_pos[0], agent_pos[1])
-            observation_horizon2.center = (agent_pos[0], agent_pos[1])
+            observation_horizon2.center = (0,0)
 
             reset()  # remove previous grid squares
 
@@ -183,10 +192,10 @@ class asv_visualization:
             return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *squares_ax2
 
         ani = FuncAnimation(fig, update, frames=len(self.left_path), init_func=init, blit=True, interval=200, repeat=False)
-        ax1.set_xlim(-RADIUS - 50, RADIUS + 50)
-        ax1.set_ylim(-RADIUS - 50, RADIUS + 200)
-        ax2.set_xlim(-RADIUS - 50, RADIUS + 50)
-        ax2.set_ylim(-RADIUS - 50, RADIUS + 200)
+        # ax1.set_xlim(-RADIUS - 50, RADIUS + 50)
+        # ax1.set_ylim(-RADIUS - 50, RADIUS + 200)
+        # ax2.set_xlim(-RADIUS - 50, RADIUS + 50)
+        # ax2.set_ylim(-RADIUS - 50, RADIUS + 200)
 
         # # Write to mp4 file
         # FFwriter = FFMpegWriter(fps=5)

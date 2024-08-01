@@ -57,6 +57,7 @@ class asv_visualization:
             for j in y:
                 if np.sqrt(i**2 + j**2) <= radius:
                     grid.append((center[0] + i, center[1] + j))
+        print(len(grid))
         return grid
 
     # Main function to create and draw ASV trajectory
@@ -219,4 +220,11 @@ class asv_visualization:
 # Create visualization
 visualization = asv_visualization(WIDTH, HEIGHT)
 visualization.draw_path()
+
+# num = 3
+# obstacles = [np.array([100, 70]), np.array([100, 100])]         # Set 2 obstacles on the path
+# for _ in range(num):
+#     pos = np.random.randint(0, [WIDTH, HEIGHT])
+#     obstacles.append(pos)
+# print(obstacles)
 

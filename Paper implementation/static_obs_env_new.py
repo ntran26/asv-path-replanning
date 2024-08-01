@@ -43,8 +43,13 @@ class ASVEnv:
     def __init__(self, render_mode = "human"):
         super(ASVEnv, self).__init__()
         self.render_mode = render_mode
+
+        # Initialize main parameters
         self.width = WIDTH
         self.height = HEIGHT
+        self.square_size = SQUARE_SIZE
+        self.observation_radius = OBSTACLE_RADIUS
+
         self.boundary = [(0,0), (0,self.height), (self.width,self.height), (self.width,0), (0,0)]
         self.position = START
         self.goal = GOAL
@@ -52,8 +57,10 @@ class ASVEnv:
         self.speed = SPEED
         self.turn_rate = TURN_RATE
 
+        # Action space and observation space
         self.action_space = spaces.Discrete(3)
-        self.observation_space = spaces.Box()   # ***to be updated***
+        grid_shape = (2 * self.observation_radius // self.square_size,) * 2
+        self.observation_space = spaces.Box(low=0, high=3)   # ***to be updated***
     
     # Generate grid function
     def generate_grid(self, radius, square_size, center):
@@ -65,16 +72,27 @@ class ASVEnv:
                 if np.sqrt(i**2 + j**2) <= radius:
                     grid.append((center[0] + i, center[1] + j))
         return grid
+    
+    # Generate static obstacles
+    def generate_static_obstacles(self, num):
+        obstacles = [np.array([100, 70]), np.array([100, 100])]         # Set 2 obstacles on the path
+        for _ in range(num):
+            pos = np.random.randint(0, [self.width, self.height])
+            obstacles.append(pos)
+        return obstacles
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
 
+        # Initialize current position and heading angle
         self.position = START
         self.heading = INITIAL_HEADING
 
+        self.generate_static_obstacles(3)
 
-
-        return
+        observation = np.array([*self.position, self.heading, self.speed])
+        
+        return observation, {}
     
     def is_on_path(self, position):
         return
