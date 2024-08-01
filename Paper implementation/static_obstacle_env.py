@@ -15,8 +15,10 @@ MAP_WIDTH = 200
 MAP_HEIGHT = 200
 INITIAL_CENTER_POINT = (100, 100)
 NUM_OBSTACLES = 20
-NUM_PATH_POINTS = 50
+NUM_PATH_POINTS = 20
 
+# Create a function that sets the priority of each state in case they overlap: 
+# obstacle/collision > goal point > path > free space
 def get_priority_state(current_state, new_state):
     if new_state == COLLISION_STATE:
         return COLLISION_STATE
@@ -28,11 +30,13 @@ def get_priority_state(current_state, new_state):
         return FREE_STATE
     return current_state
 
+# Create a function that converts each point from the global map to a grid coordinate
 def closest_multiple(n, mult):
     return int((n + mult / 2) // mult) * mult
 
+# Create a function to generate a dictionary, storing the grid coordinates and state
 def fill_grid(objects, dc):
-    grid_dict = {}
+    grid_dict = {}      # initialize the dictionary grid_dict 
     for obj in objects:
         m = obj['x']
         n = obj['y']
@@ -46,6 +50,7 @@ def fill_grid(objects, dc):
         grid_dict[(m, n)] = get_priority_state(grid_dict[(m, n)], state)
     return grid_dict
 
+# Create a function that generate grid coordinates (x,y) from global map
 def generate_grid(radius, square_size, center):
     x = np.arange(-radius + square_size, radius, square_size)
     y = np.arange(-radius + square_size, radius, square_size)
@@ -56,6 +61,7 @@ def generate_grid(radius, square_size, center):
                 grid.append((center[0] + i, center[1] + j))
     return grid
 
+# Create a function to generate random obstacles
 def generate_random_obstacles(num_obstacles, map_width, map_height):
     obstacles = []
     for _ in range(num_obstacles):
@@ -64,6 +70,7 @@ def generate_random_obstacles(num_obstacles, map_width, map_height):
         obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
     return obstacles
 
+# Create a function that generate the path to follow
 def generate_path(initial_point, num_points, vertical_distance):
     path = []
     for i in range(num_points):
@@ -71,8 +78,11 @@ def generate_path(initial_point, num_points, vertical_distance):
         path.append({'x': initial_point[0], 'y': y, 'state': PATH_STATE})
     return path
 
+# Main plot
 def plot_environment(objects, grid_dict, center_point, radius, square_size, map_width, map_height):
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 7))
+    ax1.set_aspect('equal')
+    ax2.set_aspect('equal')
 
     # Plot the whole map on the left
     ax1.set_xlim(0, map_width)
@@ -90,11 +100,14 @@ def plot_environment(objects, grid_dict, center_point, radius, square_size, map_
     # Plot path
     path_x = [obj['x'] for obj in objects if obj['state'] == PATH_STATE]
     path_y = [obj['y'] for obj in objects if obj['state'] == PATH_STATE]
-    path_line, = ax1.plot(path_x, path_y, 'go')
+    path_line, = ax1.plot(path_x, path_y, 'g')
     
     # Plot observation circle
     obs_circle = plt.Circle(center_point, radius, color='red', fill=False)
     ax1.add_patch(obs_circle)
+    
+    grid_circle = plt.Circle((0,0), radius, color='red', fill=False)
+    ax2.add_patch(grid_circle)
     
     # Plot the grid points on the right
     ax2.set_xlim(-radius, radius)
@@ -146,12 +159,14 @@ def plot_environment(objects, grid_dict, center_point, radius, square_size, map_
         return center_marker, obs_circle, *grid_patches
 
     ani = FuncAnimation(fig, update, frames=len(path_x), blit=True, interval=200, repeat=False)
+    ax1.set_xlim(-50, 250)
+    ax1.set_ylim(0, 400)
     
     plt.show()
 
 # Define objects in the environment
 obstacles = generate_random_obstacles(NUM_OBSTACLES, MAP_WIDTH, MAP_HEIGHT)
-path = generate_path(INITIAL_CENTER_POINT, NUM_PATH_POINTS, SQUARE_SIZE)
+path = generate_path(INITIAL_CENTER_POINT, NUM_PATH_POINTS, 5)
 objects_environment = obstacles + path
 
 dc = SQUARE_SIZE

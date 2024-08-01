@@ -13,21 +13,19 @@ BLUE = (0, 0, 1)
 RADIUS = 100
 SQUARE_SIZE = 10
 SPEED = 2
-OBSTACLE_RADIUS = SQUARE_SIZE / 3
+OBSTACLE_RADIUS = SQUARE_SIZE/3
 
 # Define map dimensions
 WIDTH = 200
 HEIGHT = 300
-START = (50, 50)
-GOAL = (50, 200)
+START = (0, 0)
+GOAL = (0, 200)
 TURN_RATE = 5
 INITIAL_HEADING = 90
-STEP = 150 / SPEED
-
-def closest_multiple(n, mult):
-    return int((n + mult / 2) // mult) * mult
+STEP = 200/SPEED
 
 class asv_visualization:
+    # Initialize environment
     def __init__(self, width, height):
         self.width = width
         self.height = height
@@ -37,26 +35,21 @@ class asv_visualization:
         self.start_pos = START
         self.step = STEP
         self.goal = GOAL
-        self.grid_dict = {}  # Initialize grid dictionary
 
+    # Generate grid function
     def generate_grid(self, radius, square_size, center):
         x = np.arange(-radius + square_size, radius, square_size)
         y = np.arange(-radius + square_size, radius, square_size)
         grid = []
         for i in x:
             for j in y:
-                if np.sqrt(i ** 2 + j ** 2) <= radius:
+                if np.sqrt(i**2 + j**2) <= radius:
                     grid.append((center[0] + i, center[1] + j))
         return grid
 
-    def generate_static_obstacles(self, num):
-        obstacles = [{'pos': np.array([50, 70]), 'weight': 0.9}, {'pos': np.array([50, 100]), 'weight': 0.9}]
-        for _ in range(num):
-            pos = np.random.randint(0, [100, 250])
-            obstacles.append({'pos': pos, 'weight': 0.9})
-        return obstacles
-
+    # Main function to create and draw ASV trajectory
     def draw_path(self):
+        # Initialize/Reset the variables
         self.step_count = 0
         self.speed = self.speed
         self.current_heading = self.heading
@@ -64,24 +57,31 @@ class asv_visualization:
         self.left_heading = [self.heading]
         self.position = self.start_pos
 
+        # Go straight
         while self.step_count < self.step:
             self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
                              self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
+            # Append new position and heading angle to list
             self.left_path.append(self.position)
             self.left_heading.append(self.current_heading)
+            # Update new heading angle and step count
             self.current_heading = self.current_heading
             self.step_count += 1
 
-        static_obstacles = self.generate_static_obstacles(3)
+        # Define and obstacles
+        static_obstacles = [(-30, -40), (70, -60), (70, 70), (0, 150)]
 
+        # Define boundary
         boundary = []
-        for x in range(0, 100 + 1):
-            boundary.append((x, 0))
-            boundary.append((x, 250))
-        for y in range(0, 250 + 1):
-            boundary.append((0, y))
-            boundary.append((100, y))
+        for x in range(-100, 100 + 1):
+            boundary.append((x, -50))  # lower boundary
+            boundary.append((x, 250))  # upper boundary 
+        for y in range(-50, 250 + 1):
+            boundary.append((-100, y))  # left boundary
+            boundary.append((100, y))   # right boundary 
 
+        # Initialize figure and axes
+        # ax1: global map   ax2: local map
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 8))
         ax1.set_aspect('equal')
         ax2.set_aspect('equal')
@@ -89,110 +89,113 @@ class asv_visualization:
         self.agent_1, = ax1.plot([], [], marker='^', color=BLUE)
         self.agent_2, = ax2.plot([], [], marker='^', color=BLUE)
         observation_horizon1 = plt.Circle(START, RADIUS, color='r', fill=False)
-        observation_horizon2 = plt.Circle((0, 0), RADIUS, color='r', fill=False)  # Static center
+        observation_horizon2 = plt.Circle(START, RADIUS, color='r', fill=False)
         ax1.add_patch(observation_horizon1)
         ax2.add_patch(observation_horizon2)
 
-        ax1.plot(GOAL[0], GOAL[1], marker='o', color=YELLOW)
+        # Plot goal point
+        ax1.plot(0, 200, marker='o', color=YELLOW)
 
+        # Plot the boundary
         for (x, y) in boundary:
             boundary_line = plt.Rectangle((x, y), 1, 1, edgecolor='black', facecolor='black')
             ax1.add_patch(boundary_line)
 
+        # Generate the path
         self.path = []
-        for y in range(START[1], GOAL[1] + 1):
+        for y in range(START[1], GOAL[1]+1):
             self.path.append((START[0], y))
 
+        # Plot the path
         path_array = np.array(self.path)
-        ax1.plot(path_array[:, 0], path_array[:, 1], '-', color=GREEN)
-
-        for obj in static_obstacles:
-            x, y = obj['pos']
+        ax1.plot(path_array[:,0], path_array[:,1], '-', color=GREEN)
+        
+        # Plot obstacles
+        for (x, y) in static_obstacles:
             ax1.plot(x, y, marker='o', color=RED)
 
+        # Empty list to store the collision grid coordinates
         squares_ax2 = []
 
+        # Initialize animation variables
         def init():
-            self.agent_1.set_data([], [])
-            self.agent_2.set_data([], [])
+            self.agent_1.set_data([], [])           # agent in the first plot
+            self.agent_2.set_data([], [])           # agent in the second plot
             observation_horizon1.center = START
-            grid = self.generate_grid(RADIUS, SQUARE_SIZE, (0, 0))  # Static grid for second plot
+            observation_horizon2.center = START
+            grid = self.generate_grid(RADIUS, SQUARE_SIZE, START)
             for (cx, cy) in grid:
-                rect = plt.Rectangle((cx - SQUARE_SIZE / 2, cy - SQUARE_SIZE / 2), SQUARE_SIZE, SQUARE_SIZE,
+                rect = plt.Rectangle((cx - SQUARE_SIZE/2, cy - SQUARE_SIZE/2), SQUARE_SIZE, SQUARE_SIZE,
                                      edgecolor='gray', facecolor='none')
-                ax2.add_patch(rect)
+                ax1.add_patch(rect)
                 squares_ax2.append(rect)
             return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *squares_ax2
 
-        def calculate_weight(obj_type, distance):
-            if obj_type == "goal":
-                return 1
-            elif obj_type == "wall" or obj_type == "static":
-                return 0.9
-            elif obj_type == "ship":
-                return 0.8
-            elif obj_type == "ship_prediction":
-                return -0.8 * (0.85 ** distance)
-            return 0
-
+        # Reset locations of the grid squares
         def reset():
-            for square in squares_ax2:
-                square.remove()
+            for rect in squares_ax2:
+                rect.remove()
             squares_ax2.clear()
 
+        # Main animation loop to update the frame
         def update(frame):
             agent_pos = self.left_path[frame]
+            heading = self.left_heading[frame]
+
+            # Update the line segment as part of the plot
             self.agent_1.set_data(agent_pos[0], agent_pos[1])
-            self.agent_2.set_data(0, 0)  # Static center
+            self.agent_1.set_marker((3, 0, heading - INITIAL_HEADING))
+            
+            self.agent_2.set_data(agent_pos[0], agent_pos[1])
+            self.agent_2.set_marker((3, 0, heading - INITIAL_HEADING))
 
-            # Update the observation circle in the first plot to move with the agent
-            observation_horizon1.center = agent_pos
+            # Check if the static obstacle is within the radius
 
-            # Reset gridDict for the new frame
-            self.grid_dict.clear()
+            observation_horizon1.center = (agent_pos[0], agent_pos[1])
+            observation_horizon2.center = (agent_pos[0], agent_pos[1])
+
+            reset()  # remove previous grid squares
 
             # Draw new grid squares
-            grid = self.generate_grid(RADIUS, SQUARE_SIZE, (0, 0))  # Static grid for second plot
+            grid = self.generate_grid(RADIUS, SQUARE_SIZE, (agent_pos[0], agent_pos[1]))
             for (cx, cy) in grid:
-                self.grid_dict[(cx, cy)] = {'coordinates': (cx, cy), 'weight': 0}  # Initialize gridDict with default weights
-
-            # Update gridDict based on the current environment state within observation range
-            for obj in static_obstacles + [{'pos': self.goal, 'weight': 1}] + [{'pos': p, 'weight': 0.8} for p in self.path]:
-                obj_pos = obj['pos']
-                if np.linalg.norm(np.array(agent_pos) - np.array(obj_pos)) <= RADIUS:
-                    m = obj_pos[0]
-                    n = obj_pos[1]
-                    m = np.sign(m) * closest_multiple(abs(m), SQUARE_SIZE)
-                    n = np.sign(n) * closest_multiple(abs(n), SQUARE_SIZE)
-                    if (m, n) in self.grid_dict:
-                        self.grid_dict[(m, n)]['weight'] = obj['weight']
-
-            # Update the static grid squares based on gridDict
-            reset()  # Remove previous grid squares
-            print(self.grid_dict)
-            for (cx, cy), data in self.grid_dict.items():
-                weight = data['weight']
-                color = 'none'
-                if weight == 1:
-                    color = YELLOW
-                elif weight == 0.9:
+                # Check for obstacles, path and goal in the second plot
+                is_collision = any(np.sqrt((cx - ox) ** 2 + (cy - oy) ** 2) < (SQUARE_SIZE / 2 + OBSTACLE_RADIUS)
+                                   for ox, oy in static_obstacles + boundary)
+                is_path = any(np.sqrt((cx - px) ** 2 + (cy - py) ** 2) < (SQUARE_SIZE / 2 + OBSTACLE_RADIUS)
+                              for px, py in self.path)
+                is_goal = np.sqrt((cx - self.goal[0]) ** 2 + (cy - self.goal[1]) ** 2) < (SQUARE_SIZE / 2 + OBSTACLE_RADIUS)
+                # Change the color of the grid if there is an obstacle or path                
+                if is_collision:
                     color = RED
-                elif weight == 0.8:
+                elif is_goal:
+                    color = YELLOW
+                elif is_path:
                     color = GREEN
-
-                rect = plt.Rectangle((cx - SQUARE_SIZE / 2, cy - SQUARE_SIZE / 2), SQUARE_SIZE, SQUARE_SIZE,
+                else:
+                    color = 'none'
+                rect = plt.Rectangle((cx - SQUARE_SIZE/2, cy - SQUARE_SIZE/2), SQUARE_SIZE, SQUARE_SIZE,
                                      edgecolor='gray', facecolor=color)
+                # Update the collision grid on the second plot
                 ax2.add_patch(rect)
                 squares_ax2.append(rect)
 
             return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *squares_ax2
 
-        ani = FuncAnimation(fig, update, frames=len(self.left_path), init_func=init, blit=True)
+        ani = FuncAnimation(fig, update, frames=len(self.left_path), init_func=init, blit=True, interval=200, repeat=False)
+        ax1.set_xlim(-RADIUS - 50, RADIUS + 50)
+        ax1.set_ylim(-RADIUS - 50, RADIUS + 200)
+        ax2.set_xlim(-RADIUS - 50, RADIUS + 50)
+        ax2.set_ylim(-RADIUS - 50, RADIUS + 200)
+
+        # # Write to mp4 file
+        # FFwriter = FFMpegWriter(fps=5)
+        # ani.save("Paper implementation/static_obstacle.mp4", writer=FFwriter)
+
+        # Show plot
+        ax1.grid(True)
         plt.show()
 
-        # Save animation
-        # writer = FFMpegWriter(fps=10, metadata=dict(artist='Me'), bitrate=1800)
-        # ani.save("asv_navigation.mp4", writer=writer)
-
-asv = asv_visualization(WIDTH, HEIGHT)
-asv.draw_path()
+# Create visualization
+visualization = asv_visualization(WIDTH, HEIGHT)
+visualization.draw_path()
