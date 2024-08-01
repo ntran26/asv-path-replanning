@@ -41,5 +41,7 @@ STEP 3: Filling the grid
     + closest_multiple function ensures each object's coordinates are mapped to the nearest grid cell
         Example: n = -15, s = 10 -> return -20
                  n = 15, s = 10 -> return 20
+    + "sign" keeps the original sign of the coordinate, such as -15 or +15
+    
 
 

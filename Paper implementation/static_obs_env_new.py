@@ -59,8 +59,9 @@ class ASVEnv:
 
         # Action space and observation space
         self.action_space = spaces.Discrete(3)
-        grid_shape = (2 * self.observation_radius // self.square_size,) * 2
-        self.observation_space = spaces.Box(low=0, high=3)   # ***to be updated***
+        self.observation_space = spaces.Box(low=0, high=3, shape=(313,), dtype=np.int32)   
+        # 3 possible actions: left, right, straight
+        # 4 possible states for observation, and the shape = number of grids inside the observation radius
     
     # Generate grid function
     def generate_grid(self, radius, square_size, center):

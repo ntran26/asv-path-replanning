@@ -1,253 +1,161 @@
-import gymnasium as gym
-from gymnasium import spaces
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-#                               ---------- CONFIGURATION ----------
-
-# Define colors
-BLACK = (0, 0, 0)
-WHITE = (1, 1, 1)
-RED = (1, 0, 0)
-GREEN = (0, 1, 0)
-YELLOW = (1, 1, 0)
-BLUE = (0, 0, 1)
-
-# Define colors
-BLACK = (0, 0, 0)
-WHITE = (1, 1, 1)
-RED = (1, 0, 0)
-GREEN = (0, 1, 0)
-YELLOW = (1, 1, 0)
-BLUE = (0, 0, 1)
+# Define states
+FREE_STATE = 0
+PATH_STATE = 1
+COLLISION_STATE = 2
+GOAL_STATE = 3
 
 # Constants
 RADIUS = 100
 SQUARE_SIZE = 10
-SPEED = 2
-OBSTACLE_RADIUS = SQUARE_SIZE / 3
+MAP_WIDTH = 200
+MAP_HEIGHT = 200
+INITIAL_CENTER_POINT = (100, 100)
+NUM_OBSTACLES = 20
+NUM_PATH_POINTS = 50
 
-# Map dimensions
-WIDTH = 200
-HEIGHT = 300
-START = (100, 30)
-GOAL = (100, 200)
-TURN_RATE = 5
-INITIAL_HEADING = 90
-STEP = 200 / SPEED
+def get_priority_state(current_state, new_state):
+    if new_state == COLLISION_STATE:
+        return COLLISION_STATE
+    elif new_state == GOAL_STATE and current_state != COLLISION_STATE:
+        return GOAL_STATE
+    elif new_state == PATH_STATE and current_state not in (COLLISION_STATE, GOAL_STATE):
+        return PATH_STATE
+    elif current_state not in (COLLISION_STATE, GOAL_STATE, PATH_STATE):
+        return FREE_STATE
+    return current_state
 
-# Map boundaries
-X_LOW = 0
-X_HIGH = 200
-Y_LOW = 0
-Y_HIGH = 300
+def closest_multiple(n, mult):
+    return int((n + mult / 2) // mult) * mult
 
-# Define states of the grid cell
-FREE_STATE = 0
-PATH_STATE = 1
-GOAL_STATE = 2
-COLLISION_STATE = 3
+def fill_grid(objects, dc):
+    grid_dict = {}
+    for obj in objects:
+        m = obj['x']
+        n = obj['y']
+        state = obj['state']
 
-#                               ---------- MAIN LOOP ----------
-
-class ASVEnv(gym.Env):
-    def __init__(self):
-        super(ASVEnv, self).__init__()
-
-        # Initialize parameters
-        self.width = WIDTH
-        self.height = HEIGHT
-        self.heading = INITIAL_HEADING
-        self.speed = SPEED
-        self.turn_rate = TURN_RATE
-        self.start_pos = np.array(START)
-        self.goal = np.array(GOAL)
-        self.observation_radius = RADIUS
-        self.square_size = SQUARE_SIZE
-        self.max_steps = int(STEP)
-        self.step_count = 0
-        self.position = self.start_pos.copy()
+        m = closest_multiple(m, dc)
+        n = closest_multiple(n, dc)
+        if (m, n) not in grid_dict:
+            grid_dict[(m, n)] = FREE_STATE
         
-        # Define action and observation space
-        self.action_space = spaces.Discrete(3)  # turn left, turn right, go straight
-        grid_shape = (2 * self.observation_radius // self.square_size,) * 2
-        self.observation_space = spaces.Box(low=0, high=3, shape=grid_shape, dtype=np.int32)
-        
-        # Initialize global map and obstacles
-        self.init_global_map()
-        self.reset()
+        grid_dict[(m, n)] = get_priority_state(grid_dict[(m, n)], state)
+    return grid_dict
+
+def generate_grid(radius, square_size, center):
+    x = np.arange(-radius + square_size, radius, square_size)
+    y = np.arange(-radius + square_size, radius, square_size)
+    grid = []
+    for i in x:
+        for j in y:
+            if np.sqrt(i ** 2 + j ** 2) <= radius:
+                grid.append((center[0] + i, center[1] + j))
+    return grid
+
+def generate_random_obstacles(num_obstacles, map_width, map_height):
+    obstacles = []
+    for _ in range(num_obstacles):
+        x = np.random.randint(0, map_width)
+        y = np.random.randint(0, map_height)
+        obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
+    return obstacles
+
+def generate_path(initial_point, num_points, vertical_distance):
+    path = []
+    for i in range(num_points):
+        y = initial_point[1] + i * vertical_distance
+        path.append({'x': initial_point[0], 'y': y, 'state': PATH_STATE})
+    return path
+
+def plot_environment(objects, grid_dict, center_point, radius, square_size, map_width, map_height):
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 7))
+
+    # Plot the whole map on the left
+    ax1.set_xlim(0, map_width)
+    ax1.set_ylim(0, map_height)
+    ax1.set_title('Whole Map')
     
-    def init_global_map(self):
-        # Initialize the dimension of the map
-        self.global_map = np.zeros((self.width, self.height), dtype=np.int32)
-
-        # Fill the map with free space
-        self.global_map.fill(FREE_STATE)
-
-        # Create boundary
-        self.boundary = []
-        for x in range(X_LOW, X_HIGH + 1):
-            self.boundary.append((x, Y_LOW))  # lower boundary
-            self.boundary.append((x, Y_HIGH))  # upper boundary 
-        for y in range(Y_LOW, Y_HIGH + 1):
-            self.boundary.append((X_LOW, y))  # left boundary
-            self.boundary.append((X_HIGH, y))   # right boundary
-
-        # Define boundary as COLLISION_STATE
-        for bound in self.boundary:
-            self.global_map[bound[0], bound[1]] = COLLISION_STATE
-
-        # Generate new obstacle positions
-        self.static_obstacles = self.generate_static_obstacles(num=4)
-
-        # Define obstacles as COLLISION_STATE
-        for obstacle in self.static_obstacles:
-            if 0 <= obstacle[0] < self.width and 0 <= obstacle[1] < self.height:
-                self.global_map[obstacle[0], obstacle[1]] = COLLISION_STATE
-        
-        # Create a path to follow on the map. If there is an obstacle overlap on the path, define as obstacle
-        for y in range(START[1], GOAL[1] + 1):
-            if 0 <= y < self.height and self.global_map[START[0], y] != COLLISION_STATE:
-                self.global_map[START[0], y] = PATH_STATE
-
-        # Add goal to the global map
-        self.global_map[GOAL[0], GOAL[1]] = GOAL_STATE
-
-    # Function to generate obstacles randomly **within the boundary**
-    def generate_static_obstacles(self, num):
-        obstacles = [(100, 70), (100, 100)]         # Set 2 obstacles on the path
-        for _ in range(num):
-            pos = np.random.randint(0, [self.width, self.height])   # ***to be adjusted***
-            obstacles.append(pos)
-        return obstacles
-
-    # Reset function
-    def reset(self):
-        # Re-initialize the map and states
-        self.init_global_map()
-
-        # Re-initialize variables
-        self.position = self.start_pos.copy()
-        self.heading = INITIAL_HEADING
-        self.speed = SPEED
-        self.step_count = 0
-        self.taken_steps = [self.start_pos.tolist()]
-        
-        return self.get_observation()
+    # Plot center point
+    center_marker, = ax1.plot(center_point[0], center_point[1], marker='^', color='blue')
     
-    # Check if the ASV is on path
-    def is_on_path(self, position):
-        x, y = position // self.square_size
-        return self.global_map[int(x), int(y)] == PATH_STATE
+    # Plot obstacle
+    for obj in objects:
+        if obj['state'] == COLLISION_STATE:
+            ax1.plot(obj['x'], obj['y'], 'ro')
     
-    # Check if the ASV is on the free space
-    def is_free_pos(self, position):
-        x, y = position // self.square_size
-        return self.global_map[int(x), int(y)] == FREE_STATE
+    # Plot path
+    path_x = [obj['x'] for obj in objects if obj['state'] == PATH_STATE]
+    path_y = [obj['y'] for obj in objects if obj['state'] == PATH_STATE]
+    path_line, = ax1.plot(path_x, path_y, 'go')
     
-    # Check if the ASV reached the goal
-    def is_goal(self, position):
-        x, y = position // self.square_size
-        return self.global_map[int(x), int(y)] == GOAL_STATE
+    # Plot observation circle
+    obs_circle = plt.Circle(center_point, radius, color='red', fill=False)
+    ax1.add_patch(obs_circle)
     
-    # Check if there is collision
-    def is_collision(self, position):
-        x, y = position // self.square_size
-        return self.global_map[int(x), int(y)] == COLLISION_STATE
+    # Plot the grid points on the right
+    ax2.set_xlim(-radius, radius)
+    ax2.set_ylim(-radius, radius)
+    ax2.set_title('Grid Points')
     
-    # Step function
-    def step(self, action):
-        if action == 0:     # Turn left
-            self.heading += 5
-        if action == 1:     # Turn right
-            self.heading -= 5
-        if action == 2:     # Go straight
-            self.heading = self.heading
+    grid = generate_grid(radius, square_size, center_point)
+    grid_patches = []
+    for (cx, cy) in grid:
+        state = grid_dict.get((closest_multiple(cx, square_size), closest_multiple(cy, square_size)), FREE_STATE)
+        color = 'white'
+        if state == COLLISION_STATE:
+            color = 'red'
+        elif state == PATH_STATE:
+            color = 'green'
+        elif state == GOAL_STATE:
+            color = 'yellow'
+        rect = plt.Rectangle((cx - square_size / 2 - center_point[0], cy - square_size / 2 - center_point[1]), square_size, square_size,
+                             edgecolor='gray', facecolor=color)
+        grid_patches.append(rect)
+        ax2.add_patch(rect)
+    
+    def update(frame):
+        # Move center point along the path
+        if frame < len(path_x):
+            new_center = (path_x[frame], path_y[frame])
+            center_marker.set_data(new_center)
+            obs_circle.center = new_center
 
-        # Update ASV position
-        self.position[0] += self.speed * np.cos(np.radians(self.heading))
-        self.position[1] += self.speed * np.sin(np.radians(self.heading))
-        
-        # Record ASV path and number of steps taken
-        self.taken_steps.append(self.position.tolist())
-        self.step_count += 1
-
-        # Check if the session is terminate and calculate reward
-        done, reward = self.check_done()
-        
-        obs = self.get_observation()
-        return obs, reward, done, {}
-    
-    # Terminate condition and reward calculation
-    def check_done(self):
-        if self.is_free_pos(self.position):
-            return False, -2        # On free space
-        if self.is_on_path(self.position):
-            return False, 0         # On path
-        if self.is_collision(self.position):
-            return True, -100       # Collide with obstacles or boundary
-        if self.is_goal(self.position):
-            return True, 50         # Goal reached
-        
-        # if self.step_count >= self.max_steps:
-        #     return True, -10  # Max steps reached
-
-        return False, -1    # Default penalty for each step
-    
-    # Update the observation space
-    def get_observation(self):
-        # Define number of grids and grid size
-        grid_size = 2 * self.observation_radius // self.square_size
-        grid = np.zeros((grid_size, grid_size), dtype=np.int32)
-        
-        # Agent's position on the global map
-        agent_pos_on_global = self.position // self.square_size
-
-        for i in range(grid_size):
-            for j in range(grid_size):
-                global_i = int(agent_pos_on_global[0] - grid_size // 2 + i)
-                global_j = int(agent_pos_on_global[1] - grid_size // 2 + j)
-                if 0 <= global_i < self.width and 0 <= global_j < self.height:
-                    grid[i, j] = self.global_map[global_i, global_j]
-        
-        return grid
-    
-    def render(self, mode='human'):
-        if not hasattr(self, 'fig'):
-            self.fig, self.ax = plt.subplots(1, figsize=(6,8))
-            self.ax.set_aspect('equal')
-
-        self.ax.clear()
-
-        # Plot global map
-        for i in range(self.width):
-            for j in range(self.height):
+            # Update grid_dict with the new center point
+            new_grid = generate_grid(radius, square_size, new_center)
+            for rect in grid_patches:
+                rect.remove()
+            grid_patches.clear()
+            for (cx, cy) in new_grid:
+                state = grid_dict.get((closest_multiple(cx, square_size), closest_multiple(cy, square_size)), FREE_STATE)
                 color = 'white'
-                if self.global_map[i, j] == COLLISION_STATE:
+                if state == COLLISION_STATE:
                     color = 'red'
-                elif self.global_map[i, j] == PATH_STATE:
+                elif state == PATH_STATE:
                     color = 'green'
-                elif self.global_map[i, j] == GOAL_STATE:
+                elif state == GOAL_STATE:
                     color = 'yellow'
-                self.ax.add_patch(plt.Rectangle((i, j), 1, 1, edgecolor='gray', facecolor=color, alpha=0.5))
+                rect = plt.Rectangle((cx - square_size / 2 - new_center[0], cy - square_size / 2 - new_center[1]), square_size, square_size,
+                                     edgecolor='gray', facecolor=color)
+                grid_patches.append(rect)
+                ax2.add_patch(rect)
 
-        # Plot agent's taken steps on the global map
-        for step in self.taken_steps:
-            self.ax.add_patch(plt.Circle(np.array(step) / self.square_size, OBSTACLE_RADIUS, color='blue', alpha=0.3))
+        return center_marker, obs_circle, *grid_patches
 
-        # Plot current position of the agent on the global map
-        self.ax.add_patch(plt.Circle(self.position / self.square_size, OBSTACLE_RADIUS, color='blue'))
-
-        # Plot observation circle
-        obs_circle = plt.Circle(self.position / self.square_size, self.observation_radius / self.square_size, color='blue', fill=False)
-        self.ax.add_patch(obs_circle)
-
-        self.ax.set_xlim(-RADIUS - 50, RADIUS + 50)
-        self.ax.set_ylim(-RADIUS - 50, RADIUS + 200)
-
-        plt.draw()
-        plt.pause(0.001)
+    ani = FuncAnimation(fig, update, frames=len(path_x), blit=True, interval=200, repeat=False)
     
+    plt.show()
 
+# Define objects in the environment
+obstacles = generate_random_obstacles(NUM_OBSTACLES, MAP_WIDTH, MAP_HEIGHT)
+path = generate_path(INITIAL_CENTER_POINT, NUM_PATH_POINTS, SQUARE_SIZE)
+objects_environment = obstacles + path
 
+dc = SQUARE_SIZE
+grid_dict = fill_grid(objects_environment, dc)
+
+# Plot the environment with animation
+plot_environment(objects_environment, grid_dict, INITIAL_CENTER_POINT, RADIUS, SQUARE_SIZE, MAP_WIDTH, MAP_HEIGHT)
