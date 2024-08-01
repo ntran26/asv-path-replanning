@@ -1,0 +1,45 @@
+STEP 1: Initialize the map
+- The map shows the ASV and observation circle around it. When moving, the circle moves along.
+- Generate static obstacles and boundary. Obstacle generated must not be at the goal point.
+- Create a path for the ASV to follow and a goal point.
+- Set the state of the objects on the map
+    + FREE_STATE = 0: free space on the map (mark as white)
+    + PATH_STATE = 1: path to follow (mark as green)
+    + COLLISION_STATE = 2: obstacles and boundary to be avoided (mark as red)
+    + GOAL_STATE = 3: Goal point (mark as yellow)
+    + Note: if COLLISION_STATE overlapping PATH_STATE or FREE_STATE, set as COLLISION_STATE
+
+STEP 2: Generating the grid
+- Create a list/array of grid points (x,y) from the observation circle
+- Store the state of each object into a table "object_env", containing (x,y) coordinates and state.
+
+STEP 3: Filling the grid
+- Using "closest_multiple()" function:
+    def closest_multiple(n, mult):
+        return int((n + mult/2) / mult) * mult
+
+- Create a dictionary GridDict
+    s = size of grid square
+
+    // Iterate through every objects
+    i = 0
+    while i < object_env.size:
+
+        // Retrieve object coordinates
+        m = object_env[x]
+        n = object_env[y]
+
+        // Round the coordinates to the nearest grid point
+        m = sign(m) * closest_multiple(abs(m), s)
+        n = sign(n) * closest_multiple(abs(n), s)
+
+        // Update the grid dictionary
+        GridDict[m,n].append(object_env[i].state)
+        i += 1
+    
+- Mathematical analysis:
+    + closest_multiple function ensures each object's coordinates are mapped to the nearest grid cell
+        Example: n = -15, s = 10 -> return -20
+                 n = 15, s = 10 -> return 20
+
+
