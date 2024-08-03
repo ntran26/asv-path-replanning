@@ -53,7 +53,8 @@ class asv_visualisation:
         self.obstacles = self.generate_static_obstacles(5, self.width, self.height)
         self.path = self.generate_path(self.start, self.goal)
         self.boundary = self.generate_border(self.width, self.height)
-        self.objects_environment = self.obstacles + self.path + self.boundary
+        self.goal_point = self.generate_goal(self.goal)
+        self.objects_environment = self.obstacles + self.path + self.boundary + self.goal_point
         self.grid_dict = self.fill_grid(self.objects_environment, self.grid_size)
 
     #                           -------- HELPER FUNCTIONS --------
@@ -134,6 +135,11 @@ class asv_visualisation:
             path.append({'x': start_point[0], 'y': y, 'state': PATH_STATE})
         return path
     
+    def generate_goal(self, goal_point):
+        goal = []
+        goal.append({'x': goal_point[0], 'y': goal_point[1], 'state': GOAL_STATE})
+        return goal
+    
     #                           -------- MAIN LOOP --------
     def main(self):
         # Initialize figure and axes
@@ -158,6 +164,9 @@ class asv_visualisation:
         observation_horizon2 = plt.Circle((0, 0), self.radius, color=RED, fill=False)
         ax1.add_patch(observation_horizon1)
         ax2.add_patch(observation_horizon2)
+
+        # Plot start point
+        ax1.plot(self.start[0], self.start[1], marker='o', color=BLUE)
 
         # Plot goal point
         ax1.plot(self.goal[0], self.goal[1], marker='o', color=YELLOW)
@@ -244,10 +253,19 @@ class asv_visualisation:
                     color = 'yellow'
                 rect = plt.Rectangle((cx - self.grid_size / 2 - current_pos[0], cy - self.grid_size / 2 - current_pos[1]), self.grid_size, self.grid_size,
                                      edgecolor='gray', facecolor=color)
+                rect.set_zorder(1)     # make sure the grids don't overlay other components
                 grid_patches.append(rect)
                 ax2.add_patch(rect)
+            
+            # Update ASV and observation circle after grid patches
+            self.agent_2.set_data(0, 0)
+            self.agent_2.set_marker((3, 0, self.heading - 90))
+            self.agent_2.set_zorder(3)
 
-            return self.agent_1, observation_horizon1, *grid_patches
+            observation_horizon2.center = (0, 0)
+            observation_horizon2.set_zorder(2)
+
+            return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *grid_patches
 
         ani = FuncAnimation(fig, update, frames=len(self.straight_path), blit=True, interval=200, repeat=False)
         
