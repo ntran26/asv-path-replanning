@@ -37,7 +37,7 @@ GOAL_STATE = 3          # goal point
 
 class asv_visualisation:
     # Initialize environment
-    def __init__(self, width, height):
+    def __init__(self):
         self.width = WIDTH
         self.height = HEIGHT
         self.heading = INITIAL_HEADING
@@ -48,11 +48,12 @@ class asv_visualisation:
         self.goal = GOAL
         self.radius = RADIUS
         self.grid_size = SQUARE_SIZE
+        self.center_point = (0,0)
 
-        self.obstacles = self.generate_random_obstacles(5, self.width, self.height)
+        self.obstacles = self.generate_static_obstacles(5, self.width, self.height)
         self.path = self.generate_path(self.start, self.goal)
         self.boundary = self.generate_border(self.width, self.height)
-        self.objects_environment = self.obstacles + self.path + self.boundaries
+        self.objects_environment = self.obstacles + self.path + self.boundary
         self.grid_dict = self.fill_grid(self.objects_environment, self.grid_size)
 
     #                           -------- HELPER FUNCTIONS --------
@@ -88,7 +89,7 @@ class asv_visualisation:
             if (m, n) not in grid_dict:
                 grid_dict[(m, n)] = FREE_STATE
             
-            grid_dict = [(m, n)] = self.get_priority_state(grid_dict[(m,n)], state)
+            grid_dict[(m, n)] = self.get_priority_state(grid_dict[(m,n)], state)
         return grid_dict
 
     # Create a function that generate grid coordinates (x,y) from global map
@@ -133,26 +134,6 @@ class asv_visualisation:
             path.append({'x': start_point[0], 'y': y, 'state': PATH_STATE})
         return path
     
-    #                           -------- ASV ACTION --------
-    def action(self):    
-        self.step_count = 0
-        self.speed = self.speed
-        self.current_heading = self.heading
-        self.straight_path = [self.start]
-        self.straight_heading = [self.heading]
-        self.position = self.start
-
-        # Go straight
-        while self.step_count < self.step:
-            self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
-                             self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
-            # # Append new position and heading angle to list
-            # self.left_path.append(self.position)
-            # self.left_heading.append(self.current_heading)
-            # Update new heading angle and step count
-            self.current_heading = self.current_heading
-            self.step_count += 1
-    
     #                           -------- MAIN LOOP --------
     def main(self):
         # Initialize figure and axes
@@ -161,6 +142,8 @@ class asv_visualisation:
         # First plot: whole map
         ax1.set_aspect('equal')
         ax1.set_title('MAP')
+        ax1.set_xlim(-self.radius, self.width + self.radius)
+        ax2.set_ylim(-self.radius, self.height + self.radius)
 
         # Second plot: observation per timestep
         ax2.set_aspect('equal')
@@ -194,7 +177,86 @@ class asv_visualisation:
             ax1.plot(obj['x'], obj['y'], marker='o', color=RED)
 
         # Plot the grid points on the right
+        self.grid = self.generate_grid(self.radius, self.grid_size, self.center_point)
+        grid_patches = []
+        for (cx, cy) in self.grid:
+            state = self.grid_dict.get((self.closest_multiple(cx, self.grid_size), self.closest_multiple(cy, self.grid_size)), FREE_STATE)
+            color = 'white'
+            if state == COLLISION_STATE:
+                color = 'red'
+            elif state == PATH_STATE:
+                color = 'green'
+            elif state == GOAL_STATE:
+                color = 'yellow'
+            rect = plt.Rectangle((cx - self.grid_size / 2 - self.center_point[0], cy - self.grid_size / 2 - self.center_point[1]), self.grid_size, self.grid_size,
+                                edgecolor='gray', facecolor=color)
+            grid_patches.append(rect)
+            ax2.add_patch(rect)
         
+        # Initialize/Reset the variables for actions
+        self.step_count = 0
+        self.speed = self.speed
+        self.current_heading = self.heading
+        self.straight_path = [self.start]
+        self.straight_heading = [self.heading]
+        self.position = self.start
+
+        # Plot the steps of the ASV (go straight)
+        while self.step_count < self.step:
+            self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
+                             self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
+            
+            # Append new position and heading angle to list
+            self.straight_path.append(self.position)
+            self.straight_heading.append(self.current_heading)
+
+            # Update new heading angle and step count
+            self.current_heading = self.current_heading
+            self.step_count += 1
+        
+        def update(frame):
+            current_pos = self.straight_path[frame]
+
+            # Update ASV position in the first plot
+            self.agent_1.set_data(current_pos[0], current_pos[1])
+
+            # Update ASV heading angle in both plots
+            self.agent_1.set_marker((3, 0, self.heading - 90))
+            self.agent_2.set_marker((3, 0, self.heading - 90))
+
+            # Update the observation circle: move along with the ASV in the first plot
+            observation_horizon1.center = current_pos
+
+            # Update grid_dict with the new center point
+            new_grid = self.generate_grid(self.radius, self.grid_size, current_pos)
+            for rect in grid_patches:
+                rect.remove()
+            grid_patches.clear()
+
+            for (cx, cy) in new_grid:
+                state = self.grid_dict.get((self.closest_multiple(cx, self.grid_size), self.closest_multiple(cy, self.grid_size)), FREE_STATE)
+                color = 'white'
+                if state == COLLISION_STATE:
+                    color = 'red'
+                elif state == PATH_STATE:
+                    color = 'green'
+                elif state == GOAL_STATE:
+                    color = 'yellow'
+                rect = plt.Rectangle((cx - self.grid_size / 2 - current_pos[0], cy - self.grid_size / 2 - current_pos[1]), self.grid_size, self.grid_size,
+                                     edgecolor='gray', facecolor=color)
+                grid_patches.append(rect)
+                ax2.add_patch(rect)
+
+            return self.agent_1, observation_horizon1, *grid_patches
+
+        ani = FuncAnimation(fig, update, frames=len(self.straight_path), blit=True, interval=200, repeat=False)
+        
+        plt.show()
+
+# Create visualisation
+visualisation = asv_visualisation()
+visualisation.main()
+
         
 
 
