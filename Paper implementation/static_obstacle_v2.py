@@ -120,9 +120,15 @@ class asv_visualisation:
     # Create a function to generate static obstacles
     def generate_static_obstacles(self, num_obs, map_width, map_height):
         obstacles = []
+        # Generate random obstacles around the map
         for _ in range(num_obs):
             x = np.random.randint(0, map_width)
             y = np.random.randint(0, map_height)
+            obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
+        # Generate 2 random obstacles along the path
+        for _ in range(2):
+            x = self.start[0]
+            y = np.random.randint(self.start[1] + 20, self.goal[1] - 20)
             obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
         return obstacles
     
@@ -202,32 +208,51 @@ class asv_visualisation:
         self.step_count = 0
         self.speed = self.speed
         self.current_heading = self.heading
-        self.straight_path = [self.start]
-        self.straight_heading = [self.heading]
+        self.asv_path = [self.start]
+        self.asv_heading = [self.heading]
         self.position = self.start
 
-        # Plot the steps of the ASV (go straight)
+        # Plot the steps of the ASV
+        # Go straight
         while self.step_count < self.step:
             self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
                              self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
-            
             # Append new position and heading angle to list
-            self.straight_path.append(self.position)
-            self.straight_heading.append(self.current_heading)
-
+            self.asv_path.append(self.position)
+            self.asv_heading.append(self.current_heading)
             # Update new heading angle and step count
             self.current_heading = self.current_heading
             self.step_count += 1
+
+        # # Turn left
+        # while self.step_count < self.step:
+        #     self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
+        #                     self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
+        #     # Append new position and heading angle to list
+        #     self.asv_path.append(self.position)
+        #     self.asv_heading.append(self.current_heading)
+        #     # Update new heading angle and step count
+        #     self.current_heading += self.turn_rate
+        #     self.step_count += 1
+
+        # # Turn right
+        # while self.step_count < self.step:
+        #     self.position = (self.position[0] + self.speed*np.cos(np.radians(self.current_heading)),
+        #                     self.position[1] + self.speed*np.sin(np.radians(self.current_heading)))
+        #     # Append new position and heading angle to list
+        #     self.asv_path.append(self.position)
+        #     self.asv_heading.append(self.current_heading)
+        #     # Update new heading angle and step count
+        #     self.current_heading -= self.turn_rate
+        #     self.step_count += 1
         
         def update(frame):
-            current_pos = self.straight_path[frame]
+            current_pos = self.asv_path[frame]
+            heading = self.asv_heading[frame]
 
-            # Update ASV position in the first plot
+            # Update ASV position and heading angle in first plot
             self.agent_1.set_data(current_pos[0], current_pos[1])
-
-            # Update ASV heading angle in both plots
-            self.agent_1.set_marker((3, 0, self.heading - 90))
-            self.agent_2.set_marker((3, 0, self.heading - 90))
+            self.agent_1.set_marker((3, 0, heading - 90))
 
             # Update the observation circle: move along with the ASV in the first plot
             observation_horizon1.center = current_pos
@@ -255,7 +280,7 @@ class asv_visualisation:
             
             # Update ASV and observation circle after grid patches in the second plot
             self.agent_2.set_data(0, 0)
-            self.agent_2.set_marker((3, 0, self.heading - 90))
+            self.agent_2.set_marker((3, 0, heading - 90))
             self.agent_2.set_zorder(3)
 
             observation_horizon2.center = (0, 0)
@@ -264,7 +289,7 @@ class asv_visualisation:
             return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *grid_patches
 
         # Create animation and display
-        ani = FuncAnimation(fig, update, frames=len(self.straight_path), blit=True, interval=200, repeat=False)
+        ani = FuncAnimation(fig, update, frames=len(self.asv_path), blit=True, interval=200, repeat=False)
         
         # # Write to mp4 file
         # FFwriter = FFMpegWriter(fps=5)
