@@ -190,7 +190,7 @@ class asv_visualization:
 
         # # Write to mp4 file
         # FFwriter = FFMpegWriter(fps=5)
-        # ani.save("Paper implementation/static_obstacle.mp4", writer=FFwriter)
+        # ani.save("Paper implementation/static_obstacle_v1.mp4", writer=FFwriter)
 
         # Show plot
         ax1.grid(True)

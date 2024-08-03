@@ -188,15 +188,11 @@ class asv_visualisation:
         # Plot the grid points on the right
         self.grid = self.generate_grid(self.radius, self.grid_size, self.center_point)
         grid_patches = []
+
+        # Initialize all grids as free space
         for (cx, cy) in self.grid:
             state = self.grid_dict.get((self.closest_multiple(cx, self.grid_size), self.closest_multiple(cy, self.grid_size)), FREE_STATE)
             color = 'white'
-            if state == COLLISION_STATE:
-                color = 'red'
-            elif state == PATH_STATE:
-                color = 'green'
-            elif state == GOAL_STATE:
-                color = 'yellow'
             rect = plt.Rectangle((cx - self.grid_size / 2 - self.center_point[0], cy - self.grid_size / 2 - self.center_point[1]), self.grid_size, self.grid_size,
                                 edgecolor='gray', facecolor=color)
             grid_patches.append(rect)
@@ -257,7 +253,7 @@ class asv_visualisation:
                 grid_patches.append(rect)
                 ax2.add_patch(rect)
             
-            # Update ASV and observation circle after grid patches
+            # Update ASV and observation circle after grid patches in the second plot
             self.agent_2.set_data(0, 0)
             self.agent_2.set_marker((3, 0, self.heading - 90))
             self.agent_2.set_zorder(3)
@@ -267,16 +263,15 @@ class asv_visualisation:
 
             return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *grid_patches
 
+        # Create animation and display
         ani = FuncAnimation(fig, update, frames=len(self.straight_path), blit=True, interval=200, repeat=False)
+        
+        # # Write to mp4 file
+        # FFwriter = FFMpegWriter(fps=5)
+        # ani.save("Paper implementation/static_obstacle_v2.mp4", writer=FFwriter)
         
         plt.show()
 
 # Create visualisation
 visualisation = asv_visualisation()
 visualisation.main()
-
-        
-
-
-
-
