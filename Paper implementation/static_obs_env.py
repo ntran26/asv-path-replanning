@@ -285,6 +285,11 @@ class ASVEnv(gym.Env):
             plt.pause(0.01)
 
 # Test the environment with random actions
+def update(frame):
+    env.step(env.action_space.sample())
+    env.render('human')
+    return []
+
 if __name__ == '__main__':
     env = ASVEnv()
     obs = env.reset()
@@ -293,7 +298,7 @@ if __name__ == '__main__':
         action = env.action_space.sample()  # Take a random action
         obs, reward, done, info = env.step(action)
         env.render()
-
+    
         if done:
             break
 
