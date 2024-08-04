@@ -53,12 +53,9 @@ class ASVEnv(gym.Env):
         self.grid_size = SQUARE_SIZE
         self.center_point = (0,0)
 
-        self.obstacles = self.generate_static_obstacles(5, self.width, self.height)
         self.path = self.generate_path(self.start, self.goal)
         self.boundary = self.generate_border(self.width, self.height)
         self.goal_point = self.generate_goal(self.goal)
-        self.objects_environment = self.obstacles + self.path + self.boundary + self.goal_point
-        self.grid_dict = self.fill_grid(self.objects_environment, self.grid_size)
 
         # Action space and observation space
         self.action_space = spaces.Discrete(3)
@@ -159,6 +156,10 @@ class ASVEnv(gym.Env):
 
     def reset(self, seed=None, options=None):
         # super().reset(seed=seed)
+        self.obstacles = self.generate_static_obstacles(5, self.width, self.height)
+        self.objects_environment = self.obstacles + self.path + self.boundary + self.goal_point
+        self.grid_dict = self.fill_grid(self.objects_environment, self.grid_size)
+
         self.step_count = 0
         self.current_heading = self.heading
         self.position = self.start
@@ -190,29 +191,29 @@ class ASVEnv(gym.Env):
 
         self.step_count += 1
         reward = self.calculate_reward(self.position)
-        self.done = self.check_done(self.position)
+        terminated = self.check_done(self.position)
         observation = self.get_observation()
         
-        return observation, reward, self.done, {}
+        return observation, reward, terminated, False, {}
     
     def calculate_reward(self, position):
         x, y = position
         state = self.grid_dict.get((self.closest_multiple(x, self.grid_size), self.closest_multiple(y, self.grid_size)), FREE_STATE)
         if state == COLLISION_STATE:
-            return -100
+            return -1000
         elif state == GOAL_STATE:
             return 100
         elif state == PATH_STATE:
-            return 5
-        else:
-            return -5
+            return 50
+        elif state == FREE_STATE:
+            return -15
     
     def check_done(self, position):
         if self.grid_dict.get((self.closest_multiple(position[0], self.grid_size), self.closest_multiple(position[1], self.grid_size)), FREE_STATE) == COLLISION_STATE \
             or self.grid_dict.get((self.closest_multiple(position[0], self.grid_size), self.closest_multiple(position[1], self.grid_size)), FREE_STATE) == GOAL_STATE:
             return True
         return False
-    
+
     def render(self, mode="human"):
         if mode == 'human':
             if not hasattr(self, 'fig'):
@@ -285,18 +286,13 @@ class ASVEnv(gym.Env):
             plt.pause(0.01)
 
 # Test the environment with random actions
-def update(frame):
-    env.step(env.action_space.sample())
-    env.render('human')
-    return []
-
 if __name__ == '__main__':
     env = ASVEnv()
     obs = env.reset()
 
     for _ in range(100):  # Run for 100 steps or until done
         action = env.action_space.sample()  # Take a random action
-        obs, reward, done, info = env.step(action)
+        obs, reward, done, truncated, info = env.step(action)
         env.render()
     
         if done:
