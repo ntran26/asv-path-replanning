@@ -49,19 +49,19 @@ if __name__ == '__main__':
 
     # Train the agent using PPO
     model = PPO('MlpPolicy', env, verbose=1)
-    model.learn(total_timesteps=100000)
+    model.learn(total_timesteps=1000000)
 
     # Save the model
     model.save("ppo_asv_model")
 
-    # Test the trained model
-    obs, info = env.reset()
-    for _ in range(150):  # Run for 150 steps or until done
-        action, _ = model.predict(obs, deterministic=True)
-        obs, reward, done, truncated, info = env.step(action)
-        env.render()
+    # # Test the trained model
+    # obs, info = env.reset()
+    # for _ in range(150):  # Run for 150 steps or until done
+    #     action, _ = model.predict(obs, deterministic=True)
+    #     obs, reward, done, truncated, info = env.step(action)
+    #     env.render()
 
-        if done or truncated:
-            break
+    #     if done or truncated:
+    #         break
 
-    env.close()
+    # env.close()

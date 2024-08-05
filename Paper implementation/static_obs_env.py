@@ -200,13 +200,13 @@ class ASVEnv(gym.Env):
         x, y = position
         state = self.grid_dict.get((self.closest_multiple(x, self.grid_size), self.closest_multiple(y, self.grid_size)), FREE_STATE)
         if state == COLLISION_STATE:
-            return -1000
+            return -100
         elif state == GOAL_STATE:
             return 100
         elif state == PATH_STATE:
-            return 50
+            return -1
         elif state == FREE_STATE:
-            return -15
+            return -10
     
     def check_done(self, position):
         if self.grid_dict.get((self.closest_multiple(position[0], self.grid_size), self.closest_multiple(position[1], self.grid_size)), FREE_STATE) == COLLISION_STATE \
@@ -285,17 +285,17 @@ class ASVEnv(gym.Env):
             plt.draw()
             plt.pause(0.01)
 
-# Test the environment with random actions
-if __name__ == '__main__':
-    env = ASVEnv()
-    obs = env.reset()
+# # Test the environment with random actions
+# if __name__ == '__main__':
+#     env = ASVEnv()
+#     obs = env.reset()
 
-    for _ in range(100):  # Run for 100 steps or until done
-        action = env.action_space.sample()  # Take a random action
-        obs, reward, done, truncated, info = env.step(action)
-        env.render()
+#     for _ in range(100):  # Run for 100 steps or until done
+#         action = env.action_space.sample()  # Take a random action
+#         obs, reward, done, truncated, info = env.step(action)
+#         env.render()
     
-        if done:
-            break
+#         if done:
+#             break
 
-    env.close()
+#     env.close()
