@@ -49,6 +49,7 @@ if __name__ == '__main__':
 
     # Load the model
     model_path = "ppo_asv_model"
+    # model_path = "rl_model_100000_steps"
     model = PPO.load(model_path)
 
     # Test the trained model

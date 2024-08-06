@@ -200,17 +200,34 @@ class ASVEnv(gym.Env):
         x, y = position
         state = self.grid_dict.get((self.closest_multiple(x, self.grid_size), self.closest_multiple(y, self.grid_size)), FREE_STATE)
         if state == COLLISION_STATE:
-            return -100
+            return -1000
         elif state == GOAL_STATE:
             return 100
         elif state == PATH_STATE:
-            return -1
+            return 1
         elif state == FREE_STATE:
-            return -10
+            distance_to_path = self.calculate_distance_to_path(self.position)
+            return -1 - distance_to_path * 0.1
+    
+    def calculate_distance_to_path(self, position):
+        path_x = [point['x'] for point in self.path]
+        path_y = [point['y'] for point in self.path]
+        min_distance = float('inf')
+        for px, py in zip(path_x, path_y):
+            distance = np.sqrt((position[0] - px) ** 2 + (position[1] - py) ** 2)
+            if distance < min_distance:
+                min_distance = distance
+        return min_distance
     
     def check_done(self, position):
-        if self.grid_dict.get((self.closest_multiple(position[0], self.grid_size), self.closest_multiple(position[1], self.grid_size)), FREE_STATE) == COLLISION_STATE \
-            or self.grid_dict.get((self.closest_multiple(position[0], self.grid_size), self.closest_multiple(position[1], self.grid_size)), FREE_STATE) == GOAL_STATE:
+        # If the agent collide with obstacles or boundary
+        if self.grid_dict.get((self.closest_multiple(position[0], self.grid_size), self.closest_multiple(position[1], self.grid_size)), FREE_STATE) == COLLISION_STATE:
+            return True
+        # If the agent reached goal
+        elif self.grid_dict.get((self.closest_multiple(position[0], self.grid_size), self.closest_multiple(position[1], self.grid_size)), FREE_STATE) == GOAL_STATE:
+            return True
+        # If the total number of steps are 250 or above
+        elif self.step_count >= 350:
             return True
         return False
 

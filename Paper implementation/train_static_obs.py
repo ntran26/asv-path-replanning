@@ -1,11 +1,11 @@
-import gymnasium as gym
-from stable_baselines3 import PPO
-from stable_baselines3.common.env_checker import check_env
-from stable_baselines3.common.callbacks import CheckpointCallback
-from static_obs_env import ASVEnv
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-from gymnasium import spaces
+# import gymnasium as gym
+# from stable_baselines3 import PPO
+# from stable_baselines3.common.env_checker import check_env
+# from stable_baselines3.common.callbacks import CheckpointCallback
+# from static_obs_env import ASVEnv
+# import matplotlib.pyplot as plt
+# from matplotlib.animation import FuncAnimation
+# from gymnasium import spaces
 
 #                               -------- CONFIGURATION --------
 # Define colors
@@ -40,6 +40,44 @@ COLLISION_STATE = 2     # obstacle or border
 GOAL_STATE = 3          # goal point
 
 
+# if __name__ == '__main__':
+#     # Create the environment
+#     env = ASVEnv()
+
+#     # Check the environment
+#     check_env(env)
+
+#     # Train the agent using PPO
+#     model = PPO('MlpPolicy', env, verbose=1)
+#     model.learn(total_timesteps=int(1e6))
+
+#     # Save the model
+#     model.save("ppo_asv_model")
+
+import numpy as np
+import matplotlib.pyplot as plt
+import gymnasium as gym
+from stable_baselines3 import PPO
+from stable_baselines3.common.callbacks import BaseCallback
+from stable_baselines3.common.env_checker import check_env
+from stable_baselines3.common.vec_env import DummyVecEnv
+from static_obs_env import ASVEnv
+
+class CustomCallback(BaseCallback):
+    def __init__(self, verbose=0):
+        super(CustomCallback, self).__init__(verbose)
+        self.policy_loss = []
+        self.value_loss = []
+        self.rewards = []
+
+    def _on_step(self):
+        if len(self.model.ep_info_buffer) > 0:
+            self.rewards.append(self.model.ep_info_buffer[0]["r"])
+            if "loss" in self.model.ep_info_buffer[0]:
+                self.policy_loss.append(self.model.ep_info_buffer[0]["loss"]["policy_loss"])
+                self.value_loss.append(self.model.ep_info_buffer[0]["loss"]["value_loss"])
+        return True
+
 if __name__ == '__main__':
     # Create the environment
     env = ASVEnv()
@@ -47,21 +85,21 @@ if __name__ == '__main__':
     # Check the environment
     check_env(env)
 
-    # Train the agent using PPO
+    # Define the model
     model = PPO('MlpPolicy', env, verbose=1)
-    model.learn(total_timesteps=1000000)
+
+    # Train the model with callback
+    callback = CustomCallback()
+    model.learn(total_timesteps=100000, callback=callback)
 
     # Save the model
     model.save("ppo_asv_model")
 
-    # # Test the trained model
-    # obs, info = env.reset()
-    # for _ in range(150):  # Run for 150 steps or until done
-    #     action, _ = model.predict(obs, deterministic=True)
-    #     obs, reward, done, truncated, info = env.step(action)
-    #     env.render()
-
-    #     if done or truncated:
-    #         break
-
-    # env.close()
+    # Plot the rewards
+    plt.figure(figsize=(10, 5))
+    plt.plot(callback.rewards, label='Rewards')
+    plt.xlabel('Step')
+    plt.ylabel('Reward')
+    plt.title('Reward over Steps')
+    plt.legend()
+    plt.show()
