@@ -227,7 +227,7 @@ class ASVEnv(gym.Env):
         elif self.grid_dict.get((self.closest_multiple(position[0], self.grid_size), self.closest_multiple(position[1], self.grid_size)), FREE_STATE) == GOAL_STATE:
             return True
         # If the total number of steps are 250 or above
-        elif self.step_count >= 350:
+        elif self.step_count >= 500:
             return True
         return False
 
