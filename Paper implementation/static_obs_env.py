@@ -52,15 +52,16 @@ class ASVEnv(gym.Env):
         self.radius = RADIUS
         self.grid_size = SQUARE_SIZE
         self.center_point = (0,0)
+        self.step_taken = []
 
         self.path = self.generate_path(self.start, self.goal)
         self.boundary = self.generate_border(self.width, self.height)
         self.goal_point = self.generate_goal(self.goal)
 
         # Action space and observation space
-        self.action_space = spaces.Discrete(3)
+        self.action_space = spaces.Discrete(5)
         self.observation_space = spaces.Box(low=0, high=3, shape=(313,), dtype=np.int32)   
-        # 3 possible actions: left, right, straight
+        # 5 possible actions: left, right, straight, accelerate, decelerate
         # 4 possible states for observation, and the shape = number of grids inside the observation radius
 
         self.reset()
@@ -133,11 +134,11 @@ class ASVEnv(gym.Env):
             x = np.random.randint(0, map_width)
             y = np.random.randint(0, map_height)
             obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
-        # # Generate 2 random obstacles along the path
-        # for _ in range(2):
-        #     x = self.start[0]
-        #     y = np.random.randint(self.start[1] + 20, self.goal[1] - 20)
-        #     obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
+        # Generate 2 random obstacles along the path
+        for _ in range(1):
+            x = self.start[0]
+            y = np.random.randint(self.start[1] + 20, self.goal[1] - 20)
+            obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
         return obstacles
     
     # Function that generate a path line (list/array of points)
@@ -162,6 +163,7 @@ class ASVEnv(gym.Env):
 
         self.step_count = 0
         self.current_heading = self.heading
+        self.current_speed = self.speed
         self.position = self.start
         self.done = False
         self.grid = self.generate_grid(self.radius, self.grid_size, self.position)
@@ -188,6 +190,18 @@ class ASVEnv(gym.Env):
             self.current_heading -= self.turn_rate
             self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
                         self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
+        elif action == 3:   # accelerate
+            self.current_speed += 0.5
+            if self.current_speed > 2:
+                self.current_speed = 2
+                self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
+                                self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
+        elif action == 4:   # decelerate
+            self.current_speed -= 0.5
+            if self.current_speed < 1:
+                self.current_speed = 1
+                self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
+                                self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
 
         self.step_count += 1
         reward = self.calculate_reward(self.position)
@@ -206,9 +220,9 @@ class ASVEnv(gym.Env):
         elif state == GOAL_STATE:
             return 1000
         elif state == PATH_STATE:
-            return 15 - distance_to_path * 0.1
+            return 15 
         elif state == FREE_STATE:
-            return -15 - distance_to_path * 0.1
+            return -15
     
     def calculate_distance_to_path(self, position):
         path_x = [point['x'] for point in self.path]

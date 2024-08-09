@@ -5,9 +5,12 @@ from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.vec_env import DummyVecEnv
+from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
+import torch as th
+import torch.nn as nn
+import torch.nn.functional as F
 from static_obs_env import ASVEnv
 import optuna
-from tqdm import tqdm
 
 #                               -------- CONFIGURATION --------
 # Define colors
@@ -82,6 +85,60 @@ GOAL_STATE = 3          # goal point
 #     plt.legend()
 #     plt.show()
 
+# class CustomActorCritic(nn.Module):
+#     def __init__(self, input_dim, action_dim):
+#         super(CustomActorCritic, self).__init__()
+#         # Shared layers for both actor and critic
+#         # self.fc1 = nn.Linear(input_dim, 512)
+#         # self.fc2 = nn.Linear(512, 512)
+#         # self.fc3 = nn.Linear(512, 512)
+#         self.fc1 = nn.Linear(313, 512)
+#         self.fc2 = nn.Linear(512, 1252)
+#         self.fc3 = nn.Linear(1252, 512)
+        
+#         # Actor head
+#         self.actor = nn.Linear(512, action_dim)
+
+#         # Critic head
+#         self.critic = nn.Linear(512, 1)
+    
+#     # def forward(self, x):
+#     #     x = th.relu(self.fc1(x))
+#     #     x = th.relu(self.fc2(x))
+#     #     x = th.relu(self.fc3(x))
+#     #     return x
+    
+#     def forward(self, x):
+#         x = F.relu(self.fc1(x))
+#         x = F.relu(self.fc2(x))
+#         x = self.fc3(x)
+#         return x
+    
+#     def actor_forward(self, x):
+#         x = self.forward(x)
+#         return self.actor(x)
+    
+#     def critic_forward(self, x):
+#         x = self.forward(x)
+#         return self.critic(x)
+
+# class CustomPolicy(BaseFeaturesExtractor):
+#     def __init__(self, observation_space, features_dim=1252, action_space=None):
+#         super(CustomPolicy, self).__init__(observation_space, features_dim)
+#         input_dim = features_dim
+#         action_dim = env.action_space.n
+
+#         self.actor_critic = CustomActorCritic(input_dim, action_dim)
+
+#     def forward(self, x):
+#         return self.actor_critic.forward(x)
+
+#     def forward_actor(self, x):
+#         return self.actor_critic.actor_forward(x)
+
+#     def forward_critic(self, x):
+#         return self.actor_critic.critic_forward(x)
+
 class CustomCallback(BaseCallback):
     def __init__(self, verbose=0):
         super(CustomCallback, self).__init__(verbose)
@@ -139,50 +196,73 @@ class CustomCallback(BaseCallback):
 
 # # Train final model with best hyperparameters
 # best_params = study.best_params
+
+# Create environment
 env = ASVEnv()
-learning_rate = 8.515786595813231e-05
-batch_size = 128
-n_epochs = 8
-gamma = 0.9339239258707902
-clip_range = 0.20259480665235446
+
+# Adjust hyperparameters
+learning_rate = 0.0001
+batch_size = 2048
+n_epochs = 10
+gamma = 0.99
+clip_range = 0.1
 gae_lambda = 0.9222467745570867
-vf_coef = 0.517316849734512
-ent_coef = 3.7569404673013434e-05
+vf_coef = 0.5
+ent_coef = 0.01
 # model = PPO('MlpPolicy', env, verbose=1, **best_params)
-model = PPO('MlpPolicy', env, verbose=1, 
-                learning_rate=learning_rate,
-                batch_size=batch_size,
-                n_epochs=n_epochs,
-                gamma=gamma,
-                clip_range=clip_range,
-                gae_lambda=gae_lambda,
-                vf_coef=vf_coef,
-                ent_coef=ent_coef)
-model = PPO('MlpPolicy', env, verbose=1, learning_rate=0.0001, gamma=0.99)
+# model = PPO('MlpPolicy', env, verbose=1, 
+#                 learning_rate=learning_rate,
+#                 batch_size=batch_size,
+#                 n_epochs=n_epochs,
+#                 gamma=gamma,
+#                 clip_range=clip_range,
+#                 gae_lambda=gae_lambda,
+#                 vf_coef=vf_coef,
+#                 ent_coef=ent_coef)
+# # Define the PPO policy with custom network
+# policy_kwargs = dict(features_extractor_class=CustomPolicy,
+#                     features_extractor_kwargs=dict(features_dim=1252),)  # 1252 inputs for the policy
+
+# # Create the PPO model with the custom policy
+# model = PPO('MlpPolicy', env, policy_kwargs=policy_kwargs, verbose=1,
+#             learning_rate=learning_rate,
+#             batch_size=batch_size,
+#             n_epochs=n_epochs,
+#             gamma=gamma,
+#             clip_range=clip_range,
+#             gae_lambda=gae_lambda,
+#             vf_coef=vf_coef,
+#             ent_coef=ent_coef)
+
+# Create the PPO model with the custom policy
+model = PPO('MlpPolicy', env, verbose=1,
+            learning_rate=learning_rate,
+            batch_size=batch_size,
+            n_epochs=n_epochs,
+            gamma=gamma,
+            clip_range=clip_range,
+            gae_lambda=gae_lambda,
+            vf_coef=vf_coef,
+            ent_coef=ent_coef)
 callback = CustomCallback()
-num_timesteps = int(5e5)
-# Initialize tqdm progress bar
-with tqdm(total=num_timesteps, desc="Training Progress") as pbar:
-    timestep = 0
+num_timesteps = int(1e6)
 
-    while timestep < num_timesteps:
-        # Perform one learning step
-        model.learn(total_timesteps=1000, callback=callback, reset_num_timesteps=False)
-        # Calculate mean reward
-        mean_reward = np.mean(callback.rewards[-1000:])
-        
-        # Update the timestep and progress bar
-        timestep += 1000
-        pbar.update(1000)
-# model.learn(total_timesteps=num_timesteps, callback=callback)
+# Train the model
+model.learn(total_timesteps=num_timesteps, callback=callback)
 
-model.save("ppo_asv_model")
+# Calculate mean reward
+mean_reward = np.mean(callback.rewards[-1000:])
+print(f"Mean reward: {mean_reward}")
+
+# Save the model
+model.save("ppo_custom_policy")
+
+# Plot rewards
 plt.plot(callback.rewards, label="Rewards")
 plt.xlabel('Steps')
 plt.ylabel('Reward')
 plt.title('Reward over Steps with Tuned Hyperparameters')
 plt.show()
-
 
 # [I 2024-08-08 22:04:56,912] Trial 99 finished with value: -1577.840389703 and parameters: 
 # {'learning_rate': 1.2247035372437565e-05, 'batch_size': 64, 'n_epochs': 3, 'gamma': 0.9336413752404424, 
