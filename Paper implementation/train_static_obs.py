@@ -7,6 +7,7 @@ from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.vec_env import DummyVecEnv
 from static_obs_env import ASVEnv
 import optuna
+from tqdm import tqdm
 
 #                               -------- CONFIGURATION --------
 # Define colors
@@ -153,7 +154,19 @@ model = PPO('MlpPolicy', env, verbose=1,
                 vf_coef=vf_coef,
                 ent_coef=ent_coef)
 callback = CustomCallback()
-model.learn(total_timesteps=100000, callback=callback)
+num_timesteps = int(1e5)
+# Initialize tqdm progress bar
+with tqdm(total=num_timesteps, desc="Training Progress") as pbar:
+    timestep = 0
+
+    while timestep < num_timesteps:
+        # Perform one learning step
+        model.learn(total_timesteps=1000, reset_num_timesteps=False)
+        
+        # Update the timestep and progress bar
+        timestep += 1000
+        pbar.update(1000)
+# model.learn(total_timesteps=num_timesteps, callback=callback)
 model.save("ppo_asv_model")
 plt.plot(callback.rewards)
 plt.xlabel('Steps')
