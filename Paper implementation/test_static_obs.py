@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
     # Test the trained model
     obs, info = env.reset()
-    for _ in range(150):  # Run for 150 steps or until done
+    for _ in range(500):  # Run for 500 steps or until done
         action, _ = model.predict(obs, deterministic=True)
         obs, reward, done, truncated, info = env.step(action)
         env.render()

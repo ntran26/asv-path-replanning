@@ -93,14 +93,14 @@ class CustomCallback(BaseCallback):
 
 def objective(trial):
     # Define hyperparameters
-    learning_rate = trial.suggest_loguniform('learning_rate', 1e-5, 1e-2)
-    batch_size = trial.suggest_categorical('batch_size', [32, 64, 128, 256])
-    n_epochs = trial.suggest_int('n_epochs', 1, 20)
-    gamma = trial.suggest_uniform('gamma', 0.9, 0.9999)
-    clip_range = trial.suggest_uniform('clip_range', 0.1, 0.4)
-    gae_lambda = trial.suggest_uniform('gae_lambda', 0.8, 1.0)
-    vf_coef = trial.suggest_uniform('vf_coef', 0.1, 1.0)
-    ent_coef = trial.suggest_loguniform('ent_coef', 1e-8, 1e-2)
+    learning_rate = 8.515786595813231e-05
+    batch_size = 128
+    n_epochs = 8
+    gamma = 0.9339239258707902
+    clip_range = 0.20259480665235446
+    gae_lambda = 0.9222467745570867
+    vf_coef = 0.517316849734512
+    ent_coef = 3.7569404673013434e-05
 
     # Create environment
     env = ASVEnv()
@@ -124,24 +124,48 @@ def objective(trial):
     mean_reward = np.mean(callback.rewards[-1000:])
     return mean_reward
 
-# Create study and optimize
-study = optuna.create_study(direction='maximize')
-study.optimize(objective, n_trials=100)
+# # Create study and optimize
+# study = optuna.create_study(direction='maximize')
+# study.optimize(objective, n_trials=100)
 
-# Best hyperparameters
-print("Best hyperparameters:", study.best_params)
+# # Best hyperparameters
+# print("Best hyperparameters:", study.best_params)
 
-# Train final model with best hyperparameters
-best_params = study.best_params
-env = DummyVecEnv([lambda: ASVEnv()])
-model = PPO('MlpPolicy', env, verbose=1, **best_params)
-model.learn(total_timesteps=1000000)
-
-# Plot rewards
+# # Train final model with best hyperparameters
+# best_params = study.best_params
+env = ASVEnv()
+learning_rate = 8.515786595813231e-05
+batch_size = 128
+n_epochs = 8
+gamma = 0.9339239258707902
+clip_range = 0.20259480665235446
+gae_lambda = 0.9222467745570867
+vf_coef = 0.517316849734512
+ent_coef = 3.7569404673013434e-05
+# model = PPO('MlpPolicy', env, verbose=1, **best_params)
+model = PPO('MlpPolicy', env, verbose=1, 
+                learning_rate=learning_rate,
+                batch_size=batch_size,
+                n_epochs=n_epochs,
+                gamma=gamma,
+                clip_range=clip_range,
+                gae_lambda=gae_lambda,
+                vf_coef=vf_coef,
+                ent_coef=ent_coef)
 callback = CustomCallback()
-model.learn(total_timesteps=1000000, callback=callback)
+model.learn(total_timesteps=100000, callback=callback)
+model.save("ppo_asv_model")
 plt.plot(callback.rewards)
 plt.xlabel('Steps')
 plt.ylabel('Reward')
 plt.title('Reward over Steps with Tuned Hyperparameters')
 plt.show()
+
+
+# [I 2024-08-08 22:04:56,912] Trial 99 finished with value: -1577.840389703 and parameters: 
+# {'learning_rate': 1.2247035372437565e-05, 'batch_size': 64, 'n_epochs': 3, 'gamma': 0.9336413752404424, 
+# 'clip_range': 0.34830383187752906, 'gae_lambda': 0.9744300867560989, 'vf_coef': 0.1532606515006814, 'ent_coef': 1.2917604627782274e-05}. 
+# Best is trial 65 with value: -1096.794644681.
+# Best hyperparameters: {'learning_rate': 8.515786595813231e-05, 'batch_size': 128, 
+# 'n_epochs': 8, 'gamma': 0.9339239258707902, 'clip_range': 0.20259480665235446, 
+# 'gae_lambda': 0.9222467745570867, 'vf_coef': 0.517316849734512, 'ent_coef': 3.7569404673013434e-05}

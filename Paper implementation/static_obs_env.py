@@ -185,7 +185,7 @@ class ASVEnv(gym.Env):
             self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
                         self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
         elif action == 2:   # turn right
-            self.current_heading += self.turn_rate
+            self.current_heading -= self.turn_rate
             self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
                         self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
 
@@ -248,8 +248,8 @@ class ASVEnv(gym.Env):
 
                 self.agent_1, = self.ax1.plot([], [], marker='^', color=BLUE)
                 self.agent_2, = self.ax2.plot([], [], marker='^', color=BLUE)
-                self.observation_horizon1 = plt.Circle(self.start, self.radius, color=RED, fill=False)
-                self.observation_horizon2 = plt.Circle((0, 0), self.radius, color=RED, fill=False)
+                self.observation_horizon1 = plt.Circle(self.start, self.radius, color=BLUE, fill=False)
+                self.observation_horizon2 = plt.Circle((0, 0), self.radius, color=BLUE, fill=False)
                 self.ax1.add_patch(self.observation_horizon1)
                 self.ax2.add_patch(self.observation_horizon2)
 
@@ -279,13 +279,13 @@ class ASVEnv(gym.Env):
 
             for (cx, cy) in new_grid:
                 state = self.grid_dict.get((self.closest_multiple(cx, self.grid_size), self.closest_multiple(cy, self.grid_size)), FREE_STATE)
-                color = 'white'
+                color = WHITE
                 if state == COLLISION_STATE:
-                    color = 'red'
+                    color = RED
                 elif state == PATH_STATE:
-                    color = 'green'
+                    color = GREEN
                 elif state == GOAL_STATE:
-                    color = 'yellow'
+                    color = YELLOW
                 rect = plt.Rectangle((cx - self.grid_size / 2 - self.position[0], cy - self.grid_size / 2 - self.position[1]), self.grid_size, self.grid_size,
                                     edgecolor='gray', facecolor=color)
                 rect.set_zorder(1)
