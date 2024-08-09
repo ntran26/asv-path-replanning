@@ -22,8 +22,7 @@ NUM_STATIC_OBS = 5
 RADIUS = 100
 SQUARE_SIZE = 10
 SPEED = 2
-OBSTACLE_RADIUS = SQUARE_SIZE/3
-DYNAMIC_OBS_SPEED = 1
+OBSTACLE_RADIUS = SQUARE_SIZE / 3
 
 # Define initial heading angle, turn rate and number of steps
 INITIAL_HEADING = 90
@@ -38,7 +37,8 @@ GOAL_STATE = 3          # goal point
 
 class asv_visualisation:
     # Initialize environment
-    def __init__(self):
+    def __init__(self, case):
+        self.case = case
         self.width = WIDTH
         self.height = HEIGHT
         self.heading = INITIAL_HEADING
@@ -50,9 +50,9 @@ class asv_visualisation:
         self.radius = RADIUS
         self.grid_size = SQUARE_SIZE
         self.center_point = (0, 0)
-        self.dynamic_obstacle = {'x': 100, 'y': 250, 'speed': DYNAMIC_OBS_SPEED, 'heading': 270}  # Moving straight down
 
         self.obstacles = self.generate_static_obstacles(5, self.width, self.height)
+        self.dynamic_obstacles = self.generate_dynamic_obstacles()
         self.path = self.generate_path(self.start, self.goal)
         self.boundary = self.generate_border(self.width, self.height)
         self.goal_point = self.generate_goal(self.goal)
@@ -60,7 +60,7 @@ class asv_visualisation:
         self.grid_dict = self.fill_grid(self.objects_environment, self.grid_size)
 
     #                           -------- HELPER FUNCTIONS --------
-
+    
     # Create a function that sets the priority of each state in case they overlap: 
     # obstacle/collision > goal point > path > free space
     def get_priority_state(self, current_state, new_state):
@@ -73,11 +73,11 @@ class asv_visualisation:
         elif current_state not in (COLLISION_STATE, GOAL_STATE, PATH_STATE):
             return FREE_STATE
         return current_state
-
+    
     # Create a function that converts each point from the global map to a grid coordinate
     def closest_multiple(self, n, mult):
         return int((n + mult / 2) // mult) * mult
-
+    
     # Create a function to generate a dictionary, storing the grid coordinates and state
     def fill_grid(self, objects, grid_size):
         grid_dict = {}
@@ -91,11 +91,11 @@ class asv_visualisation:
 
             if (m, n) not in grid_dict:
                 grid_dict[(m, n)] = FREE_STATE
-
-            grid_dict[(m, n)] = self.get_priority_state(grid_dict[(m, n)], state)
+            
+            grid_dict[(m, n)] = self.get_priority_state(grid_dict[(m,n)], state)
         return grid_dict
 
-    # Create a function that generate grid coordinates (x, y) from global map
+    # Create a function that generate grid coordinates (x,y) from global map
     def generate_grid(self, radius, square_size, center):
         x = np.arange(-radius + square_size, radius, square_size)
         y = np.arange(-radius + square_size, radius, square_size)
@@ -105,7 +105,7 @@ class asv_visualisation:
                 if np.sqrt(i ** 2 + j ** 2) <= radius:
                     grid.append((center[0] + i, center[1] + j))
         return grid
-
+    
     #                           -------- MAP GENERATION --------
 
     # Create a function to generate borders around the map
@@ -118,7 +118,7 @@ class asv_visualisation:
             boundary.append({'x': 0, 'y': y, 'state': COLLISION_STATE})             # left boundary
             boundary.append({'x': map_width, 'y': y, 'state': COLLISION_STATE})     # right boundary
         return boundary
-
+    
     # Create a function to generate static obstacles
     def generate_static_obstacles(self, num_obs, map_width, map_height):
         obstacles = []
@@ -133,7 +133,7 @@ class asv_visualisation:
             y = np.random.randint(self.start[1] + 20, self.goal[1] - 20)
             obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
         return obstacles
-
+    
     # Function that generate a path line (list/array of points)
     def generate_path(self, start_point, goal_point):
         path = []
@@ -142,106 +142,96 @@ class asv_visualisation:
             y = start_point[1] + i
             path.append({'x': start_point[0], 'y': y, 'state': PATH_STATE})
         return path
-
+    
     def generate_goal(self, goal_point):
         goal = []
         goal.append({'x': goal_point[0], 'y': goal_point[1], 'state': GOAL_STATE})
         return goal
+    
+    # Generate dynamic obstacles
+    def generate_dynamic_obstacles(self):
+        dynamic_obs = []
+        if self.case == 1:
+            # Crossing situation: Ship approaches from starboard
+            dynamic_obs.append({'x': 120, 'y': 100, 'heading': 270, 'speed': 2, 'state': COLLISION_STATE})
+        elif self.case == 2:
+            # Head-on situation
+            dynamic_obs.append({'x': 100, 'y': 200, 'heading': 270, 'speed': 2, 'state': COLLISION_STATE})
+        elif self.case == 3:
+            # Overtaking situation
+            dynamic_obs.append({'x': 100, 'y': 50, 'heading': 90, 'speed': 1, 'state': COLLISION_STATE})
+        elif self.case == 4:
+            # Crossing situation where agent has priority
+            dynamic_obs.append({'x': 80, 'y': 150, 'heading': 90, 'speed': 2, 'state': COLLISION_STATE})
+        return dynamic_obs
+    
+    # Update dynamic obstacles
+    def update_dynamic_obstacles(self):
+        for obs in self.dynamic_obstacles:
+            obs['x'] += obs['speed'] * np.cos(np.radians(obs['heading']))
+            obs['y'] += obs['speed'] * np.sin(np.radians(obs['heading']))
 
-    # Calculate relative bearing of the dynamic obstacle to the ASV
-    def calculate_relative_bearing(self, asv_pos, obstacle_pos, asv_heading):
-        dx = obstacle_pos[0] - asv_pos[0]
-        dy = obstacle_pos[1] - asv_pos[1]
-        angle_to_obstacle = np.degrees(np.arctan2(dy, dx))
-        relative_bearing = (angle_to_obstacle - asv_heading + 360) % 360
-        return relative_bearing
+    # Modify grid based on dynamic obstacles and COLREGs rules
+    def update_grid_with_dynamic_obstacles(self):
+        for obs in self.dynamic_obstacles:
+            dx = obs['x'] - self.center_point[0]
+            dy = obs['y'] - self.center_point[1]
+            distance = np.sqrt(dx**2 + dy**2)
+            if distance <= self.radius:
+                grid_x = self.closest_multiple(obs['x'], self.grid_size)
+                grid_y = self.closest_multiple(obs['y'], self.grid_size)
+                self.grid_dict[(grid_x, grid_y)] = COLLISION_STATE
 
-    #                           -------- MAIN LOOP --------
-    def main(self):
-        # Initialize figure and axes
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 8))
+    #                           -------- VISUALIZATION --------
+    
+    # Create an observation grid visualisation for ASV agent 
+    def get_asv_observation_grid(self):
+        center_x = self.center_point[0]
+        center_y = self.center_point[1]
+        grid = self.generate_grid(self.radius, self.grid_size, self.center_point)
+        grid_states = [self.grid_dict.get((self.closest_multiple(p[0], self.grid_size), 
+                                           self.closest_multiple(p[1], self.grid_size)), FREE_STATE) for p in grid]
+        grid_relative = [(int((p[0] - center_x) / self.grid_size), int((p[1] - center_y) / self.grid_size)) for p in grid]
+        return grid_relative, grid_states
+    
+    def display_map(self):
+        self.grid_dict = self.fill_grid(self.objects_environment, self.grid_size)
+        observation_grid, state = self.get_asv_observation_grid()
+        x, y = zip(*observation_grid)
+        colors = [BLACK if s == COLLISION_STATE else (GREEN if s == PATH_STATE else (YELLOW if s == GOAL_STATE else WHITE)) for s in state]
 
-        # First plot: whole map
-        ax1.set_aspect('equal')
-        ax1.set_title('MAP')
-        ax1.set_xlim(-self.radius, self.width + self.radius)
-        ax1.set_ylim(-self.radius, self.height + self.radius)
+        fig, ax = plt.subplots()
+        sc = ax.scatter(x, y, c=colors, s=500, marker='s', edgecolor='black')
+        plt.xlim(-self.radius / self.grid_size, self.radius / self.grid_size)
+        plt.ylim(-self.radius / self.grid_size, self.radius / self.grid_size)
+        plt.gca().set_aspect('equal', adjustable='box')
+        plt.axis('off')
+        plt.title('ASV Observation Grid')
 
-        # Second plot: observation per timestep
-        ax2.set_aspect('equal')
-        ax2.set_title('OBSERVATION')
-        ax2.set_xlim(-self.radius, self.radius)
-        ax2.set_ylim(-self.radius, self.radius)
-
-        # Plot ASV and observation circle
-        self.agent_1, = ax1.plot([], [], marker='^', color=BLUE)
-        self.agent_2, = ax2.plot([], [], marker='^', color=BLUE)
-        observation_horizon1 = plt.Circle(self.start, self.radius, color=RED, fill=False)
-        observation_horizon2 = plt.Circle((0, 0), self.radius, color=RED, fill=False)
-        ax1.add_patch(observation_horizon1)
-        ax2.add_patch(observation_horizon2)
-
-        # Plot start point
-         # Plot start point
-        ax1.plot(self.start[0], self.start[1], marker='o', color=GREEN)
-
-        # Plot goal point
-        ax1.plot(self.goal[0], self.goal[1], marker='o', color=YELLOW)
-
-        # Plot static obstacles
-        for obs in self.obstacles:
-            circle = plt.Circle((obs['x'], obs['y']), OBSTACLE_RADIUS, color=BLACK)
-            ax1.add_patch(circle)
-
-        # Plot the path
-        path_x = [point['x'] for point in self.path]
-        path_y = [point['y'] for point in self.path]
-        ax1.plot(path_x, path_y, color=WHITE)
-
-        # Initialize dynamic obstacle
-        self.dynamic_obs_plot, = ax1.plot([], [], marker='o', color=RED)
-
-        # Animation function to update the plot
         def update(frame):
-            # Update ASV position
-            asv_x, asv_y = self.start
-            asv_heading = self.heading
-            self.agent_1.set_data(asv_x, asv_y)
-            self.agent_2.set_data(0, 0)
+            ax.cla()
+            self.center_point = (self.start[0], self.start[1] + frame * self.speed)
+            self.update_dynamic_obstacles()
+            self.update_grid_with_dynamic_obstacles()
+            observation_grid, state = self.get_asv_observation_grid()
+            x, y = zip(*observation_grid)
+            colors = [BLACK if s == COLLISION_STATE else (GREEN if s == PATH_STATE else (YELLOW if s == GOAL_STATE else WHITE)) for s in state]
+            ax.scatter(x, y, c=colors, s=500, marker='s', edgecolor='black')
+            plt.xlim(-self.radius / self.grid_size, self.radius / self.grid_size)
+            plt.ylim(-self.radius / self.grid_size, self.radius / self.grid_size)
+            plt.gca().set_aspect('equal', adjustable='box')
+            plt.axis('off')
+            plt.title('ASV Observation Grid')
 
-            # Update dynamic obstacle position
-            self.dynamic_obstacle['x'] += self.dynamic_obstacle['speed'] * np.cos(np.radians(self.dynamic_obstacle['heading']))
-            self.dynamic_obstacle['y'] += self.dynamic_obstacle['speed'] * np.sin(np.radians(self.dynamic_obstacle['heading']))
-            self.dynamic_obs_plot.set_data(self.dynamic_obstacle['x'], self.dynamic_obstacle['y'])
-
-            # Check if dynamic obstacle is out of bounds and reset if necessary
-            if self.dynamic_obstacle['x'] < 0 or self.dynamic_obstacle['x'] > self.width or \
-               self.dynamic_obstacle['y'] < 0 or self.dynamic_obstacle['y'] > self.height:
-                self.dynamic_obstacle['x'], self.dynamic_obstacle['y'] = 100, 250  # Reset to initial position
-
-            # Calculate relative bearing
-            rel_bearing = self.calculate_relative_bearing((asv_x, asv_y), (self.dynamic_obstacle['x'], self.dynamic_obstacle['y']), asv_heading)
-
-            # Update observation grid
-            grid = self.generate_grid(self.radius, self.grid_size, self.start)
-            for g in grid:
-                if g in self.grid_dict:
-                    state = self.grid_dict[g]
-                    color = {FREE_STATE: WHITE, PATH_STATE: GREEN, COLLISION_STATE: RED, GOAL_STATE: YELLOW}[state]
-                    rect = plt.Rectangle((g[0] - self.grid_size / 2, g[1] - self.grid_size / 2), self.grid_size, self.grid_size, color=color)
-                    ax2.add_patch(rect)
-
-            return self.agent_1, self.agent_2, self.dynamic_obs_plot
-
-        # Create animation
-        ani = FuncAnimation(fig, update, frames=range(int(self.step)), blit=True, repeat=False)
-
-        # # Save the animation
-        # writer = FFMpegWriter(fps=10)
-        # ani.save('asv_simulation.mp4', writer=writer)
-
+        ani = FuncAnimation(fig, update, frames=int(self.step), repeat=False, interval=50)
         plt.show()
+        # # Export the animation
+        # writer = FFMpegWriter(fps=10)
+        # ani.save(f"asv_case_{self.case}.mp4", writer=writer)
 
-if __name__ == "__main__":
-    vis = asv_visualisation()
-    vis.main()
+#                           -------- TEST CASES --------
+
+# Initialize environment with a specific case
+case = 3
+asv_env = asv_visualisation(case)
+asv_env.display_map()

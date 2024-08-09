@@ -85,45 +85,50 @@ GOAL_STATE = 3          # goal point
 class CustomCallback(BaseCallback):
     def __init__(self, verbose=0):
         super(CustomCallback, self).__init__(verbose)
+        self.policy_loss = []
+        self.value_loss = []
         self.rewards = []
 
     def _on_step(self):
         if len(self.model.ep_info_buffer) > 0:
             self.rewards.append(self.model.ep_info_buffer[0]["r"])
+            if "loss" in self.model.ep_info_buffer[0]:
+                self.policy_loss.append(self.model.ep_info_buffer[0]["loss"]["policy_loss"])
+                self.value_loss.append(self.model.ep_info_buffer[0]["loss"]["value_loss"])
         return True
 
-def objective(trial):
-    # Define hyperparameters
-    learning_rate = 8.515786595813231e-05
-    batch_size = 128
-    n_epochs = 8
-    gamma = 0.9339239258707902
-    clip_range = 0.20259480665235446
-    gae_lambda = 0.9222467745570867
-    vf_coef = 0.517316849734512
-    ent_coef = 3.7569404673013434e-05
+# def objective(trial):
+#     # Define hyperparameters
+#     learning_rate = 8.515786595813231e-05
+#     batch_size = 128
+#     n_epochs = 8
+#     gamma = 0.9339239258707902
+#     clip_range = 0.20259480665235446
+#     gae_lambda = 0.9222467745570867
+#     vf_coef = 0.517316849734512
+#     ent_coef = 3.7569404673013434e-05
 
-    # Create environment
-    env = ASVEnv()
-    check_env(env)
+#     # Create environment
+#     env = ASVEnv()
+#     check_env(env)
 
-    # Define and train the model
-    model = PPO('MlpPolicy', env, verbose=0, 
-                learning_rate=learning_rate,
-                batch_size=batch_size,
-                n_epochs=n_epochs,
-                gamma=gamma,
-                clip_range=clip_range,
-                gae_lambda=gae_lambda,
-                vf_coef=vf_coef,
-                ent_coef=ent_coef)
+#     # Define and train the model
+#     model = PPO('MlpPolicy', env, verbose=0, 
+#                 learning_rate=learning_rate,
+#                 batch_size=batch_size,
+#                 n_epochs=n_epochs,
+#                 gamma=gamma,
+#                 clip_range=clip_range,
+#                 gae_lambda=gae_lambda,
+#                 vf_coef=vf_coef,
+#                 ent_coef=ent_coef)
 
-    callback = CustomCallback()
-    model.learn(total_timesteps=100000, callback=callback)
+#     callback = CustomCallback()
+#     model.learn(total_timesteps=500000, callback=callback)
 
-    # Calculate mean reward
-    mean_reward = np.mean(callback.rewards[-1000:])
-    return mean_reward
+#     # Calculate mean reward
+#     mean_reward = np.mean(callback.rewards[-1000:])
+#     return mean_reward
 
 # # Create study and optimize
 # study = optuna.create_study(direction='maximize')
@@ -153,22 +158,26 @@ model = PPO('MlpPolicy', env, verbose=1,
                 gae_lambda=gae_lambda,
                 vf_coef=vf_coef,
                 ent_coef=ent_coef)
+model = PPO('MlpPolicy', env, verbose=1, learning_rate=0.0001, gamma=0.99)
 callback = CustomCallback()
-num_timesteps = int(1e5)
+num_timesteps = int(5e5)
 # Initialize tqdm progress bar
 with tqdm(total=num_timesteps, desc="Training Progress") as pbar:
     timestep = 0
 
     while timestep < num_timesteps:
         # Perform one learning step
-        model.learn(total_timesteps=1000, reset_num_timesteps=False)
+        model.learn(total_timesteps=1000, callback=callback, reset_num_timesteps=False)
+        # Calculate mean reward
+        mean_reward = np.mean(callback.rewards[-1000:])
         
         # Update the timestep and progress bar
         timestep += 1000
         pbar.update(1000)
 # model.learn(total_timesteps=num_timesteps, callback=callback)
+
 model.save("ppo_asv_model")
-plt.plot(callback.rewards)
+plt.plot(callback.rewards, label="Rewards")
 plt.xlabel('Steps')
 plt.ylabel('Reward')
 plt.title('Reward over Steps with Tuned Hyperparameters')

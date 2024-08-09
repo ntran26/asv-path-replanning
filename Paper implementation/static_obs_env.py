@@ -133,11 +133,11 @@ class ASVEnv(gym.Env):
             x = np.random.randint(0, map_width)
             y = np.random.randint(0, map_height)
             obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
-        # Generate 2 random obstacles along the path
-        for _ in range(2):
-            x = self.start[0]
-            y = np.random.randint(self.start[1] + 20, self.goal[1] - 20)
-            obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
+        # # Generate 2 random obstacles along the path
+        # for _ in range(2):
+        #     x = self.start[0]
+        #     y = np.random.randint(self.start[1] + 20, self.goal[1] - 20)
+        #     obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
         return obstacles
     
     # Function that generate a path line (list/array of points)
@@ -199,15 +199,16 @@ class ASVEnv(gym.Env):
     def calculate_reward(self, position):
         x, y = position
         state = self.grid_dict.get((self.closest_multiple(x, self.grid_size), self.closest_multiple(y, self.grid_size)), FREE_STATE)
+        distance_to_path = self.calculate_distance_to_path(self.position)
+        
         if state == COLLISION_STATE:
             return -1000
         elif state == GOAL_STATE:
-            return 100
+            return 1000
         elif state == PATH_STATE:
-            return 1
+            return 15 - distance_to_path * 0.1
         elif state == FREE_STATE:
-            distance_to_path = self.calculate_distance_to_path(self.position)
-            return -1 - distance_to_path * 0.1
+            return -15 - distance_to_path * 0.1
     
     def calculate_distance_to_path(self, position):
         path_x = [point['x'] for point in self.path]
