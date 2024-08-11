@@ -48,9 +48,9 @@ if __name__ == '__main__':
     check_env(env)
 
     # Load the model
-    # model_path = "ppo_asv_model"
+    model_path = "ppo_asv_model"
     # model_path = "rl_model_100000_steps"
-    model_path = "rl_model_1000000_steps"
+    # model_path = "rl_model_1000000_steps"
     model = PPO.load(model_path)
 
     # Test the trained model
@@ -80,9 +80,9 @@ if __name__ == '__main__':
     for obj in env.obstacles:
         ax.plot(obj['x'], obj['y'], marker='o', color=RED)
     ax.plot(env.position[0], env.position[1], marker='^', color=BLUE)
-    step_x = [point['x'] for point in env.step_taken]
-    step_y = [point['y'] for point in env.step_taken]
-    ax.plot(step_x, step_y, '-', color=GREEN)
-    ax.show()
+    step_x = [point[0] for point in env.step_taken]
+    step_y = [point[1] for point in env.step_taken]
+    ax.plot(step_x, step_y, '-', color=BLUE)
+    plt.show()
 
     env.close()
