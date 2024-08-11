@@ -204,6 +204,7 @@ class ASVEnv(gym.Env):
                                 self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
 
         self.step_count += 1
+        self.step_taken.append((self.position[0], self.position[1]))
         reward = self.calculate_reward(self.position)
         terminated = self.check_done(self.position)
         observation = self.get_observation()
@@ -214,15 +215,24 @@ class ASVEnv(gym.Env):
         x, y = position
         state = self.grid_dict.get((self.closest_multiple(x, self.grid_size), self.closest_multiple(y, self.grid_size)), FREE_STATE)
         distance_to_path = self.calculate_distance_to_path(self.position)
+        # Calculate the distance to the nearest obstacle
+        nearest_obstacle_distance = self.calculate_distance_to_nearest_obstacle(self.position)
+        
+        # Set a threshold distance for significant penalty
+        danger_zone_threshold = self.grid_size * 2  # You can adjust this based on your environment scale
         
         if state == COLLISION_STATE:
             return -1000
         elif state == GOAL_STATE:
             return 1000
         elif state == PATH_STATE:
-            return 15 
+            return 30 - distance_to_path*0.1
         elif state == FREE_STATE:
-            return -15
+            return -15 - distance_to_path*0.1
+        
+        # Add a penalty for being too close to an obstacle
+        if nearest_obstacle_distance < danger_zone_threshold:
+            reward -= 500 * (1 - nearest_obstacle_distance / danger_zone_threshold)
     
     def calculate_distance_to_path(self, position):
         path_x = [point['x'] for point in self.path]
@@ -232,6 +242,18 @@ class ASVEnv(gym.Env):
             distance = np.sqrt((position[0] - px) ** 2 + (position[1] - py) ** 2)
             if distance < min_distance:
                 min_distance = distance
+        return min_distance
+    
+    def calculate_distance_to_nearest_obstacle(self, position):
+        x, y = position
+        min_distance = float('inf')
+        
+        for (obstacle_x, obstacle_y), state in self.grid_dict.items():
+            if state == COLLISION_STATE:
+                distance = np.sqrt((x - obstacle_x)**2 + (y - obstacle_y)**2)
+                if distance < min_distance:
+                    min_distance = distance
+        
         return min_distance
     
     def check_done(self, position):

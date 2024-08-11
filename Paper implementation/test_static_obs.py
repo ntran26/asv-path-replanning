@@ -48,8 +48,9 @@ if __name__ == '__main__':
     check_env(env)
 
     # Load the model
-    model_path = "ppo_asv_model"
+    # model_path = "ppo_asv_model"
     # model_path = "rl_model_100000_steps"
+    model_path = "rl_model_1000000_steps"
     model = PPO.load(model_path)
 
     # Test the trained model
@@ -61,5 +62,27 @@ if __name__ == '__main__':
 
         if done or truncated:
             break
+    
+    # Plot the path taken
+    fig, ax = plt.subplots(1,1, figsize=(8,8))
+    ax.set_aspect("equal")
+    ax.set_title("Steps Taken")
+    ax.set_xlim(-env.radius, env.width + env.radius)
+    ax.set_ylim(-env.radius, env.height + env.radius)
+    ax.plot(env.start[0], env.start[1], marker='o', color=BLUE)
+    ax.plot(env.goal[0], env.goal[1], marker='o', color=YELLOW)
+    for obj in env.boundary:
+        boundary_line = plt.Rectangle((obj['x'], obj['y']), 1, 1, edgecolor=BLACK, facecolor=BLACK)
+        ax.add_patch(boundary_line)
+    path_x = [point['x'] for point in env.path]
+    path_y = [point['y'] for point in env.path]
+    ax.plot(path_x, path_y, '-', color=GREEN)
+    for obj in env.obstacles:
+        ax.plot(obj['x'], obj['y'], marker='o', color=RED)
+    ax.plot(env.position[0], env.position[1], marker='^', color=BLUE)
+    step_x = [point['x'] for point in env.step_taken]
+    step_y = [point['y'] for point in env.step_taken]
+    ax.plot(step_x, step_y, '-', color=GREEN)
+    ax.show()
 
     env.close()
