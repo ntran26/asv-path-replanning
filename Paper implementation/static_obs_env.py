@@ -219,14 +219,14 @@ class ASVEnv(gym.Env):
         nearest_obstacle_distance = self.calculate_distance_to_nearest_obstacle(self.position)
         
         # Set a threshold distance for significant penalty
-        danger_zone_threshold = self.grid_size * 2  # You can adjust this based on your environment scale
+        danger_zone_threshold = self.grid_size * 2  
         
         if state == COLLISION_STATE:
             return -1000
         elif state == GOAL_STATE:
             return 1000
         elif state == PATH_STATE:
-            return 30 - distance_to_path*0.1
+            return 15 - distance_to_path*0.1
         elif state == FREE_STATE:
             return -15 - distance_to_path*0.1
         
