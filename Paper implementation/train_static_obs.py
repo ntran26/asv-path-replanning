@@ -21,29 +21,6 @@ GREEN = (0, 1, 0)
 YELLOW = (1, 1, 0)
 BLUE = (0, 0, 1)
 
-# Define map dimensions and start/goal points, number of static obstacles
-WIDTH = 200
-HEIGHT = 300
-START = (100, 30)
-GOAL = (100, 250)
-NUM_STATIC_OBS = 5
-
-# Define observation radius and grid size
-RADIUS = 100
-SQUARE_SIZE = 10
-SPEED = 2
-OBSTACLE_RADIUS = SQUARE_SIZE/3
-
-# Define initial heading angle, turn rate and number of steps
-INITIAL_HEADING = 90
-TURN_RATE = 5
-
-# Define states
-FREE_STATE = 0          # free space
-PATH_STATE = 1          # path
-COLLISION_STATE = 2     # obstacle or border
-GOAL_STATE = 3          # goal point
-
 # class CustomCallback(BaseCallback):
 #     def __init__(self, verbose=0):
 #         super(CustomCallback, self).__init__(verbose)
@@ -202,11 +179,10 @@ env = ASVEnv()
 
 # Adjust hyperparameters
 learning_rate = 0.0001
-batch_size = 2048
+batch_size = 32
 n_epochs = 10
 gamma = 0.99
 clip_range = 0.1
-gae_lambda = 0.9222467745570867
 vf_coef = 0.5
 ent_coef = 0.01
 # model = PPO('MlpPolicy', env, verbose=1, **best_params)
@@ -241,11 +217,11 @@ model = PPO('MlpPolicy', env, verbose=1,
             n_epochs=n_epochs,
             gamma=gamma,
             clip_range=clip_range,
-            gae_lambda=gae_lambda,
             vf_coef=vf_coef,
             ent_coef=ent_coef)
+# model = PPO('MlpPolicy', env, verbose=1)
 callback = CustomCallback()
-num_timesteps = int(1e6)
+num_timesteps = int(1e5)
 
 # Train the model
 model.learn(total_timesteps=num_timesteps, callback=callback)

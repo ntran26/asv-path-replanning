@@ -1,10 +1,11 @@
 import numpy as np
+import gymnasium as gym
+from gymnasium import spaces
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, FFMpegWriter
-import gym
-from gym import spaces
 
-# Define constants
+#                               -------- CONFIGURATION --------
+# Define colors
 BLACK = (0, 0, 0)
 WHITE = (1, 1, 1)
 RED = (1, 0, 0)
@@ -12,57 +13,63 @@ GREEN = (0, 1, 0)
 YELLOW = (1, 1, 0)
 BLUE = (0, 0, 1)
 
-WIDTH = 200
-HEIGHT = 300
-START = (100, 30)
-GOAL = (100, 250)
+# Define map dimensions and start/goal points, number of static obstacles
+WIDTH = 100
+HEIGHT = 150
+START = (50, 20)
+GOAL = (50, 120)
 NUM_STATIC_OBS = 5
 
+# Define observation radius and grid size
 RADIUS = 100
 SQUARE_SIZE = 10
-SPEED = 2
-OBSTACLE_RADIUS = SQUARE_SIZE / 3
+SPEED = 1
+OBSTACLE_RADIUS = SQUARE_SIZE/3
 
+# Define initial heading angle, turn rate and number of steps
 INITIAL_HEADING = 90
 TURN_RATE = 5
 
-FREE_STATE = 0
-PATH_STATE = 1
-COLLISION_STATE = 2
-GOAL_STATE = 3
+# Define states
+FREE_STATE = 0          # free space
+PATH_STATE = 1          # path
+COLLISION_STATE = 2     # obstacle or border
+GOAL_STATE = 3          # goal point
 
 class ASVEnv(gym.Env):
-    metadata = {'render.modes': ['human']}
-
-    def __init__(self):
+    metadata = {"render_modes": ["human"]}
+    def __init__(self, render_mode = "human"):
         super(ASVEnv, self).__init__()
+        self.render_mode = render_mode
+
         self.width = WIDTH
         self.height = HEIGHT
         self.heading = INITIAL_HEADING
         self.turn_rate = TURN_RATE
         self.speed = SPEED
-        # self.num_step = STEP
         self.start = START
         self.goal = GOAL
         self.radius = RADIUS
         self.grid_size = SQUARE_SIZE
-        self.center_point = (0, 0)
+        self.center_point = (0,0)
+        self.step_taken = []
 
-        self.obstacles = self.generate_static_obstacles(5, self.width, self.height)
         self.path = self.generate_path(self.start, self.goal)
         self.boundary = self.generate_border(self.width, self.height)
         self.goal_point = self.generate_goal(self.goal)
-        self.objects_environment = self.obstacles + self.path + self.boundary + self.goal_point
-        self.grid_dict = self.fill_grid(self.objects_environment, self.grid_size)
 
-        # Define action and observation space
-        self.action_space = spaces.Discrete(3)  # Actions: 0 = go straight, 1 = turn left, 2 = turn right
-        self.observation_space = spaces.Box(low=0, high=3, shape=(313,), dtype=np.int32)  # 313 grid points within the observation radius
+        # Action space and observation space
+        self.action_space = spaces.Discrete(5)
+        self.observation_space = spaces.Box(low=0, high=3, shape=(313,), dtype=np.int32)   
+        # 5 possible actions: left, right, straight, accelerate, decelerate
+        # 4 possible states for observation, and the shape = number of grids inside the observation radius
 
-        # Initialize other variables
         self.reset()
-
-    # Helper functions (same as before)
+    
+    #                           -------- HELPER FUNCTIONS --------
+    
+    # Create a function that sets the priority of each state in case they overlap: 
+    # obstacle/collision > goal point > path > free space
     def get_priority_state(self, current_state, new_state):
         if new_state == COLLISION_STATE:
             return COLLISION_STATE
@@ -74,9 +81,11 @@ class ASVEnv(gym.Env):
             return FREE_STATE
         return current_state
     
+    # Create a function that converts each point from the global map to a grid coordinate
     def closest_multiple(self, n, mult):
         return int((n + mult / 2) // mult) * mult
     
+    # Create a function to generate a dictionary, storing the grid coordinates and state
     def fill_grid(self, objects, grid_size):
         grid_dict = {}
         for obj in objects:
@@ -90,9 +99,10 @@ class ASVEnv(gym.Env):
             if (m, n) not in grid_dict:
                 grid_dict[(m, n)] = FREE_STATE
             
-            grid_dict[(m, n)] = self.get_priority_state(grid_dict[(m, n)], state)
+            grid_dict[(m, n)] = self.get_priority_state(grid_dict[(m,n)], state)
         return grid_dict
 
+    # Create a function that generate grid coordinates (x,y) from global map
     def generate_grid(self, radius, square_size, center):
         x = np.arange(-radius + square_size, radius, square_size)
         y = np.arange(-radius + square_size, radius, square_size)
@@ -102,7 +112,10 @@ class ASVEnv(gym.Env):
                 if np.sqrt(i ** 2 + j ** 2) <= radius:
                     grid.append((center[0] + i, center[1] + j))
         return grid
+    
+    #                           -------- MAP GENERATION --------
 
+    # Create a function to generate borders around the map
     def generate_border(self, map_width, map_height):
         boundary = []
         for x in range(0, map_width + 1):
@@ -112,22 +125,31 @@ class ASVEnv(gym.Env):
             boundary.append({'x': 0, 'y': y, 'state': COLLISION_STATE})             # left boundary
             boundary.append({'x': map_width, 'y': y, 'state': COLLISION_STATE})     # right boundary
         return boundary
-
+    
+    # Create a function to generate static obstacles
     def generate_static_obstacles(self, num_obs, map_width, map_height):
         obstacles = []
-        for _ in range(num_obs):
-            x = np.random.randint(0, map_width)
-            y = np.random.randint(0, map_height)
-            obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
-        for _ in range(2):
-            x = self.start[0]
-            y = np.random.randint(self.start[1] + 20, self.goal[1] - 20)
-            obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
+        # # Generate random obstacles around the map
+        # for _ in range(num_obs):
+        #     x = np.random.randint(0, map_width)
+        #     y = np.random.randint(0, map_height)
+        #     obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
+        # # Generate 2 random obstacles along the path
+        # for _ in range(1):
+        #     x = self.start[0]
+        #     y = np.random.randint(self.start[1] + 20, self.goal[1] - 20)
+        #     obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
+        # return obstacles
+        x = 50
+        y = 70
+        obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
         return obstacles
+
     
+    # Function that generate a path line (list/array of points)
     def generate_path(self, start_point, goal_point):
         path = []
-        num_points = goal_point[1] - start_point[1]
+        num_points = goal_point[1] - start_point[1]     # straight vertical line
         for i in range(num_points):
             y = start_point[1] + i
             path.append({'x': start_point[0], 'y': y, 'state': PATH_STATE})
@@ -138,62 +160,123 @@ class ASVEnv(gym.Env):
         goal.append({'x': goal_point[0], 'y': goal_point[1], 'state': GOAL_STATE})
         return goal
 
-    def reset(self):
+    def reset(self, seed=None, options=None):
+        # super().reset(seed=seed)
+        self.obstacles = self.generate_static_obstacles(5, self.width, self.height)
+        self.objects_environment = self.obstacles + self.path + self.boundary + self.goal_point
+        self.grid_dict = self.fill_grid(self.objects_environment, self.grid_size)
+
         self.step_count = 0
         self.current_heading = self.heading
+        self.current_speed = self.speed
         self.position = self.start
         self.done = False
-        self.grid = self.generate_grid(self.radius, self.grid_size, self.center_point)
-        return self._get_observation()
-
-    def _get_observation(self):
+        self.grid = self.generate_grid(self.radius, self.grid_size, self.position)
+        return self.get_observation(), {}
+    
+    def get_observation(self):
         current_pos = self.position
         new_grid = self.generate_grid(self.radius, self.grid_size, current_pos)
-        observation = np.zeros(len(new_grid), dtype=np.int32)
-        for idx, (cx, cy) in enumerate(new_grid):
-            state = self.grid_dict.get((self.closest_multiple(cx, self.grid_size), self.closest_multiple(cy, self.grid_size)), FREE_STATE)
+        observation = np.zeros(len(new_grid), dtype = np.int32)
+        for idx, (x, y) in enumerate(new_grid):
+            state = self.grid_dict.get((self.closest_multiple(x, self.grid_size), self.closest_multiple(y, self.grid_size)), FREE_STATE)
             observation[idx] = state
         return observation
-
+    
     def step(self, action):
-        if action == 0:
+        if action == 0:     # go straight
             self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
-                             self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
-        elif action == 1:
+                        self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
+        elif action == 1:   # turn left
             self.current_heading += self.turn_rate
             self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
-                             self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
-        elif action == 2:
+                        self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
+        elif action == 2:   # turn right
             self.current_heading -= self.turn_rate
             self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
-                             self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
+                        self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
+        elif action == 3:   # accelerate
+            self.current_speed += 0.5
+            if self.current_speed > 2:
+                self.current_speed = 2
+            self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
+                            self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
+        elif action == 4:   # decelerate
+            self.current_speed -= 0.5
+            if self.current_speed < 1:
+                self.current_speed = 1
+            self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
+                            self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
 
         self.step_count += 1
-        reward = self._get_reward()
-        self.done = self._check_done()
-        observation = self._get_observation()
-        return observation, reward, self.done, {}
-
-    def _get_reward(self):
-        current_pos = self.position
-        cx, cy = current_pos
-        state = self.grid_dict.get((self.closest_multiple(cx, self.grid_size), self.closest_multiple(cy, self.grid_size)), FREE_STATE)
+        self.step_taken.append((self.position[0], self.position[1]))
+        reward = self.calculate_reward(self.position)
+        terminated = self.check_done(self.position)
+        observation = self.get_observation()
+        
+        return observation, reward, terminated, False, {}
+    
+    def calculate_reward(self, position):
+        x, y = position
+        state = self.grid_dict.get((self.closest_multiple(x, self.grid_size), self.closest_multiple(y, self.grid_size)), FREE_STATE)
+        distance_to_path = self.calculate_distance_to_path(self.position)
+        # Calculate the distance to the nearest obstacle
+        nearest_obstacle_distance = self.calculate_distance_to_nearest_obstacle(self.position)
+        
+        # Set a threshold distance for significant penalty
+        danger_zone_threshold = self.grid_size * 2  
+        
         if state == COLLISION_STATE:
-            return -100
+            return -200
         elif state == GOAL_STATE:
             return 100
         elif state == PATH_STATE:
-            return 10
-        else:
-            return -1
-
-    def _check_done(self):
-        current_pos = self.position
-        if self.position[1] >= self.goal[1] or self.grid_dict.get((self.closest_multiple(current_pos[0], self.grid_size), self.closest_multiple(current_pos[1], self.grid_size)), FREE_STATE) == COLLISION_STATE:
+            return 0
+        elif state == FREE_STATE:
+            return -5 - distance_to_path*0.01
+        
+        # # Add a penalty for being too close to an obstacle
+        # if nearest_obstacle_distance < danger_zone_threshold:
+        #     reward -= 500 * (1 - nearest_obstacle_distance / danger_zone_threshold)
+    
+    def calculate_distance_to_path(self, position):
+        path_x = [point['x'] for point in self.path]
+        path_y = [point['y'] for point in self.path]
+        min_distance = float('inf')
+        for px, py in zip(path_x, path_y):
+            distance = np.sqrt((position[0] - px) ** 2 + (position[1] - py) ** 2)
+            if distance < min_distance:
+                min_distance = distance
+        return min_distance
+    
+    def calculate_distance_to_nearest_obstacle(self, position):
+        x, y = position
+        min_distance = float('inf')
+        
+        for (obstacle_x, obstacle_y), state in self.grid_dict.items():
+            if state == COLLISION_STATE:
+                distance = np.sqrt((x - obstacle_x)**2 + (y - obstacle_y)**2)
+                if distance < min_distance:
+                    min_distance = distance
+        
+        return min_distance
+    
+    def check_done(self, position):        
+        x, y = position
+        state = self.grid_dict.get((self.closest_multiple(x, self.grid_size), self.closest_multiple(y, self.grid_size)), FREE_STATE)
+        
+        # If the agent collide with obstacles or boundary
+        if state == COLLISION_STATE:
+            return True
+        # If the agent reached goal
+        elif state == GOAL_STATE:
+            return True
+        # If the total number of steps are 250 or above
+        elif self.step_count >= 500:
             return True
         return False
 
-    def render(self, mode='human'):
+    def render(self, mode="human"):
         if mode == 'human':
             if not hasattr(self, 'fig'):
                 self.fig, (self.ax1, self.ax2) = plt.subplots(1, 2, figsize=(12, 8))
@@ -210,8 +293,8 @@ class ASVEnv(gym.Env):
 
                 self.agent_1, = self.ax1.plot([], [], marker='^', color=BLUE)
                 self.agent_2, = self.ax2.plot([], [], marker='^', color=BLUE)
-                self.observation_horizon1 = plt.Circle(self.start, self.radius, color=RED, fill=False)
-                self.observation_horizon2 = plt.Circle((0, 0), self.radius, color=RED, fill=False)
+                self.observation_horizon1 = plt.Circle(self.start, self.radius, color=BLUE, fill=False)
+                self.observation_horizon2 = plt.Circle((0, 0), self.radius, color=BLUE, fill=False)
                 self.ax1.add_patch(self.observation_horizon1)
                 self.ax2.add_patch(self.observation_horizon2)
 
@@ -241,13 +324,13 @@ class ASVEnv(gym.Env):
 
             for (cx, cy) in new_grid:
                 state = self.grid_dict.get((self.closest_multiple(cx, self.grid_size), self.closest_multiple(cy, self.grid_size)), FREE_STATE)
-                color = 'white'
+                color = WHITE
                 if state == COLLISION_STATE:
-                    color = 'red'
+                    color = RED
                 elif state == PATH_STATE:
-                    color = 'green'
+                    color = GREEN
                 elif state == GOAL_STATE:
-                    color = 'yellow'
+                    color = YELLOW
                 rect = plt.Rectangle((cx - self.grid_size / 2 - self.position[0], cy - self.grid_size / 2 - self.position[1]), self.grid_size, self.grid_size,
                                     edgecolor='gray', facecolor=color)
                 rect.set_zorder(1)
@@ -264,19 +347,23 @@ class ASVEnv(gym.Env):
             plt.draw()
             plt.pause(0.01)
 
-# # Test the environment with random actions
-# if __name__ == '__main__':
-#     env = ASVEnv()
-#     obs = env.reset()
+# Test the environment with random actions
+if __name__ == '__main__':
+    env = ASVEnv()
+    obs = env.reset()
 
-#     for _ in range(100):  # Run for 100 steps or until done
-#         action = env.action_space.sample()  # Take a random action
-#         obs, reward, done, info = env.step(action)
-#         env.render()
+    print("Observation Space Shape", env.observation_space.shape)
+    print("Sample observation", env.observation_space.sample())
 
-#         if done:
-#             break
+    print("Action Space Shape", env.action_space.n)
+    print("Action Space Sample", env.action_space.sample())
 
-#     env.close()
+    for _ in range(500):  # Run for 100 steps or until done
+        action = env.action_space.sample()  # Take a random action
+        obs, reward, done, truncated, info = env.step(action)
+        print(env.observation_space)
+        env.render()
+        if done:
+            break
 
-print(int(1e6))
+    env.close()

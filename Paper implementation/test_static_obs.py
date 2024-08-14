@@ -16,29 +16,6 @@ GREEN = (0, 1, 0)
 YELLOW = (1, 1, 0)
 BLUE = (0, 0, 1)
 
-# Define map dimensions and start/goal points, number of static obstacles
-WIDTH = 200
-HEIGHT = 300
-START = (100, 30)
-GOAL = (100, 250)
-NUM_STATIC_OBS = 5
-
-# Define observation radius and grid size
-RADIUS = 100
-SQUARE_SIZE = 10
-SPEED = 2
-OBSTACLE_RADIUS = SQUARE_SIZE/3
-
-# Define initial heading angle, turn rate and number of steps
-INITIAL_HEADING = 90
-TURN_RATE = 5
-
-# Define states
-FREE_STATE = 0          # free space
-PATH_STATE = 1          # path
-COLLISION_STATE = 2     # obstacle or border
-GOAL_STATE = 3          # goal point
-
 
 if __name__ == '__main__':
     # Create the environment
@@ -48,7 +25,8 @@ if __name__ == '__main__':
     check_env(env)
 
     # Load the model
-    model_path = "ppo_asv_model"
+    # model_path = "ppo_asv_model"
+    model_path = "ppo_custom_policy"
     # model_path = "rl_model_100000_steps"
     # model_path = "rl_model_1000000_steps"
     model = PPO.load(model_path)

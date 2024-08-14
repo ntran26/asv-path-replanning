@@ -130,7 +130,7 @@ class asv_visualisation:
         # Generate 2 random obstacles along the path
         for _ in range(2):
             x = self.start[0]
-            y = np.random.randint(self.start[1] + 20, self.goal[1] - 20)
+            y = np.random.randint(self.start[1] + 50, self.goal[1] - 50)
             obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
         return obstacles
     
@@ -182,56 +182,76 @@ class asv_visualisation:
                 grid_y = self.closest_multiple(obs['y'], self.grid_size)
                 self.grid_dict[(grid_x, grid_y)] = COLLISION_STATE
 
-    #                           -------- VISUALIZATION --------
+                # Calculate relative heading angle
+                relative_heading = self.calculate_relative_heading(obs)
+
+                # Add obstacle's relative heading and distance to the list
+                self.relative_headings.append(relative_heading)
+                self.obstacle_distances.append(distance)
     
-    # Create an observation grid visualisation for ASV agent 
-    def get_asv_observation_grid(self):
-        center_x = self.center_point[0]
-        center_y = self.center_point[1]
-        grid = self.generate_grid(self.radius, self.grid_size, self.center_point)
-        grid_states = [self.grid_dict.get((self.closest_multiple(p[0], self.grid_size), 
-                                           self.closest_multiple(p[1], self.grid_size)), FREE_STATE) for p in grid]
-        grid_relative = [(int((p[0] - center_x) / self.grid_size), int((p[1] - center_y) / self.grid_size)) for p in grid]
-        return grid_relative, grid_states
+    def calculate_relative_heading(self, obs):
+        dx = obs['x'] - self.center_point[0]
+        dy = obs['y'] - self.center_point[1]
+        obs_heading = np.degrees(np.arctan2(dy, dx))
+        relative_heading = (obs_heading - self.heading) % 360
+        return relative_heading
+
+    #                           -------- PLOTTING FUNCTIONS --------
+    # Create a function that returns the color associated with each state
+    def get_state_color(self, state):
+        if state == COLLISION_STATE:
+            return BLACK
+        elif state == GOAL_STATE:
+            return GREEN
+        elif state == PATH_STATE:
+            return YELLOW
+        return WHITE
     
-    def display_map(self):
-        self.grid_dict = self.fill_grid(self.objects_environment, self.grid_size)
-        observation_grid, state = self.get_asv_observation_grid()
-        x, y = zip(*observation_grid)
-        colors = [BLACK if s == COLLISION_STATE else (GREEN if s == PATH_STATE else (YELLOW if s == GOAL_STATE else WHITE)) for s in state]
+    def plot_grid(self, grid_dict, grid_points, subplot):
+        x_coords = [p[0] for p in grid_points]
+        y_coords = [p[1] for p in grid_points]
+        colors = [self.get_state_color(grid_dict[p]) for p in grid_points]
+        subplot.scatter(x_coords, y_coords, c=colors, marker='s', s=self.grid_size*10)
+        subplot.set_xlim([self.center_point[0] - self.radius, self.center_point[0] + self.radius])
+        subplot.set_ylim([self.center_point[1] - self.radius, self.center_point[1] + self.radius])
 
-        fig, ax = plt.subplots()
-        sc = ax.scatter(x, y, c=colors, s=500, marker='s', edgecolor='black')
-        plt.xlim(-self.radius / self.grid_size, self.radius / self.grid_size)
-        plt.ylim(-self.radius / self.grid_size, self.radius / self.grid_size)
-        plt.gca().set_aspect('equal', adjustable='box')
-        plt.axis('off')
-        plt.title('ASV Observation Grid')
+    def plot_relative_headings(self, subplot):
+        angles = np.array(self.relative_headings)
+        distances = np.array(self.obstacle_distances)
+        subplot.polar(angles * np.pi / 180, distances, 'ro')
+        subplot.set_ylim([0, self.radius])
+        subplot.set_title('Relative Heading Angles')
 
-        def update(frame):
-            ax.cla()
-            self.center_point = (self.start[0], self.start[1] + frame * self.speed)
-            self.update_dynamic_obstacles()
-            self.update_grid_with_dynamic_obstacles()
-            observation_grid, state = self.get_asv_observation_grid()
-            x, y = zip(*observation_grid)
-            colors = [BLACK if s == COLLISION_STATE else (GREEN if s == PATH_STATE else (YELLOW if s == GOAL_STATE else WHITE)) for s in state]
-            ax.scatter(x, y, c=colors, s=500, marker='s', edgecolor='black')
-            plt.xlim(-self.radius / self.grid_size, self.radius / self.grid_size)
-            plt.ylim(-self.radius / self.grid_size, self.radius / self.grid_size)
-            plt.gca().set_aspect('equal', adjustable='box')
-            plt.axis('off')
-            plt.title('ASV Observation Grid')
+    # Function that plots a circle to represent the observation zone
+    def plot_observation_zone(self, ax):
+        circle = plt.Circle(self.center_point, self.radius, color=BLUE, fill=False)
+        ax.add_artist(circle)
+    
+    # Plot map, path, agent and observation zone
+    def plot_map(self, subplot):
+        subplot.clear()
+        self.plot_observation_zone(subplot)
+        grid_points = self.generate_grid(self.radius, self.grid_size, self.center_point)
+        self.plot_grid(self.grid_dict, grid_points, subplot)
+        subplot.set_aspect('equal')
+    
+    # Update frame for animation
+    def update_frame(self, i, subplot1, subplot2):
+        self.center_point = (self.start[0], self.start[1] + i)
+        self.relative_headings = []
+        self.obstacle_distances = []
+        self.update_dynamic_obstacles()
+        self.update_grid_with_dynamic_obstacles()
+        self.plot_map(subplot1)
+        self.plot_relative_headings(subplot2)
 
-        ani = FuncAnimation(fig, update, frames=int(self.step), repeat=False, interval=50)
+    #                           -------- ANIMATION --------
+    def animate(self):
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+        ani = FuncAnimation(fig, self.update_frame, fargs=(ax1, ax2), frames=int(self.step),
+                            interval=50, repeat=False)
         plt.show()
-        # # Export the animation
-        # writer = FFMpegWriter(fps=10)
-        # ani.save(f"asv_case_{self.case}.mp4", writer=writer)
 
-#                           -------- TEST CASES --------
-
-# Initialize environment with a specific case
-case = 3
-asv_env = asv_visualisation(case)
-asv_env.display_map()
+if __name__ == "__main__":
+    simulation = asv_visualisation(case=4)
+    simulation.animate()

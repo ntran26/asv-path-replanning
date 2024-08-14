@@ -277,6 +277,15 @@ class asv_visualisation:
                 rect.set_zorder(1)     # make sure the grids don't overlay other components
                 grid_patches.append(rect)
                 ax2.add_patch(rect)
+
+                if state == COLLISION_STATE:
+                    print("Collide")
+                elif state == GOAL_STATE:
+                    print("Reached goal")
+                elif state == PATH_STATE:
+                    print("On path")
+                elif state == FREE_STATE:
+                    print("On free space")
             
             # Update ASV and observation circle after grid patches in the second plot
             self.agent_2.set_data(0, 0)
