@@ -234,7 +234,7 @@ class ASVEnv(gym.Env):
         elif state == PATH_STATE:
             reward += 10 + 1 / (distance_to_goal + 1)
         elif state == FREE_STATE:
-            reward -= 1 + distance_to_path*1 + distance_to_goal*0.01
+            reward -= (1 + distance_to_path + distance_to_goal*0.01)
         
         # Add a penalty for being too close to an obstacle
         # if nearest_obstacle_distance < danger_zone_threshold:
