@@ -122,6 +122,8 @@ class CustomCallback(BaseCallback):
         self.policy_loss = []
         self.value_loss = []
         self.rewards = []
+        self.best_mean_reward = -np.inf  # Initialize to a very low value
+        self.best_model_path = "best_model.zip"
 
     def _on_step(self):
         if len(self.model.ep_info_buffer) > 0:
@@ -129,6 +131,14 @@ class CustomCallback(BaseCallback):
             if "loss" in self.model.ep_info_buffer[0]:
                 self.policy_loss.append(self.model.ep_info_buffer[0]["loss"]["policy_loss"])
                 self.value_loss.append(self.model.ep_info_buffer[0]["loss"]["value_loss"])
+
+            # Calculate the mean reward for the last 1000 steps
+            if len(self.rewards) >= 1000:
+                mean_reward = np.mean(self.rewards[-1000:])
+                if mean_reward > self.best_mean_reward:
+                    self.best_mean_reward = mean_reward
+                    print(f"New best mean reward: {mean_reward}. Saving model...")
+                    self.model.save(self.best_model_path)
         return True
 
 # def objective(trial):
@@ -178,8 +188,8 @@ class CustomCallback(BaseCallback):
 env = ASVEnv()
 
 # Adjust hyperparameters
-learning_rate = 0.0001
-batch_size = 32
+learning_rate = 0.001
+batch_size = 128
 n_epochs = 10
 gamma = 0.99
 clip_range = 0.1
@@ -221,7 +231,7 @@ model = PPO('MlpPolicy', env, verbose=1,
             ent_coef=ent_coef)
 # model = PPO('MlpPolicy', env, verbose=1)
 callback = CustomCallback()
-num_timesteps = int(1e5)
+num_timesteps = int(1e6)
 
 # Train the model
 model.learn(total_timesteps=num_timesteps, callback=callback)
@@ -240,10 +250,9 @@ plt.ylabel('Reward')
 plt.title('Reward over Steps with Tuned Hyperparameters')
 plt.show()
 
-# [I 2024-08-08 22:04:56,912] Trial 99 finished with value: -1577.840389703 and parameters: 
-# {'learning_rate': 1.2247035372437565e-05, 'batch_size': 64, 'n_epochs': 3, 'gamma': 0.9336413752404424, 
-# 'clip_range': 0.34830383187752906, 'gae_lambda': 0.9744300867560989, 'vf_coef': 0.1532606515006814, 'ent_coef': 1.2917604627782274e-05}. 
 # Best is trial 65 with value: -1096.794644681.
 # Best hyperparameters: {'learning_rate': 8.515786595813231e-05, 'batch_size': 128, 
 # 'n_epochs': 8, 'gamma': 0.9339239258707902, 'clip_range': 0.20259480665235446, 
 # 'gae_lambda': 0.9222467745570867, 'vf_coef': 0.517316849734512, 'ent_coef': 3.7569404673013434e-05}
+
+# {'learning_rate': 0.00907329821451761, 'batch_size': 64, 'n_epochs': 2, 'gamma': 0.9988044963952771, 'clip_range': 0.21608474944379513, 'gae_lambda': 0.8696976357115177, 'vf_coef': 0.3492943287414059, 'ent_coef': 4.4723499358631903e-07}

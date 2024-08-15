@@ -26,21 +26,26 @@ if __name__ == '__main__':
 
     # Load the model
     # model_path = "ppo_asv_model"
-    model_path = "ppo_custom_policy"
+    # model_path = "ppo_custom_policy"
     # model_path = "rl_model_100000_steps"
     # model_path = "rl_model_1000000_steps"
+    model_path = "best_model"
     model = PPO.load(model_path)
 
     # Test the trained model
     obs, info = env.reset()
+    cumulative_reward = 0
     for _ in range(500):  # Run for 500 steps or until done
         action, _ = model.predict(obs, deterministic=True)
         obs, reward, done, truncated, info = env.step(action)
+        cumulative_reward += reward
         env.render()
 
         if done or truncated:
             break
     
+    print(f"Cumulative reward = {cumulative_reward}")
+
     # Plot the path taken
     fig, ax = plt.subplots(1,1, figsize=(8,8))
     ax.set_aspect("equal")

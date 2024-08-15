@@ -129,22 +129,21 @@ class ASVEnv(gym.Env):
     # Create a function to generate static obstacles
     def generate_static_obstacles(self, num_obs, map_width, map_height):
         obstacles = []
-        # # Generate random obstacles around the map
-        # for _ in range(num_obs):
-        #     x = np.random.randint(0, map_width)
-        #     y = np.random.randint(0, map_height)
-        #     obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
-        # # Generate 2 random obstacles along the path
-        # for _ in range(1):
-        #     x = self.start[0]
-        #     y = np.random.randint(self.start[1] + 20, self.goal[1] - 20)
-        #     obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
-        # return obstacles
-        x = 50
-        y = 70
-        obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
+        # Generate random obstacles around the map
+        for _ in range(num_obs):
+            x = np.random.randint(0, map_width)
+            y = np.random.randint(0, map_height)
+            obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
+        # Generate 2 random obstacles along the path
+        for _ in range(2):
+            x = self.start[0]
+            y = np.random.randint(self.start[1] + 20, self.goal[1] - 20)
+            obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
         return obstacles
-
+        # x = 50
+        # y = 70
+        # obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
+        # return obstacles
     
     # Function that generate a path line (list/array of points)
     def generate_path(self, start_point, goal_point):
@@ -162,7 +161,7 @@ class ASVEnv(gym.Env):
 
     def reset(self, seed=None, options=None):
         # super().reset(seed=seed)
-        self.obstacles = self.generate_static_obstacles(5, self.width, self.height)
+        self.obstacles = self.generate_static_obstacles(3, self.width, self.height)
         self.objects_environment = self.obstacles + self.path + self.boundary + self.goal_point
         self.grid_dict = self.fill_grid(self.objects_environment, self.grid_size)
 
@@ -231,11 +230,11 @@ class ASVEnv(gym.Env):
         if state == COLLISION_STATE:
             reward -= 1000
         elif state == GOAL_STATE:
-            reward += 1000
+            reward += 500
         elif state == PATH_STATE:
-            reward += 10
+            reward += 10 + 1 / (distance_to_goal + 1)
         elif state == FREE_STATE:
-            reward -= 1 + distance_to_path*0.01
+            reward -= 1 + distance_to_path*1 + distance_to_goal*0.01
         
         # Add a penalty for being too close to an obstacle
         # if nearest_obstacle_distance < danger_zone_threshold:
@@ -259,8 +258,8 @@ class ASVEnv(gym.Env):
         return min_distance
     
     def calculate_distance_to_goal(self, position):
-        goal_x = [point['x'] for point in self.goal]
-        goal_y = [point['y'] for point in self.goal]
+        goal_x = [point['x'] for point in self.goal_point]
+        goal_y = [point['y'] for point in self.goal_point]
         min_distance = float('inf')
         for px, py in zip(goal_x, goal_y):
             distance = np.sqrt((position[0] - px) ** 2 + (position[1] - py) ** 2)

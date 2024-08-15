@@ -347,23 +347,23 @@ class ASVEnv(gym.Env):
             plt.draw()
             plt.pause(0.01)
 
-# Test the environment with random actions
-if __name__ == '__main__':
-    env = ASVEnv()
-    obs = env.reset()
+# # Test the environment with random actions
+# if __name__ == '__main__':
+#     env = ASVEnv()
+#     obs = env.reset()
 
-    print("Observation Space Shape", env.observation_space.shape)
-    print("Sample observation", env.observation_space.sample())
+#     print("Observation Space Shape", env.observation_space.shape)
+#     print("Sample observation", env.observation_space.sample())
 
-    print("Action Space Shape", env.action_space.n)
-    print("Action Space Sample", env.action_space.sample())
+#     print("Action Space Shape", env.action_space.n)
+#     print("Action Space Sample", env.action_space.sample())
 
-    for _ in range(500):  # Run for 100 steps or until done
-        action = env.action_space.sample()  # Take a random action
-        obs, reward, done, truncated, info = env.step(action)
-        print(env.observation_space)
-        env.render()
-        if done:
-            break
+#     for _ in range(500):  # Run for 100 steps or until done
+#         action = env.action_space.sample()  # Take a random action
+#         obs, reward, done, truncated, info = env.step(action)
+#         print(env.observation_space)
+#         env.render()
+#         if done:
+#             break
 
-    env.close()
+#     env.close()
