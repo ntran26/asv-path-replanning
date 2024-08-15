@@ -26,10 +26,10 @@ if __name__ == '__main__':
 
     # Load the model
     # model_path = "ppo_asv_model"
-    # model_path = "ppo_custom_policy"
+    model_path = "ppo_custom_policy"
     # model_path = "rl_model_100000_steps"
     # model_path = "rl_model_1000000_steps"
-    model_path = "best_model"
+    # model_path = "best_model"
     model = PPO.load(model_path)
 
     # Test the trained model
