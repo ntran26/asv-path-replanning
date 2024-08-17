@@ -58,11 +58,15 @@ class ASVEnv(gym.Env):
         self.boundary = self.generate_border(self.width, self.height)
         self.goal_point = self.generate_goal(self.goal)
 
-        # Action space and observation space
-        self.action_space = spaces.Discrete(5)
-        self.observation_space = spaces.Box(low=0, high=3, shape=(313,), dtype=np.int32)   
+        # Define action space and observation space
+        # 3 possible actions: left, right, straight
+        ### OR
         # 5 possible actions: left, right, straight, accelerate, decelerate
+        self.action_space = spaces.Discrete(3)
+
         # 4 possible states for observation, and the shape = number of grids inside the observation radius
+        self.observation_space = spaces.Box(low=0, high=3, shape=(313,), dtype=np.int32) 
+        
 
         self.reset()
     
@@ -194,18 +198,18 @@ class ASVEnv(gym.Env):
             self.current_heading -= self.turn_rate
             self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
                         self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
-        elif action == 3:   # accelerate
-            self.current_speed += 0.5
-            if self.current_speed > 2:
-                self.current_speed = 2
-            self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
-                            self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
-        elif action == 4:   # decelerate
-            self.current_speed -= 0.5
-            if self.current_speed < 1:
-                self.current_speed = 1
-            self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
-                            self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
+        # elif action == 3:   # accelerate
+        #     self.current_speed += 0.5
+        #     if self.current_speed > 2:
+        #         self.current_speed = 2
+        #     self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
+        #                     self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
+        # elif action == 4:   # decelerate
+        #     self.current_speed -= 0.5
+        #     if self.current_speed < 1:
+        #         self.current_speed = 1
+        #     self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
+        #                     self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
 
         self.step_count += 1
         self.step_taken.append((self.position[0], self.position[1]))
@@ -228,22 +232,22 @@ class ASVEnv(gym.Env):
         
         reward = 0
         if state == COLLISION_STATE:
-            reward -= 1000
+            reward -= 500
         elif state == GOAL_STATE:
             reward += 500
         elif state == PATH_STATE:
-            reward += 10 + 1 / (distance_to_goal + 1)
+            reward += (10 - distance_to_goal*0.1)
         elif state == FREE_STATE:
-            reward -= (1 + distance_to_path + distance_to_goal*0.01)
+            reward -= (1 + distance_to_path + distance_to_goal*0.1)
         
         # Add a penalty for being too close to an obstacle
-        # if nearest_obstacle_distance < danger_zone_threshold:
-        #     reward -= 500 * (1 - nearest_obstacle_distance / danger_zone_threshold)
-        if nearest_obstacle_distance < danger_zone_threshold:
-            reward -= 10 / (nearest_obstacle_distance + 1)
-
-        # Add a reward for getting closer to the goal
-        reward += 1 / (distance_to_goal + 1)
+        if nearest_obstacle_distance <= danger_zone_threshold:
+            reward -= 1000 / nearest_obstacle_distance
+        # If 2 grids away from the obstacles (horizontally or vertically) => reward -50
+        # If 1 grid away from the obstacles (horizontally or vertically) => reward -100
+        
+        # Add a reward/reduce penalty for getting closer to the goal
+        reward -= distance_to_goal*0.1
 
         return reward
     
