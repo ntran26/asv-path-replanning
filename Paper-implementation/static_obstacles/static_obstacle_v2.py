@@ -20,7 +20,7 @@ NUM_STATIC_OBS = 5
 
 # Define observation radius and grid size
 RADIUS = 100
-SQUARE_SIZE = 8
+SQUARE_SIZE = 10
 SPEED = 2
 OBSTACLE_RADIUS = SQUARE_SIZE/3
 

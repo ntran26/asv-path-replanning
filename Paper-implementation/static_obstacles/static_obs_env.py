@@ -364,6 +364,29 @@ class ASVEnv(gym.Env):
 
             plt.draw()
             plt.pause(0.01)
+    
+    def display_path(self):
+        # Plot the path taken
+        fig, ax = plt.subplots(1,1, figsize=(8,8))
+        ax.set_aspect("equal")
+        ax.set_title("Steps Taken")
+        ax.set_xlim(-self.radius, self.width + self.radius)
+        ax.set_ylim(-self.radius, self.height + self.radius)
+        ax.plot(self.start[0], self.start[1], marker='o', color=BLUE)
+        ax.plot(self.goal[0], self.goal[1], marker='o', color=YELLOW)
+        for obj in self.boundary:
+            boundary_line = plt.Rectangle((obj['x'], obj['y']), 1, 1, edgecolor=BLACK, facecolor=BLACK)
+            ax.add_patch(boundary_line)
+        path_x = [point['x'] for point in self.path]
+        path_y = [point['y'] for point in self.path]
+        ax.plot(path_x, path_y, '-', color=GREEN)
+        for obj in self.obstacles:
+            ax.plot(obj['x'], obj['y'], marker='o', color=RED)
+        ax.plot(self.position[0], self.position[1], marker='^', color=BLUE)
+        step_x = [point[0] for point in self.step_taken]
+        step_y = [point[1] for point in self.step_taken]
+        ax.plot(step_x, step_y, '-', color=BLUE)
+        plt.show()
 
 # Test the environment with random actions
 if __name__ == '__main__':
@@ -376,10 +399,11 @@ if __name__ == '__main__':
     print("Action Space Shape", env.action_space.n)
     print("Action Space Sample", env.action_space.sample())
 
-    for _ in range(500):  # Run for 100 steps or until done
+    for _ in range(100):  # Run for 100 steps or until done
         action = env.action_space.sample()  # Take a random action
         obs, reward, done, truncated, info = env.step(action)
         env.render()
+        env.display_path()
         if done:
             break
 
