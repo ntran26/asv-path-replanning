@@ -300,9 +300,9 @@ class asv_visualisation:
         # Create animation and display
         ani = FuncAnimation(fig, update, frames=len(self.asv_path), blit=True, interval=200, repeat=False)
         
-        # # Write to mp4 file
-        # FFwriter = FFMpegWriter(fps=5)
-        # ani.save("Paper-implementation/static_obstacle_v2.mp4", writer=FFwriter)
+        # Write to mp4 file
+        FFwriter = FFMpegWriter(fps=5)
+        ani.save("Paper-implementation/static_obstacle_v2.mp4", writer=FFwriter)
         
         plt.show()
 
