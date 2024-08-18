@@ -84,6 +84,17 @@ class ASVEnv(gym.Env):
             return FREE_STATE
         return current_state
     
+    # Create a function that generate grid coordinates (x,y) from global map
+    def generate_grid(self, radius, square_size, center):
+        x = np.arange(-radius + square_size, radius, square_size)
+        y = np.arange(-radius + square_size, radius, square_size)
+        grid = []
+        for i in x:
+            for j in y:
+                if np.sqrt(i ** 2 + j ** 2) <= radius:
+                    grid.append((center[0] + i, center[1] + j))
+        return grid
+    
     # Create a function that converts each point from the global map to a grid coordinate
     def closest_multiple(self, n, mult):
         return int((n + mult / 2) // mult) * mult
@@ -104,17 +115,6 @@ class ASVEnv(gym.Env):
             
             grid_dict[(m, n)] = self.get_priority_state(grid_dict[(m,n)], state)
         return grid_dict
-
-    # Create a function that generate grid coordinates (x,y) from global map
-    def generate_grid(self, radius, square_size, center):
-        x = np.arange(-radius + square_size, radius, square_size)
-        y = np.arange(-radius + square_size, radius, square_size)
-        grid = []
-        for i in x:
-            for j in y:
-                if np.sqrt(i ** 2 + j ** 2) <= radius:
-                    grid.append((center[0] + i, center[1] + j))
-        return grid
     
     #                           -------- MAP GENERATION --------
 

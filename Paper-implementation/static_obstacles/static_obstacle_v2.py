@@ -19,8 +19,8 @@ GOAL = (100, 250)
 NUM_STATIC_OBS = 5
 
 # Define observation radius and grid size
-RADIUS = 100
-SQUARE_SIZE = 10
+RADIUS = 50
+SQUARE_SIZE = 5
 SPEED = 2
 OBSTACLE_RADIUS = SQUARE_SIZE/3
 
@@ -154,8 +154,8 @@ class asv_visualisation:
         # First plot: whole map
         ax1.set_aspect('equal')
         ax1.set_title('MAP')
-        ax1.set_xlim(-self.radius, self.width + self.radius)
-        ax2.set_ylim(-self.radius, self.height + self.radius)
+        # ax1.set_xlim(-self.radius, self.width + self.radius)
+        # ax2.set_ylim(-self.radius, self.height + self.radius)
 
         # Second plot: observation per timestep
         ax2.set_aspect('equal')
@@ -198,7 +198,7 @@ class asv_visualisation:
         # Initialize all grids as free space
         for (cx, cy) in self.grid:
             state = self.grid_dict.get((self.closest_multiple(cx, self.grid_size), self.closest_multiple(cy, self.grid_size)), FREE_STATE)
-            color = 'white'
+            color = WHITE
             rect = plt.Rectangle((cx - self.grid_size / 2 - self.center_point[0], cy - self.grid_size / 2 - self.center_point[1]), self.grid_size, self.grid_size,
                                 edgecolor='gray', facecolor=color)
             grid_patches.append(rect)
