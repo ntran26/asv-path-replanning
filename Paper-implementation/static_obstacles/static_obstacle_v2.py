@@ -302,11 +302,10 @@ class asv_visualisation:
         
         # # Write to mp4 file
         # FFwriter = FFMpegWriter(fps=5)
-        # ani.save("Paper implementation/static_obstacle_v2.mp4", writer=FFwriter)
+        # ani.save("Paper-implementation/static_obstacle_v2.mp4", writer=FFwriter)
         
         plt.show()
 
 # Create visualisation
 visualisation = asv_visualisation()
 visualisation.main()
-print(len(visualisation.grid_dict))

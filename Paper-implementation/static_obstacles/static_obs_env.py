@@ -24,7 +24,6 @@ NUM_STATIC_OBS = 5
 RADIUS = 100
 SQUARE_SIZE = 10
 SPEED = 1
-OBSTACLE_RADIUS = SQUARE_SIZE/3
 
 # Define initial heading angle, turn rate and number of steps
 INITIAL_HEADING = 90
@@ -239,13 +238,24 @@ class ASVEnv(gym.Env):
             reward += (10 - distance_to_goal*0.1)
         elif state == FREE_STATE:
             reward -= (1 + distance_to_path + distance_to_goal*0.1)
+
+        # # Test if the state is assigned correctly in every timestep
+        # if state == COLLISION_STATE:
+        #     print("Collide")
+        # elif state == GOAL_STATE:
+        #     print("Goal")
+        # elif state == PATH_STATE:
+        #     print("On Path")
+        # elif state == FREE_STATE:
+        #     print("Free Space")
+        # else:
+        #     print("ERROR")      # if another state exists
         
         # Add a penalty for being too close to an obstacle
         if nearest_obstacle_distance <= danger_zone_threshold:
             reward -= 1000 / nearest_obstacle_distance
         # If 2 grids away from the obstacles (horizontally or vertically) => reward -50
         # If 1 grid away from the obstacles (horizontally or vertically) => reward -100
-        
         # Add a reward/reduce penalty for getting closer to the goal
         reward -= distance_to_goal*0.1
 
@@ -398,7 +408,7 @@ if __name__ == '__main__':
     obs = env.reset()
 
     print("Observation Space Shape", env.observation_space.shape)
-    print("Sample observation", env.observation_space.sample())
+    print("Sample observation", len(env.observation_space.sample()))
 
     print("Action Space Shape", env.action_space.n)
     print("Action Space Sample", env.action_space.sample())
@@ -407,8 +417,8 @@ if __name__ == '__main__':
         action = env.action_space.sample()  # Take a random action
         obs, reward, done, truncated, info = env.step(action)
         env.render()
-        env.display_path()
         if done:
             break
 
+    env.display_path()
     env.close()

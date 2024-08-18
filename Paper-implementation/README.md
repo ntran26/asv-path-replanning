@@ -1,6 +1,7 @@
 This directory focuses on recreating the methods for constructing environment and training DRL model from the paper
 "Dynamic trajectory planning for ships in dense environment using collision grid with deep reinforcement learning"
 
+NOTE: File name with "_env" is an OpenAI Gym environment, otherwise, a regular environment to visualise
 
 1. asv_trajectory.py: 
     - This file simulate the ASV's trajectory in 20 steps (STEP), with 3 possible actions
