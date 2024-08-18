@@ -15,14 +15,14 @@ BLUE = (0, 0, 1)
 
 # Define map dimensions and start/goal points
 WIDTH = 20
-HEIGHT = 30
+HEIGHT = 60
 START = (10, 5)
-GOAL = (10, 25)
+GOAL = (10, 50)
 
 # Define observation radius and grid size
 RADIUS = 10
 SQUARE_SIZE = 2
-SPEED = 0.5
+SPEED = 0.25
 
 # Define initial heading angle, turn rate and number of steps
 INITIAL_HEADING = 90
@@ -65,7 +65,6 @@ class ASVEnv(gym.Env):
         # 4 possible states for observation, and the shape = number of grids inside the observation radius
         self.observation_space = spaces.Box(low=0, high=3, shape=(77,), dtype=np.int32) 
         
-
         self.reset()
     
     #                           -------- HELPER FUNCTIONS --------
@@ -148,9 +147,9 @@ class ASVEnv(gym.Env):
         self.grid_dict = self.fill_grid(self.objects_environment, self.grid_size)
 
         self.step_count = 0
-        self.current_heading = self.heading
+        self.current_heading = self.heading + np.random.randint(-30, 30)
         self.current_speed = self.speed
-        self.position = self.start
+        self.position = ((np.random.randint(5,20)), (np.random.randint(5,20)))
         self.done = False
         self.grid = self.generate_grid(self.radius, self.grid_size, self.position)
         return self.get_observation(), {}

@@ -24,7 +24,7 @@ class CustomCallback(BaseCallback):
         self.policy_loss = []
         self.value_loss = []
         self.rewards = []
-        self.best_mean_reward = -np.inf  # Initialize to a very low value
+        self.best_mean_reward = -np.inf  
         self.best_model_path = "best_model.zip"
 
     def _on_step(self):
@@ -34,13 +34,13 @@ class CustomCallback(BaseCallback):
                 self.policy_loss.append(self.model.ep_info_buffer[0]["loss"]["policy_loss"])
                 self.value_loss.append(self.model.ep_info_buffer[0]["loss"]["value_loss"])
 
-            # Calculate the mean reward for the last 1000 steps
-            if len(self.rewards) >= 1000:
-                mean_reward = np.mean(self.rewards[-1000:])
-                if mean_reward > self.best_mean_reward:
-                    self.best_mean_reward = mean_reward
-                    print(f"New best mean reward: {mean_reward}. Saving model...")
-                    self.model.save(self.best_model_path)
+            # # Calculate the mean reward for the last 1000 steps
+            # if len(self.rewards) >= 1000:
+            #     mean_reward = np.mean(self.rewards[-1000:])
+            #     if mean_reward > self.best_mean_reward:
+            #         self.best_mean_reward = mean_reward
+            #         print(f"New best mean reward: {mean_reward}. Saving model...")
+            #         self.model.save(self.best_model_path)
         return True
 
 # Create environment
@@ -65,7 +65,7 @@ ent_coef = 0.01
 #             ent_coef=ent_coef)
 model = PPO('MlpPolicy', env, verbose=1)
 callback = CustomCallback()
-num_timesteps = int(1e6)
+num_timesteps = int(1e5)
 
 # Train the model
 model.learn(total_timesteps=num_timesteps, callback=callback)
@@ -78,8 +78,22 @@ print(f"Mean reward: {mean_reward}")
 model.save("ppo_path_follow")
 
 # Plot rewards
-plt.plot(callback.rewards, label="Rewards")
+smoothed_rewards = np.convolve(callback.rewards, np.ones(100)/100, mode='valid')
+plt.plot(smoothed_rewards)
 plt.xlabel('Steps')
-plt.ylabel('Reward')
-plt.title('Reward over Steps with Tuned Hyperparameters')
+plt.ylabel('Smoothed Reward')
+plt.title('Smoothed Reward over Steps')
 plt.show()
+
+plt.plot(callback.policy_loss, label="Policy Loss")
+plt.plot(callback.value_loss, label="Value Loss")
+plt.xlabel('Steps')
+plt.ylabel('Loss')
+plt.title('Policy and Value Loss over Steps')
+plt.legend()
+plt.show()
+# plt.plot(callback.rewards, label="Rewards")
+# plt.xlabel('Steps')
+# plt.ylabel('Reward')
+# plt.title('Reward over Steps with Tuned Hyperparameters')
+# plt.show()
