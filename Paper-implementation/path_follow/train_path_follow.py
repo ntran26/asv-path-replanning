@@ -47,23 +47,23 @@ class CustomCallback(BaseCallback):
 env = ASVEnv()
 
 # Adjust hyperparameters
-learning_rate = 0.001
-batch_size = 128
-n_epochs = 10
-gamma = 0.99
-clip_range = 0.1
-vf_coef = 0.5
-ent_coef = 0.01
+learning_rate = 0.002
+batch_size = 256
+n_epochs = 15
+gamma = 0.95
+clip_range = 0.37
+vf_coef = 0.9
+ent_coef = 9.412368520429483e-05
 
-# model = PPO('MlpPolicy', env, verbose=1,
-#             learning_rate=learning_rate,
-#             batch_size=batch_size,
-#             n_epochs=n_epochs,
-#             gamma=gamma,
-#             clip_range=clip_range,
-#             vf_coef=vf_coef,
-#             ent_coef=ent_coef)
-model = PPO('MlpPolicy', env, verbose=1)
+model = PPO('MlpPolicy', env, verbose=1,
+            learning_rate=learning_rate,
+            batch_size=batch_size,
+            n_epochs=n_epochs,
+            gamma=gamma,
+            clip_range=clip_range,
+            vf_coef=vf_coef,
+            ent_coef=ent_coef)
+# model = PPO('MlpPolicy', env, verbose=1)
 callback = CustomCallback()
 num_timesteps = int(1e5)
 
@@ -97,3 +97,10 @@ plt.show()
 # plt.ylabel('Reward')
 # plt.title('Reward over Steps with Tuned Hyperparameters')
 # plt.show()
+
+# Trial 18 finished with value: -15.668539422000002 and parameters: 
+# {'learning_rate': 0.005113216497561994, 'batch_size': 4096, 
+# 'n_epochs': 10, 'gamma': 0.9218685744361972, 
+# 'clip_range': 0.39952643431246604, 'gae_lambda': 0.9190472693604935, 
+# 'vf_coef': 0.9041047435339762, 'ent_coef': 1.1432355666615247e-05}.class CustomCallback(BaseCallback):
+#'learning_rate': 0.002227113238141113, 'batch_size': 256, 'n_epochs': 15, 'gamma': 0.950172079879918, 'clip_range': 0.3756287558375899, 'gae_lambda': 0.987440460569382, 'vf_coef': 0.8960319702073843, 'ent_coef': 9.412368520429483e-05}
