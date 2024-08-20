@@ -65,7 +65,7 @@ model = PPO('MlpPolicy', env, verbose=1,
             ent_coef=ent_coef)
 # model = PPO('MlpPolicy', env, verbose=1)
 callback = CustomCallback()
-num_timesteps = int(1e5)
+num_timesteps = int(1e6)
 
 # Train the model
 model.learn(total_timesteps=num_timesteps, callback=callback)

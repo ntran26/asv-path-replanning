@@ -259,7 +259,7 @@ class ASVEnv(gym.Env):
         elif state == GOAL_STATE:
             return True
         # If the total number of steps are 250 or above
-        elif self.step_count >= 500:
+        elif self.step_count >= 50:
             return True
         return False
 
@@ -362,7 +362,7 @@ if __name__ == '__main__':
     # print("Action Space Shape", env.action_space.n)
     # print("Action Space Sample", env.action_space.sample())
 
-    for _ in range(100):  # Run for 100 steps or until done
+    for _ in range(50):  # Run for 100 steps or until done
         action = env.action_space.sample()  # Take a random action
         obs, reward, done, truncated, info = env.step(action)
         env.render()
