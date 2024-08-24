@@ -11,6 +11,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from static_obs_env import ASVEnv
 import optuna
+from timeit import default_timer as timer
 
 #                               -------- CONFIGURATION --------
 # Define colors
@@ -173,7 +174,7 @@ class CustomCallback(BaseCallback):
 env = ASVEnv()
 
 # Adjust hyperparameters
-learning_rate = 0.001
+learning_rate = 0.0001
 batch_size = 128
 n_epochs = 10
 gamma = 0.99
@@ -192,14 +193,27 @@ model = PPO('MlpPolicy', env, verbose=1,
             ent_coef=ent_coef)
 # model = PPO('MlpPolicy', env, verbose=1)
 callback = CustomCallback()
-num_timesteps = int(5e5)
+num_timesteps = int(1e5)
+
+start_time = timer()
 
 # Train the model
 model.learn(total_timesteps=num_timesteps, callback=callback)
 
+end_time = timer()
+
 # Calculate mean reward
 mean_reward = np.mean(callback.rewards[-1000:])
-print(f"Mean reward: {mean_reward}")
+print(f"Mean reward = {mean_reward}")
+
+time = end_time - start_time
+
+hour = int(time//3600)
+time = int(time - 3600*hour)
+minute = int(time//60)
+second = int(time - 60*minute)
+
+print(f"Total time = {hour} : {minute} : {second}")
 
 # Save the model
 model.save("ppo_custom_policy")

@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import gymnasium as gym
 from gymnasium import spaces
 import matplotlib.pyplot as plt
@@ -54,7 +55,9 @@ class ASVEnv(gym.Env):
         self.radius = RADIUS
         self.grid_size = SQUARE_SIZE
         self.center_point = (0,0)
+        self.max_num_step = MAX_NUM_STEP
         self.step_taken = []
+        self.heading_angle = []
 
         self.path = self.generate_path(self.start, self.goal)
         self.boundary = self.generate_border(self.width, self.height)
@@ -118,6 +121,44 @@ class ASVEnv(gym.Env):
             grid_dict[(m, n)] = self.get_priority_state(grid_dict[(m,n)], state)
         return grid_dict
     
+    def calculate_distance_to_path(self, position):
+        path_x = [point['x'] for point in self.path]
+        path_y = [point['y'] for point in self.path]
+        min_distance = float('inf')
+        for px, py in zip(path_x, path_y):
+            distance = np.sqrt((position[0] - px) ** 2 + (position[1] - py) ** 2)
+            if distance < min_distance:
+                min_distance = distance
+        return min_distance
+    
+    def calculate_distance_to_goal(self, position):
+        goal_x = [point['x'] for point in self.goal_point]
+        goal_y = [point['y'] for point in self.goal_point]
+        min_distance = float('inf')
+        for px, py in zip(goal_x, goal_y):
+            distance = np.sqrt((position[0] - px) ** 2 + (position[1] - py) ** 2)
+            if distance < min_distance:
+                min_distance = distance
+        return min_distance
+    
+    def heading_deviation(self, current_heading, goal_position, agent_position):
+        # Calculate the heading deviation
+        optimal_heading = math.atan2(goal_position[1] - agent_position[1], 
+                                    goal_position[0] - agent_position[0])
+        heading_deviation = abs(optimal_heading - current_heading)
+        return heading_deviation
+    
+    def calculate_distance_to_nearest_obstacle(self, position):
+        x, y = position
+        min_distance = float('inf')
+        
+        for (obstacle_x, obstacle_y), state in self.grid_dict.items():
+            if state == COLLISION_STATE:
+                distance = np.sqrt((x - obstacle_x)**2 + (y - obstacle_y)**2)
+                if distance < min_distance:
+                    min_distance = distance
+        return min_distance
+    
     #                           -------- MAP GENERATION --------
 
     # Create a function to generate borders around the map
@@ -140,7 +181,7 @@ class ASVEnv(gym.Env):
             y = np.random.randint(0, map_height)
             obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
         # Generate 2 random obstacles along the path
-        for _ in range(2):
+        for _ in range(1):
             x = self.start[0]
             y = np.random.randint(self.start[1] + 20, self.goal[1] - 20)
             obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
@@ -164,9 +205,11 @@ class ASVEnv(gym.Env):
         goal.append({'x': goal_point[0], 'y': goal_point[1], 'state': GOAL_STATE})
         return goal
 
+    #                           -------- MAIN FUNCTIONS --------
+
     def reset(self, seed=None, options=None):
         # super().reset(seed=seed)
-        self.obstacles = self.generate_static_obstacles(1, self.width, self.height)
+        self.obstacles = self.generate_static_obstacles(0, self.width, self.height)
         self.objects_environment = self.obstacles + self.path + self.boundary + self.goal_point
         self.grid_dict = self.fill_grid(self.objects_environment, self.grid_size)
 
@@ -177,6 +220,21 @@ class ASVEnv(gym.Env):
         self.done = False
         self.grid = self.generate_grid(self.radius, self.grid_size, self.position)
         return self.get_observation(), {}
+    
+    def check_done(self, position):        
+        x, y = position
+        state = self.grid_dict.get((self.closest_multiple(x, self.grid_size), self.closest_multiple(y, self.grid_size)), FREE_STATE)
+        
+        # If the agent collide with obstacles or boundary
+        if state == COLLISION_STATE:
+            return True
+        # If the agent reached goal
+        elif state == GOAL_STATE:
+            return True
+        # If the total number of steps are 150 or above
+        elif self.step_count >= self.max_num_step:
+            return True
+        return False
     
     def get_observation(self):
         current_pos = self.position
@@ -227,9 +285,13 @@ class ASVEnv(gym.Env):
         distance_to_goal = self.calculate_distance_to_goal(self.position)
         # Calculate the distance to the nearest obstacle
         nearest_obstacle_distance = self.calculate_distance_to_nearest_obstacle(self.position)
+        # Calculate the heading deviation
+        optimal_heading = math.atan2(self.goal[1] - self.position[1], 
+                                    self.goal[0] - self.position[0])
+        heading_deviation = abs(optimal_heading - self.current_heading)
         
         # Set a threshold distance for significant penalty
-        danger_zone_threshold = self.grid_size * 2  
+        danger_zone_threshold = self.grid_size * 2
         
         reward = 0
         if state == COLLISION_STATE:
@@ -262,53 +324,6 @@ class ASVEnv(gym.Env):
         reward -= distance_to_goal*0.1
 
         return reward
-    
-    def calculate_distance_to_path(self, position):
-        path_x = [point['x'] for point in self.path]
-        path_y = [point['y'] for point in self.path]
-        min_distance = float('inf')
-        for px, py in zip(path_x, path_y):
-            distance = np.sqrt((position[0] - px) ** 2 + (position[1] - py) ** 2)
-            if distance < min_distance:
-                min_distance = distance
-        return min_distance
-    
-    def calculate_distance_to_goal(self, position):
-        goal_x = [point['x'] for point in self.goal_point]
-        goal_y = [point['y'] for point in self.goal_point]
-        min_distance = float('inf')
-        for px, py in zip(goal_x, goal_y):
-            distance = np.sqrt((position[0] - px) ** 2 + (position[1] - py) ** 2)
-            if distance < min_distance:
-                min_distance = distance
-        return min_distance
-    
-    def calculate_distance_to_nearest_obstacle(self, position):
-        x, y = position
-        min_distance = float('inf')
-        
-        for (obstacle_x, obstacle_y), state in self.grid_dict.items():
-            if state == COLLISION_STATE:
-                distance = np.sqrt((x - obstacle_x)**2 + (y - obstacle_y)**2)
-                if distance < min_distance:
-                    min_distance = distance
-        
-        return min_distance
-    
-    def check_done(self, position):        
-        x, y = position
-        state = self.grid_dict.get((self.closest_multiple(x, self.grid_size), self.closest_multiple(y, self.grid_size)), FREE_STATE)
-        
-        # If the agent collide with obstacles or boundary
-        if state == COLLISION_STATE:
-            return True
-        # If the agent reached goal
-        elif state == GOAL_STATE:
-            return True
-        # If the total number of steps are 150 or above
-        elif self.step_count >= MAX_NUM_STEP:
-            return True
-        return False
 
     def render(self, mode="human"):
         if mode == 'human':
@@ -381,6 +396,8 @@ class ASVEnv(gym.Env):
             plt.draw()
             plt.pause(0.01)
     
+    #                           -------- POST PROCESSING --------
+    
     def display_path(self):
         # Plot the path taken
         fig, ax = plt.subplots(1,1, figsize=(8,8))
@@ -415,7 +432,7 @@ if __name__ == '__main__':
     print("Action Space Shape", env.action_space.n)
     print("Action Space Sample", env.action_space.sample())
 
-    for _ in range(MAX_NUM_STEP):  # Run for 100 steps or until done
+    for _ in range(env.max_num_step):  # Run for 100 steps or until done
         action = env.action_space.sample()  # Take a random action
         print(env.get_observation())
         obs, reward, done, truncated, info = env.step(action)

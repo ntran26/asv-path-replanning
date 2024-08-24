@@ -35,7 +35,7 @@ if __name__ == '__main__':
     # Test the trained model
     obs, info = env.reset()
     cumulative_reward = 0
-    for _ in range(500):  # Run for 500 steps or until done
+    for _ in range(env.max_num_step):  # Run for 500 steps or until done
         action, _ = model.predict(obs, deterministic=True)
         obs, reward, done, truncated, info = env.step(action)
         cumulative_reward += reward
