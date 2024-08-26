@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import gymnasium as gym
-from stable_baselines3 import PPO
+from stable_baselines3 import PPO, DQN
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.vec_env import DummyVecEnv
@@ -55,17 +55,18 @@ clip_range = 0.37
 vf_coef = 0.9
 ent_coef = 9.412368520429483e-05
 
-model = PPO('MlpPolicy', env, verbose=1,
-            learning_rate=learning_rate,
-            batch_size=batch_size,
-            n_epochs=n_epochs,
-            gamma=gamma,
-            clip_range=clip_range,
-            vf_coef=vf_coef,
-            ent_coef=ent_coef)
+# model = PPO('MlpPolicy', env, verbose=1,
+#             learning_rate=learning_rate,
+#             batch_size=batch_size,
+#             n_epochs=n_epochs,
+#             gamma=gamma,
+#             clip_range=clip_range,
+#             vf_coef=vf_coef,
+#             ent_coef=ent_coef)
+model = DQN('MlpPolicy', env, verbose=1)
 # model = PPO('MlpPolicy', env, verbose=1)
 callback = CustomCallback()
-num_timesteps = int(1e6)
+num_timesteps = int(1e5)
 
 # Train the model
 model.learn(total_timesteps=num_timesteps, callback=callback)

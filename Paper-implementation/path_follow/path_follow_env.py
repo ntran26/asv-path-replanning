@@ -141,15 +141,19 @@ class ASVEnv(gym.Env):
         goal.append({'x': goal_point[0], 'y': goal_point[1], 'state': GOAL_STATE})
         return goal
 
+    #                           -------- MAIN FUNCTIONS --------
+
     def reset(self, seed=None, options=None):
         # super().reset(seed=seed)
         self.objects_environment = self.path + self.boundary + self.goal_point
         self.grid_dict = self.fill_grid(self.objects_environment, self.grid_size)
 
         self.step_count = 0
-        self.current_heading = self.heading + np.random.randint(-30, 30)
+        # self.current_heading = self.heading + np.random.randint(-30, 30)
+        self.current_heading = self.heading
         self.current_speed = self.speed
-        self.position = ((np.random.randint(5,20)), (np.random.randint(5,20)))
+        self.position = ((np.random.randint(5,15)), self.start[1])
+        # self.position = self.start
         self.done = False
         self.grid = self.generate_grid(self.radius, self.grid_size, self.position)
         return self.get_observation(), {}
@@ -204,13 +208,13 @@ class ASVEnv(gym.Env):
         
         reward = 0
         if state == COLLISION_STATE:
-            reward -= 500
+            reward = -500
         elif state == GOAL_STATE:
-            reward += 500
+            reward = 500
         elif state == PATH_STATE:
-            reward += (10 - distance_to_goal*0.1)
+            reward = 10 - distance_to_goal*0.5
         elif state == FREE_STATE:
-            reward -= (1 + distance_to_path + distance_to_goal*0.1)
+            reward = -10 - distance_to_path - distance_to_goal*0.5
 
         # # Test if the state is assigned correctly in every timestep
         # if state == COLLISION_STATE:
@@ -223,8 +227,6 @@ class ASVEnv(gym.Env):
         #     print("Free Space")
         # else:
         #     print("ERROR")      # if another state exists
-        
-        reward -= distance_to_goal*0.1
 
         return reward
     
@@ -259,7 +261,7 @@ class ASVEnv(gym.Env):
         elif state == GOAL_STATE:
             return True
         # If the total number of steps are 250 or above
-        elif self.step_count >= 50:
+        elif self.step_count >= 250:
             return True
         return False
 
