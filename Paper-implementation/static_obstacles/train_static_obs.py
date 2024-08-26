@@ -146,8 +146,10 @@ BLUE = (0, 0, 1)
 # best_params = study.best_params
 
 class CustomCallback(BaseCallback):
-    def __init__(self, verbose=0):
+    def __init__(self, save_freq=100000, verbose=0):
         super(CustomCallback, self).__init__(verbose)
+        self.save_freq = save_freq
+        self.model_save_counter = 0
         self.policy_loss = []
         self.value_loss = []
         self.rewards = []
@@ -155,6 +157,13 @@ class CustomCallback(BaseCallback):
         self.best_model_path = "best_model.zip"
 
     def _on_step(self):
+        # Save model at regular intervals
+        if self.num_timesteps % self.save_freq == 0:
+            model_path = f"static_obs_{self.num_timesteps}.zip"
+            print(f"Saving model at {self.num_timesteps} timesteps")
+            self.model.save(model_path)
+            self.model_save_counter += 1
+
         if len(self.model.ep_info_buffer) > 0:
             self.rewards.append(self.model.ep_info_buffer[0]["r"])
             if "loss" in self.model.ep_info_buffer[0]:
@@ -192,8 +201,8 @@ model = PPO('MlpPolicy', env, verbose=1,
             vf_coef=vf_coef,
             ent_coef=ent_coef)
 # model = PPO('MlpPolicy', env, verbose=1)
-callback = CustomCallback()
-num_timesteps = int(1e5)
+callback = CustomCallback(save_freq=100000)
+num_timesteps = int(1e6)
 
 start_time = timer()
 

@@ -175,21 +175,17 @@ class ASVEnv(gym.Env):
     # Create a function to generate static obstacles
     def generate_static_obstacles(self, num_obs, map_width, map_height):
         obstacles = []
-        # Generate random obstacles around the map
-        for _ in range(num_obs):
-            x = np.random.randint(0, map_width)
-            y = np.random.randint(0, map_height)
-            obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
+        # # Generate random obstacles around the map
+        # for _ in range(num_obs):
+        #     x = np.random.randint(0, map_width)
+        #     y = np.random.randint(0, map_height)
+        #     obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
         # Generate 2 random obstacles along the path
-        for _ in range(1):
+        for _ in range(num_obs):
             x = self.start[0]
             y = np.random.randint(self.start[1] + 20, self.goal[1] - 20)
             obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
         return obstacles
-        # x = 50
-        # y = 70
-        # obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
-        # return obstacles
     
     # Function that generate a path line (list/array of points)
     def generate_path(self, start_point, goal_point):
@@ -209,7 +205,7 @@ class ASVEnv(gym.Env):
 
     def reset(self, seed=None, options=None):
         # super().reset(seed=seed)
-        self.obstacles = self.generate_static_obstacles(0, self.width, self.height)
+        self.obstacles = self.generate_static_obstacles(1, self.width, self.height)
         self.objects_environment = self.obstacles + self.path + self.boundary + self.goal_point
         self.grid_dict = self.fill_grid(self.objects_environment, self.grid_size)
 
@@ -286,10 +282,7 @@ class ASVEnv(gym.Env):
         # Calculate the distance to the nearest obstacle
         nearest_obstacle_distance = self.calculate_distance_to_nearest_obstacle(self.position)
         # Calculate the heading deviation
-        optimal_heading = math.atan2(self.goal[1] - self.position[1], 
-                                    self.goal[0] - self.position[0])
-        heading_deviation = abs(optimal_heading - self.current_heading)
-        
+        heading_deviation = self.heading_deviation(self.current_heading, self.goal, self.position)
         # Set a threshold distance for significant penalty
         danger_zone_threshold = self.grid_size * 2
         
@@ -321,8 +314,11 @@ class ASVEnv(gym.Env):
         # If 2 grids away from the obstacles (horizontally or vertically) => reward -50
         # If 1 grid away from the obstacles (horizontally or vertically) => reward -100
         # Add a reward/reduce penalty for getting closer to the goal
-        reward -= distance_to_goal*0.1
+        reward -= distance_to_goal*0.5
 
+        # Reward for reducing heading deviation
+        reward -= heading_deviation
+        
         return reward
 
     def render(self, mode="human"):
