@@ -345,13 +345,15 @@ class ASVEnv(gym.Env):
         for obj in self.boundary:
             boundary_line = plt.Rectangle((obj['x'], obj['y']), 1, 1, edgecolor=BLACK, facecolor=BLACK)
             ax.add_patch(boundary_line)
+
         path_x = [point['x'] for point in self.path]
         path_y = [point['y'] for point in self.path]
         ax.plot(path_x, path_y, '-', color=GREEN)
         ax.plot(self.position[0], self.position[1], marker='^', color=BLUE)
+
         step_x = [point[0] for point in self.step_taken]
         step_y = [point[1] for point in self.step_taken]
-        ax.plot(step_x, step_y, '-', color=BLUE)
+        ax.plot(step_x, step_y, marker='.', color=BLUE)
         plt.show()
 
 # Test the environment with random actions

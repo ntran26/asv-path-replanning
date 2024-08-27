@@ -15,10 +15,10 @@ YELLOW = (1, 1, 0)
 BLUE = (0, 0, 1)
 
 # Define map dimensions and start/goal points, number of static obstacles
-WIDTH = 50
-HEIGHT = 100
-START = (25, 20)
-GOAL = (25, 80)
+WIDTH = 20
+HEIGHT = 60
+START = (10, 5)
+GOAL = (10, 50)
 NUM_STATIC_OBS = 5
 
 # Define observation radius and grid size
@@ -183,7 +183,7 @@ class ASVEnv(gym.Env):
         # Generate 2 random obstacles along the path
         for _ in range(num_obs):
             x = self.start[0]
-            y = np.random.randint(self.start[1] + 20, self.goal[1] - 20)
+            y = np.random.randint(self.start[1] + 10, self.goal[1] - 10)
             obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
         return obstacles
     
@@ -286,15 +286,14 @@ class ASVEnv(gym.Env):
         # Set a threshold distance for significant penalty
         danger_zone_threshold = self.grid_size * 2
         
-        reward = 0
         if state == COLLISION_STATE:
-            reward -= 500
+            reward = -500
         elif state == GOAL_STATE:
-            reward += 500
+            reward = 500
         elif state == PATH_STATE:
-            reward += (10 - distance_to_goal*0.5)
+            reward = 10 - distance_to_goal*0.5
         elif state == FREE_STATE:
-            reward -= (1 + distance_to_path + distance_to_goal*0.5)
+            reward = -(10 + distance_to_path + distance_to_goal*0.5)
 
         # # Test if the state is assigned correctly in every timestep
         # if state == COLLISION_STATE:
@@ -317,7 +316,7 @@ class ASVEnv(gym.Env):
         reward -= distance_to_goal*0.5
 
         # Reward for reducing heading deviation
-        reward -= heading_deviation
+        # reward -= heading_deviation
         
         return reward
 
@@ -414,7 +413,7 @@ class ASVEnv(gym.Env):
         ax.plot(self.position[0], self.position[1], marker='^', color=BLUE)
         step_x = [point[0] for point in self.step_taken]
         step_y = [point[1] for point in self.step_taken]
-        ax.plot(step_x, step_y, '-', color=BLUE)
+        ax.plot(step_x, step_y, marker='.', color=BLUE)
         plt.show()
 
 # Test the environment with random actions

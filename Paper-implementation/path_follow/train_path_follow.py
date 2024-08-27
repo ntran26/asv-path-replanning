@@ -8,6 +8,7 @@ from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from path_follow_env import ASVEnv
 import optuna
+from timeit import default_timer as timer
 
 #                               -------- CONFIGURATION --------
 # Define colors
@@ -63,13 +64,42 @@ ent_coef = 9.412368520429483e-05
 #             clip_range=clip_range,
 #             vf_coef=vf_coef,
 #             ent_coef=ent_coef)
-model = DQN('MlpPolicy', env, verbose=1)
 # model = PPO('MlpPolicy', env, verbose=1)
+
+# DQN Hyperparameters
+learning_rate = 0.0001
+batch_size = 128
+gamma = 0.99
+target_update_interval = 10000  # Update target network every 10k steps
+exploration_fraction = 0.1  # Fraction of total timesteps spent exploring
+exploration_final_eps = 0.01  # Final exploration rate
+
+# model = DQN('MlpPolicy', env, verbose=1,
+#             learning_rate=learning_rate,
+#             batch_size=batch_size,
+#             gamma=gamma,
+#             target_update_interval=target_update_interval,
+#             exploration_fraction=exploration_fraction,
+#             exploration_final_eps=exploration_final_eps)
+model = DQN('MlpPolicy', env, verbose=1)
+
 callback = CustomCallback()
-num_timesteps = int(1e5)
+num_timesteps = int(1e6)
+
+start_time = timer()
 
 # Train the model
 model.learn(total_timesteps=num_timesteps, callback=callback)
+
+end_time = timer()
+time = end_time - start_time
+
+hour = int(time//3600)
+time = int(time - 3600*hour)
+minute = int(time//60)
+second = int(time - 60*minute)
+
+print(f"Time elapsed = {hour} : {minute} : {second}")
 
 # Calculate mean reward
 mean_reward = np.mean(callback.rewards[-1000:])
