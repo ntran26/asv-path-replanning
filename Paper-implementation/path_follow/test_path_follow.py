@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
     # Load the model
     model_path = "ppo_path_follow"
-    model = DQN.load(model_path)
+    model = PPO.load(model_path)
 
     # Test the trained model
     obs, info = env.reset()

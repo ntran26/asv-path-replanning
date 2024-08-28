@@ -183,7 +183,7 @@ class CustomCallback(BaseCallback):
 env = ASVEnv()
 
 # Adjust hyperparameters
-learning_rate = 0.0001
+learning_rate = 0.001
 batch_size = 128
 n_epochs = 10
 gamma = 0.99
@@ -201,8 +201,8 @@ model = PPO('MlpPolicy', env, verbose=1,
             vf_coef=vf_coef,
             ent_coef=ent_coef)
 # model = PPO('MlpPolicy', env, verbose=1)
-callback = CustomCallback(save_freq=100000)
-num_timesteps = int(1e6)
+callback = CustomCallback(save_freq=int(1e5))
+num_timesteps = int(1e5)
 
 start_time = timer()
 
@@ -225,7 +225,7 @@ second = int(time - 60*minute)
 print(f"Total time = {hour} : {minute} : {second}")
 
 # Save the model
-model.save("ppo_custom_policy")
+model.save("ppo_static_obstacles")
 
 # Plot rewards
 plt.plot(callback.rewards, label="Rewards")

@@ -15,10 +15,10 @@ YELLOW = (1, 1, 0)
 BLUE = (0, 0, 1)
 
 # Define map dimensions and start/goal points, number of static obstacles
-WIDTH = 20
-HEIGHT = 60
-START = (10, 5)
-GOAL = (10, 50)
+WIDTH = 40
+HEIGHT = 100
+START = (20, 10)
+GOAL = (20, 80)
 NUM_STATIC_OBS = 5
 
 # Define observation radius and grid size
@@ -27,7 +27,7 @@ SQUARE_SIZE = 4
 
 # Define initial heading angle, turn rate and number of steps
 INITIAL_HEADING = 90
-TURN_RATE = 5
+TURN_RATE = 3
 SPEED = 0.5
 
 # Define states
@@ -37,7 +37,7 @@ COLLISION_STATE = 2     # obstacle or border
 GOAL_STATE = 3          # goal point
 
 # Define maximum steps
-MAX_NUM_STEP = 150
+MAX_NUM_STEP = 250
 
 class ASVEnv(gym.Env):
     metadata = {"render_modes": ["human"]}
@@ -173,17 +173,18 @@ class ASVEnv(gym.Env):
         return boundary
     
     # Create a function to generate static obstacles
-    def generate_static_obstacles(self, num_obs, map_width, map_height):
+    def generate_static_obstacles(self, num_obs):
         obstacles = []
         # # Generate random obstacles around the map
         # for _ in range(num_obs):
-        #     x = np.random.randint(0, map_width)
-        #     y = np.random.randint(0, map_height)
+        #     x = np.random.randint(0, self.width)
+        #     y = np.random.randint(0, self.height)
         #     obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
         # Generate 2 random obstacles along the path
         for _ in range(num_obs):
             x = self.start[0]
-            y = np.random.randint(self.start[1] + 10, self.goal[1] - 10)
+            # y = np.random.randint(self.start[1] + 10, self.goal[1] - 10)
+            y = 30
             obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
         return obstacles
     
@@ -205,7 +206,7 @@ class ASVEnv(gym.Env):
 
     def reset(self, seed=None, options=None):
         # super().reset(seed=seed)
-        self.obstacles = self.generate_static_obstacles(1, self.width, self.height)
+        self.obstacles = self.generate_static_obstacles(1)
         self.objects_environment = self.obstacles + self.path + self.boundary + self.goal_point
         self.grid_dict = self.fill_grid(self.objects_environment, self.grid_size)
 
@@ -227,7 +228,7 @@ class ASVEnv(gym.Env):
         # If the agent reached goal
         elif state == GOAL_STATE:
             return True
-        # If the total number of steps are 150 or above
+        # If the total number of steps are 250 or above
         elif self.step_count >= self.max_num_step:
             return True
         return False
@@ -284,16 +285,17 @@ class ASVEnv(gym.Env):
         # Calculate the heading deviation
         heading_deviation = self.heading_deviation(self.current_heading, self.goal, self.position)
         # Set a threshold distance for significant penalty
-        danger_zone_threshold = self.grid_size * 2
+        danger_zone_threshold = self.grid_size * 1
         
+        reward = 0
         if state == COLLISION_STATE:
-            reward = -500
+            reward -= 1000
         elif state == GOAL_STATE:
-            reward = 500
+            reward += 500
         elif state == PATH_STATE:
-            reward = 10 - distance_to_goal*0.5
+            reward += (10 - distance_to_goal*0.5)
         elif state == FREE_STATE:
-            reward = -(10 + distance_to_path + distance_to_goal*0.5)
+            reward -= (1 + distance_to_path*0.5 + distance_to_goal*0.5)
 
         # # Test if the state is assigned correctly in every timestep
         # if state == COLLISION_STATE:
@@ -429,7 +431,8 @@ if __name__ == '__main__':
 
     for _ in range(env.max_num_step):  # Run for 100 steps or until done
         action = env.action_space.sample()  # Take a random action
-        print(env.get_observation())
+        # print(env.get_observation())
+        print(env.calculate_distance_to_goal(env.position))
         obs, reward, done, truncated, info = env.step(action)
         env.render()
         if done:

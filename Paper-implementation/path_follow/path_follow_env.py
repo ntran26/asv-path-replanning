@@ -152,7 +152,8 @@ class ASVEnv(gym.Env):
         # self.current_heading = self.heading + np.random.randint(-30, 30)
         self.current_heading = self.heading
         self.current_speed = self.speed
-        self.position = ((np.random.randint(5,15)), self.start[1])
+        # self.position = ((np.random.randint(5,15)), self.start[1])
+        self.position = (5, self.start[1])
         # self.position = self.start
         self.done = False
         self.grid = self.generate_grid(self.radius, self.grid_size, self.position)
@@ -212,7 +213,7 @@ class ASVEnv(gym.Env):
         elif state == GOAL_STATE:
             reward = 500
         elif state == PATH_STATE:
-            reward = 10 - distance_to_goal*0.5
+            reward = 100 - distance_to_goal
         elif state == FREE_STATE:
             reward = -10 - distance_to_path - distance_to_goal*0.5
 

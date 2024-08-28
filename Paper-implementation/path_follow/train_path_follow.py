@@ -64,7 +64,7 @@ ent_coef = 9.412368520429483e-05
 #             clip_range=clip_range,
 #             vf_coef=vf_coef,
 #             ent_coef=ent_coef)
-# model = PPO('MlpPolicy', env, verbose=1)
+model = PPO('MlpPolicy', env, verbose=1)
 
 # DQN Hyperparameters
 learning_rate = 0.0001
@@ -81,10 +81,10 @@ exploration_final_eps = 0.01  # Final exploration rate
 #             target_update_interval=target_update_interval,
 #             exploration_fraction=exploration_fraction,
 #             exploration_final_eps=exploration_final_eps)
-model = DQN('MlpPolicy', env, verbose=1)
+# model = DQN('MlpPolicy', env, verbose=1)
 
 callback = CustomCallback()
-num_timesteps = int(1e6)
+num_timesteps = int(5e5)
 
 start_time = timer()
 
