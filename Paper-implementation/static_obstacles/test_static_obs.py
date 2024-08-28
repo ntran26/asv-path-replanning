@@ -25,13 +25,11 @@ if __name__ == '__main__':
     check_env(env)
 
     # Load the model
-    # model_path = "ppo_asv_model"
-    model_path = "ppo_static_obstacles"
-    # model_path = "rl_model_100000_steps"
-    # model_path = "rl_model_1000000_steps"
-    model_path = "best_model"
-    # model_path = "static_obs_100000"
-    # model_path = "static_obs_500000"
+    # model_path = "models/ppo_asv_model"
+    model_path = "models/ppo_static_obstacles"
+    # model_path = "models/best_model"
+    # model_path = "models/static_obs_100000"
+    # model_path = "models/static_obs_500000"
     model = PPO.load(model_path)
 
     # Test the trained model

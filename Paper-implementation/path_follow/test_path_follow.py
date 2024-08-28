@@ -25,7 +25,7 @@ if __name__ == '__main__':
     check_env(env)
 
     # Load the model
-    model_path = "ppo_path_follow"
+    model_path = "models/ppo_path_follow"
     model = PPO.load(model_path)
 
     # Test the trained model
