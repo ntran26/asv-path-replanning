@@ -66,3 +66,8 @@ NOTE: File name with "_env" is an OpenAI Gym environment, otherwise, a regular e
         + Set heading angle (and speed) to initial value
         + Reset total reward
     - Each episode will be different where the location of the obstacles will be changed
+
+
+    Training time report:
+    - For the env with 313 grids (radius = 100, grid size = 10): 100,000 episodes ~ 6 minutes
+    - For the env with 77 grids (radius = 20, grid size = 4): 100,000 episodes ~ 3 minutes

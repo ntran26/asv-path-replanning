@@ -47,6 +47,9 @@ if __name__ == '__main__':
     print(f"Cumulative reward = {cumulative_reward}")
 
     # Plot the path taken
+    print("Writting to mp4 file....")
+    env.env_visualisation()
+    print("Done!")
     env.display_path()
 
     env.close()

@@ -57,6 +57,7 @@ class ASVEnv(gym.Env):
         self.center_point = (0,0)
         self.max_num_step = MAX_NUM_STEP
         self.step_taken = []
+        self.heading_taken = []
         self.heading_angle = []
 
         self.path = self.generate_path(self.start, self.goal)
@@ -124,12 +125,18 @@ class ASVEnv(gym.Env):
     def calculate_distance_to_path(self, position):
         path_x = [point['x'] for point in self.path]
         path_y = [point['y'] for point in self.path]
+        path_deviation = 0
         min_distance = float('inf')
         for px, py in zip(path_x, path_y):
             distance = np.sqrt((position[0] - px) ** 2 + (position[1] - py) ** 2)
             if distance < min_distance:
                 min_distance = distance
-        return min_distance
+                if min_distance <= self.grid_size/2:
+                    path_deviation = 0
+                elif min_distance > self.grid_size/2:
+                    path_deviation = ((distance + 2)//(self.grid_size))
+        # return min_distance
+        return int(path_deviation)
     
     def calculate_distance_to_goal(self, position):
         goal_x = [point['x'] for point in self.goal_point]
@@ -138,8 +145,8 @@ class ASVEnv(gym.Env):
         for px, py in zip(goal_x, goal_y):
             distance = np.sqrt((position[0] - px) ** 2 + (position[1] - py) ** 2)
             if distance < min_distance:
-                min_distance = distance
-        return min_distance
+                min_distance = distance/self.grid_size
+        return int(min_distance)
     
     def heading_deviation(self, current_heading, goal_position, agent_position):
         # Calculate the heading deviation
@@ -157,7 +164,7 @@ class ASVEnv(gym.Env):
                 distance = np.sqrt((x - obstacle_x)**2 + (y - obstacle_y)**2)
                 if distance < min_distance:
                     min_distance = distance
-        return min_distance
+        return int(min_distance)
     
     #                           -------- MAP GENERATION --------
 
@@ -244,6 +251,7 @@ class ASVEnv(gym.Env):
     
     def step(self, action):
         if action == 0:     # go straight
+            self.current_heading = self.current_heading
             self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
                         self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
         elif action == 1:   # turn left
@@ -269,6 +277,7 @@ class ASVEnv(gym.Env):
 
         self.step_count += 1
         self.step_taken.append((self.position[0], self.position[1]))
+        self.heading_taken.append(self.current_heading)
         reward = self.calculate_reward(self.position)
         terminated = self.check_done(self.position)
         observation = self.get_observation()
@@ -293,9 +302,9 @@ class ASVEnv(gym.Env):
         elif state == GOAL_STATE:
             reward += 500
         elif state == PATH_STATE:
-            reward += (10 - distance_to_goal*0.5)
+            reward += (10 - distance_to_goal*0.1)
         elif state == FREE_STATE:
-            reward -= (1 + distance_to_path*0.5 + distance_to_goal*0.5)
+            reward -= (5 + distance_to_path*5 + distance_to_goal*0.1)
 
         # # Test if the state is assigned correctly in every timestep
         # if state == COLLISION_STATE:
@@ -315,6 +324,7 @@ class ASVEnv(gym.Env):
         # If 2 grids away from the obstacles (horizontally or vertically) => reward -50
         # If 1 grid away from the obstacles (horizontally or vertically) => reward -100
         # Add a reward/reduce penalty for getting closer to the goal
+
         reward -= distance_to_goal*0.5
 
         # Reward for reducing heading deviation
@@ -418,6 +428,115 @@ class ASVEnv(gym.Env):
         ax.plot(step_x, step_y, marker='.', color=BLUE)
         plt.show()
 
+    def env_visualisation(self):
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 8))
+
+        # First plot: whole map
+        ax1.set_aspect('equal')
+        ax1.set_title('MAP')
+        # Second plot: observation per timestep
+        ax2.set_aspect('equal')
+        ax2.set_title('OBSERVATION')
+        ax2.set_xlim(-self.radius, self.radius)
+        ax2.set_ylim(-self.radius, self.radius)
+
+        # Plot ASV and observation circle
+        self.agent_1, = ax1.plot([], [], marker='^', color=BLUE)
+        self.agent_2, = ax2.plot([], [], marker='^', color=BLUE)
+        observation_horizon1 = plt.Circle(self.start, self.radius, color=BLUE, fill=False)
+        observation_horizon2 = plt.Circle((0, 0), self.radius, color=BLUE, fill=False)
+        ax1.add_patch(observation_horizon1)
+        ax2.add_patch(observation_horizon2)
+
+        # Plot start point
+        ax1.plot(self.start[0], self.start[1], marker='o', color=BLUE)
+
+        # Plot goal point
+        ax1.plot(self.goal[0], self.goal[1], marker='o', color=YELLOW)
+
+        # Plot the boundary
+        for obj in self.boundary:
+            boundary_line = plt.Rectangle((obj['x'], obj['y']), 1, 1, edgecolor=BLACK, facecolor=BLACK)
+            ax1.add_patch(boundary_line)
+        
+        # Plot the path
+        path_x = [point['x'] for point in self.path]
+        path_y = [point['y'] for point in self.path]
+        ax1.plot(path_x, path_y, '-', color=GREEN)
+
+        # Plot obstacles
+        for obj in self.obstacles:
+            ax1.plot(obj['x'], obj['y'], marker='o', color=RED)
+
+        # Plot the grid points on the right
+        self.grid = self.generate_grid(self.radius, self.grid_size, self.center_point)
+        grid_patches = []
+
+        # Initialize all grids as free space
+        for (cx, cy) in self.grid:
+            state = self.grid_dict.get((self.closest_multiple(cx, self.grid_size), self.closest_multiple(cy, self.grid_size)), FREE_STATE)
+            color = WHITE
+            rect = plt.Rectangle((cx - self.grid_size / 2 - self.center_point[0], cy - self.grid_size / 2 - self.center_point[1]), self.grid_size, self.grid_size,
+                                edgecolor='gray', facecolor=color)
+            grid_patches.append(rect)
+            ax2.add_patch(rect)
+        
+        # print(len(self.step_taken))
+        # print(len(self.heading_taken))
+
+        self.asv_path = self.step_taken
+        self.asv_heading = self.heading_taken
+
+        def update(frame):
+            current_pos = self.asv_path[frame]
+            heading = self.asv_heading[frame]
+
+            # Update ASV position and heading angle in first plot
+            self.agent_1.set_data(current_pos[0], current_pos[1])
+            self.agent_1.set_marker((3, 0, heading - 90))
+
+            # Update the observation circle: move along with the ASV in the first plot
+            observation_horizon1.center = current_pos
+
+            # Update grid_dict with the new center point
+            new_grid = self.generate_grid(self.radius, self.grid_size, current_pos)
+            for rect in grid_patches:
+                rect.remove()
+            grid_patches.clear()
+
+            for (cx, cy) in new_grid:
+                state = self.grid_dict.get((self.closest_multiple(cx, self.grid_size), self.closest_multiple(cy, self.grid_size)), FREE_STATE)
+                color = WHITE
+                if state == COLLISION_STATE:
+                    color = RED
+                elif state == PATH_STATE:
+                    color = GREEN
+                elif state == GOAL_STATE:
+                    color = YELLOW
+                rect = plt.Rectangle((cx - self.grid_size / 2 - current_pos[0], cy - self.grid_size / 2 - current_pos[1]), self.grid_size, self.grid_size,
+                                     edgecolor='gray', facecolor=color)
+                rect.set_zorder(1)     # make sure the grids don't overlay other components
+                grid_patches.append(rect)
+                ax2.add_patch(rect)
+            
+            # Update ASV and observation circle after grid patches in the second plot
+            self.agent_2.set_data(0, 0)
+            self.agent_2.set_marker((3, 0, heading - 90))
+            self.agent_2.set_zorder(3)
+
+            observation_horizon2.center = (0, 0)
+            observation_horizon2.set_zorder(2)
+
+            return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *grid_patches
+
+        # Create animation and display
+        ani = FuncAnimation(fig, update, frames=len(self.asv_path), blit=True, interval=200, repeat=False)
+        
+        # Write to mp4 file
+        FFwriter = FFMpegWriter(fps=5)
+        ani.save("ppo_static_obs.mp4", writer=FFwriter)
+        # plt.show()
+
 # Test the environment with random actions
 if __name__ == '__main__':
     env = ASVEnv()
@@ -432,11 +551,12 @@ if __name__ == '__main__':
     for _ in range(env.max_num_step):  # Run for 100 steps or until done
         action = env.action_space.sample()  # Take a random action
         # print(env.get_observation())
-        print(env.calculate_distance_to_goal(env.position))
+        # print(env.calculate_distance_to_goal(env.position))
+        # print(env.calculate_distance_to_path(env.position))
+        # print(env.calculate_reward(env.position))
         obs, reward, done, truncated, info = env.step(action)
         env.render()
         if done:
             break
-
     env.display_path()
     env.close()
