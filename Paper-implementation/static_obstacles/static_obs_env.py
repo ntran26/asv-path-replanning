@@ -28,7 +28,7 @@ SQUARE_SIZE = 4
 # Define initial heading angle, turn rate and number of steps
 INITIAL_HEADING = 90
 TURN_RATE = 2
-SPEED = 2
+SPEED = 1
 
 # Define states
 FREE_STATE = 0          # free space
@@ -56,9 +56,6 @@ class ASVEnv(gym.Env):
         self.grid_size = SQUARE_SIZE
         self.center_point = (0,0)
         self.max_num_step = MAX_NUM_STEP
-        self.step_taken = []
-        self.heading_taken = []
-        self.heading_angle = []
 
         self.path = self.generate_path(self.start, self.goal)
         self.boundary = self.generate_border(self.width, self.height)
@@ -190,8 +187,8 @@ class ASVEnv(gym.Env):
         # Generate 2 random obstacles along the path
         for _ in range(num_obs):
             x = self.start[0]
-            # y = np.random.randint(self.start[1] + 10, self.goal[1] - 10)
-            y = 30
+            y = np.random.randint(self.start[1] + 10, self.goal[1] - 10)
+            # y = 30
             obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
         return obstacles
     
@@ -218,6 +215,8 @@ class ASVEnv(gym.Env):
         self.grid_dict = self.fill_grid(self.objects_environment, self.grid_size)
 
         self.step_count = 0
+        self.step_taken = []
+        self.heading_taken = []
         self.current_heading = self.heading
         self.current_speed = self.speed
         self.position = self.start
@@ -532,9 +531,9 @@ class ASVEnv(gym.Env):
         # Create animation and display
         ani = FuncAnimation(fig, update, frames=len(self.asv_path), blit=True, interval=200, repeat=False)
         
-        # Write to mp4 file
-        FFwriter = FFMpegWriter(fps=5)
-        ani.save("ppo_static_obs.mp4", writer=FFwriter)
+        # # Write to mp4 file
+        # FFwriter = FFMpegWriter(fps=5)
+        # ani.save("ppo_static_obs.mp4", writer=FFwriter)
         # plt.show()
 
 # Test the environment with random actions

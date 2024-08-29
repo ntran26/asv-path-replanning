@@ -187,7 +187,7 @@ env = ASVEnv()
 
 # Adjust hyperparameters
 learning_rate = 0.0001
-batch_size = 128
+batch_size = 256
 n_epochs = 10
 gamma = 0.99
 clip_range = 0.1
