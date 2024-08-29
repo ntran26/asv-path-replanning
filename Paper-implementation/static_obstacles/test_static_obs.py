@@ -26,10 +26,12 @@ if __name__ == '__main__':
 
     # Load the model
     # model_path = "models/ppo_asv_model"
-    model_path = "models/ppo_static_obstacles"
+    # model_path = "models/ppo_static_obstacles"
     # model_path = "models/best_model"
     # model_path = "models/static_obs_100000"
     # model_path = "models/static_obs_500000"
+    model_path = "ppo_static_obstacles"
+
     model = PPO.load(model_path)
 
     # Test the trained model

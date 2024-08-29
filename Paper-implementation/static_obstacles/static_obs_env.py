@@ -27,8 +27,8 @@ SQUARE_SIZE = 4
 
 # Define initial heading angle, turn rate and number of steps
 INITIAL_HEADING = 90
-TURN_RATE = 3
-SPEED = 0.5
+TURN_RATE = 2
+SPEED = 2
 
 # Define states
 FREE_STATE = 0          # free space
@@ -302,9 +302,9 @@ class ASVEnv(gym.Env):
         elif state == GOAL_STATE:
             reward += 500
         elif state == PATH_STATE:
-            reward += (10 - distance_to_goal*0.1)
+            reward += (15 - distance_to_goal*0.5)
         elif state == FREE_STATE:
-            reward -= (5 + distance_to_path*5 + distance_to_goal*0.1)
+            reward -= (0 + distance_to_path*5 + distance_to_goal*0.5)
 
         # # Test if the state is assigned correctly in every timestep
         # if state == COLLISION_STATE:
@@ -318,14 +318,14 @@ class ASVEnv(gym.Env):
         # else:
         #     print("ERROR")      # if another state exists
         
-        # Add a penalty for being too close to an obstacle
-        if nearest_obstacle_distance <= danger_zone_threshold:
-            reward -= 1000 / nearest_obstacle_distance
+        # # Add a penalty for being too close to an obstacle
+        # if nearest_obstacle_distance <= danger_zone_threshold:
+        #     reward -= 1000 / nearest_obstacle_distance
         # If 2 grids away from the obstacles (horizontally or vertically) => reward -50
         # If 1 grid away from the obstacles (horizontally or vertically) => reward -100
         # Add a reward/reduce penalty for getting closer to the goal
 
-        reward -= distance_to_goal*0.5
+        # reward -= distance_to_goal*0.5
 
         # Reward for reducing heading deviation
         # reward -= heading_deviation

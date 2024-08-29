@@ -186,7 +186,7 @@ class CustomCallback(BaseCallback):
 env = ASVEnv()
 
 # Adjust hyperparameters
-learning_rate = 0.001
+learning_rate = 0.0001
 batch_size = 128
 n_epochs = 10
 gamma = 0.99
