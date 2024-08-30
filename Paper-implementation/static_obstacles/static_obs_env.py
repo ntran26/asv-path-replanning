@@ -28,7 +28,7 @@ SQUARE_SIZE = 4
 # Define initial heading angle, turn rate and number of steps
 INITIAL_HEADING = 90
 TURN_RATE = 2
-SPEED = 1
+SPEED = 0.5
 
 # Define states
 FREE_STATE = 0          # free space

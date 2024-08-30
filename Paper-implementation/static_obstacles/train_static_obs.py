@@ -23,7 +23,7 @@ YELLOW = (1, 1, 0)
 BLUE = (0, 0, 1)
 
 # Number of timesteps/episodes
-NUM_EPISODES = int(1e6)
+NUM_EPISODES = int(5e5)
 
 # if __name__ == '__main__':
 #     # Create the environment
@@ -186,13 +186,14 @@ class CustomCallback(BaseCallback):
 env = ASVEnv()
 
 # Adjust hyperparameters
-learning_rate = 0.0001
+learning_rate = 0.006
 batch_size = 256
-n_epochs = 10
+n_epochs = 20
 gamma = 0.99
-clip_range = 0.1
-vf_coef = 0.5
-ent_coef = 0.01
+clip_range = 0.36
+gae_lambda = 0.86
+vf_coef = 0.27
+ent_coef = 0.0001
 
 # Create the PPO model with the custom policy
 model = PPO('MlpPolicy', env, verbose=1,
@@ -201,6 +202,7 @@ model = PPO('MlpPolicy', env, verbose=1,
             n_epochs=n_epochs,
             gamma=gamma,
             clip_range=clip_range,
+            gae_lambda=gae_lambda,
             vf_coef=vf_coef,
             ent_coef=ent_coef)
 # model = PPO('MlpPolicy', env, verbose=1)
