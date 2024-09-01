@@ -27,7 +27,7 @@ SQUARE_SIZE = 4
 
 # Define initial heading angle, turn rate and number of steps
 INITIAL_HEADING = 90
-TURN_RATE = 2
+TURN_RATE = 3
 SPEED = 0.5
 
 # Define states
@@ -295,15 +295,25 @@ class ASVEnv(gym.Env):
         # Set a threshold distance for significant penalty
         danger_zone_threshold = self.grid_size * 1
         
+        # reward = 0
+        # if state == COLLISION_STATE:
+        #     reward -= 1000
+        # elif state == GOAL_STATE:
+        #     reward += 500
+        # elif state == PATH_STATE:
+        #     reward += (15 - distance_to_goal*0.5)
+        # elif state == FREE_STATE:
+        #     reward -= (0 + distance_to_path*5 + distance_to_goal*0.5)
+
         reward = 0
         if state == COLLISION_STATE:
-            reward -= 1000
+            reward -= 100
         elif state == GOAL_STATE:
-            reward += 500
+            reward += 10
         elif state == PATH_STATE:
-            reward += (15 - distance_to_goal*0.5)
+            reward = 0
         elif state == FREE_STATE:
-            reward -= (0 + distance_to_path*5 + distance_to_goal*0.5)
+            reward -= 1
 
         # # Test if the state is assigned correctly in every timestep
         # if state == COLLISION_STATE:
@@ -552,7 +562,7 @@ if __name__ == '__main__':
         # print(env.get_observation())
         # print(env.calculate_distance_to_goal(env.position))
         # print(env.calculate_distance_to_path(env.position))
-        # print(env.calculate_reward(env.position))
+        print(env.calculate_reward(env.position))
         obs, reward, done, truncated, info = env.step(action)
         env.render()
         if done:

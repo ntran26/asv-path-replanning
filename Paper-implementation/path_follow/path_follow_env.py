@@ -153,7 +153,7 @@ class ASVEnv(gym.Env):
         self.current_heading = self.heading
         self.current_speed = self.speed
         # self.position = ((np.random.randint(5,15)), self.start[1])
-        self.position = (5, self.start[1])
+        self.position = (15, self.start[1])
         # self.position = self.start
         self.done = False
         self.grid = self.generate_grid(self.radius, self.grid_size, self.position)
