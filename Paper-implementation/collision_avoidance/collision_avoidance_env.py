@@ -18,7 +18,7 @@ BLUE = (0, 0, 1)
 WIDTH = 100
 HEIGHT = 100
 START = (10, 10)
-GOAL = (90, 90)
+GOAL = (80, 80)
 NUM_STATIC_OBS = 3
 
 # Define observation radius and grid size
@@ -121,12 +121,11 @@ class ASVEnv(gym.Env):
         position = position
         goal = self.goal
         distance_to_goal = np.sqrt((position[0] - goal[0]) ** 2 + (position[1] - goal[1]) ** 2)
-        if distance_to_goal > self.radius:
+        if distance_to_goal >= self.radius:
             dir_x = (goal[0] - position[0])/distance_to_goal
             dir_y = (goal[1] - position[1])/distance_to_goal
-            if goal[0] > position[0] and goal[1] > position[1]:
-                virtual_goal_x = position[0] + 20 * dir_x
-                virtual_goal_y = position[1] + 20 * dir_y
+            virtual_goal_x = position[0] + 30 * dir_x
+            virtual_goal_y = position[1] + 30 * dir_y
             virtual_goal = (virtual_goal_x, virtual_goal_y)
         else:
             virtual_goal = goal
@@ -150,8 +149,8 @@ class ASVEnv(gym.Env):
         obstacles = []
         # Generate random obstacles around the map
         for _ in range(num_obs):
-            x = np.random.randint(self.start[0] + 10, self.goal[0] - 10)
-            y = np.random.randint(self.start[1] + 10, self.goal[1] - 10)
+            x = np.random.randint(self.start[0], self.goal[0])
+            y = np.random.randint(self.start[1], self.goal[1])
             obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
         return obstacles
     
