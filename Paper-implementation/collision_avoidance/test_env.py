@@ -26,9 +26,8 @@ if __name__ == '__main__':
 
     # Load the model'
     # model_path = "Paper-implementation/collision_avoidance/model_500000"
-    # model_path = "Paper-implementation/collision_avoidance/ppo_static_obstacles"
-    # model_path = "Paper-implementation/collision_avoidance/ppo_static_obstacles"
-    model_path = "Paper-implementation/best_models/ppo_collision_avoidance_speed_2_turn_5"
+    model_path = "Paper-implementation/collision_avoidance/ppo_collision_avoidance"
+    # model_path = "Paper-implementation/best_models/ppo_collision_avoidance_speed_2_turn_5"
 
     model = PPO.load(model_path)
 
