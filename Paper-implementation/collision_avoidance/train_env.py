@@ -90,7 +90,7 @@ second = int(time - 60*minute)
 print(f"Total time = {hour} : {minute} : {second}")
 
 # Save the model
-model.save("Paper-implementation/collision_avoidance/ppo_static_obstacles")
+model.save("Paper-implementation/collision_avoidance/ppo_collision_avoidance")
 
 # Plot rewards
 plt.plot(callback.rewards, label="Rewards")

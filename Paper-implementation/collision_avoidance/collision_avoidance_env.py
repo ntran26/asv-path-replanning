@@ -17,18 +17,19 @@ BLUE = (0, 0, 1)
 # Define map dimensions and start/goal points, number of static obstacles
 WIDTH = 100
 HEIGHT = 100
-START = (10, 10)
+START = (30, 30)
 GOAL = (80, 80)
 NUM_STATIC_OBS = 3
 
 # Define observation radius and grid size
 RADIUS = 40
 SQUARE_SIZE = 5
+WAYPOINT_DISTANCE = 25
 
 # Define initial heading angle, turn rate and number of steps
 INITIAL_HEADING = 90
 TURN_RATE = 5
-SPEED = 1
+SPEED = 2
 
 # Define states
 FREE_STATE = 0         # free space
@@ -55,6 +56,7 @@ class ASVEnv(gym.Env):
         self.grid_size = SQUARE_SIZE
         self.center_point = (0,0)
         self.max_num_step = MAX_NUM_STEP
+        self.virtual_goal_distance = WAYPOINT_DISTANCE
 
         # Define action space and observation space
         # 3 possible actions: left, right, straight
@@ -120,12 +122,13 @@ class ASVEnv(gym.Env):
     def check_virtual_goal(self, position):
         position = position
         goal = self.goal
+        distance = self.virtual_goal_distance
         distance_to_goal = np.sqrt((position[0] - goal[0]) ** 2 + (position[1] - goal[1]) ** 2)
         if distance_to_goal >= self.radius:
             dir_x = (goal[0] - position[0])/distance_to_goal
             dir_y = (goal[1] - position[1])/distance_to_goal
-            virtual_goal_x = position[0] + 30 * dir_x
-            virtual_goal_y = position[1] + 30 * dir_y
+            virtual_goal_x = position[0] + distance * dir_x
+            virtual_goal_y = position[1] + distance * dir_y
             virtual_goal = (virtual_goal_x, virtual_goal_y)
         else:
             virtual_goal = goal
@@ -455,9 +458,9 @@ class ASVEnv(gym.Env):
         # Create animation and display
         ani = FuncAnimation(fig, update, frames=len(self.asv_path), blit=True, interval=200, repeat=False)
         
-        # # Write to mp4 file
-        # FFwriter = FFMpegWriter(fps=5)
-        # ani.save("ppo_static_obs.mp4", writer=FFwriter)
+        # Write to mp4 file
+        FFwriter = FFMpegWriter(fps=5)
+        ani.save("ppo_static_obs.mp4", writer=FFwriter)
         # plt.show()
 
 # Test the environment with random actions
@@ -473,7 +476,7 @@ if __name__ == '__main__':
 
     for _ in range(env.max_num_step):  # Run for 100 steps or until done
         action = env.action_space.sample()  # Take a random action
-        # print(env.get_observation())
+        print(env.get_observation())
         # print(len(env.get_observation()))
         # print(env.calculate_distance_to_goal(env.position))
         # print(env.calculate_distance_to_path(env.position))

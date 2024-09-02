@@ -24,9 +24,11 @@ if __name__ == '__main__':
     # Check the environment
     check_env(env)
 
-    # Load the model
-    model_path = "Paper-implementation/collision_avoidance/model_500000"
+    # Load the model'
+    # model_path = "Paper-implementation/collision_avoidance/model_500000"
     # model_path = "Paper-implementation/collision_avoidance/ppo_static_obstacles"
+    # model_path = "Paper-implementation/collision_avoidance/ppo_static_obstacles"
+    model_path = "Paper-implementation/best_models/ppo_collision_avoidance_speed_2_turn_5"
 
     model = PPO.load(model_path)
 
@@ -45,9 +47,9 @@ if __name__ == '__main__':
     print(f"Cumulative reward = {cumulative_reward}")
 
     # Plot the path taken
-    # print("Writting to mp4 file....")
-    # env.env_visualisation()
-    # print("Done!")
+    print("Writting to mp4 file....")
+    env.env_visualisation()
+    print("Done!")
     env.display_path()
 
     env.close()
