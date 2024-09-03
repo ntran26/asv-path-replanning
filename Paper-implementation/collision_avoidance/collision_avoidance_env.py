@@ -120,7 +120,6 @@ class ASVEnv(gym.Env):
         return grid_dict
     
     def check_virtual_goal(self, position):
-        position = position
         goal = self.goal
         distance = self.virtual_goal_distance
         distance_to_goal = np.sqrt((position[0] - goal[0]) ** 2 + (position[1] - goal[1]) ** 2)
@@ -240,16 +239,17 @@ class ASVEnv(gym.Env):
         #     self.position = (self.position[0] + self.speed * np.cos(np.radians(self.current_heading)),
         #                     self.position[1] + self.speed * np.sin(np.radians(self.current_heading)))
 
-        self.virtual_goal = self.check_virtual_goal(self.position)
-        virtual_goal_point = self.generate_virtual_goal(self.virtual_goal)
+        self.virtual_goal = self.check_virtual_goal(self.position)             # get coordinate of virtual goal
+        virtual_goal_point = self.generate_virtual_goal(self.virtual_goal)     # convert it into grid_dict format
 
         # Update grid_dict with the current ASV position
         self.objects_environment = self.obstacles + self.boundary + self.goal_point + virtual_goal_point
         self.grid_dict = self.fill_grid(self.objects_environment, self.grid_size, self.position)
 
         self.step_count += 1
-        self.step_taken.append((self.position[0], self.position[1]))
+        self.step_taken.append(self.position)
         self.heading_taken.append(self.current_heading)
+
         reward = self.calculate_reward(self.position)
         terminated = self.check_done(self.position)
         observation = self.get_observation()
@@ -338,6 +338,20 @@ class ASVEnv(gym.Env):
 
             plt.draw()
             plt.pause(0.01)
+
+            save_video = True
+            video_file = "demo_video.mp4"
+            # Save the frame to a video if save_video is True
+            if save_video:
+                if not hasattr(self, 'writer'):
+                    self.writer = FFMpegWriter(fps=3, metadata=dict(artist='Me'), bitrate=1800)
+                    self.writer.setup(self.fig, video_file, dpi=100)
+                self.writer.grab_frame()
+        
+        # Finalize and save the video when rendering is complete
+        if save_video and mode == 'finish':
+            if hasattr(self, 'writer'):
+                self.writer.finish()
     
     #                           -------- POST PROCESSING --------
     
@@ -359,109 +373,8 @@ class ASVEnv(gym.Env):
         step_x = [point[0] for point in self.step_taken]
         step_y = [point[1] for point in self.step_taken]
         ax.plot(step_x, step_y, marker='.', color=BLUE)
+        plt.savefig("Collision_avoidance_result")
         plt.show()
-
-    def env_visualisation(self):
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 8))
-
-        # First plot: whole map
-        ax1.set_aspect('equal')
-        ax1.set_title('MAP')
-        # Second plot: observation per timestep
-        ax2.set_aspect('equal')
-        ax2.set_title('OBSERVATION')
-        ax2.set_xlim(-self.radius, self.radius)
-        ax2.set_ylim(-self.radius, self.radius)
-
-        # Plot ASV and observation circle
-        self.agent_1, = ax1.plot([], [], marker='^', color=BLUE)
-        self.agent_2, = ax2.plot([], [], marker='^', color=BLUE)
-        observation_horizon1 = plt.Circle(self.start, self.radius, color=BLUE, fill=False)
-        observation_horizon2 = plt.Circle((0, 0), self.radius, color=BLUE, fill=False)
-        ax1.add_patch(observation_horizon1)
-        ax2.add_patch(observation_horizon2)
-
-        # Plot start point
-        ax1.plot(self.start[0], self.start[1], marker='o', color=BLUE)
-
-        # Plot goal point
-        ax1.plot(self.goal[0], self.goal[1], marker='o', color=GREEN)
-
-        # Plot the boundary
-        for obj in self.boundary:
-            boundary_line = plt.Rectangle((obj['x'], obj['y']), 1, 1, edgecolor=BLACK, facecolor=BLACK)
-            ax1.add_patch(boundary_line)
-
-        # Plot obstacles
-        for obj in self.obstacles:
-            ax1.plot(obj['x'], obj['y'], marker='o', color=RED)
-
-        # Plot the grid points on the right
-        self.grid = self.generate_grid(self.radius, self.grid_size, self.center_point)
-        grid_patches = []
-
-        # Initialize all grids as free space
-        for (cx, cy) in self.grid:
-            state = self.grid_dict.get((self.closest_multiple(cx, self.grid_size), self.closest_multiple(cy, self.grid_size)), FREE_STATE)
-            color = WHITE
-            rect = plt.Rectangle((cx - self.grid_size / 2 - self.center_point[0], cy - self.grid_size / 2 - self.center_point[1]), self.grid_size, self.grid_size,
-                                edgecolor='gray', facecolor=color)
-            grid_patches.append(rect)
-            ax2.add_patch(rect)
-        
-        # print(len(self.step_taken))
-        # print(len(self.heading_taken))
-
-        self.asv_path = self.step_taken
-        self.asv_heading = self.heading_taken
-
-        def update(frame):
-            current_pos = self.asv_path[frame]
-            heading = self.asv_heading[frame]
-
-            # Update ASV position and heading angle in first plot
-            self.agent_1.set_data(current_pos[0], current_pos[1])
-            self.agent_1.set_marker((3, 0, heading - 90))
-
-            # Update the observation circle: move along with the ASV in the first plot
-            observation_horizon1.center = current_pos
-
-            # Update grid_dict with the new center point
-            new_grid = self.generate_grid(self.radius, self.grid_size, current_pos)
-            for rect in grid_patches:
-                rect.remove()
-            grid_patches.clear()
-
-            for (cx, cy) in new_grid:
-                state = self.grid_dict.get((self.closest_multiple(cx, self.grid_size), self.closest_multiple(cy, self.grid_size)), FREE_STATE)
-                color = WHITE
-                if state == COLLISION_STATE:
-                    color = RED
-                elif state == GOAL_STATE:
-                    color = GREEN
-                rect = plt.Rectangle((cx - self.grid_size / 2 - current_pos[0], cy - self.grid_size / 2 - current_pos[1]), self.grid_size, self.grid_size,
-                                     edgecolor='gray', facecolor=color)
-                rect.set_zorder(1)     # make sure the grids don't overlay other components
-                grid_patches.append(rect)
-                ax2.add_patch(rect)
-            
-            # Update ASV and observation circle after grid patches in the second plot
-            self.agent_2.set_data(0, 0)
-            self.agent_2.set_marker((3, 0, heading - 90))
-            self.agent_2.set_zorder(3)
-
-            observation_horizon2.center = (0, 0)
-            observation_horizon2.set_zorder(2)
-
-            return self.agent_1, self.agent_2, observation_horizon1, observation_horizon2, *grid_patches
-
-        # Create animation and display
-        ani = FuncAnimation(fig, update, frames=len(self.asv_path), blit=True, interval=200, repeat=False)
-        
-        # Write to mp4 file
-        FFwriter = FFMpegWriter(fps=5)
-        ani.save("ppo_static_obs.mp4", writer=FFwriter)
-        # plt.show()
 
 # Test the environment with random actions
 if __name__ == '__main__':
