@@ -24,6 +24,7 @@ BLUE = (0, 0, 1)
 
 # Number of timesteps/episodes
 NUM_EPISODES = int(1e6)
+SAVE_FREQENCY = int(1e6)
 
 # if __name__ == '__main__':
 #     # Create the environment
@@ -195,7 +196,7 @@ model = PPO('MlpPolicy', env, verbose=1,
             vf_coef=vf_coef,
             ent_coef=ent_coef)
 # model = PPO('MlpPolicy', env, verbose=1)
-callback = CustomCallback(save_freq=int(1e5))
+callback = CustomCallback(save_freq=SAVE_FREQENCY)
 num_timesteps = NUM_EPISODES
 
 start_time = timer()

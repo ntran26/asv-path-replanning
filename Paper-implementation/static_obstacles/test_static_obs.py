@@ -24,8 +24,18 @@ if __name__ == '__main__':
     # Check the environment
     check_env(env)
 
+    # Choose model version
+    version = 1
+
     # Load the model
-    model_path = "Paper-implementation/static_obstacles/ppo_static_obstacles_v3"
+    if version == 1:
+        model_path = "Paper-implementation/static_obstacles/ppo_static_obstacles_v1"
+    elif version == 2:
+        model_path = "Paper-implementation/static_obstacles/ppo_static_obstacles_v2"
+    elif version == 3:
+        model_path = "Paper-implementation/static_obstacles/ppo_static_obstacles_v3"
+    else:
+        model_path = "Paper-implementation/static_obstacles/ppo_static_obstacles"
 
     model = PPO.load(model_path)
 
