@@ -19,7 +19,7 @@ WIDTH = 40
 HEIGHT = 150
 START = (20, 10)
 GOAL = (20, 140)
-NUM_STATIC_OBS = 3
+NUM_STATIC_OBS = 2
 
 # Define observation radius and grid size
 RADIUS = 40
@@ -196,11 +196,11 @@ class ASVEnv(gym.Env):
     # Create a function to generate static obstacles
     def generate_static_obstacles(self, num_obs):
         obstacles = []
-        # # Generate random obstacles around the map
-        # for _ in range(num_obs):
-        #     x = np.random.randint(0, self.width)
-        #     y = np.random.randint(0, self.height)
-        #     obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
+        # Generate random obstacles around the map
+        for _ in range(num_obs):
+            x = np.random.randint(0, self.width)
+            y = np.random.randint(0, self.height)
+            obstacles.append({'x': x, 'y': y, 'state': COLLISION_STATE})
         # Generate 2 random obstacles along the path
         for _ in range(num_obs):
             x = self.start[0]
@@ -341,23 +341,25 @@ class ASVEnv(gym.Env):
         # elif state == FREE_STATE:
         #     reward -= (0 + distance_to_path*5 + distance_to_goal*0.5)
 
-        # reward = 0
-        # if state == COLLISION_STATE:
-        #     reward -= 5
-        # elif state == GOAL_STATE:
-        #     reward += 10
-        # elif state == FREE_STATE:
-        #     reward = 0
-
         reward = 0
         if state == COLLISION_STATE:
             reward -= 50
         elif state == GOAL_STATE:
             reward += 10
         elif state == PATH_STATE:
-            reward = 0
+            reward += 1
         elif state == FREE_STATE:
-            reward -= 1
+            reward = 0
+
+        # reward = 0
+        # if state == COLLISION_STATE:
+        #     reward -= 50
+        # elif state == GOAL_STATE:
+        #     reward += 10
+        # elif state == PATH_STATE:
+        #     reward = 0
+        # elif state == FREE_STATE:
+        #     reward -= 1
 
         # # Test if the state is assigned correctly in every timestep
         # if state == COLLISION_STATE:
@@ -459,7 +461,7 @@ class ASVEnv(gym.Env):
             plt.draw()
             plt.pause(0.01)
 
-            save_video = 0
+            save_video = 1
             video_file = "static_obstacles.mp4"
             # Save the frame to a video if save_video is True
             if save_video == 1:
@@ -496,6 +498,7 @@ class ASVEnv(gym.Env):
         step_x = [point[0] for point in self.step_taken]
         step_y = [point[1] for point in self.step_taken]
         ax.plot(step_x, step_y, marker='.', color=BLUE)
+        plt.savefig("Static_obstacles_result")
         plt.show()
 
 # Test the environment with random actions

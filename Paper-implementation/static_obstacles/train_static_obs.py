@@ -162,7 +162,7 @@ class CustomCallback(BaseCallback):
     def _on_step(self):
         # Save model at regular intervals
         if self.num_timesteps % self.save_freq == 0:
-            model_path = f"static_obs_{self.num_timesteps}.zip"
+            model_path = f"Paper-implementation/static_obstacles/static_obs_{self.num_timesteps}.zip"
             print(f"Saving model at {self.num_timesteps} timesteps")
             self.model.save(model_path)
             self.model_save_counter += 1
@@ -172,14 +172,6 @@ class CustomCallback(BaseCallback):
             if "loss" in self.model.ep_info_buffer[0]:
                 self.policy_loss.append(self.model.ep_info_buffer[0]["loss"]["policy_loss"])
                 self.value_loss.append(self.model.ep_info_buffer[0]["loss"]["value_loss"])
-
-            # Calculate the mean reward for the last 1000 steps
-            if len(self.rewards) >= 1000:
-                mean_reward = np.mean(self.rewards[-1000:])
-                if mean_reward > self.best_mean_reward:
-                    self.best_mean_reward = mean_reward
-                    print(f"New best mean reward: {mean_reward}. Saving model...")
-                    self.model.save(self.best_model_path)
         return True
 
 # Create environment
@@ -229,7 +221,7 @@ second = int(time - 60*minute)
 print(f"Total time = {hour} : {minute} : {second}")
 
 # Save the model
-model.save("ppo_static_obstacles")
+model.save("Paper-implementation/static_obstacles/ppo_static_obstacles")
 
 # Plot rewards
 plt.plot(callback.rewards, label="Rewards")
