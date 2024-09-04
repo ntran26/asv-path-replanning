@@ -25,7 +25,7 @@ if __name__ == '__main__':
     check_env(env)
 
     # Load the model
-    model_path = "Paper-implementation/static_obstacles/ppo_static_obstacles"
+    model_path = "Paper-implementation/static_obstacles/ppo_static_obstacles_v3"
 
     model = PPO.load(model_path)
 

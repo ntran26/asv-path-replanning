@@ -156,8 +156,6 @@ class CustomCallback(BaseCallback):
         self.policy_loss = []
         self.value_loss = []
         self.rewards = []
-        self.best_mean_reward = -np.inf  # Initialize to a very low value
-        self.best_model_path = "best_model.zip"
 
     def _on_step(self):
         # Save model at regular intervals

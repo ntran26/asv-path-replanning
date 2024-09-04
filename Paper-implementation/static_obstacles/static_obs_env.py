@@ -29,7 +29,7 @@ WAYPOINT_DISTANCE = 20
 # Define initial heading angle, turn rate and number of steps
 INITIAL_HEADING = 90
 TURN_RATE = 5
-SPEED = 1
+SPEED = 2
 
 # Define states
 FREE_STATE = 0          # free space
@@ -331,35 +331,36 @@ class ASVEnv(gym.Env):
         # Set a threshold distance for significant penalty
         danger_zone_threshold = self.grid_size * 1
         
+        # # Version 1
         # reward = 0
         # if state == COLLISION_STATE:
-        #     reward -= 1000
+        #     reward -= 10
         # elif state == GOAL_STATE:
-        #     reward += 500
-        # elif state == PATH_STATE:
-        #     reward += (15 - distance_to_goal*0.5)
-        # elif state == FREE_STATE:
-        #     reward -= (0 + distance_to_path*5 + distance_to_goal*0.5)
+        #     reward += 5
+        # elif state == FREE_STATE or PATH_STATE:
+        #     reward = 0
 
-        reward = 0
-        if state == COLLISION_STATE:
-            reward -= 50
-        elif state == GOAL_STATE:
-            reward += 10
-        elif state == PATH_STATE:
-            reward += 1
-        elif state == FREE_STATE:
-            reward = 0
-
+        # # Version 2
         # reward = 0
         # if state == COLLISION_STATE:
         #     reward -= 50
         # elif state == GOAL_STATE:
         #     reward += 10
         # elif state == PATH_STATE:
-        #     reward = 0
+        #     reward += 1
         # elif state == FREE_STATE:
-        #     reward -= 1
+        #     reward = 0
+
+        # Version 3
+        reward = 0
+        if state == COLLISION_STATE:
+            reward -= 1000
+        elif state == GOAL_STATE:
+            reward += 500
+        elif state == PATH_STATE:
+            reward += (15 - distance_to_goal*0.5)
+        elif state == FREE_STATE:
+            reward -= (0 + distance_to_path*5 + distance_to_goal*0.5)
 
         # # Test if the state is assigned correctly in every timestep
         # if state == COLLISION_STATE:
