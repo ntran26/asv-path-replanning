@@ -25,7 +25,7 @@ if __name__ == '__main__':
     check_env(env)
 
     # Choose model version
-    version = 1
+    version = 2
 
     # Load the model
     if version == 1:

@@ -340,27 +340,27 @@ class ASVEnv(gym.Env):
         # elif state == FREE_STATE or PATH_STATE:
         #     reward = 0
 
-        # # Version 2
-        # reward = 0
-        # if state == COLLISION_STATE:
-        #     reward -= 50
-        # elif state == GOAL_STATE:
-        #     reward += 10
-        # elif state == PATH_STATE:
-        #     reward += 1
-        # elif state == FREE_STATE:
-        #     reward = 0
-
-        # Version 3
+        # Version 2
         reward = 0
         if state == COLLISION_STATE:
-            reward -= 1000
+            reward -= 50
         elif state == GOAL_STATE:
-            reward += 500
+            reward += 10
         elif state == PATH_STATE:
-            reward += (15 - distance_to_goal*0.5)
+            reward += 1
         elif state == FREE_STATE:
-            reward -= (0 + distance_to_path*5 + distance_to_goal*0.5)
+            reward = 0
+
+        # # Version 3
+        # reward = 0
+        # if state == COLLISION_STATE:
+        #     reward -= 1000
+        # elif state == GOAL_STATE:
+        #     reward += 500
+        # elif state == PATH_STATE:
+        #     reward += (15 - distance_to_goal*0.5)
+        # elif state == FREE_STATE:
+        #     reward -= (0 + distance_to_path*5 + distance_to_goal*0.5)
 
         # # Test if the state is assigned correctly in every timestep
         # if state == COLLISION_STATE:
