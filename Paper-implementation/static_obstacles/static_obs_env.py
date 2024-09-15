@@ -15,10 +15,10 @@ YELLOW = (1, 1, 0)
 BLUE = (0, 0, 1)
 
 # Define map dimensions and start/goal points, number of static obstacles
-WIDTH = 40
+WIDTH = 60
 HEIGHT = 150
-START = (20, 10)
-GOAL = (20, 140)
+START = (30, 10)
+GOAL = (30, 140)
 NUM_STATIC_OBS = 2
 
 # Define observation radius and grid size
@@ -38,7 +38,7 @@ COLLISION_STATE = 2     # obstacle or border
 GOAL_STATE = 3          # goal point
 
 # Define maximum steps
-MAX_NUM_STEP = 200
+MAX_NUM_STEP = 150
 
 class ASVEnv(gym.Env):
     metadata = {"render_modes": ["human"]}
@@ -235,7 +235,7 @@ class ASVEnv(gym.Env):
         self.step_count = 0
         self.step_taken = []
         self.heading_taken = []
-        self.current_heading = self.heading
+        self.current_heading = np.random.choice([0,30,60,90,120,150,180])
         self.current_speed = self.speed
         self.position = self.start
         self.virtual_goal = self.check_virtual_goal(self.position)
@@ -331,25 +331,25 @@ class ASVEnv(gym.Env):
         # Set a threshold distance for significant penalty
         danger_zone_threshold = self.grid_size * 1
         
-        # # Version 1
-        # reward = 0
-        # if state == COLLISION_STATE:
-        #     reward -= 10
-        # elif state == GOAL_STATE:
-        #     reward += 5
-        # elif state == FREE_STATE or PATH_STATE:
-        #     reward = 0
-
-        # Version 2
+        # Version 1
         reward = 0
         if state == COLLISION_STATE:
-            reward -= 50
+            reward -= 10
         elif state == GOAL_STATE:
-            reward += 10
-        elif state == PATH_STATE:
-            reward += 1
-        elif state == FREE_STATE:
+            reward += 5
+        elif state == FREE_STATE or PATH_STATE:
             reward = 0
+
+        # # Version 2
+        # reward = 0
+        # if state == COLLISION_STATE:
+        #     reward -= 50
+        # elif state == GOAL_STATE:
+        #     reward += 10
+        # elif state == PATH_STATE:
+        #     reward += 1
+        # elif state == FREE_STATE:
+        #     reward = 0
 
         # # Version 3
         # reward = 0
@@ -514,7 +514,8 @@ if __name__ == '__main__':
     # print("Action Space Sample", env.action_space.sample())
 
     for _ in range(env.max_num_step):  # Run for 100 steps or until done
-        action = env.action_space.sample()  # Take a random action
+        # action = env.action_space.sample()  # Take a random action
+        action = env.step(1)
         # print(env.get_observation())
         # print(env.calculate_distance_to_goal(env.position))
         # print(env.calculate_distance_to_path(env.position))

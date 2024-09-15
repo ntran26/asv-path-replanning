@@ -14,17 +14,19 @@ import optuna
 from timeit import default_timer as timer
 
 #                               -------- CONFIGURATION --------
-# Define colors
-BLACK = (0, 0, 0)
-WHITE = (1, 1, 1)
-RED = (1, 0, 0)
-GREEN = (0, 1, 0)
-YELLOW = (1, 1, 0)
-BLUE = (0, 0, 1)
-
 # Number of timesteps/episodes
 NUM_EPISODES = int(1e6)
 SAVE_FREQENCY = int(1e6)
+
+# Adjust hyperparameters
+learning_rate = 0.0001
+batch_size = 30000
+n_epochs = 10
+gamma = 0.99
+clip_range = 0.1
+gae_lambda = 0.86
+vf_coef = 0.5
+ent_coef = 0.01
 
 # if __name__ == '__main__':
 #     # Create the environment
@@ -175,16 +177,6 @@ class CustomCallback(BaseCallback):
 
 # Create environment
 env = ASVEnv()
-
-# Adjust hyperparameters
-learning_rate = 0.0001
-batch_size = 30000
-n_epochs = 10
-gamma = 0.99
-clip_range = 0.1
-gae_lambda = 0.86
-vf_coef = 0.5
-ent_coef = 0.01
 
 # Create the PPO model with the custom policy
 model = PPO('MlpPolicy', env, verbose=1,
