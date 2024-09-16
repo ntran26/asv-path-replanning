@@ -235,7 +235,7 @@ class ASVEnv(gym.Env):
         self.step_count = 0
         self.step_taken = []
         self.heading_taken = []
-        self.current_heading = np.random.choice([0,30,60,90,120,150,180])
+        self.current_heading = np.random.choice([0,90,180])
         self.current_speed = self.speed
         self.position = self.start
         self.virtual_goal = self.check_virtual_goal(self.position)
