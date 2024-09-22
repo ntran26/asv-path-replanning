@@ -235,7 +235,8 @@ class ASVEnv(gym.Env):
         self.step_count = 0
         self.step_taken = []
         self.heading_taken = []
-        self.current_heading = np.random.choice([0,90,180])
+        # self.current_heading = np.random.choice([0,90,180])
+        self.current_heading = self.heading
         self.current_speed = self.speed
         self.position = self.start
         self.virtual_goal = self.check_virtual_goal(self.position)
@@ -343,13 +344,13 @@ class ASVEnv(gym.Env):
         # # Version 2
         # reward = 0
         # if state == COLLISION_STATE:
-        #     reward -= 50
+        #     reward -= 100
         # elif state == GOAL_STATE:
-        #     reward += 10
+        #     reward += 20
         # elif state == PATH_STATE:
-        #     reward += 1
+        #     reward += 0
         # elif state == FREE_STATE:
-        #     reward = 0
+        #     reward = -1
 
         # # Version 3
         # reward = 0
@@ -437,6 +438,11 @@ class ASVEnv(gym.Env):
                 rect.remove()
             self.grid_patches = []
 
+            # Remove previous annotations if they exist
+            for text in getattr(self, 'text_patches', []):
+                text.remove()
+            self.text_patches = []
+
             for (cx, cy) in new_grid:
                 state = self.grid_dict.get((self.closest_multiple(cx, self.grid_size), self.closest_multiple(cy, self.grid_size)), FREE_STATE)
                 color = WHITE
@@ -452,12 +458,28 @@ class ASVEnv(gym.Env):
                 self.grid_patches.append(rect)
                 self.ax2.add_patch(rect)
 
+                # # Add the observation value as text in the middle of each grid cell
+                # state_overlay_text = self.ax2.text(cx - self.position[0], cy - self.position[1], str(state), 
+                #                     ha='center', va='center', fontsize=8, color='black')
+                # self.text_patches.append(state_overlay_text)
+
             self.agent_2.set_data(0, 0)
             self.agent_2.set_marker((3, 0, self.current_heading - 90))
             self.agent_2.set_zorder(3)
 
             self.observation_horizon2.center = (0, 0)
             self.observation_horizon2.set_zorder(2)
+
+            # Add the observation value outside the plot as text
+            if hasattr(self, 'observation_text'):
+                self.observation_text.remove()  # Remove the old observation text if it exists
+
+            observation = self.get_observation()
+            obs_text = f"{observation}"
+
+            # Add the observation as a text annotation outside the plot (below the second plot)
+            self.observation_text = self.fig.text(0.55, 0.08, obs_text, ha='left', va='center', fontsize=7, color='black')
+
 
             plt.draw()
             plt.pause(0.01)
@@ -513,10 +535,11 @@ if __name__ == '__main__':
     # print("Action Space Shape", env.action_space.n)
     # print("Action Space Sample", env.action_space.sample())
 
-    for _ in range(env.max_num_step):  # Run for 100 steps or until done
-        # action = env.action_space.sample()  # Take a random action
-        action = env.step(1)
-        # print(env.get_observation())
+    # for _ in range(env.max_num_step):  # Run for 100 steps or until done
+    for _ in range(10):  # Run for 100 steps or until done
+        action = env.action_space.sample()  # Take a random action
+        # action = env.step(1)
+        print(env.get_observation())
         # print(env.calculate_distance_to_goal(env.position))
         # print(env.calculate_distance_to_path(env.position))
         # print(env.calculate_reward(env.position))

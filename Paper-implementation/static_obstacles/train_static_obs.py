@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import gymnasium as gym
-from stable_baselines3 import PPO
+from stable_baselines3 import PPO, DQN
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.vec_env import DummyVecEnv
@@ -12,6 +12,7 @@ import torch.nn.functional as F
 from static_obs_env import ASVEnv
 import optuna
 from timeit import default_timer as timer
+import pandas as pd
 
 #                               -------- CONFIGURATION --------
 # Number of timesteps/episodes
@@ -28,129 +29,6 @@ gae_lambda = 0.86
 vf_coef = 0.5
 ent_coef = 0.01
 
-# if __name__ == '__main__':
-#     # Create the environment
-#     env = ASVEnv()
-
-#     # Check the environment
-#     check_env(env)
-
-#     # Define the model
-#     model = PPO('MlpPolicy', env, verbose=1)
-
-#     # Train the model with callback
-#     callback = CustomCallback()
-#     model.learn(total_timesteps=100000, callback=callback)
-
-#     # Save the model
-#     model.save("ppo_asv_model")
-
-#     # Plot the rewards
-#     plt.figure(figsize=(10, 5))
-#     plt.plot(callback.rewards, label='Rewards')
-#     plt.xlabel('Step')
-#     plt.ylabel('Reward')
-#     plt.title('Reward over Steps')
-#     plt.legend()
-#     plt.show()
-
-# class CustomActorCritic(nn.Module):
-#     def __init__(self, input_dim, action_dim):
-#         super(CustomActorCritic, self).__init__()
-#         # Shared layers for both actor and critic
-#         # self.fc1 = nn.Linear(input_dim, 512)
-#         # self.fc2 = nn.Linear(512, 512)
-#         # self.fc3 = nn.Linear(512, 512)
-#         self.fc1 = nn.Linear(313, 512)
-#         self.fc2 = nn.Linear(512, 1252)
-#         self.fc3 = nn.Linear(1252, 512)
-        
-#         # Actor head
-#         self.actor = nn.Linear(512, action_dim)
-
-#         # Critic head
-#         self.critic = nn.Linear(512, 1)
-    
-#     # def forward(self, x):
-#     #     x = th.relu(self.fc1(x))
-#     #     x = th.relu(self.fc2(x))
-#     #     x = th.relu(self.fc3(x))
-#     #     return x
-    
-#     def forward(self, x):
-#         x = F.relu(self.fc1(x))
-#         x = F.relu(self.fc2(x))
-#         x = self.fc3(x)
-#         return x
-    
-#     def actor_forward(self, x):
-#         x = self.forward(x)
-#         return self.actor(x)
-    
-#     def critic_forward(self, x):
-#         x = self.forward(x)
-#         return self.critic(x)
-
-# class CustomPolicy(BaseFeaturesExtractor):
-#     def __init__(self, observation_space, features_dim=1252, action_space=None):
-#         super(CustomPolicy, self).__init__(observation_space, features_dim)
-#         input_dim = features_dim
-#         action_dim = env.action_space.n
-
-#         self.actor_critic = CustomActorCritic(input_dim, action_dim)
-
-#     def forward(self, x):
-#         return self.actor_critic.forward(x)
-
-#     def forward_actor(self, x):
-#         return self.actor_critic.actor_forward(x)
-
-#     def forward_critic(self, x):
-#         return self.actor_critic.critic_forward(x)
-
-# def objective(trial):
-#     # Define hyperparameters
-#     learning_rate = 8.515786595813231e-05
-#     batch_size = 128
-#     n_epochs = 8
-#     gamma = 0.9339239258707902
-#     clip_range = 0.20259480665235446
-#     gae_lambda = 0.9222467745570867
-#     vf_coef = 0.517316849734512
-#     ent_coef = 3.7569404673013434e-05
-
-#     # Create environment
-#     env = ASVEnv()
-#     check_env(env)
-
-#     # Define and train the model
-#     model = PPO('MlpPolicy', env, verbose=0, 
-#                 learning_rate=learning_rate,
-#                 batch_size=batch_size,
-#                 n_epochs=n_epochs,
-#                 gamma=gamma,
-#                 clip_range=clip_range,
-#                 gae_lambda=gae_lambda,
-#                 vf_coef=vf_coef,
-#                 ent_coef=ent_coef)
-
-#     callback = CustomCallback()
-#     model.learn(total_timesteps=500000, callback=callback)
-
-#     # Calculate mean reward
-#     mean_reward = np.mean(callback.rewards[-1000:])
-#     return mean_reward
-
-# # Create study and optimize
-# study = optuna.create_study(direction='maximize')
-# study.optimize(objective, n_trials=100)
-
-# # Best hyperparameters
-# print("Best hyperparameters:", study.best_params)
-
-# # Train final model with best hyperparameters
-# best_params = study.best_params
-
 class CustomCallback(BaseCallback):
     def __init__(self, save_freq=100000, verbose=0):
         super(CustomCallback, self).__init__(verbose)
@@ -159,6 +37,7 @@ class CustomCallback(BaseCallback):
         self.policy_loss = []
         self.value_loss = []
         self.rewards = []
+        self.timesteps = []
 
     def _on_step(self):
         # Save model at regular intervals
@@ -168,26 +47,104 @@ class CustomCallback(BaseCallback):
             self.model.save(model_path)
             self.model_save_counter += 1
 
+        # Append reward data
         if len(self.model.ep_info_buffer) > 0:
             self.rewards.append(self.model.ep_info_buffer[0]["r"])
-            if "loss" in self.model.ep_info_buffer[0]:
-                self.policy_loss.append(self.model.ep_info_buffer[0]["loss"]["policy_loss"])
-                self.value_loss.append(self.model.ep_info_buffer[0]["loss"]["value_loss"])
+            self.timesteps.append(self.num_timesteps)
+
         return True
+
+    def _on_rollout_end(self):
+        # Collect the policy and value loss at the end of each rollout
+        logs = self.model.logger.name_to_value
+        # self.rewards.append(logs['rollout/ep_rew_mean'])
+        self.policy_loss.append(logs['rollout/ep_rew_mean'])
+        self.value_loss.append(logs['train/value_loss'])
+
+        # if 'rollout/ep_rew_mean' in logs:
+        #     self.rewards.append(logs['rollout/ep_rew_mean'])
+        #     self.policy_loss.append(logs['rollout/ep_rew_mean'])
+        # else:
+        #     self.policy_loss.append(None)
+
+        # if 'train/value_loss' in logs:
+        #     self.value_loss.append(logs['train/value_loss'])
+        # else:
+        #     self.value_loss.append(None)
+
+
+# Save data to CSV for external use (e.g., in Excel)
+def save_to_csv(callback, filename="training_data.csv"):
+    data = {
+        # 'timesteps': callback.timesteps,
+        'rewards': callback.rewards
+        # 'policy_loss': callback.policy_loss,
+        # 'value_loss': callback.value_loss
+    }
+    df = pd.DataFrame(data)
+    df.to_csv(filename, index=False)
+    print(f"Data saved to {filename}")
+
+# Smoothing function for plots
+def smooth(data, window=50):
+    return pd.Series(data).rolling(window=window).mean()
+
+# Plot rewards, policy loss, and value loss
+def plot_metrics(callback):
+    plt.figure(figsize=(15, 5))
+
+    # Plot smoothed rewards
+    plt.subplot(1, 3, 1)
+    plt.plot(smooth(callback.rewards), label="Mean Rewards", color="b")
+    plt.fill_between(range(len(callback.rewards)), 
+                     smooth(callback.rewards) - pd.Series(callback.rewards).rolling(window=50).std(),
+                     smooth(callback.rewards) + pd.Series(callback.rewards).rolling(window=50).std(),
+                     color="blue", alpha=0.2)
+    plt.title('Smoothed Mean Rewards')
+    plt.xlabel('Steps')
+    plt.ylabel('Reward')
+    plt.grid(True)
+
+    # # Plot policy loss
+    # plt.subplot(1, 3, 2)
+    # if callback.policy_loss:
+    #     plt.plot(smooth(callback.policy_loss), label="Policy Loss", color="r")
+    #     plt.title('Smoothed Policy Loss')
+    #     plt.xlabel('Steps')
+    #     plt.ylabel('Loss')
+    #     plt.grid(True)
+
+    # # Plot value loss
+    # plt.subplot(1, 3, 3)
+    # if callback.value_loss:
+    #     plt.plot(smooth(callback.value_loss), label="Value Loss", color="g")
+    #     plt.title('Smoothed Value Loss')
+    #     plt.xlabel('Steps')
+    #     plt.ylabel('Loss')
+    #     plt.grid(True)
+
+    plt.tight_layout()
+    plt.show()
 
 # Create environment
 env = ASVEnv()
 
-# Create the PPO model with the custom policy
-model = PPO('MlpPolicy', env, verbose=1,
+# Create the DQN model
+model = DQN('MlpPolicy', env, verbose=1,
             learning_rate=learning_rate,
-            batch_size=batch_size,
-            n_epochs=n_epochs,
-            gamma=gamma,
-            clip_range=clip_range,
-            vf_coef=vf_coef,
-            ent_coef=ent_coef)
-# model = PPO('MlpPolicy', env, verbose=1)
+            gamma=gamma)
+
+# # Create the PPO model
+# # model = PPO('MlpPolicy', env, verbose=1)
+# model = PPO('MlpPolicy', env, verbose=1,
+#             learning_rate=learning_rate,
+#             batch_size=batch_size,
+#             n_epochs=n_epochs,
+#             gamma=gamma,
+#             clip_range=clip_range,
+#             vf_coef=vf_coef,
+#             ent_coef=ent_coef)
+
 callback = CustomCallback(save_freq=SAVE_FREQENCY)
 num_timesteps = NUM_EPISODES
 
@@ -212,7 +169,14 @@ second = int(time - 60*minute)
 print(f"Total time = {hour} : {minute} : {second}")
 
 # Save the model
-model.save("Paper-implementation/static_obstacles/ppo_static_obstacles")
+# model.save("Paper-implementation/static_obstacles/ppo_static_obstacles")
+model.save("Paper-implementation/static_obstacles/dqn_static_obstacles")
+
+# Save training data to CSV
+save_to_csv(callback, "dqn_training_data.csv")
+
+# Plot metrics
+plot_metrics(callback)
 
 # Plot rewards
 plt.plot(callback.rewards, label="Rewards")
@@ -220,5 +184,3 @@ plt.xlabel('Steps')
 plt.ylabel('Reward')
 plt.title('Reward over Steps with Tuned Hyperparameters')
 plt.show()
-
-# {'learning_rate': 0.00907329821451761, 'batch_size': 64, 'n_epochs': 2, 'gamma': 0.9988044963952771, 'clip_range': 0.21608474944379513, 'gae_lambda': 0.8696976357115177, 'vf_coef': 0.3492943287414059, 'ent_coef': 4.4723499358631903e-07}
