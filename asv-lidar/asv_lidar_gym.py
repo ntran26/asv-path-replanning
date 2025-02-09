@@ -1,5 +1,3 @@
-# asv_lidar_gym.py
-import os
 import gymnasium as gym
 from gymnasium.spaces import Dict, Box, Discrete
 import numpy as np
@@ -31,7 +29,7 @@ class ASVLidarEnv(gym.Env):
         pygame.init()
         self.render_mode = render_mode
         self.screen_size = (400, 600)
-
+        self.icon = None
         self.fps_clock = pygame.time.Clock()
 
         self.display = None
@@ -127,7 +125,7 @@ class ASVLidarEnv(gym.Env):
             reward = 0.0
         elif abs(self.tgt) > 50:
             reward = -10.0
-        # Also, if the ship moves “backwards” (dy < 0), add a penalty.
+        # if the ship moves backwards (dy < 0), add a penalty.
         if dy < 0:
             reward -= 10.0
 
@@ -139,7 +137,7 @@ class ASVLidarEnv(gym.Env):
     def render(self):
         if self.render_mode not in self.metadata["render_modes"]:
             return
-        # Create display if needed
+        # Create display
         if self.display is None:
             self.display = pygame.display.set_mode(self.screen_size)
         self.surface.fill((0, 0, 0))
@@ -180,28 +178,29 @@ if __name__ == '__main__':
     total_reward = 0
     running = True
     while running:
-        # Random actions
-        action = env.action_space.sample()
-        obs, reward, done, _, _ = env.step(action)
-        total_reward += reward
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                done = True
-
-        # # Manual control
-        # for event in pygame.event.get():
-        #     if event.type == pygame.QUIT:
-        #         running = False
-        #     elif event.type == pygame.KEYUP:
-        #         action = CENTER
-        #     elif event.type == pygame.KEYDOWN:
-        #         if event.key == pygame.K_RIGHT:
-        #             action = STBD
-        #         elif event.key == pygame.K_LEFT:
-        #             action = PORT
+        # # Random actions
+        # action = env.action_space.sample()
         # obs, reward, done, _, _ = env.step(action)
         # total_reward += reward
+
+        # for event in pygame.event.get():
+        #     if event.type == pygame.QUIT:
+        #         done = True
+
+        # Manual control
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYUP:
+                action = CENTER
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RIGHT:
+                    action = STBD
+                elif event.key == pygame.K_LEFT:
+                    action = PORT
+
+        obs, reward, done, _, _ = env.step(action)
+        total_reward += reward
 
         if done:
             print(f"Episode finished. Time: {env.elapsed_time:.1f}s, Total reward: {total_reward}")
