@@ -9,6 +9,8 @@ from images import BOAT_ICON
 
 UPDATE_RATE = 0.5
 RENDER_FPS = 10
+MAP_WIDTH = 400
+MAP_HEIGHT = 600
 
 # Actions
 PORT = 0
@@ -36,9 +38,12 @@ class ASVLidarEnv(gym.Env):
             render_mode:str = 'human'
             ) -> None:
         
+        self.map_width = MAP_WIDTH
+        self.map_height = MAP_HEIGHT
+
         pygame.init()
         self.render_mode = render_mode
-        self.screen_size = (400,600)
+        self.screen_size = (self.map_width,self.map_height)
 
         self.icon = None
         self.fps_clock = pygame.time.Clock()
@@ -98,14 +103,30 @@ class ASVLidarEnv(gym.Env):
 
         # Generate static obstacles
         self.obstacles = []
-        self.obstacles.append(pygame.Rect(100, 300, 50, 50))
-        self.obstacles.append(pygame.Rect(50, 50, 60, 60))
-        self.obstacles.append(pygame.Rect(250, 500, 40, 40))
+        self.obstacles.append(pygame.Rect(np.random.randint(50,300), 50, 60, 60))
+        self.obstacles.append(pygame.Rect(np.random.randint(50,300), 300, 40, 40))
+        # self.obstacles.append(pygame.Rect(200, 400, 40, 40))
 
         if self.render_mode in self.metadata['render_modes']:
             self.render()
         return self._get_obs(), {}
 
+    # Configure terminal condition
+    def check_done(self, position):
+        # check if asv goes outside of the map
+        # top or bottom
+        if position[1] <= 0 or position[1] >= self.map_height:
+            return True
+        # left or right
+        if position[0] <= 0 or position[0] >= self.map_width:
+            return True
+
+        # collide with an obstacle
+        for obs in self.obstacles:
+            if obs.collidepoint(position[0], position[1]):
+                return True
+
+        return False
 
     def step(self, action):
         self.elapsed_time += UPDATE_RATE
@@ -122,6 +143,14 @@ class ASVLidarEnv(gym.Env):
         if self.render_mode in self.metadata['render_modes']:
             self.render()
 
+        """
+        Reward function:
+            For each step taken: -1
+            Stay on or near the path: 0
+            Go outside of the map: -10
+            Move in reverse: -10
+            Collide with an obstacle: -10
+        """
         # step loss
         reward = -1
         if self.tgt < 10 and self.tgt > -10:
@@ -130,27 +159,40 @@ class ASVLidarEnv(gym.Env):
         if dy < 0:
             # moving in reverse
             reward = -10
-        terminated = (self.asv_y <= 0)
-        return self._get_obs(), reward, terminated,{}
+        # collision
+        for obs in self.obstacles:
+            if obs.collidepoint(self.asv_x, self.asv_y):
+                reward = -100
+        # off border
+        if self.asv_x <= 0 or self.asv_x >= self.map_width or self.asv_y >= self.map_height:
+            reward = -100
 
+        terminated = self.check_done((self.asv_x, self.asv_y))
+        return self._get_obs(), reward, terminated,{}
 
     def render(self):
         if self.render_mode != 'human':
             return        
         if self.display is None:
             self.display = pygame.display.set_mode(self.screen_size)
+
         self.surface.fill((0, 0, 0))
+
         # Draw obstacles
         for obs in self.obstacles:
             pygame.draw.rect(self.surface, (200, 0, 0), obs)
+
         # Draw LIDAR scan
         self.lidar.render(self.surface)
+
         # Draw Path
         pygame.draw.line(self.surface,(0,200,0),(self.tgt_x,0),(self.tgt_x,self.screen_size[1]),5)
         pygame.draw.circle(self.surface,(100,0,0),(self.tgt_x,self.tgt_y),5)
+
         # Draw ownship
         if self.icon is None:
             self.icon = pygame.image.frombytes(BOAT_ICON['bytes'],BOAT_ICON['size'],BOAT_ICON['format'])
+
         # Draw status
         if self.status is not None:
             status, rect = self.status.render(f"{self.elapsed_time:005.1f}s  HDG:{self.asv_h:+004.0f}({self.asv_w:+03.0f})  TGT:{self.tgt:+004.0f}",(255,255,255),(0,0,0))
@@ -181,11 +223,11 @@ if __name__ == '__main__':
                     action = STBD
                 elif event.key == pygame.K_LEFT:
                     action = PORT
-        #print(rudder)
+        print(total_reward)
         obs,rew,term,_ = env.step(action)
         total_reward += rew
         if term:
-            print(env.elapsed_time, total_reward)
+            print(f"Elapsed time: {env.elapsed_time}, Reward: {total_reward}")
             pygame.display.quit()
             pygame.quit()
             exit()

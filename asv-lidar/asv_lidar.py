@@ -69,8 +69,8 @@ class Lidar:
                 for obs in obstacles:
                     collision = obs.clipline(ray_line)
                     if collision:
-                        # The collision returns two points that define the intersecting segment.
-                        # We compute the distance from the sensor to both points and take the smaller one.
+                        # returns two points that define the intersecting segment
+                        # compute the distance from the sensor to both points and take the smaller one
                         p1 = collision[0]
                         p2 = collision[1]
                         d1 = np.hypot(p1[0] - self._pos_x, p1[1] - self._pos_y)
