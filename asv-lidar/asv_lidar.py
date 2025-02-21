@@ -46,9 +46,14 @@ class Lidar:
             numpy.ndarray: array of ranges from sensor to obstacles.
                 If no obstacle is detected, the range remains LIDAR_RANGE.
         """
-        self._pos_x = pos[0]
-        self._pos_y = pos[1]
+        # self._pos_x = pos[0]
+        # self._pos_y = pos[1]
         self._hdg = hdg
+
+        # Set the lidar (x,y) to be in front of the asv
+        lidar_offset = 30
+        self._pos_x = pos[0] + lidar_offset * np.sin(np.radians(self._hdg))
+        self._pos_y = pos[1] - lidar_offset * np.cos(np.radians(self._hdg))
         
         # ADD: Loop over each beam angle to compute collision distances
         for idx, angle in enumerate(self._angles):
