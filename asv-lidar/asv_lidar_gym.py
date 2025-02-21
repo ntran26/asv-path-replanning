@@ -67,6 +67,14 @@ class ASVLidarEnv(gym.Env):
         self.model = ShipModel()
         self.model._v = 4.5
 
+        """
+        Observation space:
+            lidar: an array of lidar range: [21 values]
+            pos: (x,y) coordinate of asv
+            hdg: heading/yaw of the asv
+            dhdg: rate of change of heading
+            tgt: horizontal offset of the asv from the path
+        """
         self.observation_space = Dict(
             {
                 "lidar": Box(low=0,high=LIDAR_RANGE,shape=(LIDAR_BEAMS,),dtype=np.int16),
@@ -76,6 +84,7 @@ class ASVLidarEnv(gym.Env):
                 "tgt"  : Box(low=-50,high=50,shape=(1,),dtype=np.int16)
             }
         )
+
         self.action_space = Discrete(3)
         
         # LIDAR
@@ -103,8 +112,8 @@ class ASVLidarEnv(gym.Env):
 
         # Generate static obstacles
         self.obstacles = []
-        self.obstacles.append(pygame.Rect(np.random.randint(50,300), 50, 60, 60))
-        self.obstacles.append(pygame.Rect(np.random.randint(50,300), 300, 40, 40))
+        # self.obstacles.append(pygame.Rect(np.random.randint(50,300), 50, 60, 60))
+        # self.obstacles.append(pygame.Rect(np.random.randint(50,300), 300, 40, 40))
         # self.obstacles.append(pygame.Rect(200, 400, 40, 40))
 
         if self.render_mode in self.metadata['render_modes']:
@@ -130,7 +139,7 @@ class ASVLidarEnv(gym.Env):
 
     def step(self, action):
         self.elapsed_time += UPDATE_RATE
-        dx,dy,h,w = self.model.update(100,rudder_action[action],UPDATE_RATE)#pygame.time.get_ticks() / 1000.)
+        dx,dy,h,w = self.model.update(100,rudder_action[int(action)],UPDATE_RATE)#pygame.time.get_ticks() / 1000.)
         self.asv_x += dx
         self.asv_y -= dy
         self.asv_h = h
@@ -168,7 +177,7 @@ class ASVLidarEnv(gym.Env):
             reward = -100
 
         terminated = self.check_done((self.asv_x, self.asv_y))
-        return self._get_obs(), reward, terminated,{}
+        return self._get_obs(), reward, terminated, {}, {}
 
     def render(self):
         if self.render_mode != 'human':
@@ -211,20 +220,24 @@ if __name__ == '__main__':
     action = CENTER
     total_reward = 0
     while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.display.quit()
-                pygame.quit()
-                exit()
-            elif event.type == pygame.KEYUP:
-                action = CENTER
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RIGHT:
-                    action = STBD
-                elif event.key == pygame.K_LEFT:
-                    action = PORT
-        print(total_reward)
-        obs,rew,term,_ = env.step(action)
+        # for event in pygame.event.get():
+        #     if event.type == pygame.QUIT:
+        #         pygame.display.quit()
+        #         pygame.quit()
+        #         exit()
+        #     elif event.type == pygame.KEYUP:
+        #         action = CENTER
+        #     elif event.type == pygame.KEYDOWN:
+        #         if event.key == pygame.K_RIGHT:
+        #             action = STBD
+        #         elif event.key == pygame.K_LEFT:
+        #             action = PORT
+        # print(total_reward)
+        # obs,rew,term,_ = env.step(action)
+        
+        action = env.action_space.sample()  # Take a random action
+        obs,rew,term,_,_ = env.step(action)
+
         total_reward += rew
         if term:
             print(f"Elapsed time: {env.elapsed_time}, Reward: {total_reward}")

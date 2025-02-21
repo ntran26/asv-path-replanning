@@ -50,21 +50,20 @@ class Lidar:
         self._pos_y = pos[1]
         self._hdg = hdg
         
-        # ADD: Loop over each beam angle to compute collision distances.
+        # ADD: Loop over each beam angle to compute collision distances
         for idx, angle in enumerate(self._angles):
-            # Calculate the absolute angle (sensor heading + beam angle) in radians.
+            # Calculate the absolute angle (sensor heading + beam angle) in radians
             absolute_angle = np.radians(self._hdg + angle)
-            # Compute the endpoint of the beam at maximum range (if no obstacle is hit).
-            # NOTE: Using sin for x and cos for y, with y subtracted to account for pygame's coordinate system.
+            # Compute the endpoint of the beam at maximum range (if no obstacle)
             end_x = self._pos_x + LIDAR_RANGE * np.sin(absolute_angle)
             end_y = self._pos_y - LIDAR_RANGE * np.cos(absolute_angle)
             # Define the ray as a line tuple: (start_x, start_y, end_x, end_y)
             ray_line = (self._pos_x, self._pos_y, end_x, end_y)
             
-            # Initialize the closest distance to the maximum range.
+            # Initialize the closest distance to the maximum range
             closest_distance = LIDAR_RANGE
             
-            # Check for collision with each obstacle.
+            # Check for collision with each obstacle
             if obstacles:
                 for obs in obstacles:
                     collision = obs.clipline(ray_line)
