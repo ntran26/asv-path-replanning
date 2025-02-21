@@ -20,7 +20,7 @@ class Lidar:
         self._pos_x = 0
         self._pos_y = 0
         self._hdg = 0
-        # EDIT: Changed dtype to float for more precision and set up beam angles evenly across the swath.
+        # EDIT: Changed dtype to float for more precision and set up beam angles evenly across the swath
         self._angles = np.linspace(-LIDAR_SWATH/2, LIDAR_SWATH/2, LIDAR_BEAMS, dtype=np.float64)
         self._ranges = np.ones_like(self._angles) * LIDAR_RANGE
 
@@ -84,10 +84,10 @@ class Lidar:
         
     def render(self, surface: pygame.Surface):
         """
-        Render the LIDAR beams as lines on the given surface.
+        Render the LIDAR beams as lines on the given surface
 
         Args:
-            surface (pygame.Surface): The surface on which to render the beams.
+            surface (pygame.Surface): The surface on which to render the beams
         """
         for idx, angle in enumerate(self._angles):
             # Calculate the absolute angle in radians.

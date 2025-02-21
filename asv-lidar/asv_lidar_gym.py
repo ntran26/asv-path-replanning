@@ -112,8 +112,8 @@ class ASVLidarEnv(gym.Env):
 
         # Generate static obstacles
         self.obstacles = []
-        # self.obstacles.append(pygame.Rect(np.random.randint(50,300), 50, 60, 60))
-        # self.obstacles.append(pygame.Rect(np.random.randint(50,300), 300, 40, 40))
+        self.obstacles.append(pygame.Rect(np.random.randint(50,300), 50, 60, 60))
+        self.obstacles.append(pygame.Rect(np.random.randint(50,300), 300, 40, 40))
         # self.obstacles.append(pygame.Rect(200, 400, 40, 40))
 
         if self.render_mode in self.metadata['render_modes']:
@@ -131,9 +131,13 @@ class ASVLidarEnv(gym.Env):
             return True
 
         # collide with an obstacle
-        for obs in self.obstacles:
-            if obs.collidepoint(position[0], position[1]):
-                return True
+        lidar_list = self.lidar.ranges.astype(np.int64)
+        if np.any(lidar_list <= 30):
+            return True
+
+        # for obs in self.obstacles:
+        #     if obs.collidepoint(position[0], position[1]):
+        #         return True
 
         return False
 
@@ -169,9 +173,9 @@ class ASVLidarEnv(gym.Env):
             # moving in reverse
             reward = -10
         # collision
-        for obs in self.obstacles:
-            if obs.collidepoint(self.asv_x, self.asv_y):
-                reward = -100
+        lidar_list = self.lidar.ranges.astype(np.int64)
+        if np.any(lidar_list <= 30):
+            reward = -100
         # off border
         if self.asv_x <= 0 or self.asv_x >= self.map_width or self.asv_y >= self.map_height:
             reward = -100
@@ -203,9 +207,12 @@ class ASVLidarEnv(gym.Env):
             self.icon = pygame.image.frombytes(BOAT_ICON['bytes'],BOAT_ICON['size'],BOAT_ICON['format'])
 
         # Draw status
+        lidar = self.lidar.ranges.astype(np.int16)
         if self.status is not None:
             status, rect = self.status.render(f"{self.elapsed_time:005.1f}s  HDG:{self.asv_h:+004.0f}({self.asv_w:+03.0f})  TGT:{self.tgt:+004.0f}",(255,255,255),(0,0,0))
             self.surface.blit(status, [10,550])
+            # lidar_status, rect = self.status.render(f"{lidar}",(255,255,255),(0,0,0))
+            # self.surface.blit(lidar_status, [5,575])
         os = pygame.transform.rotozoom(self.icon,-self.asv_h,2)
         self.surface.blit(os,os.get_rect(center=(self.asv_x,self.asv_y)))
         self.display.blit(self.surface,[0,0])
@@ -220,23 +227,27 @@ if __name__ == '__main__':
     action = CENTER
     total_reward = 0
     while True:
-        # for event in pygame.event.get():
-        #     if event.type == pygame.QUIT:
-        #         pygame.display.quit()
-        #         pygame.quit()
-        #         exit()
-        #     elif event.type == pygame.KEYUP:
-        #         action = CENTER
-        #     elif event.type == pygame.KEYDOWN:
-        #         if event.key == pygame.K_RIGHT:
-        #             action = STBD
-        #         elif event.key == pygame.K_LEFT:
-        #             action = PORT
-        # print(total_reward)
-        # obs,rew,term,_ = env.step(action)
-        
-        action = env.action_space.sample()  # Take a random action
+        # Manual control
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.display.quit()
+                pygame.quit()
+                exit()
+            elif event.type == pygame.KEYUP:
+                action = CENTER
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RIGHT:
+                    action = STBD
+                elif event.key == pygame.K_LEFT:
+                    action = PORT
         obs,rew,term,_,_ = env.step(action)
+        print(total_reward)
+        # lidar_list = obs['lidar']
+        # print(lidar_list)
+        
+        # # Random actions
+        # action = env.action_space.sample()
+        # obs,rew,term,_,_ = env.step(action)
 
         total_reward += rew
         if term:
