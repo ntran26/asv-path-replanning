@@ -6,7 +6,7 @@ from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
 
 # Toggle between train and test
-TRAIN = False
+TRAIN = True
 
 # Import your environment
 from asv_lidar_gym import ASVLidarEnv
@@ -15,15 +15,22 @@ from asv_lidar_gym import ASVLidarEnv
 env = ASVLidarEnv(render_mode=None)
 env = Monitor(env)  # For logging episode rewards
 
+# Hyperparamters
+learn_rate = 0.0001
+ent_coef = 0.1
+
+
 # Model save path
 MODEL_PATH = "ppo_asv_model"
 
 if TRAIN:
     # Initialize PPO model
-    model = PPO("MultiInputPolicy", env, verbose=1, tensorboard_log="./ppo_asv_tensorboard/")
+    model = PPO("MultiInputPolicy", env, verbose=1, tensorboard_log="./ppo_asv_tensorboard/",
+                learning_rate=learn_rate,
+                ent_coef=ent_coef)
 
     # Training parameters
-    timesteps = 1000000
+    timesteps = 5000000
 
     # Lists to store rewards for plotting
     reward_log = []
@@ -51,7 +58,10 @@ if TRAIN:
     print(f"Mean reward: {mean_reward} +/- {std_reward}")
 
     # Plot the average reward over episodes
-    plt.plot(np.convolve(reward_log, np.ones(10)/10, mode='valid'))  # Smooth curve
+    mean_rewards = np.zeros(len(reward_log))
+    for x in range(len(mean_rewards)):
+        mean_rewards[x] = np.mean(reward_log[max(0,x-99):(x+1)])
+    plt.plot(mean_rewards) 
     plt.xlabel("Episodes")
     plt.ylabel("Average Reward")
     plt.title("Training Progress: Average Reward per Episode")
