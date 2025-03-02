@@ -4,50 +4,71 @@ import matplotlib.pyplot as plt
 from stable_baselines3 import PPO
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
-
-# Toggle between train and test
-TRAIN = True
-
-# Import your environment
+from stable_baselines3.common.callbacks import BaseCallback
 from asv_lidar_gym import ASVLidarEnv
 
+# Toggle between train and test
+TRAIN = 0
 # Create the environment
 env = ASVLidarEnv(render_mode=None)
 env = Monitor(env)  # For logging episode rewards
 
 # Hyperparamters
 learn_rate = 0.0001
+n_steps = 2048
+batch_size = 256
+n_epochs = 10
+gamma = 0.99
+gae_lambda = 0.95
+clip_range = 0.2
+clip_range_vf = None
 ent_coef = 0.1
+vf_coef = 0.5
 
+class CustomCallback(BaseCallback):
+    def __init__(self, save_freq=500000, verbose=0):
+        super(CustomCallback, self).__init__(verbose)
+        self.save_freq = save_freq
+        self.model_save_counter = 0
+        self.policy_loss = []
+        self.value_loss = []
+        self.rewards = []
+
+    def _on_step(self):
+        # # Save model at regular intervals
+        # if self.num_timesteps % self.save_freq == 0:
+        #     model_path = f"models/model_{self.num_timesteps}.zip"
+        #     print(f"Saving model at {self.num_timesteps} timesteps")
+        #     self.model.save(model_path)
+        #     self.model_save_counter += 1
+
+        if len(self.model.ep_info_buffer) > 0:
+            self.rewards.append(self.model.ep_info_buffer[0]["r"])
+            if "loss" in self.model.ep_info_buffer[0]:
+                self.policy_loss.append(self.model.ep_info_buffer[0]["loss"]["policy_loss"])
+                self.value_loss.append(self.model.ep_info_buffer[0]["loss"]["value_loss"])
+        return True
 
 # Model save path
 MODEL_PATH = "ppo_asv_model"
 
-if TRAIN:
+if TRAIN == 1:
     # Initialize PPO model
     model = PPO("MultiInputPolicy", env, verbose=1, tensorboard_log="./ppo_asv_tensorboard/",
-                learning_rate=learn_rate,
-                ent_coef=ent_coef)
+                learning_rate=learn_rate, n_steps=n_steps, batch_size=batch_size, n_epochs=n_epochs,
+                gamma=gamma, gae_lambda=gae_lambda, clip_range=clip_range, clip_range_vf=clip_range_vf,
+                ent_coef=ent_coef, vf_coef=vf_coef)
 
     # Training parameters
-    timesteps = 5000000
+    timesteps = 1000000
+    callback = CustomCallback()
 
     # Lists to store rewards for plotting
     reward_log = []
     episode_rewards = []
 
-    # Callback function to log rewards
-    def reward_callback(locals_, globals_):
-        global episode_rewards
-        if "reward" in locals_:
-            episode_rewards.append(locals_["reward"])
-        if "dones" in locals_ and locals_["dones"]:
-            reward_log.append(sum(episode_rewards))
-            episode_rewards = []
-        return True
-
     # Train the model
-    model.learn(total_timesteps=timesteps, callback=reward_callback)
+    model.learn(total_timesteps=timesteps, callback=callback)
 
     # Save the model
     model.save("ppo_asv_model")
@@ -57,22 +78,22 @@ if TRAIN:
     mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=10)
     print(f"Mean reward: {mean_reward} +/- {std_reward}")
 
-    # Plot the average reward over episodes
-    mean_rewards = np.zeros(len(reward_log))
-    for x in range(len(mean_rewards)):
-        mean_rewards[x] = np.mean(reward_log[max(0,x-99):(x+1)])
-    plt.plot(mean_rewards) 
-    plt.xlabel("Episodes")
-    plt.ylabel("Average Reward")
-    plt.title("Training Progress: Average Reward per Episode")
-    plt.savefig("reward_plot.png")
+    # Plot rewards/episodes
+    fig = plt.figure(1)
+    plt.plot(callback.rewards, label="Rewards")
+    plt.xlabel('Episodes')
+    plt.ylabel('Reward')
+    plt.title('Reward over Episodes')
     plt.show()
+    fig.savefig("reward_plot.png")
 
     env.close()
 
 else:
     # Load the trained model and test it
     model = PPO.load(MODEL_PATH)
+    # model = PPO.load("ppo_path_follow.zip")
+
     test_env = ASVLidarEnv(render_mode="human")
 
     obs, _ = test_env.reset()
