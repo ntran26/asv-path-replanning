@@ -9,6 +9,7 @@ from asv_lidar_gym import ASVLidarEnv
 
 # Toggle between train and test
 TRAIN = 0
+
 # Create the environment
 env = ASVLidarEnv(render_mode=None)
 env = Monitor(env)  # For logging episode rewards
@@ -22,7 +23,7 @@ gamma = 0.99
 gae_lambda = 0.95
 clip_range = 0.2
 clip_range_vf = None
-ent_coef = 0.1
+ent_coef = 0.01
 vf_coef = 0.5
 
 class CustomCallback(BaseCallback):
@@ -34,13 +35,18 @@ class CustomCallback(BaseCallback):
         self.value_loss = []
         self.rewards = []
 
-    def _on_step(self):
+    def _on_step(self) -> bool:
         # # Save model at regular intervals
         # if self.num_timesteps % self.save_freq == 0:
         #     model_path = f"models/model_{self.num_timesteps}.zip"
         #     print(f"Saving model at {self.num_timesteps} timesteps")
         #     self.model.save(model_path)
         #     self.model_save_counter += 1
+
+        if self.locals.get("loss", None) is not None:
+            loss = self.locals["loss"]
+            self.policy_loss.append(loss.get("policy_loss", 0))
+            self.value_loss.append(loss.get("value_loss", 0))
 
         if len(self.model.ep_info_buffer) > 0:
             self.rewards.append(self.model.ep_info_buffer[0]["r"])
@@ -60,15 +66,15 @@ if TRAIN == 1:
                 ent_coef=ent_coef, vf_coef=vf_coef)
 
     # Training parameters
-    timesteps = 1000000
+    timesteps = 5000000
     callback = CustomCallback()
 
-    # Lists to store rewards for plotting
-    reward_log = []
-    episode_rewards = []
+    # # Lists to store rewards for plotting
+    # reward_log = []
+    # episode_rewards = []
 
     # Train the model
-    model.learn(total_timesteps=timesteps, callback=callback)
+    model.learn(total_timesteps=timesteps, tb_log_name="asv_ppo", callback=callback)
 
     # Save the model
     model.save("ppo_asv_model")
@@ -84,15 +90,27 @@ if TRAIN == 1:
     plt.xlabel('Episodes')
     plt.ylabel('Reward')
     plt.title('Reward over Episodes')
-    plt.show()
     fig.savefig("reward_plot.png")
+
+    fig = plt.figure(2)
+    plt.subplot(221)
+    plt.plot(callback.policy_loss)
+    plt.title("Policy Loss")
+    plt.xlabel("Training Steps")
+
+    plt.subplot(222)
+    plt.plot(callback.value_loss)
+    plt.title("Value Loss")
+    plt.xlabel("Training Steps")
+
+    plt.show()
 
     env.close()
 
 else:
     # Load the trained model and test it
-    model = PPO.load(MODEL_PATH)
-    # model = PPO.load("ppo_path_follow.zip")
+    # model = PPO.load(MODEL_PATH)
+    model = PPO.load("ppo_path_follow.zip")
 
     test_env = ASVLidarEnv(render_mode="human")
 

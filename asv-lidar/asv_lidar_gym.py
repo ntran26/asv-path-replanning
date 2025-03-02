@@ -6,6 +6,7 @@ import pygame.freetype
 from ship_model import ShipModel
 from asv_lidar import Lidar, LIDAR_RANGE, LIDAR_BEAMS
 from images import BOAT_ICON
+import cv2
 
 UPDATE_RATE = 0.5
 RENDER_FPS = 10
@@ -96,6 +97,12 @@ class ASVLidarEnv(gym.Env):
         # Initialize obstacles
         self.obstacles = []
 
+        # Initialize video recorder
+        self.record_video = True
+        self.video_writer = None
+        self.frame_size = (self.map_width, self.map_height)
+        self.video_fps = RENDER_FPS
+
     def _get_obs(self):
         return {
             'lidar': self.lidar.ranges.astype(np.int16),
@@ -113,8 +120,8 @@ class ASVLidarEnv(gym.Env):
 
         # Generate static obstacles
         self.obstacles = []
-        self.obstacles.append(pygame.Rect(np.random.randint(50,300), 50, 60, 60))
-        self.obstacles.append(pygame.Rect(np.random.randint(50,300), 300, 40, 40))
+        # self.obstacles.append(pygame.Rect(np.random.randint(50,300), 50, 60, 60))
+        # self.obstacles.append(pygame.Rect(np.random.randint(50,300), 300, 40, 40))
         # self.obstacles.append(pygame.Rect(200, 400, 40, 40))
 
         if self.render_mode in self.metadata['render_modes']:
@@ -192,6 +199,11 @@ class ASVLidarEnv(gym.Env):
 
         self.surface.fill((0, 0, 0))
 
+        # Draw map boundaries
+        pygame.draw.line(self.surface,(200,0,0),(0,0),(0,self.map_height),5)
+        pygame.draw.line(self.surface,(200,0,0),(self.map_width,0),(self.map_width,self.map_height),5)
+        pygame.draw.line(self.surface,(200,0,0),(0,self.map_height),(self.map_width,self.map_height),5)
+
         # Draw obstacles
         for obs in self.obstacles:
             pygame.draw.rect(self.surface, (200, 0, 0), obs)
@@ -214,12 +226,25 @@ class ASVLidarEnv(gym.Env):
             self.surface.blit(status, [10,550])
             # lidar_status, rect = self.status.render(f"{lidar}",(255,255,255),(0,0,0))
             # self.surface.blit(lidar_status, [5,575])
+
         os = pygame.transform.rotozoom(self.icon,-self.asv_h,2)
         self.surface.blit(os,os.get_rect(center=(self.asv_x,self.asv_y)))
         self.display.blit(self.surface,[0,0])
         pygame.display.update()
         self.fps_clock.tick(RENDER_FPS)
 
+        # Capture frame and save to video
+        if self.record_video:
+            frame = pygame.surfarray.array3d(self.surface)  # convert pygame surface to numpy array
+            frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)  # rotate for correct orientation
+            frame = cv2.flip(frame, 1)
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)  # convert RGB to BGR (opencv)
+            
+            if self.video_writer is None:
+                fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec
+                self.video_writer = cv2.VideoWriter('asv_lidar.mp4', fourcc, self.video_fps, self.frame_size)
+
+            self.video_writer.write(frame)
 
 if __name__ == '__main__':
     env = ASVLidarEnv(render_mode='human')
