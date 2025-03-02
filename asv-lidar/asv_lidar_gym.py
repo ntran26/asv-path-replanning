@@ -120,8 +120,8 @@ class ASVLidarEnv(gym.Env):
 
         # Generate static obstacles
         self.obstacles = []
-        # self.obstacles.append(pygame.Rect(np.random.randint(50,300), 50, 60, 60))
-        # self.obstacles.append(pygame.Rect(np.random.randint(50,300), 300, 40, 40))
+        self.obstacles.append(pygame.Rect(np.random.randint(50,300), 50, 60, 60))
+        self.obstacles.append(pygame.Rect(np.random.randint(50,300), 300, 40, 40))
         # self.obstacles.append(pygame.Rect(200, 400, 40, 40))
 
         if self.render_mode in self.metadata['render_modes']:
@@ -183,10 +183,10 @@ class ASVLidarEnv(gym.Env):
         # collision
         lidar_list = self.lidar.ranges.astype(np.int64)
         if np.any(lidar_list <= 30):
-            reward = -50
+            reward = -20
         # off border
         if self.asv_x <= 0 or self.asv_x >= self.map_width or self.asv_y >= self.map_height:
-            reward = -50
+            reward = -20
 
         terminated = self.check_done((self.asv_x, self.asv_y))
         return self._get_obs(), reward, terminated, {}, {}
