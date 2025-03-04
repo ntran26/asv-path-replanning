@@ -34,7 +34,7 @@ class Lidar:
         """Return a copy of sensor range readings."""
         return self._ranges.copy()
     
-    def scan(self, pos, hdg, obstacles=None) -> np.ndarray:
+    def scan(self, pos, hdg, obstacles=None, map_border=None) -> np.ndarray:
         """
         Perform a LIDAR scan.
 
@@ -62,30 +62,90 @@ class Lidar:
             # Compute the endpoint of the beam at maximum range (if no obstacle)
             end_x = self._pos_x + LIDAR_RANGE * np.sin(absolute_angle)
             end_y = self._pos_y - LIDAR_RANGE * np.cos(absolute_angle)
-            # Define the ray as a line tuple: (start_x, start_y, end_x, end_y)
-            ray_line = (self._pos_x, self._pos_y, end_x, end_y)
             
             # Initialize the closest distance to the maximum range
             closest_distance = LIDAR_RANGE
+
+            obstacle_edges = []
+
+            # Define the ray as a line tuple: (start_x, start_y, end_x, end_y)
+            # ray_line = (self._pos_x, self._pos_y, end_x, end_y)
             
-            # Check for collision with each obstacle
+            # # Check for collision with each obstacle
+            # if obstacles:
+            #     for obs in obstacles:
+            #         collision = obs.clipline(ray_line)
+            #         if collision:
+            #             # returns two points that define the intersecting segment
+            #             # compute the distance from the sensor to both points and take the smaller one
+            #             p1 = collision[0]
+            #             p2 = collision[1]
+            #             d1 = np.hypot(p1[0] - self._pos_x, p1[1] - self._pos_y)
+            #             d2 = np.hypot(p2[0] - self._pos_x, p2[1] - self._pos_y)
+            #             collision_distance = min(d1, d2)
+            #             if collision_distance < closest_distance:
+            #                 closest_distance = collision_distance
+
             if obstacles:
                 for obs in obstacles:
-                    collision = obs.clipline(ray_line)
-                    if collision:
-                        # returns two points that define the intersecting segment
-                        # compute the distance from the sensor to both points and take the smaller one
-                        p1 = collision[0]
-                        p2 = collision[1]
-                        d1 = np.hypot(p1[0] - self._pos_x, p1[1] - self._pos_y)
-                        d2 = np.hypot(p2[0] - self._pos_x, p2[1] - self._pos_y)
-                        collision_distance = min(d1, d2)
-                        if collision_distance < closest_distance:
-                            closest_distance = collision_distance
+                    for i in range(len(obs)):
+                        v1 = obs[i]
+                        v2 = obs[(i + 1) % len(obs)]
+                        obstacle_edges.append((v1, v2))
+
+            if map_border:
+                for i in range(len(map_border)):
+                    v1, v2 = map_border[i], map_border[(i + 1) % len(map_border)]
+                    obstacle_edges.append((v1, v2))
+
+            for edge in obstacle_edges:
+                intersection = self.line_intersection((self._pos_x, self._pos_y), (end_x, end_y), edge[0], edge[1])
+                if intersection:
+                    dist = np.hypot(intersection[0] - self._pos_x, intersection[1] - self._pos_y)
+                    closest_distance = min(closest_distance, dist)
+
             # Update the range reading for this beam.
             self._ranges[idx] = closest_distance
         
         return self._ranges.copy()
+
+    def line_intersection(self, a1, a2, b1, b2):
+        """
+        Compute the intersection between 2 line segments
+        Returns the intersection points (x, y) and None if there's no intersection
+        """
+        def cross_product(a, b):
+            return a[0] * b[1] - a[1] * b[0]
+        
+        # vectors from p1 to p2, q1 to q2
+        a = (a2[0] - a1[0], a2[1] - a1[1])
+        b = (b2[0] - b1[0], b2[1] - b1[1])
+
+        # cross product between 2 vectors
+        a_cross_b = cross_product(a, b)
+
+        # vector from a1 to b1
+        a_b = (b1[0] - a1[0], b1[1] - a1[1])
+        a_b_cross_a = cross_product(a_b, a)
+
+        # check if the lines are parallel or collinear
+        if a_cross_b == 0 and a_b_cross_a == 0:     # collinear
+            return None
+        if a_cross_b == 0:      # parallel
+            return None
+
+        # compute scaler_a, where intersection occurs along vector a
+        scalar_a = cross_product(a_b, b) / a_cross_b
+        # compute scalar_b, where intersection occurs along vector b
+        scalar_b = a_b_cross_a / a_cross_b
+
+        # check for intersection
+        if 0 <= scalar_a <= 1 and 0 <= scalar_b <= 1:
+            intersection_x = a1[0] + scalar_a * a[0]
+            intersection_y = a1[1] + scalar_a * a[1]
+            return (intersection_x, intersection_y)
+
+        return None
         
     def render(self, surface: pygame.Surface):
         """

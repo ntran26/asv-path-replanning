@@ -97,6 +97,9 @@ class ASVLidarEnv(gym.Env):
         # Initialize obstacles
         self.obstacles = []
 
+        # Initialize map borders
+        self.map_border = [(0,0), (0,self.map_height), (self.map_width,self.map_height), (self.map_width,0)]
+
         # Initialize video recorder
         self.record_video = True
         self.video_writer = None
@@ -120,8 +123,10 @@ class ASVLidarEnv(gym.Env):
 
         # Generate static obstacles
         self.obstacles = []
-        self.obstacles.append(pygame.Rect(np.random.randint(50,300), 50, 60, 60))
-        self.obstacles.append(pygame.Rect(np.random.randint(50,300), 300, 40, 40))
+        # self.obstacles.append(pygame.Rect(np.random.randint(50,300), 50, 60, 60))
+        # self.obstacles.append(pygame.Rect(np.random.randint(50,300), 300, 40, 40))
+        self.obstacles.append([(50, 50), (110, 50), (110, 110), (50, 110)])
+        self.obstacles.append([(200, 200), (220, 250), (180, 270), (160, 230)])
         # self.obstacles.append(pygame.Rect(200, 400, 40, 40))
 
         if self.render_mode in self.metadata['render_modes']:
@@ -159,7 +164,7 @@ class ASVLidarEnv(gym.Env):
         self.tgt_y = self.asv_y-50
         self.tgt = self.tgt_x - self.asv_x
 
-        self.lidar.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=self.obstacles)
+        self.lidar.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=self.obstacles, map_border=self.map_border)
 
         if self.render_mode in self.metadata['render_modes']:
             self.render()
@@ -200,13 +205,14 @@ class ASVLidarEnv(gym.Env):
         self.surface.fill((0, 0, 0))
 
         # Draw map boundaries
-        pygame.draw.line(self.surface,(200,0,0),(0,0),(0,self.map_height),5)
-        pygame.draw.line(self.surface,(200,0,0),(self.map_width,0),(self.map_width,self.map_height),5)
-        pygame.draw.line(self.surface,(200,0,0),(0,self.map_height),(self.map_width,self.map_height),5)
+        line = self.map_border
+        pygame.draw.line(self.surface, (200, 0, 0), line[0], line[1], 5)
+        pygame.draw.line(self.surface, (200, 0, 0), line[1], line[2], 5)
+        pygame.draw.line(self.surface, (200, 0, 0), line[2], line[3], 5)
 
         # Draw obstacles
         for obs in self.obstacles:
-            pygame.draw.rect(self.surface, (200, 0, 0), obs)
+            pygame.draw.polygon(self.surface, (200, 0, 0), obs)
 
         # Draw LIDAR scan
         self.lidar.render(self.surface)
@@ -275,7 +281,7 @@ if __name__ == '__main__':
 
         # print(lidar_list)
         # print(total_reward)
-        # print(obs['tgt'])
+        # print(obs)
         total_reward += rew
         if term:
             print(f"Elapsed time: {env.elapsed_time}, Reward: {total_reward:0.2f}")
