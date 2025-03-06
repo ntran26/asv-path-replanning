@@ -98,7 +98,12 @@ class ASVLidarEnv(gym.Env):
         self.obstacles = []
 
         # Initialize map borders
-        self.map_border = [(0,0), (0,self.map_height), (self.map_width,self.map_height), (self.map_width,0)]
+        # self.map_border = [(0,0), (0,self.map_height), (self.map_width,self.map_height), (self.map_width,0)]
+        self.map_border = [
+                            [(0, 0), (0, self.map_height),(0,0),(0, self.map_height)],  
+                            [(0, self.map_height), (self.map_width, self.map_height),(0, self.map_height),(self.map_width, self.map_height)],
+                            [(self.map_width, self.map_height), (self.map_width, 0),(self.map_width, self.map_height),(self.map_width, 0)]
+                        ]
 
         # Initialize video recorder
         self.record_video = True
@@ -125,8 +130,11 @@ class ASVLidarEnv(gym.Env):
         self.obstacles = []
         # self.obstacles.append(pygame.Rect(np.random.randint(50,300), 50, 60, 60))
         # self.obstacles.append(pygame.Rect(np.random.randint(50,300), 300, 40, 40))
-        self.obstacles.append([(50, 50), (110, 50), (110, 110), (50, 110)])
-        self.obstacles.append([(200, 200), (220, 250), (180, 270), (160, 230)])
+        x = np.random.randint(50,300)
+        self.obstacles.append([(x, 50), (x+60, 50), (x+60, 110), (x, 110)])
+
+        x = np.random.randint(50,300)
+        self.obstacles.append([(x, 300), (x + 20, 350), (x - 20, 370), (x - 40, 330)])
         # self.obstacles.append(pygame.Rect(200, 400, 40, 40))
 
         if self.render_mode in self.metadata['render_modes']:
@@ -178,16 +186,18 @@ class ASVLidarEnv(gym.Env):
             Collide with an obstacle: -10
         """
         # step loss
-        reward = 0
+        reward = -1
         if self.tgt < self.path_range and self.tgt > -self.path_range:
             # gradually increase the reward as the asv approaches the path
             reward = 1 - (abs(self.tgt) / self.path_range)
         if dy < 0:
             # moving in reverse
             reward = -10
+        if self.asv_y <= 0 and self.tgt <= self.path_range:
+            reward = 20
         # collision
         lidar_list = self.lidar.ranges.astype(np.int64)
-        if np.any(lidar_list <= 30):
+        if np.any(lidar_list <= self.collision):
             reward = -20
         # off border
         if self.asv_x <= 0 or self.asv_x >= self.map_width or self.asv_y >= self.map_height:
@@ -206,9 +216,9 @@ class ASVLidarEnv(gym.Env):
 
         # Draw map boundaries
         line = self.map_border
-        pygame.draw.line(self.surface, (200, 0, 0), line[0], line[1], 5)
-        pygame.draw.line(self.surface, (200, 0, 0), line[1], line[2], 5)
-        pygame.draw.line(self.surface, (200, 0, 0), line[2], line[3], 5)
+        pygame.draw.line(self.surface, (200, 0, 0), (0,0), (0,self.map_height), 5)
+        pygame.draw.line(self.surface, (200, 0, 0), (0,self.map_height), (self.map_width,self.map_height), 5)
+        pygame.draw.line(self.surface, (200, 0, 0), (self.map_width,0), (self.map_width,self.map_height), 5)
 
         # Draw obstacles
         for obs in self.obstacles:
@@ -280,7 +290,7 @@ if __name__ == '__main__':
         # obs,rew,term,_,_ = env.step(action)
 
         # print(lidar_list)
-        # print(total_reward)
+        print(total_reward)
         # print(obs)
         total_reward += rew
         if term:

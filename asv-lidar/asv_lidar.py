@@ -2,8 +2,8 @@ import pygame
 import numpy as np
 
 LIDAR_RANGE = 150
-LIDAR_SWATH = 90
-LIDAR_BEAMS = 21
+LIDAR_SWATH = 180
+LIDAR_BEAMS = 42
 
 class Lidar:
     """Basic LIDAR simulator using pygame rects to determine sensor ranges."""
@@ -94,9 +94,11 @@ class Lidar:
                         obstacle_edges.append((v1, v2))
 
             if map_border:
-                for i in range(len(map_border)):
-                    v1, v2 = map_border[i], map_border[(i + 1) % len(map_border)]
-                    obstacle_edges.append((v1, v2))
+                for border in map_border:
+                    for i in range(len(border)):
+                        v1 = border[i]
+                        v2 = border[(i + 1) % len(border)]
+                        obstacle_edges.append((v1, v2))
 
             for edge in obstacle_edges:
                 intersection = self.line_intersection((self._pos_x, self._pos_y), (end_x, end_y), edge[0], edge[1])

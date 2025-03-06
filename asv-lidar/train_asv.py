@@ -8,7 +8,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 from asv_lidar_gym import ASVLidarEnv
 
 # Toggle between train and test
-TRAIN = 0
+TRAIN = 1
 
 # Create the environment
 env = ASVLidarEnv(render_mode=None)
@@ -27,7 +27,7 @@ ent_coef = 0.01
 vf_coef = 0.5
 
 class CustomCallback(BaseCallback):
-    def __init__(self, save_freq=500000, verbose=0):
+    def __init__(self, save_freq=100000, verbose=0):
         super(CustomCallback, self).__init__(verbose)
         self.save_freq = save_freq
         self.model_save_counter = 0
@@ -36,12 +36,12 @@ class CustomCallback(BaseCallback):
         self.rewards = []
 
     def _on_step(self) -> bool:
-        # # Save model at regular intervals
-        # if self.num_timesteps % self.save_freq == 0:
-        #     model_path = f"models/model_{self.num_timesteps}.zip"
-        #     print(f"Saving model at {self.num_timesteps} timesteps")
-        #     self.model.save(model_path)
-        #     self.model_save_counter += 1
+        # Save model at regular intervals
+        if self.num_timesteps % self.save_freq == 0:
+            model_path = f"models/model_{self.num_timesteps}.zip"
+            print(f"Saving model at {self.num_timesteps} timesteps")
+            self.model.save(model_path)
+            self.model_save_counter += 1
 
         if self.locals.get("loss", None) is not None:
             loss = self.locals["loss"]
@@ -109,8 +109,8 @@ if TRAIN == 1:
 
 else:
     # Load the trained model and test it
-    # model = PPO.load(MODEL_PATH)
-    model = PPO.load("ppo_path_follow.zip")
+    model = PPO.load(MODEL_PATH)
+    # model = PPO.load("ppo_path_follow.zip")
 
     test_env = ASVLidarEnv(render_mode="human")
 
@@ -122,5 +122,6 @@ else:
         action, _ = model.predict(obs, deterministic=True)  # Use learned policy
         obs, reward, done, _, _ = test_env.step(action)
         total_reward += reward
+        print(total_reward)
 
     print(f"Test episode completed. Total reward: {total_reward}")
