@@ -8,7 +8,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 from asv_lidar_gym import ASVLidarEnv
 
 # Toggle between train and test
-TRAIN = 1
+TRAIN = 0
 
 # Create the environment
 env = ASVLidarEnv(render_mode=None)
