@@ -67,13 +67,14 @@ class ASVLidarEnv(gym.Env):
         self.asv_x = 0
         self.asv_h = 0
         self.asv_w = 0
+        self.angle_diff = 0
 
         self.model = ShipModel()
         self.model._v = 4.5
 
         """
         Observation space:
-            lidar: an array of lidar range: [21 values]
+            lidar: an array of lidar range: [42 values]
             pos: (x,y) coordinate of asv
             hdg: heading/yaw of the asv
             dhdg: rate of change of heading
@@ -125,6 +126,8 @@ class ASVLidarEnv(gym.Env):
         self.tgt_x = 150
         self.asv_y = 550
         self.asv_x = 200
+        self.goal_x = 150
+        self.goal_y = 0
 
         # Generate static obstacles
         self.obstacles = []
@@ -135,6 +138,8 @@ class ASVLidarEnv(gym.Env):
 
         x = np.random.randint(50,300)
         self.obstacles.append([(x, 300), (x + 20, 350), (x - 20, 370), (x - 40, 330)])
+
+        # Fixed obstacle
         # self.obstacles.append(pygame.Rect(200, 400, 40, 40))
 
         if self.render_mode in self.metadata['render_modes']:
@@ -161,6 +166,16 @@ class ASVLidarEnv(gym.Env):
         #         return True
 
         return False
+    
+    # Calculate the relative angle between current heading and goal
+    def calculate_angle(self, asv_x, asv_y, heading, goal_x, goal_y):
+        dx = goal_x - asv_x
+        dy = goal_y - asv_y
+
+        target_angle = np.degrees(np.arctan2(dx, -dy))       # pygame invert y-axis
+        angle_diff = (target_angle - heading + 180) % 360 - 180    # normalize to [-180,180]
+
+        return angle_diff
 
     def step(self, action):
         self.elapsed_time += UPDATE_RATE
@@ -174,6 +189,8 @@ class ASVLidarEnv(gym.Env):
 
         self.lidar.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=self.obstacles, map_border=self.map_border)
 
+        self.angle_diff = self.calculate_angle(self.asv_x, self.asv_y, self.asv_h, self.goal_x, self.goal_y)
+        
         if self.render_mode in self.metadata['render_modes']:
             self.render()
 
@@ -186,7 +203,7 @@ class ASVLidarEnv(gym.Env):
             Collide with an obstacle: -10
         """
         # step loss
-        reward = -1
+        reward = 0
         if self.tgt < self.path_range and self.tgt > -self.path_range:
             # gradually increase the reward as the asv approaches the path
             reward = 1 - (abs(self.tgt) / self.path_range)
@@ -202,6 +219,11 @@ class ASVLidarEnv(gym.Env):
         # off border
         if self.asv_x <= 0 or self.asv_x >= self.map_width or self.asv_y >= self.map_height:
             reward = -20
+        # head towards goal
+        if self.angle_diff >= 30 or self.angle_diff <= -30:
+            reward = -abs(self.angle_diff/5)
+        elif self.angle_diff < 30 and self.angle_diff > -30:
+            reward = abs(self.angle_diff/5)
 
         terminated = self.check_done((self.asv_x, self.asv_y))
         return self._get_obs(), reward, terminated, {}, {}
@@ -231,6 +253,9 @@ class ASVLidarEnv(gym.Env):
         pygame.draw.line(self.surface,(0,200,0),(self.tgt_x,0),(self.tgt_x,self.screen_size[1]),5)
         pygame.draw.circle(self.surface,(100,0,0),(self.tgt_x,self.tgt_y),5)
 
+        # Draw destination
+        pygame.draw.circle(self.surface,(200,0,200),(self.goal_x,self.goal_y),10)
+
         # Draw ownship
         if self.icon is None:
             self.icon = pygame.image.frombytes(BOAT_ICON['bytes'],BOAT_ICON['size'],BOAT_ICON['format'])
@@ -238,7 +263,7 @@ class ASVLidarEnv(gym.Env):
         # Draw status
         lidar = self.lidar.ranges.astype(np.int16)
         if self.status is not None:
-            status, rect = self.status.render(f"{self.elapsed_time:005.1f}s  HDG:{self.asv_h:+004.0f}({self.asv_w:+03.0f})  TGT:{self.tgt:+004.0f}",(255,255,255),(0,0,0))
+            status, rect = self.status.render(f"{self.elapsed_time:005.1f}s  HDG:{self.asv_h:+004.0f}({self.asv_w:+03.0f})  TGT:{self.tgt:+004.0f}  TGT_HDG:{self.angle_diff:.2f}",(255,255,255),(0,0,0))
             self.surface.blit(status, [10,550])
             # lidar_status, rect = self.status.render(f"{lidar}",(255,255,255),(0,0,0))
             # self.surface.blit(lidar_status, [5,575])

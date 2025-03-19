@@ -66,15 +66,11 @@ if TRAIN == 1:
                 ent_coef=ent_coef, vf_coef=vf_coef)
 
     # Training parameters
-    timesteps = 5000000
+    timesteps = 1000000
     callback = CustomCallback()
 
-    # # Lists to store rewards for plotting
-    # reward_log = []
-    # episode_rewards = []
-
     # Train the model
-    model.learn(total_timesteps=timesteps, tb_log_name="asv_ppo", callback=callback)
+    model.learn(total_timesteps=timesteps, tb_log_name="asv_ppo", callback=callback, progress_bar=True)
 
     # Save the model
     model.save("ppo_asv_model")
