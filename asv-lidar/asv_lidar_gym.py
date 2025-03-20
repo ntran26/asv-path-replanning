@@ -86,7 +86,8 @@ class ASVLidarEnv(gym.Env):
                 "pos"  : Box(low=np.array([0,0]),high=np.array(self.screen_size),shape=(2,),dtype=np.int16),
                 "hdg"  : Box(low=0,high=360,shape=(1,),dtype=np.int16),
                 "dhdg" : Box(low=0,high=36,shape=(1,),dtype=np.int16),
-                "tgt"  : Box(low=-50,high=50,shape=(1,),dtype=np.int16)
+                "tgt"  : Box(low=-50,high=50,shape=(1,),dtype=np.int16),
+                "target_heading": Box(low=-180,high=180,shape=(1,),dtype=np.int16)
             }
         )
 
@@ -118,7 +119,8 @@ class ASVLidarEnv(gym.Env):
             'pos': np.array([self.asv_x, self.asv_y],dtype=np.int16),
             'hdg': np.array([self.asv_h],dtype=np.int16),
             'dhdg': np.array([self.asv_w],dtype=np.int16),
-            'tgt': np.array([self.tgt],dtype=np.int16)
+            'tgt': np.array([self.tgt],dtype=np.int16),
+            'target_heading': np.array([self.angle_diff],dtype=np.int16)
         }
 
     def reset(self,seed=None, options=None):
@@ -220,10 +222,10 @@ class ASVLidarEnv(gym.Env):
         if self.asv_x <= 0 or self.asv_x >= self.map_width or self.asv_y >= self.map_height:
             reward = -20
         # head towards goal
-        if self.angle_diff >= 30 or self.angle_diff <= -30:
-            reward = -abs(self.angle_diff/5)
-        elif self.angle_diff < 30 and self.angle_diff > -30:
-            reward = abs(self.angle_diff/5)
+        if self.angle_diff >= 20 or self.angle_diff <= -20:
+            reward = -abs(self.angle_diff/10)
+        elif self.angle_diff < 20 and self.angle_diff > -20:
+            reward = abs(self.angle_diff/10)
 
         terminated = self.check_done((self.asv_x, self.asv_y))
         return self._get_obs(), reward, terminated, {}, {}
