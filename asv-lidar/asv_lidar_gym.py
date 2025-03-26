@@ -43,7 +43,7 @@ class ASVLidarEnv(gym.Env):
         self.map_height = MAP_HEIGHT
 
         self.path_range = 50
-        self.collision = 20
+        self.collision = 10
 
         pygame.init()
         self.render_mode = render_mode
@@ -204,31 +204,54 @@ class ASVLidarEnv(gym.Env):
             Move in reverse: -10
             Collide with an obstacle: -10
         """
-        # step loss
-        reward = 0
-        if self.tgt < self.path_range and self.tgt > -self.path_range:
-            # gradually increase the reward as the asv approaches the path
-            reward = 1 - (abs(self.tgt) / self.path_range)
-        if dy < 0:
-            # moving in reverse
-            reward = -10
-        if self.asv_y <= 0 and self.tgt <= self.path_range:
-            reward = 20
-        # collision
-        lidar_list = self.lidar.ranges.astype(np.int64)
-        if np.any(lidar_list <= self.collision):
-            reward = -20
-        # off border
-        if self.asv_x <= 0 or self.asv_x >= self.map_width or self.asv_y >= self.map_height:
-            reward = -20
-        # head towards goal
-        if self.angle_diff >= 20 or self.angle_diff <= -20:
-            reward = -abs(self.angle_diff/10)
-        elif self.angle_diff < 20 and self.angle_diff > -20:
-            reward = abs(self.angle_diff/10)
+        # # step loss
+        # reward = -1
+        # if self.tgt < self.path_range and self.tgt > -self.path_range:
+        #     # gradually increase the reward as the asv approaches the path
+        #     reward = 1 - (abs(self.tgt) / self.path_range)
+        # if dy < 0:
+        #     # moving in reverse
+        #     reward = -10
+        # if self.asv_y <= 0 and self.tgt <= self.path_range:
+        #     reward = 20
+        # # collision
+        # lidar_list = self.lidar.ranges.astype(np.int64)
+        # if np.any(lidar_list <= self.collision):
+        #     reward = -20
+        # # off border
+        # if self.asv_x <= 0 or self.asv_x >= self.map_width or self.asv_y >= self.map_height:
+        #     reward = -20
+        # # head towards goal
+        # if self.angle_diff >= 20 or self.angle_diff <= -20:
+        #     reward = -abs(self.angle_diff/10)
+        # elif self.angle_diff < 20 and self.angle_diff > -20:
+        #     reward = abs(self.angle_diff/10)
+
+        # penatly for each step taken
+        r_exist = -0.1
+
+        # path following reward
+        r_pf = np.exp(-0.05 * abs(self.tgt))
+
+        # heading alignment reward (reward = 1 if aligned, -1 if opposite)
+        angle_diff_rad = np.radians(self.angle_diff)
+        r_heading = np.cos(angle_diff_rad)
+
+        # obstacle avoidance reward
+        lidar_list = self.lidar.ranges.astype(np.float32)
+        r_oa = 0
+        for i, dist in enumerate(lidar_list):
+            theta = self.lidar.angles[i]    # angle of lidar beam
+            weight = 1 / (1 + abs(theta))   # prioritize beams closer to center/front
+            r_oa += weight / max(dist, 1)
+        r_oa = -r_oa / len(lidar_list)
+
+        # Combined rewards
+        lambda_ = 0.7       # weighting factor
+        reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist
 
         terminated = self.check_done((self.asv_x, self.asv_y))
-        return self._get_obs(), reward, terminated, {}, {}
+        return self._get_obs(), reward, terminated, False, {}
 
     def render(self):
         if self.render_mode != 'human':
