@@ -2,8 +2,8 @@ import pygame
 import numpy as np
 
 LIDAR_RANGE = 150
-LIDAR_SWATH = 180
-LIDAR_BEAMS = 42
+LIDAR_SWATH = 270
+LIDAR_BEAMS = 63
 
 class Lidar:
     """Basic LIDAR simulator using pygame rects to determine sensor ranges."""

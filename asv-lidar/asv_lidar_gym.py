@@ -141,6 +141,9 @@ class ASVLidarEnv(gym.Env):
         x = np.random.randint(50,300)
         self.obstacles.append([(x, 300), (x + 20, 350), (x - 20, 370), (x - 40, 330)])
 
+        x = np.random.randint(50,300)
+        self.obstacles.append([(x, 200), (x+50, 200), (x+50, 220), (x, 250)])
+
         # Fixed obstacle
         # self.obstacles.append(pygame.Rect(200, 400, 40, 40))
 

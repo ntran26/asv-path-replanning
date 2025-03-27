@@ -68,6 +68,9 @@ if __name__=='__main__':
     # Model save path
     MODEL_PATH = "ppo_asv_model"
 
+
+    #                       -------------- TRAINING --------------
+
     if TRAIN == 1:
         # Initialize PPO model
         model = PPO("MultiInputPolicy", env, verbose=1, tensorboard_log="./ppo_asv_tensorboard/",
@@ -113,10 +116,14 @@ if __name__=='__main__':
 
         env.close()
 
+
+    #                       -------------- TESTING --------------
+
     else:
         # Load the trained model and test it
         model = PPO.load(MODEL_PATH)
         # model = PPO.load("ppo_path_follow.zip")
+        # model = PPO.load("ppo_asv_model_180.zip")
 
         test_env = ASVLidarEnv(render_mode="human")
 
