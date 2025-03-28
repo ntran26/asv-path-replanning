@@ -7,7 +7,7 @@ from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.callbacks import BaseCallback
-from asv_lidar_gym import ASVLidarEnv
+from asv_lidar_gym_continuous import ASVLidarEnv
 import multiprocessing
 
 if __name__=='__main__':
@@ -135,6 +135,6 @@ if __name__=='__main__':
             action, _ = model.predict(obs, deterministic=True)  # Use learned policy
             obs, reward, done, _, _ = test_env.step(action)
             total_reward += reward
-            print(total_reward)
+            # print(total_reward)
 
         print(f"Test episode completed. Total reward: {total_reward}")

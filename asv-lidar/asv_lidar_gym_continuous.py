@@ -91,7 +91,7 @@ class ASVLidarEnv(gym.Env):
             }
         )
 
-        self.action_space = Discrete(3)
+        self.action_space = Box(low=np.array([-1.0]), high=np.array([1.0]), dtype=np.float32)
         
         # LIDAR
         self.lidar = Lidar()
@@ -184,13 +184,16 @@ class ASVLidarEnv(gym.Env):
 
     def step(self, action):
         self.elapsed_time += UPDATE_RATE
-        dx,dy,h,w = self.model.update(100,rudder_action[int(action)],UPDATE_RATE)#pygame.time.get_ticks() / 1000.)
+        rudder = float(np.clip(action[0], -1, 1))
+        dx,dy,h,w = self.model.update(100,rudder*25,UPDATE_RATE)#pygame.time.get_ticks() / 1000.)
         self.asv_x += dx
         self.asv_y -= dy
         self.asv_h = h
         self.asv_w = w
         self.tgt_y = self.asv_y-50
         self.tgt = self.tgt_x - self.asv_x
+
+        print(h)
 
         self.lidar.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=self.obstacles, map_border=self.map_border)
 
@@ -322,28 +325,28 @@ if __name__ == '__main__':
     action = CENTER
     total_reward = 0
     while True:
-        # Manual control
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.display.quit()
-                pygame.quit()
-                exit()
-            elif event.type == pygame.KEYUP:
-                action = CENTER
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RIGHT:
-                    action = STBD
-                elif event.key == pygame.K_LEFT:
-                    action = PORT
-        obs,rew,term,_,_ = env.step(action)
-        lidar_list = obs['lidar']
-        
-        # # Random actions
-        # action = env.action_space.sample()
+        # # Manual control
+        # for event in pygame.event.get():
+        #     if event.type == pygame.QUIT:
+        #         pygame.display.quit()
+        #         pygame.quit()
+        #         exit()
+        #     elif event.type == pygame.KEYUP:
+        #         action = CENTER
+        #     elif event.type == pygame.KEYDOWN:
+        #         if event.key == pygame.K_RIGHT:
+        #             action = STBD
+        #         elif event.key == pygame.K_LEFT:
+        #             action = PORT
         # obs,rew,term,_,_ = env.step(action)
+        # lidar_list = obs['lidar']
+        
+        # Random actions
+        action = env.action_space.sample()
+        obs,rew,term,_,_ = env.step(action)
 
         # print(lidar_list)
-        print(total_reward)
+        # print(total_reward)
         # print(obs)
         total_reward += rew
         if term:
