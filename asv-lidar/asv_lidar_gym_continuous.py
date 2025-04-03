@@ -10,8 +10,9 @@ import cv2
 
 UPDATE_RATE = 0.5
 RENDER_FPS = 10
-MAP_WIDTH = 400
+MAP_WIDTH = 1000
 MAP_HEIGHT = 600
+NUM_OBS = 30
 
 # Actions
 PORT = 0
@@ -96,8 +97,8 @@ class ASVLidarEnv(gym.Env):
         # LIDAR
         self.lidar = Lidar()
 
-        # Initialize obstacles
-        self.obstacles = []
+        # Initialize number of obstacles
+        self.num_obs = NUM_OBS
 
         # Initialize map borders
         # self.map_border = [(0,0), (0,self.map_height), (self.map_width,self.map_height), (self.map_width,0)]
@@ -123,29 +124,62 @@ class ASVLidarEnv(gym.Env):
             'target_heading': np.array([self.angle_diff],dtype=np.int16)
         }
 
+    def generate_path(self, start_x, start_y, goal_x, goal_y):
+        # calculate number of waypoints
+        path_length = int(np.hypot(abs(goal_x - start_x), goal_y - goal_x))
+
+        # record path coordinates
+        path_x = np.round(np.linspace(start_x, goal_x, path_length)).astype(int)
+        path_y = np.round(np.linspace(start_y, goal_y, path_length)).astype(int)
+
+        # store path coordinates
+        path = np.column_stack((path_x, path_y))
+
+        return path
+    
+    def generate_obstacles(self, num_obs):
+        obstacles = []
+        for _ in range(num_obs):
+            x = np.random.randint(50, self.map_width - 50)
+            y = np.random.randint(50, self.map_height - 50)
+
+            # ensure the obstacle is not close to start/goal 
+            if np.linalg.norm([x - self.start_x, y - self.start_y]) > 50 and \
+                np.linalg.norm([x - self.goal_x, y - self.goal_y]) > 50:
+                obstacles.append([(x, y), (x+60, y), (x+60, y+60), (x, y+60)])
+        return obstacles
+
     def reset(self,seed=None, options=None):
         super().reset(seed=seed)
-        self.tgt_x = 150
-        self.asv_y = 550
-        self.asv_x = 200
-        self.goal_x = 150
-        self.goal_y = 0
+
+        # Randomize start position
+        self.start_y = self.map_height - 50
+        self.start_x = np.random.randint(50, self.map_width - 50)
+
+        # Initialize asv position
+        self.asv_x = self.start_x
+        self.asv_y = self.start_y
+
+        # Randomize goal position
+        self.goal_y = 20
+        self.goal_x = np.random.randint(50, self.map_width - 50)
+
+        # Generate the path
+        self.path = self.generate_path(self.start_x, self.start_y, self.goal_x, self.goal_y)
 
         # Generate static obstacles
-        self.obstacles = []
-        # self.obstacles.append(pygame.Rect(np.random.randint(50,300), 50, 60, 60))
-        # self.obstacles.append(pygame.Rect(np.random.randint(50,300), 300, 40, 40))
-        x = np.random.randint(50,300)
-        self.obstacles.append([(x, 50), (x+60, 50), (x+60, 110), (x, 110)])
+        # self.obstacles = []
 
-        x = np.random.randint(50,300)
-        self.obstacles.append([(x, 300), (x + 20, 350), (x - 20, 370), (x - 40, 330)])
+        # x = np.random.randint(50, self.map_width - 100)
+        # self.obstacles.append([(x, 50), (x+60, 50), (x+60, 110), (x, 110)])
 
-        x = np.random.randint(50,300)
-        self.obstacles.append([(x, 200), (x+50, 200), (x+50, 220), (x, 250)])
+        # x = np.random.randint(50,self.map_width - 100)
+        # self.obstacles.append([(x, 300), (x + 20, 350), (x - 20, 370), (x - 40, 330)])
 
-        # Fixed obstacle
-        # self.obstacles.append(pygame.Rect(200, 400, 40, 40))
+        # x = np.random.randint(50, self.map_width - 100)
+        # self.obstacles.append([(x, 200), (x+50, 200), (x+50, 220), (x, 250)])
+
+        self.obstacles = self.generate_obstacles(self.num_obs)
 
         if self.render_mode in self.metadata['render_modes']:
             self.render()
@@ -165,10 +199,6 @@ class ASVLidarEnv(gym.Env):
         lidar_list = self.lidar.ranges.astype(np.int64)
         if np.any(lidar_list <= self.collision):
             return True
-
-        # for obs in self.obstacles:
-        #     if obs.collidepoint(position[0], position[1]):
-        #         return True
 
         return False
     
@@ -190,10 +220,18 @@ class ASVLidarEnv(gym.Env):
         self.asv_y -= dy
         self.asv_h = h
         self.asv_w = w
-        self.tgt_y = self.asv_y-50
-        self.tgt = self.tgt_x - self.asv_x
 
-        print(h)
+        # closest perpendicular distance from asv to path
+        asv_pos = np.array([self.asv_x, self.asv_y])
+        distance = np.linalg.norm(self.path - asv_pos, axis=1)
+        self.tgt = np.min(distance)
+
+        # extract (x,y) target
+        closest_idx = np.argmin(distance)
+        self.tgt_x, self.tgt_y = self.path[closest_idx]
+
+        # self.tgt_y = self.asv_y-50
+        # self.tgt = self.tgt_x - self.asv_x
 
         self.lidar.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=self.obstacles, map_border=self.map_border)
 
@@ -281,7 +319,7 @@ class ASVLidarEnv(gym.Env):
         self.lidar.render(self.surface)
 
         # Draw Path
-        pygame.draw.line(self.surface,(0,200,0),(self.tgt_x,0),(self.tgt_x,self.screen_size[1]),5)
+        pygame.draw.line(self.surface,(0,200,0),(self.start_x,self.start_y),(self.goal_x,self.goal_y),5)
         pygame.draw.circle(self.surface,(100,0,0),(self.tgt_x,self.tgt_y),5)
 
         # Draw destination

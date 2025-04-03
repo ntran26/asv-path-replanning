@@ -37,7 +37,7 @@ if __name__=='__main__':
     vf_coef = 0.5
 
     class CustomCallback(BaseCallback):
-        def __init__(self, save_freq=100000, verbose=0):
+        def __init__(self, save_freq=500000, verbose=0):
             super(CustomCallback, self).__init__(verbose)
             self.save_freq = save_freq
             self.model_save_counter = 0
@@ -79,7 +79,7 @@ if __name__=='__main__':
                     ent_coef=ent_coef, vf_coef=vf_coef)
 
         # Training parameters
-        timesteps = 1000000
+        timesteps = 2000000
         callback = CustomCallback()
 
         # Train the model
@@ -132,7 +132,7 @@ if __name__=='__main__':
         total_reward = 0
 
         while not done:
-            action, _ = model.predict(obs, deterministic=True)  # Use learned policy
+            action, _ = model.predict(obs, deterministic=True) 
             obs, reward, done, _, _ = test_env.step(action)
             total_reward += reward
             # print(total_reward)
