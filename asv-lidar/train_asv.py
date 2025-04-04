@@ -14,7 +14,7 @@ if __name__=='__main__':
     multiprocessing.freeze_support()
 
     # Toggle between train and test
-    TRAIN = 0
+    TRAIN = 1
 
     # Create the environment
     num_envs = 8
