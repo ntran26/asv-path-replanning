@@ -14,7 +14,7 @@ if __name__=='__main__':
     multiprocessing.freeze_support()
 
     # Toggle between train and test
-    TRAIN = 1
+    TRAIN = 0
 
     # Create the environment
     num_envs = 8
@@ -79,7 +79,7 @@ if __name__=='__main__':
                     ent_coef=ent_coef, vf_coef=vf_coef)
 
         # Training parameters
-        timesteps = 2000000
+        timesteps = 1000000
         callback = CustomCallback()
 
         # Train the model
