@@ -69,7 +69,6 @@ class ASVLidarEnv(gym.Env):
         self.asv_h = 0
         self.asv_w = 0
         self.angle_diff = 0
-        self.distance_to_goal = 1000
 
         self.model = ShipModel()
         self.model._v = 4.5
@@ -89,8 +88,7 @@ class ASVLidarEnv(gym.Env):
                 "hdg"  : Box(low=0,high=360,shape=(1,),dtype=np.int16),
                 "dhdg" : Box(low=0,high=36,shape=(1,),dtype=np.int16),
                 "tgt"  : Box(low=-50,high=50,shape=(1,),dtype=np.int16),
-                "target_heading": Box(low=-180,high=180,shape=(1,),dtype=np.int16),
-                "distance_to_goal": Box(low=0, high=1000, shape=(1,), dtype=np.int16),
+                "target_heading": Box(low=-180,high=180,shape=(1,),dtype=np.int16)
             }
         )
 
@@ -124,8 +122,7 @@ class ASVLidarEnv(gym.Env):
             'hdg': np.array([self.asv_h],dtype=np.int16),
             'dhdg': np.array([self.asv_w],dtype=np.int16),
             'tgt': np.array([self.tgt],dtype=np.int16),
-            'target_heading': np.array([self.angle_diff],dtype=np.int16),
-            'distance_to_goal': np.array([self.distance_to_goal],dtype=np.int16)
+            'target_heading': np.array([self.angle_diff],dtype=np.int16)
         }
 
     def generate_path(self, start_x, start_y, goal_x, goal_y):
@@ -157,18 +154,18 @@ class ASVLidarEnv(gym.Env):
         super().reset(seed=seed)
 
         # Randomize start position
-        self.start_y = self.map_height - 20
+        self.start_y = self.map_height - 50
         # self.start_x = np.random.randint(50, self.map_width - 50)
-        self.start_x = 20
+        self.start_x = 50
 
         # Initialize asv position
         self.asv_x = self.start_x
         self.asv_y = self.start_y
 
         # Randomize goal position
-        self.goal_y = 20
+        self.goal_y = 50
         # self.goal_x = np.random.randint(50, self.map_width - 50)
-        self.goal_x = self.map_width - 20
+        self.goal_x = self.map_width - 50
 
         # Generate the path
         self.path = self.generate_path(self.start_x, self.start_y, self.goal_x, self.goal_y)
@@ -196,7 +193,7 @@ class ASVLidarEnv(gym.Env):
             return True
         
         # the agent reaches goal
-        if self.distance_to_goal <= 50:
+        if self.distance_to_goal <= 20:
             return True
 
         return False
@@ -271,7 +268,7 @@ class ASVLidarEnv(gym.Env):
         #     reward = abs(self.angle_diff/10)
 
         # penatly for each step taken
-        r_exist = -1
+        r_exist = -0.1
 
         # path following reward
         r_pf = np.exp(-0.05 * abs(self.tgt))
@@ -291,18 +288,19 @@ class ASVLidarEnv(gym.Env):
 
         # if the agent reaches goal
         self.distance_to_goal = np.linalg.norm([self.asv_x - self.goal_x, self.asv_y - self.goal_y])
-        if self.distance_to_goal <= 50:
+        if self.distance_to_goal <= 20:
             r_goal = 50
         else:
             r_goal = 0
 
         # Combined rewards
         lambda_ = 0.7       # weighting factor
+        reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
 
-        if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):
-            reward = -1000
-        else:
-            reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
+        # if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):
+        #     reward = -1000
+        # else:
+        #     reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
 
         terminated = self.check_done((self.asv_x, self.asv_y))
         return self._get_obs(), reward, terminated, False, {}
