@@ -43,7 +43,6 @@ class ASVLidarEnv(gym.Env):
         self.map_width = MAP_WIDTH
         self.map_height = MAP_HEIGHT
 
-        self.path_range = 50
         self.collision = 10
 
         pygame.init()
@@ -142,12 +141,25 @@ class ASVLidarEnv(gym.Env):
         obstacles = []
         for _ in range(num_obs):
             x = np.random.randint(50, self.map_width - 50)
-            y = np.random.randint(50, self.map_height - 50)
+            y = np.random.randint(50, self.map_height - 150)
 
             # ensure the obstacle is not close to start/goal 
             if np.linalg.norm([x - self.start_x, y - self.start_y]) > 100 and \
                 np.linalg.norm([x - self.goal_x, y - self.goal_y]) > 100:
                 obstacles.append([(x, y), (x+30, y), (x+30, y+30), (x, y+30)])
+
+        # x1 = np.random.randint(50, self.map_width - 50)
+        # y1 = 100
+        # obstacles.append([(x1, y1), (x1+60, y1), (x1+60, y1+50), (x1, y1+50)])
+
+        # x2 = np.random.randint(50, self.map_width - 50)
+        # obstacles.append([(x2, 300), (x2 + 20, 350), (x2 - 20, 370), (x2 - 40, 330)])
+
+        # x = np.random.randint(50, self.map_width - 50)
+        # obstacles.append([(x, 300), (x + 20, 350), (x - 20, 370), (x - 40, 330)])
+
+        # x = np.random.randint(50, self.map_width - 50)
+        # obstacles.append([(x, 200), (x+50, 200), (x+50, 220), (x, 250)])
         return obstacles
 
     def reset(self,seed=None, options=None):
@@ -159,13 +171,13 @@ class ASVLidarEnv(gym.Env):
         # self.start_x = 50
 
         # Initialize asv position
-        self.asv_x = self.start_x
+        self.asv_x = self.map_width/2
         self.asv_y = self.start_y
 
         # Randomize goal position
         self.goal_y = 50
-        self.goal_x = np.random.randint(50, self.map_width - 50)
-        # self.goal_x = self.map_width - 50
+        # self.goal_x = np.random.randint(50, self.map_width - 50)
+        self.goal_x = self.start_x
 
         # Generate the path
         self.path = self.generate_path(self.start_x, self.start_y, self.goal_x, self.goal_y)
@@ -193,7 +205,7 @@ class ASVLidarEnv(gym.Env):
             return True
         
         # the agent reaches goal
-        if self.distance_to_goal <= 20:
+        if self.distance_to_goal <= self.collision+30:
             return True
 
         return False
@@ -218,16 +230,17 @@ class ASVLidarEnv(gym.Env):
         self.asv_w = w
 
         # closest perpendicular distance from asv to path
-        asv_pos = np.array([self.asv_x, self.asv_y])
-        distance = np.linalg.norm(self.path - asv_pos, axis=1)
-        self.tgt = np.min(distance)
+        # asv_pos = np.array([self.asv_x, self.asv_y])
+        # distance = np.linalg.norm(self.path - asv_pos, axis=1)
+        # self.tgt = np.min(distance)
 
         # extract (x,y) target
-        closest_idx = np.argmin(distance)
-        self.tgt_x, self.tgt_y = self.path[closest_idx]
+        # closest_idx = np.argmin(distance)
+        # self.tgt_x, self.tgt_y = self.path[closest_idx]
 
-        # self.tgt_y = self.asv_y-50
-        # self.tgt = self.tgt_x - self.asv_x
+        self.tgt_y = self.asv_y-50
+        self.tgt_x = self.goal_x
+        self.tgt = self.tgt_x - self.asv_x
 
         self.lidar.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=self.obstacles, map_border=self.map_border)
 
@@ -268,7 +281,7 @@ class ASVLidarEnv(gym.Env):
         #     reward = abs(self.angle_diff/10)
 
         # penatly for each step taken
-        r_exist = -0.5
+        r_exist = -0.1
 
         # path following reward
         r_pf = np.exp(-0.05 * abs(self.tgt))
@@ -288,19 +301,19 @@ class ASVLidarEnv(gym.Env):
 
         # if the agent reaches goal
         self.distance_to_goal = np.linalg.norm([self.asv_x - self.goal_x, self.asv_y - self.goal_y])
-        if self.distance_to_goal <= 10:
+        if self.distance_to_goal <= self.collision+30:
             r_goal = 50
         else:
             r_goal = 0
 
         # Combined rewards
-        lambda_ = 0.75       # weighting factor
-        reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
+        lambda_ = 0.7       # weighting factor
+        # reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
 
-        # if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):
-        #     reward = -1000
-        # else:
-        #     reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
+        if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):
+            reward = -1000
+        else:
+            reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
 
         terminated = self.check_done((self.asv_x, self.asv_y))
         return self._get_obs(), reward, terminated, False, {}
