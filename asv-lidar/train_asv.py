@@ -14,7 +14,7 @@ if __name__=='__main__':
     multiprocessing.freeze_support()
 
     # Toggle between train and test
-    TRAIN = 1
+    TRAIN = 0
 
     # Create the environment
     num_envs = 8
@@ -79,7 +79,7 @@ if __name__=='__main__':
                     ent_coef=ent_coef, vf_coef=vf_coef)
 
         # Training parameters
-        timesteps = 5000000
+        timesteps = 1000000
         callback = CustomCallback()
 
         # Train the model
@@ -121,9 +121,11 @@ if __name__=='__main__':
 
     else:
         # Load the trained model and test it
-        model = PPO.load(MODEL_PATH)
-        # model = PPO.load("ppo_path_follow.zip")
-        # model = PPO.load("ppo_asv_model_180.zip")
+        # model = PPO.load(MODEL_PATH)
+        # model = PPO.load("models/ppo_path_follow.zip")
+        # model = PPO.load("models/ppo_asv_model_180.zip")
+        model = PPO.load("models/ppo_asv_model_continuous_1.zip")
+        # model = PPO.load("models/ppo_asv_model_continuous_2.zip")
 
         test_env = ASVLidarEnv(render_mode="human")
 
