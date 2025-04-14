@@ -1,5 +1,6 @@
 import gymnasium as gym
 import numpy as np
+import pygame
 import matplotlib.pyplot as plt
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
@@ -7,7 +8,7 @@ from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.callbacks import BaseCallback
-from asv_lidar_gym_continuous import ASVLidarEnv
+from asv_lidar_gym_continuous import ASVLidarEnv, MAP_WIDTH, MAP_HEIGHT
 import multiprocessing
 
 if __name__=='__main__':
@@ -121,22 +122,50 @@ if __name__=='__main__':
 
     else:
         # Load the trained model and test it
-        # model = PPO.load(MODEL_PATH)
+        model = PPO.load(MODEL_PATH)
         # model = PPO.load("models/ppo_path_follow.zip")
         # model = PPO.load("models/ppo_asv_model_180.zip")
-        model = PPO.load("models/ppo_asv_model_continuous_1.zip")
+        # model = PPO.load("models/ppo_asv_model_continuous_1.zip")
         # model = PPO.load("models/ppo_asv_model_continuous_2.zip")
 
-        test_env = ASVLidarEnv(render_mode="human")
+        env = ASVLidarEnv(render_mode="human")
 
-        obs, _ = test_env.reset()
+        obs, _ = env.reset()
         done = False
         total_reward = 0
 
         while not done:
             action, _ = model.predict(obs, deterministic=True) 
-            obs, reward, done, _, _ = test_env.step(action)
+            obs, reward, done, _, _ = env.step(action)
             total_reward += reward
             # print(total_reward)
 
         print(f"Test episode completed. Total reward: {total_reward}")
+
+        # Save path taken as image
+        path_surface = pygame.Surface((MAP_WIDTH, MAP_HEIGHT))
+        path_surface.fill((255,255,255))
+
+        for i in range(1, len(env.asv_path)):
+            pygame.draw.circle(path_surface, (0, 0, 200), env.asv_path[i], 3)
+
+        display = pygame.display.set_mode(env.screen_size)
+        os = pygame.transform.rotozoom(env.icon,-env.asv_h,2)
+        path_surface.blit(os,os.get_rect(center=(env.asv_x,env.asv_y)))
+        display.blit(path_surface,[0,0])
+
+        # Draw obstacles
+        for obs in env.obstacles:
+            pygame.draw.polygon(path_surface, (200, 0, 0), obs)
+        
+        # Draw Path
+        pygame.draw.line(path_surface,(0,200,0),(env.start_x,env.start_y),(env.goal_x,env.goal_y),5)
+        pygame.draw.circle(path_surface,(100,0,0),(env.tgt_x,env.tgt_y),5)
+
+        # # Draw map boundaries
+        # pygame.draw.line(path_surface, (200, 0, 0), (0,0), (0,env.map_height), 5)
+        # pygame.draw.line(path_surface, (200, 0, 0), (0,env.map_height), (env.map_width,env.map_height), 5)
+        # pygame.draw.line(path_surface, (200, 0, 0), (env.map_width,0), (env.map_width,env.map_height), 5)
+        # pygame.draw.line(path_surface, (200, 0, 0), (0,0), (env.map_width,0), 5)
+
+        pygame.image.save(path_surface, "asv_path_result.png")

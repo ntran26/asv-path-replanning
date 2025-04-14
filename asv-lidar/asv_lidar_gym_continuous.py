@@ -13,6 +13,7 @@ RENDER_FPS = 10
 MAP_WIDTH = 400
 MAP_HEIGHT = 600
 NUM_OBS = 5
+COLLISION_RANGE = 10
 
 # Actions
 PORT = 0
@@ -43,7 +44,10 @@ class ASVLidarEnv(gym.Env):
         self.map_width = MAP_WIDTH
         self.map_height = MAP_HEIGHT
 
-        self.collision = 10
+        self.collision = COLLISION_RANGE
+
+        # Path that ASV taken
+        self.asv_path = []
 
         pygame.init()
         self.render_mode = render_mode
@@ -126,7 +130,11 @@ class ASVLidarEnv(gym.Env):
 
     def generate_path(self, start_x, start_y, goal_x, goal_y):
         # calculate number of waypoints
-        path_length = int(np.hypot(abs(goal_x - start_x), goal_y - goal_x))
+        # if start_x != goal_x:
+        #     path_length = int(np.hypot(abs(goal_x - start_x), goal_y - goal_x))
+        # else:
+        #     path_length = abs(goal_y - start_y)
+        path_length = max(2, int(np.hypot(abs(goal_x - start_x), abs(goal_y - start_y))))
 
         # record path coordinates
         path_x = np.round(np.linspace(start_x, goal_x, path_length)).astype(int)
@@ -170,20 +178,33 @@ class ASVLidarEnv(gym.Env):
         self.start_x = np.random.randint(50, self.map_width - 50)
         # self.start_x = 100
 
-        # Initialize asv position
+        # Initialize asv position (fixed)
         self.asv_x = self.map_width/2
+        self.asv_y = self.start_y
+
+        # Initialize asv position (random)
+        if self.start_x > 100 and self.start_x < self.map_width - 100:
+            self.asv_x = np.random.randint(self.start_x - 50, self.start_x + 50)
+        elif self.start_x <= 100:
+            self.asv_x = self.start_x + 50
+        elif self.start_x >= self.map_width - 100:
+            self.asv_x = self.start_x - 50
+        
         self.asv_y = self.start_y
 
         # Randomize goal position
         self.goal_y = 50
-        # self.goal_x = np.random.randint(50, self.map_width - 50)
-        self.goal_x = self.start_x
+        self.goal_x = np.random.randint(50, self.map_width - 50)
+        # self.goal_x = self.start_x
 
         # Generate the path
         self.path = self.generate_path(self.start_x, self.start_y, self.goal_x, self.goal_y)
 
         # Generate static obstacles
         self.obstacles = self.generate_obstacles(self.num_obs)
+
+        # Initialize the ASV path list
+        self.asv_path = [(self.asv_x, self.asv_y)]
 
         if self.render_mode in self.metadata['render_modes']:
             self.render()
@@ -230,17 +251,17 @@ class ASVLidarEnv(gym.Env):
         self.asv_w = w
 
         # closest perpendicular distance from asv to path
-        # asv_pos = np.array([self.asv_x, self.asv_y])
-        # distance = np.linalg.norm(self.path - asv_pos, axis=1)
-        # self.tgt = np.min(distance)
+        asv_pos = np.array([self.asv_x, self.asv_y])
+        distance = np.linalg.norm(self.path - asv_pos, axis=1)
+        self.tgt = np.min(distance)
 
         # extract (x,y) target
-        # closest_idx = np.argmin(distance)
-        # self.tgt_x, self.tgt_y = self.path[closest_idx]
+        closest_idx = np.argmin(distance)
+        self.tgt_x, self.tgt_y = self.path[closest_idx]
 
-        self.tgt_y = self.asv_y-50
-        self.tgt_x = self.goal_x
-        self.tgt = self.tgt_x - self.asv_x
+        # self.tgt_y = self.asv_y-50
+        # self.tgt_x = self.goal_x
+        # self.tgt = self.tgt_x - self.asv_x
 
         self.lidar.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=self.obstacles, map_border=self.map_border)
 
@@ -248,6 +269,9 @@ class ASVLidarEnv(gym.Env):
         
         if self.render_mode in self.metadata['render_modes']:
             self.render()
+        
+        # append new coordinate of asv
+        self.asv_path.append((self.asv_x, self.asv_y))
 
         """
         Reward function:
@@ -286,12 +310,12 @@ class ASVLidarEnv(gym.Env):
         else:
             r_exist = -0.1
 
-        # path following reward
-        r_pf = np.exp(-0.05 * abs(self.tgt))
-
         # heading alignment reward (reward = 1 if aligned, -1 if opposite)
         angle_diff_rad = np.radians(self.angle_diff)
-        r_heading = np.cos(angle_diff_rad)
+        r_heading = 2 * np.cos(angle_diff_rad)
+
+        # path following reward
+        r_pf = np.exp(-0.05 * abs(self.tgt))
 
         # obstacle avoidance reward
         lidar_list = self.lidar.ranges.astype(np.float32)
@@ -311,12 +335,12 @@ class ASVLidarEnv(gym.Env):
 
         # Combined rewards
         lambda_ = 0.7       # weighting factor
-        # reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
+        reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_goal + r_heading
 
         # if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):
         #     reward = -1000
         # else:
-        reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
+        #     reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
 
         terminated = self.check_done((self.asv_x, self.asv_y))
         return self._get_obs(), reward, terminated, False, {}
@@ -414,6 +438,30 @@ if __name__ == '__main__':
         total_reward += rew
         if term:
             print(f"Elapsed time: {env.elapsed_time}, Reward: {total_reward:0.2f}")
+
+            # Save path taken as image
+            path_surface = pygame.Surface((MAP_WIDTH, MAP_HEIGHT))
+            path_surface.fill((255,255,255))
+
+            for i in range(1, len(env.asv_path)):
+                pygame.draw.circle(path_surface, (0, 0, 200), env.asv_path[i], 5)
+
+            # Draw obstacles
+            for obs in env.obstacles:
+                pygame.draw.polygon(path_surface, (200, 0, 0), obs)
+            
+            # Draw Path
+            pygame.draw.line(path_surface,(0,200,0),(env.start_x,env.start_y),(env.goal_x,env.goal_y),5)
+            pygame.draw.circle(path_surface,(100,0,0),(env.tgt_x,env.tgt_y),5)
+
+            # Draw map boundaries
+            pygame.draw.line(path_surface, (200, 0, 0), (0,0), (0,env.map_height), 5)
+            pygame.draw.line(path_surface, (200, 0, 0), (0,env.map_height), (env.map_width,env.map_height), 5)
+            pygame.draw.line(path_surface, (200, 0, 0), (env.map_width,0), (env.map_width,env.map_height), 5)
+            pygame.draw.line(path_surface, (200, 0, 0), (0,0), (env.map_width,0), 5)
+
+            pygame.image.save(path_surface, "asv_path_result.png")          
+
             pygame.display.quit()
             pygame.quit()
             exit()
