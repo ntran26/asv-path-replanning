@@ -12,7 +12,7 @@ UPDATE_RATE = 0.5
 RENDER_FPS = 10
 MAP_WIDTH = 400
 MAP_HEIGHT = 600
-NUM_OBS = 5
+NUM_OBS = 10
 COLLISION_RANGE = 10
 
 # Actions
@@ -78,7 +78,7 @@ class ASVLidarEnv(gym.Env):
 
         """
         Observation space:
-            lidar: an array of lidar range: [42 values]
+            lidar: an array of lidar range: [63 values]
             pos: (x,y) coordinate of asv
             hdg: heading/yaw of the asv
             dhdg: rate of change of heading
@@ -214,8 +214,8 @@ class ASVLidarEnv(gym.Env):
     def check_done(self, position):
         # # check if asv goes outside of the map
         # # top or bottom
-        # if position[1] <= 0 or position[1] >= self.map_height:
-        #     return True
+        if position[1] >= self.map_height:
+            return True
         # # left or right
         # if position[0] <= 0 or position[0] >= self.map_width:
         #     return True
@@ -305,14 +305,14 @@ class ASVLidarEnv(gym.Env):
         #     reward = abs(self.angle_diff/10)
 
         # penatly for each step taken
-        if dy < 0:
-            r_exist = -10
-        else:
-            r_exist = -0.1
+        # if dy < 0:
+        #     r_exist = -10
+        # else:
+        r_exist = -0.1
 
         # heading alignment reward (reward = 1 if aligned, -1 if opposite)
         angle_diff_rad = np.radians(self.angle_diff)
-        r_heading = 2 * np.cos(angle_diff_rad)
+        r_heading = np.cos(angle_diff_rad)
 
         # path following reward
         r_pf = np.exp(-0.05 * abs(self.tgt))
@@ -334,13 +334,13 @@ class ASVLidarEnv(gym.Env):
             r_goal = 0
 
         # Combined rewards
-        lambda_ = 0.7       # weighting factor
-        reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_goal + r_heading
+        lambda_ = 0.8       # weighting factor
+        # reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_goal + r_heading
 
-        # if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):
-        #     reward = -1000
-        # else:
-        #     reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
+        if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):
+            reward = -1000
+        else:
+            reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
 
         terminated = self.check_done((self.asv_x, self.asv_y))
         return self._get_obs(), reward, terminated, False, {}
@@ -358,7 +358,7 @@ class ASVLidarEnv(gym.Env):
         pygame.draw.line(self.surface, (200, 0, 0), (0,0), (0,self.map_height), 5)
         pygame.draw.line(self.surface, (200, 0, 0), (0,self.map_height), (self.map_width,self.map_height), 5)
         pygame.draw.line(self.surface, (200, 0, 0), (self.map_width,0), (self.map_width,self.map_height), 5)
-        pygame.draw.line(self.surface, (200, 0, 0), (0,0), (self.map_width,0), 5)
+        # pygame.draw.line(self.surface, (200, 0, 0), (0,0), (self.map_width,0), 5)
 
         # Draw obstacles
         for obs in self.obstacles:

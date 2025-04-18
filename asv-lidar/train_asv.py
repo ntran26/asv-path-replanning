@@ -8,7 +8,9 @@ from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.callbacks import BaseCallback
-from asv_lidar_gym_continuous import ASVLidarEnv, MAP_WIDTH, MAP_HEIGHT
+from asv_lidar_gym_continuous import ASVLidarEnv
+from test_run import testEnv
+
 import multiprocessing
 
 if __name__=='__main__':
@@ -34,7 +36,7 @@ if __name__=='__main__':
     gae_lambda = 0.95
     clip_range = 0.2
     clip_range_vf = None
-    ent_coef = 0.01
+    ent_coef = 0.001
     vf_coef = 0.5
 
     class CustomCallback(BaseCallback):
@@ -78,6 +80,8 @@ if __name__=='__main__':
                     learning_rate=learn_rate, n_steps=n_steps, batch_size=batch_size, n_epochs=n_epochs,
                     gamma=gamma, gae_lambda=gae_lambda, clip_range=clip_range, clip_range_vf=clip_range_vf,
                     ent_coef=ent_coef, vf_coef=vf_coef)
+        
+        # model = PPO("MultiInputPolicy", env, verbose=1, tensorboard_log="./ppo_asv_tensorboard/")
 
         # Training parameters
         timesteps = 1000000
@@ -127,8 +131,9 @@ if __name__=='__main__':
         # model = PPO.load("models/ppo_asv_model_180.zip")
         # model = PPO.load("models/ppo_asv_model_continuous_1.zip")
         # model = PPO.load("models/ppo_asv_model_continuous_2.zip")
+        # model = PPO.load("models/ppo_asv_model_continuous_3.zip")
 
-        env = ASVLidarEnv(render_mode="human")
+        env = testEnv(render_mode="human")
 
         obs, _ = env.reset()
         done = False
@@ -143,7 +148,7 @@ if __name__=='__main__':
         print(f"Test episode completed. Total reward: {total_reward}")
 
         # Save path taken as image
-        path_surface = pygame.Surface((MAP_WIDTH, MAP_HEIGHT))
+        path_surface = pygame.Surface((env.map_width, env.map_height))
         path_surface.fill((255,255,255))
 
         for i in range(1, len(env.asv_path)):
