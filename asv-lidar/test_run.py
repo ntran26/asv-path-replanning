@@ -8,6 +8,8 @@ from asv_lidar import Lidar, LIDAR_RANGE, LIDAR_BEAMS
 from images import BOAT_ICON
 import cv2
 
+TEST_CASE = 3
+
 UPDATE_RATE = 0.5
 RENDER_FPS = 10
 MAP_WIDTH = 400
@@ -26,14 +28,6 @@ rudder_action = {
 }
 
 class testEnv(gym.Env):
-    """ Autonomous Surface Vessel w/ LIDAR Gymnasium environment
-
-        Args:
-            render_mode (str): If/How to render the environment
-                "human" will render a pygame windows, episodes are run in real-time
-                None will not render, episodes run as fast as possible
-    """
-    
     metadata = {"render_modes": ["human"]}
 
     def __init__(
@@ -76,14 +70,6 @@ class testEnv(gym.Env):
         self.model = ShipModel()
         self.model._v = 4.5
 
-        """
-        Observation space:
-            lidar: an array of lidar range: [42 values]
-            pos: (x,y) coordinate of asv
-            hdg: heading/yaw of the asv
-            dhdg: rate of change of heading
-            tgt: horizontal offset of the asv from the path
-        """
         self.observation_space = Dict(
             {
                 "lidar": Box(low=0,high=LIDAR_RANGE,shape=(LIDAR_BEAMS,),dtype=np.int16),
@@ -130,10 +116,6 @@ class testEnv(gym.Env):
 
     def generate_path(self, start_x, start_y, goal_x, goal_y):
         # calculate number of waypoints
-        # if start_x != goal_x:
-        #     path_length = int(np.hypot(abs(goal_x - start_x), goal_y - goal_x))
-        # else:
-        #     path_length = abs(goal_y - start_y)
         path_length = max(2, int(np.hypot(abs(goal_x - start_x), abs(goal_y - start_y))))
 
         # record path coordinates
@@ -145,63 +127,74 @@ class testEnv(gym.Env):
 
         return path
     
-    def generate_obstacles(self, num_obs):
+    def generate_obstacles(self, test_case):
         obstacles = []
-        for _ in range(num_obs):
-            x = np.random.randint(50, self.map_width - 50)
-            y = np.random.randint(50, self.map_height - 150)
+        if test_case == 1:
+            x = 125
+            y = 300
+            obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
+        elif test_case == 2:
+            x = 100
+            y = 100
+            obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
+            x = 250
+            y = 200
+            obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
+            x = 175
+            y = 300
+            obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
+        elif test_case == 3:
+            x = 50
+            y = 300
+            obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
+            x = 110
+            obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
+            x = 170
+            obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
+            x = 230
+            obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
+            x = 340
+            obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
 
-            # ensure the obstacle is not close to start/goal 
-            if np.linalg.norm([x - self.start_x, y - self.start_y]) > 100 and \
-                np.linalg.norm([x - self.goal_x, y - self.goal_y]) > 100:
-                obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
-
-        # x1 = np.random.randint(50, self.map_width - 50)
-        # y1 = 100
-        # obstacles.append([(x1, y1), (x1+60, y1), (x1+60, y1+50), (x1, y1+50)])
-
-        # x2 = np.random.randint(50, self.map_width - 50)
-        # obstacles.append([(x2, 300), (x2 + 20, 350), (x2 - 20, 370), (x2 - 40, 330)])
-
-        # x = np.random.randint(50, self.map_width - 50)
-        # obstacles.append([(x, 300), (x + 20, 350), (x - 20, 370), (x - 40, 330)])
-
-        # x = np.random.randint(50, self.map_width - 50)
-        # obstacles.append([(x, 200), (x+50, 200), (x+50, 220), (x, 250)])
         return obstacles
 
     def reset(self,seed=None, options=None):
         super().reset(seed=seed)
 
-        # Randomize start position
-        self.start_y = self.map_height - 50
-        self.start_x = np.random.randint(50, self.map_width - 50)
-        # self.start_x = 100
+        if TEST_CASE == 1:
+            self.start_x = 150
+            self.start_y = 550
 
-        # Initialize asv position (fixed)
-        self.asv_x = self.map_width/2
-        self.asv_y = self.start_y
+            self.goal_x = 150
+            self.goal_y = 50
 
-        # Initialize asv position (random)
-        if self.start_x > 100 and self.start_x < self.map_width - 100:
-            self.asv_x = np.random.randint(self.start_x - 50, self.start_x + 50)
-        elif self.start_x <= 100:
-            self.asv_x = self.start_x + 50
-        elif self.start_x >= self.map_width - 100:
-            self.asv_x = self.start_x - 50
+            self.asv_x = 150
         
-        self.asv_y = self.start_y
+        elif TEST_CASE == 2:
+            self.start_x = 200
+            self.start_y = 550
+            
+            self.goal_x = 200
+            self.goal_y = 50
 
-        # Randomize goal position
-        self.goal_y = 50
-        self.goal_x = np.random.randint(50, self.map_width - 50)
-        # self.goal_x = self.start_x
+            self.asv_x = 200
+        
+        elif TEST_CASE == 3:
+            self.start_x = 50
+            self.start_y = 550
+
+            self.goal_x = 350
+            self.goal_y = 50
+
+            self.asv_x = 50
+
+        self.asv_y = self.start_y
 
         # Generate the path
         self.path = self.generate_path(self.start_x, self.start_y, self.goal_x, self.goal_y)
 
         # Generate static obstacles
-        self.obstacles = self.generate_obstacles(self.num_obs)
+        self.obstacles = self.generate_obstacles(TEST_CASE)
 
         # Initialize the ASV path list
         self.asv_path = [(self.asv_x, self.asv_y)]

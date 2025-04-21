@@ -20,9 +20,9 @@ if __name__=='__main__':
     TRAIN = 0
 
     # Choose algorithm
-    # algorithm = 'PPO'
+    algorithm = 'PPO'
     # algorithm = 'DDPG'
-    algorithm = 'SAC'
+    # algorithm = 'SAC'
 
     # Create the environment
 
@@ -146,15 +146,14 @@ if __name__=='__main__':
         # Load the trained model and test it
         if algorithm == 'PPO':
             model = PPO.load(MODEL_PATH)
+            # model = PPO.load("models/ppo_asv_model_continuous_1.zip")
+            # model = PPO.load("models/ppo_asv_model_continuous_2.zip")
+            # model = PPO.load("models/ppo_asv_model_continuous_3.zip")
         elif algorithm == 'SAC':
             model = SAC.load(MODEL_PATH)
         elif algorithm == 'DDPG':
             model = DDPG.load(MODEL_PATH)
-        # model = PPO.load("models/ppo_path_follow.zip")
-        # model = PPO.load("models/ppo_asv_model_180.zip")
-        # model = PPO.load("models/ppo_asv_model_continuous_1.zip")
-        # model = PPO.load("models/ppo_asv_model_continuous_2.zip")
-        # model = PPO.load("models/ppo_asv_model_continuous_3.zip")
+
 
         env = testEnv(render_mode="human")
 
