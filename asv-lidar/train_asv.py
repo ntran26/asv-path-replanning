@@ -2,7 +2,7 @@ import gymnasium as gym
 import numpy as np
 import pygame
 import matplotlib.pyplot as plt
-from stable_baselines3 import PPO
+from stable_baselines3 import PPO, DDPG, SAC
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3.common.monitor import Monitor
@@ -19,13 +19,22 @@ if __name__=='__main__':
     # Toggle between train and test
     TRAIN = 0
 
+    # Choose algorithm
+    # algorithm = 'PPO'
+    # algorithm = 'DDPG'
+    algorithm = 'SAC'
+
     # Create the environment
-    num_envs = 8
 
     def make_env():
         return Monitor(ASVLidarEnv(render_mode=None))   # monitor/logging
 
-    env = SubprocVecEnv([make_env for _ in range(num_envs)])    # parallelize training
+    if algorithm == 'PPO' or 'SAC':
+        num_envs = 8
+        env = SubprocVecEnv([make_env for _ in range(num_envs)])    # parallelize training
+    elif algorithm == 'DDPG':
+        num_envs = 1
+        env = Monitor(ASVLidarEnv(render_mode=None))
 
     # Hyperparamters
     learn_rate = 0.0001
@@ -40,7 +49,7 @@ if __name__=='__main__':
     vf_coef = 0.5
 
     class CustomCallback(BaseCallback):
-        def __init__(self, save_freq=500000, verbose=0):
+        def __init__(self, save_freq=100000, verbose=0):
             super(CustomCallback, self).__init__(verbose)
             self.save_freq = save_freq
             self.model_save_counter = 0
@@ -69,29 +78,38 @@ if __name__=='__main__':
             return True
 
     # Model save path
-    MODEL_PATH = "ppo_asv_model"
+    MODEL_PATH = f"{algorithm.lower()}_asv_model"
 
 
     #                       -------------- TRAINING --------------
 
     if TRAIN == 1:
         # Initialize PPO model
-        model = PPO("MultiInputPolicy", env, verbose=1, tensorboard_log="./ppo_asv_tensorboard/",
-                    learning_rate=learn_rate, n_steps=n_steps, batch_size=batch_size, n_epochs=n_epochs,
-                    gamma=gamma, gae_lambda=gae_lambda, clip_range=clip_range, clip_range_vf=clip_range_vf,
-                    ent_coef=ent_coef, vf_coef=vf_coef)
+        if algorithm == 'PPO':
+            model = PPO("MultiInputPolicy", env, verbose=1, tensorboard_log=f"./{algorithm.lower()}_log/",
+                        learning_rate=learn_rate, n_steps=n_steps, batch_size=batch_size, n_epochs=n_epochs,
+                        gamma=gamma, gae_lambda=gae_lambda, clip_range=clip_range, clip_range_vf=clip_range_vf,
+                        ent_coef=ent_coef, vf_coef=vf_coef)
+        elif algorithm == 'SAC':
+            model = SAC("MultiInputPolicy", env, verbose=1, tensorboard_log=f"./{algorithm.lower()}_log/",
+                        learning_rate=learn_rate, batch_size=batch_size, gamma=gamma, buffer_size=1000000,
+                        train_freq=1, gradient_steps=1, ent_coef='auto')
+        elif algorithm == 'DDPG':
+            model = DDPG("MultiInputPolicy", env, verbose=1, tensorboard_log=f"./{algorithm.lower()}_log/",
+                        learning_rate=learn_rate, batch_size=256, gamma=gamma, buffer_size=1000000,
+                        train_freq=(1, 'step'), gradient_steps=-1)
         
         # model = PPO("MultiInputPolicy", env, verbose=1, tensorboard_log="./ppo_asv_tensorboard/")
 
         # Training parameters
-        timesteps = 1000000
+        timesteps = 500000
         callback = CustomCallback()
 
         # Train the model
-        model.learn(total_timesteps=timesteps, tb_log_name="asv_ppo", callback=callback, progress_bar=True)
+        model.learn(total_timesteps=timesteps, tb_log_name=f"asv_{algorithm.lower()}", callback=callback, progress_bar=True)
 
         # Save the model
-        model.save("ppo_asv_model")
+        model.save(f"{algorithm.lower()}_asv_model")
         print("Model saved!")
 
         # Evaluate the model
@@ -126,7 +144,12 @@ if __name__=='__main__':
 
     else:
         # Load the trained model and test it
-        model = PPO.load(MODEL_PATH)
+        if algorithm == 'PPO':
+            model = PPO.load(MODEL_PATH)
+        elif algorithm == 'SAC':
+            model = SAC.load(MODEL_PATH)
+        elif algorithm == 'DDPG':
+            model = DDPG.load(MODEL_PATH)
         # model = PPO.load("models/ppo_path_follow.zip")
         # model = PPO.load("models/ppo_asv_model_180.zip")
         # model = PPO.load("models/ppo_asv_model_continuous_1.zip")

@@ -108,8 +108,8 @@ class testEnv(gym.Env):
         self.map_border = [
                             [(0, 0), (0, self.map_height),(0,0),(0, self.map_height)],  
                             [(0, self.map_height), (self.map_width, self.map_height),(0, self.map_height),(self.map_width, self.map_height)],
-                            [(self.map_width, self.map_height), (self.map_width, 0),(self.map_width, self.map_height),(self.map_width, 0)]
-                            # [(0, 0), (self.map_width, 0),(0,0),(self.map_width, 0)]
+                            [(self.map_width, self.map_height), (self.map_width, 0),(self.map_width, self.map_height),(self.map_width, 0)],
+                            [(0, 0), (self.map_width, 0),(0,0),(self.map_width, 0)]
                         ]
 
         # Initialize video recorder
