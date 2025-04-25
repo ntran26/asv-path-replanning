@@ -151,8 +151,8 @@ class testEnv(gym.Env):
             obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
             x = 170
             obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
-            x = 230
-            obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
+            # x = 230
+            # obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
             x = 340
             obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
 
@@ -266,42 +266,8 @@ class testEnv(gym.Env):
         # append new coordinate of asv
         self.asv_path.append((self.asv_x, self.asv_y))
 
-        """
-        Reward function:
-            For each step taken: -1
-            Stay on or near the path: 0
-            Go outside of the map: -10
-            Move in reverse: -10
-            Collide with an obstacle: -10
-        """
-        # # step loss
-        # reward = -1
-        # if self.tgt < self.path_range and self.tgt > -self.path_range:
-        #     # gradually increase the reward as the asv approaches the path
-        #     reward = 1 - (abs(self.tgt) / self.path_range)
-        # if dy < 0:
-        #     # moving in reverse
-        #     reward = -10
-        # if self.asv_y <= 0 and self.tgt <= self.path_range:
-        #     reward = 20
-        # # collision
-        # lidar_list = self.lidar.ranges.astype(np.int64)
-        # if np.any(lidar_list <= self.collision):
-        #     reward = -20
-        # # off border
-        # if self.asv_x <= 0 or self.asv_x >= self.map_width or self.asv_y >= self.map_height:
-        #     reward = -20
-        # # head towards goal
-        # if self.angle_diff >= 20 or self.angle_diff <= -20:
-        #     reward = -abs(self.angle_diff/10)
-        # elif self.angle_diff < 20 and self.angle_diff > -20:
-        #     reward = abs(self.angle_diff/10)
-
         # penatly for each step taken
-        if dy < 0:
-            r_exist = -10
-        else:
-            r_exist = -0.1
+        r_exist = -1
 
         # heading alignment reward (reward = 1 if aligned, -1 if opposite)
         angle_diff_rad = np.radians(self.angle_diff)
@@ -351,7 +317,7 @@ class testEnv(gym.Env):
         pygame.draw.line(self.surface, (200, 0, 0), (0,0), (0,self.map_height), 5)
         pygame.draw.line(self.surface, (200, 0, 0), (0,self.map_height), (self.map_width,self.map_height), 5)
         pygame.draw.line(self.surface, (200, 0, 0), (self.map_width,0), (self.map_width,self.map_height), 5)
-        # pygame.draw.line(self.surface, (200, 0, 0), (0,0), (self.map_width,0), 5)
+        pygame.draw.line(self.surface, (200, 0, 0), (0,0), (self.map_width,0), 5)
 
         # Draw obstacles
         for obs in self.obstacles:
@@ -361,7 +327,7 @@ class testEnv(gym.Env):
         self.lidar.render(self.surface)
 
         # Draw Path
-        pygame.draw.line(self.surface,(0,200,0),(self.start_x,self.start_y),(self.goal_x,self.goal_y),5)
+        self.draw_dashed_line(self.surface,(0,200,0),(self.start_x,self.start_y),(self.goal_x,self.goal_y),width=5)
         pygame.draw.circle(self.surface,(100,0,0),(self.tgt_x,self.tgt_y),5)
 
         # Draw destination
@@ -397,3 +363,16 @@ class testEnv(gym.Env):
                 self.video_writer = cv2.VideoWriter('asv_lidar.mp4', fourcc, self.video_fps, self.frame_size)
 
             self.video_writer.write(frame)
+    
+    def draw_dashed_line(self, surface, color, start_pos, end_pos, width=1, dash_length=10, exclude_corner=True):
+        # convert to numpy array
+        start_pos = np.array(start_pos)
+        end_pos = np.array(end_pos)
+
+        # get distance between start and end pos
+        length = np.linalg.norm(end_pos - start_pos)
+        dash_amount = int(length/dash_length)
+
+        dash_knots = np.array([np.linspace(start_pos[i], end_pos[i], dash_amount) for i in range(2)]).transpose()
+        
+        return [pygame.draw.line(surface, color, tuple(dash_knots[n]), tuple(dash_knots[n+1]), width) for n in range(int(exclude_corner), dash_amount - int(exclude_corner), 2)]

@@ -129,11 +129,6 @@ class ASVLidarEnv(gym.Env):
         }
 
     def generate_path(self, start_x, start_y, goal_x, goal_y):
-        # calculate number of waypoints
-        # if start_x != goal_x:
-        #     path_length = int(np.hypot(abs(goal_x - start_x), goal_y - goal_x))
-        # else:
-        #     path_length = abs(goal_y - start_y)
         path_length = max(2, int(np.hypot(abs(goal_x - start_x), abs(goal_y - start_y))))
 
         # record path coordinates
@@ -308,7 +303,7 @@ class ASVLidarEnv(gym.Env):
         # if dy < 0:
         #     r_exist = -10
         # else:
-        r_exist = -0.1
+        r_exist = -1
 
         # heading alignment reward (reward = 1 if aligned, -1 if opposite)
         angle_diff_rad = np.radians(self.angle_diff)
@@ -334,7 +329,7 @@ class ASVLidarEnv(gym.Env):
             r_goal = 0
 
         # Combined rewards
-        lambda_ = 0.8       # weighting factor
+        lambda_ = 0.9       # weighting factor
         # reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_goal + r_heading
 
         if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):
@@ -344,6 +339,19 @@ class ASVLidarEnv(gym.Env):
 
         terminated = self.check_done((self.asv_x, self.asv_y))
         return self._get_obs(), reward, terminated, False, {}
+    
+    def draw_dashed_line(self, surface, color, start_pos, end_pos, width=1, dash_length=10, exclude_corner=True):
+        # convert to numpy array
+        start_pos = np.array(start_pos)
+        end_pos = np.array(end_pos)
+
+        # get distance between start and end pos
+        length = np.linalg.norm(end_pos - start_pos)
+        dash_amount = int(length/dash_length)
+
+        dash_knots = np.array([np.linspace(start_pos[i], end_pos[i], dash_amount) for i in range(2)]).transpose()
+        
+        return [pygame.draw.line(surface, color, tuple(dash_knots[n]), tuple(dash_knots[n+1]), width) for n in range(int(exclude_corner), dash_amount - int(exclude_corner), 2)]
 
     def render(self):
         if self.render_mode != 'human':
@@ -368,7 +376,7 @@ class ASVLidarEnv(gym.Env):
         self.lidar.render(self.surface)
 
         # Draw Path
-        pygame.draw.line(self.surface,(0,200,0),(self.start_x,self.start_y),(self.goal_x,self.goal_y),5)
+        self.draw_dashed_line(self.surface,(0,200,0),(self.start_x,self.start_y),(self.goal_x,self.goal_y),width=5)
         pygame.draw.circle(self.surface,(100,0,0),(self.tgt_x,self.tgt_y),5)
 
         # Draw destination

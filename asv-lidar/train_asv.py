@@ -20,9 +20,9 @@ if __name__=='__main__':
     TRAIN = 0
 
     # Choose algorithm
-    algorithm = 'PPO'
+    # algorithm = 'PPO'
     # algorithm = 'DDPG'
-    # algorithm = 'SAC'
+    algorithm = 'SAC'
 
     # Create the environment
 
@@ -49,7 +49,7 @@ if __name__=='__main__':
     vf_coef = 0.5
 
     class CustomCallback(BaseCallback):
-        def __init__(self, save_freq=100000, verbose=0):
+        def __init__(self, save_freq=500000, verbose=0):
             super(CustomCallback, self).__init__(verbose)
             self.save_freq = save_freq
             self.model_save_counter = 0
@@ -102,7 +102,7 @@ if __name__=='__main__':
         # model = PPO("MultiInputPolicy", env, verbose=1, tensorboard_log="./ppo_asv_tensorboard/")
 
         # Training parameters
-        timesteps = 500000
+        timesteps = 1000000
         callback = CustomCallback()
 
         # Train the model
@@ -145,10 +145,11 @@ if __name__=='__main__':
     else:
         # Load the trained model and test it
         if algorithm == 'PPO':
-            model = PPO.load(MODEL_PATH)
-            # model = PPO.load("models/ppo_asv_model_continuous_1.zip")
+            # model = PPO.load(MODEL_PATH)
+            model = PPO.load("models/ppo_asv_model_continuous_1.zip")
             # model = PPO.load("models/ppo_asv_model_continuous_2.zip")
             # model = PPO.load("models/ppo_asv_model_continuous_3.zip")
+            # model = PPO.load("models/model_1000000.zip")
         elif algorithm == 'SAC':
             model = SAC.load(MODEL_PATH)
         elif algorithm == 'DDPG':
@@ -156,6 +157,7 @@ if __name__=='__main__':
 
 
         env = testEnv(render_mode="human")
+        # env = ASVLidarEnv(render_mode="human")
 
         obs, _ = env.reset()
         done = False
@@ -176,18 +178,19 @@ if __name__=='__main__':
         for i in range(1, len(env.asv_path)):
             pygame.draw.circle(path_surface, (0, 0, 200), env.asv_path[i], 3)
 
-        display = pygame.display.set_mode(env.screen_size)
-        os = pygame.transform.rotozoom(env.icon,-env.asv_h,2)
-        path_surface.blit(os,os.get_rect(center=(env.asv_x,env.asv_y)))
-        display.blit(path_surface,[0,0])
-
         # Draw obstacles
         for obs in env.obstacles:
             pygame.draw.polygon(path_surface, (200, 0, 0), obs)
         
         # Draw Path
-        pygame.draw.line(path_surface,(0,200,0),(env.start_x,env.start_y),(env.goal_x,env.goal_y),5)
+        env.draw_dashed_line(path_surface,(0,200,0),(env.start_x,env.start_y),(env.goal_x,env.goal_y),width=5)
         pygame.draw.circle(path_surface,(100,0,0),(env.tgt_x,env.tgt_y),5)
+
+        # Draw ship
+        display = pygame.display.set_mode(env.screen_size)
+        os = pygame.transform.rotozoom(env.icon,-env.asv_h,2)
+        path_surface.blit(os,os.get_rect(center=(env.asv_x,env.asv_y)))
+        display.blit(path_surface,[0,0])
 
         # # Draw map boundaries
         # pygame.draw.line(path_surface, (200, 0, 0), (0,0), (0,env.map_height), 5)
