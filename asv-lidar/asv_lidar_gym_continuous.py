@@ -83,6 +83,7 @@ class ASVLidarEnv(gym.Env):
             hdg: heading/yaw of the asv
             dhdg: rate of change of heading
             tgt: horizontal offset of the asv from the path
+            target_heading: heading error with respect to the destination point
         """
         self.observation_space = Dict(
             {
@@ -329,7 +330,7 @@ class ASVLidarEnv(gym.Env):
             r_goal = 0
 
         # Combined rewards
-        lambda_ = 0.9       # weighting factor
+        lambda_ = 0.8       # weighting factor
         # reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_goal + r_heading
 
         if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):

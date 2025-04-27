@@ -21,8 +21,8 @@ if __name__=='__main__':
 
     # Choose algorithm
     # algorithm = 'PPO'
-    # algorithm = 'DDPG'
-    algorithm = 'SAC'
+    algorithm = 'DDPG'
+    # algorithm = 'SAC'
 
     # Create the environment
 
@@ -96,7 +96,7 @@ if __name__=='__main__':
                         train_freq=1, gradient_steps=1, ent_coef='auto')
         elif algorithm == 'DDPG':
             model = DDPG("MultiInputPolicy", env, verbose=1, tensorboard_log=f"./{algorithm.lower()}_log/",
-                        learning_rate=learn_rate, batch_size=256, gamma=gamma, buffer_size=1000000,
+                        learning_rate=learn_rate, batch_size=batch_size, gamma=gamma, buffer_size=1000000,
                         train_freq=(1, 'step'), gradient_steps=-1)
         
         # model = PPO("MultiInputPolicy", env, verbose=1, tensorboard_log="./ppo_asv_tensorboard/")
