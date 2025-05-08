@@ -34,7 +34,8 @@ class testEnv(gym.Env):
             self, 
             render_mode:str = 'human'
             ) -> None:
-        
+        self.test_case = TEST_CASE
+
         self.map_width = MAP_WIDTH
         self.map_height = MAP_HEIGHT
 
@@ -129,7 +130,16 @@ class testEnv(gym.Env):
     
     def generate_obstacles(self, test_case):
         obstacles = []
-        if test_case == 1:
+        if test_case == 0:          # 10 random obstacles
+            for _ in range(10):
+                x = np.random.randint(50, self.map_width - 50)
+                y = np.random.randint(50, self.map_height - 150)
+
+                # ensure the obstacle is not close to start/goal 
+                if np.linalg.norm([x - self.start_x, y - self.start_y]) > 100 and \
+                    np.linalg.norm([x - self.goal_x, y - self.goal_y]) > 100:
+                    obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
+        elif test_case == 1:
             x = 125
             y = 300
             obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
@@ -161,7 +171,22 @@ class testEnv(gym.Env):
     def reset(self,seed=None, options=None):
         super().reset(seed=seed)
 
-        if TEST_CASE == 1:
+        if self.test_case == 0:
+            # Randomize start position
+            self.start_y = self.map_height - 50
+            self.start_x = np.random.randint(50, self.map_width - 50)
+            # Randomize goal position
+            self.goal_y = 50
+            self.goal_x = np.random.randint(50, self.map_width - 50)
+            # Initialize asv position (random)
+            if self.start_x > 100 and self.start_x < self.map_width - 100:
+                self.asv_x = np.random.randint(self.start_x - 50, self.start_x + 50)
+            elif self.start_x <= 100:
+                self.asv_x = self.start_x + 50
+            elif self.start_x >= self.map_width - 100:
+                self.asv_x = self.start_x - 50
+
+        if self.test_case == 1:
             self.start_x = 150
             self.start_y = 550
 
@@ -170,7 +195,7 @@ class testEnv(gym.Env):
 
             self.asv_x = 150
         
-        elif TEST_CASE == 2:
+        elif self.test_case == 2:
             self.start_x = 200
             self.start_y = 550
             
@@ -179,7 +204,7 @@ class testEnv(gym.Env):
 
             self.asv_x = 200
         
-        elif TEST_CASE == 3:
+        elif self.test_case == 3:
             self.start_x = 50
             self.start_y = 550
 
@@ -194,7 +219,7 @@ class testEnv(gym.Env):
         self.path = self.generate_path(self.start_x, self.start_y, self.goal_x, self.goal_y)
 
         # Generate static obstacles
-        self.obstacles = self.generate_obstacles(TEST_CASE)
+        self.obstacles = self.generate_obstacles(self.test_case)
 
         # Initialize the ASV path list
         self.asv_path = [(self.asv_x, self.asv_y)]
@@ -296,10 +321,10 @@ class testEnv(gym.Env):
         lambda_ = 0.7       # weighting factor
         reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_goal + r_heading
 
-        # if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):
-        #     reward = -1000
-        # else:
-        #     reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
+        if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):
+            reward = -1000
+        else:
+            reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
 
         terminated = self.check_done((self.asv_x, self.asv_y))
         return self._get_obs(), reward, terminated, False, {}

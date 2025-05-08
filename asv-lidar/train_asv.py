@@ -2,7 +2,7 @@ import gymnasium as gym
 import numpy as np
 import pygame
 import matplotlib.pyplot as plt
-from stable_baselines3 import PPO, DDPG, SAC
+from stable_baselines3 import PPO, DDPG, SAC, TD3
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3.common.monitor import Monitor
@@ -19,9 +19,11 @@ if __name__=='__main__':
     # Toggle between train and test
     TRAIN = 0
 
+    TEST_CASE = 1
+
     # Choose algorithm
     # algorithm = 'PPO'
-    algorithm = 'DDPG'
+    algorithm = 'TD3'
     # algorithm = 'SAC'
 
     # Create the environment
@@ -29,12 +31,12 @@ if __name__=='__main__':
     def make_env():
         return Monitor(ASVLidarEnv(render_mode=None))   # monitor/logging
 
-    if algorithm == 'PPO' or 'SAC':
+    if algorithm == 'PPO' or 'SAC' or 'TD3':
         num_envs = 8
         env = SubprocVecEnv([make_env for _ in range(num_envs)])    # parallelize training
-    elif algorithm == 'DDPG':
-        num_envs = 1
-        env = Monitor(ASVLidarEnv(render_mode=None))
+    # elif algorithm == 'TD3':
+    #     num_envs = 1
+    #     env = Monitor(ASVLidarEnv(render_mode=None))
 
     # Hyperparamters
     learn_rate = 0.0001
@@ -94,10 +96,10 @@ if __name__=='__main__':
             model = SAC("MultiInputPolicy", env, verbose=1, tensorboard_log=f"./{algorithm.lower()}_log/",
                         learning_rate=learn_rate, batch_size=batch_size, gamma=gamma, buffer_size=1000000,
                         train_freq=1, gradient_steps=1, ent_coef='auto')
-        elif algorithm == 'DDPG':
-            model = DDPG("MultiInputPolicy", env, verbose=1, tensorboard_log=f"./{algorithm.lower()}_log/",
-                        learning_rate=learn_rate, batch_size=batch_size, gamma=gamma, buffer_size=1000000,
-                        train_freq=(1, 'step'), gradient_steps=-1)
+        elif algorithm == 'TD3':
+            model = TD3("MultiInputPolicy", env, verbose=1, tensorboard_log=f"./{algorithm.lower()}_log/",
+                    learning_rate=learn_rate, batch_size=batch_size, gamma=gamma, buffer_size=1000000,
+                    train_freq=(1, 'step'), gradient_steps=-1)
         
         # model = PPO("MultiInputPolicy", env, verbose=1, tensorboard_log="./ppo_asv_tensorboard/")
 
@@ -152,11 +154,13 @@ if __name__=='__main__':
             # model = PPO.load("models/model_1000000.zip")
         elif algorithm == 'SAC':
             model = SAC.load(MODEL_PATH)
-        elif algorithm == 'DDPG':
-            model = DDPG.load(MODEL_PATH)
+            model = SAC.load("models/sac_asv_model_1.zip")
+        elif algorithm == 'TD3':
+            model = TD3.load(MODEL_PATH)
 
 
         env = testEnv(render_mode="human")
+        env.test_case = TEST_CASE
         # env = ASVLidarEnv(render_mode="human")
 
         obs, _ = env.reset()

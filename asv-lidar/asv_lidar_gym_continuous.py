@@ -174,9 +174,9 @@ class ASVLidarEnv(gym.Env):
         self.start_x = np.random.randint(50, self.map_width - 50)
         # self.start_x = 100
 
-        # Initialize asv position (fixed)
-        self.asv_x = self.map_width/2
-        self.asv_y = self.start_y
+        # # Initialize asv position (fixed)
+        # self.asv_x = self.map_width/2
+        # self.asv_y = self.start_y
 
         # Initialize asv position (random)
         if self.start_x > 100 and self.start_x < self.map_width - 100:
