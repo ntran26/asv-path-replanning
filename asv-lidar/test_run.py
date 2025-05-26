@@ -125,8 +125,9 @@ class testEnv(gym.Env):
 
         # store path coordinates
         path = np.column_stack((path_x, path_y))
+        converted_path = [tuple(map(int, point)) for point in path]
 
-        return path
+        return converted_path
     
     def generate_obstacles(self, test_case):
         obstacles = []
