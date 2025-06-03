@@ -141,10 +141,12 @@ class testEnv(gym.Env):
                     np.linalg.norm([x - self.goal_x, y - self.goal_y]) > 100:
                     obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
         elif test_case == 1:
+            obstacles = []
+        elif test_case == 2:
             x = 125
             y = 300
             obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
-        elif test_case == 2:
+        elif test_case == 5:
             x = 100
             y = 100
             obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
@@ -154,7 +156,7 @@ class testEnv(gym.Env):
             x = 175
             y = 300
             obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
-        elif test_case == 3:
+        elif test_case == 6:
             x = 50
             y = 300
             obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
@@ -186,8 +188,17 @@ class testEnv(gym.Env):
                 self.asv_x = self.start_x + 50
             elif self.start_x >= self.map_width - 100:
                 self.asv_x = self.start_x - 50
+        
+        elif self.test_case == 1:
+            self.start_x = 150
+            self.start_y = 550
 
-        if self.test_case == 1:
+            self.goal_x = 150
+            self.goal_y = 50
+
+            self.asv_x = 150
+
+        elif self.test_case == 2:
             self.start_x = 150
             self.start_y = 550
 
@@ -196,7 +207,7 @@ class testEnv(gym.Env):
 
             self.asv_x = 150
         
-        elif self.test_case == 2:
+        elif self.test_case == 5:
             self.start_x = 200
             self.start_y = 550
             
@@ -205,7 +216,7 @@ class testEnv(gym.Env):
 
             self.asv_x = 200
         
-        elif self.test_case == 3:
+        elif self.test_case == 6:
             self.start_x = 50
             self.start_y = 550
 

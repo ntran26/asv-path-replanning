@@ -19,14 +19,14 @@ if __name__=='__main__':
     multiprocessing.freeze_support()
 
     # Toggle between train and test
-    TRAIN = 2
+    TRAIN = 0
 
-    TEST_CASE = 3
+    TEST_CASE = 1
 
     # Choose algorithm
-    algorithm = 'PPO'
+    # algorithm = 'PPO'
     # algorithm = 'TD3'
-    # algorithm = 'SAC'
+    algorithm = 'SAC'
 
     # Create the environment
 
@@ -262,15 +262,16 @@ if __name__=='__main__':
 
         # Plot with matplotlib
 
-        plt.figure()
+        plt.figure(figsize=(6,10))
 
         for i in range(1, len(env.asv_path)):
             pygame.draw.circle(path_surface, (0, 0, 200), env.asv_path[i], 3)
         plt.plot(*zip(*asv_path), label="ASV Path", color="blue")
+        plt.plot(*zip(*path), label="Path", color="green", alpha=0.5, linestyle="--")
         plt.scatter(*start, color='green', label='Start')
         plt.scatter(*goal, color='yellow', label='Goal')
         for obs in obstacles:
-            poly = plt.Polygon(obs, color='red', alpha=0.3)
+            poly = plt.Polygon(obs, color='red')
             plt.gca().add_patch(poly)
 
         plt.gca().invert_yaxis()
@@ -279,7 +280,9 @@ if __name__=='__main__':
         plt.ylabel('Y')
         plt.title('ASV Path Visualization')
         plt.legend()
-        plt.axis('equal')
-        plt.grid(True)
+        # plt.axis('equal')
+        plt.xlim((0,400))
+        plt.ylim((600,0))
+        plt.grid(False)
         plt.show()
 
