@@ -152,18 +152,6 @@ class ASVLidarEnv(gym.Env):
                 np.linalg.norm([x - self.goal_x, y - self.goal_y]) > 100:
                 obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
 
-        # x1 = np.random.randint(50, self.map_width - 50)
-        # y1 = 100
-        # obstacles.append([(x1, y1), (x1+60, y1), (x1+60, y1+50), (x1, y1+50)])
-
-        # x2 = np.random.randint(50, self.map_width - 50)
-        # obstacles.append([(x2, 300), (x2 + 20, 350), (x2 - 20, 370), (x2 - 40, 330)])
-
-        # x = np.random.randint(50, self.map_width - 50)
-        # obstacles.append([(x, 300), (x + 20, 350), (x - 20, 370), (x - 40, 330)])
-
-        # x = np.random.randint(50, self.map_width - 50)
-        # obstacles.append([(x, 200), (x+50, 200), (x+50, 220), (x, 250)])
         return obstacles
 
     def reset(self,seed=None, options=None):
@@ -197,6 +185,7 @@ class ASVLidarEnv(gym.Env):
         self.path = self.generate_path(self.start_x, self.start_y, self.goal_x, self.goal_y)
 
         # Generate static obstacles
+        self.num_obs = np.random.randint(0, NUM_OBS)
         self.obstacles = self.generate_obstacles(self.num_obs)
 
         # Initialize the ASV path list
@@ -270,35 +259,8 @@ class ASVLidarEnv(gym.Env):
         self.asv_path.append((self.asv_x, self.asv_y))
 
         """
-        Reward function:
-            For each step taken: -1
-            Stay on or near the path: 0
-            Go outside of the map: -10
-            Move in reverse: -10
-            Collide with an obstacle: -10
+        Reward function
         """
-        # # step loss
-        # reward = -1
-        # if self.tgt < self.path_range and self.tgt > -self.path_range:
-        #     # gradually increase the reward as the asv approaches the path
-        #     reward = 1 - (abs(self.tgt) / self.path_range)
-        # if dy < 0:
-        #     # moving in reverse
-        #     reward = -10
-        # if self.asv_y <= 0 and self.tgt <= self.path_range:
-        #     reward = 20
-        # # collision
-        # lidar_list = self.lidar.ranges.astype(np.int64)
-        # if np.any(lidar_list <= self.collision):
-        #     reward = -20
-        # # off border
-        # if self.asv_x <= 0 or self.asv_x >= self.map_width or self.asv_y >= self.map_height:
-        #     reward = -20
-        # # head towards goal
-        # if self.angle_diff >= 20 or self.angle_diff <= -20:
-        #     reward = -abs(self.angle_diff/10)
-        # elif self.angle_diff < 20 and self.angle_diff > -20:
-        #     reward = abs(self.angle_diff/10)
 
         # penatly for each step taken
         # if dy < 0:

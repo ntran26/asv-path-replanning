@@ -19,9 +19,12 @@ if __name__=='__main__':
     multiprocessing.freeze_support()
 
     # Toggle between train and test
+    # 0: test
+    # 1: train
+    # 2: plot using data
     TRAIN = 0
 
-    TEST_CASE = 1
+    TEST_CASE = 6
 
     # Choose algorithm
     # algorithm = 'PPO'
@@ -155,7 +158,7 @@ if __name__=='__main__':
             # model = PPO.load("models/ppo_asv_model_continuous_3.zip")
         elif algorithm == 'SAC':
             model = SAC.load(MODEL_PATH)
-            model = SAC.load("models/sac_asv_model_1.zip")
+            # model = SAC.load("models/sac_asv_model_1.zip")
         elif algorithm == 'TD3':
             model = TD3.load(MODEL_PATH)
 
