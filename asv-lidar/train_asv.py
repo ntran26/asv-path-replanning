@@ -24,12 +24,12 @@ if __name__=='__main__':
     # 2: plot using data
     TRAIN = 0
 
-    TEST_CASE = 6
+    TEST_CASE = 2
 
     # Choose algorithm
-    # algorithm = 'PPO'
+    algorithm = 'PPO'
     # algorithm = 'TD3'
-    algorithm = 'SAC'
+    # algorithm = 'SAC'
 
     # Create the environment
 
@@ -109,7 +109,7 @@ if __name__=='__main__':
         # model = PPO("MultiInputPolicy", env, verbose=1, tensorboard_log="./ppo_asv_tensorboard/")
 
         # Training parameters
-        timesteps = 1000000
+        timesteps = 2000000
         callback = CustomCallback()
 
         # Train the model
@@ -153,12 +153,12 @@ if __name__=='__main__':
         # Load the trained model and test it
         if algorithm == 'PPO':
             # model = PPO.load(MODEL_PATH)
-            model = PPO.load("models/ppo_asv_model_continuous_1.zip")
-            # model = PPO.load("models/ppo_asv_model_continuous_2.zip")
-            # model = PPO.load("models/ppo_asv_model_continuous_3.zip")
+            # model = PPO.load("models/ppo_asv_model_v1.zip")
+            model = PPO.load("models/ppo_asv_model_v2.zip")
         elif algorithm == 'SAC':
-            model = SAC.load(MODEL_PATH)
-            # model = SAC.load("models/sac_asv_model_1.zip")
+            # model = SAC.load(MODEL_PATH)
+            # model = SAC.load("models/sac_asv_model_v1.zip")
+            model = SAC.load("models/sac_asv_model_v2.zip")
         elif algorithm == 'TD3':
             model = TD3.load(MODEL_PATH)
 
@@ -223,6 +223,8 @@ if __name__=='__main__':
         # pygame.draw.line(path_surface, (200, 0, 0), (0,0), (env.map_width,0), 5)
 
         pygame.image.save(path_surface, "asv_path_result.png")
+
+    #                       -------------- PLOTTING --------------
 
     else:
         # define environment

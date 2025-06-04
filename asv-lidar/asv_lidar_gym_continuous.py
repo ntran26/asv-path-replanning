@@ -266,7 +266,7 @@ class ASVLidarEnv(gym.Env):
         # if dy < 0:
         #     r_exist = -10
         # else:
-        r_exist = -1
+        r_exist = -0.1
 
         # heading alignment reward (reward = 1 if aligned, -1 if opposite)
         angle_diff_rad = np.radians(self.angle_diff)
@@ -295,10 +295,10 @@ class ASVLidarEnv(gym.Env):
         lambda_ = 0.8       # weighting factor
         # reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_goal + r_heading
 
-        if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):
-            reward = -1000
-        else:
-            reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
+        # if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):
+        #     reward = -1000
+        # else:
+        reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
 
         terminated = self.check_done((self.asv_x, self.asv_y))
         return self._get_obs(), reward, terminated, False, {}

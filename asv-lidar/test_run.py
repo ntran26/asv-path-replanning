@@ -143,9 +143,9 @@ class testEnv(gym.Env):
         elif test_case == 1:
             obstacles = []
         elif test_case == 2:
-            x = 125
-            y = 300
-            obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
+            x = 150
+            y = 250
+            obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
         elif test_case == 5:
             x = 100
             y = 100
