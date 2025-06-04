@@ -27,12 +27,12 @@ if __name__=='__main__':
     # 2: plot using data
     TRAIN = 2
 
-    TEST_CASE = 6
+    TEST_CASE = 0
 
     # Choose algorithm
-    # algorithm = 'PPO'
+    algorithm = 'PPO'
     # algorithm = 'TD3'
-    algorithm = 'SAC'
+    # algorithm = 'SAC'
 
     # Create the environment
 
@@ -183,6 +183,7 @@ if __name__=='__main__':
 
         # Save data
         result_data = {
+            "heading": env.asv_h,
             "start": [env.start_x, env.start_y],
             "goal": [env.goal_x, env.goal_y],
             "obstacles": env.obstacles,
@@ -243,8 +244,8 @@ if __name__=='__main__':
 
     else:
         # load data file
-        ppo = "data/ppo_data_case_5.json"
-        sac = "data/sac_data_case_5.json"
+        ppo = "data/ppo_data_random_0.json"
+        sac = "data/sac_data_random_0.json"
         with open(ppo, "r") as f:
             ppo_data = json.load(f)
         with open(sac, "r") as f:
@@ -256,6 +257,8 @@ if __name__=='__main__':
         path = ppo_data["path"]
         ppo_path = ppo_data["asv_path"]
         sac_path = sac_data["asv_path"]
+        ppo_heading = ppo_data["heading"]
+        sac_heading = sac_data["heading"]
         
         # # plot data with pygame
 
@@ -289,12 +292,12 @@ if __name__=='__main__':
 
         # Load the boat icon image from bytes
         boat_img = Image.frombytes(BOAT_ICON["format"], BOAT_ICON["size"], BOAT_ICON["bytes"])
-        rotated_img = boat_img.rotate(45, expand=True, resample=Image.BICUBIC)
+        rotated_img = boat_img.rotate(-sac_heading, expand=True, resample=Image.BICUBIC)
         imgbox = OffsetImage(rotated_img, zoom=1.5)
         final_x, final_y = sac_path[-1]
         ab1 = AnnotationBbox(imgbox, (final_x, final_y), frameon=False)
 
-        rotated_img = boat_img.rotate(-90, expand=True, resample=Image.BICUBIC)
+        rotated_img = boat_img.rotate(-ppo_heading, expand=True, resample=Image.BICUBIC)
         imgbox = OffsetImage(rotated_img, zoom=1.5)
         final_x, final_y = ppo_path[-1]
         ab2 = AnnotationBbox(imgbox, (final_x, final_y), frameon=False)
