@@ -12,6 +12,9 @@ from asv_lidar_gym_continuous import ASVLidarEnv
 from test_run import testEnv
 import json
 import os
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+from PIL import Image
+from images import BOAT_ICON
 
 import multiprocessing
 
@@ -22,14 +25,14 @@ if __name__=='__main__':
     # 0: test
     # 1: train
     # 2: plot using data
-    TRAIN = 0
+    TRAIN = 2
 
-    TEST_CASE = 2
+    TEST_CASE = 99
 
     # Choose algorithm
-    algorithm = 'PPO'
+    # algorithm = 'PPO'
     # algorithm = 'TD3'
-    # algorithm = 'SAC'
+    algorithm = 'SAC'
 
     # Create the environment
 
@@ -195,6 +198,18 @@ if __name__=='__main__':
         with open("asv_data.json", "w") as f:
             json.dump(result_data, f, indent=4)
 
+        # save data of random test cases
+        if env.test_case == 0:
+            random_data = {
+                "start": [env.start_x, env.start_y],
+                "goal": [env.goal_x, env.goal_y],
+                "obstacles": env.obstacles,
+                "path": env.path,
+                "asv_start": env.asv_path[0]
+            }
+            with open("random_data.json","w") as f:
+                json.dump(random_data, f, indent=4)
+
         # Save path taken as image
         path_surface = pygame.Surface((env.map_width, env.map_height))
         path_surface.fill((255,255,255))
@@ -227,57 +242,72 @@ if __name__=='__main__':
     #                       -------------- PLOTTING --------------
 
     else:
-        # define environment
-        env = testEnv(render_mode="human")
-        env.test_case = TEST_CASE
-
         # load data file
-        with open("asv_data.json", "r") as f:
-            data = json.load(f)
+        with open("ppo_random_data_1.json", "r") as f:
+            ppo_data = json.load(f)
+        with open("sac_random_data_1.json", "r") as f:
+            sac_data = json.load(f)
         
-        # extract data
-        start = data["start"]
-        goal = data["goal"]
-        obstacles = data["obstacles"]
-        path = data["path"]
-        asv_path = data["asv_path"]
-
-        # plot data
-        path_surface = pygame.Surface((env.map_width, env.map_height))
-        path_surface.fill((255,255,255))
-
-        for i in range(1, len(asv_path)):
-            pygame.draw.circle(path_surface, (0, 0, 200), asv_path[i], 3)
-
-        # Draw obstacles
-        for obs in obstacles:
-            pygame.draw.polygon(path_surface, (200, 0, 0), obs)
+        start = ppo_data["start"]
+        goal = ppo_data["goal"]
+        obstacles = ppo_data["obstacles"]
+        path = ppo_data["path"]
+        ppo_path = ppo_data["asv_path"]
+        sac_path = sac_data["asv_path"]
         
-        # Draw Path
-        env.draw_dashed_line(path_surface,(0,200,0),(start[0],start[1]),(goal[0],goal[1]),width=5)
-        pygame.draw.circle(path_surface,(100,0,0),(goal[0],goal[1]),5)
+        # # plot data with pygame
 
-        # # Draw ship
-        # display = pygame.display.set_mode(env.screen_size)
-        # os_ = pygame.transform.rotozoom(env.icon,-asv_path[-1][1],2)
-        # path_surface.blit(os_,os_.get_rect(center=(asv_path[-1][0],asv_path[-1][1])))
-        # display.blit(path_surface,[0,0])
+        # # define environment
+        # env = testEnv(render_mode="human")
+        # env.test_case = TEST_CASE
 
-        pygame.image.save(path_surface, "asv_data_result.png")
+        # path_surface = pygame.Surface((env.map_width, env.map_height))
+        # path_surface.fill((255,255,255))
+
+        # # for i in range(1, len(asv_path)):
+        # #     pygame.draw.circle(path_surface, (0, 0, 200), asv_path[i], 3)
+
+        # # Draw obstacles
+        # for obs in obstacles:
+        #     pygame.draw.polygon(path_surface, (200, 0, 0), obs)
+        
+        # # Draw Path
+        # env.draw_dashed_line(path_surface,(0,200,0),(start[0],start[1]),(goal[0],goal[1]),width=5)
+        # pygame.draw.circle(path_surface,(100,0,0),(goal[0],goal[1]),5)
+
+        # # # Draw ship
+        # # display = pygame.display.set_mode(env.screen_size)
+        # # os_ = pygame.transform.rotozoom(env.icon,-asv_path[-1][1],2)
+        # # path_surface.blit(os_,os_.get_rect(center=(asv_path[-1][0],asv_path[-1][1])))
+        # # display.blit(path_surface,[0,0])
 
         # Plot with matplotlib
 
         plt.figure(figsize=(6,10))
 
-        for i in range(1, len(env.asv_path)):
-            pygame.draw.circle(path_surface, (0, 0, 200), env.asv_path[i], 3)
-        plt.plot(*zip(*asv_path), label="ASV Path", color="blue")
-        plt.plot(*zip(*path), label="Path", color="green", alpha=0.5, linestyle="--")
+        # Load the boat icon image from bytes
+        boat_img = Image.frombytes(BOAT_ICON["format"], BOAT_ICON["size"], BOAT_ICON["bytes"])
+
+        # Matplotlib-compatible image
+        rotated_img = boat_img.rotate(-25, expand=True)
+        imgbox = OffsetImage(rotated_img, zoom=1.5)
+
+        # Final coordinate to place the boat icon
+        final_x, final_y = sac_path[-1]
+
+        # Create annotation box
+        ab = AnnotationBbox(imgbox, (final_x, final_y), frameon=False)
+
+        plt.plot(*zip(*ppo_path), label="PPO Path", color="purple", linestyle="dashdot")
+        plt.plot(*zip(*sac_path), label="SAC Path", color="blue", linestyle="solid")
+        plt.plot(*zip(*path), label="Path", color="green", alpha=0.5, linestyle="dotted")
         plt.scatter(*start, color='green', label='Start')
-        plt.scatter(*goal, color='yellow', label='Goal')
+        plt.scatter(*goal, color='red', label='Goal')
         for obs in obstacles:
             poly = plt.Polygon(obs, color='red')
             plt.gca().add_patch(poly)
+        
+        plt.gca().add_artist(ab)
 
         plt.gca().invert_yaxis()
         
@@ -289,5 +319,6 @@ if __name__=='__main__':
         plt.xlim((0,400))
         plt.ylim((600,0))
         plt.grid(False)
+        plt.savefig("asv_path_random_1.png", dpi=300, bbox_inches='tight')
         plt.show()
 

@@ -6,9 +6,10 @@ import pygame.freetype
 from ship_model import ShipModel
 from asv_lidar import Lidar, LIDAR_RANGE, LIDAR_BEAMS
 from images import BOAT_ICON
+import json
 import cv2
 
-TEST_CASE = 3
+TEST_CASE = 0
 
 UPDATE_RATE = 0.5
 RENDER_FPS = 10
@@ -132,42 +133,60 @@ class testEnv(gym.Env):
     def generate_obstacles(self, test_case):
         obstacles = []
         if test_case == 0:          # 10 random obstacles
-            for _ in range(10):
+            for _ in range(np.random.randint(5,10)):
                 x = np.random.randint(50, self.map_width - 50)
                 y = np.random.randint(50, self.map_height - 150)
 
                 # ensure the obstacle is not close to start/goal 
                 if np.linalg.norm([x - self.start_x, y - self.start_y]) > 100 and \
                     np.linalg.norm([x - self.goal_x, y - self.goal_y]) > 100:
-                    obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
+                    # obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
+                    obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
+
         elif test_case == 1:
             obstacles = []
         elif test_case == 2:
             x = 150
-            y = 250
+            y = 300
             obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
-        elif test_case == 5:
-            x = 100
-            y = 100
-            obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
-            x = 250
-            y = 200
-            obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
+        elif test_case == 3:
+            x = 125
+            y = 300
+            obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
+        elif test_case == 4:
             x = 175
             y = 300
-            obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
+            obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
+        elif test_case == 5:
+            x = 125
+            y = 125
+            obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
+            x = 275
+            y = 225
+            obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
+            x = 200
+            y = 325
+            obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
         elif test_case == 6:
-            x = 50
-            y = 300
-            obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
-            x = 110
-            obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
-            x = 170
-            obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
+            x = 75
+            y = 325
+            obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
+
+            x = 135
+            obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
+
+            x = 195
+            obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
+
             # x = 230
             # obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
-            x = 340
-            obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
+            x = 365
+            obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
+        else:
+            # load data file
+            with open("random_data_1.json", "r") as f:
+                data = json.load(f)
+            obstacles = data["obstacles"]
 
         return obstacles
 
@@ -198,7 +217,7 @@ class testEnv(gym.Env):
 
             self.asv_x = 150
 
-        elif self.test_case == 2:
+        elif self.test_case >= 2 and self.test_case <= 4:
             self.start_x = 150
             self.start_y = 550
 
@@ -224,6 +243,16 @@ class testEnv(gym.Env):
             self.goal_y = 50
 
             self.asv_x = 50
+        
+        else:
+            # load data file
+            with open("random_data_1.json", "r") as f:
+                data = json.load(f)
+            self.start_x = data["start"][0]
+            self.start_y = data["start"][1]
+            self.goal_x = data["goal"][0]
+            self.goal_y = data["goal"][1]
+            self.asv_x = data["asv_start"][0]
 
         self.asv_y = self.start_y
 
@@ -330,7 +359,7 @@ class testEnv(gym.Env):
             r_goal = 0
 
         # Combined rewards
-        lambda_ = 0.7       # weighting factor
+        lambda_ = 0.8       # weighting factor
         reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_goal + r_heading
 
         if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):
