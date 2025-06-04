@@ -27,7 +27,7 @@ if __name__=='__main__':
     # 2: plot using data
     TRAIN = 2
 
-    TEST_CASE = 99
+    TEST_CASE = 6
 
     # Choose algorithm
     # algorithm = 'PPO'
@@ -207,7 +207,7 @@ if __name__=='__main__':
                 "path": env.path,
                 "asv_start": env.asv_path[0]
             }
-            with open("random_data.json","w") as f:
+            with open("data.json","w") as f:
                 json.dump(random_data, f, indent=4)
 
         # Save path taken as image
@@ -243,9 +243,11 @@ if __name__=='__main__':
 
     else:
         # load data file
-        with open("ppo_random_data_1.json", "r") as f:
+        ppo = "data/ppo_data_case_5.json"
+        sac = "data/sac_data_case_5.json"
+        with open(ppo, "r") as f:
             ppo_data = json.load(f)
-        with open("sac_random_data_1.json", "r") as f:
+        with open(sac, "r") as f:
             sac_data = json.load(f)
         
         start = ppo_data["start"]
@@ -287,16 +289,15 @@ if __name__=='__main__':
 
         # Load the boat icon image from bytes
         boat_img = Image.frombytes(BOAT_ICON["format"], BOAT_ICON["size"], BOAT_ICON["bytes"])
-
-        # Matplotlib-compatible image
-        rotated_img = boat_img.rotate(-25, expand=True)
+        rotated_img = boat_img.rotate(45, expand=True, resample=Image.BICUBIC)
         imgbox = OffsetImage(rotated_img, zoom=1.5)
-
-        # Final coordinate to place the boat icon
         final_x, final_y = sac_path[-1]
+        ab1 = AnnotationBbox(imgbox, (final_x, final_y), frameon=False)
 
-        # Create annotation box
-        ab = AnnotationBbox(imgbox, (final_x, final_y), frameon=False)
+        rotated_img = boat_img.rotate(-90, expand=True, resample=Image.BICUBIC)
+        imgbox = OffsetImage(rotated_img, zoom=1.5)
+        final_x, final_y = ppo_path[-1]
+        ab2 = AnnotationBbox(imgbox, (final_x, final_y), frameon=False)
 
         plt.plot(*zip(*ppo_path), label="PPO Path", color="purple", linestyle="dashdot")
         plt.plot(*zip(*sac_path), label="SAC Path", color="blue", linestyle="solid")
@@ -307,7 +308,8 @@ if __name__=='__main__':
             poly = plt.Polygon(obs, color='red')
             plt.gca().add_patch(poly)
         
-        plt.gca().add_artist(ab)
+        plt.gca().add_artist(ab1)
+        plt.gca().add_artist(ab2)
 
         plt.gca().invert_yaxis()
         
@@ -319,6 +321,6 @@ if __name__=='__main__':
         plt.xlim((0,400))
         plt.ylim((600,0))
         plt.grid(False)
-        plt.savefig("asv_path_random_1.png", dpi=300, bbox_inches='tight')
+        plt.savefig("asv_plot.png", dpi=300, bbox_inches='tight')
         plt.show()
 

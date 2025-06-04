@@ -1,5 +1,5 @@
 import gymnasium as gym
-from gymnasium.spaces import Dict, Box, Discrete
+from gymnasium.spaces import Dict, Box
 import numpy as np
 import pygame
 import pygame.freetype
@@ -9,7 +9,21 @@ from images import BOAT_ICON
 import json
 import cv2
 
+"""
+Test case 0: random start & goal points, random obstacles
+
+Test case 1: start & goal at center, no obstacles (path following)
+Test case 2: start & goal at center, single obstacle on path
+Test case 3: start & goal at center, single obstacle to the left of path
+Test case 4: start & goal at center, single obstacle to the right of path
+Test case 5: start & goal at center, 3 obstacles scatter along the path
+Test case 6: start & goal at each corner, 4 obstacles cover the path, leaving a single blank space 
+
+Else: take the setup from recorded data of a random obstacles scenario (test case 0)
+"""
+
 TEST_CASE = 0
+ENV_DATA = "data/env_setup/data_1"
 
 UPDATE_RATE = 0.5
 RENDER_FPS = 10
@@ -106,6 +120,8 @@ class testEnv(gym.Env):
         self.frame_size = (self.map_width, self.map_height)
         self.video_fps = RENDER_FPS
 
+        self.env_data = ENV_DATA
+
     def _get_obs(self):
         return {
             'lidar': self.lidar.ranges.astype(np.int16),
@@ -171,20 +187,15 @@ class testEnv(gym.Env):
             x = 75
             y = 325
             obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
-
             x = 135
             obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
-
             x = 195
             obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
-
-            # x = 230
-            # obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
             x = 365
             obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
         else:
             # load data file
-            with open("random_data_1.json", "r") as f:
+            with open(self.env_data, "r") as f:
                 data = json.load(f)
             obstacles = data["obstacles"]
 
@@ -246,7 +257,7 @@ class testEnv(gym.Env):
         
         else:
             # load data file
-            with open("random_data_1.json", "r") as f:
+            with open(self.env_data, "r") as f:
                 data = json.load(f)
             self.start_x = data["start"][0]
             self.start_y = data["start"][1]
