@@ -2,7 +2,7 @@ import gymnasium as gym
 import numpy as np
 import pygame
 import matplotlib.pyplot as plt
-from stable_baselines3 import PPO, DDPG, SAC, TD3
+from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3.common.monitor import Monitor
@@ -25,26 +25,21 @@ if __name__=='__main__':
     # 0: test
     # 1: train
     # 2: plot using data
-    TRAIN = 2
+    TRAIN = 1
 
     TEST_CASE = 0
 
     # Choose algorithm
-    algorithm = 'PPO'
-    # algorithm = 'TD3'
-    # algorithm = 'SAC'
+    # algorithm = 'PPO'
+    algorithm = 'SAC'
 
     # Create the environment
 
     def make_env():
         return Monitor(ASVLidarEnv(render_mode=None))   # monitor/logging
 
-    if algorithm == 'PPO' or 'SAC' or 'TD3':
-        num_envs = 8
-        env = SubprocVecEnv([make_env for _ in range(num_envs)])    # parallelize training
-    # elif algorithm == 'TD3':
-    #     num_envs = 1
-    #     env = Monitor(ASVLidarEnv(render_mode=None))
+    num_envs = 8
+    env = SubprocVecEnv([make_env for _ in range(num_envs)])    # parallelize training
 
     # Hyperparamters
     learn_rate = 0.0001
@@ -100,19 +95,14 @@ if __name__=='__main__':
                         learning_rate=learn_rate, n_steps=n_steps, batch_size=batch_size, n_epochs=n_epochs,
                         gamma=gamma, gae_lambda=gae_lambda, clip_range=clip_range, clip_range_vf=clip_range_vf,
                         ent_coef=ent_coef, vf_coef=vf_coef)
+            # model = PPO("MultiInputPolicy", env, verbose=1, tensorboard_log="./ppo_asv_tensorboard/")
         elif algorithm == 'SAC':
             model = SAC("MultiInputPolicy", env, verbose=1, tensorboard_log=f"./{algorithm.lower()}_log/",
                         learning_rate=learn_rate, batch_size=batch_size, gamma=gamma, buffer_size=1000000,
                         train_freq=1, gradient_steps=1, ent_coef='auto')
-        elif algorithm == 'TD3':
-            model = TD3("MultiInputPolicy", env, verbose=1, tensorboard_log=f"./{algorithm.lower()}_log/",
-                    learning_rate=learn_rate, batch_size=batch_size, gamma=gamma, buffer_size=1000000,
-                    train_freq=(1, 'step'), gradient_steps=-1)
         
-        # model = PPO("MultiInputPolicy", env, verbose=1, tensorboard_log="./ppo_asv_tensorboard/")
-
         # Training parameters
-        timesteps = 2000000
+        timesteps = 1000000
         callback = CustomCallback()
 
         # Train the model
@@ -134,16 +124,16 @@ if __name__=='__main__':
         plt.title('Reward over Episodes')
         fig.savefig("reward_plot.png")
 
-        fig = plt.figure(2)
-        plt.subplot(221)
-        plt.plot(callback.policy_loss)
-        plt.title("Policy Loss")
-        plt.xlabel("Training Steps")
+        # fig = plt.figure(2)
+        # plt.subplot(221)
+        # plt.plot(callback.policy_loss)
+        # plt.title("Policy Loss")
+        # plt.xlabel("Training Steps")
 
-        plt.subplot(222)
-        plt.plot(callback.value_loss)
-        plt.title("Value Loss")
-        plt.xlabel("Training Steps")
+        # plt.subplot(222)
+        # plt.plot(callback.value_loss)
+        # plt.title("Value Loss")
+        # plt.xlabel("Training Steps")
 
         plt.show()
 
@@ -162,8 +152,6 @@ if __name__=='__main__':
             # model = SAC.load(MODEL_PATH)
             # model = SAC.load("models/sac_asv_model_v1.zip")
             model = SAC.load("models/sac_asv_model_v2.zip")
-        elif algorithm == 'TD3':
-            model = TD3.load(MODEL_PATH)
 
         env = testEnv(render_mode="human")
         env.test_case = TEST_CASE
