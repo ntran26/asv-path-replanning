@@ -27,7 +27,7 @@ if __name__=='__main__':
     # 2: plot using data
     TRAIN = 1
 
-    TEST_CASE = 0
+    TEST_CASE = 5
 
     # Choose algorithm
     # algorithm = 'PPO'
@@ -151,7 +151,8 @@ if __name__=='__main__':
         elif algorithm == 'SAC':
             # model = SAC.load(MODEL_PATH)
             # model = SAC.load("models/sac_asv_model_v1.zip")
-            model = SAC.load("models/sac_asv_model_v2.zip")
+            # model = SAC.load("models/sac_asv_model_v2.zip")
+            model = SAC.load("models/sac_asv_model_0_5.zip")
 
         env = testEnv(render_mode="human")
         env.test_case = TEST_CASE

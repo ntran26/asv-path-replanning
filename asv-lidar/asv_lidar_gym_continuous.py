@@ -292,7 +292,7 @@ class ASVLidarEnv(gym.Env):
             r_goal = 0
 
         # Combined rewards
-        lambda_ = 0.5       # weighting factor
+        lambda_ = 0.9       # weighting factor
         # reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_goal + r_heading
 
         if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):

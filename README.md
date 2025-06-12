@@ -1,5 +1,7 @@
 This repository is for the porject ASV Path Replanning and Collision Avoidance using Deep Reinforcement Learning
 
+-----     DESCRIPTION     -----
+
 The agent needs to follow a predefined path while avoiding static obstacles.
 
 asv-lidar: The current work in progress
@@ -38,3 +40,39 @@ Paper-implementation: First attempt - inspired from the paper "Dynamic trajector
   + On path: 0
   + Reach goal: +20
   + Collide with obstacle/border: -100
+
+-----     USAGE     -----
+The main folder is located in 'asv-lidar'
+- 'asv_lidar.py': simulated lidar sensor.
+- 'ship_model.py': model of the simulated ASV.
+- 'asv_lidar_gym_continuous.py': environment uses in training PPO and SAC agents.
+- 'test_run.py': a set of test scenarios for testing the trained agent.
+  + TEST_CASE == 0: random environment setup
+  + TEST_CASE == 1 to 6: test scenarios
+  + Else: use a selected environment setup from data/env-setup
+- 'train_asv': main script to train/test/plot data
+  + TRAIN == 0: test the trained agent
+  + TRAIN == 1: train the agent
+  + TRAIN == 2: plot data
+
+- Data folder:
+  + After testing the agent, a test data will be saved as .json file listed in 'data' folder. 
+  + Plotting the data requires both PPO and SAC agents data.
+  + If the random environment setup is selected (TEST_CASE == 0), data of the environment is saved as .json file,   listed in 'data/env-setup'.
+
+- Tensorboard:
+  + Data from training sessions
+  + Access 'ppo_log' or 'sac_log' and run 'tensorboard --logdir==$filename$\
+
+- Results:
+  + Recorded videos stored in 'videos'
+  + ASV trajectories stored in 'results'
+
+- Models:
+  + ppo_asv_model_180: discrete action with 180 degrees lidar swath
+  + ppo_asv_model_270: discrete action with 270 degrees lidar swath
+  The rest are continuous action space
+  + ppo_asv_model_v1: PPO model v1 - fixed path, random obstacles, fixed number of obstacles (10)
+  + ppo_asv_model_v2: PPO model v2 - random path and obstacles, random number of obstacles (0-10)
+  + sac_asv_model_v1: SAC model v1 - random path and obstacles, fixed number of obstacles (10)
+  + sac_asv_model_v2: SAC model v2 - random path and obstacles, random number of obstacles (0-10)
