@@ -27,11 +27,11 @@ if __name__=='__main__':
     # 2: plot using data
     TRAIN = 1
 
-    TEST_CASE = 5
+    TEST_CASE = 6
 
     # Choose algorithm
-    # algorithm = 'PPO'
-    algorithm = 'SAC'
+    algorithm = 'PPO'
+    # algorithm = 'SAC'
 
     # Create the environment
 
@@ -145,9 +145,9 @@ if __name__=='__main__':
     elif TRAIN == 0:
         # Load the trained model and test it
         if algorithm == 'PPO':
-            # model = PPO.load(MODEL_PATH)
+            model = PPO.load(MODEL_PATH)
             # model = PPO.load("models/ppo_asv_model_v1.zip")
-            model = PPO.load("models/ppo_asv_model_v2.zip")
+            # model = PPO.load("models/ppo_asv_model_v2.zip")
         elif algorithm == 'SAC':
             # model = SAC.load(MODEL_PATH)
             # model = SAC.load("models/sac_asv_model_v1.zip")
