@@ -42,6 +42,7 @@ Paper-implementation: First attempt - inspired from the paper "Dynamic trajector
   + Collide with obstacle/border: -100
 
 -----     USAGE     -----
+
 The main folder is located in 'asv-lidar'
 - 'asv_lidar.py': simulated lidar sensor.
 - 'ship_model.py': model of the simulated ASV.
