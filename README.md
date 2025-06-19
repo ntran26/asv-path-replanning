@@ -1,6 +1,6 @@
 This repository is for the porject ASV Path Replanning and Collision Avoidance using Deep Reinforcement Learning
 
------     DESCRIPTION     -----
+                                          -----     DESCRIPTION     -----
 
 The agent needs to follow a predefined path while avoiding static obstacles.
 
@@ -41,7 +41,7 @@ Paper-implementation: First attempt - inspired from the paper "Dynamic trajector
   + Reach goal: +20
   + Collide with obstacle/border: -100
 
------     USAGE     -----
+                                            -----     USAGE     -----
 
 The main folder is located in 'asv-lidar'
 - 'asv_lidar.py': simulated lidar sensor.
