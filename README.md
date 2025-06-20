@@ -77,7 +77,7 @@ The main folder is located in 'asv-lidar'
   + Data from training sessions
   + Access 'ppo_log' or 'sac_log' and run
   ```
-  tensorboard --logdir==$filename$\
+  tensorboard --logdir==./$filename$/
   ```
 
 - Results:
