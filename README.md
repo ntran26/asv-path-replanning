@@ -6,23 +6,29 @@ The agent needs to follow a predefined path while avoiding static obstacles.
 
 asv-lidar: The current work in progress
 - The environment is created with Gymnasium and PyGame
-- The ASV emits 21 lidar beams distributed evenly in 90 degrees ahead of the ASV.
+- The ASV emits 63 lidar beams distributed evenly in 270 degrees ahead of the ASV.
 - The lidar beams have a maximum range of 150 m, if there is an obstacle, it will return a value of distance to obstacle.
 - Observation space (MultiDiscrete):
   + lidar: a list of lidar range [150, 150,..., 150]
   + pos: coordinate of ASV [x,y]
-  + hdg: current heading angle [a value between 0-360]
-  + dhdg: change of heading [a value between 0-36]
+  + hdg: current heading angle [a value between 0 to 360]
+  + dhdg: change of heading [a value between 0 to 36]
   + tgt: target waypoint towards the path (distance from pos to path on x-axis)
-- Action space (Discrete):
+  + target_heading: heading error with respect to the goal point [a value between -180 to 180]
+- Action space (discrete):
   + 0: turn to port (rudder = -25)
   + 1: keep ahead (rudder = 0)
   + 2: turn to starboard (rudder = 25)
+- Action space (continuous):
+  + Lower bound: rudder = -25
+  + Upper bound: rudder = 25
 - Reward function (to be updated):
   + Outside of path (> 50m): 0 or -1
   + Near path: 1 - (tgt / path_range), where path_range = 50m from path
   + Move in reverse: -10
   + Collision/off border: -20
+
+The current reward function is updated in "asv_lidar_gym_continuous", inspired from the paper "Taming an Autonomous Surface Vehicle for Path Following and Collision Avoidance Using Deep Reinforcement Learning"
 
 Paper-implementation: First attempt - inspired from the paper "Dynamic trajectory planning for ships in dense environment using collision grid with deep reinforcement learning"
 - The environment is created with Gymnasium and Matplotlib
@@ -54,11 +60,11 @@ The main folder is located in 'asv-lidar'
 - 'train_test_asv': main script to train/test model
   + To train a new model (can choose between ppo and sac)
   ```
-      python train_test_asv.py --mode train --algo sac
+  python train_test_asv.py --mode train --algo sac
   ```
   + To test a model (can choose between ppo and sac, case from 0 to 6)
   ```
-      python train_test_asv.py --mode test --algo sac --case 0
+  python train_test_asv.py --mode test --algo sac --case 0
   ```
   + If no arguments passed, use test mode, SAC agent, test case = 0 (random)
 
