@@ -23,7 +23,7 @@ Else: take the setup from recorded data of a random obstacles scenario (test cas
 """
 
 TEST_CASE = 0
-ENV_DATA = "data/env_setup/data_0.json"
+ENV_DATA = "data/env_setup/data_1.json"
 
 UPDATE_RATE = 0.5
 RENDER_FPS = 10

@@ -1,0 +1,8 @@
+{
+    "agent": "SAC_0_5",
+    "episodes": 100,
+    "success_rate": 0.94,
+    "avg_cross_track_error": 28.457910101171425,
+    "avg_total_reward": 34.441303478351216,
+    "avg_time": 75.01
+}

@@ -1,0 +1,8 @@
+{
+    "agent": "PPO_0_6",
+    "episodes": 100,
+    "success_rate": 0.23,
+    "avg_cross_track_error": 72.27368293301664,
+    "avg_total_reward": -820.671167349761,
+    "avg_time": 75.705
+}

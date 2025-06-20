@@ -10,7 +10,6 @@ from test_run import testEnv
 import json
 import argparse
 import sys
-
 import multiprocessing
 
 if __name__=='__main__':
@@ -145,8 +144,8 @@ if __name__=='__main__':
         elif algorithm == 'SAC':
             # model = SAC.load(MODEL_PATH)
             # model = SAC.load("models/sac_asv_model_v1.zip")
-            # model = SAC.load("models/sac_asv_model_v2.zip")
-            model = SAC.load("models/sac_asv_model_0_5.zip")
+            model = SAC.load("models/sac_asv_model_v2.zip")
+            # model = SAC.load("models/sac_asv_model_0_5.zip")
 
         env = testEnv(render_mode="human")
         env.test_case = args.case
@@ -191,7 +190,7 @@ if __name__=='__main__':
                 "path": env.path,
                 "asv_start": env.asv_path[0]
             }
-            with open("data.json","w") as f:
+            with open("env_data.json","w") as f:
                 json.dump(random_data, f, indent=4)
 
         # Save path taken as image

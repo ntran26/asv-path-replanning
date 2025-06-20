@@ -1,0 +1,86 @@
+from asv_lidar_gym_continuous import ASVLidarEnv
+from stable_baselines3 import PPO, SAC
+import numpy as np
+import json
+import os
+from tqdm import trange
+
+class PPOAgent:
+    def __init__(self, path):
+        self.model = PPO.load(path)
+    def predict(self, obs):
+        return self.model.predict(obs, deterministic=True)[0]
+
+class SACAgent:
+    def __init__(self, path):
+        self.model = SAC.load(path)
+    def predict(self, obs):
+        return self.model.predict(obs, deterministic=True)[0]
+
+def evaluate_agent(agent, agent_name, n_episodes=100, render=False):
+    env = ASVLidarEnv(render_mode="human" if render else None)
+
+    success_count = 0
+    all_cross_track_errors = []
+    total_rewards = []
+    time_efficiencies = []
+
+    for ep in trange(n_episodes, desc=f"Evaluating {agent_name}"):
+        obs, _ = env.reset()
+        done = False
+        total_reward = 0
+        cte_list = []
+        start_time = env.elapsed_time
+
+        while not done:
+            action = agent.predict(obs)
+            obs, reward, done, _, _ = env.step(action)
+            total_reward += reward
+            cte_list.append(abs(obs['tgt'][0]))
+
+        reached_goal = env.distance_to_goal <= env.collision + 30
+        collided = np.any(env.lidar.ranges.astype(np.int64) <= env.collision)
+        success = reached_goal and not collided
+
+        if success:
+            success_count += 1
+
+        total_rewards.append(total_reward)
+        all_cross_track_errors.append(np.mean(cte_list))
+        time_efficiencies.append(env.elapsed_time - start_time)
+
+    # Aggregate Results
+    results = {
+        "agent": agent_name,
+        "episodes": n_episodes,
+        "success_rate": success_count / n_episodes,
+        "avg_cross_track_error": float(np.mean(all_cross_track_errors)),
+        "avg_total_reward": float(np.mean(total_rewards)),
+        "avg_time": float(np.mean(time_efficiencies))
+    }
+
+    # Save as JSON
+    os.makedirs("eval_results", exist_ok=True)
+    with open(f"eval_results/{agent_name}_eval.json", "w") as f:
+        json.dump(results, f, indent=4)
+
+    return results
+
+if __name__ == "__main__":
+    agents = {
+        "PPO_0_5": PPOAgent("models/ppo_asv_model_0_5.zip"),
+        "PPO_0_6": PPOAgent("models/ppo_asv_model_0_6.zip"),
+        "PPO_0_7": PPOAgent("models/ppo_asv_model_0_7.zip"),
+        "PPO_0_8": PPOAgent("models/ppo_asv_model_0_8.zip"),
+        "PPO_0_9": PPOAgent("models/ppo_asv_model_0_9.zip"),
+        "SAC_0_5": SACAgent("models/sac_asv_model_0_5.zip"),
+        "SAC_0_6": SACAgent("models/sac_asv_model_0_6.zip"),
+        "SAC_0_7": SACAgent("models/sac_asv_model_0_7.zip"),
+        "SAC_0_8": SACAgent("models/sac_asv_model_v2.zip"),
+        "SAC_0_9": SACAgent("models/sac_asv_model_0_9.zip"),
+    }
+
+    for name, agent in agents.items():
+        result = evaluate_agent(agent, name, n_episodes=100, render=False)
+        print(f"\n{name} Results:")
+        print(json.dumps(result, indent=2))
