@@ -53,13 +53,13 @@ The main folder is located in 'asv-lidar'
   + Else: use a selected environment setup from data/env-setup
 - 'train_test_asv': main script to train/test model
   + To train a new model (can choose between ppo and sac)
-  '''
+  ```
       python train_test_asv.py --mode train --algo sac
-  '''
+  ```
   + To test a model (can choose between ppo and sac, case from 0 to 6)
-  '''
+  ```
       python train_test_asv.py --mode test --algo sac --case 0
-  '''
+  ```
   + If no arguments passed, use test mode, SAC agent, test case = 0 (random)
 
 - Data folder:
