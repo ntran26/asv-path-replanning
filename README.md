@@ -41,7 +41,7 @@ Paper-implementation: First attempt - inspired from the paper "Dynamic trajector
   + Reach goal: +20
   + Collide with obstacle/border: -100
 
-                                            -----     USAGE     -----
+                                      -----     USAGE     -----
 
 The main folder is located in 'asv-lidar'
 - 'asv_lidar.py': simulated lidar sensor.
@@ -51,10 +51,12 @@ The main folder is located in 'asv-lidar'
   + TEST_CASE == 0: random environment setup
   + TEST_CASE == 1 to 6: test scenarios
   + Else: use a selected environment setup from data/env-setup
-- 'train_asv': main script to train/test/plot data
-  + TRAIN == 0: test the trained agent
-  + TRAIN == 1: train the agent
-  + TRAIN == 2: plot data
+- 'train_test_asv': main script to train/test model
+  + To train a new model (can choose between ppo and sac)
+      python train_test_asv.py --mode train --algo sac
+  + To test a model (can choose between ppo and sac, case from 0 to 6)
+      python train_test_asv.py --mode test --algo sac --case 0
+  + If no arguments passed, use test mode, SAC agent, test case = 0 (random)
 
 - Data folder:
   + After testing the agent, a test data will be saved as .json file listed in 'data' folder. 

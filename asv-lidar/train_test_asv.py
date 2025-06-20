@@ -1,9 +1,6 @@
-import gymnasium as gym
-import numpy as np
 import pygame
 import matplotlib.pyplot as plt
 from stable_baselines3 import PPO, SAC
-from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
@@ -11,33 +8,30 @@ from stable_baselines3.common.callbacks import BaseCallback
 from asv_lidar_gym_continuous import ASVLidarEnv
 from test_run import testEnv
 import json
-import os
-from matplotlib.offsetbox import OffsetImage, AnnotationBbox
-from PIL import Image
-from images import BOAT_ICON
+import argparse
+import sys
 
 import multiprocessing
 
 if __name__=='__main__':
     multiprocessing.freeze_support()
 
-    # Toggle between train and test
-    # 0: test
-    # 1: train
-    # 2: plot using data
-    TRAIN = 1
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--mode', choices=['train','test'], required='False', help='Select train or test')
+    parser.add_argument('--algo', choices=['ppo','sac'], required='False', help='Select PPO or SAC algorithm')
+    parser.add_argument('--case', type=int, default=0, help='Select test case (only use in test mode)')
 
-    TEST_CASE = 6
+    if len(sys.argv) == 1:
+        print("No arguments passed. Using default: mode=test, algo=sac, case=0\n")
+        args = parser.parse_args(['--mode', 'test', '--algo', 'sac', '--case', '0'])
+    else:
+        args = parser.parse_args()
 
-    # Choose algorithm
-    algorithm = 'PPO'
-    # algorithm = 'SAC'
+    algorithm = args.algo.upper()
 
     # Create the environment
-
     def make_env():
         return Monitor(ASVLidarEnv(render_mode=None))   # monitor/logging
-
     num_envs = 8
     env = SubprocVecEnv([make_env for _ in range(num_envs)])    # parallelize training
 
@@ -88,7 +82,7 @@ if __name__=='__main__':
 
     #                       -------------- TRAINING --------------
 
-    if TRAIN == 1:
+    if args.mode == 'train':
         # Initialize PPO model
         if algorithm == 'PPO':
             model = PPO("MultiInputPolicy", env, verbose=1, tensorboard_log=f"./{algorithm.lower()}_log/",
@@ -142,7 +136,7 @@ if __name__=='__main__':
 
     #                       -------------- TESTING --------------
 
-    elif TRAIN == 0:
+    elif args.mode == 'test':
         # Load the trained model and test it
         if algorithm == 'PPO':
             model = PPO.load(MODEL_PATH)
@@ -155,7 +149,7 @@ if __name__=='__main__':
             model = SAC.load("models/sac_asv_model_0_5.zip")
 
         env = testEnv(render_mode="human")
-        env.test_case = TEST_CASE
+        env.test_case = args.case
         # env = ASVLidarEnv(render_mode="human")
 
         obs, _ = env.reset()
@@ -228,91 +222,3 @@ if __name__=='__main__':
         # pygame.draw.line(path_surface, (200, 0, 0), (0,0), (env.map_width,0), 5)
 
         pygame.image.save(path_surface, "asv_path_result.png")
-
-    #                       -------------- PLOTTING --------------
-
-    else:
-        # load data file
-        ppo = "data/ppo_data_random_0.json"
-        sac = "data/sac_data_random_0.json"
-        with open(ppo, "r") as f:
-            ppo_data = json.load(f)
-        with open(sac, "r") as f:
-            sac_data = json.load(f)
-        
-        start = ppo_data["start"]
-        goal = ppo_data["goal"]
-        obstacles = ppo_data["obstacles"]
-        path = ppo_data["path"]
-        ppo_path = ppo_data["asv_path"]
-        sac_path = sac_data["asv_path"]
-        ppo_heading = ppo_data["heading"]
-        sac_heading = sac_data["heading"]
-        
-        # # plot data with pygame
-
-        # # define environment
-        # env = testEnv(render_mode="human")
-        # env.test_case = TEST_CASE
-
-        # path_surface = pygame.Surface((env.map_width, env.map_height))
-        # path_surface.fill((255,255,255))
-
-        # # for i in range(1, len(asv_path)):
-        # #     pygame.draw.circle(path_surface, (0, 0, 200), asv_path[i], 3)
-
-        # # Draw obstacles
-        # for obs in obstacles:
-        #     pygame.draw.polygon(path_surface, (200, 0, 0), obs)
-        
-        # # Draw Path
-        # env.draw_dashed_line(path_surface,(0,200,0),(start[0],start[1]),(goal[0],goal[1]),width=5)
-        # pygame.draw.circle(path_surface,(100,0,0),(goal[0],goal[1]),5)
-
-        # # # Draw ship
-        # # display = pygame.display.set_mode(env.screen_size)
-        # # os_ = pygame.transform.rotozoom(env.icon,-asv_path[-1][1],2)
-        # # path_surface.blit(os_,os_.get_rect(center=(asv_path[-1][0],asv_path[-1][1])))
-        # # display.blit(path_surface,[0,0])
-
-        # Plot with matplotlib
-
-        plt.figure(figsize=(6,10))
-
-        # Load the boat icon image from bytes
-        boat_img = Image.frombytes(BOAT_ICON["format"], BOAT_ICON["size"], BOAT_ICON["bytes"])
-        rotated_img = boat_img.rotate(-sac_heading, expand=True, resample=Image.BICUBIC)
-        imgbox = OffsetImage(rotated_img, zoom=1.5)
-        final_x, final_y = sac_path[-1]
-        ab1 = AnnotationBbox(imgbox, (final_x, final_y), frameon=False)
-
-        rotated_img = boat_img.rotate(-ppo_heading, expand=True, resample=Image.BICUBIC)
-        imgbox = OffsetImage(rotated_img, zoom=1.5)
-        final_x, final_y = ppo_path[-1]
-        ab2 = AnnotationBbox(imgbox, (final_x, final_y), frameon=False)
-
-        plt.plot(*zip(*ppo_path), label="PPO Path", color="purple", linestyle="dashdot")
-        plt.plot(*zip(*sac_path), label="SAC Path", color="blue", linestyle="solid")
-        plt.plot(*zip(*path), label="Path", color="green", alpha=0.5, linestyle="dotted")
-        plt.scatter(*start, color='green', label='Start')
-        plt.scatter(*goal, color='red', label='Goal')
-        for obs in obstacles:
-            poly = plt.Polygon(obs, color='red')
-            plt.gca().add_patch(poly)
-        
-        plt.gca().add_artist(ab1)
-        plt.gca().add_artist(ab2)
-
-        plt.gca().invert_yaxis()
-        
-        plt.xlabel('X')
-        plt.ylabel('Y')
-        plt.title('ASV Path Visualization')
-        plt.legend()
-        # plt.axis('equal')
-        plt.xlim((0,400))
-        plt.ylim((600,0))
-        plt.grid(False)
-        plt.savefig("asv_plot.png", dpi=300, bbox_inches='tight')
-        plt.show()
-
