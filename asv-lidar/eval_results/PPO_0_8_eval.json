@@ -1,8 +1,8 @@
 {
     "agent": "PPO_0_8",
     "episodes": 100,
-    "success_rate": 0.54,
-    "avg_cross_track_error": 74.04811797502177,
-    "avg_total_reward": -474.20770385978335,
-    "avg_time": 91.045
+    "success_rate": 0.81,
+    "avg_cross_track_error": 45.88190252320386,
+    "avg_total_reward": -139.0380119378037,
+    "avg_time": 83.595
 }

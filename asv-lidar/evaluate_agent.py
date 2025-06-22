@@ -59,11 +59,6 @@ def evaluate_agent(agent, agent_name, n_episodes=100, render=False):
         "avg_time": float(np.mean(time_efficiencies))
     }
 
-    # Save as JSON
-    os.makedirs("eval_results", exist_ok=True)
-    with open(f"eval_results/{agent_name}_eval.json", "w") as f:
-        json.dump(results, f, indent=4)
-
     return results
 
 if __name__ == "__main__":
@@ -80,7 +75,13 @@ if __name__ == "__main__":
         "SAC_0_9": SACAgent("models/sac_asv_model_0_9.zip"),
     }
 
+    results_list = []
     for name, agent in agents.items():
-        result = evaluate_agent(agent, name, n_episodes=100, render=False)
+        result = evaluate_agent(agent, name, n_episodes=1000, render=False)
+        results_list.append(result)
         print(f"\n{name} Results:")
         print(json.dumps(result, indent=2))
+    
+    os.makedirs("eval_results", exist_ok=True)
+    with open("eval_results/all_agents_eval.json", "w") as f:
+        json.dump(results_list, f, indent=4)

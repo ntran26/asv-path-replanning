@@ -1,0 +1,82 @@
+[
+    {
+        "agent": "PPO_0_5",
+        "episodes": 1000,
+        "success_rate": 0.67,
+        "avg_cross_track_error": 62.637216997951555,
+        "avg_total_reward": -304.2831346218929,
+        "avg_time": 81.2405
+    },
+    {
+        "agent": "PPO_0_6",
+        "episodes": 1000,
+        "success_rate": 0.574,
+        "avg_cross_track_error": 47.130453060409316,
+        "avg_total_reward": -398.82126117219684,
+        "avg_time": 83.454
+    },
+    {
+        "agent": "PPO_0_7",
+        "episodes": 1000,
+        "success_rate": 0.607,
+        "avg_cross_track_error": 53.18352836239451,
+        "avg_total_reward": -369.58333844174456,
+        "avg_time": 76.6155
+    },
+    {
+        "agent": "PPO_0_8",
+        "episodes": 1000,
+        "success_rate": 0.543,
+        "avg_cross_track_error": 52.406246452185634,
+        "avg_total_reward": -434.1910537526873,
+        "avg_time": 79.6745
+    },
+    {
+        "agent": "PPO_0_9",
+        "episodes": 1000,
+        "success_rate": 0.663,
+        "avg_cross_track_error": 60.48123624581268,
+        "avg_total_reward": -318.1009369491871,
+        "avg_time": 80.2925
+    },
+    {
+        "agent": "SAC_0_5",
+        "episodes": 1000,
+        "success_rate": 0.975,
+        "avg_cross_track_error": 29.816739645667454,
+        "avg_total_reward": 62.81084074941097,
+        "avg_time": 76.23
+    },
+    {
+        "agent": "SAC_0_6",
+        "episodes": 1000,
+        "success_rate": 0.9,
+        "avg_cross_track_error": 34.44888193947182,
+        "avg_total_reward": -24.597062245145285,
+        "avg_time": 74.5055
+    },
+    {
+        "agent": "SAC_0_7",
+        "episodes": 1000,
+        "success_rate": 0.971,
+        "avg_cross_track_error": 47.010440883181914,
+        "avg_total_reward": 38.00681173442376,
+        "avg_time": 80.287
+    },
+    {
+        "agent": "SAC_0_8",
+        "episodes": 1000,
+        "success_rate": 0.945,
+        "avg_cross_track_error": 32.80072147860701,
+        "avg_total_reward": 25.47320452635584,
+        "avg_time": 75.418
+    },
+    {
+        "agent": "SAC_0_9",
+        "episodes": 1000,
+        "success_rate": 0.913,
+        "avg_cross_track_error": 39.468272784306656,
+        "avg_total_reward": -17.474020862982588,
+        "avg_time": 76.7655
+    }
+]
