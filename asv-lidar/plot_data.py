@@ -9,6 +9,7 @@ from images import BOAT_ICON
 # load data file
 ppo = "data/ppo_data_random_0.json"
 sac = "data/sac_data_random_0.json"
+
 with open(ppo, "r") as f:
     ppo_data = json.load(f)
 with open(sac, "r") as f:
@@ -61,6 +62,12 @@ plt.ylim((600,0))
 plt.grid(False)
 plt.savefig("asv_plot.png", dpi=300, bbox_inches='tight')
 plt.show()
+
+sac1 = "data/test_case_5/sac_0_5_data.json"
+sac2 = "data/test_case_5/sac_0_6_data.json"
+sac3 = "data/test_case_5/sac_0_7_data.json"
+sac4 = "data/test_case_5/sac_0_8_data.json"
+sac5 = "data/test_case_5/sac_0_9_data.json"
 
 
 # plot data with pygame
