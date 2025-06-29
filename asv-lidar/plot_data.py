@@ -1,74 +1,74 @@
-import pygame
-import matplotlib.pyplot as plt
-from test_run import testEnv
 import json
+import matplotlib.pyplot as plt
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from PIL import Image
 from images import BOAT_ICON
 
-# load data file
-ppo = "data/ppo_data_random_0.json"
-sac = "data/sac_data_random_0.json"
+def load_data(filepath):
+    with open(filepath, 'r') as f:
+        return json.load(f)
 
-with open(ppo, "r") as f:
-    ppo_data = json.load(f)
-with open(sac, "r") as f:
-    sac_data = json.load(f)
+def add_boat_icon(ax, x, y, heading, zoom=1.25):
+    boat_img = Image.frombytes(BOAT_ICON["format"], BOAT_ICON["size"], BOAT_ICON["bytes"])
+    rotated_img = boat_img.rotate(-heading, expand=True, resample=Image.BICUBIC)
+    imgbox = OffsetImage(rotated_img, zoom=zoom)
+    ab = AnnotationBbox(imgbox, (x, y), frameon=False)
+    ax.add_artist(ab)
 
-start = ppo_data["start"]
-goal = ppo_data["goal"]
-obstacles = ppo_data["obstacles"]
-path = ppo_data["path"]
-ppo_path = ppo_data["asv_path"]
-sac_path = sac_data["asv_path"]
-ppo_heading = ppo_data["heading"]
-sac_heading = sac_data["heading"]
+# List of dataset
+datasets = [
+    # ("PPO", "data/ppo_data_random_0.json", "purple", "dashdot"),
+    # ("SAC", "data/sac_data_random_0.json", "blue", "solid"),
+    ("$ \lambda $ = 0.5", "data/test_case_4/sac_0_5_data.json", "orange", "dashed"),
+    ("$ \lambda $ = 0.6", "data/test_case_4/sac_0_6_data.json", "teal", "dotted"),
+    ("$ \lambda $ = 0.7", "data/test_case_4/sac_0_7_data.json", "magenta", "solid"),
+    ("$ \lambda $ = 0.8", "data/test_case_4/sac_0_8_data.json", "brown", "dashdot"),
+    ("$ \lambda $ = 0.9", "data/test_case_4/sac_0_9_data.json", "gray", "dashed"),
+]
 
-plt.figure(figsize=(6,10))
+# Use the first data file to set up the map
+reference_data = load_data(datasets[0][1])
+start = reference_data["start"]
+goal = reference_data["goal"]
+obstacles = reference_data["obstacles"]
+path = reference_data["path"]
 
-# Load the boat icon image from bytes
-boat_img = Image.frombytes(BOAT_ICON["format"], BOAT_ICON["size"], BOAT_ICON["bytes"])
-rotated_img = boat_img.rotate(-sac_heading, expand=True, resample=Image.BICUBIC)
-imgbox = OffsetImage(rotated_img, zoom=1.5)
-final_x, final_y = sac_path[-1]
-ab1 = AnnotationBbox(imgbox, (final_x, final_y), frameon=False)
+# Initalize plot
+plt.figure(figsize=(6, 10))
+ax = plt.gca()
 
-rotated_img = boat_img.rotate(-ppo_heading, expand=True, resample=Image.BICUBIC)
-imgbox = OffsetImage(rotated_img, zoom=1.5)
-final_x, final_y = ppo_path[-1]
-ab2 = AnnotationBbox(imgbox, (final_x, final_y), frameon=False)
-
-plt.plot(*zip(*ppo_path), label="PPO Path", color="purple", linestyle="dashdot")
-plt.plot(*zip(*sac_path), label="SAC Path", color="blue", linestyle="solid")
-plt.plot(*zip(*path), label="Path", color="green", alpha=0.5, linestyle="dotted")
+# Plot reference path and static elements
+plt.plot(*zip(*path), label="Reference Path", color="green", linestyle="dotted", alpha=0.5)
 plt.scatter(*start, color='green', label='Start')
 plt.scatter(*goal, color='red', label='Goal')
 for obs in obstacles:
     poly = plt.Polygon(obs, color='red')
-    plt.gca().add_patch(poly)
+    ax.add_patch(poly)
 
-plt.gca().add_artist(ab1)
-plt.gca().add_artist(ab2)
+# Plot each dataset
+for label, filepath, color, style in datasets:
+    try:
+        data = load_data(filepath)
+        path_data = data["asv_path"]
+        heading = data.get("heading", 0)
+        plt.plot(*zip(*path_data), label=label, color=color, linestyle=style)
 
-plt.gca().invert_yaxis()
+        final_x, final_y = path_data[-1]
+        add_boat_icon(ax, final_x, final_y, heading)
+    except Exception as e:
+        print(f"Error loading {label} from {filepath}: {e}")
 
-plt.xlabel('X')
-plt.ylabel('Y')
-plt.title('ASV Path Visualization')
+# Show plot
+ax.invert_yaxis()
+plt.xlabel("X")
+plt.ylabel("Y")
+plt.title("Test scenario 4")
 plt.legend()
-# plt.axis('equal')
-plt.xlim((0,400))
-plt.ylim((600,0))
+plt.xlim((0, 400))
+plt.ylim((600, 0))
 plt.grid(False)
-plt.savefig("asv_plot.png", dpi=300, bbox_inches='tight')
+plt.savefig("Test scenario 4.png", dpi=300, bbox_inches='tight')
 plt.show()
-
-sac1 = "data/test_case_5/sac_0_5_data.json"
-sac2 = "data/test_case_5/sac_0_6_data.json"
-sac3 = "data/test_case_5/sac_0_7_data.json"
-sac4 = "data/test_case_5/sac_0_8_data.json"
-sac5 = "data/test_case_5/sac_0_9_data.json"
-
 
 # plot data with pygame
 
@@ -97,4 +97,3 @@ sac5 = "data/test_case_5/sac_0_9_data.json"
 # # os_ = pygame.transform.rotozoom(env.icon,-asv_path[-1][1],2)
 # # path_surface.blit(os_,os_.get_rect(center=(asv_path[-1][0],asv_path[-1][1])))
 # # display.blit(path_surface,[0,0])
-
