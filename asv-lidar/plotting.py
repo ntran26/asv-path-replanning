@@ -19,11 +19,11 @@ def add_boat_icon(ax, x, y, heading, zoom=1.25):
 datasets = [
     # ("PPO", "data/ppo_data_random_0.json", "purple", "dashdot"),
     # ("SAC", "data/sac_data_random_0.json", "blue", "solid"),
-    ("$ \lambda $ = 0.5", "data/test_case_6/sac_0_5_data.json", "orange", "dashed"),
-    ("$ \lambda $ = 0.6", "data/test_case_6/sac_0_6_data.json", "teal", "dotted"),
-    ("$ \lambda $ = 0.7", "data/test_case_6/sac_0_7_data.json", "magenta", "solid"),
-    ("$ \lambda $ = 0.8", "data/test_case_6/sac_0_8_data.json", "brown", "dashdot"),
-    ("$ \lambda $ = 0.9", "data/test_case_6/sac_0_9_data.json", "gray", "dashed"),
+    ("$ \lambda $ = 0.5", "data/test_case_4/sac_0_5_data.json", "orange", "dashed"),
+    ("$ \lambda $ = 0.6", "data/test_case_4/sac_0_6_data.json", "teal", "dotted"),
+    ("$ \lambda $ = 0.7", "data/test_case_4/sac_0_7_data.json", "magenta", "solid"),
+    ("$ \lambda $ = 0.8", "data/test_case_4/sac_0_8_data.json", "brown", "dashdot"),
+    ("$ \lambda $ = 0.9", "data/test_case_4/sac_0_9_data.json", "gray", "dashed"),
 ]
 
 # Use the first data file to set up the map
@@ -62,10 +62,10 @@ for label, filepath, color, style in datasets:
 ax.invert_yaxis()
 plt.xlabel("X")
 plt.ylabel("Y")
-plt.title("Test scenario 6")
+plt.title("Test scenario 4")
 plt.legend()
 plt.xlim((0, 400))
 plt.ylim((600, 0))
 plt.grid(False)
-plt.savefig("Test scenario 6.png", dpi=300, bbox_inches='tight')
+plt.savefig("Test scenario 4.png", dpi=300, bbox_inches='tight')
 plt.show()
