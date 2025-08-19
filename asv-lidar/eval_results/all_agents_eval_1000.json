@@ -1,0 +1,92 @@
+[
+    {
+        "agent": "PPO_0_5",
+        "episodes": 1000,
+        "success_rate": 0.569,
+        "avg_cross_track_error": 60.368254920887004,
+        "std_cross_track_error": 35.80858427689288,
+        "avg_total_reward": -411.97616868214976,
+        "avg_time": 82.3605
+    },
+    {
+        "agent": "PPO_0_6",
+        "episodes": 1000,
+        "success_rate": 0.494,
+        "avg_cross_track_error": 59.214847502602765,
+        "std_cross_track_error": 34.30691076914551,
+        "avg_total_reward": -494.0109386794722,
+        "avg_time": 80.614
+    },
+    {
+        "agent": "PPO_0_7",
+        "episodes": 1000,
+        "success_rate": 0.674,
+        "avg_cross_track_error": 50.92439817838535,
+        "std_cross_track_error": 32.426132595941716,
+        "avg_total_reward": -292.3490886617711,
+        "avg_time": 78.4815
+    },
+    {
+        "agent": "PPO_0_8",
+        "episodes": 1000,
+        "success_rate": 0.506,
+        "avg_cross_track_error": 58.2299896366368,
+        "std_cross_track_error": 30.47494469282049,
+        "avg_total_reward": -482.28851625053153,
+        "avg_time": 83.479
+    },
+    {
+        "agent": "PPO_0_9",
+        "episodes": 1000,
+        "success_rate": 0.653,
+        "avg_cross_track_error": 54.82244935453012,
+        "std_cross_track_error": 27.277223735671264,
+        "avg_total_reward": -321.61050749052436,
+        "avg_time": 80.8135
+    },
+    {
+        "agent": "SAC_0_5",
+        "episodes": 1000,
+        "success_rate": 0.954,
+        "avg_cross_track_error": 30.24864171177616,
+        "std_cross_track_error": 20.243219593642806,
+        "avg_total_reward": 39.49983278154399,
+        "avg_time": 75.7525
+    },
+    {
+        "agent": "SAC_0_6",
+        "episodes": 1000,
+        "success_rate": 0.899,
+        "avg_cross_track_error": 34.78193231868101,
+        "std_cross_track_error": 19.969724295216057,
+        "avg_total_reward": -26.612310263965227,
+        "avg_time": 74.3915
+    },
+    {
+        "agent": "SAC_0_7",
+        "episodes": 1000,
+        "success_rate": 0.955,
+        "avg_cross_track_error": 47.638203912508445,
+        "std_cross_track_error": 29.491717565665756,
+        "avg_total_reward": 19.237686873606005,
+        "avg_time": 79.4685
+    },
+    {
+        "agent": "SAC_0_8",
+        "episodes": 1000,
+        "success_rate": 0.93,
+        "avg_cross_track_error": 34.04965080233707,
+        "std_cross_track_error": 20.299208823983488,
+        "avg_total_reward": 7.909449757997575,
+        "avg_time": 75.028
+    },
+    {
+        "agent": "SAC_0_9",
+        "episodes": 1000,
+        "success_rate": 0.918,
+        "avg_cross_track_error": 40.31639479340107,
+        "std_cross_track_error": 26.12732300434407,
+        "avg_total_reward": -12.534471742437525,
+        "avg_time": 77.2215
+    }
+]

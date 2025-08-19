@@ -5,6 +5,8 @@ import json
 import os
 from tqdm import trange
 
+NUM_EPS = 100
+
 class PPOAgent:
     def __init__(self, path):
         self.model = PPO.load(path)
@@ -17,7 +19,7 @@ class SACAgent:
     def predict(self, obs):
         return self.model.predict(obs, deterministic=True)[0]
 
-def evaluate_agent(agent, agent_name, n_episodes=100, render=False):
+def evaluate_agent(agent, agent_name, seeds, render=False):
     env = ASVLidarEnv(render_mode="human" if render else None)
 
     success_count = 0
@@ -25,8 +27,8 @@ def evaluate_agent(agent, agent_name, n_episodes=100, render=False):
     total_rewards = []
     time_efficiencies = []
 
-    for ep in trange(n_episodes, desc=f"Evaluating {agent_name}"):
-        obs, _ = env.reset()
+    for seed in trange(len(seeds), desc=f"Evaluating {agent_name}"):
+        obs, _ = env.reset(seed=seeds[seed])
         done = False
         total_reward = 0
         cte_list = []
@@ -52,9 +54,10 @@ def evaluate_agent(agent, agent_name, n_episodes=100, render=False):
     # Aggregate Results
     results = {
         "agent": agent_name,
-        "episodes": n_episodes,
-        "success_rate": success_count / n_episodes,
+        "episodes": len(seeds),
+        "success_rate": success_count / len(seeds),
         "avg_cross_track_error": float(np.mean(all_cross_track_errors)),
+        "std_cross_track_error": float(np.std(all_cross_track_errors)),
         "avg_total_reward": float(np.mean(total_rewards)),
         "avg_time": float(np.mean(time_efficiencies))
     }
@@ -75,9 +78,12 @@ if __name__ == "__main__":
         "SAC_0_9": SACAgent("models/sac_asv_model_0_9.zip"),
     }
 
+    # Pre-generate fixed seeds for all agents
+    eval_seeds = [i for i in range(NUM_EPS)]
+
     results_list = []
     for name, agent in agents.items():
-        result = evaluate_agent(agent, name, n_episodes=1000, render=False)
+        result = evaluate_agent(agent, name, eval_seeds, render=False)
         results_list.append(result)
         print(f"\n{name} Results:")
         print(json.dumps(result, indent=2))

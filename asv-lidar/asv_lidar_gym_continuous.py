@@ -156,6 +156,8 @@ class ASVLidarEnv(gym.Env):
 
     def reset(self,seed=None, options=None):
         super().reset(seed=seed)
+        if seed is not None:
+            np.random.seed(seed)
 
         # Randomize start position
         self.start_y = self.map_height - 50
