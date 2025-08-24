@@ -23,13 +23,13 @@ Else: take the setup from recorded data of a random obstacles scenario (test cas
 """
 
 TEST_CASE = 0
-ENV_DATA = "data/env_setup/data_1.json"
+ENV_DATA = "data/env_setup/data_2.json"
 
 UPDATE_RATE = 0.5
 RENDER_FPS = 10
 MAP_WIDTH = 400
 MAP_HEIGHT = 600
-NUM_OBS = 5
+NUM_OBS = 10
 COLLISION_RANGE = 10
 
 # Actions
@@ -159,21 +159,21 @@ class testEnv(gym.Env):
                     # obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
                     obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
 
-        elif test_case == 1:
+        elif test_case == 7:
             obstacles = []
-        elif test_case == 2:
+        elif test_case == 1:
             x = 150
             y = 300
             obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
-        elif test_case == 3:
+        elif test_case == 2:
             x = 125
             y = 300
             obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
-        elif test_case == 4:
+        elif test_case == 3:
             x = 175
             y = 300
             obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
-        elif test_case == 5:
+        elif test_case == 4:
             x = 125
             y = 125
             obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
@@ -183,16 +183,26 @@ class testEnv(gym.Env):
             x = 200
             y = 325
             obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
-        elif test_case == 6:
-            x = 75
+        elif test_case == 5:
+            x = 50
             y = 325
             obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
-            x = 135
+            x = 110
             obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
-            x = 195
+            x = 170
             obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
-            x = 365
+            x = 320
             obstacles.append([(x-25,y-25), (x+25,y-25), (x+25,y+25), (x-25,y+25)])
+        elif test_case == 6:
+            x = 90
+            y = 300
+            obstacles.append([(x-80, y-150), (x+80, y-150), (x+80, y+150), (x-80, y+150)])
+            x = 310
+            obstacles.append([(x-60, y-100), (x+60, y-100), (x+60, y+100), (x-60, y+100)])
+            x = 200
+            y = 50
+            obstacles.append([(x-60, y-30), (x+90, y-30), (x+90, y+30), (x-60, y+30)])
+
         else:
             # load data file
             with open(self.env_data, "r") as f:
@@ -219,7 +229,7 @@ class testEnv(gym.Env):
             elif self.start_x >= self.map_width - 100:
                 self.asv_x = self.start_x - 50
         
-        elif self.test_case == 1:
+        elif self.test_case == 7:
             self.start_x = 150
             self.start_y = 550
 
@@ -228,7 +238,7 @@ class testEnv(gym.Env):
 
             self.asv_x = 150
 
-        elif self.test_case >= 2 and self.test_case <= 4:
+        elif self.test_case >= 1 and self.test_case <= 3:
             self.start_x = 150
             self.start_y = 550
 
@@ -237,7 +247,7 @@ class testEnv(gym.Env):
 
             self.asv_x = 150
         
-        elif self.test_case == 5:
+        elif self.test_case == 4:
             self.start_x = 200
             self.start_y = 550
             
@@ -246,14 +256,21 @@ class testEnv(gym.Env):
 
             self.asv_x = 200
         
-        elif self.test_case == 6:
+        elif self.test_case == 5:
             self.start_x = 50
             self.start_y = 550
 
-            self.goal_x = 350
+            self.goal_x = 250
             self.goal_y = 50
 
             self.asv_x = 50
+
+        elif self.test_case == 6:
+            self.start_x = 350
+            self.start_y = 550
+            self.goal_x = 50
+            self.goal_y = 50
+            self.asv_x = 300
         
         else:
             # load data file
@@ -370,7 +387,7 @@ class testEnv(gym.Env):
             r_goal = 0
 
         # Combined rewards
-        lambda_ = 0.8       # weighting factor
+        lambda_ = 0.5       # weighting factor
         reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_goal + r_heading
 
         if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):

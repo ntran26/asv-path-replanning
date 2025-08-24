@@ -12,7 +12,7 @@ UPDATE_RATE = 0.5
 RENDER_FPS = 10
 MAP_WIDTH = 400
 MAP_HEIGHT = 600
-NUM_OBS = 5
+NUM_OBS = 10
 COLLISION_RANGE = 10
 
 # Actions
@@ -294,7 +294,7 @@ class ASVLidarEnv(gym.Env):
             r_goal = 0
 
         # Combined rewards
-        lambda_ = 0.8       # weighting factor
+        lambda_ = 0.1       # weighting factor
         # reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_goal + r_heading
 
         if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):

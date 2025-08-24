@@ -66,7 +66,7 @@ The main folder is located in 'asv-lidar'
   ```
   python train_test_asv.py --mode test --algo sac --case 0
   ```
-  + If no arguments passed, use test mode, SAC agent, test case = 0 (random)
+  + If no arguments passed, by default, test mode will be run with SAC agent on a random test case.
 
 - Data folder:
   + After testing the agent, a test data will be saved as .json file listed in 'data' folder. 

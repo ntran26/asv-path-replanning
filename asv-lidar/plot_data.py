@@ -19,11 +19,11 @@ def add_boat_icon(ax, x, y, heading, zoom=1.25):
 datasets = [
     # ("PPO", "data/ppo_data_random_0.json", "purple", "dashdot"),
     # ("SAC", "data/sac_data_random_0.json", "blue", "solid"),
-    ("$ \lambda $ = 0.5", "data/test_case_4/sac_0_5_data.json", "orange", "dashed"),
-    ("$ \lambda $ = 0.6", "data/test_case_4/sac_0_6_data.json", "teal", "dotted"),
-    ("$ \lambda $ = 0.7", "data/test_case_4/sac_0_7_data.json", "magenta", "solid"),
-    ("$ \lambda $ = 0.8", "data/test_case_4/sac_0_8_data.json", "brown", "dashdot"),
-    ("$ \lambda $ = 0.9", "data/test_case_4/sac_0_9_data.json", "gray", "dashed"),
+    ("$ \lambda $ = 0.5", "data/test_case_6/sac_0_5_data.json", "orange", "dashed"),
+    ("$ \lambda $ = 0.6", "data/test_case_6/sac_0_6_data.json", "blue", "dotted"),
+    ("$ \lambda $ = 0.7", "data/test_case_6/sac_0_7_data.json", "magenta", "dashdot"),
+    ("$ \lambda $ = 0.8", "data/test_case_6/sac_0_8_data.json", "brown", (0, (3, 5, 1, 5, 1, 5))),
+    ("$ \lambda $ = 0.9", "data/test_case_6/sac_0_9_data.json", "green", (0, (3, 1, 1, 1)))
 ]
 
 # Use the first data file to set up the map
@@ -38,7 +38,7 @@ plt.figure(figsize=(6, 10))
 ax = plt.gca()
 
 # Plot reference path and static elements
-plt.plot(*zip(*path), label="Reference Path", color="green", linestyle="dotted", alpha=0.5)
+plt.plot(*zip(*path), label="Reference Path", color="black", linestyle="solid")
 plt.scatter(*start, color='green', label='Start')
 plt.scatter(*goal, color='red', label='Goal')
 for obs in obstacles:
@@ -51,7 +51,7 @@ for label, filepath, color, style in datasets:
         data = load_data(filepath)
         path_data = data["asv_path"]
         heading = data.get("heading", 0)
-        plt.plot(*zip(*path_data), label=label, color=color, linestyle=style)
+        plt.plot(*zip(*path_data), label=label, color=color, linestyle=style, linewidth=2)
 
         final_x, final_y = path_data[-1]
         add_boat_icon(ax, final_x, final_y, heading)
@@ -62,12 +62,12 @@ for label, filepath, color, style in datasets:
 ax.invert_yaxis()
 plt.xlabel("X")
 plt.ylabel("Y")
-plt.title("Test scenario 4")
+plt.title("Test scenario 6")
 plt.legend()
 plt.xlim((0, 400))
 plt.ylim((600, 0))
 plt.grid(False)
-plt.savefig("Test scenario 4.png", dpi=300, bbox_inches='tight')
+plt.savefig("Test scenario.png", dpi=300, bbox_inches='tight')
 plt.show()
 
 # plot data with pygame

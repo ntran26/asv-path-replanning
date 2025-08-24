@@ -12,6 +12,11 @@ import argparse
 import sys
 import multiprocessing
 
+"""
+Train: python train_test_asv.py --mode train --algo sac
+Test: python train_test_asv.py --mode test --algo sac --case 0
+"""
+
 if __name__=='__main__':
     multiprocessing.freeze_support()
 
