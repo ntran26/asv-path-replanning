@@ -150,7 +150,7 @@ if __name__=='__main__':
             # model = SAC.load(MODEL_PATH)
             # model = SAC.load("models/sac_asv_model_v1.zip")
             # model = SAC.load("models/sac_asv_model_v2.zip")
-            model = SAC.load("models/sac_asv_model_0_9.zip")
+            model = SAC.load("models/sac_asv_model_0_1.zip")
 
         env = testEnv(render_mode="human")
         env.test_case = args.case
