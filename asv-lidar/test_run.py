@@ -23,7 +23,7 @@ Else: take the setup from recorded data of a random obstacles scenario (test cas
 """
 
 TEST_CASE = 0
-ENV_DATA = "data/env_setup/data_2.json"
+ENV_DATA = "data/env_setup/env_1.json"
 
 UPDATE_RATE = 0.5
 RENDER_FPS = 10
@@ -149,7 +149,7 @@ class testEnv(gym.Env):
     def generate_obstacles(self, test_case):
         obstacles = []
         if test_case == 0:          # 10 random obstacles
-            for _ in range(np.random.randint(5,10)):
+            for _ in range(NUM_OBS):
                 x = np.random.randint(50, self.map_width - 50)
                 y = np.random.randint(50, self.map_height - 150)
 

@@ -143,14 +143,14 @@ if __name__=='__main__':
     elif args.mode == 'test':
         # Load the trained model and test it
         if algorithm == 'PPO':
-            model = PPO.load(MODEL_PATH)
+            # model = PPO.load(MODEL_PATH)
             # model = PPO.load("models/ppo_asv_model_v1.zip")
-            # model = PPO.load("models/ppo_asv_model_v2.zip")
+            model = PPO.load("models/ppo_asv_model_v2.zip")
         elif algorithm == 'SAC':
             # model = SAC.load(MODEL_PATH)
             # model = SAC.load("models/sac_asv_model_v1.zip")
             # model = SAC.load("models/sac_asv_model_v2.zip")
-            model = SAC.load("models/sac_asv_model_0_1.zip")
+            model = SAC.load("models/sac_asv_model_0_5.zip")
 
         env = testEnv(render_mode="human")
         env.test_case = args.case
