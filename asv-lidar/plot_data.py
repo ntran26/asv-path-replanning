@@ -19,11 +19,11 @@ def add_boat_icon(ax, x, y, heading, zoom=1.25):
 datasets = [
     # ("PPO", "data/ppo_data_random_0.json", "purple", "dashdot"),
     # ("SAC", "data/sac_data_random_0.json", "blue", "solid"),
-    ("$ \lambda $ = 0.5", "data/test_case_1/sac_0_5_data.json", "orange", "dashed"),
-    ("$ \lambda $ = 0.6", "data/test_case_1/sac_0_6_data.json", "blue", "dotted"),
-    ("$ \lambda $ = 0.7", "data/test_case_1/sac_0_7_data.json", "magenta", "dashdot"),
-    ("$ \lambda $ = 0.8", "data/test_case_1/sac_0_8_data.json", "brown", (0, (3, 5, 1, 5, 1, 5))),
-    ("$ \lambda $ = 0.9", "data/test_case_1/sac_0_9_data.json", "green", (0, (3, 1, 1, 1)))
+    ("$ \lambda $ = 0.5", "data/test_case_6/sac_0_5_data.json", "orange", "dashed"),
+    ("$ \lambda $ = 0.6", "data/test_case_6/sac_0_6_data.json", "blue", "dotted"),
+    ("$ \lambda $ = 0.7", "data/test_case_6/sac_0_7_data.json", "magenta", "dashdot"),
+    ("$ \lambda $ = 0.8", "data/test_case_6/sac_0_8_data.json", "brown", (0, (3, 5, 1, 5, 1, 5))),
+    ("$ \lambda $ = 0.9", "data/test_case_6/sac_0_9_data.json", "green", (0, (3, 1, 1, 1)))
 ]
 
 # Use the first data file to set up the map
@@ -62,7 +62,7 @@ for label, filepath, color, style in datasets:
 ax.invert_yaxis()
 plt.xlabel("X")
 plt.ylabel("Y")
-plt.title("Test scenario 1")
+plt.title("Test scenario 6")
 plt.legend()
 plt.xlim((0, 400))
 plt.ylim((600, 0))
