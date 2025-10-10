@@ -1,0 +1,10 @@
+gymnasium==1.2.1
+matplotlib==3.10.6
+numpy==2.3.3
+optuna==4.5.0
+pandas==2.3.2
+Pillow==11.3.0
+pygame==2.6.1
+stable_baselines3==2.7.0
+torch==2.8.0
+tqdm==4.67.1
