@@ -4,6 +4,8 @@ from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from PIL import Image
 from images import BOAT_ICON
 
+TEST_SCENARIO = 6
+
 def load_data(filepath):
     with open(filepath, 'r') as f:
         return json.load(f)
@@ -19,11 +21,12 @@ def add_boat_icon(ax, x, y, heading, zoom=1.25):
 datasets = [
     # ("PPO", "data/ppo_data_random_0.json", "purple", "dashdot"),
     # ("SAC", "data/sac_data_random_0.json", "blue", "solid"),
-    ("$ \lambda $ = 0.5", "data/test_case_6/sac_0_5_data.json", "orange", "dashed"),
-    ("$ \lambda $ = 0.6", "data/test_case_6/sac_0_6_data.json", "blue", "dotted"),
-    ("$ \lambda $ = 0.7", "data/test_case_6/sac_0_7_data.json", "magenta", "dashdot"),
-    ("$ \lambda $ = 0.8", "data/test_case_6/sac_0_8_data.json", "brown", (0, (3, 5, 1, 5, 1, 5))),
-    ("$ \lambda $ = 0.9", "data/test_case_6/sac_0_9_data.json", "green", (0, (3, 1, 1, 1)))
+    ("SAC, $ \lambda $ = 0.5", f"data/test_case_{TEST_SCENARIO}/sac_0_5_data.json", "orange", "dashed"),
+    ("SAC, $ \lambda $ = 0.6", f"data/test_case_{TEST_SCENARIO}/sac_0_6_data.json", "blue", "dotted"),
+    ("SAC, $ \lambda $ = 0.7", f"data/test_case_{TEST_SCENARIO}/sac_0_7_data.json", "magenta", "dashdot"),
+    ("SAC, $ \lambda $ = 0.8", f"data/test_case_{TEST_SCENARIO}/sac_0_8_data.json", "brown", (0, (3, 5, 1, 5, 1, 5))),
+    ("SAC, $ \lambda $ = 0.9", f"data/test_case_{TEST_SCENARIO}/sac_0_9_data.json", "green", (0, (3, 1, 1, 1))),
+    ("PPO, $ \lambda $ = 0.7 (best)", f"data/test_case_{TEST_SCENARIO}/ppo_best_data.json", "black", "dashdot")
 ]
 
 # Use the first data file to set up the map
@@ -62,13 +65,13 @@ for label, filepath, color, style in datasets:
 ax.invert_yaxis()
 plt.xlabel("X")
 plt.ylabel("Y")
-plt.title("Test scenario 6")
+plt.title(f"Test scenario {TEST_SCENARIO}")
 plt.legend()
 plt.xlim((0, 400))
 plt.ylim((600, 0))
 plt.grid(True)
 plt.grid(color='#dddddd', alpha=0.7)
-plt.savefig("Test scenario.png", dpi=300, bbox_inches='tight')
+plt.savefig(f"Test scenario {TEST_SCENARIO}.png", dpi=300, bbox_inches='tight')
 plt.show()
 
 # plot data with pygame

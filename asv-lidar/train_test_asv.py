@@ -145,7 +145,8 @@ if __name__=='__main__':
         if algorithm == 'PPO':
             # model = PPO.load(MODEL_PATH)
             # model = PPO.load("models/ppo_asv_model_v1.zip")
-            model = PPO.load("models/ppo_asv_model_v2.zip")
+            # model = PPO.load("models/ppo_asv_model_v2.zip")
+            model = PPO.load("models/ppo_asv_model_0_7.zip")
         elif algorithm == 'SAC':
             # model = SAC.load(MODEL_PATH)
             # model = SAC.load("models/sac_asv_model_v1.zip")

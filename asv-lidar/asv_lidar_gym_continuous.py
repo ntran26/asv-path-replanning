@@ -4,7 +4,7 @@ import numpy as np
 import pygame
 import pygame.freetype
 from ship_model import ShipModel
-from asv_lidar import Lidar, LIDAR_RANGE, LIDAR_BEAMS
+from asv_lidar_new import Lidar, LIDAR_RANGE, LIDAR_BEAMS
 from images import BOAT_ICON
 import cv2
 
@@ -412,28 +412,28 @@ if __name__ == '__main__':
         if term:
             print(f"Elapsed time: {env.elapsed_time}, Reward: {total_reward:0.2f}")
 
-            # Save path taken as image
-            path_surface = pygame.Surface((MAP_WIDTH, MAP_HEIGHT))
-            path_surface.fill((255,255,255))
+            # # Save path taken as image
+            # path_surface = pygame.Surface((MAP_WIDTH, MAP_HEIGHT))
+            # path_surface.fill((255,255,255))
 
-            for i in range(1, len(env.asv_path)):
-                pygame.draw.circle(path_surface, (0, 0, 200), env.asv_path[i], 5)
+            # for i in range(1, len(env.asv_path)):
+            #     pygame.draw.circle(path_surface, (0, 0, 200), env.asv_path[i], 5)
 
-            # Draw obstacles
-            for obs in env.obstacles:
-                pygame.draw.polygon(path_surface, (200, 0, 0), obs)
+            # # Draw obstacles
+            # for obs in env.obstacles:
+            #     pygame.draw.polygon(path_surface, (200, 0, 0), obs)
             
-            # Draw Path
-            pygame.draw.line(path_surface,(0,200,0),(env.start_x,env.start_y),(env.goal_x,env.goal_y),5)
-            pygame.draw.circle(path_surface,(100,0,0),(env.tgt_x,env.tgt_y),5)
+            # # Draw Path
+            # pygame.draw.line(path_surface,(0,200,0),(env.start_x,env.start_y),(env.goal_x,env.goal_y),5)
+            # pygame.draw.circle(path_surface,(100,0,0),(env.tgt_x,env.tgt_y),5)
 
-            # Draw map boundaries
-            pygame.draw.line(path_surface, (200, 0, 0), (0,0), (0,env.map_height), 5)
-            pygame.draw.line(path_surface, (200, 0, 0), (0,env.map_height), (env.map_width,env.map_height), 5)
-            pygame.draw.line(path_surface, (200, 0, 0), (env.map_width,0), (env.map_width,env.map_height), 5)
-            pygame.draw.line(path_surface, (200, 0, 0), (0,0), (env.map_width,0), 5)
+            # # Draw map boundaries
+            # pygame.draw.line(path_surface, (200, 0, 0), (0,0), (0,env.map_height), 5)
+            # pygame.draw.line(path_surface, (200, 0, 0), (0,env.map_height), (env.map_width,env.map_height), 5)
+            # pygame.draw.line(path_surface, (200, 0, 0), (env.map_width,0), (env.map_width,env.map_height), 5)
+            # pygame.draw.line(path_surface, (200, 0, 0), (0,0), (env.map_width,0), 5)
 
-            pygame.image.save(path_surface, "asv_path_result.png")          
+            # pygame.image.save(path_surface, "asv_path_result.png")          
 
             pygame.display.quit()
             pygame.quit()
