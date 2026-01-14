@@ -114,7 +114,7 @@ plt.ylabel('Y')
 plt.title('Points A, B, and C with specified distances')
 plt.grid(True)
 plt.legend()
-# plt.show()
+plt.show()
 
 random = np.random.choice([0,30,60,90,120,150,180])
 print(random)

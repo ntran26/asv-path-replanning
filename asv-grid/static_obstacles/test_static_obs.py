@@ -29,13 +29,13 @@ if __name__ == '__main__':
 
     # Load the model
     if version == 1:
-        model_path = "Paper-implementation/static_obstacles/ppo_static_obstacles_v1"
+        model_path = "static_obstacles/ppo_static_obstacles_v1"
     elif version == 2:
-        model_path = "Paper-implementation/static_obstacles/ppo_static_obstacles_v2"
+        model_path = "static_obstacles/ppo_static_obstacles_v2"
     elif version == 3:
-        model_path = "Paper-implementation/static_obstacles/ppo_static_obstacles_v3"
+        model_path = "static_obstacles/ppo_static_obstacles_v3"
     else:
-        model_path = "Paper-implementation/static_obstacles/ppo_static_obstacles"
+        model_path = "static_obstacles/ppo_static_obstacles"
 
     model = PPO.load(model_path)
 
