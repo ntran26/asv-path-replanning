@@ -4,7 +4,7 @@ import numpy as np
 import pygame
 import pygame.freetype
 from ship_model import ShipModel
-from asv_lidar_new import Lidar, LIDAR_RANGE, LIDAR_BEAMS, LIDAR_PARTITION
+from asv_lidar import Lidar, LIDAR_RANGE, LIDAR_BEAMS
 from images import BOAT_ICON
 import cv2
 
@@ -87,7 +87,7 @@ class ASVLidarEnv(gym.Env):
         """
         self.observation_space = Dict(
             {
-                "lidar": Box(low=0,high=1,shape=(LIDAR_PARTITION,),dtype=np.float32),
+                "lidar": Box(low=0,high=LIDAR_RANGE,shape=(LIDAR_BEAMS,),dtype=np.int16),
                 "pos"  : Box(low=np.array([0,0]),high=np.array(self.screen_size),shape=(2,),dtype=np.int16),
                 "hdg"  : Box(low=0,high=360,shape=(1,),dtype=np.int16),
                 "dhdg" : Box(low=0,high=36,shape=(1,),dtype=np.int16),
@@ -100,7 +100,6 @@ class ASVLidarEnv(gym.Env):
         
         # LIDAR
         self.lidar = Lidar()
-        self.lidar_obs = np.ones(LIDAR_PARTITION, dtype=np.float32)
 
         # Initialize number of obstacles
         self.num_obs = NUM_OBS
@@ -122,7 +121,7 @@ class ASVLidarEnv(gym.Env):
 
     def _get_obs(self):
         return {
-            "lidar": self.lidar_obs.astype(np.float32),
+            'lidar': self.lidar.ranges.astype(np.int16),
             'pos': np.array([self.asv_x, self.asv_y],dtype=np.int16),
             'hdg': np.array([self.asv_h],dtype=np.int16),
             'dhdg': np.array([self.asv_w],dtype=np.int16),
@@ -194,16 +193,8 @@ class ASVLidarEnv(gym.Env):
         # Initialize the ASV path list
         self.asv_path = [(self.asv_x, self.asv_y)]
 
-        # Lidar scan in meters
-        sector_m = self.lidar.scan((self.asv_x, self.asv_y), self.asv_h, 
-                                   obstacles=self.obstacles, map_border=self.map_border)
-        
-        # Normalize for RL observation
-        self.lidar_obs = np.clip(sector_m, 0.0, LIDAR_RANGE) / LIDAR_RANGE
-
         if self.render_mode in self.metadata['render_modes']:
             self.render()
-
         return self._get_obs(), {}
 
     # Configure terminal condition
@@ -259,11 +250,7 @@ class ASVLidarEnv(gym.Env):
         # self.tgt_x = self.goal_x
         # self.tgt = self.tgt_x - self.asv_x
 
-        # Lidar range in meters and normalization
-        sector_m = self.lidar.scan((self.asv_x, self.asv_y), self.asv_h,
-                                    obstacles=self.obstacles, map_border=self.map_border)
-
-        self.lidar_obs = np.clip(sector_m, 0.0, LIDAR_RANGE) / LIDAR_RANGE
+        self.lidar.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=self.obstacles, map_border=self.map_border)
 
         self.angle_diff = self.calculate_angle(self.asv_x, self.asv_y, self.asv_h, self.goal_x, self.goal_y)
         
@@ -425,28 +412,28 @@ if __name__ == '__main__':
         if term:
             print(f"Elapsed time: {env.elapsed_time}, Reward: {total_reward:0.2f}")
 
-            # # Save path taken as image
-            # path_surface = pygame.Surface((MAP_WIDTH, MAP_HEIGHT))
-            # path_surface.fill((255,255,255))
+            # Save path taken as image
+            path_surface = pygame.Surface((MAP_WIDTH, MAP_HEIGHT))
+            path_surface.fill((255,255,255))
 
-            # for i in range(1, len(env.asv_path)):
-            #     pygame.draw.circle(path_surface, (0, 0, 200), env.asv_path[i], 5)
+            for i in range(1, len(env.asv_path)):
+                pygame.draw.circle(path_surface, (0, 0, 200), env.asv_path[i], 5)
 
-            # # Draw obstacles
-            # for obs in env.obstacles:
-            #     pygame.draw.polygon(path_surface, (200, 0, 0), obs)
+            # Draw obstacles
+            for obs in env.obstacles:
+                pygame.draw.polygon(path_surface, (200, 0, 0), obs)
             
-            # # Draw Path
-            # pygame.draw.line(path_surface,(0,200,0),(env.start_x,env.start_y),(env.goal_x,env.goal_y),5)
-            # pygame.draw.circle(path_surface,(100,0,0),(env.tgt_x,env.tgt_y),5)
+            # Draw Path
+            pygame.draw.line(path_surface,(0,200,0),(env.start_x,env.start_y),(env.goal_x,env.goal_y),5)
+            pygame.draw.circle(path_surface,(100,0,0),(env.tgt_x,env.tgt_y),5)
 
-            # # Draw map boundaries
-            # pygame.draw.line(path_surface, (200, 0, 0), (0,0), (0,env.map_height), 5)
-            # pygame.draw.line(path_surface, (200, 0, 0), (0,env.map_height), (env.map_width,env.map_height), 5)
-            # pygame.draw.line(path_surface, (200, 0, 0), (env.map_width,0), (env.map_width,env.map_height), 5)
-            # pygame.draw.line(path_surface, (200, 0, 0), (0,0), (env.map_width,0), 5)
+            # Draw map boundaries
+            pygame.draw.line(path_surface, (200, 0, 0), (0,0), (0,env.map_height), 5)
+            pygame.draw.line(path_surface, (200, 0, 0), (0,env.map_height), (env.map_width,env.map_height), 5)
+            pygame.draw.line(path_surface, (200, 0, 0), (env.map_width,0), (env.map_width,env.map_height), 5)
+            pygame.draw.line(path_surface, (200, 0, 0), (0,0), (env.map_width,0), 5)
 
-            # pygame.image.save(path_surface, "asv_path_result.png")          
+            pygame.image.save(path_surface, "asv_path_result.png")          
 
             pygame.display.quit()
             pygame.quit()

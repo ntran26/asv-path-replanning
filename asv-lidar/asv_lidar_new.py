@@ -74,73 +74,79 @@ class Lidar:
             numpy.ndarray: array of ranges from sensor to obstacles.
                 If no obstacle is detected, the range remains LIDAR_RANGE.
         """
-        # self._pos_x = pos[0]
-        # self._pos_y = pos[1]
         self._hdg = hdg
 
         # Set the lidar (x,y) to be in front of the asv
         lidar_offset = 30
         self._pos_x = pos[0] + lidar_offset * np.sin(np.radians(self._hdg))
         self._pos_y = pos[1] - lidar_offset * np.cos(np.radians(self._hdg))
-        
-        # Loop over each beam angle to compute collision distances
+
+        # -----------------------------
+        # Build edges ONCE per scan
+        # -----------------------------
+        edges = []
+
+        if obstacles:
+            for poly in obstacles:
+                n = len(poly)
+                for i in range(n):
+                    edges.append((poly[i], poly[(i + 1) % n]))
+
+        if map_border:
+            for poly in map_border:
+                n = len(poly)
+                for i in range(n):
+                    edges.append((poly[i], poly[(i + 1) % n]))
+
+        # -----------------------------
+        # Beam casting
+        # -----------------------------
         for idx, angle in enumerate(self._angles):
-            # Calculate the absolute angle (sensor heading + beam angle) in radians
             absolute_angle = np.radians(self._hdg + angle)
-            # Compute the endpoint of the beam at maximum range (if no obstacle)
             end_x = self._pos_x + LIDAR_RANGE * np.sin(absolute_angle)
             end_y = self._pos_y - LIDAR_RANGE * np.cos(absolute_angle)
-            
-            # Initialize the closest distance to the maximum range
-            closest_distance = LIDAR_RANGE
 
-            edges = []
-
-            if obstacles:
-                for obs in obstacles:
-                    for i in range(len(obs)):
-                        # v1 = obs[i]
-                        # v2 = obs[(i + 1) % len(obs)]
-                        # edges.append((v1, v2))
-                        edges.append((obs[i], obs[(i + 1) % len(obs)]))
-
-            if map_border:
-                for border in map_border:
-                    for i in range(len(border)):
-                        # v1 = border[i]
-                        # v2 = border[(i + 1) % len(border)]
-                        # edges.append((v1, v2))
-                        edges.append((border[i], border[(i + 1) % len(border)]))
+            # IMPORTANT: always initialize closest here (fixes your error)
+            closest = LIDAR_RANGE
 
             for e in edges:
-                intersect = self.line_intersection((self._pos_x, self._pos_y), (end_x, end_y), e[0], e[1])
-                if intersect:
-                    d = np.hypot(intersect[0] - self._pos_x, intersect[1] - self._pos_y)
-                    closest = min(closest, d)
+                p = self.line_intersection(
+                    (self._pos_x, self._pos_y), (end_x, end_y),
+                    e[0], e[1]
+                )
+                if p is not None:
+                    d = np.hypot(p[0] - self._pos_x, p[1] - self._pos_y)
+                    if d < closest:
+                        closest = d
 
             self._ranges[idx] = closest
 
-        # Sector pooling
+        # -----------------------------
+        # Sector pooling (ONCE per scan)
+        # -----------------------------
         sector_size = BEAM_PER_SECTOR
-        sector_angle = np.radians(LIDAR_SWATH / LIDAR_PARTITION)
+
+        # Beam spacing inferred from your setup (better than LIDAR_SWATH/LIDAR_PARTITION here)
+        # because each sector contains `sector_size` beams.
+        beam_spacing = np.radians(LIDAR_SWATH / LIDAR_BEAMS)
+        sector_angle_span = beam_spacing * (sector_size - 1)
 
         self._sector_ranges = np.zeros(LIDAR_PARTITION, dtype=np.float32)
         self._sector_feasible = np.zeros(LIDAR_PARTITION, dtype=bool)
 
-        # Threshold for visualization 
-        min_clearance = getattr(self, "min_clearance", 10.0)
+        # Use a clearance threshold for "free vs blocked" coloring in render
+        clearance = getattr(self, "min_clearance", 10.0)
 
         for i in range(LIDAR_PARTITION):
             start = i * sector_size
             end = (i + 1) * sector_size
             sector_ranges = self._ranges[start:end]
 
-            pooled = self.pooling(sector_ranges, VESSEL_WIDTH, sector_angle)
+            pooled = self.pooling(sector_ranges, VESSEL_WIDTH, sector_angle_span)
             self._sector_ranges[i] = pooled
+            self._sector_feasible[i] = pooled > clearance
 
-            # For rendering: "blocked" if pooled distance is very close.
-            self._sector_feasible[i] = pooled > min_clearance
-
+        # Return pooled sector distances (meters)
         return self._sector_ranges.copy()
 
     def line_intersection(self, a1, a2, b1, b2):

@@ -31,6 +31,7 @@ MAP_WIDTH = 400
 MAP_HEIGHT = 600
 NUM_OBS = 10
 COLLISION_RANGE = 10
+LIDAR_PARTITION = 15
 
 # Actions
 PORT = 0
@@ -88,7 +89,8 @@ class testEnv(gym.Env):
 
         self.observation_space = Dict(
             {
-                "lidar": Box(low=0,high=LIDAR_RANGE,shape=(LIDAR_BEAMS,),dtype=np.int16),
+                # "lidar": Box(low=0,high=LIDAR_RANGE,shape=(LIDAR_BEAMS,),dtype=np.int16),
+                "lidar": Box(low=0,high=1,shape=(LIDAR_PARTITION,),dtype=np.float32),
                 "pos"  : Box(low=np.array([0,0]),high=np.array(self.screen_size),shape=(2,),dtype=np.int16),
                 "hdg"  : Box(low=0,high=360,shape=(1,),dtype=np.int16),
                 "dhdg" : Box(low=0,high=36,shape=(1,),dtype=np.int16),
