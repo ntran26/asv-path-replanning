@@ -5,8 +5,8 @@ from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.callbacks import BaseCallback
-from asv_lidar_gym_continuous import ASVLidarEnv
-from test_run import testEnv
+from asv_lidar_rudder_speed_control import ASVLidarEnv
+# from test_run import testEnv  # optional custom test wrapper
 import json
 import argparse
 import sys
@@ -67,6 +67,17 @@ if __name__=='__main__':
                 print(f"Saving model at {self.num_timesteps} timesteps")
                 self.model.save(model_path)
                 self.model_save_counter += 1
+
+            if self.locals.get("loss", None) is not None:
+                loss = self.locals["loss"]
+                self.policy_loss.append(loss.get("policy_loss", 0))
+                self.value_loss.append(loss.get("value_loss", 0))
+
+            if len(self.model.ep_info_buffer) > 0:
+                self.rewards.append(self.model.ep_info_buffer[0]["r"])
+                if "loss" in self.model.ep_info_buffer[0]:
+                    self.policy_loss.append(self.model.ep_info_buffer[0]["loss"]["policy_loss"])
+                    self.value_loss.append(self.model.ep_info_buffer[0]["loss"]["value_loss"])
             return True
 
     # Model save path
@@ -111,6 +122,17 @@ if __name__=='__main__':
         plt.title('Reward over Episodes')
         fig.savefig("reward_plot.png")
 
+        # fig = plt.figure(2)
+        # plt.subplot(221)
+        # plt.plot(callback.policy_loss)
+        # plt.title("Policy Loss")
+        # plt.xlabel("Training Steps")
+
+        # plt.subplot(222)
+        # plt.plot(callback.value_loss)
+        # plt.title("Value Loss")
+        # plt.xlabel("Training Steps")
+
         plt.show()
 
         env.close()
@@ -121,19 +143,18 @@ if __name__=='__main__':
     elif args.mode == 'test':
         # Load the trained model and test it
         if algorithm == 'PPO':
-            model = PPO.load(MODEL_PATH)
+            # model = PPO.load(MODEL_PATH)
             # model = PPO.load("models/ppo_asv_model_v1.zip")
             # model = PPO.load("models/ppo_asv_model_v2.zip")
-            # model = PPO.load("models/ppo_asv_model_0_7.zip")
+            model = PPO.load("models/ppo_asv_model_0_7.zip")
         elif algorithm == 'SAC':
-            model = SAC.load(MODEL_PATH)
+            # model = SAC.load(MODEL_PATH)
             # model = SAC.load("models/sac_asv_model_v1.zip")
             # model = SAC.load("models/sac_asv_model_v2.zip")
-            # model = SAC.load("models/sac_asv_model_0_5.zip")
+            model = SAC.load("models/sac_asv_model_0_5.zip")
 
-        env = testEnv(render_mode="human")
-        env.test_case = args.case
-        # env = ASVLidarEnv(render_mode="human")
+        env = ASVLidarEnv(render_mode="human")
+        # Optional: if you have custom scripted test cases, plug them in here.
 
         obs, _ = env.reset()
         done = False
