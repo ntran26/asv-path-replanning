@@ -3,7 +3,7 @@ from gymnasium.spaces import Dict, Box, Discrete
 import numpy as np
 import pygame
 import pygame.freetype
-from ship_model import ShipModel
+from ship_model import ShipModel, THRUST_COEF, DRAG_COEF
 from asv_lidar import Lidar, LIDAR_RANGE, LIDAR_BEAMS
 from images import BOAT_ICON
 import cv2
@@ -99,7 +99,7 @@ class ASVLidarEnv(gym.Env):
                 "spd"  : Box(low=0.0, high=10.0, shape=(1,), dtype=np.float32),
                 "tgt"  : Box(low=-50,high=50,shape=(1,),dtype=np.int16),
                 "target_heading": Box(low=-180,high=180,shape=(1,),dtype=np.int16)
-            
+
             }
         )
 
