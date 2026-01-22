@@ -91,15 +91,14 @@ class ASVLidarEnv(gym.Env):
         """
         self.observation_space = Dict(
             {
-
                 "lidar": Box(low=0, high=LIDAR_RANGE, shape=(LIDAR_BEAMS,), dtype=np.float32),
                 "pos"  : Box(low=np.array([0,0]),high=np.array(self.screen_size),shape=(2,),dtype=np.int16),
                 "hdg"  : Box(low=0,high=360,shape=(1,),dtype=np.int16),
                 "dhdg" : Box(low=0,high=36,shape=(1,),dtype=np.int16),
-                "spd"  : Box(low=0.0, high=10.0, shape=(1,), dtype=np.float32),
+                "speed"  : Box(low=0.0, high=10.0, shape=(1,), dtype=np.float32),
+                "speed_norm": Box(low=0.0, high=1.5, shape=(1,), dtype=np.float32),
                 "tgt"  : Box(low=-50,high=50,shape=(1,),dtype=np.int16),
                 "target_heading": Box(low=-180,high=180,shape=(1,),dtype=np.int16)
-
             }
         )
 

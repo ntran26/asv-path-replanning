@@ -15,5 +15,3 @@ Control (check for limit/calibration)
 Ship paramters:
 - Width and Length
 - Lidar position on vessel
-
-

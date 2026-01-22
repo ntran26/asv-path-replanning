@@ -21,7 +21,7 @@ RPM_MIN = 0
 RPM_MAX = 200
 
 # Reward shaping parameters (aligned with the paper)
-# NOTE: Angles in the paper are treated in radians; we convert our degree-based lidar angles.
+
 GAMMA_E = 0.05      # cross-track decay (paper Eq. 31)
 GAMMA_THETA = 4.0   # angle weighting for obstacle penalty (paper Eq. 32)
 GAMMA_X = 0.005     # distance scaling for obstacle penalty (paper Eq. 32)
