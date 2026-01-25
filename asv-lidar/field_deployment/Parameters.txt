@@ -1,0 +1,14 @@
+
+Vessel:
+- Width: 0.5 m
+- Length: 1.7 m
+
+Sensors:
+- Positional sensor: X, Y, Yaw (meter)
+- LiDAR range: 1 to 16 (meter)
+- LiDAR angle: 1 beam every half degree for 360 degrees
+
+Environment:
+- Width: 10 m
+- Length/Height: 25 m
+

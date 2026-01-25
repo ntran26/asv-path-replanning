@@ -8,14 +8,14 @@ from asv_lidar import Lidar, LIDAR_RANGE, LIDAR_BEAMS
 from images import BOAT_ICON
 import cv2
 
-UPDATE_RATE = 0.5
+UPDATE_RATE = 0.1   # 10 Hz
 RENDER_FPS = 10
 MAP_WIDTH = 400
 MAP_HEIGHT = 600
 NUM_OBS = 10
 COLLISION_RANGE = 10
 
-# Speed control (rpm command mapped from action)
+# Speed control (rpm)
 RPM_MIN = 0
 RPM_MAX = 200
 
@@ -294,9 +294,6 @@ class ASVLidarEnv(gym.Env):
         """
 
         # penatly for each step taken
-        # if dy < 0:
-        #     r_exist = -10
-        # else:
         r_exist = -1
 
         # heading alignment reward (reward = 1 if aligned, -1 if opposite)
@@ -360,7 +357,7 @@ class ASVLidarEnv(gym.Env):
         pygame.draw.line(self.surface, (200, 0, 0), (0,0), (0,self.map_height), 5)
         pygame.draw.line(self.surface, (200, 0, 0), (0,self.map_height), (self.map_width,self.map_height), 5)
         pygame.draw.line(self.surface, (200, 0, 0), (self.map_width,0), (self.map_width,self.map_height), 5)
-        # pygame.draw.line(self.surface, (200, 0, 0), (0,0), (self.map_width,0), 5)
+        pygame.draw.line(self.surface, (200, 0, 0), (0,0), (self.map_width,0), 5)
 
         # Draw obstacles
         for obs in self.obstacles:
@@ -385,8 +382,6 @@ class ASVLidarEnv(gym.Env):
         if self.status is not None:
             status, rect = self.status.render(f"{self.elapsed_time:005.1f}s  V:{self.model._v:0.2f}m/s  HDG:{self.asv_h:+004.0f}({self.asv_w:+03.0f})  TGT:{self.tgt:+004.0f}  TGT_HDG:{self.angle_diff:.2f}",(255,255,255),(0,0,0))
             self.surface.blit(status, [10,550])
-            # lidar_status, rect = self.status.render(f"{lidar}",(255,255,255),(0,0,0))
-            # self.surface.blit(lidar_status, [5,575])
 
         os = pygame.transform.rotozoom(self.icon,-self.asv_h,2)
         self.surface.blit(os,os.get_rect(center=(self.asv_x,self.asv_y)))
@@ -413,57 +408,13 @@ if __name__ == '__main__':
     pygame.event.set_allowed((pygame.QUIT,pygame.KEYDOWN,pygame.KEYUP))
     action = CENTER
     total_reward = 0
-    while True:
-        # # Manual control
-        # for event in pygame.event.get():
-        #     if event.type == pygame.QUIT:
-        #         pygame.display.quit()
-        #         pygame.quit()
-        #         exit()
-        #     elif event.type == pygame.KEYUP:
-        #         action = CENTER
-        #     elif event.type == pygame.KEYDOWN:
-        #         if event.key == pygame.K_RIGHT:
-        #             action = STBD
-        #         elif event.key == pygame.K_LEFT:
-        #             action = PORT
-        # obs,rew,term,_,_ = env.step(action)
-        # lidar_list = obs['lidar']
-        
+    while True:        
         # Random actions
         action = env.action_space.sample()
         obs,rew,term,_,_ = env.step(action)
-
-        # print(lidar_list)
-        # print(total_reward)
-        # print(obs)
         total_reward += rew
         if term:
-            print(f"Elapsed time: {env.elapsed_time}, Reward: {total_reward:0.2f}")
-
-            # # Save path taken as image
-            # path_surface = pygame.Surface((MAP_WIDTH, MAP_HEIGHT))
-            # path_surface.fill((255,255,255))
-
-            # for i in range(1, len(env.asv_path)):
-            #     pygame.draw.circle(path_surface, (0, 0, 200), env.asv_path[i], 5)
-
-            # # Draw obstacles
-            # for obs in env.obstacles:
-            #     pygame.draw.polygon(path_surface, (200, 0, 0), obs)
-            
-            # # Draw Path
-            # pygame.draw.line(path_surface,(0,200,0),(env.start_x,env.start_y),(env.goal_x,env.goal_y),5)
-            # pygame.draw.circle(path_surface,(100,0,0),(env.tgt_x,env.tgt_y),5)
-
-            # # Draw map boundaries
-            # pygame.draw.line(path_surface, (200, 0, 0), (0,0), (0,env.map_height), 5)
-            # pygame.draw.line(path_surface, (200, 0, 0), (0,env.map_height), (env.map_width,env.map_height), 5)
-            # pygame.draw.line(path_surface, (200, 0, 0), (env.map_width,0), (env.map_width,env.map_height), 5)
-            # pygame.draw.line(path_surface, (200, 0, 0), (0,0), (env.map_width,0), 5)
-
-            # pygame.image.save(path_surface, "asv_path_result.png")          
-
+            print(f"Elapsed time: {env.elapsed_time}, Reward: {total_reward:0.2f}")         
             pygame.display.quit()
             pygame.quit()
             exit()
