@@ -81,7 +81,7 @@ if __name__=='__main__':
             return True
 
     # Model save path
-    MODEL_PATH = f"{algorithm.lower()}_asv_model"
+    MODEL_PATH = f"{algorithm.lower()}_asv_model.zip"
 
 
     #                       -------------- TRAINING --------------
@@ -143,18 +143,17 @@ if __name__=='__main__':
     elif args.mode == 'test':
         # Load the trained model and test it
         if algorithm == 'PPO':
-            # model = PPO.load(MODEL_PATH)
+            model = PPO.load(MODEL_PATH)
             # model = PPO.load("models/ppo_asv_model_v1.zip")
             # model = PPO.load("models/ppo_asv_model_v2.zip")
-            model = PPO.load("models/ppo_asv_model_0_7.zip")
+            # model = PPO.load("models/ppo_asv_model_0_7.zip")
         elif algorithm == 'SAC':
-            # model = SAC.load(MODEL_PATH)
+            model = SAC.load(MODEL_PATH)
             # model = SAC.load("models/sac_asv_model_v1.zip")
             # model = SAC.load("models/sac_asv_model_v2.zip")
-            model = SAC.load("models/sac_asv_model_0_5.zip")
+            # model = SAC.load("models/sac_asv_model_0_5.zip")
 
         env = ASVLidarEnv(render_mode="human")
-        # Optional: if you have custom scripted test cases, plug them in here.
 
         obs, _ = env.reset()
         done = False

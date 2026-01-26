@@ -18,6 +18,7 @@ COLLISION_RANGE = 10
 # Speed control (rpm)
 RPM_MIN = 0
 RPM_MAX = 200
+U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 
 # Actions
 PORT = 0
@@ -101,11 +102,13 @@ class ASVLidarEnv(gym.Env):
                 "target_heading": Box(low=-180,high=180,shape=(1,),dtype=np.int16)
             }
         )
-
+        """
+        Action space:
+            action = [rudder, throttle] within normalized range [-1,1]
+            rudder command: rudder angle percentage for ShipModel.update()
+            throttle command: RPM for [RPM_MIN, RPM_MAX]
+        """
         self.action_space = Box(low=np.array([-1.0, -1.0]), high=np.array([1.0, 1.0]), dtype=np.float32)
-        # action = [rudder_cmd, throttle_cmd] each in [-1,1]
-        # rudder_cmd -> rudder angle percentage for ShipModel.update()
-        # throttle_cmd -> rpm in [RPM_MIN, RPM_MAX]
         
         # LIDAR
         self.lidar = Lidar()
@@ -114,7 +117,6 @@ class ASVLidarEnv(gym.Env):
         self.num_obs = NUM_OBS
 
         # Initialize map borders
-        # self.map_border = [(0,0), (0,self.map_height), (self.map_width,self.map_height), (self.map_width,0)]
         self.map_border = [
                             [(0, 0), (0, self.map_height),(0,0),(0, self.map_height)],  
                             [(0, self.map_height), (self.map_width, self.map_height),(0, self.map_height),(self.map_width, self.map_height)],
@@ -134,7 +136,8 @@ class ASVLidarEnv(gym.Env):
             'pos': np.array([self.asv_x, self.asv_y],dtype=np.int16),
             'hdg': np.array([self.asv_h],dtype=np.int16),
             'dhdg': np.array([self.asv_w],dtype=np.int16),
-            'spd': np.array([self.model._v], dtype=np.float32),
+            'speed': np.array([self.model._v], dtype=np.float32),
+            'speed_norm': np.array([min(max(self.model._v / max(U_MAX, 1e-6), 0.0), 1.5)], dtype=np.float32),
             'tgt': np.array([self.tgt],dtype=np.int16),
             'target_heading': np.array([self.angle_diff],dtype=np.int16)
         }
@@ -275,10 +278,6 @@ class ASVLidarEnv(gym.Env):
         closest_idx = np.argmin(distance)
         self.tgt_x, self.tgt_y = self.path[closest_idx]
 
-        # self.tgt_y = self.asv_y-50
-        # self.tgt_x = self.goal_x
-        # self.tgt = self.tgt_x - self.asv_x
-
         self.lidar.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=self.obstacles, map_border=self.map_border)
 
         self.angle_diff = self.calculate_angle(self.asv_x, self.asv_y, self.asv_h, self.goal_x, self.goal_y)
@@ -296,37 +295,56 @@ class ASVLidarEnv(gym.Env):
         # penatly for each step taken
         r_exist = -1
 
+        # new parameters
+        epsilon_x = 1   # distance buffer
+        gamma_e = 0.05  # cross-track decay
+        gamma_theta = 0.03  # angle weighting
+        lambda_ = 0.5   # weighting parameter
+
+        # Speed terms
+        U = float(self.model._v)
+        U_max = float(max(U_MAX, 1e-6))
+        U_norm = float(np.clip(U / U_max, 0.0, 1.5))
+
         # heading alignment reward (reward = 1 if aligned, -1 if opposite)
         angle_diff_rad = np.radians(self.angle_diff)
-        r_heading = np.cos(angle_diff_rad)
+        r_heading = float(np.cos(angle_diff_rad))
 
         # path following reward
-        r_pf = np.exp(-0.05 * abs(self.tgt))
+        offset_error = float(abs(self.tgt))
+        # r_pf = np.exp(-0.05 * abs(self.tgt))
+        r_pf = -1 + (np.exp(-gamma_e * offset_error) + 1) * (U_norm * r_heading + 1)
 
         # obstacle avoidance reward
-        lidar_list = self.lidar.ranges.astype(np.float32)
-        r_oa = 0
-        for i, dist in enumerate(lidar_list):
-            theta = self.lidar.angles[i]    # angle of lidar beam
-            weight = 1 / (1 + abs(theta))   # prioritize beams closer to center/front
-            r_oa += weight / max(dist, 1)
-        r_oa = -r_oa / len(lidar_list)
+        lidar_d = self.lidar.ranges.astype(np.float32)
+        lidar_theta = self.lidar.angles.astype(np.float32)
+
+        weights = 1 / (1 + np.abs(gamma_theta * lidar_theta))
+        inv_term = 1 / np.maximum(lidar_d - epsilon_x, 1e-3)
+        r_oa = -float(np.sum(weights * inv_term) / (np.sum(weights) + 1e-6))
+
+        # lidar_list = self.lidar.ranges.astype(np.float32)
+        # r_oa = 0
+        # for i, dist in enumerate(lidar_list):
+        #     theta = self.lidar.angles[i]    # angle of lidar beam
+        #     weight = 1 / (1 + abs(theta))   # prioritize beams closer to center/front
+        #     r_oa += weight / max(dist, epsilon_x)
+        # r_oa = -r_oa / len(lidar_list)
 
         # if the agent reaches goal
         self.distance_to_goal = np.linalg.norm([self.asv_x - self.goal_x, self.asv_y - self.goal_y])
         if self.distance_to_goal <= self.collision+30:
-            r_goal = 50
+            r_goal = 100
         else:
             r_goal = 0
 
         # Combined rewards
-        lambda_ = 0.1       # weighting factor
         # reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_goal + r_heading
 
         if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):
             reward = -1000
         else:
-            reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
+            reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_goal
 
         terminated = self.check_done((self.asv_x, self.asv_y))
         return self._get_obs(), reward, terminated, False, {}
