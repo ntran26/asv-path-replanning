@@ -16,7 +16,7 @@ NUM_OBS = 10
 COLLISION_RANGE = 10
 
 # Speed control (rpm)
-RPM_MIN = 0
+RPM_MIN = 50
 RPM_MAX = 200
 U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 
@@ -97,7 +97,6 @@ class ASVLidarEnv(gym.Env):
                 "hdg"  : Box(low=0,high=360,shape=(1,),dtype=np.int16),
                 "dhdg" : Box(low=0,high=36,shape=(1,),dtype=np.int16),
                 "speed"  : Box(low=0.0, high=10.0, shape=(1,), dtype=np.float32),
-                "speed_norm": Box(low=0.0, high=1.5, shape=(1,), dtype=np.float32),
                 "tgt"  : Box(low=-50,high=50,shape=(1,),dtype=np.int16),
                 "target_heading": Box(low=-180,high=180,shape=(1,),dtype=np.int16)
             }
@@ -137,7 +136,6 @@ class ASVLidarEnv(gym.Env):
             'hdg': np.array([self.asv_h],dtype=np.int16),
             'dhdg': np.array([self.asv_w],dtype=np.int16),
             'speed': np.array([self.model._v], dtype=np.float32),
-            'speed_norm': np.array([min(max(self.model._v / max(U_MAX, 1e-6), 0.0), 1.5)], dtype=np.float32),
             'tgt': np.array([self.tgt],dtype=np.int16),
             'target_heading': np.array([self.angle_diff],dtype=np.int16)
         }

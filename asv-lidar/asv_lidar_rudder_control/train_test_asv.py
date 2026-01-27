@@ -67,6 +67,8 @@ if __name__=='__main__':
                 print(f"Saving model at {self.num_timesteps} timesteps")
                 self.model.save(model_path)
                 self.model_save_counter += 1
+            if len(self.model.ep_info_buffer) > 0:
+                self.rewards.append(self.model.ep_info_buffer[0]["r"])
             return True
 
     # Model save path

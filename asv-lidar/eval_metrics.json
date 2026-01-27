@@ -1,0 +1,542 @@
+[
+  {
+    "timesteps": 50000,
+    "episode": 0,
+    "ep_reward": -1088.5954790665637,
+    "ep_len": 315,
+    "final_dist": 278.66390318993666,
+    "mean_speed": 7.50994086228198,
+    "min_lidar_range": 10.605788230895996
+  },
+  {
+    "timesteps": 50000,
+    "episode": 1,
+    "ep_reward": -1309.6326882194371,
+    "ep_len": 459,
+    "final_dist": 204.47176419512365,
+    "mean_speed": 7.648260163553997,
+    "min_lidar_range": 10.237398147583008
+  },
+  {
+    "timesteps": 50000,
+    "episode": 2,
+    "ep_reward": -1440.926979393252,
+    "ep_len": 661,
+    "final_dist": 194.23646400094432,
+    "mean_speed": 7.714368741701741,
+    "min_lidar_range": 10.266481399536133
+  },
+  {
+    "timesteps": 100000,
+    "episode": 0,
+    "ep_reward": -1073.0130424569393,
+    "ep_len": 127,
+    "final_dist": 431.852519350681,
+    "mean_speed": 6.94147892064234,
+    "min_lidar_range": 10.32211971282959
+  },
+  {
+    "timesteps": 100000,
+    "episode": 1,
+    "ep_reward": -1323.5638645169995,
+    "ep_len": 669,
+    "final_dist": 59.33319618338152,
+    "mean_speed": 7.619804519124335,
+    "min_lidar_range": 10.74921703338623
+  },
+  {
+    "timesteps": 100000,
+    "episode": 2,
+    "ep_reward": -1384.6165307240121,
+    "ep_len": 664,
+    "final_dist": 83.83421096104684,
+    "mean_speed": 7.691823389815605,
+    "min_lidar_range": 10.722953796386719
+  },
+  {
+    "timesteps": 150000,
+    "episode": 0,
+    "ep_reward": -27.076650565768333,
+    "ep_len": 597,
+    "final_dist": 39.410367738862796,
+    "mean_speed": 7.8123223695050426,
+    "min_lidar_range": 54.310794830322266
+  },
+  {
+    "timesteps": 150000,
+    "episode": 1,
+    "ep_reward": -1561.037581267668,
+    "ep_len": 680,
+    "final_dist": 244.77359820592415,
+    "mean_speed": 7.5940547734819015,
+    "min_lidar_range": 10.380095481872559
+  },
+  {
+    "timesteps": 150000,
+    "episode": 2,
+    "ep_reward": -1192.7445599744005,
+    "ep_len": 366,
+    "final_dist": 225.28083859639617,
+    "mean_speed": 7.774245608652352,
+    "min_lidar_range": 10.989028930664062
+  },
+  {
+    "timesteps": 200000,
+    "episode": 0,
+    "ep_reward": -1158.3154944081223,
+    "ep_len": 389,
+    "final_dist": 226.7251889297975,
+    "mean_speed": 7.846100492183131,
+    "min_lidar_range": 10.972413063049316
+  },
+  {
+    "timesteps": 200000,
+    "episode": 1,
+    "ep_reward": -1148.6545285889738,
+    "ep_len": 243,
+    "final_dist": 321.3604209814599,
+    "mean_speed": 7.399102910387659,
+    "min_lidar_range": 10.663784980773926
+  },
+  {
+    "timesteps": 200000,
+    "episode": 2,
+    "ep_reward": -1208.921584993532,
+    "ep_len": 332,
+    "final_dist": 254.24054092309794,
+    "mean_speed": 7.729492693583464,
+    "min_lidar_range": 10.97494888305664
+  },
+  {
+    "timesteps": 250000,
+    "episode": 0,
+    "ep_reward": -1117.988067630712,
+    "ep_len": 184,
+    "final_dist": 371.5558016335176,
+    "mean_speed": 6.993003405848394,
+    "min_lidar_range": 10.596723556518555
+  },
+  {
+    "timesteps": 250000,
+    "episode": 1,
+    "ep_reward": -1123.8448167793952,
+    "ep_len": 226,
+    "final_dist": 338.0927788942774,
+    "mean_speed": 7.332808890959769,
+    "min_lidar_range": 10.591486930847168
+  },
+  {
+    "timesteps": 250000,
+    "episode": 2,
+    "ep_reward": -1030.6070641155663,
+    "ep_len": 393,
+    "final_dist": 214.09885079393786,
+    "mean_speed": 7.401859512019435,
+    "min_lidar_range": 10.689229965209961
+  },
+  {
+    "timesteps": 300000,
+    "episode": 0,
+    "ep_reward": -1011.3452553744886,
+    "ep_len": 73,
+    "final_dist": 459.04255027014483,
+    "mean_speed": 6.239669861050655,
+    "min_lidar_range": 10.693267822265625
+  },
+  {
+    "timesteps": 300000,
+    "episode": 1,
+    "ep_reward": -137.8171972311157,
+    "ep_len": 586,
+    "final_dist": 39.76580917525609,
+    "mean_speed": 7.867260353181954,
+    "min_lidar_range": 59.94330978393555
+  },
+  {
+    "timesteps": 300000,
+    "episode": 2,
+    "ep_reward": -1039.5895477509464,
+    "ep_len": 61,
+    "final_dist": 501.525403452276,
+    "mean_speed": 6.334658871645744,
+    "min_lidar_range": 10.873832702636719
+  },
+  {
+    "timesteps": 350000,
+    "episode": 0,
+    "ep_reward": -1469.1769658939816,
+    "ep_len": 711,
+    "final_dist": 103.84913494292344,
+    "mean_speed": 7.8186319374454705,
+    "min_lidar_range": 10.651769638061523
+  },
+  {
+    "timesteps": 350000,
+    "episode": 1,
+    "ep_reward": -1510.1363982690273,
+    "ep_len": 674,
+    "final_dist": 161.86747476746655,
+    "mean_speed": 7.73247172139863,
+    "min_lidar_range": 10.609729766845703
+  },
+  {
+    "timesteps": 350000,
+    "episode": 2,
+    "ep_reward": -55.3974530314627,
+    "ep_len": 649,
+    "final_dist": 39.50811676260882,
+    "mean_speed": 7.472459803999853,
+    "min_lidar_range": 24.939062118530273
+  },
+  {
+    "timesteps": 400000,
+    "episode": 0,
+    "ep_reward": -1016.7402281044641,
+    "ep_len": 23,
+    "final_dist": 488.7764647965932,
+    "mean_speed": 4.999062804857573,
+    "min_lidar_range": 10.54796314239502
+  },
+  {
+    "timesteps": 400000,
+    "episode": 1,
+    "ep_reward": -1096.4291173212696,
+    "ep_len": 184,
+    "final_dist": 383.54872854339425,
+    "mean_speed": 7.076746398959095,
+    "min_lidar_range": 10.943582534790039
+  },
+  {
+    "timesteps": 400000,
+    "episode": 2,
+    "ep_reward": -1556.025536358255,
+    "ep_len": 726,
+    "final_dist": 308.9900851411759,
+    "mean_speed": 7.402859559094701,
+    "min_lidar_range": 10.83056354522705
+  },
+  {
+    "timesteps": 450000,
+    "episode": 0,
+    "ep_reward": -1535.0303533597048,
+    "ep_len": 725,
+    "final_dist": 187.84288399363075,
+    "mean_speed": 7.283718508990992,
+    "min_lidar_range": 10.768709182739258
+  },
+  {
+    "timesteps": 450000,
+    "episode": 1,
+    "ep_reward": -1017.2085590854371,
+    "ep_len": 42,
+    "final_dist": 478.81501764128234,
+    "mean_speed": 5.369103612438517,
+    "min_lidar_range": 10.705351829528809
+  },
+  {
+    "timesteps": 450000,
+    "episode": 2,
+    "ep_reward": -1118.167245790228,
+    "ep_len": 229,
+    "final_dist": 390.41475573774363,
+    "mean_speed": 7.141302680926216,
+    "min_lidar_range": 10.520060539245605
+  },
+  {
+    "timesteps": 500000,
+    "episode": 0,
+    "ep_reward": -91.87790126252264,
+    "ep_len": 650,
+    "final_dist": 39.88326558364307,
+    "mean_speed": 7.340400494843942,
+    "min_lidar_range": 20.605100631713867
+  },
+  {
+    "timesteps": 500000,
+    "episode": 1,
+    "ep_reward": -1492.471441157044,
+    "ep_len": 686,
+    "final_dist": 112.8109748272107,
+    "mean_speed": 7.503560216440762,
+    "min_lidar_range": 10.960685729980469
+  },
+  {
+    "timesteps": 500000,
+    "episode": 2,
+    "ep_reward": -1100.5316331654046,
+    "ep_len": 168,
+    "final_dist": 390.869266078246,
+    "mean_speed": 6.7955403715037646,
+    "min_lidar_range": 10.864640235900879
+  },
+  {
+    "timesteps": 550000,
+    "episode": 0,
+    "ep_reward": -1206.6559724206081,
+    "ep_len": 430,
+    "final_dist": 215.60079859987385,
+    "mean_speed": 7.662548145790985,
+    "min_lidar_range": 10.464195251464844
+  },
+  {
+    "timesteps": 550000,
+    "episode": 1,
+    "ep_reward": -1480.9970238389665,
+    "ep_len": 679,
+    "final_dist": 148.50677157170463,
+    "mean_speed": 7.564193486757735,
+    "min_lidar_range": 10.983368873596191
+  },
+  {
+    "timesteps": 550000,
+    "episode": 2,
+    "ep_reward": -1006.4596436329279,
+    "ep_len": 40,
+    "final_dist": 478.74190058460846,
+    "mean_speed": 5.4191458303438464,
+    "min_lidar_range": 10.47999095916748
+  },
+  {
+    "timesteps": 600000,
+    "episode": 0,
+    "ep_reward": -1400.6827594051342,
+    "ep_len": 497,
+    "final_dist": 357.024487993538,
+    "mean_speed": 7.0268109566423735,
+    "min_lidar_range": 10.950312614440918
+  },
+  {
+    "timesteps": 600000,
+    "episode": 1,
+    "ep_reward": -1501.8417551796665,
+    "ep_len": 782,
+    "final_dist": 130.171659883807,
+    "mean_speed": 7.756415335741636,
+    "min_lidar_range": 10.859580039978027
+  },
+  {
+    "timesteps": 600000,
+    "episode": 2,
+    "ep_reward": -123.50716747999857,
+    "ep_len": 643,
+    "final_dist": 39.28029496081455,
+    "mean_speed": 7.449651623232759,
+    "min_lidar_range": 16.471614837646484
+  },
+  {
+    "timesteps": 650000,
+    "episode": 0,
+    "ep_reward": -1653.3838828266198,
+    "ep_len": 796,
+    "final_dist": 153.1913577244851,
+    "mean_speed": 7.083223715360755,
+    "min_lidar_range": 10.847456932067871
+  },
+  {
+    "timesteps": 650000,
+    "episode": 1,
+    "ep_reward": -278.043850290297,
+    "ep_len": 673,
+    "final_dist": 39.921717939183836,
+    "mean_speed": 7.340557874407245,
+    "min_lidar_range": 25.32109260559082
+  },
+  {
+    "timesteps": 650000,
+    "episode": 2,
+    "ep_reward": -1582.8721189555292,
+    "ep_len": 747,
+    "final_dist": 142.09910394189205,
+    "mean_speed": 7.417283819375923,
+    "min_lidar_range": 10.621066093444824
+  },
+  {
+    "timesteps": 700000,
+    "episode": 0,
+    "ep_reward": -1404.9310919184056,
+    "ep_len": 792,
+    "final_dist": 152.2532729140551,
+    "mean_speed": 7.919599917742306,
+    "min_lidar_range": 10.27529525756836
+  },
+  {
+    "timesteps": 700000,
+    "episode": 1,
+    "ep_reward": -1516.6786536192108,
+    "ep_len": 677,
+    "final_dist": 145.8663916744526,
+    "mean_speed": 7.792466533549317,
+    "min_lidar_range": 10.637797355651855
+  },
+  {
+    "timesteps": 700000,
+    "episode": 2,
+    "ep_reward": -174.35083340799605,
+    "ep_len": 609,
+    "final_dist": 39.623519244095505,
+    "mean_speed": 7.889250542243013,
+    "min_lidar_range": 59.77805709838867
+  },
+  {
+    "timesteps": 750000,
+    "episode": 0,
+    "ep_reward": -1156.2485038778289,
+    "ep_len": 263,
+    "final_dist": 364.71987144805087,
+    "mean_speed": 7.544762712741334,
+    "min_lidar_range": 10.521233558654785
+  },
+  {
+    "timesteps": 750000,
+    "episode": 1,
+    "ep_reward": -1048.694941879687,
+    "ep_len": 80,
+    "final_dist": 473.6012663080031,
+    "mean_speed": 6.274298268330739,
+    "min_lidar_range": 10.598615646362305
+  },
+  {
+    "timesteps": 750000,
+    "episode": 2,
+    "ep_reward": -1546.2510386586578,
+    "ep_len": 717,
+    "final_dist": 135.80658962910755,
+    "mean_speed": 7.587510996599512,
+    "min_lidar_range": 10.916248321533203
+  },
+  {
+    "timesteps": 800000,
+    "episode": 0,
+    "ep_reward": -1507.4199328147367,
+    "ep_len": 698,
+    "final_dist": 241.49363239452202,
+    "mean_speed": 7.585657370090626,
+    "min_lidar_range": 10.65530014038086
+  },
+  {
+    "timesteps": 800000,
+    "episode": 1,
+    "ep_reward": -1406.5939351418028,
+    "ep_len": 481,
+    "final_dist": 344.0727340466135,
+    "mean_speed": 7.173887835202331,
+    "min_lidar_range": 10.68728256225586
+  },
+  {
+    "timesteps": 800000,
+    "episode": 2,
+    "ep_reward": -1479.6986363734889,
+    "ep_len": 728,
+    "final_dist": 157.9224837055073,
+    "mean_speed": 7.968361100840707,
+    "min_lidar_range": 10.58028793334961
+  },
+  {
+    "timesteps": 850000,
+    "episode": 0,
+    "ep_reward": -1088.1707036246762,
+    "ep_len": 193,
+    "final_dist": 375.2819324260245,
+    "mean_speed": 7.05366534623116,
+    "min_lidar_range": 10.636775970458984
+  },
+  {
+    "timesteps": 850000,
+    "episode": 1,
+    "ep_reward": -1010.8590032701941,
+    "ep_len": 42,
+    "final_dist": 510.77112543224746,
+    "mean_speed": 5.045448583590642,
+    "min_lidar_range": 10.847325325012207
+  },
+  {
+    "timesteps": 850000,
+    "episode": 2,
+    "ep_reward": -1492.176134970012,
+    "ep_len": 699,
+    "final_dist": 193.64181324943615,
+    "mean_speed": 7.623851699705678,
+    "min_lidar_range": 10.771371841430664
+  },
+  {
+    "timesteps": 900000,
+    "episode": 0,
+    "ep_reward": -614.4441506463639,
+    "ep_len": 981,
+    "final_dist": 39.777195243008734,
+    "mean_speed": 7.195708985777258,
+    "min_lidar_range": 12.575814247131348
+  },
+  {
+    "timesteps": 900000,
+    "episode": 1,
+    "ep_reward": -1386.0536488671914,
+    "ep_len": 715,
+    "final_dist": 78.74977036338136,
+    "mean_speed": 7.943861517440836,
+    "min_lidar_range": 10.509987831115723
+  },
+  {
+    "timesteps": 900000,
+    "episode": 2,
+    "ep_reward": -1094.4452972821914,
+    "ep_len": 217,
+    "final_dist": 393.1736149363769,
+    "mean_speed": 7.383299238177118,
+    "min_lidar_range": 10.663619995117188
+  },
+  {
+    "timesteps": 950000,
+    "episode": 0,
+    "ep_reward": -471.83024574642377,
+    "ep_len": 763,
+    "final_dist": 39.93641048754044,
+    "mean_speed": 7.415003548837828,
+    "min_lidar_range": 14.511635780334473
+  },
+  {
+    "timesteps": 950000,
+    "episode": 1,
+    "ep_reward": -1015.8771701698172,
+    "ep_len": 25,
+    "final_dist": 491.2626788900709,
+    "mean_speed": 5.368982043888824,
+    "min_lidar_range": 10.854897499084473
+  },
+  {
+    "timesteps": 950000,
+    "episode": 2,
+    "ep_reward": -1278.4094658703034,
+    "ep_len": 397,
+    "final_dist": 277.60629204970206,
+    "mean_speed": 7.565049466115056,
+    "min_lidar_range": 10.914048194885254
+  },
+  {
+    "timesteps": 1000000,
+    "episode": 0,
+    "ep_reward": -1144.2066926895754,
+    "ep_len": 267,
+    "final_dist": 362.0075573426348,
+    "mean_speed": 6.950269695878633,
+    "min_lidar_range": 10.832219123840332
+  },
+  {
+    "timesteps": 1000000,
+    "episode": 1,
+    "ep_reward": -241.24087571604937,
+    "ep_len": 672,
+    "final_dist": 39.419916883047,
+    "mean_speed": 7.826871149837565,
+    "min_lidar_range": 34.00595474243164
+  },
+  {
+    "timesteps": 1000000,
+    "episode": 2,
+    "ep_reward": -575.8388466524532,
+    "ep_len": 924,
+    "final_dist": 39.92392946289601,
+    "mean_speed": 7.567693190476652,
+    "min_lidar_range": 19.639904022216797
+  }
+]

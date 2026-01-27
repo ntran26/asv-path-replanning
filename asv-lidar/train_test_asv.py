@@ -1,3 +1,7 @@
+import os
+import csv
+import time
+import numpy as np
 import pygame
 import matplotlib.pyplot as plt
 from stable_baselines3 import PPO, SAC
@@ -6,7 +10,7 @@ from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.callbacks import BaseCallback
 from asv_lidar_rudder_speed_control import ASVLidarEnv
-# from test_run import testEnv  # optional custom test wrapper
+# from test_run import testEnv 
 import json
 import argparse
 import sys
@@ -38,6 +42,50 @@ if __name__=='__main__':
         return Monitor(ASVLidarEnv(render_mode=None))   # monitor/logging
     num_envs = 8
     env = SubprocVecEnv([make_env for _ in range(num_envs)])    # parallelize training
+    eval_env = ASVLidarEnv(render_mode=None)
+
+    # Create evaluation function
+    def eval_one_episode(model, env, deterministic=True, max_steps=5000):
+        obs, _ = env.reset()
+        done = False
+
+        ep_reward = 0
+        step_count = 0
+
+        # recorded metrics
+        speed_list = []
+        min_lidar_range = []
+
+        while not done and step_count < max_steps:
+            action, _ = model.predict(obs, deterministic=deterministic)
+            obs, reward, done, _, _ = env.step(action)
+            ep_reward += float(reward)
+            step_count += 1
+
+            # append speed
+            spd = float(getattr(env.model, "_v", 0))
+            speed_list.append(spd)
+
+            # minimum lidar range
+            if hasattr(env, "lidar") and hasattr(env.lidar, "ranges"):
+                range = np.array(env.lidar.ranges, dtype=np.float32)
+                range[range <= 0] = np.inf
+                min_lidar_range.append(float(np.min(range)) if np.any(np.isfinite(range)) else float("inf"))
+            
+        # final distance to goal
+        dx = float(env.goal_x - env.asv_x)
+        dy = float(env.goal_y - env.asv_y)
+        final_dist = float(np.hypot(dx, dy))
+
+        # log metrics
+        metrics = {
+            "ep_reward": ep_reward,
+            "ep_len": step_count,
+            "final_dist": final_dist,
+            "mean_speed": float(np.mean(speed_list)) if speed_list else 0,
+            "min_lidar_range": float(np.min(min_lidar_range)) if min_lidar_range else float("inf")
+        }
+        return metrics
 
     # Hyperparamters
     learn_rate = 0.0001
@@ -52,7 +100,7 @@ if __name__=='__main__':
     vf_coef = 0.5
 
     class CustomCallback(BaseCallback):
-        def __init__(self, save_freq=500000, verbose=0):
+        def __init__(self, save_freq=500000, verbose=1):
             super(CustomCallback, self).__init__(verbose)
             self.save_freq = save_freq
             self.model_save_counter = 0
@@ -67,22 +115,74 @@ if __name__=='__main__':
                 print(f"Saving model at {self.num_timesteps} timesteps")
                 self.model.save(model_path)
                 self.model_save_counter += 1
-
-            if self.locals.get("loss", None) is not None:
-                loss = self.locals["loss"]
-                self.policy_loss.append(loss.get("policy_loss", 0))
-                self.value_loss.append(loss.get("value_loss", 0))
-
             if len(self.model.ep_info_buffer) > 0:
                 self.rewards.append(self.model.ep_info_buffer[0]["r"])
-                if "loss" in self.model.ep_info_buffer[0]:
-                    self.policy_loss.append(self.model.ep_info_buffer[0]["loss"]["policy_loss"])
-                    self.value_loss.append(self.model.ep_info_buffer[0]["loss"]["value_loss"])
+            return True
+
+    class EvalMetricsCallback(BaseCallback):
+        def __init__(self, eval_env, eval_freq=50000, n_eval_episodes=3,
+                    csv_path="eval_metrics.csv", json_path="eval_metrics.json",
+                    verbose=1):
+            super().__init__(verbose)
+            self.eval_env = eval_env
+            self.eval_freq = eval_freq
+            self.n_eval_episodes = n_eval_episodes
+            self.csv_path = csv_path
+            self.json_path = json_path
+
+            self.rows = []
+            self._csv_inited = False
+
+        def _init_csv(self):
+            if self._csv_inited:
+                return
+            header = ["timesteps", "episode", "ep_reward", "ep_len", "final_dist", "mean_speed", "min_lidar_range"]
+            write_header = not os.path.exists(self.csv_path)
+            with open(self.csv_path, "a", newline="") as f:
+                w = csv.writer(f)
+                if write_header:
+                    w.writerow(header)
+            self._csv_inited = True
+
+        def _append_row(self, row):
+            self._init_csv()
+            with open(self.csv_path, "a", newline="") as f:
+                csv.writer(f).writerow(row)
+
+        def _on_step(self) -> bool:
+            # Run evaluation every eval_freq timesteps
+            if self.num_timesteps % self.eval_freq != 0:
+                return True
+
+            results = []
+            for i in range(self.n_eval_episodes):
+                m = eval_one_episode(self.model, self.eval_env, deterministic=True)
+                results.append(m)
+
+                # print per episode
+                if self.verbose:
+                    print(
+                        f"[EVAL @ {self.num_timesteps}] ep#{i} "
+                        f"R={m['ep_reward']:.1f} len={m['ep_len']} "
+                        f"d_goal={m['final_dist']:.2f}m "
+                        f"v_mean={m['mean_speed']:.2f}m/s "
+                        f"min_lidar={m['min_lidar_range']:.2f}m"
+                    )
+
+                # save each episode row
+                row = [self.num_timesteps, i, m["ep_reward"], m["ep_len"],
+                    m["final_dist"], m["mean_speed"], m["min_lidar_range"]]
+                self._append_row(row)
+
+            # also store JSON snapshot (accumulated)
+            self.rows.extend([{"timesteps": self.num_timesteps, "episode": i, **r} for i, r in enumerate(results)])
+            with open(self.json_path, "w") as f:
+                json.dump(self.rows, f, indent=2)
+
             return True
 
     # Model save path
     MODEL_PATH = f"{algorithm.lower()}_asv_model.zip"
-
 
     #                       -------------- TRAINING --------------
 
@@ -101,7 +201,8 @@ if __name__=='__main__':
         
         # Training parameters
         timesteps = 1000000
-        callback = CustomCallback()
+        # callback = CustomCallback()
+        callback = [CustomCallback(), EvalMetricsCallback(eval_env, eval_freq=50000, n_eval_episodes=3)]
 
         # Train the model
         model.learn(total_timesteps=timesteps, tb_log_name=f"asv_{algorithm.lower()}", callback=callback, progress_bar=True)
