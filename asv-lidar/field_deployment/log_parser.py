@@ -349,7 +349,7 @@ if __name__ == "__main__":
         
         obs = frame_to_gym_obs(frame, origin_xyh=origin, include_velocity=True)
 
-        if count < 3:
+        if count:
             print(f"Frame {count}: t={frame.t_sec:.3f}s pos={obs['pos']} yaw={obs['hdg']} spd={obs['spd']}")
             print(f" lidar shape: {obs['lidar'].shape}, min/max: {obs['lidar'].min():.2f}/{obs['lidar'].max():.2f}")
         count += 1
