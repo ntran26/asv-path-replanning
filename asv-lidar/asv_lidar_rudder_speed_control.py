@@ -87,6 +87,7 @@ class ASVLidarEnv(gym.Env):
             pos: (x,y) coordinate of asv
             hdg: heading/yaw of the asv
             dhdg: rate of change of heading
+            speed: velocity of the vessel (m/s)
             tgt: horizontal offset of the asv from the path
             target_heading: heading error with respect to the destination point
         """

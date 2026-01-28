@@ -16,7 +16,6 @@ Notes:
   - A 'frame' is emitted on each LiDAR scan line (LiDAR is treated as the main observation clock).
   - Pose + HDG are fused as "latest values seen before the scan".
 
-Author: generated for Nam_PhD / Bluefin deployment.
 """
 from __future__ import annotations
 
@@ -26,7 +25,7 @@ from typing import Dict, IO, Iterator, Optional, Tuple, Union
 
 import numpy as np
 import re
-
+import os
 
 _HDG_RE = re.compile(r'^\[(?P<t>\d\d:\d\d:\d\d\.\d+)\]\[(?P<pkt>\s*\d+)\]\s*HDG:(?P<hdg>-?\d+(?:\.\d+)?)\s*$')
 _POSE_RE = re.compile(
