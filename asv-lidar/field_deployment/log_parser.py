@@ -128,7 +128,25 @@ class BluefinStreamDecoder:
     Output a frame when there is a LiDAR line
     """
 
-    # Regex patterns matching the line formats
+    """
+    Regex patterns matching the line formats
+        re.compile(pattern): pre-compile regex to run faster
+        r"..": raw string
+        ^ and $: start and end of line
+        \[ and \]: match the bracket characters
+        \d: one digit
+        \d{2}: exactly two digits (HH:MM:SS)
+        \d{6}: exactly six digits (microseconds)
+            \d{2}:\d{2}:\d{2}\.\d{6} matches 13:32:07.817313
+        (?P<name>...): named capture groups, capture whatever matches inside and store it under "name"
+            (?P<seq>\d+) captures the sequence number
+            (?P<body>.*) captures the LiDAR list
+            (?P<x>...),(?P<y>...),(?P<yaw>...) captures x, y, yaw
+        \s*: allow any amount of spaces
+        .*: match anything (except newline)
+            *: repeat 0 or more times
+            \[(?P<body>.*)\]: capture all text inside bracket (lidar ranges)
+    """
 
     _re_hdg = re.compile(
         r"^\[(?P<ts>\d{2}:\d{2}:\d{2}\.\d{6})\]\[(?P<seq>\d+)\]\s*HDG:(?P<hdg>[-+]?\d+(?:\.\d+)?)\s*$"
