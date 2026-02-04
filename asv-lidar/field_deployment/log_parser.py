@@ -353,6 +353,8 @@ def frame_to_gym_obs(
 
 if __name__ == "__main__":
     import sys
+    import os
+
     if len(sys.argv) < 2:
         print("Usage: python log_parser.py test_1.log")
         raise SystemExit(1)
@@ -361,7 +363,11 @@ if __name__ == "__main__":
     origin = None
     count = 0
 
-    for frame in frames_from_file(sys.argv[1], decoder):
+    test_dir = 'bluefin_test_2026_01_21'
+    test_file = sys.argv[1]
+    filename = os.path.join(test_dir, test_file)
+
+    for frame in frames_from_file(filename, decoder):
         if origin is None:
             origin = (frame.x_m, frame.y_m, frame.yaw_deg)
         

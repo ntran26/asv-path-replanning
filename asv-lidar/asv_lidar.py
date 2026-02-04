@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+from ship_model import VESSEL_LENGTH
 
 LIDAR_RANGE = 150
 LIDAR_SWATH = 270
@@ -20,7 +21,7 @@ class Lidar:
         self._pos_x = 0
         self._pos_y = 0
         self._hdg = 0
-        # EDIT: Changed dtype to float for more precision and set up beam angles evenly across the swath
+
         self._angles = np.linspace(-LIDAR_SWATH/2, LIDAR_SWATH/2, LIDAR_BEAMS, dtype=np.float64)
         self._ranges = np.ones_like(self._angles) * LIDAR_RANGE
 
@@ -51,11 +52,11 @@ class Lidar:
         self._hdg = hdg
 
         # Set the lidar (x,y) to be in front of the asv
-        lidar_offset = 30
+        lidar_offset = VESSEL_LENGTH/2
         self._pos_x = pos[0] + lidar_offset * np.sin(np.radians(self._hdg))
         self._pos_y = pos[1] - lidar_offset * np.cos(np.radians(self._hdg))
         
-        # ADD: Loop over each beam angle to compute collision distances
+        # Loop over each beam angle to compute collision distances
         for idx, angle in enumerate(self._angles):
             # Calculate the absolute angle (sensor heading + beam angle) in radians
             absolute_angle = np.radians(self._hdg + angle)
@@ -67,24 +68,6 @@ class Lidar:
             closest_distance = LIDAR_RANGE
 
             obstacle_edges = []
-
-            # Define the ray as a line tuple: (start_x, start_y, end_x, end_y)
-            # ray_line = (self._pos_x, self._pos_y, end_x, end_y)
-            
-            # # Check for collision with each obstacle
-            # if obstacles:
-            #     for obs in obstacles:
-            #         collision = obs.clipline(ray_line)
-            #         if collision:
-            #             # returns two points that define the intersecting segment
-            #             # compute the distance from the sensor to both points and take the smaller one
-            #             p1 = collision[0]
-            #             p2 = collision[1]
-            #             d1 = np.hypot(p1[0] - self._pos_x, p1[1] - self._pos_y)
-            #             d2 = np.hypot(p2[0] - self._pos_x, p2[1] - self._pos_y)
-            #             collision_distance = min(d1, d2)
-            #             if collision_distance < closest_distance:
-            #                 closest_distance = collision_distance
 
             if obstacles:
                 for obs in obstacles:

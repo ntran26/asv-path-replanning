@@ -9,14 +9,14 @@ from images import BOAT_ICON
 import cv2
 
 UPDATE_RATE = 0.1   # 10 Hz
-RENDER_FPS = 10
+RENDER_FPS = 20
 MAP_WIDTH = 400
 MAP_HEIGHT = 600
 NUM_OBS = 10
 COLLISION_RANGE = 10
 
 # Speed control (rpm)
-RPM_MIN = 50
+RPM_MIN = 100
 RPM_MAX = 200
 U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 
@@ -67,6 +67,7 @@ class ASVLidarEnv(gym.Env):
         if render_mode in self.metadata['render_modes']:
             self.surface = pygame.Surface(self.screen_size)
             self.status = pygame.freetype.SysFont(pygame.font.get_default_font(),size=10)
+
         # State
         self.elapsed_time = 0.
         self.tgt_x = 0
@@ -77,9 +78,11 @@ class ASVLidarEnv(gym.Env):
         self.asv_h = 0
         self.asv_w = 0
         self.angle_diff = 0
+        self.prev_x = None
+        self.prev_y = None
+        self.speed_mps = 0.0
 
         self.model = ShipModel()
-        self.model._v = 4.5
 
         """
         Observation space:
@@ -136,10 +139,105 @@ class ASVLidarEnv(gym.Env):
             'pos': np.array([self.asv_x, self.asv_y],dtype=np.int16),
             'hdg': np.array([self.asv_h],dtype=np.int16),
             'dhdg': np.array([self.asv_w],dtype=np.int16),
-            'speed': np.array([self.model._v], dtype=np.float32),
+            'speed': np.array([self.speed_mps], dtype=np.float32),
             'tgt': np.array([self.tgt],dtype=np.int16),
             'target_heading': np.array([self.angle_diff],dtype=np.int16)
         }
+
+    def _hull_polygon_world(self):
+        """
+        Returns 4 points (x,y) of the vessel hull rectangle
+        Assumes self.asv_x, self.asv_y is vessel center
+        Heading self.asv_h is degrees, where 0 points "up" (negative y)
+        """
+        L = ShipModel.vessel_length + 2*ShipModel.hull_margin
+        W = ShipModel.vessel_width + 2*ShipModel.hull_margin
+
+        # optional: if sensor position not at center
+        shift = ShipModel.hull_forward_shift
+
+        half_L = 0.5*L
+        half_W = 0.5*W
+
+        h = np.radians(float(self.asv_h))
+        sin_h = np.sin(h)
+        cos_h = np.cos(h)
+
+        # four corners of the vessel
+        local = [(+half_L + shift, +half_W),
+                 (+half_L + shift, -half_W),
+                 (-half_L + shift, -half_W),
+                 (-half_L + shift, +half_W)]
+        
+        cx = float(self.asv_x)
+        cy = float(self.asv_y)
+
+        # Convert (forward, left) -> world (x right, y down)
+        # forward vector = (sin(h), -cos(h))
+        # left vector    = (-cos(h), -sin(h))
+        poly = []
+        for x_forward, y_left in local:
+            x = cx + x_forward * sin_h - y_left * cos_h
+            y = cy - x_forward * cos_h - y_left * sin_h
+            poly.append((x,y))
+        return poly
+
+    def _polys_intersect_sat(self, polyA, polyB):
+        """
+        Separating Axis Theorem for convex polygons (works for rectangles).
+        polyA, polyB: list of (x,y)
+        """
+        def project(poly, ax, ay):
+            dots = [p[0]*ax + p[1]*ay for p in poly]
+            return min(dots), max(dots)
+        
+        for poly in (polyA, polyB):
+            n = len(poly)
+            for i in range(n):
+                x1, y1 = poly[i]
+                x2, y2 = poly[(i+1) % n]
+                # edge normal (axis)
+                ax = -(y2 - y1)
+                ay = (x2 - x1)
+
+                minA, maxA = project(polyA, ax, ay)
+                minB, maxB = project(polyB, ax, ay)
+
+                if maxA < minB or maxB < minA:
+                    return False
+        return True
+    
+    def _check_collision_geom(self):
+        """
+        True collision if hull intersects any obstacle OR crosses map boundary
+        Independent of LiDAR collision_range
+        """
+        hull = self._hull_polygon_world()
+
+        xs = [p[0] for p in hull]
+        ys = [p[1] for p in hull]
+
+        # border collision: any corner outside boundary
+        if min(xs) < 0 or max(xs) > self.map_width or min(ys) < 0 or max(ys) > self.map_height:
+            return True
+        
+        hx0, hx1 = min(xs), max(xs)
+        hy0, hy1 = min(ys), max(ys)
+
+        # Obstacle collision
+        for obs in self.obstacles:
+            # obs is polygon list [(x,y),...]
+            oxs = [p[0] for p in obs]
+            oys = [p[1] for p in obs]
+            ox0, ox1 = min(oxs), max(oxs)
+            oy0, oy1 = min(oys), max(oys)
+
+            if hx1 < ox0 or ox1 < hx0 or hy1 < oy0 or oy1 < hy0:
+                continue
+            if self._polys_intersect_sat(hull, obs):
+                return True
+            
+        return False
 
     def generate_path(self, start_x, start_y, goal_x, goal_y):
         path_length = max(2, int(np.hypot(abs(goal_x - start_x), abs(goal_y - start_y))))
@@ -203,6 +301,10 @@ class ASVLidarEnv(gym.Env):
         
         self.asv_y = self.start_y
 
+        self.prev_x = float(self.asv_x)
+        self.prev_y = float(self.asv_y)
+        self.speed_mps = 0.0
+
         # Randomize goal position
         self.goal_y = 50
         self.goal_x = np.random.randint(50, self.map_width - 50)
@@ -233,8 +335,7 @@ class ASVLidarEnv(gym.Env):
         #     return True
 
         # collide with an obstacle
-        lidar_list = self.lidar.ranges.astype(np.int64)
-        if np.any(lidar_list <= self.collision):
+        if self._check_collision_geom():
             return True
         
         # the agent reaches goal
@@ -262,11 +363,21 @@ class ASVLidarEnv(gym.Env):
         rpm = RPM_MIN + (throttle_cmd + 1.0) * 0.5 * (RPM_MAX - RPM_MIN)
         rpm = float(np.clip(rpm, RPM_MIN, RPM_MAX))
 
+        # Store current position
+        x_prev = float(self.asv_x)
+        y_prev = float(self.asv_y)
+
         dx,dy,h,w = self.model.update(rpm, rudder_cmd*25, UPDATE_RATE)  # ShipModel expects rudder in [-100,100]
         self.asv_x += dx
         self.asv_y -= dy
         self.asv_h = h
         self.asv_w = w
+
+        # calculate speed
+        dx_pos = float(self.asv_x) - x_prev
+        dy_pos = float(self.asv_y) - y_prev
+        speed_units_per_s = np.sqrt((dx_pos*dx_pos + dy_pos*dy_pos)) / float(UPDATE_RATE)
+        self.speed_mps = float(speed_units_per_s)
 
         # closest perpendicular distance from asv to path
         asv_pos = np.array([self.asv_x, self.asv_y])
@@ -340,7 +451,7 @@ class ASVLidarEnv(gym.Env):
         # Combined rewards
         # reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_goal + r_heading
 
-        if np.any(self.lidar.ranges.astype(np.int64) <= self.collision):
+        if self._check_collision_geom():
             reward = -1000
         else:
             reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_goal
@@ -397,7 +508,7 @@ class ASVLidarEnv(gym.Env):
         # Draw status
         lidar = self.lidar.ranges.astype(np.int16)
         if self.status is not None:
-            status, rect = self.status.render(f"{self.elapsed_time:005.1f}s  V:{self.model._v:0.2f}m/s  HDG:{self.asv_h:+004.0f}({self.asv_w:+03.0f})  TGT:{self.tgt:+004.0f}  TGT_HDG:{self.angle_diff:.2f}",(255,255,255),(0,0,0))
+            status, rect = self.status.render(f"{self.elapsed_time:005.1f}s  V:{self.speed_mps:0.2f}m/s  HDG:{self.asv_h:+004.0f}({self.asv_w:+03.0f})  TGT:{self.tgt:+004.0f}  TGT_HDG:{self.angle_diff:.2f}",(255,255,255),(0,0,0))
             self.surface.blit(status, [10,550])
 
         os = pygame.transform.rotozoom(self.icon,-self.asv_h,2)
