@@ -8,9 +8,9 @@ MAX_RUD_ANGLE = 45
 RUDDEROFFSET = 3
 MOMINERTIA = 0.5*MASS*RUDDEROFFSET**2
 
-VESSEL_LENGTH = 1.7
-VESSEL_WIDTH = 0.5
-HULL_MARGIN = 0.05  # safe margin around vessel
+VESSEL_LENGTH = 30
+VESSEL_WIDTH = 20
+HULL_MARGIN = VESSEL_WIDTH/10  # safe margin around vessel
 HULL_FORWARD_SHIFT = 0
 
 class ShipModel:
@@ -21,11 +21,6 @@ class ShipModel:
         self._w = 0.
         self._dw = 0.
         self._last_t = None
-        
-        self.vessel_length = VESSEL_LENGTH
-        self.vessel_width = VESSEL_WIDTH
-        self.hull_margin = HULL_MARGIN
-        self.hull_forward_shift = HULL_FORWARD_SHIFT
 
     def _calc_forces(self, rpm,rud):
         thrust =    THRUST_COEF * rpm**2

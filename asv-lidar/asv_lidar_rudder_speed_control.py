@@ -3,7 +3,7 @@ from gymnasium.spaces import Dict, Box, Discrete
 import numpy as np
 import pygame
 import pygame.freetype
-from ship_model import ShipModel, THRUST_COEF, DRAG_COEF
+from ship_model import ShipModel, THRUST_COEF, DRAG_COEF, VESSEL_LENGTH, VESSEL_WIDTH, HULL_MARGIN, HULL_FORWARD_SHIFT
 from asv_lidar import Lidar, LIDAR_RANGE, LIDAR_BEAMS
 from images import BOAT_ICON
 import cv2
@@ -150,11 +150,11 @@ class ASVLidarEnv(gym.Env):
         Assumes self.asv_x, self.asv_y is vessel center
         Heading self.asv_h is degrees, where 0 points "up" (negative y)
         """
-        L = ShipModel.vessel_length + 2*ShipModel.hull_margin
-        W = ShipModel.vessel_width + 2*ShipModel.hull_margin
+        L = VESSEL_LENGTH + 2*HULL_MARGIN
+        W = VESSEL_WIDTH + 2*HULL_MARGIN
 
         # optional: if sensor position not at center
-        shift = ShipModel.hull_forward_shift
+        shift = HULL_FORWARD_SHIFT
 
         half_L = 0.5*L
         half_W = 0.5*W
@@ -504,6 +504,12 @@ class ASVLidarEnv(gym.Env):
         # Draw ownship
         if self.icon is None:
             self.icon = pygame.image.frombytes(BOAT_ICON['bytes'],BOAT_ICON['size'],BOAT_ICON['format'])
+            self.icon_scaled = None
+            self._icon_scaled_size = None
+        
+        if self.icon_scaled is None or self._icon_scaled_size != (VESSEL_WIDTH, VESSEL_LENGTH):
+            self.icon_scaled = pygame.transform.smoothscale(self.icon, (VESSEL_WIDTH, VESSEL_LENGTH))
+            self._icon_scaled_size = (VESSEL_WIDTH, VESSEL_LENGTH)
 
         # Draw status
         lidar = self.lidar.ranges.astype(np.int16)
@@ -511,7 +517,7 @@ class ASVLidarEnv(gym.Env):
             status, rect = self.status.render(f"{self.elapsed_time:005.1f}s  V:{self.speed_mps:0.2f}m/s  HDG:{self.asv_h:+004.0f}({self.asv_w:+03.0f})  TGT:{self.tgt:+004.0f}  TGT_HDG:{self.angle_diff:.2f}",(255,255,255),(0,0,0))
             self.surface.blit(status, [10,550])
 
-        os = pygame.transform.rotozoom(self.icon,-self.asv_h,2)
+        os = pygame.transform.rotozoom(self.icon_scaled,-self.asv_h,1)
         self.surface.blit(os,os.get_rect(center=(self.asv_x,self.asv_y)))
         self.display.blit(self.surface,[0,0])
         pygame.display.update()
