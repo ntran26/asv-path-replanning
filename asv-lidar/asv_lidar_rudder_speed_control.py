@@ -13,7 +13,6 @@ RENDER_FPS = 20
 MAP_WIDTH = 400
 MAP_HEIGHT = 600
 NUM_OBS = 10
-COLLISION_RANGE = 10
 
 # Speed control (rpm)
 RPM_MIN = 100
@@ -48,8 +47,6 @@ class ASVLidarEnv(gym.Env):
         
         self.map_width = MAP_WIDTH
         self.map_height = MAP_HEIGHT
-
-        self.collision = COLLISION_RANGE
 
         # Path that ASV taken
         self.asv_path = []
@@ -339,7 +336,7 @@ class ASVLidarEnv(gym.Env):
             return True
         
         # the agent reaches goal
-        if self.distance_to_goal <= self.collision+30:
+        if self.distance_to_goal <= VESSEL_LENGTH/2:
             return True
 
         return False
@@ -443,7 +440,7 @@ class ASVLidarEnv(gym.Env):
 
         # if the agent reaches goal
         self.distance_to_goal = np.linalg.norm([self.asv_x - self.goal_x, self.asv_y - self.goal_y])
-        if self.distance_to_goal <= self.collision+30:
+        if self.distance_to_goal <= VESSEL_LENGTH/2:
             r_goal = 100
         else:
             r_goal = 0
@@ -519,6 +516,8 @@ class ASVLidarEnv(gym.Env):
 
         os = pygame.transform.rotozoom(self.icon_scaled,-self.asv_h,1)
         self.surface.blit(os,os.get_rect(center=(self.asv_x,self.asv_y)))
+        ship_outline = self._hull_polygon_world()
+        pygame.draw.polygon(self.surface, (255, 0, 0), ship_outline, width=2)
         self.display.blit(self.surface,[0,0])
         pygame.display.update()
         self.fps_clock.tick(RENDER_FPS)
