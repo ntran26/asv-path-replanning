@@ -455,7 +455,7 @@ if __name__=='__main__':
             pygame.draw.polygon(path_surface, (200, 0, 0), obs)
 
         # Draw path
-        env.draw_dashed_line(path_surface, (0, 200, 0), (env.start_x, env.start_y), (env.goal_x, env.goal_y), width=5)
+        env._draw_dashed_line(path_surface, (0, 200, 0), (env.start_x, env.start_y), (env.goal_x, env.goal_y), width=5)
         pygame.draw.circle(path_surface, (100, 0, 0), (env.tgt_x, env.tgt_y), 5)
 
         # Draw ship icon

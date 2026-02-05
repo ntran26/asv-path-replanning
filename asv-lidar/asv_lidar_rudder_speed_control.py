@@ -416,6 +416,7 @@ class ASVLidarEnv(gym.Env):
             r_pf: path following reward
             r_oa: obstacle avoidance reward
             r_prog: progress reward (distance from goal)
+            r_goal: reward when reach goal
         """
         # 1) Penalty per step
         r_exist = -0.05
@@ -425,8 +426,7 @@ class ASVLidarEnv(gym.Env):
         r_heading = float(np.cos(angle_diff_rad))
 
         # 3) Path following reward
-        offset_error = float(abs(self.tgt))
-        r_pf = -1 + (np.exp(-gamma_e * offset_error) + 1) * (U_norm * r_heading + 1)
+        r_pf = -1 + (np.exp(-gamma_e * abs(self.tgt)) + 1) * (U_norm * r_heading + 1)
 
         # 4) Obstacle avoidance reward
         lidar_d = self.lidar.ranges.astype(np.float32)
@@ -446,13 +446,14 @@ class ASVLidarEnv(gym.Env):
 
         collided = bool(self._check_collision_geom())
         reached_goal = bool(self.distance_to_goal <= VESSEL_LENGTH/2)
+
+        # 6) Reach goal reward
+        r_goal = k_goal if reached_goal else 0
         
         if collided:
             self.reward = k_col
-        elif reached_goal:
-            self.reward = k_goal
         else:
-            self.reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_prog
+            self.reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_prog + r_goal
 
         terminated = self.check_done((self.asv_x, self.asv_y))
 
