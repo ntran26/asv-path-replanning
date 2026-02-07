@@ -8,16 +8,19 @@ from asv_lidar import Lidar, LIDAR_RANGE, LIDAR_BEAMS
 from images import BOAT_ICON
 import cv2
 
+# System parameters
 UPDATE_RATE = 0.1   # 10 Hz
 RENDER_FPS = 20
 MAP_WIDTH = 400
 MAP_HEIGHT = 600
-NUM_OBS = 10
+MAX_OBS = 10
 
 # Speed control (rpm)
 RPM_MIN = 100
 RPM_MAX = 200
 U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
+MAX_IN = 1
+MIN_IN = -1
 
 # Actions
 PORT = 0
@@ -114,7 +117,7 @@ class ASVLidarEnv(gym.Env):
         self.lidar = Lidar()
 
         # Initialize number of obstacles
-        self.num_obs = NUM_OBS
+        self.max_obs = MAX_OBS
 
         # Initialize map borders
         self.map_border = [
@@ -320,7 +323,7 @@ class ASVLidarEnv(gym.Env):
         self.path = self._generate_path(self.start_x, self.start_y, self.goal_x, self.goal_y)
 
         # Generate static obstacles
-        self.num_obs = np.random.randint(0, NUM_OBS)
+        self.num_obs = np.random.randint(0, self.max_obs)
         self.obstacles = self._generate_obstacles(self.num_obs)
 
         # Initialize the ASV path list
@@ -351,18 +354,20 @@ class ASVLidarEnv(gym.Env):
 
     def step(self, action):
         self.elapsed_time += UPDATE_RATE
-        rudder_cmd = float(np.clip(action[0], -1, 1))
-        throttle_cmd = float(np.clip(action[1], -1, 1))
+        rudder_cmd = float(np.clip(action[0], MIN_IN, MAX_IN))
+        throttle_cmd = float(np.clip(action[1], MIN_IN, MAX_IN))
+
+        # Map rudder_cmd [-1,1] -> rudder [-25, 25]
+        rudder = rudder_cmd * 25
 
         # Map throttle_cmd [-1,1] -> rpm [RPM_MIN, RPM_MAX]
-        rpm = RPM_MIN + (throttle_cmd + 1.0) * 0.5 * (RPM_MAX - RPM_MIN)
-        rpm = float(np.clip(rpm, RPM_MIN, RPM_MAX))
+        rpm = (throttle_cmd - MIN_IN) * ((RPM_MAX - RPM_MIN)/(MAX_IN - MIN_IN)) + RPM_MIN
 
         # Store current position
         x_prev = float(self.asv_x)
         y_prev = float(self.asv_y)
 
-        dx,dy,h,w = self.model.update(rpm, rudder_cmd*25, UPDATE_RATE)  # ShipModel expects rudder in [-100,100]
+        dx,dy,h,w = self.model.update(rpm, rudder, UPDATE_RATE)  # ShipModel expects rudder in [-100,100]
         self.asv_x += dx
         self.asv_y -= dy
         self.asv_h = h
@@ -396,18 +401,13 @@ class ASVLidarEnv(gym.Env):
         """
         Reward shaping parameters
         """
-        epsilon_x = 1       # distance buffer
-        gamma_e = 0.05      # cross-track decay
-        gamma_theta = 0.03  # angle weighting
         lambda_ = 0.5       # weighting parameter
-        k_prog = 5.0        # progress gain (0~10)
         k_goal = 500        # reach goal reward
         k_col = -1000       # collision penalty
 
-        # Speed terms
-        U = float(self.speed_mps)
-        U_max = float(max(U_MAX, 1e-6))
-        U_norm = float(np.clip(U / U_max, 0.0, 1.5))
+        # Define terminal flags
+        collided = bool(self._check_collision_geom())
+        reached_goal = bool(self.distance_to_goal <= VESSEL_LENGTH/2)
 
         """
         Reward function
@@ -419,46 +419,36 @@ class ASVLidarEnv(gym.Env):
             r_goal: reward when reach goal
         """
         # 1) Penalty per step
-        r_exist = -0.05
+        r_exist = -0.5
 
         # 2) Heading alignment reward (reward = 1 if aligned, -1 if opposite)
         angle_diff_rad = np.radians(self.angle_diff)
-        r_heading = float(np.cos(angle_diff_rad))
+        r_heading = np.cos(angle_diff_rad)
 
         # 3) Path following reward
-        r_pf = -1 + (np.exp(-gamma_e * abs(self.tgt)) + 1) * (U_norm * r_heading + 1)
+        r_pf = np.exp(-0.05 * abs(self.tgt))
 
         # 4) Obstacle avoidance reward
-        lidar_d = self.lidar.ranges.astype(np.float32)
-        lidar_theta = self.lidar.angles.astype(np.float32)
+        lidar_list = self.lidar.ranges.astype(np.float32)
+        r_oa = 0
+        for i, dist in enumerate(lidar_list):
+            theta = self.lidar.angles[i]    # angle of lidar beam
+            weight = 1 / (1 + abs(theta))   # prioritize beams closer to center/front
+            r_oa += weight / max(dist, 1)
+        r_oa = -r_oa / len(lidar_list)
 
-        weights = 1 / (1 + np.abs(gamma_theta * lidar_theta))
-        inv_term = 1 / np.maximum(lidar_d - epsilon_x, 1e-3)
-        r_oa = -float(np.sum(weights * inv_term) / (np.sum(weights) + 1e-6))
-
-        # 5) Progress reward
-        # update the current distance to goal
-        self.distance_to_goal = float(np.hypot(self.goal_x - self.asv_x, self.goal_y - self.asv_y))
-        self.progress = float(self.prev_distance_to_goal - self.distance_to_goal)
-        self.prev_distance_to_goal = self.distance_to_goal
-
-        r_prog = k_prog * np.clip(self.progress, -1.0, 1.0)
-
-        collided = bool(self._check_collision_geom())
-        reached_goal = bool(self.distance_to_goal <= VESSEL_LENGTH/2)
-
-        # 6) Reach goal reward
+        # 5) Reach goal reward
         r_goal = k_goal if reached_goal else 0
         
         if collided:
             self.reward = k_col
         else:
-            self.reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_prog + r_goal
+            self.reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_goal
 
         terminated = self.check_done((self.asv_x, self.asv_y))
 
         # --------- Reward breakdown for logging ---------
-        reward_shaped = float(lambda_ * r_pf + (1.0 - lambda_) * r_oa + r_exist + r_prog)
+        reward_shaped = float(lambda_ * r_pf + (1.0 - lambda_) * r_oa + r_exist)
         info = {
             "r_exist": float(r_exist),
             "r_heading": float(r_heading),
@@ -468,8 +458,7 @@ class ASVLidarEnv(gym.Env):
             "r_oa_weighted": float((1.0 - lambda_) * r_oa),
             "r_goal": float(k_goal),
             "lambda": float(lambda_),
-            "U": float(U),
-            "U_norm": float(U_norm),
+            "U": float(self.speed_mps),
             "distance_to_goal": float(self.distance_to_goal),
             "collided": int(collided),
             "reached_goal": int(reached_goal),

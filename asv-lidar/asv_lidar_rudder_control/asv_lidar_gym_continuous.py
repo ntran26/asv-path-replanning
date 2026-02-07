@@ -74,7 +74,6 @@ class ASVLidarEnv(gym.Env):
         self.angle_diff = 0
 
         self.model = ShipModel()
-        self.model._v = 4.5
 
         """
         Observation space:
