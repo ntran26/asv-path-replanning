@@ -13,7 +13,7 @@ UPDATE_RATE = 0.1   # 10 Hz
 RENDER_FPS = 20
 MAP_WIDTH = 400
 MAP_HEIGHT = 600
-MAX_OBS = 6
+MAX_OBS = 10
 
 # Reward shaping parameters
 GAMMA_E      = 0.05
