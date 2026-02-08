@@ -116,6 +116,12 @@ def eval_one_episode(model, env, deterministic=True, max_steps=5000):
     min_lidar_list = []
     p10_front_list = []
 
+    # Reward breakdown
+    r_pf_list = []
+    r_oa_list = []
+    r_exist_list = []
+    lam_list = []
+
     d_start = float(np.hypot(env.goal_x - env.asv_x, env.goal_y - env.asv_y))
 
     while step_count < max_steps:
@@ -125,6 +131,11 @@ def eval_one_episode(model, env, deterministic=True, max_steps=5000):
         action = np.array(action).reshape(-1)
 
         obs, reward, terminated, truncated, info = env.step(action)
+        if isinstance(info, dict):
+            r_pf_list.append(float(info.get("r_pf", 0.0)))
+            r_oa_list.append(float(info.get("r_oa", 0.0)))
+            r_exist_list.append(float(info.get("r_exist", 0.0)))
+            lam_list.append(float(info.get("lam", np.nan)))
         done = bool(terminated or truncated)
 
         ep_reward += float(reward)
@@ -203,6 +214,11 @@ def eval_one_episode(model, env, deterministic=True, max_steps=5000):
 
         "min_lidar_all": safe_min(min_lidar_list),
         "p10_front": safe_min(p10_front_list),  # worst-case front clearance proxy
+
+        "mean_r_pf": safe_mean(r_pf_list),
+        "mean_r_oa": safe_mean(r_oa_list),
+        "mean_r_exist": safe_mean(r_exist_list),
+        "mean_lambda": safe_mean([x for x in lam_list if np.isfinite(x)])
     }
     return metrics
 
@@ -250,7 +266,8 @@ class EvalMetricsCallback(BaseCallback):
             "mean_abs_rudder", "std_rudder",
             "mean_abs_tgt", "max_abs_tgt",
             "mean_abs_angle_diff", "max_abs_angle_diff",
-            "min_lidar_all", "p10_front"
+            "min_lidar_all", "p10_front",
+            "mean_r_pf", "mean_r_oa", "mean_r_exist", "mean_lambda"
         ]
 
     def _init_csv(self):

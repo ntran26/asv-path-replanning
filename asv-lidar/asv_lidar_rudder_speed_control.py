@@ -13,7 +13,15 @@ UPDATE_RATE = 0.1   # 10 Hz
 RENDER_FPS = 20
 MAP_WIDTH = 400
 MAP_HEIGHT = 600
-MAX_OBS = 10
+MAX_OBS = 6
+
+# Reward shaping parameters
+GAMMA_E      = 0.05
+GAMMA_THETA  = 4.0
+GAMMA_X      = 0.005
+EPSILON_X    = 1.0
+ALPHA_R      = 0.1
+R_COLLISION  = -2000.0
 
 # Speed control (rpm)
 RPM_MIN = 100
@@ -331,8 +339,6 @@ class ASVLidarEnv(gym.Env):
 
         # Initialize distance to goal
         self.distance_to_goal = float(np.linalg.norm([self.asv_x - self.goal_x, self.asv_y - self.goal_y]))
-        self.prev_distance_to_goal = self.distance_to_goal
-        self.progress = 0
 
         self.reward = 0
 
@@ -398,37 +404,62 @@ class ASVLidarEnv(gym.Env):
         # append new coordinate of asv
         self.asv_path.append((self.asv_x, self.asv_y))
 
-        """
-        Reward shaping parameters
-        """
-        lambda_ = 0.5       # weighting parameter
-        k_goal = 500        # reach goal reward
-        k_col = -1000       # collision penalty
+        # update distance to goal
+        self.distance_to_goal = float(np.linalg.norm([self.asv_x - self.goal_x, self.asv_y - self.goal_y]))
 
         # Define terminal flags
         collided = bool(self._check_collision_geom())
         reached_goal = bool(self.distance_to_goal <= VESSEL_LENGTH/2)
 
-        """
-        Reward function
-            r_exist: penalty per step
-            r_heading: heading reward (towards goal)
-            r_pf: path following reward
-            r_oa: obstacle avoidance reward
-            r_prog: progress reward (distance from goal)
-            r_goal: reward when reach goal
-        """
-        # 1) Penalty per step
-        r_exist = -0.5
 
-        # 2) Heading alignment reward (reward = 1 if aligned, -1 if opposite)
+
+        # lam = 0.5
+
+        # Speed
+        U = float(self.speed_mps)
+        U_max = float(max(U_MAX, 1e-6))
+        U_norm = float(U / U_max)
+
+        # # Course/heading alignment
+        # chi_tilde = float(np.radians(self.angle_diff))
+        # cos_chi = float(np.cos(chi_tilde))
+
+        # # Path following reward (r_pf)
+        # ye = float(abs(self.tgt))  # cross-track error magnitude
+        # r_pf = -1.0 + (U_norm * cos_chi + 1.0) * (float(np.exp(-GAMMA_E * ye)) + 1.0)
+
+        # # Obstacle avoidance reward (r_oa)
+        # lidar_d = self.lidar.ranges.astype(np.float32)
+        # theta_deg = self.lidar.angles.astype(np.float32)
+        # theta_rad = np.radians(theta_deg)
+        # w = 1.0 / (1.0 + np.abs(GAMMA_THETA * theta_rad))
+
+        # # handle out of range 0: <1m or >16m
+        # x = np.where(lidar_d <= 0.0, float(LIDAR_RANGE), lidar_d)
+        # pen = 1.0 / (GAMMA_X * (np.maximum(x, EPSILON_X) ** 2))
+
+        # r_oa = -float(np.sum(w * pen) / (np.sum(w) + 1e-6))
+        
+        # # living penalty depends on lambda
+        # r_exist = -lam * (2.0 * ALPHA_R + 1.0)
+
+        # if collided:
+        #     reward = (1.0 - lam) * R_COLLISION
+        # elif reached_goal:
+        #     reward = 500
+        # else:
+        #     reward = lam * r_pf + (1.0 - lam) * r_oa + r_exist
+
+        r_exist = -1
+
+        # heading alignment reward (reward = 1 if aligned, -1 if opposite)
         angle_diff_rad = np.radians(self.angle_diff)
         r_heading = np.cos(angle_diff_rad)
 
-        # 3) Path following reward
+        # path following reward
         r_pf = np.exp(-0.05 * abs(self.tgt))
 
-        # 4) Obstacle avoidance reward
+        # obstacle avoidance reward
         lidar_list = self.lidar.ranges.astype(np.float32)
         r_oa = 0
         for i, dist in enumerate(lidar_list):
@@ -437,37 +468,36 @@ class ASVLidarEnv(gym.Env):
             r_oa += weight / max(dist, 1)
         r_oa = -r_oa / len(lidar_list)
 
-        # 5) Reach goal reward
-        r_goal = k_goal if reached_goal else 0
-        
-        if collided:
-            self.reward = k_col
+        # if the agent reaches goal
+        self.distance_to_goal = np.linalg.norm([self.asv_x - self.goal_x, self.asv_y - self.goal_y])
+        if reached_goal:
+            r_goal = 50
         else:
-            self.reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_goal
+            r_goal = 0
+
+        # Combined rewards
+        lambda_ = 0.5       # weighting factor
+        # reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_exist + r_goal + r_heading
+
+        if collided:
+            reward = -1000
+        else:
+            reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
 
         terminated = self.check_done((self.asv_x, self.asv_y))
 
-        # --------- Reward breakdown for logging ---------
-        reward_shaped = float(lambda_ * r_pf + (1.0 - lambda_) * r_oa + r_exist)
         info = {
-            "r_exist": float(r_exist),
-            "r_heading": float(r_heading),
-            "r_pf_raw": float(r_pf),
-            "r_pf_weighted": float(lambda_ * r_pf),
-            "r_oa_raw": float(r_oa),
-            "r_oa_weighted": float((1.0 - lambda_) * r_oa),
-            "r_goal": float(k_goal),
-            "lambda": float(lambda_),
-            "U": float(self.speed_mps),
-            "distance_to_goal": float(self.distance_to_goal),
-            "collided": int(collided),
-            "reached_goal": int(reached_goal),
-            "reward_shaped": reward_shaped,
-            "r_terminal": float(-1000.0 if collided else 0.0),
-            "reward_total": float(self.reward),
+            "lam": lambda_,
+            "r_pf": r_pf,
+            "r_oa": r_oa,
+            "r_exist": r_exist,
+            "U": U,
+            "U_norm": U_norm,
+            "cos_chi": r_heading,
+            "collision": collided,
         }
 
-        return self._get_obs(), self.reward, terminated, False, info
+        return self._get_obs(), reward, terminated, False, info
 
     def render(self):
         if self.render_mode != 'human':
@@ -511,7 +541,7 @@ class ASVLidarEnv(gym.Env):
         # Draw status
         # lidar = self.lidar.ranges.astype(np.int16)
         if self.status is not None:
-            status, rect = self.status.render(f"{self.elapsed_time:005.1f}s  V:{self.speed_mps:0.2f}m/s  HDG:{self.asv_h:+004.0f}({self.asv_w:+03.0f})  TGT:{self.tgt:+004.0f}  TGT_HDG:{self.angle_diff:.2f}   REW:{self.reward:.2f}",(255,255,255),(0,0,0))
+            status, rect = self.status.render(f"{self.elapsed_time:005.1f}s  V:{self.speed_mps:0.2f}m/s  HDG:{self.asv_h:+004.0f}({self.asv_w:+03.0f})  TGT:{self.tgt:+004.0f}  TGT_HDG:{self.angle_diff:.2f}   GOAL:{self.distance_to_goal:.2f}",(255,255,255),(0,0,0))
             self.surface.blit(status, [10,550])
 
         os = pygame.transform.rotozoom(self.icon_scaled,-self.asv_h,1)
