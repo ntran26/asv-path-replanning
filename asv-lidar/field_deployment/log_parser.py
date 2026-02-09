@@ -24,6 +24,7 @@ import re
 import numpy as np
 from dataclasses import dataclass
 from typing import Iterator, Optional, Tuple, Dict, Any
+import time
 
 # Data Container for a single timestep
 @dataclass
@@ -340,7 +341,7 @@ def frame_to_gym_obs(
         "lidar": frame.lidar_m.astype(np.float32),
         "pos": np.array([x,y], dtype=np.float32),
         "hdg": np.array([yaw], dtype=np.float32),
-        "dhg": np.array([0.0], dtype=np.float32),
+        "dhdg": np.array([0.0], dtype=np.float32),
         "tgt": np.array([0.0], dtype=np.float32),
         "target_heading": np.array([0.0], dtype=np.float32),
     }
@@ -376,6 +377,7 @@ if __name__ == "__main__":
         if count:
             print(f"Frame {count}: t={frame.t_sec:.3f}s pos={obs['pos']} yaw={obs['hdg']} spd={obs['spd']}")
             print(f" lidar shape: {obs['lidar'].shape}, min/max: {obs['lidar'].min():.2f}/{obs['lidar'].max():.2f}")
+            time.sleep(0.5)
         count += 1
     
     print(f"Decoded {count} frames.")
