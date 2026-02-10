@@ -460,25 +460,25 @@ if __name__=='__main__':
         with open("asv_data.json", "w") as f:
             json.dump(result_data, f, indent=4)
 
-        # Save path taken as image
-        path_surface = pygame.Surface((env.map_width, env.map_height))
-        path_surface.fill((255, 255, 255))
+        # # Save path taken as image
+        # path_surface = pygame.Surface((env.map_width, env.map_height))
+        # path_surface.fill((255, 255, 255))
 
-        for i in range(1, len(env.asv_path)):
-            pygame.draw.circle(path_surface, (0, 0, 200), env.asv_path[i], 3)
+        # for i in range(1, len(env.asv_path)):
+        #     pygame.draw.circle(path_surface, (0, 0, 200), env.asv_path[i], 3)
 
-        # Draw obstacles
-        for obs in env.obstacles:
-            pygame.draw.polygon(path_surface, (200, 0, 0), obs)
+        # # Draw obstacles
+        # for obs in env.obstacles:
+        #     pygame.draw.polygon(path_surface, (200, 0, 0), obs)
 
-        # Draw path
-        env._draw_dashed_line(path_surface, (0, 200, 0), (env.start_x, env.start_y), (env.goal_x, env.goal_y), width=5)
-        pygame.draw.circle(path_surface, (100, 0, 0), (env.tgt_x, env.tgt_y), 5)
+        # # Draw path
+        # env._draw_dashed_line(path_surface, (0, 200, 0), (env.start_x, env.start_y), (env.goal_x, env.goal_y), width=5)
+        # pygame.draw.circle(path_surface, (100, 0, 0), (env.tgt_x, env.tgt_y), 5)
 
-        # Draw ship icon
-        display = pygame.display.set_mode(env.screen_size)
-        os_ = pygame.transform.rotozoom(env.icon, -env.asv_h, 1)
-        path_surface.blit(os_, os_.get_rect(center=(env.asv_x, env.asv_y)))
-        display.blit(path_surface, [0, 0])
+        # # Draw ship icon
+        # display = pygame.display.set_mode(env.screen_size)
+        # os_ = pygame.transform.rotozoom(env.icon, -env.asv_h, 1)
+        # path_surface.blit(os_, os_.get_rect(center=(env.asv_x, env.asv_y)))
+        # display.blit(path_surface, [0, 0])
 
-        pygame.image.save(path_surface, "asv_path_result.png")
+        # pygame.image.save(path_surface, "asv_path_result.png")

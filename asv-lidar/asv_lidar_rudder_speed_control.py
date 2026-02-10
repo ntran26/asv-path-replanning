@@ -8,12 +8,14 @@ from asv_lidar import Lidar, LIDAR_RANGE, LIDAR_BEAMS
 from images import BOAT_ICON
 import cv2
 
+RENDER_SCALE = 25
+
 # System parameters
 UPDATE_RATE = 0.1   # 10 Hz
-RENDER_FPS = 20
-MAP_WIDTH = 400
-MAP_HEIGHT = 600
-MAX_OBS = 10
+RENDER_FPS = 10
+MAP_WIDTH = 10
+MAP_HEIGHT = 25
+MAX_OBS = 6
 
 # Reward shaping parameters
 GAMMA_E      = 0.05
@@ -24,8 +26,8 @@ ALPHA_R      = 0.1
 R_COLLISION  = -2000.0
 
 # Speed control (rpm)
-RPM_MIN = 100
-RPM_MAX = 200
+RPM_MIN = 16
+RPM_MAX = 32
 U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 MAX_IN = 1
 MIN_IN = -1
@@ -64,7 +66,10 @@ class ASVLidarEnv(gym.Env):
 
         pygame.init()
         self.render_mode = render_mode
-        self.screen_size = (self.map_width,self.map_height)
+        self.world_size = (self.map_width,self.map_height)
+        self.render_scale = RENDER_SCALE
+        self.window_size = (int(self.map_width*self.render_scale), 
+                            int(self.map_height*self.render_scale))
 
         self.icon = None
         self.fps_clock = pygame.time.Clock()
@@ -73,7 +78,7 @@ class ASVLidarEnv(gym.Env):
         self.surface = None
         self.status = None
         if render_mode in self.metadata['render_modes']:
-            self.surface = pygame.Surface(self.screen_size)
+            self.surface = pygame.Surface(self.window_size)
             self.status = pygame.freetype.SysFont(pygame.font.get_default_font(),size=10)
 
         # State
@@ -105,7 +110,7 @@ class ASVLidarEnv(gym.Env):
         self.observation_space = Dict(
             {
                 "lidar": Box(low=0, high=LIDAR_RANGE, shape=(LIDAR_BEAMS,), dtype=np.float32),
-                "pos"  : Box(low=np.array([0,0]),high=np.array(self.screen_size),shape=(2,),dtype=np.int16),
+                "pos"  : Box(low=np.array([0,0]),high=np.array(self.world_size),shape=(2,),dtype=np.int16),
                 "hdg"  : Box(low=0,high=360,shape=(1,),dtype=np.int16),
                 "dhdg" : Box(low=0,high=36,shape=(1,),dtype=np.int16),
                 "speed"  : Box(low=0.0, high=10.0, shape=(1,), dtype=np.float32),
@@ -138,7 +143,7 @@ class ASVLidarEnv(gym.Env):
         # Initialize video recorder
         self.record_video = True
         self.video_writer = None
-        self.frame_size = (self.map_width, self.map_height)
+        self.frame_size = self.window_size
         self.video_fps = RENDER_FPS
 
     def _get_obs(self):
@@ -262,13 +267,13 @@ class ASVLidarEnv(gym.Env):
     def _generate_obstacles(self, num_obs):
         obstacles = []
         for _ in range(num_obs):
-            x = np.random.randint(50, self.map_width - 50)
-            y = np.random.randint(50, self.map_height - 150)
+            x = np.random.randint(1, self.map_width - 1)
+            y = np.random.randint(1, self.map_height - 1)
 
             # ensure the obstacle is not close to start/goal 
-            if np.linalg.norm([x - self.start_x, y - self.start_y]) > 100 and \
-                np.linalg.norm([x - self.goal_x, y - self.goal_y]) > 100:
-                obstacles.append([(x, y), (x+50, y), (x+50, y+50), (x, y+50)])
+            if np.linalg.norm([x - self.start_x, y - self.start_y]) > 1 and \
+                np.linalg.norm([x - self.goal_x, y - self.goal_y]) > 1:
+                obstacles.append([(x, y), (x+1, y), (x+1, y+1), (x, y+1)])
 
         return obstacles
     
@@ -309,12 +314,12 @@ class ASVLidarEnv(gym.Env):
 
         # Reset dynamics + sensors
         self.model = ShipModel()
-        self.model._v = 4.5
+        self.model._v = 0
         self.lidar.reset()
 
         # Randomize start position
-        self.start_y = self.map_height - 50
-        self.start_x = np.random.randint(50, self.map_width - 50)
+        self.start_y = self.map_height - 1
+        self.start_x = np.random.randint(1, self.map_width - 1)
         
         self.asv_y = self.start_y
         self.asv_x = self.start_x
@@ -324,8 +329,8 @@ class ASVLidarEnv(gym.Env):
         self.speed_mps = 0.0
 
         # Randomize goal position
-        self.goal_y = 50
-        self.goal_x = np.random.randint(50, self.map_width - 50)
+        self.goal_y = 1
+        self.goal_x = np.random.randint(1, self.map_width - 1)
 
         # Generate the path
         self.path = self._generate_path(self.start_x, self.start_y, self.goal_x, self.goal_y)
@@ -410,7 +415,6 @@ class ASVLidarEnv(gym.Env):
         # Define terminal flags
         collided = bool(self._check_collision_geom())
         reached_goal = bool(self.distance_to_goal <= VESSEL_LENGTH/2)
-
 
 
         # lam = 0.5
@@ -503,52 +507,85 @@ class ASVLidarEnv(gym.Env):
         if self.render_mode != 'human':
             return        
         if self.display is None:
-            self.display = pygame.display.set_mode(self.screen_size)
+            self.display = pygame.display.set_mode(self.window_size)
+        
+        scale = float(self.render_scale)
+
+        def scale_point(xy):    # scale point from world -> pixel
+            return (int(round(xy[0] * scale)), int(round(xy[1] * scale)))
+        def scale_scalar(v):    # scale scalar (radius, width, dash length) -> pixels
+            return max(1, int(round(v * scale)))
 
         self.surface.fill((0, 0, 0))
 
         # Draw map boundaries
-        line = self.map_border
-        pygame.draw.line(self.surface, (200, 0, 0), (0,0), (0,self.map_height), 5)
-        pygame.draw.line(self.surface, (200, 0, 0), (0,self.map_height), (self.map_width,self.map_height), 5)
-        pygame.draw.line(self.surface, (200, 0, 0), (self.map_width,0), (self.map_width,self.map_height), 5)
-        pygame.draw.line(self.surface, (200, 0, 0), (0,0), (self.map_width,0), 5)
+        bw = max(2, int(round(2)))  # keep border thickness readable in pixels
+        W = self.window_size[0] - 1
+        H = self.window_size[1] - 1
+        pygame.draw.line(self.surface, (200, 0, 0), (0, 0), (0, H), bw)
+        pygame.draw.line(self.surface, (200, 0, 0), (0, H), (W, H), bw)
+        pygame.draw.line(self.surface, (200, 0, 0), (W, 0), (W, H), bw)
+        pygame.draw.line(self.surface, (200, 0, 0), (0, 0), (W, 0), bw)
 
         # Draw obstacles
         for obs in self.obstacles:
-            pygame.draw.polygon(self.surface, (200, 0, 0), obs)
+            obs_px = [scale_point(p) for p in obs]
+            pygame.draw.polygon(self.surface, (200, 0, 0), obs_px)
 
         # Draw LIDAR scan
-        self.lidar.render(self.surface)
+        self.lidar.render(self.surface, scale=scale)
 
         # Draw Path
-        self._draw_dashed_line(self.surface,(0,200,0),(self.start_x,self.start_y),(self.goal_x,self.goal_y),width=5)
-        pygame.draw.circle(self.surface,(100,0,0),(self.tgt_x,self.tgt_y),5)
+        self._draw_dashed_line(
+            self.surface,
+            (0,200,0),
+            scale_point((self.start_x,self.start_y)),
+            scale_point((self.goal_x,self.goal_y)),
+            width=2,
+            dash_length=int(np.clip(scale, 8, 30))
+        )
+        pygame.draw.circle(self.surface,(100,0,0),
+                           scale_point((self.tgt_x,self.tgt_y)),
+                           radius=3)
 
         # Draw destination
-        pygame.draw.circle(self.surface,(200,0,200),(self.goal_x,self.goal_y),10)
+        pygame.draw.circle(self.surface, (200, 0, 200), 
+                           scale_point((self.goal_x, self.goal_y)), 
+                           max(4, int(round(6))))
 
         # Draw ownship
         if self.icon is None:
             self.icon = pygame.image.frombytes(BOAT_ICON['bytes'],BOAT_ICON['size'],BOAT_ICON['format'])
             self.icon_scaled = None
             self._icon_scaled_size = None
-        
-        if self.icon_scaled is None or self._icon_scaled_size != (VESSEL_WIDTH, VESSEL_LENGTH):
-            self.icon_scaled = pygame.transform.smoothscale(self.icon, (VESSEL_WIDTH, VESSEL_LENGTH))
-            self._icon_scaled_size = (VESSEL_WIDTH, VESSEL_LENGTH)
+
+        icon_width = max(1, int(round(VESSEL_WIDTH * scale)))
+        icon_length = max(1, int(round(VESSEL_LENGTH * scale)))
+        icon_size = (icon_width, icon_length)
+
+        if self.icon_scaled is None or self._icon_scaled_size != icon_size:
+            self.icon_scaled = pygame.transform.smoothscale(self.icon, icon_size)
+            self._icon_scaled_size = icon_size
 
         # Draw status
-        # lidar = self.lidar.ranges.astype(np.int16)
-        if self.status is not None:
-            status, rect = self.status.render(f"{self.elapsed_time:005.1f}s  V:{self.speed_mps:0.2f}m/s  HDG:{self.asv_h:+004.0f}({self.asv_w:+03.0f})  TGT:{self.tgt:+004.0f}  TGT_HDG:{self.angle_diff:.2f}   GOAL:{self.distance_to_goal:.2f}",(255,255,255),(0,0,0))
-            self.surface.blit(status, [10,550])
-
-        os = pygame.transform.rotozoom(self.icon_scaled,-self.asv_h,1)
-        self.surface.blit(os,os.get_rect(center=(self.asv_x,self.asv_y)))
+        os = pygame.transform.rotozoom(self.icon_scaled, -self.asv_h, 1)
+        self.surface.blit(os, os.get_rect(center=scale_point((self.asv_x, self.asv_y))))
         ship_outline = self._hull_polygon_world()
-        pygame.draw.polygon(self.surface, (255, 0, 0), ship_outline, width=2)
-        self.display.blit(self.surface,[0,0])
+        ship_outline_px = [scale_point(p) for p in ship_outline]
+        pygame.draw.polygon(self.surface, (255, 0, 0), ship_outline_px, width=max(2, int(round(2))))
+
+        if self.status is not None:
+            status_surf, rect = self.status.render(
+                f"{self.elapsed_time:005.1f}s  V:{self.speed_mps:0.2f}m/s  "
+                f"HDG:{self.asv_h:+004.0f}({self.asv_w:+03.0f})  "
+                f"TGT:{self.tgt:+004.0f}  TGT_HDG:{self.angle_diff:.2f}  "
+                f"GOAL:{self.distance_to_goal:.2f}",
+                (255, 255, 255),
+                (0, 0, 0)
+            )
+            self.surface.blit(status_surf, (10, self.window_size[1] - 30))
+
+        self.display.blit(self.surface, (0, 0))
         pygame.display.update()
         self.fps_clock.tick(RENDER_FPS)
 

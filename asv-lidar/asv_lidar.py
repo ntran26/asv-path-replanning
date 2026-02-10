@@ -2,9 +2,9 @@ import pygame
 import numpy as np
 from ship_model import VESSEL_LENGTH
 
-LIDAR_RANGE = 150
+LIDAR_RANGE = 16
 LIDAR_SWATH = 270
-LIDAR_BEAMS = 63
+LIDAR_BEAMS = 90
 
 class Lidar:
     """Basic LIDAR simulator using pygame rects to determine sensor ranges."""
@@ -132,7 +132,7 @@ class Lidar:
 
         return None
         
-    def render(self, surface: pygame.Surface):
+    def render(self, surface: pygame.Surface, scale: float=1.0):
         """
         Render the LIDAR beams as lines on the given surface
 
@@ -145,4 +145,11 @@ class Lidar:
             # Compute the endpoint for the current beam using its range reading.
             x = self._pos_x + self._ranges[idx] * np.sin(absolute_angle)
             y = self._pos_y - self._ranges[idx] * np.cos(absolute_angle)
-            pygame.draw.aaline(surface, (90, 90, 200), (self._pos_x, self._pos_y), (x, y))
+            pygame.draw.aaline(
+                surface,
+                (90, 90, 200),
+                (self._pos_x * scale, self._pos_y * scale),
+                (x * scale, y * scale)
+            )
+
+            
