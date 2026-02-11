@@ -358,7 +358,7 @@ class ASVLidarEnv(gym.Env):
             return True
         
         # the agent reaches goal
-        if self.distance_to_goal <= VESSEL_LENGTH/2:
+        if self.distance_to_goal <= HULL_MARGIN:
             return True
 
         return False
@@ -575,15 +575,21 @@ class ASVLidarEnv(gym.Env):
         pygame.draw.polygon(self.surface, (255, 0, 0), ship_outline_px, width=max(2, int(round(2))))
 
         if self.status is not None:
-            status_surf, rect = self.status.render(
+            status_surf_1, rect = self.status.render(
                 f"{self.elapsed_time:005.1f}s  V:{self.speed_mps:0.2f}m/s  "
                 f"HDG:{self.asv_h:+004.0f}({self.asv_w:+03.0f})  "
-                f"TGT:{self.tgt:+004.0f}  TGT_HDG:{self.angle_diff:.2f}  "
-                f"GOAL:{self.distance_to_goal:.2f}",
+                f"TGT:{self.tgt:+004.0f}    ",
                 (255, 255, 255),
                 (0, 0, 0)
             )
-            self.surface.blit(status_surf, (10, self.window_size[1] - 30))
+            status_surf_2, rect = self.status.render(
+                f"TGT_HDG:{self.angle_diff:.2f}    "
+                f"GOAL:{self.distance_to_goal:.2f}  ",
+                (255, 255, 255),
+                (0, 0, 0)
+            )
+            self.surface.blit(status_surf_1, (10, self.window_size[1] - 30))
+            self.surface.blit(status_surf_2, (10, self.window_size[1] - 15))
 
         self.display.blit(self.surface, (0, 0))
         pygame.display.update()
@@ -613,6 +619,7 @@ if __name__ == '__main__':
         action = env.action_space.sample()
         obs,rew,term,_,_ = env.step(action)
         total_reward += rew
+        # print(f"Action: {action}    Reward: {rew}")
         if term:
             print(f"Elapsed time: {env.elapsed_time}, Reward: {total_reward:0.2f}")         
             pygame.display.quit()

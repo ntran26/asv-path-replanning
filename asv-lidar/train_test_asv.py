@@ -9,7 +9,7 @@ from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.callbacks import BaseCallback
-from asv_lidar_rudder_speed_control import ASVLidarEnv, RPM_MAX, RPM_MIN
+from asv_lidar_rudder_speed_control import ASVLidarEnv, RPM_MAX, RPM_MIN, HULL_MARGIN
 # from test_run import testEnv 
 import json
 import argparse
@@ -71,8 +71,8 @@ def termination_reason(env, done: bool, hit_max_steps: bool) -> str:
 
     # Goal (uses same logic as env.check_done)
     goal_radius = float(getattr(env, "collision", 0.0)) + 30.0
-    d_goal = float(np.hypot(env.goal_x - env.asv_x, env.goal_y - env.asv_y))
-    if d_goal <= goal_radius:
+    d_goal = float(np.linalg.norm([env.asv_x - env.goal_x, env.asv_y - env.goal_y]))
+    if d_goal <= HULL_MARGIN:
         return "goal"
 
     # Border vs obstacle
@@ -442,6 +442,7 @@ if __name__=='__main__':
         while not done:
             action, _ = model.predict(obs, deterministic=True)
             obs, reward, terminated, truncated, info = env.step(action)
+            print(f"Action: {action}    Reward: {reward}")
             done = bool(terminated or truncated)
             total_reward += float(reward)
 
