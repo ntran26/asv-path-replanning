@@ -491,14 +491,27 @@ class ASVLidarEnv(gym.Env):
         terminated = self.check_done((self.asv_x, self.asv_y))
 
         info = {
-            "lam": lambda_,
-            "r_pf": r_pf,
-            "r_oa": r_oa,
-            "r_exist": r_exist,
-            "U": U,
-            "U_norm": U_norm,
-            "cos_chi": r_heading,
-            "collision": collided,
+            # reward mix + components
+            "lam": float(lambda_),
+            "r_pf": float(r_pf),
+            "r_oa": float(r_oa),
+            "r_exist": float(r_exist),
+            "r_heading": float(r_heading),
+
+            # speed diagnostics
+            "U": float(U),
+            "U_norm": float(U_norm),
+            "speed_mps": float(self.speed_mps),
+
+            # actions in real units (useful for debugging)
+            "rpm": float(rpm),
+            "rudder_deg": float(rudder_cmd * 25.0),
+
+            # navigation + safety
+            "distance_to_goal": float(self.distance_to_goal),
+            "tgt": float(self.tgt),
+            "angle_diff": float(self.angle_diff),
+            "collision": bool(self._check_collision_geom()),
         }
 
         return self._get_obs(), reward, terminated, False, info
