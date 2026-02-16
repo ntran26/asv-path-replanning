@@ -416,43 +416,10 @@ class ASVLidarEnv(gym.Env):
         collided = bool(self._check_collision_geom())
         reached_goal = bool(self.distance_to_goal <= VESSEL_LENGTH/2)
 
-
-        # lam = 0.5
-
         # Speed
         U = float(self.speed_mps)
         U_max = float(max(U_MAX, 1e-6))
         U_norm = float(U / U_max)
-
-        # # Course/heading alignment
-        # chi_tilde = float(np.radians(self.angle_diff))
-        # cos_chi = float(np.cos(chi_tilde))
-
-        # # Path following reward (r_pf)
-        # ye = float(abs(self.tgt))  # cross-track error magnitude
-        # r_pf = -1.0 + (U_norm * cos_chi + 1.0) * (float(np.exp(-GAMMA_E * ye)) + 1.0)
-
-        # # Obstacle avoidance reward (r_oa)
-        # lidar_d = self.lidar.ranges.astype(np.float32)
-        # theta_deg = self.lidar.angles.astype(np.float32)
-        # theta_rad = np.radians(theta_deg)
-        # w = 1.0 / (1.0 + np.abs(GAMMA_THETA * theta_rad))
-
-        # # handle out of range 0: <1m or >16m
-        # x = np.where(lidar_d <= 0.0, float(LIDAR_RANGE), lidar_d)
-        # pen = 1.0 / (GAMMA_X * (np.maximum(x, EPSILON_X) ** 2))
-
-        # r_oa = -float(np.sum(w * pen) / (np.sum(w) + 1e-6))
-        
-        # # living penalty depends on lambda
-        # r_exist = -lam * (2.0 * ALPHA_R + 1.0)
-
-        # if collided:
-        #     reward = (1.0 - lam) * R_COLLISION
-        # elif reached_goal:
-        #     reward = 500
-        # else:
-        #     reward = lam * r_pf + (1.0 - lam) * r_oa + r_exist
 
         r_exist = -1
 

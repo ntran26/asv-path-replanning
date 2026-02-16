@@ -484,7 +484,7 @@ class EvalMetricsCallback(BaseCallback):
 # -------------------------------
 def parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument("--mode", choices=["train", "test"], default="train")
+    p.add_argument("--mode", choices=["train", "test", "eval"], default="test")
     p.add_argument("--algo", choices=["ppo", "sac"], default="sac")
     p.add_argument("--timesteps", type=int, default=1_000_000)
     p.add_argument("--num-envs", type=int, default=8)
@@ -653,3 +653,26 @@ if __name__ == "__main__":
             json.dump(result_data, f, indent=4)
             
         env.close()
+    
+    elif args.mode == "eval":
+        if algo == "ppo":
+            model = PPO.load(model_path)
+        elif algo == "sac":
+            model = SAC.load(model_path)
+        else:
+            raise ValueError(f"Unknown algo: {algo}")
+
+        eval_env = ASVLidarEnv(render_mode=None)
+        eval_env.reset(seed=args.seed + 10_000)
+
+        rows = []
+        for ep_i in range(args.n_eval_episodes):
+            m = eval_one_episode(model, eval_env, deterministic=True, max_steps=args.eval_max_steps)
+            print(f"[EVAL] ep#{ep_i} R={m['ep_reward']:.1f} len={m['ep_len']} reason={m['term_reason']} "
+                f"prog/step={m['progress_per_step']:.3f} v_mean={m['mean_speed']:.2f}")
+            rows.append({"episode": ep_i, **m})
+
+        with open("eval_only_metrics.json", "w") as f:
+            json.dump(rows, f, indent=2)
+
+        eval_env.close()
