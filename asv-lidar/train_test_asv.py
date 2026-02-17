@@ -498,8 +498,11 @@ def parse_args():
 
     # model paths
     p.add_argument("--model-path", type=str, default=None)
-    return p.parse_args()
 
+    # test scenario
+    p.add_argument("--test-case", type=int, default=None)
+
+    return p.parse_args()
 
 def make_env(seed: int, rank: int):
     """
@@ -616,8 +619,8 @@ if __name__ == "__main__":
         eval_env.close()
 
     elif args.mode == "test":
-        # Import pygame only in test mode (keeps training lighter / headless-friendly)
-        import pygame  # noqa: F401
+        # Import pygame only in test mode
+        import pygame
 
         if algo == "ppo":
             model = PPO.load(model_path)
@@ -627,6 +630,10 @@ if __name__ == "__main__":
             raise ValueError(f"Unknown algo: {algo}")
 
         env = ASVLidarEnv(render_mode="human")
+        if args.test_case is not None:
+            env.test_case = args.test_case
+        else:
+            env.test_case = None
         obs, _ = env.reset()
         done = False
         total_reward = 0.0
