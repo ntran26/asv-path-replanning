@@ -5,10 +5,12 @@ import pygame
 import pygame.freetype
 from ship_model import ShipModel, THRUST_COEF, DRAG_COEF, VESSEL_LENGTH, VESSEL_WIDTH, HULL_MARGIN, HULL_FORWARD_SHIFT
 from asv_lidar import Lidar, LIDAR_RANGE, LIDAR_BEAMS
+from test_run import TestCase
 from images import BOAT_ICON
 import cv2
 
 RENDER_SCALE = 25
+TEST_CASE = None
 
 # System parameters
 UPDATE_RATE = 0.1   # 10 Hz
@@ -96,6 +98,7 @@ class ASVLidarEnv(gym.Env):
         self.speed_mps = 0.0
 
         self.model = ShipModel()
+        self.scenario = TestCase()
 
         """
         Observation space:
@@ -145,6 +148,8 @@ class ASVLidarEnv(gym.Env):
         self.video_writer = None
         self.frame_size = self.window_size
         self.video_fps = RENDER_FPS
+
+        self.test_case = TEST_CASE
 
     def _get_obs(self):
         return {
@@ -264,16 +269,21 @@ class ASVLidarEnv(gym.Env):
 
         return path
     
-    def _generate_obstacles(self, num_obs):
+    def _generate_obstacles(self, num_obs, test_case=None):
         obstacles = []
-        for _ in range(num_obs):
-            x = np.random.randint(1, self.map_width - 1)
-            y = np.random.randint(1, self.map_height - 1)
 
-            # ensure the obstacle is not close to start/goal 
-            if np.linalg.norm([x - self.start_x, y - self.start_y]) > 1 and \
-                np.linalg.norm([x - self.goal_x, y - self.goal_y]) > 1:
-                obstacles.append([(x, y), (x+1, y), (x+1, y+1), (x, y+1)])
+        if test_case is None:
+            for _ in range(num_obs):
+                x = np.random.randint(1, self.map_width - 1)
+                y = np.random.randint(1, self.map_height - 1)
+
+                # ensure the obstacle is not close to start/goal 
+                if np.linalg.norm([x - self.start_x, y - self.start_y]) > 1 and \
+                    np.linalg.norm([x - self.goal_x, y - self.goal_y]) > 1:
+                    obstacles.append([(x, y), (x+1, y), (x+1, y+1), (x, y+1)])
+
+        else:
+            obstacles = self.scenario.obstacles(test_case=test_case)
 
         return obstacles
     
@@ -317,27 +327,28 @@ class ASVLidarEnv(gym.Env):
         self.model._v = 0
         self.lidar.reset()
 
-        # Randomize start position
-        self.start_y = self.map_height - 1
-        self.start_x = np.random.randint(1, self.map_width - 1)
-        
-        self.asv_y = self.start_y
+        # Randomize start and goal positions
+        if self.test_case is None:
+            self.start_x = np.random.randint(1, self.map_width - 1)
+            self.start_y = self.map_height - 1
+            self.goal_x = np.random.randint(1, self.map_width - 1)
+            self.goal_y = 1    
+        else:
+            self.start_x, self.start_y, self.goal_x, self.goal_y = self.scenario.position(test_case=self.test_case)
+
         self.asv_x = self.start_x
+        self.asv_y = self.start_y
 
         self.prev_x = float(self.asv_x)
         self.prev_y = float(self.asv_y)
         self.speed_mps = 0.0
-
-        # Randomize goal position
-        self.goal_y = 1
-        self.goal_x = np.random.randint(1, self.map_width - 1)
 
         # Generate the path
         self.path = self._generate_path(self.start_x, self.start_y, self.goal_x, self.goal_y)
 
         # Generate static obstacles
         self.num_obs = np.random.randint(0, self.max_obs)
-        self.obstacles = self._generate_obstacles(self.num_obs)
+        self.obstacles = self._generate_obstacles(self.num_obs, self.test_case)
 
         # Initialize the ASV path list
         self.asv_path = [(self.asv_x, self.asv_y)]
