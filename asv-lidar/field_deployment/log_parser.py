@@ -293,7 +293,7 @@ class BluefinStreamDecoder:
                 t_sec = float(t),
                 ts_str = ts_str,
                 x_m = float(x),
-                y_m = float(y),
+                y_m = -float(y),
                 yaw_deg = float(yaw_deg),
                 vx_mps = float(vx),
                 vy_mps = float(vy),
@@ -364,7 +364,7 @@ if __name__ == "__main__":
     origin = None
     count = 0
 
-    test_dir = 'bluefin_test_2026_01_21'
+    test_dir = 'data'
     test_file = sys.argv[1]
     filename = os.path.join(test_dir, test_file)
 

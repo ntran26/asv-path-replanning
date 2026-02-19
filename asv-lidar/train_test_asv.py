@@ -483,26 +483,26 @@ class EvalMetricsCallback(BaseCallback):
 # Main
 # -------------------------------
 def parse_args():
-    p = argparse.ArgumentParser()
-    p.add_argument("--mode", choices=["train", "test", "eval"], default="test")
-    p.add_argument("--algo", choices=["ppo", "sac"], default="sac")
-    p.add_argument("--timesteps", type=int, default=1_000_000)
-    p.add_argument("--num-envs", type=int, default=8)
-    p.add_argument("--seed", type=int, default=0)
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--mode", choices=["train", "test", "eval"], default="test")
+    ap.add_argument("--algo", choices=["ppo", "sac"], default="sac")
+    ap.add_argument("--timesteps", type=int, default=1_000_000)
+    ap.add_argument("--num-envs", type=int, default=8)
+    ap.add_argument("--seed", type=int, default=0)
 
     # evaluation / checkpoint
-    p.add_argument("--eval-freq", type=int, default=50_000)
-    p.add_argument("--n-eval-episodes", type=int, default=3)
-    p.add_argument("--eval-max-steps", type=int, default=5_000)
-    p.add_argument("--save-freq", type=int, default=500_000)
+    ap.add_argument("--eval-freq", type=int, default=50_000)
+    ap.add_argument("--n-eval-episodes", type=int, default=3)
+    ap.add_argument("--eval-max-steps", type=int, default=5_000)
+    ap.add_argument("--save-freq", type=int, default=500_000)
 
     # model paths
-    p.add_argument("--model-path", type=str, default=None)
+    ap.add_argument("--model-path", type=str, default=None)
 
     # test scenario
-    p.add_argument("--test-case", type=int, default=None)
+    ap.add_argument("--test-case", type=int, default=None)
 
-    return p.parse_args()
+    return ap.parse_args()
 
 def make_env(seed: int, rank: int):
     """
