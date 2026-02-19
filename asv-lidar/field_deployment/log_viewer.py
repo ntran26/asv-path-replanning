@@ -2,10 +2,6 @@
 
 Practice tool (offline): replay a Bluefin log file and visualize decoded values.
 
-This is an extension of the previous `bluefin_log_viewer_pygame.py`.
-It still shows the decoded text (timestamp / pose / velocity / LiDAR),
-*and* now it also draws the vessel trajectory as it replays.
-
 What it shows per decoded LiDAR frame (10 Hz in the logs):
   - Log timestamp + t_sec (seconds since start)
   - Pose: x, y, yaw (from SLAM)
@@ -31,7 +27,7 @@ Controls:
   Esc / window close : quit
 
 Run:
-  python bluefin_log_viewer_pygame_traj.py /path/to/test_1.log
+  python log_viewer.py data/test_1.log
 
 Notes:
   - This script imports log parser.
@@ -48,6 +44,7 @@ from typing import Optional, List, Tuple
 
 import numpy as np
 import pygame
+import cv2
 
 from log_parser import BluefinStreamDecoder, BluefinFrame
 
@@ -222,6 +219,16 @@ def draw_map_panel(
             pygame.draw.line(surface, (255, 200, 80), p, tip, 3)
             pygame.draw.circle(surface, (255, 200, 80), tip, 4)
 
+def surface_to_bgr(screen: pygame.Surface) -> np.ndarray:
+    """
+    Convert pygame Surface -> OpenCV BGR uint8 image.
+    pygame.surfarray.array3d gives (W,H,3) in RGB.
+    OpenCV expects (H,W,3) in BGR.
+    """
+    frame_rgb = pygame.surfarray.array3d(screen)            # (W,H,3)
+    frame_rgb = np.transpose(frame_rgb, (1, 0, 2))          # (H,W,3)
+    frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)  # BGR
+    return frame_bgr
 
 # -----------------------------
 #  Main UI loop
@@ -236,6 +243,11 @@ def main() -> None:
     ap.add_argument("--full", action="store_true", help="Start with full LiDAR list enabled")
     ap.add_argument("--no-map", action="store_true", help="Start with the map panel hidden")
     ap.add_argument("--zoom", type=float, default=30.0, help="Initial zoom in pixels per meter")
+    ap.add_argument("--record", action="store_true", help="Record an MP4 of the pygame window")
+    ap.add_argument("--out-video", default="bluefin_replay.mp4", help="Output video filename")
+    ap.add_argument("--out-image", default="bluefin_final.png", help="Output final screenshot filename")
+    ap.add_argument("--video-fps", type=float, default=None, help="Video FPS. If not set, defaults to --fps (UI rate).")
+
     args = ap.parse_args()
 
     if not os.path.exists(args.logfile):
@@ -245,13 +257,26 @@ def main() -> None:
 
     pygame.init()
     pygame.display.set_caption("Bluefin log viewer + trajectory")
+    video_fps = float(args.video_fps) if args.video_fps is not None else float(args.fps)
 
     # Layout: left text panel + right map panel
-    win_w, win_h = 1400, 800
+    win_w, win_h = 1200, 600
     text_w = 800
     map_w = win_w - text_w
 
     screen = pygame.display.set_mode((win_w, win_h))
+
+    video_writer = None
+    capture_period = 1.0 / max(video_fps, 1e-9)
+    next_capture_due = time.perf_counter()
+
+    if args.record:
+        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+        video_writer = cv2.VideoWriter(args.out_video, fourcc, video_fps, (win_w, win_h))
+        if not video_writer.isOpened():
+            raise RuntimeError(f"Could not open video writer")
+        print(f"[REC] Recording to {args.out_video} at {video_fps:.1f} fps, size={win_w}x{win_h}")
+
     clock = pygame.time.Clock()
 
     font = pygame.font.SysFont("consolas", 18) or pygame.font.Font(None, 18)
@@ -265,7 +290,7 @@ def main() -> None:
     lidar_scroll = 0
 
     show_map = not bool(args.no_map)
-    follow_mode = False
+    follow_mode = True
 
     # Map state
     default_px_per_m = float(args.zoom)
@@ -311,6 +336,9 @@ def main() -> None:
                     cached_lidar_key = None
                     lidar_scroll = 0
                     next_due = time.perf_counter()
+                elif event.key == pygame.K_p:
+                    pygame.image.save(screen, args.out_image)
+                    print(f"[IMG] Saved: {args.out_image}")
 
                     origin_world = None
                     path_world = []
@@ -361,10 +389,11 @@ def main() -> None:
         # -----------------
         # Playback timing
         # -----------------
-        if not paused and now >= next_due:
+        while not paused and now >= next_due:
             next_frame = stream.next_frame()
             if next_frame is None:
                 paused = True  # EOF
+                break
             else:
                 if prev_t_sec is None:
                     dt_last = 0.1
@@ -377,7 +406,8 @@ def main() -> None:
 
                 frame = next_frame
                 prev_t_sec = float(next_frame.t_sec)
-                next_due = now + (dt_last / float(args.rate))
+                # next_due = now + (dt_last / float(args.rate))
+                next_due += (dt_last / float(args.rate))
 
                 # Invalidate lidar cache for new frame
                 cached_lidar_key = None
@@ -416,6 +446,7 @@ def main() -> None:
         ]
 
         if frame is None:
+            next_due = now
             header_lines.append("Waiting for first LiDAR frame...")
         else:
             lidar = frame.lidar_m
@@ -506,10 +537,30 @@ def main() -> None:
                 label = f"points={len(path_world)}"
                 screen.blit(small.render(label, True, (210, 210, 220)), (map_rect.left + 8, map_rect.top + 8))
 
+        if video_writer is not None:
+            # Keep the output video time aligned with real time:
+            # write as many frames as needed based on wall-clock schedule.
+            while now >= next_capture_due:
+                video_writer.write(surface_to_bgr(screen))
+                next_capture_due += capture_period
+            
+        if args.record:
+            pygame.image.save(screen, args.out_image)
+
         pygame.display.flip()
         clock.tick(args.fps)
 
     stream.close()
+
+    # Save a final screenshot
+    pygame.image.save(screen, args.out_image)
+    print(f"[IMG] Saved final screenshot: {args.out_image}")
+
+    # Release the video
+    if video_writer is not None:
+        video_writer.release()
+        print(f"[REC] Video saved: {args.out_video}")
+
     pygame.quit()
 
 

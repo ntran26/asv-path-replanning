@@ -1,0 +1,4 @@
+test_1: origin at bottom right
+test_2: origin at bottom midpoint, circle test
+test_3: origin at bottom midpoint, go straight, maximum speed test
+test_4: origin at bottom right, full circle test, maximum rudder test
