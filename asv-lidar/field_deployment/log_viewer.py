@@ -24,10 +24,12 @@ Controls:
   0     : reset zoom to default
   W/A/S/D : pan map up/left/down/right (only when follow mode is OFF)
 
+  P     : take a snapshot
   Esc / window close : quit
 
 Run:
   python log_viewer.py data/test_1.log
+  python log_viewer.py data/test_2.log --record --video-fps 30
 
 Notes:
   - This script imports log parser.
@@ -48,6 +50,28 @@ import cv2
 
 from log_parser import BluefinStreamDecoder, BluefinFrame
 
+# -----------------------------
+# LiDAR constants
+# -----------------------------
+LIDAR_FULL_BEAMS = 720
+LIDAR_FULL_STEP = 360 / LIDAR_FULL_BEAMS    # 0.5 degrees
+
+# LIDAR_SWATH = 360
+# LIDAR_BEAMS = 720
+
+LIDAR_SWATH = 270
+LIDAR_BEAMS = 90
+
+LIDAR_MAX = 16
+
+# Angle of lidar relative to forward direction
+LIDAR_INDEX_DEG = 0
+
+# Vessel size 
+VESSEL_LENGTH = 1.7
+VESSEL_WIDTH = 0.5
+LIDAR_OFFSET_M = VESSEL_LENGTH/2
+
 
 # -----------------------------
 #  Log decoding / streaming
@@ -55,12 +79,6 @@ from log_parser import BluefinStreamDecoder, BluefinFrame
 
 class FrameStream:
     """Incremental decoder for a log file.
-
-    Why streaming instead of decoding the whole file?
-      - Your LiDAR lines are huge (720 beams), so logs get big quickly.
-      - Streaming can practice on large logs without loading them into RAM.
-
-    The key idea:
       - read file line-by-line
       - feed each line into BluefinStreamDecoder
       - only "yield" a frame when the decoder sees a LiDAR line (one full scan)
@@ -119,6 +137,22 @@ def format_lidar_lines(lidar_m: np.ndarray, *, per_line: int = 12, precision: in
         lines.append(", ".join(chunk))
     return lines
 
+def pick_lidar_swath(full_ranges_m: np.ndarray, angles_deg: np.ndarray, *, index0_deg: float) -> np.ndarray:
+    """
+    Pick ranges from a 360 scan for the angles
+    - full ranges_m has 720 beams covering 360 degrees
+    - beam i corresponds to angle = index0_deg + i*0.5 degrees
+    - angles_deg ranges from [-135, 135] for 270 lidar swath
+    """
+    full_ranges_m = np.asarray(full_ranges_m).ravel()
+    n = full_ranges_m.size
+    if n == 0:
+        return full_ranges_m
+    
+    step = 360/n
+    idx = np.round((angles_deg - index0_deg)/step).astype(int) % n
+
+    return full_ranges_m[idx]
 
 # -----------------------------
 #  Map / trajectory rendering
@@ -166,7 +200,13 @@ def draw_map_panel(
     view_center_world: Tuple[float, float],
     px_per_m: float,
     show_axes: bool = True,
-) -> None:
+    lidar_angles_deg: Optional[np.ndarray] = None,
+    lidar_ranges_m: Optional[np.ndarray] = None,
+    lidar_offset_m: float = LIDAR_OFFSET_M,
+    lidar_index0_deg: float = 0,
+    lidar_index0_range_m: Optional[float] = None,
+    mark_index0: bool = True
+    ) -> None:
     """Draw the trajectory polyline and the current vessel marker."""
 
     # Background
@@ -219,6 +259,42 @@ def draw_map_panel(
             pygame.draw.line(surface, (255, 200, 80), p, tip, 3)
             pygame.draw.circle(surface, (255, 200, 80), tip, 4)
 
+    # Draw lidar beams
+    if (current_world is not None) and (yaw_deg is not None) and (lidar_angles_deg is not None) and (lidar_ranges_m is not None):
+        # heading in radians
+        h = float(np.deg2rad(yaw_deg))
+
+        # place lidar in front of vessel
+        sensor_world = (float(current_world[0] + lidar_offset_m * np.sin(h)),
+                        float(current_world[1] + lidar_offset_m * np.cos(h)))
+        s_px = world_to_screen(sensor_world, 
+                               view_center_world=view_center_world,
+                               view_center_px=view_center_px,
+                               px_per_m=px_per_m)
+        if mark_index0:
+            a0 = float(np.deg2rad(yaw_deg + lidar_index0_deg))
+            r0 = float(lidar_index0_range_m) if lidar_index0_range_m is not None else LIDAR_MAX
+            r0 = float(np.clip(r0, 0, LIDAR_MAX))
+
+            end0_world = (sensor_world[0] + r0*np.sin(a0), sensor_world[1] + r0*np.cos(a0))
+            end0_px = world_to_screen(end0_world, view_center_world=view_center_world, view_center_px=view_center_px, px_per_m=px_per_m)
+
+            pygame.draw.aaline(surface, (255,50,50), s_px, end0_px)
+            pygame.draw.circle(surface, (255,50,50), end0_px, 4)
+
+        prev_clip = surface.get_clip()
+        surface.set_clip(map_rect)
+        try:
+            for angle, range in zip(lidar_angles_deg, lidar_ranges_m):
+                r = float(np.clip(range, 0, LIDAR_MAX))
+                a = float(np.deg2rad(yaw_deg + angle))
+
+                end_world = (sensor_world[0] + r*np.sin(a), sensor_world[1] + r*np.cos(a))
+                e_px = world_to_screen(end_world, view_center_world=view_center_world, view_center_px=view_center_px, px_per_m=px_per_m)
+                pygame.draw.aaline(surface, (90,90,200), s_px, e_px)
+        finally:
+            surface.set_clip(prev_clip)
+
 def surface_to_bgr(screen: pygame.Surface) -> np.ndarray:
     """
     Convert pygame Surface -> OpenCV BGR uint8 image.
@@ -229,6 +305,32 @@ def surface_to_bgr(screen: pygame.Surface) -> np.ndarray:
     frame_rgb = np.transpose(frame_rgb, (1, 0, 2))          # (H,W,3)
     frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)  # BGR
     return frame_bgr
+
+def plot_trajectory(traj_xy: List[Tuple[float, float]], traj_yaw_deg: List[float], out_png: str) -> None:
+    import matplotlib.pyplot as plt
+
+    xs = np.array([p[0] for p in traj_xy], dtype=float)
+    ys = np.array([p[1] for p in traj_xy], dtype=float)
+
+    plt.figure(figsize=(6,6))
+    plt.plot(xs,ys)
+    plt.scatter([xs[-1]], [ys[-1]]) # final point marker
+
+    # final heading arrow
+    h = np.deg2rad(traj_yaw_deg[-1])
+    arrow_len = 1
+    dx = arrow_len * np.sin(h)
+    dy = arrow_len * np.cos(h)
+    plt.arrow(xs[-1], ys[-1], dx, dy, length_includes_head=True)
+
+    ax = plt.gca()
+    ax.set_aspect("equal", adjustable="box")
+    plt.xlabel("X (m)")
+    plt.ylabel("Y (m)")
+    plt.tight_layout()
+    plt.savefig(out_png, dpi=200)
+    plt.close()
+    print(f"[PLOT] Saved: {out_png}")
 
 # -----------------------------
 #  Main UI loop
@@ -247,6 +349,7 @@ def main() -> None:
     ap.add_argument("--out-video", default="bluefin_replay.mp4", help="Output video filename")
     ap.add_argument("--out-image", default="bluefin_final.png", help="Output final screenshot filename")
     ap.add_argument("--video-fps", type=float, default=None, help="Video FPS. If not set, defaults to --fps (UI rate).")
+    ap.add_argument("--plot", default="trajectory_plot.png", help="Matplotlib trajectory plot output")
 
     args = ap.parse_args()
 
@@ -309,6 +412,11 @@ def main() -> None:
 
     cached_lidar_lines: List[str] = []
     cached_lidar_key = None
+
+    lidar_draw_angles = np.linspace(-LIDAR_SWATH/2, LIDAR_SWATH/2, LIDAR_BEAMS, dtype=np.float64)
+
+    traj_xy: List[Tuple[float, float]] = []
+    traj_yaw: List[float] = []
 
     running = True
     while running:
@@ -424,6 +532,9 @@ def main() -> None:
                 )
                 path_world.append(rel)
 
+                traj_xy.append((float(frame.x_m), float(frame.y_m)))
+                traj_yaw.append(float(frame.yaw_deg))
+
                 if follow_mode:
                     view_center_world = rel
 
@@ -463,7 +574,8 @@ def main() -> None:
             header_lines += [
                 f"Frame #{stream.frame_index:06d}    ts={frame.ts_str}    t_sec={frame.t_sec:9.3f}    dt~{dt_last:0.3f}s (~{(1.0/dt_last if dt_last>1e-6 else 0):0.1f} Hz)",
                 f"Pose(SLAM):  x={frame.x_m:+0.3f} m   y={frame.y_m:+0.3f} m   yaw={frame.yaw_deg:0.2f} deg   (hdg_ref={frame.hdg_ref_deg})",
-                f"Pose(rel):   x={rel_x:+0.3f} m   y={rel_y:+0.3f} m   origin=({origin_world[0]:+0.3f},{origin_world[1]:+0.3f})",
+                f"Control: rudder: {frame.s1:0.2f}, thruster: {frame.s2:0.2f}",
+                # f"Pose(rel):   x={rel_x:+0.3f} m   y={rel_y:+0.3f} m   origin=({origin_world[0]:+0.3f},{origin_world[1]:+0.3f})",
                 f"Vel(derived): vx={frame.vx_mps:+0.3f} m/s   vy={frame.vy_mps:+0.3f} m/s   speed={frame.speed_mps:0.3f} m/s",
                 f"LiDAR: beams={lidar.size}   units=m (dm*0.1)   min/mean/max={lidar_min:0.2f}/{lidar_mean:0.2f}/{lidar_max:0.2f}",
             ]
@@ -507,6 +619,7 @@ def main() -> None:
 
         # --- Map panel ---
         if show_map:
+            lidar_ranges_draw = pick_lidar_swath(frame.lidar_m, lidar_draw_angles, index0_deg=LIDAR_INDEX_DEG)
             if frame is None or origin_world is None:
                 # Show an empty map
                 draw_map_panel(
@@ -517,6 +630,11 @@ def main() -> None:
                     yaw_deg=None,
                     view_center_world=view_center_world,
                     px_per_m=px_per_m,
+                    lidar_angles_deg=lidar_draw_angles,
+                    lidar_ranges_m=lidar_ranges_draw,
+                    lidar_index0_deg=LIDAR_INDEX_DEG,
+                    lidar_index0_range_m=frame.lidar_m[0] if frame.lidar_m.size > 0 else None,
+                    mark_index0=True
                 )
             else:
                 current_rel = (
@@ -531,21 +649,23 @@ def main() -> None:
                     yaw_deg=float(frame.yaw_deg),
                     view_center_world=view_center_world,
                     px_per_m=px_per_m,
+                    lidar_angles_deg=lidar_draw_angles,
+                    lidar_ranges_m=lidar_ranges_draw,
+                    lidar_index0_deg=LIDAR_INDEX_DEG,
+                    lidar_index0_range_m=frame.lidar_m[0] if frame.lidar_m.size > 0 else None,
+                    mark_index0=True
                 )
 
                 # A small status label in the map corner
                 label = f"points={len(path_world)}"
                 screen.blit(small.render(label, True, (210, 210, 220)), (map_rect.left + 8, map_rect.top + 8))
 
-        if video_writer is not None:
+        if video_writer is not None and not paused:
             # Keep the output video time aligned with real time:
             # write as many frames as needed based on wall-clock schedule.
             while now >= next_capture_due:
                 video_writer.write(surface_to_bgr(screen))
                 next_capture_due += capture_period
-            
-        if args.record:
-            pygame.image.save(screen, args.out_image)
 
         pygame.display.flip()
         clock.tick(args.fps)
@@ -560,6 +680,8 @@ def main() -> None:
     if video_writer is not None:
         video_writer.release()
         print(f"[REC] Video saved: {args.out_video}")
+    
+    plot_trajectory(traj_xy, traj_yaw, args.plot)
 
     pygame.quit()
 

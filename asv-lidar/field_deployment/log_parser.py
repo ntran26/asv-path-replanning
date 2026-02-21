@@ -153,9 +153,10 @@ class BluefinStreamDecoder:
         r"^\[(?P<ts>\d{2}:\d{2}:\d{2}\.\d{6})\]\[(?P<seq>\d+)\]\s*HDG:(?P<hdg>[-+]?\d+(?:\.\d+)?)\s*$"
     )
 
+    # Re-check sensor orientation (-Y,-X,Yaw+180?)
     _re_pose = re.compile(
         r"^\[(?P<ts>\d{2}:\d{2}:\d{2}\.\d{6})\]"
-        r"(?P<x>[-+]\d+\.\d+),(?P<y>[-+]\d+\.\d+),(?P<yaw>[-+]\d+\.\d+)\s*$"
+        r"(?P<y>[-+]\d+\.\d+),(?P<x>[-+]\d+\.\d+),(?P<yaw>[-+]\d+\.\d+)\s*$"
     )
 
     _re_rc = re.compile(
@@ -199,8 +200,8 @@ class BluefinStreamDecoder:
         # Latched values
         self._last_hdg_ref: Optional[float] = None
         self._last_seq: Optional[int] = None
-        self._last_s1: Optional[int] = None
-        self._last_s2: Optional[int] = None
+        self._last_s1: Optional[int] = 0
+        self._last_s2: Optional[int] = 0
 
         # Pose + velocity state
         self._last_pose: Optional[Tuple[float, float, float]] = None
@@ -250,8 +251,9 @@ class BluefinStreamDecoder:
             t = self._real_time(ts_str)
 
             x = float(m.group("x"))
-            y = float(m.group("y"))
-            yaw_deg = _wrap_360(float(m.group("yaw")))
+            y = -float(m.group("y"))
+            yaw_deg = -float(m.group("yaw"))
+            # yaw_deg = _wrap_360(float(m.group("yaw")))
 
             # Velocity
             if self._last_pose is not None and self._last_pose_t is not None:
@@ -293,7 +295,7 @@ class BluefinStreamDecoder:
                 t_sec = float(t),
                 ts_str = ts_str,
                 x_m = float(x),
-                y_m = -float(y),
+                y_m = float(y),
                 yaw_deg = float(yaw_deg),
                 vx_mps = float(vx),
                 vy_mps = float(vy),
