@@ -119,7 +119,7 @@ def _downsample_stride(arr: np.ndarray, out_n: int) -> np.ndarray:
     if out_n <= 0:
         raise ValueError("out_n must be > 0")
     step = n / out_n
-    idx = (np.arrange(out_n) * step).astype(int)
+    idx = (np.arange(out_n) * step).astype(int)
     return arr[idx]
 
 # Streaming Decoder

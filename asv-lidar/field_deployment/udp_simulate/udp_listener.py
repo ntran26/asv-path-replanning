@@ -1,12 +1,16 @@
+"""
+Run: python udp_listener.py --print-raw
+"""
+
 import socket
 import argparse
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--bind-ip", default="0.0.0.0")     # local bind IP
-    ap.add_argument("--local-port", default=5000)       # local UDP port to listen on
+    ap.add_argument("--local-port", type=int, default=5000)       # local UDP port to listen on
     ap.add_argument("--server-ip", default="127.0.0.1") # vessel IP
-    ap.add_argument("--server-port", default=5050)      # vessel port
+    ap.add_argument("--server-port", type=int, default=5050)      # vessel port
     ap.add_argument("--print-raw", action="store_true") # print raw lines
     args = ap.parse_args()
 
