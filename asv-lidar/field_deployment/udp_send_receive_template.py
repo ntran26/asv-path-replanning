@@ -1,22 +1,24 @@
 import socket
 
-UDP_IP = "127.0.0.1"
-UDP_PORT = 5005
-MESSAGE = b"Hello, world!"
+ROBOT_ADDR = ('10.201.208.152', 5050)
 
-print("UDP target IP:", UDP_IP)
-print("UDP target port:", UDP_PORT)
-print("Message:", MESSAGE)
+# create a UDP socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-sock = socket.socket(socket.AF_INET,    # internet
-                     socket.SOCK_DGRAM) # UDP
+# configure it to listen on any IP address, port 5050
+sock.bind(('0.0.0.0', 5050))
 
-# Sending message
-sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+# send a msg to the robot to register as a listener
+sock.sendto(b'START\n', ROBOT_ADDR)
 
-# Receiving message
-sock.bind((UDP_IP, UDP_PORT))
-
+# main program loop
 while True:
-   data, addr = sock.recvfrom(1024)     # buffer size 1024 bytes
-   print("Receive message:", data)
+    # wait until a new message arrives
+    msg, addr = sock.recvfrom(4096)
+
+    # Do something with the message
+    #   e.g. parse data, update agent, etc.
+    print(msg)
+
+    # Send a command (if necessary) to the robot
+    sock.sendto(b'SOME COMMAND', ROBOT_ADDR)

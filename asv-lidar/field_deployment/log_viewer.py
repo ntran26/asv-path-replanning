@@ -20,8 +20,6 @@ Controls:
   C     : clear the currently drawn path (keeps current origin)
   G     : toggle "follow" mode (camera centers on vessel)
 
-  = / - : zoom map in / out
-  0     : reset zoom to default
   W/A/S/D : pan map up/left/down/right (only when follow mode is OFF)
 
   P     : take a snapshot
@@ -158,10 +156,6 @@ def pick_lidar_swath(full_ranges_m: np.ndarray, angles_deg: np.ndarray, *, index
 #  Map / trajectory rendering
 # -----------------------------
 
-def _clamp(v: float, lo: float, hi: float) -> float:
-    return max(lo, min(hi, v))
-
-
 def world_to_screen(
     xy_world: Tuple[float, float],
     *,
@@ -179,15 +173,14 @@ def world_to_screen(
       - +x is to the right
       - +y is *down*
 
-    So we invert y when mapping to screen.
     """
     x, y = xy_world
     cx_w, cy_w = view_center_world
     cx_px, cy_px = view_center_px
 
     sx = cx_px + (x - cx_w) * px_per_m
-    sy = cy_px - (y - cy_w) * px_per_m  # invert Y
-    return int(round(sx)), int(round(sy))
+    sy = cy_px - (y - cy_w) * px_per_m  # inverted Y
+    return sx, sy
 
 
 def draw_map_panel(
@@ -344,7 +337,7 @@ def main() -> None:
     ap.add_argument("--fps", type=int, default=60, help="UI frame rate cap")
     ap.add_argument("--full", action="store_true", help="Start with full LiDAR list enabled")
     ap.add_argument("--no-map", action="store_true", help="Start with the map panel hidden")
-    ap.add_argument("--zoom", type=float, default=30.0, help="Initial zoom in pixels per meter")
+    ap.add_argument("--zoom", type=float, default=20, help="Initial zoom in pixels per meter")
     ap.add_argument("--record", action="store_true", help="Record an MP4 of the pygame window")
     ap.add_argument("--out-video", default="bluefin_replay.mp4", help="Output video filename")
     ap.add_argument("--out-image", default="bluefin_final.png", help="Output final screenshot filename")
@@ -396,9 +389,7 @@ def main() -> None:
     follow_mode = True
 
     # Map state
-    default_px_per_m = float(args.zoom)
-    px_per_m = float(args.zoom)
-    px_per_m = _clamp(px_per_m, 2.0, 400.0)
+    px_per_m = args.zoom
 
     origin_world: Optional[Tuple[float, float]] = None
     path_world: List[Tuple[float, float]] = []  # stored relative to origin
@@ -473,14 +464,6 @@ def main() -> None:
                         origin_world = (float(frame.x_m), float(frame.y_m))
                         path_world = [(0.0, 0.0)]
                         view_center_world = (0.0, 0.0)
-
-                # Zoom controls
-                elif event.key == pygame.K_EQUALS:  # '=' key (also '+' with shift)
-                    px_per_m = _clamp(px_per_m * 1.15, 2.0, 400.0)
-                elif event.key == pygame.K_MINUS:
-                    px_per_m = _clamp(px_per_m / 1.15, 2.0, 400.0)
-                elif event.key == pygame.K_0:
-                    px_per_m = default_px_per_m
 
                 # Pan controls (only if not following)
                 elif not follow_mode:

@@ -153,7 +153,7 @@ class BluefinStreamDecoder:
         r"^\[(?P<ts>\d{2}:\d{2}:\d{2}\.\d{6})\]\[(?P<seq>\d+)\]\s*HDG:(?P<hdg>[-+]?\d+(?:\.\d+)?)\s*$"
     )
 
-    # Re-check sensor orientation (-Y,-X,Yaw+180?)
+    # Re-check sensor orientation (-Y, X, -Yaw)
     _re_pose = re.compile(
         r"^\[(?P<ts>\d{2}:\d{2}:\d{2}\.\d{6})\]"
         r"(?P<y>[-+]\d+\.\d+),(?P<x>[-+]\d+\.\d+),(?P<yaw>[-+]\d+\.\d+)\s*$"

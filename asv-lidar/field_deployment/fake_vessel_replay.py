@@ -1,5 +1,5 @@
 """
-Run: python fake_vessel_replay.py --log ../data/test_2.log
+Run: python fake_vessel_replay.py --log data/test_2.log
 """
 
 import socket
@@ -40,14 +40,14 @@ def main():
     sock.bind((args.bind_ip, args.port))
 
     print("[FAKE VESSEL] Listening on {}:{}", args.bind_ip, args.port)
-    print("[FAKE VESSEL] Waiting for HEY...")
+    print("[FAKE VESSEL] Waiting for START...")
 
     # Wait for handshake
     while True:
         data, addr = sock.recvfrom(4096)
-        if data.strip() == b"HEY":
+        if data.strip() == b"START":
             client_addr = addr
-            print("[FAKE VESSEL] Got HEY from {}, streaming will start", client_addr)
+            print("[FAKE VESSEL] Got START from {}, streaming will start", client_addr)
             break
         else:
             print("[FAKE VESSEL] Ignoring packet from {}: {}", addr, data)
