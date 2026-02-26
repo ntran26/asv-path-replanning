@@ -533,6 +533,13 @@ def main() -> None:
         y = 10
         line_h = 22
 
+        lidar_raw = None
+        lidar_view = None
+
+        if frame is not None:
+            lidar_raw = frame.lidar_m
+            lidar_view = pick_lidar_swath(lidar_raw, lidar_draw_angles, index0_deg=LIDAR_INDEX_DEG)
+
         header_lines = [
             f"File: {os.path.basename(args.logfile)}",
             f"Playback: {'PAUSED' if paused else 'RUNNING'}   speed={args.rate:.2f}x   (Space=pause, F=full lidar, R=restart)",
@@ -543,7 +550,7 @@ def main() -> None:
             next_due = now
             header_lines.append("Waiting for first LiDAR frame...")
         else:
-            lidar = frame.lidar_m
+            lidar = lidar_view if lidar_view is not None else lidar_raw
             lidar_min = float(np.min(lidar)) if lidar.size else float("nan")
             lidar_max = float(np.max(lidar)) if lidar.size else float("nan")
             lidar_mean = float(np.mean(lidar)) if lidar.size else float("nan")
@@ -572,32 +579,29 @@ def main() -> None:
         # --- LiDAR text ---
         if frame is not None:
             if show_full_lidar:
-                cache_key = (stream.frame_index,)
-                if cache_key != cached_lidar_key:
-                    cached_lidar_lines = format_lidar_lines(frame.lidar_m, per_line=12, precision=1)
-                    cached_lidar_key = cache_key
-
-                max_lines_on_screen = max(1, (win_h - y - 20) // 18)
-                max_scroll = max(0, len(cached_lidar_lines) - max_lines_on_screen)
-                lidar_scroll = min(lidar_scroll, max_scroll)
-
-                info = f"LiDAR full list (scroll {lidar_scroll}/{max_scroll})"
-                screen.blit(font.render(info, True, (200, 200, 210)), (10, y))
-                y += 22
-
-                for i in range(lidar_scroll, min(len(cached_lidar_lines), lidar_scroll + max_lines_on_screen)):
-                    s = cached_lidar_lines[i]
-                    screen.blit(small.render(s, True, (210, 210, 220)), (10, y))
-                    y += 18
+                lidar_src = lidar_raw
+                title = "LiDAR full list"
             else:
-                lidar = frame.lidar_m
-                first = ", ".join(f"{float(x):0.1f}" for x in lidar[:12])
-                last = ", ".join(f"{float(x):0.1f}" for x in lidar[-12:])
-                screen.blit(font.render("LiDAR summary (press F for full list)", True, (200, 200, 210)), (10, y))
-                y += 22
-                screen.blit(small.render(f"first 12: [{first}]", True, (210, 210, 220)), (10, y))
-                y += 18
-                screen.blit(small.render(f" last 12: [{last}]", True, (210, 210, 220)), (10, y))
+                lidar_src = lidar_view
+                title = "Processed LiDAR list"
+            cached_key = (stream.frame_index, show_full_lidar)
+            if cached_key != cached_lidar_key:
+                cached_lidar_lines = format_lidar_lines(lidar_src, per_line=15, precision=1)
+                cached_lidar_key = cached_key
+            max_lines_on_screen = max(1, (win_h-y-20)//18)
+            max_scroll = max(0, len(cached_lidar_lines) - max_lines_on_screen)
+            lidar_scroll = min(lidar_scroll, max_scroll)
+            
+            if show_full_lidar:
+                info = f"{title} (scroll {lidar_scroll}/{max_scroll})"
+            else:
+                info = title
+            
+            screen.blit(font.render(info, True, (200,200,210)), (10,y))
+            y += 22
+
+            for s in cached_lidar_lines[lidar_scroll : lidar_scroll + max_lines_on_screen]:
+                screen.blit(small.render(s, True, (210,210,220)), (10,y))
                 y += 18
 
         # --- Map panel ---

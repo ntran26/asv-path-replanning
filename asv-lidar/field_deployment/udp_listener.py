@@ -2,7 +2,6 @@
 Run: python udp_listener.py --record-log sea_trial.log
 """
 
-import time
 import socket
 import argparse
 import pygame
@@ -35,7 +34,7 @@ def main():
 
     # Send HEY to start stream
     sock.sendto(b"START\n", (args.server_ip, args.server_port))
-    print("[LISTENER] Sent HEY to {}, {}", args.server_ip, args.server_port)
+    print("[LISTENER] Sent START to {}, {}", args.server_ip, args.server_port)
     print("[LISTENER] Listening on {}, {}", args.bind_ip, args.local_port)
 
     log = None
@@ -81,16 +80,13 @@ def main():
 
     running = True
     while running:
-        now_perf = time.perf_counter()
-        now_wall = time.time()
-
         # events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    running == False
+                    running = False
                 elif event.key == pygame.K_SPACE:
                     paused = not paused
                 elif event.key == pygame.K_f:
@@ -130,132 +126,138 @@ def main():
                         view_center_world = (view_center_world[0] + pan_step_m, view_center_world[1])       
 
         # Receive and decode
-        while True:
-            msg, addr = sock.recvfrom(65535)
-            chunk = msg.decode("utf-8", errors="replace")
-            buf += chunk
+        msg, addr = sock.recvfrom(65535)
+        chunk = msg.decode("utf-8", errors="replace")
+        buf += chunk
 
-            # split into lines safely
-            while "\n" in buf:
-                line, buf = buf.split("\n", 1)
-                line = line.strip()
-                if not line:
-                    continue
+        # split into lines safely
+        while "\n" in buf:
+            line, buf = buf.split("\n", 1)
+            line = line.strip()
+            if not line:
+                continue
 
-                rx_lines += 1
+            rx_lines += 1
 
-                if args.print_raw:
-                    print(line)
+            if args.print_raw:
+                print(line)
 
-                if log is not None:
-                    log.write(line + "\n")
-                
-                decoded = decoder.feed(line)
-                if decoded is not None:
-                    rx_frames += 1
-                    if not paused:
-                        frame = decoded
-                        cached_lidar_key = None
-                        if origin_world is None:
-                            origin_world = (frame.x_m, frame.y_m)
-                            path_world = [(0,0)]
-                        rel = (frame.x_m - origin_world[0], frame.y_m - origin_world[1])
-                        path_world.append(rel)
-
-                        if len(path_world) > args.max_path:
-                            path_world = path_world[-args.max_path:]
-                        if follow_mode:
-                            view_center_world = rel
-
-            # Draw UI
-            screen.fill((20,20,25))
-
-            map_rect = pygame.Rect(text_w, 0, map_w, win_h)
-
-            y = 10
-            line_h = 22
-            header_lines = [f"UDP: local={args.bind_ip}:{args.local_port}  server={args.server_ip}:{args.server_port}",
-                            f"RX: lines={rx_lines}  frames={rx_frames}   {'PAUSED' if paused else 'RUNNING'} (Space)   full_lidar={'ON' if show_full_lidar else 'OFF'} (F)",
-                            f"Map: {'ON' if show_map else 'OFF'} (M)   follow={'ON' if follow_mode else 'OFF'} (G)   zoom={px_per_m:0.1f}px/m (=/-/0)   origin={'SET' if origin_world else 'NONE'} (O)"]
-            if frame is None:
-                header_lines.append("Waiting for first decoded LiDAR frame...")
-            else:
-                lidar = frame.lidar_m
-                header_lines += [
-                    f"ts={frame.ts_str}   t={frame.t_sec:0.3f}s   seq={frame.seq}   hdg_ref={frame.hdg_ref_deg}",
-                    f"Pose: x={frame.x_m:+0.3f} m  y={frame.y_m:+0.3f} m  yaw={frame.yaw_deg:+0.2f} deg",
-                    f"Vel:  vx={frame.vx_mps:+0.3f} m/s  vy={frame.vy_mps:+0.3f} m/s  spd={frame.speed_mps:0.3f} m/s",
-                    f"RC:   S1={frame.s1}   S2={frame.s2}",
-                    f"LiDAR: N={lidar.size}  min/mean/max={float(lidar.min()):0.2f}/{float(lidar.mean()):0.2f}/{float(lidar.max()):0.2f}",
-                ]
-            for s in header_lines:
-                screen.blit(font.render(s, True, (235, 235, 245)), (10, y))
-                y += line_h
-
-            y += 10
-
-            # lidar text area
-            if frame is not None:
-                if show_full_lidar:
-                    cache_key = (rx_frames,)
-                    if cache_key != cached_lidar_key:
-                        cached_lidar_lines = log_viewer.format_lidar_lines(frame.lidar_m, per_line=15, precision=1)
-                        cached_lidar_key = cache_key
-                max_lines_on_screen = max(1, (win_h-y-20)//10)
-                max_scroll = max(0, len(cached_lidar_lines) - max_lines_on_screen)
-                lidar_scroll = min(lidar_scroll, max_scroll)
-
-                screen.blit(font.render(f"LiDAR full list (scroll {lidar_scroll}/{max_scroll})", True, (200, 200, 210)), (10, y))
-                y += 22
-
-                for i in range(lidar_scroll, min(len(cached_lidar_lines), lidar_scroll + max_lines_on_screen)):
-                    screen.blit(small.render(cached_lidar_lines[i], True, (210, 210, 220)), (10, y))
-                    y += 18
-
-                else:
-                    lidar = frame.lidar_m
-                    first = ", ".join(f"{float(x):0.1f}" for x in lidar[:12])
-                    last = ", ".join(f"{float(x):0.1f}" for x in lidar[-12:])
-                    screen.blit(font.render("LiDAR summary (press F for full list)", True, (200, 200, 210)), (10, y))
-                    y += 22
-                    screen.blit(small.render(f"first 12: [{first}]", True, (210, 210, 220)), (10, y))
-                    y += 18
-                    screen.blit(small.render(f" last 12: [{last}]", True, (210, 210, 220)), (10, y))
-                    y += 18
+            if log is not None:
+                log.write(line + "\n")
             
-            # map panel
-            if show_map:
-                if frame is None or origin_world is None:
-                    log_viewer.draw_map_panel(
-                        screen,
-                        map_rect,
-                        path_world=path_world,
-                        current_world=None,
-                        yaw_deg=None,
-                        view_center_world=view_center_world,
-                        px_per_m=px_per_m,
-                    )
-                else:
-                    current_rel = (frame.x_m - origin_world[0], frame.y_m - origin_world[1])
-                    lidar_ranges_draw = log_viewer.pick_lidar_swath(frame.lidar_m, lidar_draw_angles, index0_deg=log_viewer.LIDAR_INDEX_DEG)
+            decoded = decoder.feed(line)
+            if decoded is not None:
+                rx_frames += 1
+                if not paused:
+                    frame = decoded
+                    cached_lidar_key = None
+                    if origin_world is None:
+                        origin_world = (frame.x_m, frame.y_m)
+                        path_world = [(0,0)]
+                    rel = (frame.x_m - origin_world[0], frame.y_m - origin_world[1])
+                    path_world.append(rel)
 
-                    log_viewer.draw_map_panel(
-                        screen,
-                        map_rect,
-                        path_world=path_world,
-                        current_world=current_rel,
-                        yaw_deg=frame.yaw_deg,
-                        view_center_world=view_center_world,
-                        px_per_m=px_per_m,
-                        lidar_angles_deg=lidar_draw_angles,
-                        lidar_ranges_m=lidar_ranges_draw,
-                        lidar_index0_deg=log_viewer.LIDAR_INDEX_DEG,
-                        lidar_index0_range_m=float(frame.lidar_m[0]) if frame.lidar_m.size > 0 else None,
-                        mark_index0=True,
-                    )
+                    if len(path_world) > args.max_path:
+                        path_world = path_world[-args.max_path:]
+                    if follow_mode:
+                        view_center_world = rel
+
+        # Draw UI
+        screen.fill((20,20,25))
+
+        map_rect = pygame.Rect(text_w, 0, map_w, win_h)
+
+        y = 10
+        line_h = 22
+
+        lidar_raw = None
+        lidar_view = None
+
+        if frame is not None:
+            lidar_raw = frame.lidar_m
+            lidar_view = log_viewer.pick_lidar_swath(lidar_raw, lidar_draw_angles, index0_deg=log_viewer.LIDAR_INDEX_DEG)
         
-            pygame.display.flip()
-            clock.tick(args.fps)
+        header_lines = [f"UDP: local={args.bind_ip}:{args.local_port}  server={args.server_ip}:{args.server_port}",
+                        f"RX: lines={rx_lines}  frames={rx_frames}   {'PAUSED' if paused else 'RUNNING'} (Space)   full_lidar={'ON' if show_full_lidar else 'OFF'} (F)",
+                        f"Map: {'ON' if show_map else 'OFF'} (M)   follow={'ON' if follow_mode else 'OFF'} (G)   zoom={px_per_m:0.1f}px/m  origin={'SET' if origin_world else 'NONE'} (O)"]
+        if frame is None:
+            header_lines.append("Waiting for first decoded LiDAR frame...")
+        else:
+            lidar = frame.lidar_m
+            header_lines += [
+                f"ts={frame.ts_str}   t={frame.t_sec:0.3f}s   seq={frame.seq}   hdg_ref={frame.hdg_ref_deg}",
+                f"Pose: x={frame.x_m:+0.3f} m  y={frame.y_m:+0.3f} m  yaw={frame.yaw_deg:+0.2f} deg",
+                f"Vel:  vx={frame.vx_mps:+0.3f} m/s  vy={frame.vy_mps:+0.3f} m/s  spd={frame.speed_mps:0.3f} m/s",
+                f"RC:   S1={frame.s1}   S2={frame.s2}",
+                f"LiDAR: N={lidar.size}  min/mean/max={float(lidar.min()):0.2f}/{float(lidar.mean()):0.2f}/{float(lidar.max()):0.2f}",
+            ]
+        for s in header_lines:
+            screen.blit(font.render(s, True, (235, 235, 245)), (10, y))
+            y += line_h
+
+        y += 10
+    
+        # lidar text area
+        if frame is not None:
+            if show_full_lidar:
+                lidar_src = lidar_raw
+                title = "LiDAR full list"
+            else:
+                lidar_src = lidar_view
+                title = "Processed LiDAR list"
+            cached_key = (rx_frames, show_full_lidar)
+            if cached_key != cached_lidar_key:
+                cached_lidar_lines = log_viewer.format_lidar_lines(lidar_src, per_line=15, precision=1)
+                cached_lidar_key = cached_key
+            max_lines_on_screen = max(1, (win_h-y-20)//18)
+            max_scroll = max(0, len(cached_lidar_lines) - max_lines_on_screen)
+            lidar_scroll = min(lidar_scroll, max_scroll)
+            
+            if show_full_lidar:
+                info = f"{title} (scroll {lidar_scroll}/{max_scroll})"
+            else:
+                info = title
+            
+            screen.blit(font.render(info, True, (200,200,210)), (10,y))
+            y += 22
+
+            for s in cached_lidar_lines[lidar_scroll : lidar_scroll + max_lines_on_screen]:
+                screen.blit(small.render(s, True, (210,210,220)), (10,y))
+                y += 18
+        
+        # map panel
+        if show_map:
+            if frame is None or origin_world is None:
+                log_viewer.draw_map_panel(
+                    screen,
+                    map_rect,
+                    path_world=path_world,
+                    current_world=None,
+                    yaw_deg=None,
+                    view_center_world=view_center_world,
+                    px_per_m=px_per_m,
+                )
+            else:
+                current_rel = (frame.x_m - origin_world[0], frame.y_m - origin_world[1])
+                lidar_ranges_draw = log_viewer.pick_lidar_swath(frame.lidar_m, lidar_draw_angles, index0_deg=log_viewer.LIDAR_INDEX_DEG)
+
+                log_viewer.draw_map_panel(
+                    screen,
+                    map_rect,
+                    path_world=path_world,
+                    current_world=current_rel,
+                    yaw_deg=frame.yaw_deg,
+                    view_center_world=view_center_world,
+                    px_per_m=px_per_m,
+                    lidar_angles_deg=lidar_draw_angles,
+                    lidar_ranges_m=lidar_ranges_draw,
+                    lidar_index0_deg=log_viewer.LIDAR_INDEX_DEG,
+                    lidar_index0_range_m=float(frame.lidar_m[0]) if frame.lidar_m.size > 0 else None,
+                    mark_index0=True,
+                )
+
+        pygame.display.flip()
+        clock.tick(args.fps)
 
     if log is not None:
         log.close()
