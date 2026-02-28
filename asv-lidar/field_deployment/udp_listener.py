@@ -1,5 +1,5 @@
 """
-Run: python udp_listener.py --record-log sea_trial.log
+Run: python udp_listener.py --server-ip "10.201.208.224" --record-log sea_trial.log
 """
 
 import socket
@@ -32,7 +32,7 @@ def main():
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind((args.bind_ip, args.local_port))
 
-    # Send HEY to start stream
+    # Send to start stream
     sock.sendto(b"START\n", (args.server_ip, args.server_port))
     print("[LISTENER] Sent START to {}, {}", args.server_ip, args.server_port)
     print("[LISTENER] Listening on {}, {}", args.bind_ip, args.local_port)
@@ -127,40 +127,41 @@ def main():
 
         # Receive and decode
         msg, addr = sock.recvfrom(65535)
-        chunk = msg.decode("utf-8", errors="replace")
-        buf += chunk
+        line = msg.decode("utf-8", errors="replace")
+        
+        # buf += chunk
 
-        # split into lines safely
-        while "\n" in buf:
-            line, buf = buf.split("\n", 1)
-            line = line.strip()
-            if not line:
-                continue
+        # # split into lines safely
+        # while "\n" in buf:
+        #     line, buf = buf.split("\n", 1)
+        #     line = line.strip()
+        #     if not line:
+        #         continue
 
-            rx_lines += 1
+        rx_lines += 1
 
-            if args.print_raw:
-                print(line)
+        if args.print_raw:
+            print(line)
 
-            if log is not None:
-                log.write(line + "\n")
-            
-            decoded = decoder.feed(line)
-            if decoded is not None:
-                rx_frames += 1
-                if not paused:
-                    frame = decoded
-                    cached_lidar_key = None
-                    if origin_world is None:
-                        origin_world = (frame.x_m, frame.y_m)
-                        path_world = [(0,0)]
-                    rel = (frame.x_m - origin_world[0], frame.y_m - origin_world[1])
-                    path_world.append(rel)
+        if log is not None:
+            log.write(line + "\n")
+        
+        decoded = decoder.feed(line)
+        if decoded is not None:
+            rx_frames += 1
+            if not paused:
+                frame = decoded
+                cached_lidar_key = None
+                if origin_world is None:
+                    origin_world = (frame.x_m, frame.y_m)
+                    path_world = [(0,0)]
+                rel = (frame.x_m - origin_world[0], frame.y_m - origin_world[1])
+                path_world.append(rel)
 
-                    if len(path_world) > args.max_path:
-                        path_world = path_world[-args.max_path:]
-                    if follow_mode:
-                        view_center_world = rel
+                if len(path_world) > args.max_path:
+                    path_world = path_world[-args.max_path:]
+                if follow_mode:
+                    view_center_world = rel
 
         # Draw UI
         screen.fill((20,20,25))
