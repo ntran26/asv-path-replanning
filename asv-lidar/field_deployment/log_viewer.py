@@ -543,7 +543,7 @@ def main() -> None:
         header_lines = [
             f"File: {os.path.basename(args.logfile)}",
             f"Playback: {'PAUSED' if paused else 'RUNNING'}   speed={args.rate:.2f}x   (Space=pause, F=full lidar, R=restart)",
-            f"Map: {'ON' if show_map else 'OFF'}  follow={'ON' if follow_mode else 'OFF'}  zoom={px_per_m:0.1f}px/m  (M,G,=,-,O)",
+            f"Map: {'ON' if show_map else 'OFF'}  follow={'ON' if follow_mode else 'OFF'}  zoom={px_per_m:0.1f}px/m",
         ]
 
         if frame is None:
@@ -580,10 +580,10 @@ def main() -> None:
         if frame is not None:
             if show_full_lidar:
                 lidar_src = lidar_raw
-                title = "LiDAR full list"
+                title = "LiDAR full list (F)"
             else:
                 lidar_src = lidar_view
-                title = "Processed LiDAR list"
+                title = "Processed LiDAR list (F)"
             cached_key = (stream.frame_index, show_full_lidar)
             if cached_key != cached_lidar_key:
                 cached_lidar_lines = format_lidar_lines(lidar_src, per_line=15, precision=1)
