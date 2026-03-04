@@ -77,7 +77,8 @@ def _ts_to_seconds(ts_str: str) -> float:
     """
     hh, mm, rest = ts_str.split(":")
     ss, micros = rest.split(".")
-    return int(hh)*3600 + int(mm)*60 + int(ss) + int(micros) / 1e6
+    seconds = int(hh)*3600 + int(mm)*60 + int(ss) + int(micros) / 1e6
+    return seconds
 
 def _wrap_360(deg: float) -> float:
     """
@@ -323,8 +324,8 @@ def frames_from_file(filepath: str, decoder: Optional[BluefinStreamDecoder] = No
 def frame_to_gym_obs(
         frame: BluefinFrame,
         *,
-        origin_xyh: Optional[Tuple[float, float, float]] = None,
-        include_velocity: bool = True,) -> Dict[str, Any]:
+        origin_xyh: Optional[Tuple[float, float, float]] = None
+    ) -> Dict[str, Any]:
     """
     Convert frame -> Gym MultiInput dict
     If origin_xyh is provided, set (x, y, yaw) as (0,0,0)
@@ -344,13 +345,10 @@ def frame_to_gym_obs(
         "pos": np.array([x,y], dtype=np.float32),
         "hdg": np.array([yaw], dtype=np.float32),
         "dhdg": np.array([0.0], dtype=np.float32),
+        "speed": np.array([frame.speed_mps], dtype=np.float32),
         "tgt": np.array([0.0], dtype=np.float32),
         "target_heading": np.array([0.0], dtype=np.float32),
-    }
-
-    if include_velocity:
-        obs["vel"] = np.array([frame.vx_mps, frame.vy_mps], dtype=np.float32)
-        obs["spd"] = np.array([frame.speed_mps], dtype=np.float32)
+    }        
 
     return obs
 

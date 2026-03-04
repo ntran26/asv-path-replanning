@@ -1,5 +1,4 @@
-"""bluefin_log_viewer_pygame_traj.py
-
+"""
 Practice tool (offline): replay a Bluefin log file and visualize decoded values.
 
 What it shows per decoded LiDAR frame (10 Hz in the logs):
