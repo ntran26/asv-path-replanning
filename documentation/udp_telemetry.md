@@ -428,18 +428,568 @@ class FrameStream:
         while True:
             line = self._fh.readline()
             if line == "":
-                return None  # EOF
+                return None
             frame = self.decoder.feed(line)
             if frame is not None:
                 self.frame_index += 1
                 return frame
 ```
+### FrameStream class
+This class iterates over the decoded frames. It wraps the file handle and decoder state into an object that can return the next decoded LiDAR frame each time **next_frame()** is called. 
+
+**next_frame()** reads as many lines as needed until it reaches end of file or it gets a full BluefinFrame from the decoder.
+
+```python
+def format_lidar_lines(lidar_m: np.ndarray, 
+                        *, 
+                        per_line: int = 12, 
+                        precision: int = 1) -> List[str]:
+    if lidar_m.ndim != 1:
+        lidar_m = np.asarray(lidar_m).ravel()
+
+    fmt = f"{{:.{precision}f}}"
+    tokens = [fmt.format(float(x)) for x in lidar_m]
+
+    lines: List[str] = []
+    for i in range(0, len(tokens), per_line):
+        chunk = tokens[i : i + per_line]
+        lines.append(", ".join(chunk))
+    return lines
+
+def pick_lidar_swath(full_ranges_m: np.ndarray, 
+                    angles_deg: np.ndarray, 
+                    *, 
+                    index0_deg: float) -> np.ndarray:
+    full_ranges_m = np.asarray(full_ranges_m).ravel()
+    n = full_ranges_m.size
+    if n == 0:
+        return full_ranges_m
+    
+    step = 360/n
+    idx = np.round((angles_deg - index0_deg)/step).astype(int) % n
+
+    return full_ranges_m[idx]
+```
+### Format LiDAR
+- **format_lidar_lines()** makes a long vector printable inside the UI, wrapped across multiple lines.
+- **pick_lidar_swath()** is the "view" function that downscale to a desirable number of beams and swath.
+
+In the viewer, the user can toggle between full LiDAR list of 720 values or a processed LiDAR list of 90 beams.
+
+```python
+def world_to_screen(xy_world: Tuple[float, float],
+                    *,
+                    view_center_world: Tuple[float, float],
+                    view_center_px: Tuple[int, int],
+                    px_per_m: float) -> Tuple[int, int]:
+    x, y = xy_world
+    cx_w, cy_w = view_center_world
+    cx_px, cy_px = view_center_px
+
+    sx = cx_px + (x - cx_w) * px_per_m
+    sy = cy_px - (y - cy_w) * px_per_m
+    return sx, sy
+```
+### Coordinate transform
+This function **world_to_screen()** converts world coordinate (meters) to pygame coordinate (pixels). An important convention in pygame is that the y-axis is inverted -> the code substracts **(y - cy_w)** to invert Y.
+
+The "camera" is defined by:
+- **view_center_world**: world point at the center of view
+- **view_center_pix**: pixel center of the map panel
+- **px_per_m**: zoom scale
+
+```python
+def draw_map_panel(
+    surface: pygame.Surface,
+    map_rect: pygame.Rect,
+    *,
+    path_world: List[Tuple[float, float]],
+    current_world: Optional[Tuple[float, float]] = None,
+    yaw_deg: Optional[float] = None,
+    view_center_world: Tuple[float, float],
+    px_per_m: float,
+    show_axes: bool = True,
+    lidar_angles_deg: Optional[np.ndarray] = None,
+    lidar_ranges_m: Optional[np.ndarray] = None,
+    lidar_offset_m: float = LIDAR_OFFSET_M,
+    lidar_index0_deg: float = 0,
+    lidar_index0_range_m: Optional[float] = None,
+    mark_index0: bool = True
+    ) -> None:
+
+    pygame.draw.rect(surface, (10, 10, 12), map_rect)
+    pygame.draw.rect(surface, (80, 80, 90), map_rect, width=2)
+
+    view_center_px = map_rect.center
+```
+### Map rendering function
+The first step is to clear and frame the map panel.
+
+```python
+if len(path_world) >= 2:
+    pts = [
+        world_to_screen(p, view_center_world=view_center_world, view_center_px=view_center_px, px_per_m=px_per_m)
+        for p in path_world
+    ]
+    # Clip drawing to the map panel area
+    prev_clip = surface.get_clip()
+    surface.set_clip(map_rect)
+    try:
+        pygame.draw.lines(surface, (80, 180, 255), False, pts, 2)
+    finally:
+        surface.set_clip(prev_clip)
+```
+Draw the trajectory polyline:
+- Each stored point is converted into pixels.
+- Use **set_clip(map_rect)** to avoid drawing outside the panel.
+
+```python
+if current_world is not None:
+    p = world_to_screen(current_world, view_center_world=view_center_world, view_center_px=view_center_px, px_per_m=px_per_m)
+    pygame.draw.circle(surface, (255, 255, 255), p, 5)
+    pygame.draw.circle(surface, (0, 0, 0), p, 5, 1)
+
+    if yaw_deg is not None:
+        yaw_rad = float(np.deg2rad(yaw_deg))
+        arrow_len_m = 1.2
+        tip_world = (
+            float(current_world[0] + arrow_len_m * np.sin(yaw_rad)),
+            float(current_world[1] + arrow_len_m * np.cos(yaw_rad)),
+        )
+        tip = world_to_screen(tip_world, view_center_world=view_center_world, view_center_px=view_center_px, px_per_m=px_per_m)
+        pygame.draw.line(surface, (255, 200, 80), p, tip, 3)
+        pygame.draw.circle(surface, (255, 200, 80), tip, 4)
+```
+Draw current position and heading arrow:
+- Draws the vessel as a dot and heading direction as a yellow arrow.
+- Assumes yaw=0 points to positive Y and yaw=90 towards positive X.
+
+```python
+if (current_world is not None) and (yaw_deg is not None) and (lidar_angles_deg is not None) and (lidar_ranges_m is not None):
+        
+    h = float(np.deg2rad(yaw_deg))
+
+    sensor_world = (float(current_world[0] + lidar_offset_m * np.sin(h)),
+                    float(current_world[1] + lidar_offset_m * np.cos(h)))
+    s_px = world_to_screen(sensor_world, 
+                            view_center_world=view_center_world,
+                            view_center_px=view_center_px,
+                            px_per_m=px_per_m)
+    if mark_index0:
+        a0 = float(np.deg2rad(yaw_deg + lidar_index0_deg))
+        r0 = float(lidar_index0_range_m) if lidar_index0_range_m is not None else LIDAR_MAX
+        r0 = float(np.clip(r0, 0, LIDAR_MAX))
+
+        end0_world = (sensor_world[0] + r0*np.sin(a0), sensor_world[1] + r0*np.cos(a0))
+        end0_px = world_to_screen(end0_world, view_center_world=view_center_world, view_center_px=view_center_px, px_per_m=px_per_m)
+
+        pygame.draw.aaline(surface, (255,50,50), s_px, end0_px)
+        pygame.draw.circle(surface, (255,50,50), end0_px, 4)
+
+    prev_clip = surface.get_clip()
+    surface.set_clip(map_rect)
+    try:
+        for angle, range in zip(lidar_angles_deg, lidar_ranges_m):
+            r = float(np.clip(range, 0, LIDAR_MAX))
+            a = float(np.deg2rad(yaw_deg + angle))
+
+            end_world = (sensor_world[0] + r*np.sin(a), sensor_world[1] + r*np.cos(a))
+            e_px = world_to_screen(end_world, view_center_world=view_center_world, view_center_px=view_center_px, px_per_m=px_per_m)
+            pygame.draw.aaline(surface, (90,90,200), s_px, e_px)
+    finally:
+        surface.set_clip(prev_clip)
+```
+Draw LiDAR rays:
+- Converts to radians
+- Position the LiDAR start point in front of the vessel
+- Draw each beam as a line of length = range
+- (Optional) highlights the initial index in red
+
+```python
+def surface_to_bgr(screen: pygame.Surface) -> np.ndarray:
+    frame_rgb = pygame.surfarray.array3d(screen)            
+    frame_rgb = np.transpose(frame_rgb, (1, 0, 2))   
+    frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR) 
+    return frame_bgr
+
+def plot_trajectory(traj_xy: List[Tuple[float, float]], traj_yaw_deg: List[float], out_png: str) -> None:
+    import matplotlib.pyplot as plt
+
+    xs = np.array([p[0] for p in traj_xy], dtype=float)
+    ys = np.array([p[1] for p in traj_xy], dtype=float)
+
+    plt.figure(figsize=(6,6))
+    plt.plot(xs,ys)
+    plt.scatter([xs[-1]], [ys[-1]])
+
+    h = np.deg2rad(traj_yaw_deg[-1])
+    arrow_len = 1
+    dx = arrow_len * np.sin(h)
+    dy = arrow_len * np.cos(h)
+    plt.arrow(xs[-1], ys[-1], dx, dy, length_includes_head=True)
+
+    ax = plt.gca()
+    ax.set_aspect("equal", adjustable="box")
+    plt.xlabel("X (m)")
+    plt.ylabel("Y (m)")
+    plt.tight_layout()
+    plt.savefig(out_png, dpi=200)
+    plt.close()
+    print(f"[PLOT] Saved: {out_png}")
+```
+### Record video and plot trajectory
+- **surface_to_bgr()** converts pygame frames into a form of OpenCV so that it can be encoded into MP4.
+- **plot_trajectory()** produces a clean final figure.
+
+```python
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("logfile", help="Path to test_*.log")
+    ap.add_argument("--rate", type=float, default=1.0, help="Playback speed multiplier (1.0 = realtime)")
+    ap.add_argument("--fps", type=int, default=60, help="UI frame rate cap")
+    ap.add_argument("--full", action="store_true", help="Start with full LiDAR list enabled")
+    ap.add_argument("--no-map", action="store_true", help="Start with the map panel hidden")
+    ap.add_argument("--zoom", type=float, default=20, help="Initial zoom in pixels per meter")
+    ap.add_argument("--record", action="store_true", help="Record an MP4 of the pygame window")
+    ap.add_argument("--out-video", default="bluefin_replay.mp4", help="Output video filename")
+    ap.add_argument("--out-image", default="bluefin_final.png", help="Output final screenshot filename")
+    ap.add_argument("--video-fps", type=float, default=None, help="Video FPS. If not set, defaults to --fps (UI rate).")
+    ap.add_argument("--plot", default="trajectory_plot.png", help="Matplotlib trajectory plot output")
+
+    args = ap.parse_args()
+
+    if not os.path.exists(args.logfile):
+        raise SystemExit(f"File not found: {args.logfile}")
+    if args.rate <= 0:
+        raise SystemExit("--rate must be > 0")
+```
+### Main loop
+Argument parsing setup:
+- **--rate** playback rate
+- **--fps** UI frame rate
+- **--full** start with full lidar
+- **--no-map** enable/disable map
+- **--zoom** zoom scale
+- **--record** screen recording
+
+```python
+pygame.init()
+pygame.display.set_caption("Bluefin log viewer + trajectory")
+video_fps = float(args.video_fps) if args.video_fps is not None else float(args.fps)
+
+# Layout: left text panel + right map panel
+win_w, win_h = 1200, 600
+text_w = 800
+map_w = win_w - text_w
+
+screen = pygame.display.set_mode((win_w, win_h))
+
+video_writer = None
+capture_period = 1.0 / max(video_fps, 1e-9)
+next_capture_due = time.perf_counter()
+
+if args.record:
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+    video_writer = cv2.VideoWriter(args.out_video, fourcc, video_fps, (win_w, win_h))
+    if not video_writer.isOpened():
+        raise RuntimeError(f"Could not open video writer")
+    print(f"[REC] Recording to {args.out_video} at {video_fps:.1f} fps, size={win_w}x{win_h}")
+
+clock = pygame.time.Clock()
+
+font = pygame.font.SysFont("consolas", 18) or pygame.font.Font(None, 18)
+small = pygame.font.SysFont("consolas", 15) or pygame.font.Font(None, 15)
+
+decoder = BluefinStreamDecoder(lidar_out_beams=720)
+stream = FrameStream(args.logfile, decoder)
+```
+
+```python
+paused = False
+    show_full_lidar = bool(args.full)
+    lidar_scroll = 0
+
+    show_map = not bool(args.no_map)
+    follow_mode = True
+
+    px_per_m = args.zoom
+
+    origin_world: Optional[Tuple[float, float]] = None
+    path_world: List[Tuple[float, float]] = []  
+    view_center_world = (0.0, 0.0)
+
+    frame: Optional[BluefinFrame] = None
+    prev_t_sec: Optional[float] = None
+    next_due = time.perf_counter()
+    dt_last = 0.1
+
+    cached_lidar_lines: List[str] = []
+    cached_lidar_key = None
+
+    lidar_draw_angles = np.linspace(-LIDAR_SWATH/2, LIDAR_SWATH/2, LIDAR_BEAMS, dtype=np.float64)
+
+    traj_xy: List[Tuple[float, float]] = []
+    traj_yaw: List[float] = []
+```
+
+```python
+running = True
+    while running:
+        now = time.perf_counter()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+                elif event.key == pygame.K_SPACE:
+                    paused = not paused
+                elif event.key == pygame.K_f:
+                    show_full_lidar = not show_full_lidar
+                    lidar_scroll = 0
+                elif event.key == pygame.K_r:
+                    stream.restart()
+                    frame = None
+                    prev_t_sec = None
+                    cached_lidar_lines = []
+                    cached_lidar_key = None
+                    lidar_scroll = 0
+                    next_due = time.perf_counter()
+                elif event.key == pygame.K_p:
+                    pygame.image.save(screen, args.out_image)
+                    print(f"[IMG] Saved: {args.out_image}")
+
+                    origin_world = None
+                    path_world = []
+                    view_center_world = (0.0, 0.0)
+
+                # LiDAR scrolling (only makes sense in full mode)
+                elif event.key == pygame.K_UP:
+                    if show_full_lidar:
+                        lidar_scroll = max(0, lidar_scroll - 1)
+                elif event.key == pygame.K_DOWN:
+                    if show_full_lidar:
+                        lidar_scroll = lidar_scroll + 1
+
+                # Map toggles
+                elif event.key == pygame.K_m:
+                    show_map = not show_map
+                elif event.key == pygame.K_g:
+                    follow_mode = not follow_mode
+                elif event.key == pygame.K_c:
+                    path_world = []
+                elif event.key == pygame.K_o:
+                    # Re-zero origin at current frame
+                    if frame is not None:
+                        origin_world = (float(frame.x_m), float(frame.y_m))
+                        path_world = [(0.0, 0.0)]
+                        view_center_world = (0.0, 0.0)
+
+                # Pan controls (only if not following)
+                elif not follow_mode:
+                    pan_step_m = 20.0 / px_per_m 
+                    if event.key == pygame.K_w:
+                        view_center_world = (view_center_world[0], view_center_world[1] + pan_step_m)
+                    elif event.key == pygame.K_s:
+                        view_center_world = (view_center_world[0], view_center_world[1] - pan_step_m)
+                    elif event.key == pygame.K_a:
+                        view_center_world = (view_center_world[0] - pan_step_m, view_center_world[1])
+                    elif event.key == pygame.K_d:
+                        view_center_world = (view_center_world[0] + pan_step_m, view_center_world[1])
+```
+
+```python
+while not paused and now >= next_due:
+    next_frame = stream.next_frame()
+    if next_frame is None:
+        paused = True 
+        break
+    else:
+        if prev_t_sec is None:
+            dt_last = 0.1
+        else:
+            dt = float(next_frame.t_sec - prev_t_sec)
+            if dt <= 0 or dt > 5:
+                dt = 0.1
+            dt_last = dt
+
+        frame = next_frame
+        prev_t_sec = float(next_frame.t_sec)
+        next_due += (dt_last / float(args.rate))
+
+        cached_lidar_key = None
+
+        if origin_world is None:
+            origin_world = (float(frame.x_m), float(frame.y_m))
+            path_world = [(0.0, 0.0)]
+
+        rel = (
+            float(frame.x_m - origin_world[0]),
+            float(frame.y_m - origin_world[1]),
+        )
+        path_world.append(rel)
+
+        traj_xy.append((float(frame.x_m), float(frame.y_m)))
+        traj_yaw.append(float(frame.yaw_deg))
+
+        if follow_mode:
+            view_center_world = rel
+```
+
+```python
+screen.fill((20, 20, 25))
+text_rect = pygame.Rect(0, 0, text_w, win_h)
+map_rect = pygame.Rect(text_w, 0, map_w, win_h)
+
+y = 10
+line_h = 22
+
+lidar_raw = None
+lidar_view = None
+
+if frame is not None:
+    lidar_raw = frame.lidar_m
+    lidar_view = pick_lidar_swath(lidar_raw, lidar_draw_angles, index0_deg=LIDAR_INDEX_DEG)
+
+header_lines = [
+    f"File: {os.path.basename(args.logfile)}",
+    f"Playback: {'PAUSED' if paused else 'RUNNING'}   speed={args.rate:.2f}x   (Space=pause, F=full lidar, R=restart)",
+    f"Map: {'ON' if show_map else 'OFF'}  follow={'ON' if follow_mode else 'OFF'}  zoom={px_per_m:0.1f}px/m",
+]
+
+if frame is None:
+    next_due = now
+    header_lines.append("Waiting for first LiDAR frame...")
+else:
+    lidar = lidar_view if lidar_view is not None else lidar_raw
+    lidar_min = float(np.min(lidar)) if lidar.size else float("nan")
+    lidar_max = float(np.max(lidar)) if lidar.size else float("nan")
+    lidar_mean = float(np.mean(lidar)) if lidar.size else float("nan")
+
+    if origin_world is None:
+        rel_x, rel_y = 0.0, 0.0
+    else:
+        rel_x = float(frame.x_m - origin_world[0])
+        rel_y = float(frame.y_m - origin_world[1])
+
+    header_lines += [
+        f"Frame #{stream.frame_index:06d}    ts={frame.ts_str}    t_sec={frame.t_sec:9.3f}    dt~{dt_last:0.3f}s (~{(1.0/dt_last if dt_last>1e-6 else 0):0.1f} Hz)",
+        f"Pose(SLAM):  x={frame.x_m:+0.3f} m   y={frame.y_m:+0.3f} m   yaw={frame.yaw_deg:0.2f} deg   (hdg_ref={frame.hdg_ref_deg})",
+        f"Control: rudder: {frame.s1:0.2f}, thruster: {frame.s2:0.2f}",
+        f"Vel(derived): vx={frame.vx_mps:+0.3f} m/s   vy={frame.vy_mps:+0.3f} m/s   speed={frame.speed_mps:0.3f} m/s",
+        f"LiDAR: beams={lidar.size}   units=m (dm*0.1)   min/mean/max={lidar_min:0.2f}/{lidar_mean:0.2f}/{lidar_max:0.2f}",
+    ]
+
+for s in header_lines:
+    screen.blit(font.render(s, True, (235, 235, 245)), (10, y))
+    y += line_h
+
+y += 10
+```
+### Show status text
+
+```python
+if frame is not None:
+    if show_full_lidar:
+        lidar_src = lidar_raw
+        title = "LiDAR full list (F)"
+    else:
+        lidar_src = lidar_view
+        title = "Processed LiDAR list (F)"
+    cached_key = (stream.frame_index, show_full_lidar)
+    if cached_key != cached_lidar_key:
+        cached_lidar_lines = format_lidar_lines(lidar_src, per_line=15, precision=1)
+        cached_lidar_key = cached_key
+    max_lines_on_screen = max(1, (win_h-y-20)//18)
+    max_scroll = max(0, len(cached_lidar_lines) - max_lines_on_screen)
+    lidar_scroll = min(lidar_scroll, max_scroll)
+    
+    if show_full_lidar:
+        info = f"{title} (scroll {lidar_scroll}/{max_scroll})"
+    else:
+        info = title
+    
+    screen.blit(font.render(info, True, (200,200,210)), (10,y))
+    y += 22
+
+    for s in cached_lidar_lines[lidar_scroll : lidar_scroll + max_lines_on_screen]:
+        screen.blit(small.render(s, True, (210,210,220)), (10,y))
+        y += 18
+```
+### Show LiDAR text
 
 
+```python
+if show_map:
+    lidar_ranges_draw = pick_lidar_swath(frame.lidar_m, lidar_draw_angles, index0_deg=LIDAR_INDEX_DEG)
+    if frame is None or origin_world is None:
+        # Show an empty map
+        draw_map_panel(
+            screen,
+            map_rect,
+            path_world=path_world,
+            current_world=None,
+            yaw_deg=None,
+            view_center_world=view_center_world,
+            px_per_m=px_per_m,
+            lidar_angles_deg=lidar_draw_angles,
+            lidar_ranges_m=lidar_ranges_draw,
+            lidar_index0_deg=LIDAR_INDEX_DEG,
+            lidar_index0_range_m=frame.lidar_m[0] if frame.lidar_m.size > 0 else None,
+            mark_index0=True
+        )
+    else:
+        current_rel = (
+            float(frame.x_m - origin_world[0]),
+            float(frame.y_m - origin_world[1]),
+        )
+        draw_map_panel(
+            screen,
+            map_rect,
+            path_world=path_world,
+            current_world=current_rel,
+            yaw_deg=float(frame.yaw_deg),
+            view_center_world=view_center_world,
+            px_per_m=px_per_m,
+            lidar_angles_deg=lidar_draw_angles,
+            lidar_ranges_m=lidar_ranges_draw,
+            lidar_index0_deg=LIDAR_INDEX_DEG,
+            lidar_index0_range_m=frame.lidar_m[0] if frame.lidar_m.size > 0 else None,
+            mark_index0=True
+        )
+
+        label = f"points={len(path_world)}"
+        screen.blit(small.render(label, True, (210, 210, 220)), (map_rect.left + 8, map_rect.top + 8))
+```
+### Map panel
+
+```python
+if video_writer is not None and not paused:
+    while now >= next_capture_due:
+        video_writer.write(surface_to_bgr(screen))
+        next_capture_due += capture_period
+pygame.display.flip()
+clock.tick(args.fps)
+```
+
+```python
+stream.close()
+
+pygame.image.save(screen, args.out_image)
+print(f"[IMG] Saved final screenshot: {args.out_image}")
+
+if video_writer is not None:
+    video_writer.release()
+    print(f"[REC] Video saved: {args.out_video}")
+
+plot_trajectory(traj_xy, traj_yaw, args.plot)
+
+pygame.quit()
+```
+### Release video, final screenshot, trajectory plot 
 
 
-
-## Simulate UDP Server
+## 3. Simulate UDP Server
 
 ### fake_vessel_replay.py
 

@@ -207,18 +207,6 @@ def draw_map_panel(
 
     view_center_px = map_rect.center
 
-    # Optional axes through the view center
-    if show_axes:
-        cx, cy = view_center_px
-        pygame.draw.line(surface, (40, 40, 45), (map_rect.left, cy), (map_rect.right, cy), 1)
-        pygame.draw.line(surface, (40, 40, 45), (cx, map_rect.top), (cx, map_rect.bottom), 1)
-
-        # A simple scale bar: 1m
-        bar_len_px = int(round(px_per_m))
-        bar_x0 = map_rect.left + 20
-        bar_y0 = map_rect.bottom - 25
-        pygame.draw.line(surface, (180, 180, 190), (bar_x0, bar_y0), (bar_x0 + bar_len_px, bar_y0), 3)
-
     # Draw path
     if len(path_world) >= 2:
         pts = [
