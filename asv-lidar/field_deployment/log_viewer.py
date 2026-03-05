@@ -426,10 +426,6 @@ def main() -> None:
                     pygame.image.save(screen, args.out_image)
                     print(f"[IMG] Saved: {args.out_image}")
 
-                    origin_world = None
-                    path_world = []
-                    view_center_world = (0.0, 0.0)
-
                 # LiDAR scrolling (only makes sense in full mode)
                 elif event.key == pygame.K_UP:
                     if show_full_lidar:
@@ -538,9 +534,6 @@ def main() -> None:
             header_lines.append("Waiting for first LiDAR frame...")
         else:
             lidar = lidar_view if lidar_view is not None else lidar_raw
-            lidar_min = float(np.min(lidar)) if lidar.size else float("nan")
-            lidar_max = float(np.max(lidar)) if lidar.size else float("nan")
-            lidar_mean = float(np.mean(lidar)) if lidar.size else float("nan")
 
             if origin_world is None:
                 rel_x, rel_y = 0.0, 0.0
@@ -554,7 +547,7 @@ def main() -> None:
                 f"Control: rudder: {frame.s1:0.2f}, thruster: {frame.s2:0.2f}",
                 # f"Pose(rel):   x={rel_x:+0.3f} m   y={rel_y:+0.3f} m   origin=({origin_world[0]:+0.3f},{origin_world[1]:+0.3f})",
                 f"Vel(derived): vx={frame.vx_mps:+0.3f} m/s   vy={frame.vy_mps:+0.3f} m/s   speed={frame.speed_mps:0.3f} m/s",
-                f"LiDAR: beams={lidar.size}   units=m (dm*0.1)   min/mean/max={lidar_min:0.2f}/{lidar_mean:0.2f}/{lidar_max:0.2f}",
+                f"LiDAR: beams={lidar.size}   units=m (dm*0.1)",
             ]
 
         for s in header_lines:
@@ -603,12 +596,7 @@ def main() -> None:
                     current_world=None,
                     yaw_deg=None,
                     view_center_world=view_center_world,
-                    px_per_m=px_per_m,
-                    lidar_angles_deg=lidar_draw_angles,
-                    lidar_ranges_m=lidar_ranges_draw,
-                    lidar_index0_deg=LIDAR_INDEX_DEG,
-                    lidar_index0_range_m=frame.lidar_m[0] if frame.lidar_m.size > 0 else None,
-                    mark_index0=True
+                    px_per_m=px_per_m
                 )
             else:
                 current_rel = (

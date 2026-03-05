@@ -202,10 +202,10 @@ def main():
         if frame is not None:
             if show_full_lidar:
                 lidar_src = lidar_raw
-                title = "LiDAR full list"
+                title = "LiDAR full list (F)"
             else:
                 lidar_src = lidar_view
-                title = "Processed LiDAR list"
+                title = "Processed LiDAR list (F)"
             cached_key = (rx_frames, show_full_lidar)
             if cached_key != cached_lidar_key:
                 cached_lidar_lines = log_viewer.format_lidar_lines(lidar_src, per_line=15, precision=1)

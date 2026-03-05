@@ -2,9 +2,10 @@ This repository is for the porject ASV Path Replanning and Collision Avoidance u
 
 # DESCRIPTION
 
-The agent needs to follow a predefined path while avoiding static obstacles.
+The agent needs to follow a predefined path while avoiding static and dynamic obstacles.
 
-asv-lidar: The current work in progress
+## asv-lidar
+The current work in progress
 - The environment is created with Gymnasium and PyGame
 - The ASV emits 63 lidar beams distributed evenly in 270 degrees ahead of the ASV.
 - The lidar beams have a maximum range of 150 m, if there is an obstacle, it will return a value of distance to obstacle.
@@ -30,7 +31,8 @@ asv-lidar: The current work in progress
 
 The current reward function is updated in "asv_lidar_gym_continuous", inspired from the paper "Taming an Autonomous Surface Vehicle for Path Following and Collision Avoidance Using Deep Reinforcement Learning"
 
-Paper-implementation: First attempt - inspired from the paper "Dynamic trajectory planning for ships in dense environment using collision grid with deep reinforcement learning"
+## asv-grid
+First attempt - inspired from the paper "Dynamic trajectory planning for ships in dense environment using collision grid with deep reinforcement learning"
 - The environment is created with Gymnasium and Matplotlib
 - A field-of-view around the ASV is generated to act as the local view.
 - Observation space (Discrete):
@@ -49,7 +51,7 @@ Paper-implementation: First attempt - inspired from the paper "Dynamic trajector
 
 # USAGE
 
-The main folder is located in 'asv-lidar'
+The main folder is located in **asv-lidar**
 - 'asv_lidar.py': simulated lidar sensor.
 - 'ship_model.py': model of the simulated ASV.
 - 'asv_lidar_gym_continuous.py': environment uses in training PPO and SAC agents.
