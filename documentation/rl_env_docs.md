@@ -24,16 +24,44 @@ This convention affects:
 Control/Action
 - $\boldsymbol{a_t}$ ∈ [-1,1] : normalized rudder command (policy output)
 - $\boldsymbol{a_t}$ ∈ [-1,1] : normalized throttle command (policy output)
-- $\boldsymbol{\delta}$ (deg or rad): rudder angle command
+- $\boldsymbol{\delta}$: rudder angle command (deg or rad)
 - **RPM**: propeller speed command
 
 Time and pose
-- $\boldsymbol{\Delta t}$ (s): simulation step (UPDATE_RATE)
+- $\boldsymbol{\Delta t}$: simulation step (s) (UPDATE_RATE)
 - **(x,y)**: vessel position in world coordinate
-- $\boldsymbol{\omega}$ (deg/s or rad/s): yaw rate
+- $\boldsymbol{\omega}$: yaw rate (deg/s or rad/s)
 
-Dynamics
-- 
+Ship dynamics
+- **v**: forward speed (m/s)
+- **a**: forward acceleration (m/s^2)
+- $\boldsymbol\alpha$: yaw acceleration (rad/s^2)
+- **T**: thrust force
+- **F**: net forward force
+- **M**: yaw moment
+- **m**: mass
+- **I**: moment of inertia
+- $\boldsymbol{k_T}$: thrust coefficient
+- $\boldsymbol{k_D}$: drag coefficient
+
+LiDAR
+- **N**: number of beams
+- **S**: lidar swath (deg)
+- **R**: max scanning range (m)
+- $\boldsymbol{\theta_i}$: relative beam angle (deg)
+- $\boldsymbol\phi_i=\psi+\theta_i$: absolute beam direction
+- **n**: measured range of beam i (m)
+
+Navigation/Reward
+- **tgt**: path tracking error (min distance to reference path)
+- **e** $\boldsymbol\psi$: heading error to goal, wrapped to [-180,180]
+- $\boldsymbol{r_{pf}, r_{oa}, r_{head}, r_{exist}, r_{goal}}$: reward components
+- $\boldsymbol\lambda$: weighting factor between path following/obstacle avoidance
+
+## 1. Ship Dynamic Model
+
+### File: ship_model.py
+
 
 
 ## 2. Simulate LiDAR
@@ -42,18 +70,24 @@ Dynamics
 
 This code implements a 2D LiDAR simulator for the ASV gym environment. It casts LiDAR beams at a set of angles and measures distance to obstacles and map borders. For this simulated LiDAR to work, the coordinates of obstacles and map boundaries are known and fed as inputs.
 
-Workflow: LidarScan =(pos(x,y), heading)
-1. Offset sensor origin forward by vessel_length/2 along heading
-2. Convert each obstacle polygon into a list of edge segments
-3. For each beam angle θ_i:
-    - Compute ray end at max range R
-    - For each edge segment:
-        - Compute intersection with ray segment
-        - Keep the shortest distance
-    - Store the shortest distance as **ranges[i]**
-4. Return **ranges**
+### Workflow:
 
-
+Input: Lidar.scan = ( pos(x,y), $\boldsymbol\psi$, obstacle, map_border ) <br>
+Output: Lidar.ranges = ranges[i]  of length N
+1. Offset sensor origin to the front of vessel by L/2
+2. Convert all polygons (obstacles + border) to a list of edge segments
+3. For i = (1, N) beams:
+    - $\phi_i=\psi+\theta_i$
+    - Compute endpoint: <br>
+        $x_{end}=x_s + R \cdot sin(\phi_i)$ <br>
+        $y_{end}=y_s - R \cdot cos(\phi_i)$
+    - closest = R
+    - For each segment:
+        - if intersection: <br>
+            d = distance ( intersection, (x<sub>s</sub> , y<sub>s</sub>) ) <br>
+            closest = min (closest , d)
+    - ranges[i] = closest
+4. return ranges[i]
 
 ### Imports and LiDAR constants:
 
@@ -71,6 +105,7 @@ Imports
 - **numpy**: processing angle grids and vector math
 
 Constants
+- **VESSEL_LENGTH**: length of vessel from **ship_model.py** (m)
 - **LIDAR_RANGE**: maximum range (m)
 - **LIDAR_SWATH**: angular field of view (degrees)
 - **LIDAR_BEAMS**: number of LiDAR beams
@@ -93,15 +128,115 @@ class Lidar:
         self._angles = np.linspace(-LIDAR_SWATH/2, LIDAR_SWATH/2, LIDAR_BEAMS, dtype=np.float64)
         self._ranges = np.ones_like(self._angles) * LIDAR_RANGE
 ```
-
+- Initialize lidar class: (x, y), heading
+- **reset()** initializes lidar **angles** and **ranges**
 
 ```python
-    @property
-    def angles(self):
-        return self._angles.copy()
+@property
+def angles(self):
+    return self._angles.copy()
 
-    @property
-    def ranges(self):
-        return self._ranges.copy()
+@property
+def ranges(self):
+    return self._ranges.copy()
 ```
-Make a copy of lidar **angles** and **ranges** for outputs.
+- Make a copy of lidar **angles** and **ranges** for outputs.
+
+```python
+def scan(self, pos, hdg, obstacles=None, map_border=None) -> np.ndarray:
+    self._hdg = hdg
+    lidar_offset = VESSEL_LENGTH/2
+    self._pos_x = pos[0] + lidar_offset * np.sin(np.radians(self._hdg))
+    self._pos_y = pos[1] - lidar_offset * np.cos(np.radians(self._hdg))
+```
+- Initialize lidar scan function
+- Pass current heading angle
+- Offset lidar position to the front <br>
+$x_s = x + (L/2)sin(\psi)$ <br> $y_s = y - (L/2)cos(\psi)$ <br>
+
+```python
+    for idx, angle in enumerate(self._angles):
+        absolute_angle = np.radians(self._hdg + angle)
+        end_x = self._pos_x + LIDAR_RANGE * np.sin(absolute_angle)
+        end_y = self._pos_y - LIDAR_RANGE * np.cos(absolute_angle)
+        closest_distance = LIDAR_RANGE
+
+        obstacle_edges = []
+        if obstacles:
+            for obs in obstacles:
+                for i in range(len(obs)):
+                    v1 = obs[i]
+                    v2 = obs[(i + 1) % len(obs)]
+                    obstacle_edges.append((v1, v2))
+
+        if map_border:
+            for border in map_border:
+                for i in range(len(border)):
+                    v1 = border[i]
+                    v2 = border[(i + 1) % len(border)]
+                    obstacle_edges.append((v1, v2))
+
+        for edge in obstacle_edges:
+            intersection = self.line_intersection((self._pos_x, self._pos_y), (end_x, end_y), edge[0], edge[1])
+            if intersection:
+                dist = np.hypot(intersection[0] - self._pos_x, intersection[1] - self._pos_y)
+                closest_distance = min(closest_distance, dist)
+
+        self._ranges[idx] = closest_distance
+    
+    return self._ranges.copy()
+```
+- Obstacles are passed in as polygons: list of vertex tuples
+- **line_intersection()** converts polygons to a flat list of edges
+- Map boundaries are treated as obstacles
+
+```python
+def line_intersection(self, a1, a2, b1, b2):
+
+        def cross_product(a, b):
+            return a[0] * b[1] - a[1] * b[0]
+        
+        a = (a2[0] - a1[0], a2[1] - a1[1])
+        b = (b2[0] - b1[0], b2[1] - b1[1])
+
+        a_cross_b = cross_product(a, b)
+
+        a_b = (b1[0] - a1[0], b1[1] - a1[1])
+        a_b_cross_a = cross_product(a_b, a)
+
+        if a_cross_b == 0 and a_b_cross_a == 0:     
+            return None
+        if a_cross_b == 0:      
+            return None
+
+        scalar_a = cross_product(a_b, b) / a_cross_b
+        scalar_b = a_b_cross_a / a_cross_b
+
+        if 0 <= scalar_a <= 1 and 0 <= scalar_b <= 1:
+            intersection_x = a1[0] + scalar_a * a[0]
+            intersection_y = a1[1] + scalar_a * a[1]
+            return (intersection_x, intersection_y)
+
+        return None
+```
+
+```python
+def render(self, surface: pygame.Surface, scale: float=1.0):
+    for idx, angle in enumerate(self._angles):
+        absolute_angle = np.radians(self._hdg + angle)
+        x = self._pos_x + self._ranges[idx] * np.sin(absolute_angle)
+        y = self._pos_y - self._ranges[idx] * np.cos(absolute_angle)
+        pygame.draw.aaline(
+            surface,
+            (90, 90, 200),
+            (self._pos_x * scale, self._pos_y * scale),
+            (x * scale, y * scale))
+```
+
+## 3. ASV Gym Environment
+
+## File: asv_lidar_rudder_speed_control.py
+
+## 4. Train/Test/Eval Agent with Stable-Baselines3
+
+### File: train_test_asv.py
