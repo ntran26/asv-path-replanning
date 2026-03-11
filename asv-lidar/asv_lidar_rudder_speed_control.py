@@ -190,13 +190,13 @@ class ASVLidarEnv(gym.Env):
         cx = float(self.asv_x)
         cy = float(self.asv_y)
 
-        # Convert (forward, left) -> world (x right, y down)
-        # forward vector = (sin(h), -cos(h))
-        # left vector    = (-cos(h), -sin(h))
+        # Convert (forward, left) -> world (x right, y up)
+        # forward vector = (+sin(h), +cos(h))
+        # left vector    = (-cos(h), +sin(h))
         poly = []
         for x_forward, y_left in local:
             x = cx + x_forward * sin_h - y_left * cos_h
-            y = cy - x_forward * cos_h - y_left * sin_h
+            y = cy + x_forward * cos_h + y_left * sin_h
             poly.append((x,y))
         return poly
 
@@ -292,7 +292,7 @@ class ASVLidarEnv(gym.Env):
         dx = goal_x - asv_x
         dy = goal_y - asv_y
 
-        target_angle = np.degrees(np.arctan2(dx, -dy))       # pygame invert y-axis
+        target_angle = np.degrees(np.arctan2(dx, dy))    
         angle_diff = (target_angle - heading + 180) % 360 - 180    # normalize to [-180,180]
 
         return angle_diff
@@ -330,9 +330,9 @@ class ASVLidarEnv(gym.Env):
         # Randomize start and goal positions
         if self.test_case is None:
             self.start_x = np.random.randint(1, self.map_width - 1)
-            self.start_y = self.map_height - 1
+            self.start_y = 1
             self.goal_x = np.random.randint(1, self.map_width - 1)
-            self.goal_y = 1    
+            self.goal_y = self.map_height - 1
         else:
             self.start_x, self.start_y, self.goal_x, self.goal_y = self.scenario.position(test_case=self.test_case)
 
@@ -391,7 +391,7 @@ class ASVLidarEnv(gym.Env):
 
         dx,dy,h,w = self.model.update(rpm, rudder, UPDATE_RATE)  # ShipModel expects rudder in [-100,100]
         self.asv_x += dx
-        self.asv_y -= dy
+        self.asv_y += dy
         self.asv_h = h
         self.asv_w = w
 
@@ -503,9 +503,11 @@ class ASVLidarEnv(gym.Env):
         scale = float(self.render_scale)
 
         def scale_point(xy):    # scale point from world -> pixel
-            return (int(round(xy[0] * scale)), int(round(xy[1] * scale)))
-        def scale_scalar(v):    # scale scalar (radius, width, dash length) -> pixels
-            return max(1, int(round(v * scale)))
+            x, y = float(xy[0]), float(xy[1])
+            px = int(round(x * scale))
+            py = int(round((self.map_height - y) * scale))
+            py = max(0, min(self.window_size[1] - 1, py))   # clamp border
+            return (px,py)
 
         self.surface.fill((0, 0, 0))
 
@@ -524,7 +526,7 @@ class ASVLidarEnv(gym.Env):
             pygame.draw.polygon(self.surface, (200, 0, 0), obs_px)
 
         # Draw LIDAR scan
-        self.lidar.render(self.surface, scale=scale)
+        self.lidar.render(self.surface, scale_point)
 
         # Draw Path
         self._draw_dashed_line(

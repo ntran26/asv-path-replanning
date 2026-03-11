@@ -54,7 +54,7 @@ class Lidar:
         # Set the lidar (x,y) to be in front of the asv
         lidar_offset = VESSEL_LENGTH/2
         self._pos_x = pos[0] + lidar_offset * np.sin(np.radians(self._hdg))
-        self._pos_y = pos[1] - lidar_offset * np.cos(np.radians(self._hdg))
+        self._pos_y = pos[1] + lidar_offset * np.cos(np.radians(self._hdg))
         
         # Loop over each beam angle to compute collision distances
         for idx, angle in enumerate(self._angles):
@@ -62,7 +62,7 @@ class Lidar:
             absolute_angle = np.radians(self._hdg + angle)
             # Compute the endpoint of the beam at maximum range (if no obstacle)
             end_x = self._pos_x + LIDAR_RANGE * np.sin(absolute_angle)
-            end_y = self._pos_y - LIDAR_RANGE * np.cos(absolute_angle)
+            end_y = self._pos_y + LIDAR_RANGE * np.cos(absolute_angle)
             
             # Initialize the closest distance to the maximum range
             closest_distance = LIDAR_RANGE
@@ -132,24 +132,32 @@ class Lidar:
 
         return None
         
-    def render(self, surface: pygame.Surface, scale: float=1.0):
-        """
-        Render the LIDAR beams as lines on the given surface
+    # def render(self, surface: pygame.Surface, scale: float=1.0):
+    #     """
+    #     Render the LIDAR beams as lines on the given surface
 
-        Args:
-            surface (pygame.Surface): The surface on which to render the beams
-        """
+    #     Args:
+    #         surface (pygame.Surface): The surface on which to render the beams
+    #     """
+    #     for idx, angle in enumerate(self._angles):
+    #         # Calculate the absolute angle in radians.
+    #         absolute_angle = np.radians(self._hdg + angle)
+    #         # Compute the endpoint for the current beam using its range reading.
+    #         x = self._pos_x + self._ranges[idx] * np.sin(absolute_angle)
+    #         y = self._pos_y + self._ranges[idx] * np.cos(absolute_angle)
+    #         pygame.draw.aaline(
+    #             surface,
+    #             (90, 90, 200),
+    #             (self._pos_x * scale, self._pos_y * scale),
+    #             (x * scale, y * scale)
+    #         )
+
+    def render(self, surface, world_to_screen):
+        origin = world_to_screen((self._pos_x, self._pos_y))
         for idx, angle in enumerate(self._angles):
-            # Calculate the absolute angle in radians.
             absolute_angle = np.radians(self._hdg + angle)
-            # Compute the endpoint for the current beam using its range reading.
             x = self._pos_x + self._ranges[idx] * np.sin(absolute_angle)
-            y = self._pos_y - self._ranges[idx] * np.cos(absolute_angle)
-            pygame.draw.aaline(
-                surface,
-                (90, 90, 200),
-                (self._pos_x * scale, self._pos_y * scale),
-                (x * scale, y * scale)
-            )
-
+            y = self._pos_y + self._ranges[idx] * np.cos(absolute_angle)
+            end = world_to_screen((x, y))
+            pygame.draw.aaline(surface, (90, 90, 200), origin, end)
             
