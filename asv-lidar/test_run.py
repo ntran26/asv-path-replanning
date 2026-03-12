@@ -48,38 +48,26 @@ class TestCase:
                              (x+self.obs_size, y+self.obs_size), (x-self.obs_size, y+self.obs_size)])
         elif test_case == 4:    # 3 obstacles
             x = 5
-            y = 20
+            y = 5
             self.obs.append([(x-self.obs_size, y-self.obs_size), (x+self.obs_size, y-self.obs_size), 
                              (x+self.obs_size, y+self.obs_size), (x-self.obs_size, y+self.obs_size)])
             x = 8
-            y = 10
+            y = 15
             self.obs.append([(x-self.obs_size, y-self.obs_size), (x+self.obs_size, y-self.obs_size), 
                              (x+self.obs_size, y+self.obs_size), (x-self.obs_size, y+self.obs_size)])
             x = 3
-            y = 6
+            y = 18
             self.obs.append([(x-self.obs_size, y-self.obs_size), (x+self.obs_size, y-self.obs_size), 
                              (x+self.obs_size, y+self.obs_size), (x-self.obs_size, y+self.obs_size)])
         elif test_case == 5:    # horizontal obstacles
             x = 3.5
-            y = 15
+            y = 10
             obs_size_x = 3      # make obstacle longer horizonatally
             self.obs.append([(x-obs_size_x, y-self.obs_size), (x+obs_size_x, y-self.obs_size), 
                              (x+obs_size_x, y+self.obs_size), (x-obs_size_x, y+self.obs_size)])
             x = 9
             self.obs.append([(x-self.obs_size, y-self.obs_size), (x+self.obs_size, y-self.obs_size), 
                              (x+self.obs_size, y+self.obs_size), (x-self.obs_size, y+self.obs_size)])
-        # elif test_case == 6:
-        #     x = 90
-        #     y = 300
-        #     self.obs.append([(x-self.obs_size, y-self.obs_size), (x+self.obs_size, y-self.obs_size), 
-        #                      (x+self.obs_size, y+self.obs_size), (x-self.obs_size, y+self.obs_size)])
-        #     x = 310
-        #     self.obs.append([(x-self.obs_size, y-self.obs_size), (x+self.obs_size, y-self.obs_size), 
-        #                      (x+self.obs_size, y+self.obs_size), (x-self.obs_size, y+self.obs_size)])
-        #     x = 200
-        #     y = 50
-        #     self.obs.append([(x-self.obs_size, y-self.obs_size), (x+self.obs_size, y-self.obs_size), 
-        #                      (x+self.obs_size, y+self.obs_size), (x-self.obs_size, y+self.obs_size)])
         elif test_case == 99:
             # load data file
             with open(self.env_data, "r") as f:
@@ -93,14 +81,14 @@ class TestCase:
     def position(self, test_case):
         if test_case >= 0 and test_case <= 4:
             self.start_x = 5
-            self.start_y = 24
+            self.start_y = 1
             self.goal_x = 5
-            self.goal_y = 1
+            self.goal_y = 24
         elif test_case == 5:
             self.start_x = 2
-            self.start_y = 24
+            self.start_y = 1
             self.goal_x = 8
-            self.goal_y = 1
+            self.goal_y = 24
         elif test_case == 99:
             # load data file
             with open(self.env_data, "r") as f:

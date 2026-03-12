@@ -95,7 +95,7 @@ class ASVLidarEnv(gym.Env):
         self.angle_diff = 0
         self.prev_x = None
         self.prev_y = None
-        self.speed_mps = 0.0
+        self.speed_mps = 0.
 
         self.model = ShipModel()
         self.scenario = TestCase()
@@ -369,7 +369,7 @@ class ASVLidarEnv(gym.Env):
             return True
         
         # the agent reaches goal
-        if self.distance_to_goal <= HULL_MARGIN:
+        if self.distance_to_goal <= VESSEL_WIDTH:
             return True
 
         return False
@@ -380,7 +380,7 @@ class ASVLidarEnv(gym.Env):
         throttle_cmd = float(np.clip(action[1], MIN_IN, MAX_IN))
 
         # Map rudder_cmd [-1,1] -> rudder [-25, 25]
-        rudder = rudder_cmd * 25
+        rudder = rudder_cmd * 100
 
         # Map throttle_cmd [-1,1] -> rpm [RPM_MIN, RPM_MAX]
         rpm = (throttle_cmd - MIN_IN) * ((RPM_MAX - RPM_MIN)/(MAX_IN - MIN_IN)) + RPM_MIN
@@ -389,7 +389,7 @@ class ASVLidarEnv(gym.Env):
         x_prev = float(self.asv_x)
         y_prev = float(self.asv_y)
 
-        dx,dy,h,w = self.model.update(rpm, rudder, UPDATE_RATE)  # ShipModel expects rudder in [-100,100]
+        dx,dy,h,w = self.model.update(rpm, rudder, UPDATE_RATE)
         self.asv_x += dx
         self.asv_y += dy
         self.asv_h = h
@@ -611,6 +611,7 @@ if __name__ == '__main__':
         # Random actions
         action = env.action_space.sample()
         obs,rew,term,_,_ = env.step(action)
+        print(action[0] * 25)
         total_reward += rew
         # print(f"Action: {action}    Reward: {rew}")
         if term:
