@@ -1,7 +1,7 @@
 """
 Run: python udp_live_rl.py --server-ip "10.201.208.224"
 """
-
+import time
 import socket
 import argparse
 import pygame
@@ -94,9 +94,7 @@ def draw_static_ref(surface: pygame.Surface,
     finally:
         surface.set_clip(prev_clip)
 
-# ----------------------------------------------------------------------
 # RL observation adapter
-# ----------------------------------------------------------------------
 def frame_to_rl_obs(
         frame: BluefinFrame,
         *,
@@ -138,11 +136,11 @@ def frame_to_rl_obs(
     else:
         rx0, ry0 = real_origin_xy
 
-    # mx = start_xy[0] + (frame.x_m - rx0) * pos_scale
-    # my = start_xy[1] + (frame.y_m - ry0) * pos_scale
+    mx = start_xy[0] + (frame.x_m - rx0) * pos_scale
+    my = start_xy[1] + (frame.y_m - ry0) * pos_scale
 
-    mx = frame.x_m * pos_scale
-    my = frame.y_m * pos_scale
+    # mx = frame.x_m * pos_scale
+    # my = frame.y_m * pos_scale
 
     # heading and heading rate
     yaw_deg = frame.yaw_deg
@@ -378,12 +376,13 @@ def main():
                             lidar_index0_deg=log_viewer.LIDAR_INDEX_DEG,
                         )
 
-                        # Send action commands
+    #-----------------Send action commands----------------------------
                         action, _ = model.predict(latest_obs)
                         latest_action = np.asarray(action, dtype=np.float32).reshape(-1)
                         latest_cmd = latest_action*100
-                        robot_addr = (args.bind_ip, args.local_port)
-                        sock.sendto(latest_cmd, robot_addr)
+                        command = f"$CMD,{latest_cmd[0]},{latest_cmd[1]}"
+                        sock.sendto(command.encode(), (args.server_ip, args.server_port))
+    #-----------------------------------------------------------------
 
                         last_yaw_deg = yaw_deg
                         last_t_sec = frame.t_sec
