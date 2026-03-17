@@ -1,5 +1,5 @@
 """
-Run: python udp_live_rl.py --server-ip "10.201.208.224"
+Run: python udp_live_rl.py --server-ip "10.201.208.224" --test-case 0
 """
 import time
 import socket

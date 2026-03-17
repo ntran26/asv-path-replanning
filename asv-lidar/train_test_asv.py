@@ -14,7 +14,7 @@ from asv_lidar_rudder_speed_control import ASVLidarEnv, RPM_MAX, RPM_MIN
 
 """
 Train:
-  python train_test_asv.py --mode train --algo sac --timesteps 1000000
+  python train_test_asv.py --mode train --algo ppo --timesteps 1000000
 
 Test (render):
   python train_test_asv.py --mode test --algo sac
@@ -36,7 +36,7 @@ def action_to_rpm(throttle_cmd: float) -> float:
 def action_to_rudder_deg(rudder_cmd: float) -> float:
     """Map normalized rudder [-1,1] to degrees (same mapping as env.step)."""
     rudder_cmd = float(np.clip(rudder_cmd, -1.0, 1.0))
-    return float(rudder_cmd * 25.0)
+    return float(rudder_cmd * 30)
 
 
 # -------------------------------
@@ -203,8 +203,6 @@ def eval_one_episode(model, env: ASVLidarEnv, deterministic: bool = True, max_st
                 r_oa_list.append(float(info["r_oa"]))
             if "r_exist" in info:
                 r_exist_list.append(float(info["r_exist"]))
-            if "r_heading" in info:
-                r_heading_list.append(float(info["r_heading"]))
             if bool(info.get("collision", False)):
                 collided_steps += 1
 
@@ -642,6 +640,7 @@ if __name__ == "__main__":
             action, _ = model.predict(obs, deterministic=True)
             obs, reward, terminated, truncated, info = env.step(action)
             # print(obs["lidar"])
+            print(action)
             done = bool(terminated or truncated)
             total_reward += float(reward)
 
