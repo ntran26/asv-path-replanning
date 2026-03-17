@@ -208,6 +208,7 @@ class BluefinStreamDecoder:
         self._last_pose: Optional[Tuple[float, float, float]] = None
         self._last_pose_t: Optional[float] = None
         self._last_vel: Tuple[float, float, float] = (0, 0, 0)
+        self._max_spd: Optional[float] = 0
 
     # Pose + velocity state
     def _real_time(self, ts_str: str) -> float:
@@ -265,6 +266,9 @@ class BluefinStreamDecoder:
                     vy = (y - prev_y) / dt
                     spd = float(np.hypot(vx, vy))
                     self._last_vel = (float(vx), float(vy), spd)
+                    if spd >= self._max_spd:
+                        self._max_spd = spd
+                        print(spd)
             
             self._last_pose = (x, y, yaw_deg)
             self._last_pose_t = t
@@ -278,6 +282,7 @@ class BluefinStreamDecoder:
 
             lidar_int = _parse_int_list_csv(m.group("body"))
             lidar_m = lidar_int.astype(np.float32) * self.lidar_unit_scale
+            lidar_m = lidar_m[::-1]     # reverse lidar scan direction (clockwise)
 
             if self.lidar_out_of_range:
                 lidar_m = np.where(lidar_m <= 0, self.lidar_max_m, lidar_m)

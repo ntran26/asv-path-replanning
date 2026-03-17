@@ -379,8 +379,17 @@ def main():
     #-----------------Send action commands----------------------------
                         action, _ = model.predict(latest_obs)
                         latest_action = np.asarray(action, dtype=np.float32).reshape(-1)
-                        latest_cmd = latest_action*100
-                        command = f"$CMD,{latest_cmd[0]},{latest_cmd[1]}"
+                        # latest_cmd = latest_action*100
+
+                        def rudder_to_cmd(a):
+                            return 80 * a - 20      # [-100, 60]
+                        def thrust_to_cmd(b):
+                            return np.clip(100*b, 50, 100)  # [50, 100]
+
+                        rudder_cmd = rudder_to_cmd(latest_action[0])
+                        thrust_cmd = thrust_to_cmd(latest_action[1])
+
+                        command = f"$CMD,{rudder_cmd},{thrust_cmd}"
                         sock.sendto(command.encode(), (args.server_ip, args.server_port))
     #-----------------------------------------------------------------
 
@@ -449,10 +458,10 @@ def main():
         
         header_lines += ["    "]
         
-        if latest_action is not None and latest_cmd is not None:
+        if latest_action is not None:
             header_lines += [
                 f"Policy action: [{float(latest_action[0]):+.3f}, {float(latest_action[1]):+.3f}]",
-                f"Command: [{float(latest_cmd[0]):+.1f}, {float(latest_cmd[1]):+.1f}]",
+                f"Command: [{float(rudder_cmd):+.1f}, {float(thrust_cmd):+.1f}]",
             ]
 
         for s in header_lines:
@@ -544,3 +553,16 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# t_now = time.perf_counter()
+
+# if last_proc_time is not None:
+#     print(f"wall dt = {t_now - last_proc_time:.4f}s")
+
+# t0 = time.perf_counter()
+# action, _ = model.predict(latest_obs)
+# t1 = time.perf_counter()
+
+# print(f"predict time = {t1 - t0:.4f}s, frame_t = {frame.t_sec:.3f}")
+# last_proc_time = t_now

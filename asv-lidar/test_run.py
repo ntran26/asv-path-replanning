@@ -83,12 +83,12 @@ class TestCase:
             self.start_x = 5
             self.start_y = 1
             self.goal_x = 5
-            self.goal_y = 24
+            self.goal_y = 22
         elif test_case == 5:
             self.start_x = 2
             self.start_y = 1
             self.goal_x = 8
-            self.goal_y = 24
+            self.goal_y = 22
         elif test_case == 99:
             # load data file
             with open(self.env_data, "r") as f:

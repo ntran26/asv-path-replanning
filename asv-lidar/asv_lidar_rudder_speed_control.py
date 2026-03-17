@@ -329,10 +329,11 @@ class ASVLidarEnv(gym.Env):
 
         # Randomize start and goal positions
         if self.test_case is None:
-            self.start_x = np.random.randint(1, self.map_width - 1)
-            self.start_y = 1
-            self.goal_x = np.random.randint(1, self.map_width - 1)
-            self.goal_y = self.map_height - 1
+            # self.start_x = np.random.randint(1, self.map_width - 1)
+            # self.start_y = 1
+            # self.goal_x = np.random.randint(1, self.map_width - 1)
+            # self.goal_y = self.map_height - 1
+            self.start_x, self.start_y, self.goal_x, self.goal_y = self.scenario.position(test_case=1)
         else:
             self.start_x, self.start_y, self.goal_x, self.goal_y = self.scenario.position(test_case=self.test_case)
 
@@ -611,7 +612,7 @@ if __name__ == '__main__':
         # Random actions
         action = env.action_space.sample()
         obs,rew,term,_,_ = env.step(action)
-        print(action[0] * 25)
+        # print(action[0] * 25)
         total_reward += rew
         # print(f"Action: {action}    Reward: {rew}")
         if term:
