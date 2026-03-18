@@ -29,8 +29,8 @@ ALPHA_R = 0.1
 R_COLLISION = -2000.0
 
 # Speed control (rpm)
-RPM_MIN = 16
-RPM_MAX = 17
+RPM_MIN = 30
+RPM_MAX = 32
 U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 MAX_IN = 1
 MIN_IN = -1
@@ -710,7 +710,7 @@ if __name__ == '__main__':
     while True:        
         # Random actions
         action = env.action_space.sample()
-        # action = [-1, -1]
+        action = [-1, 1]
         obs,rew,term,_,_ = env.step(action)
         print(action)
         total_reward += rew
