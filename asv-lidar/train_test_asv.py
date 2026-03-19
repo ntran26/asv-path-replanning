@@ -10,7 +10,7 @@ from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.vec_env import SubprocVecEnv, VecMonitor
 from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback, CallbackList
 
-from asv_lidar_rudder_speed_control import ASVLidarEnv, RPM_MAX, RPM_MIN
+from rl_env import ASVLidarEnv, RPM_MAX, RPM_MIN
 
 """
 Train:

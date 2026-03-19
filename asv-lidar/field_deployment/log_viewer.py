@@ -327,7 +327,7 @@ def main() -> None:
     ap.add_argument("--zoom", type=float, default=20, help="Initial zoom in pixels per meter")
     ap.add_argument("--record", action="store_true", help="Record an MP4 of the pygame window")
     ap.add_argument("--out-video", default="bluefin_replay.mp4", help="Output video filename")
-    ap.add_argument("--out-image", default="bluefin_final.png", help="Output final screenshot filename")
+    ap.add_argument("--out-image", default="snapshot.png", help="Output final screenshot filename")
     ap.add_argument("--video-fps", type=float, default=None, help="Video FPS. If not set, defaults to --fps (UI rate).")
     ap.add_argument("--plot", default="trajectory_plot.png", help="Matplotlib trajectory plot output")
 
@@ -633,10 +633,6 @@ def main() -> None:
         clock.tick(args.fps)
 
     stream.close()
-
-    # Save a final screenshot
-    pygame.image.save(screen, args.out_image)
-    print(f"[IMG] Saved final screenshot: {args.out_image}")
 
     # Release the video
     if video_writer is not None:

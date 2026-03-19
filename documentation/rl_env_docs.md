@@ -82,7 +82,7 @@ Navigation/Reward
 
 ### File: ship_model.py
 
-
+This script provides a simplified planar vessel dynamics model 
 
 
 ## 2. Simulate LiDAR
