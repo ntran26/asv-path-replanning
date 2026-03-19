@@ -141,7 +141,7 @@ def pick_lidar_swath(full_ranges_m: np.ndarray, angles_deg: np.ndarray, *, index
     - beam i corresponds to angle = index0_deg + i*0.5 degrees
     - angles_deg ranges from [-135, 135] for 270 lidar swath
     """
-    full_ranges_m = np.asarray(full_ranges_m).ravel()
+    full_ranges_m = np.asarray(full_ranges_m).ravel()   # flatten to 1D array
     n = full_ranges_m.size
     if n == 0:
         return full_ranges_m
@@ -543,10 +543,14 @@ def main() -> None:
 
             header_lines += [
                 f"Frame #{stream.frame_index:06d}    ts={frame.ts_str}    t_sec={frame.t_sec:9.3f}    dt~{dt_last:0.3f}s (~{(1.0/dt_last if dt_last>1e-6 else 0):0.1f} Hz)",
-                f"Pose(SLAM):  x={frame.x_m:+0.3f} m   y={frame.y_m:+0.3f} m   yaw={frame.yaw_deg:0.2f} deg   (hdg_ref={frame.hdg_ref_deg})",
+                " ",
+                f"Position:  x = {frame.x_m:+0.3f} m   y = {frame.y_m:+0.3f} m",
+                f"Heading: hdg = {frame.yaw_deg:0.2f} deg     dhdg = {frame.yaw_rate:0.2f} deg/s",
+                f"Velocity: speed = {frame.speed_mps:0.3f},     ",
+                " ",
                 f"Control: rudder: {frame.s1:0.2f}, thruster: {frame.s2:0.2f}",
-                # f"Pose(rel):   x={rel_x:+0.3f} m   y={rel_y:+0.3f} m   origin=({origin_world[0]:+0.3f},{origin_world[1]:+0.3f})",
-                f"Vel(derived): vx={frame.vx_mps:+0.3f} m/s   vy={frame.vy_mps:+0.3f} m/s   speed={frame.speed_mps:0.3f} m/s",
+                " ",
+                # f"Vel(derived): vx={frame.vx_mps:+0.3f} m/s   vy={frame.vy_mps:+0.3f} m/s   speed={frame.speed_mps:0.3f} m/s",
                 f"LiDAR: beams={lidar.size}   units=m (dm*0.1)",
             ]
 

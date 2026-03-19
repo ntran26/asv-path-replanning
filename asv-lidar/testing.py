@@ -17,7 +17,7 @@ UPDATE_RATE = 0.1   # 10 Hz
 RENDER_FPS = 10
 MAP_WIDTH = 10
 MAP_HEIGHT = 25
-MAX_OBS = 2
+MAX_OBS = 1
 
 # Reward shaping parameters
 LAMBDA_REWARD = 0.5
@@ -30,8 +30,9 @@ R_COLLISION = -2000.0
 
 # Speed control (rpm)
 RPM_MIN = 16
-RPM_MAX = 20
+RPM_MAX = 32
 U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
+print(U_MAX)
 MAX_IN = 1
 MIN_IN = -1
 
@@ -330,10 +331,10 @@ class ASVLidarEnv(gym.Env):
 
         # Randomize start and goal positions
         if self.test_case is None:
-            self.start_x = np.random.randint(2, self.map_width - 2)
-            self.start_y = 2
-            self.goal_x = np.random.randint(2, self.map_width - 2)
-            self.goal_y = self.map_height - 5
+            self.start_x = 9
+            self.start_y = 1
+            self.goal_x = 1
+            self.goal_y = 20
 
         self.asv_x = self.start_x
         self.asv_y = self.start_y
@@ -366,16 +367,6 @@ class ASVLidarEnv(gym.Env):
         # collide with an obstacle or out of bounds
         if self._check_collision_geom():
             return True
-        
-        # lidar < 1m
-        lidar_list = self.lidar.ranges.astype(np.int64)
-        if np.any(lidar_list <= 1.0):
-            return True
-        
-        # the agent reaches goal
-        if self.distance_to_goal <= VESSEL_LENGTH:
-            return True
-
         return False
 
     def step(self, action):
@@ -501,32 +492,6 @@ class ASVLidarEnv(gym.Env):
         pygame.draw.line(self.surface, (200, 0, 0), (W, 0), (W, H), bw)
         pygame.draw.line(self.surface, (200, 0, 0), (0, 0), (W, 0), bw)
 
-        # Draw obstacles
-        for obs in self.obstacles:
-            obs_px = [scale_point(p) for p in obs]
-            pygame.draw.polygon(self.surface, (200, 0, 0), obs_px)
-
-        # Draw LIDAR scan
-        self.lidar.render(self.surface, scale_point)
-
-        # Draw Path
-        self._draw_dashed_line(
-            self.surface,
-            (0,200,0),
-            scale_point((self.start_x,self.start_y)),
-            scale_point((self.goal_x,self.goal_y)),
-            width=2,
-            dash_length=int(np.clip(scale, 8, 30))
-        )
-        pygame.draw.circle(self.surface,(100,0,0),
-                           scale_point((self.tgt_x,self.tgt_y)),
-                           radius=3)
-
-        # Draw destination
-        pygame.draw.circle(self.surface, (200, 0, 200), 
-                           scale_point((self.goal_x, self.goal_y)), 
-                           max(4, int(round(6))))
-
         # Draw ownship
         if self.icon is None:
             self.icon = pygame.image.frombytes(BOAT_ICON['bytes'],BOAT_ICON['size'],BOAT_ICON['format'])
@@ -551,12 +516,13 @@ class ASVLidarEnv(gym.Env):
         if self.status is not None:
             status_surf_1, rect = self.status.render(
                 f"{self.elapsed_time:005.1f}s  V:{self.speed_mps:0.2f}m/s  "
-                f"HDG:{self.asv_h:+004.0f}({self.asv_w:+03.0f})  "
-                f"TGT:{self.tgt:+004.0f}    ",
+                f"HDG:{self.asv_h:+004.0f}  "
+                f"DHDG:{self.asv_w:+0.2f}  ",
                 (255, 255, 255),
                 (0, 0, 0)
             )
             status_surf_2, rect = self.status.render(
+                f"TGT:{self.tgt:+004.0f}    "
                 f"TGT_HDG:{self.angle_diff:.2f}    "
                 f"GOAL:{self.distance_to_goal:.2f}  ",
                 (255, 255, 255),

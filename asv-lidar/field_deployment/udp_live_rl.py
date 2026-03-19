@@ -103,8 +103,6 @@ def frame_to_rl_obs(
         start_xy: Tuple[float, float],
         goal_xy: Tuple[float, float],
         reference_path: np.ndarray,
-        last_yaw_deg: Optional[float],
-        last_t_sec: Optional[float],
         pos_scale: float,
         speed_scale: float,
         lidar_index0_deg: float
@@ -144,11 +142,7 @@ def frame_to_rl_obs(
 
     # heading and heading rate
     yaw_deg = frame.yaw_deg
-    yaw_rate = 0.0
-    if last_yaw_deg is not None and last_t_sec is not None:
-        dt = frame.t_sec - last_t_sec
-        if dt > 1e-6:
-            yaw_rate = ((yaw_deg - last_yaw_deg + 180) % 360 - 180) / dt
+    yaw_rate = frame.yaw_rate
     
     # speed
     speed = frame.speed_mps * speed_scale
@@ -257,7 +251,6 @@ def main():
 
     latest_obs: Optional[Dict[str, np.ndarray]] = None
     latest_action: Optional[np.ndarray] = None
-    latest_cmd: Optional[np.ndarray] = None
     latest_aux: Optional[Dict[str, float]] = None
 
     # UI state
@@ -369,8 +362,6 @@ def main():
                             start_xy=start_xy,
                             goal_xy=goal_xy,
                             reference_path=reference_path,
-                            last_yaw_deg=last_yaw_deg,
-                            last_t_sec=last_t_sec,
                             pos_scale=SCALE,
                             speed_scale=SCALE,
                             lidar_index0_deg=log_viewer.LIDAR_INDEX_DEG,
@@ -392,10 +383,6 @@ def main():
                         command = f"$CMD,{rudder_cmd},{thrust_cmd}"
                         sock.sendto(command.encode(), (args.server_ip, args.server_port))
     #-----------------------------------------------------------------
-
-                        last_yaw_deg = yaw_deg
-                        last_t_sec = frame.t_sec
-
                     else:
                         # viewer-only fallback mapping
                         mapped_xy = (
@@ -406,7 +393,7 @@ def main():
                             "x": mapped_xy[0],
                             "y": mapped_xy[1],
                             "yaw_deg": frame.yaw_deg,
-                            "yaw_rate": 0.0,
+                            "yaw_rate": frame.yaw_rate,
                             "speed": float(frame.speed_mps),
                             "tgt": 0.0,
                             "target_heading": 0.0,
@@ -447,7 +434,7 @@ def main():
             header_lines += [
                 f"ts={frame.ts_str}   t={frame.t_sec:0.3f}s   seq={frame.seq}   hdg_ref={frame.hdg_ref_deg}",
                 "  ",
-                f"Real frame: x={frame.x_m:+0.3f}  y={frame.y_m:+0.3f}  yaw={frame.yaw_deg:+0.2f}  spd={frame.speed_mps:0.3f}",
+                f"Real frame: x={frame.x_m:+0.3f}  y={frame.y_m:+0.3f}  hdg={frame.yaw_deg:+0.2f}   dhdg={frame.yaw_rate:+0.2f}  spd={frame.speed_mps:0.3f}",
             ]
             header_lines += ["    "]
             if latest_aux is not None:

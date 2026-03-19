@@ -1,0 +1,101 @@
+% Bluefin4DOFModel_Solver.m
+
+clear
+
+% The single prop & single rudder boat:
+% Initial conditions:
+% x(1)=u        = surge velocity          (m/s)
+% x(2)=v        = sway velocity           (m/s)
+% x(3)=p        = roll rate               (rad/s)
+% x(4)=r        = yaw velocity            (rad/s)
+% x(5)=x        = position in x-direction (m)
+% x(6)=y        = position in y-direction (m)
+% x(7)=phi      = roll angle              (rad)
+% x(8)=psi      = yaw angle               (rad)
+% x(9)=delta    = actual rudder angle     (rad)
+% x(10)=n1      = propeller               (rps)
+% x(11)=n2      = bow thruster            (rps)
+
+x = [0.5 0 0 0 0 0 0 0 0 1 1]';
+u0 = [20*pi/180 1000 0]';
+
+% simulation parameters
+ss = 0.01;
+%FT = 1.38;
+FT = 100;
+index = 0;
+
+for k = 0:ss:FT
+    index = index + 1;
+    ui = u0;
+% Euler's method:    
+    xdot = Bluefin4DOFModel(x,ui);
+    x    = x + ss*xdot;
+
+    if x(8) >= 2*pi,
+        x(8) = x(8)-2*pi;
+    elseif x(8) <= 0,
+        x(8) = x(8) + 2*pi;
+    else
+        x(8) = x(8);
+    end
+    
+% RK2 or RK4 method?
+
+% store data:
+    data(index,1)  = ui(1); % rudder
+    data(index,2)  = ui(2); % propeller rpm
+    data(index,3)  = x(1);  % u [m/s]
+    data(index,4)  = x(2);  % v [m/s]
+    data(index,5)  = x(3);
+    data(index,6)  = x(4);  
+    data(index,7)  = x(5);  % x-position
+    data(index,8)  = x(6);  % y-position
+    data(index,9)  = x(7);
+    data(index,10) = x(8);
+    data(index,11) = k;   % time
+end
+
+% x(1)=u        = surge velocity          (m/s)
+% x(2)=v        = sway velocity           (m/s)
+% x(3)=p        = roll rate               (rad/s)
+% x(4)=r        = yaw velocity            (rad/s)
+% x(5)=x        = position in x-direction (m)
+% x(6)=y        = position in y-direction (m)
+% x(7)=phi      = roll angle              (rad)
+% x(8)=psi      = yaw angle               (rad)
+% x(9)=delta    = actual rudder angle     (rad)
+% x(10)=n1      = propeller               (rps)
+% x(11)=n2      = bow thruster            (rps)
+
+% plotting
+figure(1)
+subplot(411);plot(data(:,11),data(:,3));grid
+ylabel('u');
+subplot(412);plot(data(:,11),data(:,4));grid
+ylabel('v');
+subplot(413);plot(data(:,11),data(:,10)*180/pi);grid
+ylabel('\psi [deg]');
+subplot(414);plot(data(:,11),data(:,9)*180/pi);grid
+ylabel('\phi [deg]');
+
+% to plot the trajectory:
+figure(2)
+L1 = 1.725;
+plot(data(:,8)/L1,data(:,7)/L1);grid;axis('equal')
+title('Turning circle \delta = 35 deg')
+xlabel('x-position [Dist/L]')
+ylabel('y-position [Dist/L]')
+% to plot the yaw angle:
+%plot(data(:,11),data(:,8)*180/pi);grid
+%axis('equal');
+% to plot yaw rage: x(3) >> data(:,5)
+%plot(data(:,11),data(:,5)*180/pi);grid
+
+% to plot the trajectory:
+figure(3)
+plot(data(:,8),data(:,7));grid;axis('equal')
+title('Turning circle \delta = 35 deg')
+xlabel('x-position [m]')
+ylabel('y-position [m]')
+
