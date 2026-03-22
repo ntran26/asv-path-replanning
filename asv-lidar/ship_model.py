@@ -1,9 +1,14 @@
 import numpy as np
 
 MASS = 500
-THRUST_COEF = 0.04 #0.032 #(320N @ 100 RPM, based on 2xT500 thrusters)
-DRAG_COEF = 10 #12.8    #(320N of drag at 5m/s)
-TURN_COEF = 2800      #480Nm @ 10deg/s
+# THRUST_COEF = 0.04 #0.032 #(320N @ 100 RPM, based on 2xT500 thrusters)
+# DRAG_COEF = 10 #12.8    #(320N of drag at 5m/s)
+# TURN_COEF = 2800      #480Nm @ 10deg/s
+
+THRUST_COEF = 0.07
+DRAG_COEF = 10
+TURN_COEF = 100
+
 MAX_RUD_ANGLE = 30
 RUDDEROFFSET = 3
 MOMINERTIA = 0.5*MASS*RUDDEROFFSET**2

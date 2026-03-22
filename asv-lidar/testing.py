@@ -11,10 +11,12 @@ import cv2
 
 RENDER_SCALE = 25
 TEST_CASE = None
+START_X = 9
+START_Y = 1
 
 # System parameters
 UPDATE_RATE = 0.1   # 10 Hz
-RENDER_FPS = 10
+RENDER_FPS = 20
 MAP_WIDTH = 10
 MAP_HEIGHT = 25
 MAX_OBS = 1
@@ -30,7 +32,7 @@ R_COLLISION = -2000.0
 
 # Speed control (rpm)
 RPM_MIN = 16
-RPM_MAX = 32
+RPM_MAX = 30
 U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 print(U_MAX)
 MAX_IN = 1
@@ -331,8 +333,8 @@ class ASVLidarEnv(gym.Env):
 
         # Randomize start and goal positions
         if self.test_case is None:
-            self.start_x = 9
-            self.start_y = 1
+            self.start_x = START_X
+            self.start_y = START_Y
             self.goal_x = 1
             self.goal_y = 20
 
@@ -557,9 +559,11 @@ if __name__ == '__main__':
     while True:        
         # Random actions
         action = env.action_space.sample()
-        action = [-1, 1]
+        action = [0, 1]
+        if env.model._v >= 1:
+            action = [-1, 1]
         obs,rew,term,_,_ = env.step(action)
-        print(action)
+        # print(action)
         total_reward += rew
         # print(f"Action: {action}    Reward: {rew}")
         if term:
