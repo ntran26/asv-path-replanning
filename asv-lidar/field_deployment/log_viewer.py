@@ -553,11 +553,7 @@ def main() -> None:
 
             header_lines += [
                 f"Frame #{stream.frame_index:06d}    ts={frame.ts_str}    t_sec={frame.t_sec:9.3f}    dt~{dt_last:0.3f}s (~{(1.0/dt_last if dt_last>1e-6 else 0):0.1f} Hz)",
-                " ",
-                f"Position:  x = {frame.x_m:+0.3f} m   y = {frame.y_m:+0.3f} m",
-                f"Heading: hdg = {frame.yaw_deg:0.2f} deg     dhdg = {frame.yaw_rate:0.2f} deg/s",
-                f"Velocity: speed = {frame.speed_mps:0.3f}     ",
-                " ",
+                f"Pose(SLAM):  x={frame.x_m:+0.3f} m   y={frame.y_m:+0.3f} m   yaw={frame.yaw_deg:0.2f} deg   (hdg_ref={frame.hdg_ref_deg})",
                 f"Control: rudder: {frame.s1:0.2f}, thruster: {frame.s2:0.2f}",
                 " ",
                 # f"Vel(derived): vx={frame.vx_mps:+0.3f} m/s   vy={frame.vy_mps:+0.3f} m/s   speed={frame.speed_mps:0.3f} m/s",
