@@ -59,6 +59,7 @@ class BluefinFrame:
     vx_mps: float
     vy_mps: float
     speed_mps: float
+    yaw_rate: float
 
     lidar_m: np.ndarray
 
@@ -85,6 +86,13 @@ def _wrap_360(deg: float) -> float:
     Normalize angle to [0,360]
     """
     return (deg % 360 + 360) % 360
+
+def _wrap_180(deg: float) -> float:
+    """
+    Normalize angle difference to [-180, 180]
+    Useful for shortest signed angular difference
+    """
+    return (deg + 180.0) % 360.0 - 180.0
 
 def _parse_int_list_csv(text: str) -> np.ndarray:
     """
@@ -207,7 +215,8 @@ class BluefinStreamDecoder:
         # Pose + velocity state
         self._last_pose: Optional[Tuple[float, float, float]] = None
         self._last_pose_t: Optional[float] = None
-        self._last_vel: Tuple[float, float, float] = (0, 0, 0)
+        # self._last_vel: Tuple[float, float, float] = (0, 0, 0)
+        self._last_vel: Tuple[float, float, float, float] = (0, 0, 0, 0)
         self._max_spd: Optional[float] = 0
 
     # Pose + velocity state
@@ -255,20 +264,22 @@ class BluefinStreamDecoder:
             x = float(m.group("x"))
             y = -float(m.group("y"))
             yaw_deg = -float(m.group("yaw"))
-            # yaw_deg = _wrap_360(float(m.group("yaw")))
 
-            # Velocity
+            # Velocity and heading rate
             if self._last_pose is not None and self._last_pose_t is not None:
                 dt = t - self._last_pose_t
                 if dt > 1e-6:
-                    prev_x, prev_y, _ = self._last_pose
+                    prev_x, prev_y, prev_yaw = self._last_pose
                     vx = (x - prev_x) / dt
                     vy = (y - prev_y) / dt
-                    spd = float(np.hypot(vx, vy))
-                    self._last_vel = (float(vx), float(vy), spd)
-                    if spd >= self._max_spd:
+                    spd = np.hypot(vx, vy)
+                    yaw_rate = (_wrap_180(yaw_deg - prev_yaw)) / dt
+                    self._last_vel = (vx, vy, spd, yaw_rate)                  
+
+                    # show max speed
+                    if spd > self._max_spd:
                         self._max_spd = spd
-                        print(spd)
+                        print(f"Max velocity: {spd:.3f} m/s")
             
             self._last_pose = (x, y, yaw_deg)
             self._last_pose_t = t
@@ -295,17 +306,18 @@ class BluefinStreamDecoder:
                 return None
             
             x, y, yaw_deg = self._last_pose
-            vx, vy, spd = self._last_vel
+            vx, vy, spd, yaw_rate = self._last_vel
 
             return BluefinFrame(
-                t_sec = float(t),
+                t_sec = t,
                 ts_str = ts_str,
-                x_m = float(x),
-                y_m = float(y),
-                yaw_deg = float(yaw_deg),
-                vx_mps = float(vx),
-                vy_mps = float(vy),
-                speed_mps = float(spd),
+                x_m = x,
+                y_m = y,
+                yaw_deg = yaw_deg,
+                vx_mps = vx,
+                vy_mps = vy,
+                speed_mps = spd,
+                yaw_rate = yaw_rate,
                 lidar_m = lidar_m,
                 hdg_ref_deg = self._last_hdg_ref,
                 s1 = self._last_s1,
@@ -338,6 +350,7 @@ def frame_to_gym_obs(
     x = frame.x_m
     y = frame.y_m
     yaw = frame.yaw_deg
+    dhdg = frame.yaw_rate
 
     if origin_xyh is not None:
         x0, y0, yaw0 = origin_xyh
@@ -349,7 +362,7 @@ def frame_to_gym_obs(
         "lidar": frame.lidar_m.astype(np.float32),
         "pos": np.array([x,y], dtype=np.float32),
         "hdg": np.array([yaw], dtype=np.float32),
-        "dhdg": np.array([0.0], dtype=np.float32),
+        "dhdg": np.array([dhdg], dtype=np.float32),
         "speed": np.array([frame.speed_mps], dtype=np.float32),
         "tgt": np.array([0.0], dtype=np.float32),
         "target_heading": np.array([0.0], dtype=np.float32),
@@ -377,10 +390,10 @@ if __name__ == "__main__":
         if origin is None:
             origin = (frame.x_m, frame.y_m, frame.yaw_deg)
         
-        obs = frame_to_gym_obs(frame, origin_xyh=origin, include_velocity=True)
+        obs = frame_to_gym_obs(frame, origin_xyh=origin)
 
         if count:
-            print(f"Frame {count}: t={frame.t_sec:.3f}s pos={obs['pos']} yaw={obs['hdg']} spd={obs['spd']}")
+            print(f"Frame {count}: t={frame.t_sec:.3f}s pos={obs['pos']} yaw={obs['hdg']} dhdg={obs['dhdg']} spd={obs['speed']}")
             print(f" lidar shape: {obs['lidar'].shape}, min/max: {obs['lidar'].min():.2f}/{obs['lidar'].max():.2f}")
             time.sleep(0.1)
         count += 1

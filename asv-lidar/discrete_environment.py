@@ -436,41 +436,6 @@ class ASVLidarEnv(gym.Env):
         collided = bool(self._check_collision_geom())
         reached_goal = bool(self.distance_to_goal <= VESSEL_LENGTH)
 
-        # # -----------------------------
-        # # Simple reward for debug training
-        # # -----------------------------
-        # R_EXIST = -0.1
-        # R_GOAL = 100.0
-        # R_COLLISION = -100.0
-
-        # PATH_TOL = 1.5   
-        # W_PATH = 1.0
-        # W_HEAD = 0.5
-
-        # # terminal flags
-        # collided = bool(self._check_collision_geom())
-        # reached_goal = bool(self.distance_to_goal <= VESSEL_LENGTH / 2)
-
-        # # 1) living penalty
-        # r_exist = R_EXIST
-
-        # # 2) path reward (linear, positive when close to path)
-        # path_error = float(abs(self.tgt))
-        # r_path = max(0.0, 1.0 - path_error / PATH_TOL)
-
-        # # 3) heading reward (positive when facing goal, negative when facing away)
-        # heading_error = min(abs(float(self.angle_diff)), 180.0)
-        # r_heading = 1.0 - heading_error / 90.0   # +1 at 0deg, 0 at 90deg, -1 at 180deg
-        # r_heading = float(np.clip(r_heading, -1.0, 1.0))
-
-        # # 4) combine
-        # if collided:
-        #     reward = R_COLLISION
-        # elif reached_goal:
-        #     reward = R_GOAL
-        # else:
-        #     reward = r_exist + W_PATH * r_path + W_HEAD * r_heading
-
         r_exist = -0.1
 
         # heading alignment reward (reward = 1 if aligned, -1 if opposite)
@@ -503,52 +468,6 @@ class ASVLidarEnv(gym.Env):
             reward = -1000
         else:
             reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
-        
-        # lam = LAMBDA_REWARD
-
-        # # cross-track error
-        # ye = abs(self.tgt)
-
-        # # pose-base speed
-        # U = self.speed_mps
-        # U_norm = U / U_MAX
-
-        # # Course error relative to the path direction (better than using heading-only)
-        # if U > 1e-6:
-        #     course_deg = np.degrees(np.arctan2(dx_pos, dy_pos))
-        # else:
-        #     course_deg = self.asv_h
-
-        # path_dx = float(self.goal_x - self.start_x)
-        # path_dy = float(self.goal_y - self.start_y)
-        # path_course_deg = float(np.degrees(np.arctan2(path_dx, path_dy)))
-
-        # chi_tilde_deg = (course_deg - path_course_deg + 180.0) % 360.0 - 180.0
-        # chi_tilde = float(np.radians(chi_tilde_deg))
-        # cos_chi = float(np.cos(chi_tilde))
-
-        # r_pf = float(-1.0 + (U_norm * cos_chi + 1.0) * (np.exp(-GAMMA_E * ye) + 1.0))
-
-        # # Obstacle avoidance reward
-        # lidar_d = self.lidar.ranges.astype(np.float32)
-        # theta_rad = np.radians(self.lidar.angles.astype(np.float32))
-
-        # w = 1.0 / (1.0 + np.abs(GAMMA_THETA * theta_rad))
-
-        # # < 1 for out-of-range, treat it as "far"
-        # x = np.where(lidar_d <= 1.0, LIDAR_RANGE, lidar_d)
-
-        # pen = 1.0 / (GAMMA_X * (np.maximum(x, EPSILON_X) ** 2))
-        # r_oa = -float(np.sum(w * pen) / (np.sum(w) + 1e-6))
-
-        # # living penalty
-        # r_exist = -lam * (2.0 * ALPHA_R + 1.0)
-
-        # # combined reward
-        # if collided:
-        #     reward = float((1.0 - lam) * R_COLLISION)   # = -1000 when lam=0.5 and R_COLLISION=-2000
-        # else:
-        #     reward = float(lam * r_pf + (1.0 - lam) * r_oa + r_exist)
 
         terminated = self.check_done((self.asv_x, self.asv_y))
         info = {
@@ -558,41 +477,6 @@ class ASVLidarEnv(gym.Env):
             "collided": bool(collided),
             "reached_goal": bool(reached_goal),
         }
-
-        # info = {
-        #     # reward mix + components
-        #     "lam": float(lam),
-        #     "r_pf": float(r_pf),
-        #     "r_oa": float(r_oa),
-        #     "r_exist": float(r_exist),
-        #     "reward": float(reward),
-
-        #     # path-following terms used in Eq (31)
-        #     "ye": float(ye),
-        #     "U": float(U),
-        #     "U_norm": float(U_norm),
-        #     "course_deg": float(course_deg),
-        #     "path_course_deg": float(path_course_deg),
-        #     "chi_tilde_deg": float(chi_tilde_deg),
-        #     "cos_chi": float(cos_chi),
-
-        #     # obstacle-avoidance diagnostics from Eq (32)
-        #     "min_lidar": float(np.min(lidar_d)) if len(lidar_d) > 0 else float("inf"),
-        #     "min_x_used": float(np.min(x)) if len(x) > 0 else float("inf"),
-        #     "mean_w": float(np.mean(w)) if len(w) > 0 else 0.0,
-        #     "mean_pen": float(np.mean(pen)) if len(pen) > 0 else 0.0,
-
-        #     # speed / control diagnostics
-        #     "speed_mps": float(self.speed_mps),
-        #     "rpm": float(rpm),
-        #     "rudder_deg": float(rudder_cmd * 30),
-
-        #     # navigation + terminal diagnostics
-        #     "distance_to_goal": float(self.distance_to_goal),
-        #     "tgt": float(self.tgt),
-        #     "collided": bool(collided),
-        #     "reached_goal": bool(reached_goal),
-        # }
 
         return self._get_obs(), reward, terminated, False, info
 
