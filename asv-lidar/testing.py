@@ -19,7 +19,7 @@ START_Y = 1
 
 # System parameters
 UPDATE_RATE = 0.1   # 10 Hz
-RENDER_FPS = 20
+RENDER_FPS = 10
 MAP_WIDTH = 10
 MAP_HEIGHT = 25
 MAX_OBS = 1

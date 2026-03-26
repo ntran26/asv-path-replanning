@@ -61,6 +61,10 @@ class BluefinFrame:
     speed_mps: float
     yaw_rate: float
 
+    # body frame
+    u_body_mps: float
+    v_body_mps: float
+
     lidar_m: np.ndarray
 
     hdg_ref_deg: Optional[float] = None
@@ -215,8 +219,9 @@ class BluefinStreamDecoder:
         # Pose + velocity state
         self._last_pose: Optional[Tuple[float, float, float]] = None
         self._last_pose_t: Optional[float] = None
-        # self._last_vel: Tuple[float, float, float] = (0, 0, 0)
-        self._last_vel: Tuple[float, float, float, float] = (0, 0, 0, 0)
+        # self._last_vel: Tuple[float, float, float] = (0, 0, 0)                # (x, y, yaw)
+        # self._last_vel: Tuple[float, float, float, float] = (0, 0, 0, 0)      # add yaw_rate
+        self._last_vel: Tuple[float, float, float, float] = (0, 0, 0, 0, 0, 0)  # add u and v
         self._max_spd: Optional[float] = 0
 
     # Pose + velocity state
@@ -274,7 +279,13 @@ class BluefinStreamDecoder:
                     vy = (y - prev_y) / dt
                     spd = np.hypot(vx, vy)
                     yaw_rate = (_wrap_180(yaw_deg - prev_yaw)) / dt
-                    self._last_vel = (vx, vy, spd, yaw_rate)                  
+                    yaw_rad = np.deg2rad(yaw_deg)
+
+                    # body frame velocity
+                    u_body = vx * np.sin(yaw_rad) + vy * np.cos(yaw_rad)
+                    v_body = -vx * np.cos(yaw_rad) + vy * np.sin(yaw_rad)
+
+                    self._last_vel = (vx, vy, spd, u_body, v_body, yaw_rate)                  
 
                     # show max speed
                     if spd > self._max_spd:
@@ -306,7 +317,7 @@ class BluefinStreamDecoder:
                 return None
             
             x, y, yaw_deg = self._last_pose
-            vx, vy, spd, yaw_rate = self._last_vel
+            vx, vy, spd, u_body, v_body, yaw_rate = self._last_vel
 
             return BluefinFrame(
                 t_sec = t,
@@ -318,6 +329,8 @@ class BluefinStreamDecoder:
                 vy_mps = vy,
                 speed_mps = spd,
                 yaw_rate = yaw_rate,
+                u_body_mps = u_body,
+                v_body_mps = v_body,
                 lidar_m = lidar_m,
                 hdg_ref_deg = self._last_hdg_ref,
                 s1 = self._last_s1,

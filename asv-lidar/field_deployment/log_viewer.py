@@ -39,7 +39,8 @@ from __future__ import annotations
 import argparse
 import os
 import time
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Dict, Any
+import json
 
 import numpy as np
 import pygame
@@ -322,11 +323,242 @@ def plot_trajectory(traj_xy: List[Tuple[float, float]], traj_yaw_deg: List[float
     plt.close()
     print(f"[PLOT] Saved: {out_png}")
 
+# -----------------------Analyzer helper functions---------------------------------
+def wrap_180(deg: float) -> float:
+    return (deg + 180.0) % 360.0 - 180.0
+
+
+def unwrap_heading_deg(yaw_deg: np.ndarray) -> np.ndarray:
+    yaw_deg = np.asarray(yaw_deg, dtype=float)
+    if yaw_deg.size == 0:
+        return yaw_deg.copy()
+
+    out = np.empty_like(yaw_deg)
+    out[0] = yaw_deg[0]
+    for i in range(1, yaw_deg.size):
+        out[i] = out[i - 1] + wrap_180(yaw_deg[i] - yaw_deg[i - 1])
+    return out
+
+
+def sample_at_time(t_rel: np.ndarray, values: np.ndarray, query_s: float):
+    if len(t_rel) == 0 or query_s < t_rel[0] or query_s > t_rel[-1]:
+        return None
+    return float(np.interp(query_s, t_rel, values))
+
+
+def first_crossing_time(t_rel: np.ndarray, values: np.ndarray, threshold: float):
+    for i in range(1, len(values)):
+        if values[i - 1] < threshold <= values[i]:
+            return float(t_rel[i])
+    return None
+
+
+def first_abs_crossing_time(t_rel: np.ndarray, values: np.ndarray, threshold: float):
+    vals = np.abs(values)
+    for i in range(1, len(vals)):
+        if vals[i - 1] < threshold <= vals[i]:
+            return float(t_rel[i])
+    return None
+
+
+def slope_over_window(t_rel: np.ndarray, values: np.ndarray, t1: float, t2: float):
+    mask = (t_rel >= t1) & (t_rel <= t2)
+    if np.count_nonzero(mask) < 2:
+        return None
+    p = np.polyfit(t_rel[mask], values[mask], 1)
+    return float(p[0])
+
+
+def cumulative_distance(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    ds = np.hypot(np.diff(x), np.diff(y))
+    return np.concatenate([[0.0], np.cumsum(ds)])
+
+
+def circle_fit_radius(x: np.ndarray, y: np.ndarray):
+    if len(x) < 6:
+        return None
+
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+
+    A = np.column_stack([2*x, 2*y, np.ones_like(x)])
+    b = x*x + y*y
+    sol, *_ = np.linalg.lstsq(A, b, rcond=None)
+    cx, cy, c0 = sol
+    r2 = c0 + cx*cx + cy*cy
+    if r2 <= 0:
+        return None
+    return float(np.sqrt(r2))
+
+def first_sustained_index(values: np.ndarray, threshold: float, count: int = 3):
+    run = 0
+    for i, v in enumerate(values):
+        if v > threshold:
+            run += 1
+            if run >= count:
+                return i - count + 1
+        else:
+            run = 0
+    return None
+
+def first_sustained_abs_index(values: np.ndarray, threshold: float, count: int = 3):
+    run = 0
+    for i, v in enumerate(values):
+        if abs(v) > threshold:
+            run += 1
+            if run >= count:
+                return i - count + 1
+        else:
+            run = 0
+    return None
+#----------------------------------------------------------------------------------
+#-----------------------------Analyzer class---------------------------------------
+class RunAnalyzer:
+    def __init__(self):
+        self.t = []
+        self.x = []
+        self.y = []
+        self.yaw = []
+        self.yaw_rate = []
+        self.speed = []
+        self.u_body = []
+        self.v_body = []
+        self.s1 = []
+        self.s2 = []
+
+    def add_frame(self, frame: BluefinFrame):
+        self.t.append(float(frame.t_sec))
+        self.x.append(float(frame.x_m))
+        self.y.append(float(frame.y_m))
+        self.yaw.append(float(frame.yaw_deg))
+        self.yaw_rate.append(float(frame.yaw_rate))
+        self.speed.append(float(frame.speed_mps))
+        self.u_body.append(float(frame.u_body_mps))
+        self.v_body.append(float(frame.v_body_mps))
+        self.s1.append(np.nan if frame.s1 is None else float(frame.s1))
+        self.s2.append(np.nan if frame.s2 is None else float(frame.s2))
+
+    def straight_metrics(self) -> Dict[str, Any]:
+        if len(self.t) < 2:
+            return {}
+
+        t = np.asarray(self.t, dtype=float)
+        x = np.asarray(self.x, dtype=float)
+        y = np.asarray(self.y, dtype=float)
+        u = np.asarray(self.u_body, dtype=float)
+
+        # detect motion start using forward speed
+        motion_thresh = 0.05   
+        # idx_candidates = np.where(u > motion_thresh)[0]
+
+        # if idx_candidates.size == 0:
+        #     return {}
+
+        # idx0 = int(idx_candidates[0])
+
+        idx0 = first_sustained_index(u, motion_thresh, count=3)
+        if idx0 is None:
+            return {}
+
+        t_rel = t[idx0:] - t[idx0]
+        u_rel = u[idx0:]
+        x_rel = x[idx0:]
+        y_rel = y[idx0:]
+        dist_rel = cumulative_distance(x_rel, y_rel)
+
+        peak_u = float(np.max(u_rel))
+
+        return {
+            "u_body_at_2s_mps": sample_at_time(t_rel, u_rel, 2.0),
+            "u_body_at_5s_mps": sample_at_time(t_rel, u_rel, 5.0),
+            "u_body_at_10s_mps": sample_at_time(t_rel, u_rel, 10.0),
+            "distance_at_5s_m": sample_at_time(t_rel, dist_rel, 5.0),
+            "distance_at_10s_m": sample_at_time(t_rel, dist_rel, 10.0),
+            "initial_accel_0_2_mps2": slope_over_window(t_rel, u_rel, 0.0, 2.0),
+            "initial_accel_0_5_mps2": slope_over_window(t_rel, u_rel, 0.0, 5.0),
+            "peak_u_body_mps": peak_u,
+            "time_to_50pct_peak_u_s": first_crossing_time(t_rel, u_rel, 0.5 * peak_u),
+            "time_to_90pct_peak_u_s": first_crossing_time(t_rel, u_rel, 0.9 * peak_u),
+        }
+
+    def turn_metrics(self) -> Dict[str, Any]:
+        if len(self.t) < 2:
+            return {}
+
+        t = np.asarray(self.t, dtype=float)
+        x = np.asarray(self.x, dtype=float)
+        y = np.asarray(self.y, dtype=float)
+        yaw = np.asarray(self.yaw, dtype=float)
+        yaw_rate = np.asarray(self.yaw_rate, dtype=float)
+        u = np.asarray(self.u_body, dtype=float)
+
+        # detect turn start using yaw rate magnitude
+        turn_thresh = 1.0   # deg/s, adjust if needed
+        # idx_candidates = np.where(np.abs(yaw_rate) > turn_thresh)[0]
+
+        # if idx_candidates.size == 0:
+        #     return {}
+
+        # idx0 = int(idx_candidates[0])
+
+        idx0 = first_sustained_abs_index(yaw_rate, turn_thresh, count=3)
+        if idx0 is None:
+            return {}
+
+        t_rel = t[idx0:] - t[idx0]
+        x_rel = x[idx0:]
+        y_rel = y[idx0:]
+        yaw_rel = yaw[idx0:]
+        yaw_rate_rel = yaw_rate[idx0:]
+        u_rel = u[idx0:]
+
+        yaw_u = unwrap_heading_deg(yaw_rel)
+        dpsi = yaw_u - yaw_u[0]
+
+        r90 = None
+        r180 = None
+
+        idx90 = np.where(np.abs(dpsi) >= 90.0)[0]
+        if idx90.size > 0:
+            r90 = circle_fit_radius(x_rel[:idx90[0]+1], y_rel[:idx90[0]+1])
+
+        idx180 = np.where(np.abs(dpsi) >= 180.0)[0]
+        if idx180.size > 0:
+            r180 = circle_fit_radius(x_rel[:idx180[0]+1], y_rel[:idx180[0]+1])
+
+        return {
+            "turn_start_idx": idx0,
+            "turn_start_t_sec": float(t[idx0]),
+            "yaw_rate_at_2s_degps": sample_at_time(t_rel, yaw_rate_rel, 2.0),
+            "yaw_rate_at_5s_degps": sample_at_time(t_rel, yaw_rate_rel, 5.0),
+            "yaw_rate_at_10s_degps": sample_at_time(t_rel, yaw_rate_rel, 10.0),
+            "u_body_2s_into_turn_mps": sample_at_time(t_rel, u_rel, 2.0),
+            "u_body_5s_into_turn_mps": sample_at_time(t_rel, u_rel, 5.0),
+            "u_body_10s_into_turn_mps": sample_at_time(t_rel, u_rel, 10.0),
+            "time_to_30deg_s": first_abs_crossing_time(t_rel, dpsi, 30.0),
+            "time_to_60deg_s": first_abs_crossing_time(t_rel, dpsi, 60.0),
+            "time_to_90deg_s": first_abs_crossing_time(t_rel, dpsi, 90.0),
+            "time_to_180deg_s": first_abs_crossing_time(t_rel, dpsi, 180.0),
+            "radius_first_90deg_m": r90,
+            "radius_first_180deg_m": r180,
+            "diameter_first_90deg_m": None if r90 is None else 2.0 * r90,
+            "diameter_first_180deg_m": None if r180 is None else 2.0 * r180,
+        }
+
+    def export(self, out_json: str, logfile: str):
+        data = {
+            "logfile": logfile,
+            "n_frames": len(self.t),
+            "straight_metrics": self.straight_metrics(),
+            "turn_metrics": self.turn_metrics(),
+        }
+        with open(out_json, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+#-----------------------------------------------------------------------------------------
+
 # -----------------------------
 #  Main UI loop
 # -----------------------------
-
-
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("logfile", help="Path to test_*.log")
@@ -340,6 +572,8 @@ def main() -> None:
     ap.add_argument("--out-image", default="snapshot.png", help="Output final screenshot filename")
     ap.add_argument("--video-fps", type=float, default=60, help="Video FPS. If not set, defaults to --fps (UI rate).")
     ap.add_argument("--plot", default="trajectory_plot.png", help="Matplotlib trajectory plot output")
+
+    ap.add_argument("--metrics", default="metrics.json", help="Optional JSON file to save extracted metrics")
 
     args = ap.parse_args()
 
@@ -405,6 +639,9 @@ def main() -> None:
 
     traj_xy: List[Tuple[float, float]] = []
     traj_yaw: List[float] = []
+
+    # Add ship dynamics analyzer
+    analyzer = RunAnalyzer()
 
     running = True
     while running:
@@ -489,6 +726,7 @@ def main() -> None:
                     dt_last = dt
 
                 frame = next_frame
+                analyzer.add_frame(frame)
                 prev_t_sec = float(next_frame.t_sec)
                 # next_due = now + (dt_last / float(args.rate))
                 next_due += (dt_last / float(args.rate))
@@ -556,7 +794,9 @@ def main() -> None:
                 f"Pose(SLAM):  x={frame.x_m:+0.3f} m   y={frame.y_m:+0.3f} m   yaw={frame.yaw_deg:0.2f} deg   (hdg_ref={frame.hdg_ref_deg})",
                 f"Control: rudder: {frame.s1:0.2f}, thruster: {frame.s2:0.2f}",
                 " ",
-                # f"Vel(derived): vx={frame.vx_mps:+0.3f} m/s   vy={frame.vy_mps:+0.3f} m/s   speed={frame.speed_mps:0.3f} m/s",
+                f"Vel: vx={frame.vx_mps:+0.3f}  vy={frame.vy_mps:+0.3f}  speed={frame.speed_mps:0.3f}  ",
+                f"u_body={frame.u_body_mps:+0.3f}  v_body={frame.v_body_mps:+0.3f}  yaw_rate={frame.yaw_rate:+0.2f}",
+                " ",
                 f"LiDAR: beams={lidar.size}   units=m (dm*0.1)",
             ]
 
@@ -651,8 +891,20 @@ def main() -> None:
     
     plot_trajectory(traj_xy, traj_yaw, args.plot)
 
-    pygame.quit()
+    straight_summary = analyzer.straight_metrics()
+    turn_summary = analyzer.turn_metrics()
 
+    print("\n[STRAIGHT METRICS]")
+    print(json.dumps(straight_summary, indent=2))
+
+    print("\n[TURN METRICS]")
+    print(json.dumps(turn_summary, indent=2))
+
+    if args.metrics:
+        analyzer.export(args.metrics, args.logfile)
+        print(f"[JSON] Saved metrics: {args.metrics}")
+
+    pygame.quit()
 
 if __name__ == "__main__":
     main()
