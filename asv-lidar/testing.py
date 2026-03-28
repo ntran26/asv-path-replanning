@@ -3,7 +3,8 @@ from gymnasium.spaces import Dict, Box
 import numpy as np
 import pygame
 import pygame.freetype
-from ship_model import ShipModel, THRUST_COEF, DRAG_COEF, VESSEL_LENGTH, VESSEL_WIDTH, HULL_MARGIN, HULL_FORWARD_SHIFT
+# from ship_model import ShipModel, THRUST_COEF, DRAG_COEF, VESSEL_LENGTH, VESSEL_WIDTH, HULL_MARGIN, HULL_FORWARD_SHIFT
+from ship_model_bluefin import ShipModel, THRUST_COEF, DRAG_COEF, VESSEL_LENGTH, VESSEL_WIDTH, HULL_MARGIN, HULL_FORWARD_SHIFT
 from asv_lidar import Lidar, LIDAR_RANGE, LIDAR_BEAMS
 from test_run import TestCase
 from images import BOAT_ICON
@@ -15,7 +16,7 @@ from datetime import datetime
 RENDER_SCALE = 25
 TEST_CASE = None
 START_X = 9
-START_Y = 1
+START_Y = 2
 
 # System parameters
 UPDATE_RATE = 0.1   # 10 Hz
@@ -630,8 +631,8 @@ if __name__ == "__main__":
     env = ASVLidarEnv(render_mode="human")
 
     try:
-        scenario_name = "straight_accel"
-        # scenario_name = "turning_circle_port"
+        # scenario_name = "straight_accel"
+        scenario_name = "turning_circle_port"
         # scenario_name = "turning_circle_stbd"
 
         scenario_cfg = TEST_SCENARIOS[scenario_name]
@@ -639,3 +640,12 @@ if __name__ == "__main__":
 
     finally:
         env.close()
+
+    # # Save path taken as image
+    # path_surface = pygame.Surface((env.map_width, env.map_height))
+    # path_surface.fill((255,255,255))
+
+    # for i in range(1, len(env.asv_path)):
+    #     pygame.draw.circle(path_surface, (0, 0, 200), env.asv_path[i], 3)
+    
+    # pygame.image.save(path_surface, "asv_path_result.png")
