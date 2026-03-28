@@ -327,7 +327,6 @@ def plot_trajectory(traj_xy: List[Tuple[float, float]], traj_yaw_deg: List[float
 def wrap_180(deg: float) -> float:
     return (deg + 180.0) % 360.0 - 180.0
 
-
 def unwrap_heading_deg(yaw_deg: np.ndarray) -> np.ndarray:
     yaw_deg = np.asarray(yaw_deg, dtype=float)
     if yaw_deg.size == 0:
@@ -339,19 +338,16 @@ def unwrap_heading_deg(yaw_deg: np.ndarray) -> np.ndarray:
         out[i] = out[i - 1] + wrap_180(yaw_deg[i] - yaw_deg[i - 1])
     return out
 
-
 def sample_at_time(t_rel: np.ndarray, values: np.ndarray, query_s: float):
     if len(t_rel) == 0 or query_s < t_rel[0] or query_s > t_rel[-1]:
         return None
     return float(np.interp(query_s, t_rel, values))
-
 
 def first_crossing_time(t_rel: np.ndarray, values: np.ndarray, threshold: float):
     for i in range(1, len(values)):
         if values[i - 1] < threshold <= values[i]:
             return float(t_rel[i])
     return None
-
 
 def first_abs_crossing_time(t_rel: np.ndarray, values: np.ndarray, threshold: float):
     vals = np.abs(values)
@@ -360,7 +356,6 @@ def first_abs_crossing_time(t_rel: np.ndarray, values: np.ndarray, threshold: fl
             return float(t_rel[i])
     return None
 
-
 def slope_over_window(t_rel: np.ndarray, values: np.ndarray, t1: float, t2: float):
     mask = (t_rel >= t1) & (t_rel <= t2)
     if np.count_nonzero(mask) < 2:
@@ -368,11 +363,9 @@ def slope_over_window(t_rel: np.ndarray, values: np.ndarray, t1: float, t2: floa
     p = np.polyfit(t_rel[mask], values[mask], 1)
     return float(p[0])
 
-
 def cumulative_distance(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     ds = np.hypot(np.diff(x), np.diff(y))
     return np.concatenate([[0.0], np.cumsum(ds)])
-
 
 def circle_fit_radius(x: np.ndarray, y: np.ndarray):
     if len(x) < 6:
@@ -394,6 +387,17 @@ def first_sustained_index(values: np.ndarray, threshold: float, count: int = 3):
     run = 0
     for i, v in enumerate(values):
         if v > threshold:
+            run += 1
+            if run >= count:
+                return i - count + 1
+        else:
+            run = 0
+    return None
+
+def first_sustained_deviation_index(values: np.ndarray, baseline: float, threshold: float, count: int = 3):
+    run = 0
+    for i, v in enumerate(values):
+        if abs(v - baseline) > threshold:
             run += 1
             if run >= count:
                 return i - count + 1
@@ -446,39 +450,91 @@ class RunAnalyzer:
         x = np.asarray(self.x, dtype=float)
         y = np.asarray(self.y, dtype=float)
         u = np.asarray(self.u_body, dtype=float)
+        s2 = np.asarray(self.s2, dtype=float)
 
-        # detect motion start using forward speed
-        motion_thresh = 0.05   
-        # idx_candidates = np.where(u > motion_thresh)[0]
-
-        # if idx_candidates.size == 0:
-        #     return {}
-
-        # idx0 = int(idx_candidates[0])
-
-        idx0 = first_sustained_index(u, motion_thresh, count=3)
-        if idx0 is None:
+        # -----------------------------
+        # 1) Detect S2 start (input start)
+        # -----------------------------
+        # Use early samples as neutral baseline
+        valid_s2 = s2[np.isfinite(s2)]
+        if valid_s2.size == 0:
             return {}
 
-        t_rel = t[idx0:] - t[idx0]
-        u_rel = u[idx0:]
-        x_rel = x[idx0:]
-        y_rel = y[idx0:]
-        dist_rel = cumulative_distance(x_rel, y_rel)
+        s2_neutral = float(np.median(valid_s2[:min(20, valid_s2.size)]))
 
-        peak_u = float(np.max(u_rel))
+        # Threshold for detecting throttle command change
+        s2_thresh = 30.0
+        idx_s2 = first_sustained_deviation_index(s2, s2_neutral, s2_thresh, count=3)
+        if idx_s2 is None:
+            idx_s2 = 0
+
+        # -----------------------------
+        # 2) Detect motion start (response start)
+        # -----------------------------
+        motion_thresh = 0.05
+        idx_motion = first_sustained_index(u, motion_thresh, count=3)
+        if idx_motion is None:
+            idx_motion = idx_s2
+
+        # -----------------------------
+        # 3) Build S2-referenced signals
+        # -----------------------------
+        t_rel_s2 = t[idx_s2:] - t[idx_s2]
+        u_rel_s2 = u[idx_s2:]
+        x_rel_s2 = x[idx_s2:]
+        y_rel_s2 = y[idx_s2:]
+        dist_rel_s2 = cumulative_distance(x_rel_s2, y_rel_s2)
+        s2_rel = s2[idx_s2:]
+
+        # -----------------------------
+        # 4) Build motion-referenced signals
+        # -----------------------------
+        t_rel_motion = t[idx_motion:] - t[idx_motion]
+        u_rel_motion = u[idx_motion:]
+        x_rel_motion = x[idx_motion:]
+        y_rel_motion = y[idx_motion:]
+        dist_rel_motion = cumulative_distance(x_rel_motion, y_rel_motion)
+
+        peak_u = float(np.max(u))
+        peak_s2 = float(np.max(s2_rel)) if len(s2_rel) > 0 else None
 
         return {
-            "u_body_at_2s_mps": sample_at_time(t_rel, u_rel, 2.0),
-            "u_body_at_5s_mps": sample_at_time(t_rel, u_rel, 5.0),
-            "u_body_at_10s_mps": sample_at_time(t_rel, u_rel, 10.0),
-            "distance_at_5s_m": sample_at_time(t_rel, dist_rel, 5.0),
-            "distance_at_10s_m": sample_at_time(t_rel, dist_rel, 10.0),
-            "initial_accel_0_2_mps2": slope_over_window(t_rel, u_rel, 0.0, 2.0),
-            "initial_accel_0_5_mps2": slope_over_window(t_rel, u_rel, 0.0, 5.0),
+            # input / motion alignment
+            "s2_neutral": s2_neutral,
+            "s2_start_idx": int(idx_s2),
+            "s2_start_t_sec": float(t[idx_s2]),
+            "motion_start_idx": int(idx_motion),
+            "motion_start_t_sec": float(t[idx_motion]),
+            "motion_lag_s": float(t[idx_motion] - t[idx_s2]),
+
+            # S2 profile
+            "s2_peak": peak_s2,
+            "time_to_90pct_peak_s2_s": None if peak_s2 is None else first_crossing_time(
+                t_rel_s2, np.abs(s2_rel - s2_neutral), 0.9 * np.max(np.abs(s2_rel - s2_neutral))
+            ),
+
+            # response relative to S2 start
+            "u_body_at_2s_after_s2_mps": sample_at_time(t_rel_s2, u_rel_s2, 2.0),
+            "u_body_at_5s_after_s2_mps": sample_at_time(t_rel_s2, u_rel_s2, 5.0),
+            "u_body_at_10s_after_s2_mps": sample_at_time(t_rel_s2, u_rel_s2, 10.0),
+            "distance_at_5s_after_s2_m": sample_at_time(t_rel_s2, dist_rel_s2, 5.0),
+            "distance_at_10s_after_s2_m": sample_at_time(t_rel_s2, dist_rel_s2, 10.0),
+            "initial_accel_0_2_after_s2_mps2": slope_over_window(t_rel_s2, u_rel_s2, 0.0, 2.0),
+            "initial_accel_0_5_after_s2_mps2": slope_over_window(t_rel_s2, u_rel_s2, 0.0, 5.0),
+
+            # response relative to motion start
+            "u_body_at_2s_after_motion_mps": sample_at_time(t_rel_motion, u_rel_motion, 2.0),
+            "u_body_at_5s_after_motion_mps": sample_at_time(t_rel_motion, u_rel_motion, 5.0),
+            "u_body_at_10s_after_motion_mps": sample_at_time(t_rel_motion, u_rel_motion, 10.0),
+            "distance_at_5s_after_motion_m": sample_at_time(t_rel_motion, dist_rel_motion, 5.0),
+            "distance_at_10s_after_motion_m": sample_at_time(t_rel_motion, dist_rel_motion, 10.0),
+            "initial_accel_0_2_after_motion_mps2": slope_over_window(t_rel_motion, u_rel_motion, 0.0, 2.0),
+            "initial_accel_0_5_after_motion_mps2": slope_over_window(t_rel_motion, u_rel_motion, 0.0, 5.0),
+
+            # overall
             "peak_u_body_mps": peak_u,
-            "time_to_50pct_peak_u_s": first_crossing_time(t_rel, u_rel, 0.5 * peak_u),
-            "time_to_90pct_peak_u_s": first_crossing_time(t_rel, u_rel, 0.9 * peak_u),
+            "time_to_50pct_peak_u_after_motion_s": first_crossing_time(t_rel_motion, u_rel_motion, 0.5 * peak_u),
+            "time_to_90pct_peak_u_after_motion_s": first_crossing_time(t_rel_motion, u_rel_motion, 0.9 * peak_u),
         }
 
     def turn_metrics(self) -> Dict[str, Any]:
@@ -491,54 +547,112 @@ class RunAnalyzer:
         yaw = np.asarray(self.yaw, dtype=float)
         yaw_rate = np.asarray(self.yaw_rate, dtype=float)
         u = np.asarray(self.u_body, dtype=float)
+        s1 = np.asarray(self.s1, dtype=float)
 
-        # detect turn start using yaw rate magnitude
-        turn_thresh = 1.0   # deg/s, adjust if needed
-        # idx_candidates = np.where(np.abs(yaw_rate) > turn_thresh)[0]
-
-        # if idx_candidates.size == 0:
-        #     return {}
-
-        # idx0 = int(idx_candidates[0])
-
-        idx0 = first_sustained_abs_index(yaw_rate, turn_thresh, count=3)
-        if idx0 is None:
+        # -----------------------------
+        # 1) Detect S1 start (rudder input start)
+        # -----------------------------
+        valid_s1 = s1[np.isfinite(s1)]
+        if valid_s1.size == 0:
             return {}
 
-        t_rel = t[idx0:] - t[idx0]
-        x_rel = x[idx0:]
-        y_rel = y[idx0:]
-        yaw_rel = yaw[idx0:]
-        yaw_rate_rel = yaw_rate[idx0:]
-        u_rel = u[idx0:]
+        s1_neutral = float(np.median(valid_s1[:min(20, valid_s1.size)]))
 
-        yaw_u = unwrap_heading_deg(yaw_rel)
-        dpsi = yaw_u - yaw_u[0]
+        s1_thresh = 30.0
+        idx_s1 = first_sustained_deviation_index(s1, s1_neutral, s1_thresh, count=3)
+        if idx_s1 is None:
+            idx_s1 = 0
 
+        # -----------------------------
+        # 2) Detect actual turn start from yaw rate
+        # -----------------------------
+        turn_thresh = 1.0
+        idx_turn = first_sustained_abs_index(yaw_rate, turn_thresh, count=3)
+        if idx_turn is None:
+            idx_turn = idx_s1
+
+        # -----------------------------
+        # 3) S1-referenced signals
+        # -----------------------------
+        t_rel_s1 = t[idx_s1:] - t[idx_s1]
+        x_rel_s1 = x[idx_s1:]
+        y_rel_s1 = y[idx_s1:]
+        yaw_rel_s1 = yaw[idx_s1:]
+        yaw_rate_rel_s1 = yaw_rate[idx_s1:]
+        u_rel_s1 = u[idx_s1:]
+        s1_rel = s1[idx_s1:]
+
+        yaw_u_s1 = unwrap_heading_deg(yaw_rel_s1)
+        dpsi_s1 = yaw_u_s1 - yaw_u_s1[0]
+
+        # -----------------------------
+        # 4) Turn-response-referenced signals
+        # -----------------------------
+        t_rel_turn = t[idx_turn:] - t[idx_turn]
+        x_rel_turn = x[idx_turn:]
+        y_rel_turn = y[idx_turn:]
+        yaw_rel_turn = yaw[idx_turn:]
+        yaw_rate_rel_turn = yaw_rate[idx_turn:]
+        u_rel_turn = u[idx_turn:]
+
+        yaw_u_turn = unwrap_heading_deg(yaw_rel_turn)
+        dpsi_turn = yaw_u_turn - yaw_u_turn[0]
+
+        # -----------------------------
+        # 5) Radius estimates from actual turn start
+        # -----------------------------
         r90 = None
         r180 = None
 
-        idx90 = np.where(np.abs(dpsi) >= 90.0)[0]
+        idx90 = np.where(np.abs(dpsi_turn) >= 90.0)[0]
         if idx90.size > 0:
-            r90 = circle_fit_radius(x_rel[:idx90[0]+1], y_rel[:idx90[0]+1])
+            r90 = circle_fit_radius(x_rel_turn[:idx90[0] + 1], y_rel_turn[:idx90[0] + 1])
 
-        idx180 = np.where(np.abs(dpsi) >= 180.0)[0]
+        idx180 = np.where(np.abs(dpsi_turn) >= 180.0)[0]
         if idx180.size > 0:
-            r180 = circle_fit_radius(x_rel[:idx180[0]+1], y_rel[:idx180[0]+1])
+            r180 = circle_fit_radius(x_rel_turn[:idx180[0] + 1], y_rel_turn[:idx180[0] + 1])
+
+        peak_abs_yaw_rate = float(np.max(np.abs(yaw_rate_rel_turn))) if len(yaw_rate_rel_turn) > 0 else None
+        peak_s1 = float(np.max(np.abs(s1_rel - s1_neutral))) if len(s1_rel) > 0 else None
 
         return {
-            "turn_start_idx": idx0,
-            "turn_start_t_sec": float(t[idx0]),
-            "yaw_rate_at_2s_degps": sample_at_time(t_rel, yaw_rate_rel, 2.0),
-            "yaw_rate_at_5s_degps": sample_at_time(t_rel, yaw_rate_rel, 5.0),
-            "yaw_rate_at_10s_degps": sample_at_time(t_rel, yaw_rate_rel, 10.0),
-            "u_body_2s_into_turn_mps": sample_at_time(t_rel, u_rel, 2.0),
-            "u_body_5s_into_turn_mps": sample_at_time(t_rel, u_rel, 5.0),
-            "u_body_10s_into_turn_mps": sample_at_time(t_rel, u_rel, 10.0),
-            "time_to_30deg_s": first_abs_crossing_time(t_rel, dpsi, 30.0),
-            "time_to_60deg_s": first_abs_crossing_time(t_rel, dpsi, 60.0),
-            "time_to_90deg_s": first_abs_crossing_time(t_rel, dpsi, 90.0),
-            "time_to_180deg_s": first_abs_crossing_time(t_rel, dpsi, 180.0),
+            # input / response alignment
+            "s1_neutral": s1_neutral,
+            "s1_start_idx": int(idx_s1),
+            "s1_start_t_sec": float(t[idx_s1]),
+            "turn_start_idx": int(idx_turn),
+            "turn_start_t_sec": float(t[idx_turn]),
+            "turn_lag_s": float(t[idx_turn] - t[idx_s1]),
+
+            # S1 profile
+            "peak_abs_s1_from_neutral": peak_s1,
+
+            # turning response relative to S1 start
+            "yaw_rate_at_2s_after_s1_degps": sample_at_time(t_rel_s1, yaw_rate_rel_s1, 2.0),
+            "yaw_rate_at_5s_after_s1_degps": sample_at_time(t_rel_s1, yaw_rate_rel_s1, 5.0),
+            "yaw_rate_at_10s_after_s1_degps": sample_at_time(t_rel_s1, yaw_rate_rel_s1, 10.0),
+            "u_body_2s_after_s1_mps": sample_at_time(t_rel_s1, u_rel_s1, 2.0),
+            "u_body_5s_after_s1_mps": sample_at_time(t_rel_s1, u_rel_s1, 5.0),
+            "u_body_10s_after_s1_mps": sample_at_time(t_rel_s1, u_rel_s1, 10.0),
+            "time_to_30deg_after_s1_s": first_abs_crossing_time(t_rel_s1, dpsi_s1, 30.0),
+            "time_to_60deg_after_s1_s": first_abs_crossing_time(t_rel_s1, dpsi_s1, 60.0),
+            "time_to_90deg_after_s1_s": first_abs_crossing_time(t_rel_s1, dpsi_s1, 90.0),
+            "time_to_180deg_after_s1_s": first_abs_crossing_time(t_rel_s1, dpsi_s1, 180.0),
+
+            # turning response relative to actual turn start
+            "peak_abs_yaw_rate_degps": peak_abs_yaw_rate,
+            "yaw_rate_at_2s_after_turn_degps": sample_at_time(t_rel_turn, yaw_rate_rel_turn, 2.0),
+            "yaw_rate_at_5s_after_turn_degps": sample_at_time(t_rel_turn, yaw_rate_rel_turn, 5.0),
+            "yaw_rate_at_10s_after_turn_degps": sample_at_time(t_rel_turn, yaw_rate_rel_turn, 10.0),
+            "u_body_2s_after_turn_mps": sample_at_time(t_rel_turn, u_rel_turn, 2.0),
+            "u_body_5s_after_turn_mps": sample_at_time(t_rel_turn, u_rel_turn, 5.0),
+            "u_body_10s_after_turn_mps": sample_at_time(t_rel_turn, u_rel_turn, 10.0),
+            "time_to_30deg_after_turn_s": first_abs_crossing_time(t_rel_turn, dpsi_turn, 30.0),
+            "time_to_60deg_after_turn_s": first_abs_crossing_time(t_rel_turn, dpsi_turn, 60.0),
+            "time_to_90deg_after_turn_s": first_abs_crossing_time(t_rel_turn, dpsi_turn, 90.0),
+            "time_to_180deg_after_turn_s": first_abs_crossing_time(t_rel_turn, dpsi_turn, 180.0),
+
+            # geometry
             "radius_first_90deg_m": r90,
             "radius_first_180deg_m": r180,
             "diameter_first_90deg_m": None if r90 is None else 2.0 * r90,
@@ -551,6 +665,13 @@ class RunAnalyzer:
             "n_frames": len(self.t),
             "straight_metrics": self.straight_metrics(),
             "turn_metrics": self.turn_metrics(),
+            "series": {
+                "t_sec": self.t,
+                "u_body_mps": self.u_body,
+                "yaw_rate_degps": self.yaw_rate,
+                "s1": self.s1,
+                "s2": self.s2,
+            }
         }
         with open(out_json, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
