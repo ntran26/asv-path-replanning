@@ -3,8 +3,8 @@ from gymnasium.spaces import Dict, Box
 import numpy as np
 import pygame
 import pygame.freetype
-# from ship_model import ShipModel, THRUST_COEF, DRAG_COEF, VESSEL_LENGTH, VESSEL_WIDTH, HULL_MARGIN, HULL_FORWARD_SHIFT
-from ship_model_bluefin import ShipModel, THRUST_COEF, DRAG_COEF, VESSEL_LENGTH, VESSEL_WIDTH, HULL_MARGIN, HULL_FORWARD_SHIFT
+from ship_model import ShipModel, THRUST_COEF, DRAG_COEF, VESSEL_LENGTH, VESSEL_WIDTH, HULL_MARGIN, HULL_FORWARD_SHIFT
+# from ship_model_bluefin import ShipModel, THRUST_COEF, DRAG_COEF, VESSEL_LENGTH, VESSEL_WIDTH, HULL_MARGIN, HULL_FORWARD_SHIFT
 from asv_lidar import Lidar, LIDAR_RANGE, LIDAR_BEAMS
 from test_run import TestCase
 from images import BOAT_ICON
@@ -36,7 +36,7 @@ R_COLLISION = -2000.0
 
 # Speed control (rpm)
 RPM_MIN = 0
-RPM_MAX = 13
+RPM_MAX = 32
 U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 print(f"Estimated U_MAX = {U_MAX:.3f} m/s")
 MAX_IN = 1

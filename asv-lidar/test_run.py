@@ -81,7 +81,7 @@ class TestCase:
     def position(self, test_case):
         if test_case >= 0 and test_case <= 4:
             self.start_x = 5
-            self.start_y = 1
+            self.start_y = 2
             self.goal_x = 5
             self.goal_y = 22
         elif test_case == 5:

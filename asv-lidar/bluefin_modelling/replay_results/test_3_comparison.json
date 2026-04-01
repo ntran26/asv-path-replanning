@@ -1,0 +1,66 @@
+{
+  "motion": {
+    "peak_u_body_mps": {
+      "real": 2.303828951408619,
+      "sim": 0.21984056620255651,
+      "rel_error": 0.9045760033234497
+    },
+    "initial_accel_0_2_after_motion_mps2": {
+      "real": 0.27225858101668204,
+      "sim": 0.018214509343751312,
+      "rel_error": 0.9330984930732624
+    },
+    "initial_accel_0_5_after_motion_mps2": {
+      "real": 0.10448637060160684,
+      "sim": 0.040273861948960016,
+      "rel_error": 0.6145539201230455
+    },
+    "distance_at_10s_after_motion_m": {
+      "real": 10.143419093577025,
+      "sim": 1.710765635078772,
+      "rel_error": 0.8313423097974867
+    },
+    "time_to_50pct_peak_u_after_motion_s": {
+      "real": 1.9774749999996857,
+      "sim": 1.9979119999989052,
+      "rel_error": 0.010334896774534596
+    },
+    "time_to_90pct_peak_u_after_motion_s": {
+      "real": 13.666803000000073,
+      "sim": 3.199114000002737,
+      "rel_error": 0.7659208228872019
+    }
+  },
+  "turn": {
+    "peak_abs_yaw_rate_degps": {
+      "real": 30.383131285223275,
+      "sim": 0.1587367939715734,
+      "rel_error": 0.9947754958999643
+    },
+    "time_to_90deg_after_turn_s": {
+      "real": 37.165995999996085,
+      "sim": null,
+      "rel_error": null
+    },
+    "time_to_180deg_after_turn_s": {
+      "real": 41.05540999999357,
+      "sim": null,
+      "rel_error": null
+    },
+    "radius_first_90deg_m": {
+      "real": 8.497711452282612,
+      "sim": null,
+      "rel_error": null
+    },
+    "radius_first_180deg_m": {
+      "real": 7.696358823287177,
+      "sim": null,
+      "rel_error": null
+    },
+    "u_body_10s_after_turn_mps": {
+      "real": 1.0181274899979946,
+      "sim": 3.084534857961088e-07,
+      "rel_error": 0.9999996970384467
+    }
+  }
+}

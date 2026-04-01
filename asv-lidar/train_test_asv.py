@@ -23,7 +23,6 @@ Optional:
   --num-envs 8 --eval-freq 50000 --n-eval-episodes 5 --save-freq 500000
 """
 
-
 # -------------------------------
 # Action decoding helpers (for logging)
 # -------------------------------
@@ -32,12 +31,10 @@ def action_to_rpm(throttle_cmd: float) -> float:
     throttle_cmd = float(np.clip(throttle_cmd, -1.0, 1.0))
     return float(RPM_MIN + (throttle_cmd + 1.0) * 0.5 * (RPM_MAX - RPM_MIN))
 
-
 def action_to_rudder_deg(rudder_cmd: float) -> float:
     """Map normalized rudder [-1,1] to degrees (same mapping as env.step)."""
     rudder_cmd = float(np.clip(rudder_cmd, -1.0, 1.0))
     return float(rudder_cmd * 30)
-
 
 # -------------------------------
 # Domain-specific evaluation helpers
@@ -75,14 +72,9 @@ def lidar_clearance_stats(env: ASVLidarEnv) -> Dict[str, float]:
 
     return out
 
-
 def termination_reason(env: ASVLidarEnv, done: bool, hit_max_steps: bool) -> str:
     """
     Infer termination reason without changing the env.
-
-    We avoid hard-coded goal radii here because your project has used multiple unit
-    conventions (pixels / dm / meters) over time.
-
     Returns: goal / obstacle / border / timeout / terminated
     """
     if hit_max_steps:
@@ -120,8 +112,6 @@ def termination_reason(env: ASVLidarEnv, done: bool, hit_max_steps: bool) -> str
         return "goal"
 
     return "terminated" if done else "timeout"
-
-
 
 def eval_one_episode(model, env: ASVLidarEnv, deterministic: bool = True, max_steps: int = 5000) -> Dict[str, Any]:
     """
@@ -274,7 +264,6 @@ def eval_one_episode(model, env: ASVLidarEnv, deterministic: bool = True, max_st
     }
 
     return metrics
-
 
 # -------------------------------
 # Callbacks
@@ -476,7 +465,6 @@ class EvalMetricsCallback(BaseCallback):
 
         return True
 
-
 # -------------------------------
 # Main
 # -------------------------------
@@ -512,7 +500,6 @@ def make_env(seed: int, rank: int):
         env.reset(seed=seed + rank)
         return env
     return _init
-
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
