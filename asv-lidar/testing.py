@@ -35,8 +35,8 @@ ALPHA_R = 0.1
 R_COLLISION = -2000.0
 
 # Speed control (rpm)
-RPM_MIN = 16
-RPM_MAX = 30
+RPM_MIN = 0
+RPM_MAX = 13
 U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 print(f"Estimated U_MAX = {U_MAX:.3f} m/s")
 MAX_IN = 1
