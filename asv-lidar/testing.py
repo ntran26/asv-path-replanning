@@ -3,8 +3,8 @@ from gymnasium.spaces import Dict, Box
 import numpy as np
 import pygame
 import pygame.freetype
-from ship_model import ShipModel, THRUST_COEF, DRAG_COEF, VESSEL_LENGTH, VESSEL_WIDTH, HULL_MARGIN, HULL_FORWARD_SHIFT
-# from ship_model_bluefin import ShipModel, THRUST_COEF, DRAG_COEF, VESSEL_LENGTH, VESSEL_WIDTH, HULL_MARGIN, HULL_FORWARD_SHIFT
+# from ship_model import ShipModel, THRUST_COEF, DRAG_COEF, VESSEL_LENGTH, VESSEL_WIDTH, HULL_MARGIN, HULL_FORWARD_SHIFT
+from ship_model_bluefin import ShipModel, THRUST_COEF, DRAG_COEF, VESSEL_LENGTH, VESSEL_WIDTH, HULL_MARGIN, HULL_FORWARD_SHIFT
 from asv_lidar import Lidar, LIDAR_RANGE, LIDAR_BEAMS
 from test_run import TestCase
 from images import BOAT_ICON

@@ -2,23 +2,23 @@
   "motion": {
     "peak_u_body_mps": {
       "real": 2.187778114541087,
-      "sim": 0.6042811822891967,
-      "rel_error": 0.7237922903274165
+      "sim": 0.6055240633967287,
+      "rel_error": 0.7232241883342247
     },
     "initial_accel_0_2_after_motion_mps2": {
       "real": 0.10407682734596134,
-      "sim": 0.07251819255733183,
-      "rel_error": 0.30322441213283324
+      "sim": 0.07252544610298332,
+      "rel_error": 0.303154717986341
     },
     "initial_accel_0_5_after_motion_mps2": {
       "real": 0.10793260366599437,
-      "sim": 0.06945652689237944,
-      "rel_error": 0.3564824294675784
+      "sim": 0.06947996488806564,
+      "rel_error": 0.3562652754761975
     },
     "distance_at_10s_after_motion_m": {
       "real": 12.541392448221169,
-      "sim": 3.8018345308532053,
-      "rel_error": 0.696857063794982
+      "sim": 3.8062243676778604,
+      "rel_error": 0.6965070359298323
     },
     "time_to_50pct_peak_u_after_motion_s": {
       "real": 2.495410000003176,
@@ -34,31 +34,31 @@
   "turn": {
     "peak_abs_yaw_rate_degps": {
       "real": 32.895064744321544,
-      "sim": 1.0388024030576133,
-      "rel_error": 0.9684207217364746
+      "sim": 1.3593643750746134,
+      "rel_error": 0.9586757349274021
     },
     "time_to_90deg_after_turn_s": {
-      "real": 16.084329999997863,
+      "real": 9.386873999996169,
       "sim": null,
       "rel_error": null
     },
     "time_to_180deg_after_turn_s": {
-      "real": 19.98490099999617,
+      "real": 13.287444999994477,
       "sim": null,
       "rel_error": null
     },
     "radius_first_90deg_m": {
-      "real": 10.466639569923705,
+      "real": 6.764052753690381,
       "sim": null,
       "rel_error": null
     },
     "radius_first_180deg_m": {
-      "real": 6.133325083874645,
+      "real": 4.197906120095384,
       "sim": null,
       "rel_error": null
     },
     "u_body_10s_after_turn_mps": {
-      "real": 1.9053113836602413,
+      "real": 1.2811643227445577,
       "sim": null,
       "rel_error": null
     }

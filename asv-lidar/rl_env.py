@@ -17,7 +17,7 @@ UPDATE_RATE = 0.1   # 10 Hz
 RENDER_FPS = 10
 MAP_WIDTH = 10
 MAP_HEIGHT = 25
-MAX_OBS = 2
+MAX_OBS = 5
 
 # Reward shaping parameters
 LAMBDA_REWARD = 0.5

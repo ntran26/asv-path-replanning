@@ -110,9 +110,9 @@ NVR = 116.985615725573e-009
 # User-tunable gains
 # ---------------------------------------------------------------------------
 # Kept in the familiar style of the old Python model.
-THRUST_COEF = 0.04        # scales propeller thrust from the old rpm interface
-DRAG_COEF = 1.0           # scales surge hull drag terms
-TURN_COEF = 1.0           # scales sway / yaw damping + rudder-generated turning
+THRUST_COEF = 0.07        # scales propeller thrust from the old rpm interface
+DRAG_COEF = 1.5           # scales surge hull drag terms
+TURN_COEF = 5.0           # scales sway / yaw damping + rudder-generated turning
 
 # Extra stabilizing / shaping gains.
 # These are not in the old model but help keep the MATLAB-inspired version
@@ -120,8 +120,8 @@ TURN_COEF = 1.0           # scales sway / yaw damping + rudder-generated turning
 RUDDER_FORCE_SCALE = 0.10
 LINEAR_SURGE_DAMP = 2.0
 LINEAR_SWAY_DAMP = 20.0
-LINEAR_YAW_DAMP = 5.0
-BOW_THRUSTER_YAW_GAIN = 0.0  # set > 0 if you later want to use thruster_rpm
+LINEAR_YAW_DAMP = 4.0
+BOW_THRUSTER_YAW_GAIN = 0.0     # set > 0 if use thruster_rpm
 
 # Numerical safety limits
 MIN_FLOW_SPEED = 0.05

@@ -2,23 +2,23 @@
   "motion": {
     "peak_u_body_mps": {
       "real": 2.303828951408619,
-      "sim": 0.21984056620255651,
-      "rel_error": 0.9045760033234497
+      "sim": 0.21977653000073916,
+      "rel_error": 0.9046037988773592
     },
     "initial_accel_0_2_after_motion_mps2": {
       "real": 0.27225858101668204,
-      "sim": 0.018214509343751312,
-      "rel_error": 0.9330984930732624
+      "sim": 0.018211716209370062,
+      "rel_error": 0.9331087521966693
     },
     "initial_accel_0_5_after_motion_mps2": {
       "real": 0.10448637060160684,
-      "sim": 0.040273861948960016,
-      "rel_error": 0.6145539201230455
+      "sim": 0.040264467304099855,
+      "rel_error": 0.6146438327576416
     },
     "distance_at_10s_after_motion_m": {
       "real": 10.143419093577025,
-      "sim": 1.710765635078772,
-      "rel_error": 0.8313423097974867
+      "sim": 1.710074274845933,
+      "rel_error": 0.831410468297738
     },
     "time_to_50pct_peak_u_after_motion_s": {
       "real": 1.9774749999996857,
@@ -34,33 +34,33 @@
   "turn": {
     "peak_abs_yaw_rate_degps": {
       "real": 30.383131285223275,
-      "sim": 0.1587367939715734,
-      "rel_error": 0.9947754958999643
+      "sim": 0.17650448108606684,
+      "rel_error": 0.9941907080139594
     },
     "time_to_90deg_after_turn_s": {
-      "real": 37.165995999996085,
+      "real": 35.06733700000041,
       "sim": null,
       "rel_error": null
     },
     "time_to_180deg_after_turn_s": {
-      "real": 41.05540999999357,
+      "real": 38.956694000000425,
       "sim": null,
       "rel_error": null
     },
     "radius_first_90deg_m": {
-      "real": 8.497711452282612,
+      "real": 8.11301679728808,
       "sim": null,
       "rel_error": null
     },
     "radius_first_180deg_m": {
-      "real": 7.696358823287177,
+      "real": 7.216319433747963,
       "sim": null,
       "rel_error": null
     },
     "u_body_10s_after_turn_mps": {
-      "real": 1.0181274899979946,
-      "sim": 3.084534857961088e-07,
-      "rel_error": 0.9999996970384467
+      "real": 1.8465809530754096,
+      "sim": 0.014800875154138535,
+      "rel_error": 0.9919847136246649
     }
   }
 }
