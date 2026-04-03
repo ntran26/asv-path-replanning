@@ -3,7 +3,7 @@ from gymnasium.spaces import Dict, Box, Discrete
 import numpy as np
 import pygame
 import pygame.freetype
-from ship_model_bluefin import ShipModel, THRUST_COEF, DRAG_COEF, VESSEL_LENGTH, VESSEL_WIDTH, HULL_MARGIN, HULL_FORWARD_SHIFT
+from ship_model import ShipModel, THRUST_COEF, DRAG_COEF, VESSEL_LENGTH, VESSEL_WIDTH, HULL_MARGIN, HULL_FORWARD_SHIFT
 from asv_lidar import Lidar, LIDAR_RANGE, LIDAR_BEAMS
 from test_run import TestCase
 from images import BOAT_ICON
@@ -30,7 +30,7 @@ R_COLLISION = -2000.0
 
 # Speed control (rpm)
 RPM_MIN = 0
-RPM_MAX = 15
+RPM_MAX = 24
 U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 MAX_IN = 1
 MIN_IN = -1
@@ -370,10 +370,10 @@ class ASVLidarEnv(gym.Env):
         if self._check_collision_geom():
             return True
         
-        # lidar < 1m
-        lidar_list = self.lidar.ranges.astype(np.int64)
-        if np.any(lidar_list <= 1.0):
-            return True
+        # # lidar < 1m
+        # lidar_list = self.lidar.ranges.astype(np.int64)
+        # if np.any(lidar_list <= 1.0):
+        #     return True
         
         # the agent reaches goal
         if self.distance_to_goal <= VESSEL_LENGTH:
