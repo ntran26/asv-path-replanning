@@ -48,7 +48,7 @@ class TestCase:
                              (x+self.obs_size, y+self.obs_size), (x-self.obs_size, y+self.obs_size)])
         elif test_case == 4:    # 3 obstacles
             x = 5
-            y = 5
+            y = 8
             self.obs.append([(x-self.obs_size, y-self.obs_size), (x+self.obs_size, y-self.obs_size), 
                              (x+self.obs_size, y+self.obs_size), (x-self.obs_size, y+self.obs_size)])
             x = 8
@@ -61,7 +61,7 @@ class TestCase:
                              (x+self.obs_size, y+self.obs_size), (x-self.obs_size, y+self.obs_size)])
         elif test_case == 5:    # horizontal obstacles
             x = 3.5
-            y = 10
+            y = 15
             obs_size_x = 3      # make obstacle longer horizonatally
             self.obs.append([(x-obs_size_x, y-self.obs_size), (x+obs_size_x, y-self.obs_size), 
                              (x+obs_size_x, y+self.obs_size), (x-obs_size_x, y+self.obs_size)])
@@ -86,7 +86,7 @@ class TestCase:
             self.goal_y = 22
         elif test_case == 5:
             self.start_x = 2
-            self.start_y = 1
+            self.start_y = 2
             self.goal_x = 8
             self.goal_y = 22
         elif test_case == 99:

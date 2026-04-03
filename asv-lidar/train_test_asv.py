@@ -17,7 +17,7 @@ Train:
   python train_test_asv.py --mode train --algo ppo --timesteps 1000000
 
 Test (render):
-  python train_test_asv.py --mode test --algo sac
+  python train_test_asv.py --mode test --algo ppo
 
 Optional:
   --num-envs 8 --eval-freq 50000 --n-eval-episodes 5 --save-freq 500000
