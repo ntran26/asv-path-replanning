@@ -310,7 +310,7 @@ class ASVLidarEnv(gym.Env):
         dash_knots = np.array([np.linspace(start_pos[i], end_pos[i], dash_amount) for i in range(2)]).transpose()
         
         return [pygame.draw.line(surface, color, tuple(dash_knots[n]), tuple(dash_knots[n+1]), width) for n in range(int(exclude_corner), dash_amount - int(exclude_corner), 2)]
-
+    
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
         if seed is not None:
@@ -434,39 +434,6 @@ class ASVLidarEnv(gym.Env):
         collided = bool(self._check_collision_geom())
         reached_goal = bool(self.distance_to_goal <= VESSEL_LENGTH)
 
-        # r_exist = -0.1
-
-        # # heading alignment reward (reward = 1 if aligned, -1 if opposite)
-        # angle_diff_rad = np.radians(self.angle_diff)
-        # r_heading = np.cos(angle_diff_rad)
-
-        # # path following reward
-        # r_pf = np.exp(-0.05 * abs(self.tgt))
-
-        # # obstacle avoidance reward
-        # lidar_list = self.lidar.ranges.astype(np.float32)
-        # r_oa = 0
-        # for i, dist in enumerate(lidar_list):
-        #     theta = self.lidar.angles[i]    # angle of lidar beam
-        #     weight = 1 / (1 + abs(theta))   # prioritize beams closer to center/front
-        #     r_oa += weight / max(dist, 1)
-        # r_oa = -r_oa / len(lidar_list)
-
-        # # if the agent reaches goal
-        # self.distance_to_goal = np.linalg.norm([self.asv_x - self.goal_x, self.asv_y - self.goal_y])
-        # if reached_goal:
-        #     r_goal = 50
-        # else:
-        #     r_goal = 0
-
-        # # Combined rewards
-        # lambda_ = 0.5       # weighting factor
-
-        # if collided:
-        #     reward = -1000
-        # else:
-        #     reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
-        
         lam = LAMBDA_REWARD
 
         # cross-track error
@@ -514,13 +481,6 @@ class ASVLidarEnv(gym.Env):
             reward = float(lam * r_pf + (1.0 - lam) * r_oa + r_exist)
 
         terminated = self.check_done((self.asv_x, self.asv_y))
-        # info = {
-        #     # navigation + terminal diagnostics
-        #     "distance_to_goal": float(self.distance_to_goal),
-        #     "tgt": float(self.tgt),
-        #     "collided": bool(collided),
-        #     "reached_goal": bool(reached_goal),
-        # }
 
         info = {
             # reward mix + components
