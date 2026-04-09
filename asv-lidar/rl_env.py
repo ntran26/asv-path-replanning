@@ -17,16 +17,21 @@ UPDATE_RATE = 0.1   # 10 Hz
 RENDER_FPS = 10
 MAP_WIDTH = 10
 MAP_HEIGHT = 25
-MAX_OBS = 5
+MAX_OBS = 8
+DHDG_MAX_DPS = 180
 
 # Reward shaping parameters
 LAMBDA_REWARD = 0.5
 GAMMA_E = 0.05
-GAMMA_THETA = 4.0
-GAMMA_X = 0.005
-EPSILON_X = 1.0
+# GAMMA_THETA = 2.0
+# GAMMA_X = 0.005
+# EPSILON_X = 1.0
 ALPHA_R = 0.1
 R_COLLISION = -2000.0
+
+OA_FRONT_HALF_ANGLE_DEG = 45
+OA_FRONT_PERCENTILE = 10
+OA_SAFE_CLEARANCE = 4.5
 
 # Speed control (rpm)
 RPM_MIN = 0
@@ -105,8 +110,8 @@ class ASVLidarEnv(gym.Env):
         Observation space:
             lidar: an array of lidar range: [63 values]
             pos: (x,y) coordinate of asv
-            hdg: heading/yaw of the asv
-            dhdg: rate of change of heading
+            hdg: heading/yaw of the asv 
+            dhdg: rate of change of heading (normalized)
             speed: velocity of the vessel (m/s)
             tgt: horizontal offset of the asv from the path
             target_heading: heading error with respect to the destination point
@@ -116,7 +121,7 @@ class ASVLidarEnv(gym.Env):
                 "lidar": Box(low=0, high=LIDAR_RANGE, shape=(LIDAR_BEAMS,), dtype=np.float32),
                 "pos"  : Box(low=np.array([0,0]),high=np.array(self.world_size),shape=(2,),dtype=np.float32),
                 "hdg"  : Box(low=0,high=360,shape=(1,),dtype=np.float32),
-                "dhdg" : Box(low=0,high=36,shape=(1,),dtype=np.float32),
+                "dhdg" : Box(low=-1.0,high=1.0,shape=(1,),dtype=np.float32),
                 "speed"  : Box(low=0.0, high=10.0, shape=(1,), dtype=np.float32),
                 "tgt"  : Box(low=-50,high=50,shape=(1,),dtype=np.float32),
                 "target_heading": Box(low=-180,high=180,shape=(1,),dtype=np.float32)
@@ -157,7 +162,7 @@ class ASVLidarEnv(gym.Env):
             'lidar': self.lidar.ranges.astype(np.float32),
             'pos': np.array([self.asv_x, self.asv_y],dtype=np.float32),
             'hdg': np.array([self.asv_h],dtype=np.float32),
-            'dhdg': np.array([self.asv_w],dtype=np.float32),
+            'dhdg': np.array([np.clip(self.asv_w / 180, -1.0, 1.0)],dtype=np.float32),
             'speed': np.array([self.speed_mps], dtype=np.float32),
             'tgt': np.array([self.tgt],dtype=np.float32),
             'target_heading': np.array([self.angle_diff],dtype=np.float32)
@@ -349,7 +354,7 @@ class ASVLidarEnv(gym.Env):
         self.path = self._generate_path(self.start_x, self.start_y, self.goal_x, self.goal_y)
 
         # Generate static obstacles
-        self.num_obs = np.random.randint(0, self.max_obs)
+        self.num_obs = np.random.randint(0, self.max_obs + 1)
         self.obstacles = self._generate_obstacles(self.num_obs, self.test_case)
 
         # Initialize the ASV path list
@@ -418,8 +423,6 @@ class ASVLidarEnv(gym.Env):
         self.tgt_x, self.tgt_y = self.path[closest_idx]
 
         self.lidar.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=self.obstacles, map_border=self.map_border)
-
-        self.angle_diff = self._calculate_angle(self.asv_x, self.asv_y, self.asv_h, self.goal_x, self.goal_y)
         
         if self.render_mode in self.metadata['render_modes']:
             self.render()
@@ -453,23 +456,52 @@ class ASVLidarEnv(gym.Env):
         path_dy = float(self.goal_y - self.start_y)
         path_course_deg = float(np.degrees(np.arctan2(path_dx, path_dy)))
 
-        chi_tilde_deg = (course_deg - path_course_deg + 180.0) % 360.0 - 180.0
+        chi_tilde_deg = (course_deg - path_course_deg + 180) % 360 - 180
         chi_tilde = float(np.radians(chi_tilde_deg))
         cos_chi = float(np.cos(chi_tilde))
 
-        r_pf = float(-1.0 + (U_norm * cos_chi + 1.0) * (np.exp(-GAMMA_E * ye) + 1.0))
+        r_pf = float(-1 + (U_norm * cos_chi + 1) * (np.exp(-GAMMA_E * ye) + 1))
 
         # Obstacle avoidance reward
         lidar_d = self.lidar.ranges.astype(np.float32)
-        theta_rad = np.radians(self.lidar.angles.astype(np.float32))
+        theta_deg = self.lidar.angles.astype(np.float32)
 
-        w = 1.0 / (1.0 + np.abs(GAMMA_THETA * theta_rad))
+        front_mask = np.abs(theta_deg) <= OA_FRONT_HALF_ANGLE_DEG
+        front_ranges = lidar_d[front_mask] if np.any(front_mask) else lidar_d
+        front_ranges = front_ranges[np.isfinite(front_ranges)]
+        if front_ranges.size == 0:
+            front_ranges = np.array([LIDAR_RANGE], dtype=np.float32)
 
-        # < 1 for out-of-range, treat it as "far"
-        x = np.where(lidar_d <= 1.0, LIDAR_RANGE, lidar_d)
+        front_clear = np.percentile(front_ranges, OA_FRONT_PERCENTILE)
 
-        pen = 1.0 / (GAMMA_X * (np.maximum(x, EPSILON_X) ** 2))
-        r_oa = -float(np.sum(w * pen) / (np.sum(w) + 1e-6))
+        CENTER_HALF_ANGLE_DEG = 10.0
+
+        left_mask = (theta_deg >= -OA_FRONT_HALF_ANGLE_DEG) & (theta_deg < -CENTER_HALF_ANGLE_DEG)
+        center_mask = np.abs(theta_deg) <= CENTER_HALF_ANGLE_DEG
+        right_mask = (theta_deg > CENTER_HALF_ANGLE_DEG) & (theta_deg <= OA_FRONT_HALF_ANGLE_DEG)
+
+        left_ranges = lidar_d[left_mask] if np.any(left_mask) else np.array([LIDAR_RANGE], dtype=np.float32)
+        center_ranges = lidar_d[center_mask] if np.any(center_mask) else np.array([LIDAR_RANGE], dtype=np.float32)
+        right_ranges = lidar_d[right_mask] if np.any(right_mask) else np.array([LIDAR_RANGE], dtype=np.float32)
+
+        left_ranges = left_ranges[np.isfinite(left_ranges)]
+        center_ranges = center_ranges[np.isfinite(center_ranges)]
+        right_ranges = right_ranges[np.isfinite(right_ranges)]
+
+        if left_ranges.size == 0:
+            left_ranges = np.array([LIDAR_RANGE], dtype=np.float32)
+        if center_ranges.size == 0:
+            center_ranges = np.array([LIDAR_RANGE], dtype=np.float32)
+        if right_ranges.size == 0:
+            right_ranges = np.array([LIDAR_RANGE], dtype=np.float32)
+
+        left_p10 = float(np.percentile(left_ranges, OA_FRONT_PERCENTILE))
+        center_p10 = float(np.percentile(center_ranges, OA_FRONT_PERCENTILE))
+        right_p10 = float(np.percentile(right_ranges, OA_FRONT_PERCENTILE))
+
+        oa_deficit = max(0.0, float((OA_SAFE_CLEARANCE - front_clear) / OA_SAFE_CLEARANCE))
+        oa_active = oa_deficit > 0
+        r_oa = -(oa_deficit ** 2)
 
         # living penalty
         r_exist = -lam * (2.0 * ALPHA_R + 1.0)
@@ -483,38 +515,18 @@ class ASVLidarEnv(gym.Env):
         terminated = self.check_done((self.asv_x, self.asv_y))
 
         info = {
-            # reward mix + components
-            "lam": float(lam),
-            "r_pf": float(r_pf),
-            "r_oa": float(r_oa),
-            "r_exist": float(r_exist),
-            "reward": float(reward),
-
-            # path-following terms used in Eq (31)
-            "ye": float(ye),
-            "U": float(U),
-            "U_norm": float(U_norm),
-            "course_deg": float(course_deg),
-            "path_course_deg": float(path_course_deg),
-            "chi_tilde_deg": float(chi_tilde_deg),
-            "cos_chi": float(cos_chi),
-
-            # obstacle-avoidance diagnostics from Eq (32)
-            "min_lidar": float(np.min(lidar_d)) if len(lidar_d) > 0 else float("inf"),
-            "min_x_used": float(np.min(x)) if len(x) > 0 else float("inf"),
-            "mean_w": float(np.mean(w)) if len(w) > 0 else 0.0,
-            "mean_pen": float(np.mean(pen)) if len(pen) > 0 else 0.0,
-
-            # speed / control diagnostics
-            "speed_mps": float(self.speed_mps),
-            "rpm": float(rpm),
-            "rudder_deg": float(rudder_cmd * 30),
-
-            # navigation + terminal diagnostics
-            "distance_to_goal": float(self.distance_to_goal),
-            "tgt": float(self.tgt),
-            "collided": bool(collided),
-            "reached_goal": bool(reached_goal),
+            "front_clear": float(front_clear),
+            "oa_deficit": float(oa_deficit),
+            "oa_active": bool(oa_active),
+            "left_p10": float(left_p10),
+            "center_p10": float(center_p10),
+            "right_p10": float(right_p10),
+            "reward_pf_contrib": float(lam * r_pf),
+            "reward_oa_contrib": float((1.0 - lam) * r_oa),
+            "x": float(self.asv_x),
+            "y": float(self.asv_y),
+            "heading_deg": float(self.asv_h),
+            "dhdg_raw": float(self.asv_w),
         }
 
         return self._get_obs(), reward, terminated, False, info

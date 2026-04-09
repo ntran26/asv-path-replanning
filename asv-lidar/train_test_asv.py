@@ -53,7 +53,7 @@ def lidar_front_stats(env: ASVLidarEnv) -> Dict[str, float]:
     if finite.size:
         out["min_lidar"] = float(np.min(finite))
 
-    front_mask = np.abs(angles) <= 30.0
+    front_mask = np.abs(angles) <= 45.0
     if np.any(front_mask):
         front = ranges[front_mask]
     else:
@@ -110,6 +110,17 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
     rudders: List[float] = []
     front_p10s: List[float] = []
     min_lidars: List[float] = []
+    signed_rudders: List[float] = []
+    front_clears: List[float] = []
+    oa_active_flags: List[float] = []
+    left_p10s: List[float] = []
+    center_p10s: List[float] = []
+    right_p10s: List[float] = []
+    r_pfs: List[float] = []
+    r_oas: List[float] = []
+    pf_contribs: List[float] = []
+    oa_contribs: List[float] = []
+    first_oa_step = None
 
     while steps < max_steps:
         action, _ = model.predict(obs, deterministic=deterministic)
@@ -118,6 +129,25 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
         obs, reward, terminated, truncated, info = env.step(action)
         total_reward += float(reward)
         steps += 1
+
+        signed_rudder = action_to_rudder_deg(float(action[0]))
+        signed_rudders.append(signed_rudder)
+
+        front_clears.append(float(info.get("front_clear", float("inf"))))
+        oa_now = bool(info.get("oa_active", False))
+        oa_active_flags.append(1.0 if oa_now else 0.0)
+
+        if oa_now and first_oa_step is None:
+            first_oa_step = steps
+
+        left_p10s.append(float(info.get("left_p10", float("inf"))))
+        center_p10s.append(float(info.get("center_p10", float("inf"))))
+        right_p10s.append(float(info.get("right_p10", float("inf"))))
+
+        r_pfs.append(float(info.get("r_pf", 0.0)))
+        r_oas.append(float(info.get("r_oa", 0.0)))
+        pf_contribs.append(float(info.get("reward_pf_contrib", 0.0)))
+        oa_contribs.append(float(info.get("reward_oa_contrib", 0.0)))
 
         speeds.append(float(getattr(env, "speed_mps", 0.0)))
         rpms.append(action_to_rpm(float(action[1])))
@@ -147,6 +177,21 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
         "d_end": float(getattr(env, "distance_to_goal", float("inf"))),
         "start": [float(env.start_x), float(env.start_y)],
         "goal": [float(env.goal_x), float(env.goal_y)],
+        "mean_signed_rudder": float(np.mean(signed_rudders)) if signed_rudders else 0.0,
+        "max_abs_rudder": float(np.max(np.abs(signed_rudders))) if signed_rudders else 0.0,
+        "min_front_clear": float(np.min(front_clears)) if front_clears else float("inf"),
+        "oa_active_frac": float(np.mean(oa_active_flags)) if oa_active_flags else 0.0,
+        "first_oa_step": int(first_oa_step) if first_oa_step is not None else -1,
+        "left_p10_min": float(np.min(left_p10s)) if left_p10s else float("inf"),
+        "center_p10_min": float(np.min(center_p10s)) if center_p10s else float("inf"),
+        "right_p10_min": float(np.min(right_p10s)) if right_p10s else float("inf"),
+        "mean_r_pf": float(np.mean(r_pfs)) if r_pfs else 0.0,
+        "mean_r_oa": float(np.mean(r_oas)) if r_oas else 0.0,
+        "mean_pf_contrib": float(np.mean(pf_contribs)) if pf_contribs else 0.0,
+        "mean_oa_contrib": float(np.mean(oa_contribs)) if oa_contribs else 0.0,
+        "final_x": float(env.asv_x),
+        "final_y": float(env.asv_y),
+        "final_heading": float(env.asv_h),
     }
 
 def evaluate_benchmark(model, env: ASVLidarEnv, cases: List[int], max_steps: int) -> Dict[str, Any]:
@@ -165,6 +210,13 @@ def evaluate_benchmark(model, env: ASVLidarEnv, cases: List[int], max_steps: int
         "obstacle_rate": float(np.mean([r == "obstacle" for r in term_reasons])) if rows else 0.0,
         "border_rate": float(np.mean([r == "border" for r in term_reasons])) if rows else 0.0,
         "timeout_rate": float(np.mean([r == "timeout" for r in term_reasons])) if rows else 0.0,
+        "min_front_clear": float(np.min([row["min_front_clear"] for row in rows])) if rows else float("inf"),
+        "mean_oa_active_frac": float(np.mean([row["oa_active_frac"] for row in rows])) if rows else 0.0,
+        "mean_pf_contrib": float(np.mean([row["mean_pf_contrib"] for row in rows])) if rows else 0.0,
+        "mean_oa_contrib": float(np.mean([row["mean_oa_contrib"] for row in rows])) if rows else 0.0,
+        "min_left_p10": float(np.min([row["left_p10_min"] for row in rows])) if rows else float("inf"),
+        "min_center_p10": float(np.min([row["center_p10_min"] for row in rows])) if rows else float("inf"),
+        "min_right_p10": float(np.min([row["right_p10_min"] for row in rows])) if rows else float("inf"),
     }
     return {"rows": rows, "summary": summary}
 
@@ -278,7 +330,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=0)
 
     parser.add_argument("--model-path", type=str, default=None)
-    parser.add_argument("--test-case", type=int, default=0)
+    parser.add_argument("--test-case", type=int, default=None)
 
     parser.add_argument("--eval-freq", type=int, default=DEFAULT_EVAL_FREQ)
     parser.add_argument("--eval-max-steps", type=int, default=DEFAULT_EVAL_MAX_STEPS)
@@ -296,9 +348,15 @@ def make_train_env(seed: int, rank: int):
 
 def build_model(algo: str, env, num_envs: int):
     algo = algo.lower()
-    learning_rate = 1e-4
-    batch_size = 512
+    learning_rate = 3e-4
+    batch_size = 256
     gamma = 0.99
+    gae_lambda = 0.95
+    clip_range = 0.2
+    ent_coef = 0.0
+    vf_coef = 0.5
+    n_epochs = 10
+    n_steps = 2048
 
     if algo == "ppo":
         return PPO(
@@ -307,14 +365,14 @@ def build_model(algo: str, env, num_envs: int):
             verbose=1,
             tensorboard_log="./ppo_log/",
             learning_rate=learning_rate,
-            n_steps=num_envs * 1024,
+            n_steps=n_steps,
             batch_size=batch_size,
-            n_epochs=10,
+            n_epochs=n_epochs,
             gamma=gamma,
-            gae_lambda=0.95,
-            clip_range=0.2,
-            ent_coef=0.01,
-            vf_coef=0.5,
+            gae_lambda=gae_lambda,
+            clip_range=clip_range,
+            ent_coef=ent_coef,
+            vf_coef=vf_coef,
         )
 
     if algo == "sac":
