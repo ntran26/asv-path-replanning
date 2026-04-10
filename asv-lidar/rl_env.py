@@ -21,17 +21,37 @@ MAX_OBS = 8
 DHDG_MAX_DPS = 180
 
 # Reward shaping parameters
-LAMBDA_REWARD = 0.5
-GAMMA_E = 0.05
-# GAMMA_THETA = 2.0
-# GAMMA_X = 0.005
-# EPSILON_X = 1.0
+# LAMBDA_REWARD = 0.5
+GAMMA_E = 0.1   # make lateral path error matter more
 ALPHA_R = 0.1
 R_COLLISION = -2000.0
 
+# replace fixed lam with two modes
+LAMBDA_CLEAR = 0.70
+LAMBDA_THREAT = 0.25
+
 OA_FRONT_HALF_ANGLE_DEG = 45
 OA_FRONT_PERCENTILE = 10
-OA_SAFE_CLEARANCE = 4.5
+# OA_SAFE_CLEARANCE = 4.5
+OA_CENTER_HALF_ANGLE_DEG = 20
+OA_WARN_CLEARANCE = 4.5
+OA_CRIT_CLEARANCE = 1.5
+
+# make the near-collision kicker start earlier and hit harder
+OA_NEAR_CLEARANCE = 1.3
+OA_CENTER_GAIN = 3.0
+
+# make side-selection more decisive
+OA_DIR_GAIN = 0.8
+OA_DIR_SCALE = 1.5
+OA_NEAR_GAIN = 2.0
+
+# Goal-direct parameters
+GOAL_BRAKE_RADIUS = 4.0
+GOAL_CTE_BOOST = 2.0
+GOAL_NEAR_GAIN = 0.8
+GOAL_SPEED_GAIN = 1.2
+R_GOAL = 300.0
 
 # Speed control (rpm)
 RPM_MIN = 0
@@ -432,12 +452,13 @@ class ASVLidarEnv(gym.Env):
 
         # update distance to goal
         self.distance_to_goal = np.linalg.norm([self.asv_x - self.goal_x, self.asv_y - self.goal_y])
+        self.angle_diff = self._calculate_angle(self.asv_x, self.asv_y, self.asv_h, self.goal_x, self.goal_y)
 
         # Define terminal flags
         collided = bool(self._check_collision_geom())
         reached_goal = bool(self.distance_to_goal <= VESSEL_LENGTH)
 
-        lam = LAMBDA_REWARD
+        # lam = LAMBDA_REWARD
 
         # cross-track error
         ye = abs(self.tgt)
@@ -445,6 +466,9 @@ class ASVLidarEnv(gym.Env):
         # pose-base speed
         U = self.speed_mps
         U_norm = U / U_MAX
+
+        goal_norm = float(np.clip((GOAL_BRAKE_RADIUS - self.distance_to_goal) / GOAL_BRAKE_RADIUS, 0.0, 1.0))
+        gamma_e_eff = GAMMA_E * (1.0 + GOAL_CTE_BOOST * goal_norm)
 
         # Course error relative to the path direction (better than using heading-only)
         if U > 1e-6:
@@ -460,25 +484,24 @@ class ASVLidarEnv(gym.Env):
         chi_tilde = float(np.radians(chi_tilde_deg))
         cos_chi = float(np.cos(chi_tilde))
 
-        r_pf = float(-1 + (U_norm * cos_chi + 1) * (np.exp(-GAMMA_E * ye) + 1))
+        # r_pf = float(-1 + (U_norm * cos_chi + 1) * (np.exp(-GAMMA_E * ye) + 1))
+        r_pf = float(-1 + (U_norm * cos_chi + 1) * (np.exp(-gamma_e_eff * ye) + 1))
 
         # Obstacle avoidance reward
         lidar_d = self.lidar.ranges.astype(np.float32)
         theta_deg = self.lidar.angles.astype(np.float32)
 
-        front_mask = np.abs(theta_deg) <= OA_FRONT_HALF_ANGLE_DEG
-        front_ranges = lidar_d[front_mask] if np.any(front_mask) else lidar_d
-        front_ranges = front_ranges[np.isfinite(front_ranges)]
-        if front_ranges.size == 0:
-            front_ranges = np.array([LIDAR_RANGE], dtype=np.float32)
+        # front_mask = np.abs(theta_deg) <= OA_FRONT_HALF_ANGLE_DEG
+        # front_ranges = lidar_d[front_mask] if np.any(front_mask) else lidar_d
+        # front_ranges = front_ranges[np.isfinite(front_ranges)]
+        # if front_ranges.size == 0:
+        #     front_ranges = np.array([LIDAR_RANGE], dtype=np.float32)
 
-        front_clear = np.percentile(front_ranges, OA_FRONT_PERCENTILE)
+        # front_clear = np.percentile(front_ranges, OA_FRONT_PERCENTILE)
 
-        CENTER_HALF_ANGLE_DEG = 10.0
-
-        left_mask = (theta_deg >= -OA_FRONT_HALF_ANGLE_DEG) & (theta_deg < -CENTER_HALF_ANGLE_DEG)
-        center_mask = np.abs(theta_deg) <= CENTER_HALF_ANGLE_DEG
-        right_mask = (theta_deg > CENTER_HALF_ANGLE_DEG) & (theta_deg <= OA_FRONT_HALF_ANGLE_DEG)
+        left_mask = (theta_deg >= -OA_FRONT_HALF_ANGLE_DEG) & (theta_deg < -OA_CENTER_HALF_ANGLE_DEG)
+        center_mask = np.abs(theta_deg) <= OA_CENTER_HALF_ANGLE_DEG
+        right_mask = (theta_deg > OA_CENTER_HALF_ANGLE_DEG) & (theta_deg <= OA_FRONT_HALF_ANGLE_DEG)
 
         left_ranges = lidar_d[left_mask] if np.any(left_mask) else np.array([LIDAR_RANGE], dtype=np.float32)
         center_ranges = lidar_d[center_mask] if np.any(center_mask) else np.array([LIDAR_RANGE], dtype=np.float32)
@@ -499,34 +522,74 @@ class ASVLidarEnv(gym.Env):
         center_p10 = float(np.percentile(center_ranges, OA_FRONT_PERCENTILE))
         right_p10 = float(np.percentile(right_ranges, OA_FRONT_PERCENTILE))
 
-        oa_deficit = max(0.0, float((OA_SAFE_CLEARANCE - front_clear) / OA_SAFE_CLEARANCE))
-        oa_active = oa_deficit > 0
-        r_oa = -(oa_deficit ** 2)
+        center_norm = (OA_WARN_CLEARANCE - center_p10) / max(OA_WARN_CLEARANCE - OA_CRIT_CLEARANCE, 1e-6)
+        center_norm = float(np.clip(center_norm, 0.0, 1.0))
+        r_center = -OA_CENTER_GAIN * (center_norm ** 2)
+
+        gap_bias = float(np.tanh((right_p10 - left_p10) / OA_DIR_SCALE))
+        rudder_align = float(np.tanh(2.0 * rudder_cmd))
+        r_dir = OA_DIR_GAIN * center_norm * gap_bias * rudder_align
+
+        if center_p10 < OA_NEAR_CLEARANCE:
+            near_norm = float(np.clip((OA_NEAR_CLEARANCE - center_p10) / OA_NEAR_CLEARANCE, 0.0, 1.0))
+            r_near = -OA_NEAR_GAIN * (near_norm ** 2)
+        else:
+            near_norm = 0.0
+            r_near = 0.0
+
+        r_oa = r_center + r_dir + r_near
+
+        threat = max(center_norm, near_norm)
+        lam = LAMBDA_CLEAR - (LAMBDA_CLEAR - LAMBDA_THREAT) * threat
+
+        goal_gate = 1.0 - threat
+        r_goal_near = GOAL_NEAR_GAIN * (goal_norm ** 2)
+        r_goal_slow = -GOAL_SPEED_GAIN * goal_norm * (U_norm ** 2)
+        r_goal = goal_gate * (r_goal_near + r_goal_slow)
 
         # living penalty
-        r_exist = -lam * (2.0 * ALPHA_R + 1.0)
+        r_exist = -0.5 * (2.0 * ALPHA_R + 1.0)   # = -0.6 with ALPHA_R = 0.1
 
-        # combined reward
         if collided:
-            reward = float((1.0 - lam) * R_COLLISION)   # = -1000 when lam=0.5 and R_COLLISION=-2000
+            reward = float(R_COLLISION)
+        elif reached_goal:
+            reward = float(R_GOAL + r_goal)
         else:
-            reward = float(lam * r_pf + (1.0 - lam) * r_oa + r_exist)
+            reward = float(lam * r_pf + (1.0 - lam) * r_oa + r_exist + r_goal)
 
         terminated = self.check_done((self.asv_x, self.asv_y))
 
         info = {
-            "front_clear": float(front_clear),
-            "oa_deficit": float(oa_deficit),
-            "oa_active": bool(oa_active),
-            "left_p10": float(left_p10),
-            "center_p10": float(center_p10),
-            "right_p10": float(right_p10),
             "reward_pf_contrib": float(lam * r_pf),
             "reward_oa_contrib": float((1.0 - lam) * r_oa),
             "x": float(self.asv_x),
             "y": float(self.asv_y),
             "heading_deg": float(self.asv_h),
             "dhdg_raw": float(self.asv_w),
+
+            "front_clear": float(center_p10),
+            "oa_active": bool(center_norm > 0),
+            "left_p10": float(left_p10),
+            "center_p10": float(center_p10),
+            "right_p10": float(right_p10),
+            "center_norm": float(center_norm),
+            "gap_bias": float(gap_bias),
+            "rudder_align": float(rudder_align),
+            "near_norm": float(near_norm),
+            "r_center": float(r_center),
+            "r_dir": float(r_dir),
+            "r_near": float(r_near),
+            "reward_pf_contrib": float(lam * r_pf),
+            "reward_oa_contrib": float((1.0 - lam) * r_oa),
+            "r_pf": float(r_pf),
+            "r_oa": float(r_oa),
+            "threat": float(threat),
+            "lam": float(lam),
+            "goal_norm": float(goal_norm),
+            "gamma_e_eff": float(gamma_e_eff),
+            "r_goal_near": float(r_goal_near),
+            "r_goal_slow": float(r_goal_slow),
+            "r_goal": float(r_goal),
         }
 
         return self._get_obs(), reward, terminated, False, info
