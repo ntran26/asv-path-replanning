@@ -1,10 +1,10 @@
 import gymnasium as gym
-from gymnasium.spaces import Dict, Box, Discrete
+from gymnasium.spaces import Dict, Box
 import numpy as np
 import pygame
 import pygame.freetype
-from ship_model import ShipModel, THRUST_COEF, DRAG_COEF, VESSEL_LENGTH, VESSEL_WIDTH, HULL_MARGIN, HULL_FORWARD_SHIFT
-from asv_lidar import Lidar, LIDAR_RANGE, LIDAR_BEAMS
+from ship_model import ShipModel, THRUST_COEF, DRAG_COEF, VESSEL_LENGTH, VESSEL_WIDTH, HULL_MARGIN, HULL_FORWARD_SHIFT, MAX_RUD_ANGLE
+from asv_lidar import Lidar, LIDAR_MIN_RANGE, LIDAR_RANGE, LIDAR_BEAMS
 from test_run import TestCase
 from images import BOAT_ICON
 import cv2
@@ -21,37 +21,29 @@ MAX_OBS = 8
 DHDG_MAX_DPS = 180
 
 # Reward shaping parameters
-# LAMBDA_REWARD = 0.5
-GAMMA_E = 0.1   # make lateral path error matter more
+GAMMA_E = 0.12
 ALPHA_R = 0.1
 R_COLLISION = -2000.0
+R_GOAL = 300.0
 
-# replace fixed lam with two modes
+# Threat-adaptive blend between path following and obstacle avoidance.
 LAMBDA_CLEAR = 0.70
 LAMBDA_THREAT = 0.25
 
 OA_FRONT_HALF_ANGLE_DEG = 45
 OA_FRONT_PERCENTILE = 10
-# OA_SAFE_CLEARANCE = 4.5
 OA_CENTER_HALF_ANGLE_DEG = 20
 OA_WARN_CLEARANCE = 4.5
 OA_CRIT_CLEARANCE = 1.5
-
-# make the near-collision kicker start earlier and hit harder
-OA_NEAR_CLEARANCE = 1.3
-OA_CENTER_GAIN = 3.0
-
-# make side-selection more decisive
+OA_NEAR_CLEARANCE = 1.8
+OA_CENTER_GAIN = 2.5
 OA_DIR_GAIN = 0.8
 OA_DIR_SCALE = 1.5
 OA_NEAR_GAIN = 2.0
+OA_SPEED_GAIN = 1.0
 
-# Goal-direct parameters
-GOAL_BRAKE_RADIUS = 4.0
-GOAL_CTE_BOOST = 2.0
-GOAL_NEAR_GAIN = 0.8
-GOAL_SPEED_GAIN = 1.2
-R_GOAL = 300.0
+# LiDAR-sector observation hysteresis.
+SECTOR_CLEAR_RECOVERY_M = 0.20
 
 # Speed control (rpm)
 RPM_MIN = 0
@@ -59,6 +51,7 @@ RPM_MAX = 24
 U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 MAX_IN = 1
 MIN_IN = -1
+GOAL_DIST_MAX = float(np.hypot(MAP_WIDTH, MAP_HEIGHT))
 
 # Actions
 PORT = 0
@@ -122,6 +115,15 @@ class ASVLidarEnv(gym.Env):
         self.prev_x = None
         self.prev_y = None
         self.speed_mps = 0.
+        self.goal_dist_norm = 1.0
+        self.left_clear_norm = 1.0
+        self.center_clear_norm = 1.0
+        self.right_clear_norm = 1.0
+        self.rudder_state_norm = 0.0
+        self.rpm_state_norm = 0.0
+        self.left_clear_lidar_m = float(LIDAR_RANGE)
+        self.center_clear_lidar_m = float(LIDAR_RANGE)
+        self.right_clear_lidar_m = float(LIDAR_RANGE)
 
         self.model = ShipModel()
         self.scenario = TestCase()
@@ -135,16 +137,26 @@ class ASVLidarEnv(gym.Env):
             speed: velocity of the vessel (m/s)
             tgt: horizontal offset of the asv from the path
             target_heading: heading error with respect to the destination point
+            goal_dist: normalized distance-to-goal
+            left/center/right_clear: compact LiDAR-derived sector clearances with hysteresis
+            rudder_state: current actual rudder state (normalized)
+            rpm_state: current rpm command state (normalized)
         """
         self.observation_space = Dict(
             {
-                "lidar": Box(low=0, high=LIDAR_RANGE, shape=(LIDAR_BEAMS,), dtype=np.float32),
+                "lidar": Box(low=LIDAR_MIN_RANGE, high=LIDAR_RANGE, shape=(LIDAR_BEAMS,), dtype=np.float32),
                 "pos"  : Box(low=np.array([0,0]),high=np.array(self.world_size),shape=(2,),dtype=np.float32),
                 "hdg"  : Box(low=0,high=360,shape=(1,),dtype=np.float32),
                 "dhdg" : Box(low=-1.0,high=1.0,shape=(1,),dtype=np.float32),
                 "speed"  : Box(low=0.0, high=10.0, shape=(1,), dtype=np.float32),
                 "tgt"  : Box(low=-50,high=50,shape=(1,),dtype=np.float32),
-                "target_heading": Box(low=-180,high=180,shape=(1,),dtype=np.float32)
+                "target_heading": Box(low=-180,high=180,shape=(1,),dtype=np.float32),
+                "goal_dist": Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
+                "left_clear": Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
+                "center_clear": Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
+                "right_clear": Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
+                "rudder_state": Box(low=-1.0, high=1.0, shape=(1,), dtype=np.float32),
+                "rpm_state": Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
             }
         )
         """
@@ -185,7 +197,13 @@ class ASVLidarEnv(gym.Env):
             'dhdg': np.array([np.clip(self.asv_w / 180, -1.0, 1.0)],dtype=np.float32),
             'speed': np.array([self.speed_mps], dtype=np.float32),
             'tgt': np.array([self.tgt],dtype=np.float32),
-            'target_heading': np.array([self.angle_diff],dtype=np.float32)
+            'target_heading': np.array([self.angle_diff],dtype=np.float32),
+            'goal_dist': np.array([self.goal_dist_norm], dtype=np.float32),
+            'left_clear': np.array([self.left_clear_norm], dtype=np.float32),
+            'center_clear': np.array([self.center_clear_norm], dtype=np.float32),
+            'right_clear': np.array([self.right_clear_norm], dtype=np.float32),
+            'rudder_state': np.array([self.rudder_state_norm], dtype=np.float32),
+            'rpm_state': np.array([self.rpm_state_norm], dtype=np.float32),
         }
 
     def _hull_polygon_world(self):
@@ -322,6 +340,144 @@ class ASVLidarEnv(gym.Env):
         angle_diff = (target_angle - heading + 180) % 360 - 180    # normalize to [-180,180]
 
         return angle_diff
+
+    def _signed_cross_track_error(self, asv_x, asv_y):
+        path_dx = float(self.goal_x - self.start_x)
+        path_dy = float(self.goal_y - self.start_y)
+        path_norm = float(np.hypot(path_dx, path_dy))
+        if path_norm < 1e-6:
+            return 0.0
+
+        rel_x = float(asv_x - self.start_x)
+        rel_y = float(asv_y - self.start_y)
+        cross = path_dx * rel_y - path_dy * rel_x
+        return float(cross / path_norm)
+
+    def _border_clearance(self):
+        hull = self._hull_polygon_world()
+        xs = [p[0] for p in hull]
+        ys = [p[1] for p in hull]
+        return float(min(min(xs), self.map_width - max(xs), min(ys), self.map_height - max(ys)))
+
+    def _geometry_ranges_for_angles(self, beam_angles_deg):
+        """True geometry clearances without LiDAR blind-zone saturation."""
+        if beam_angles_deg.size == 0:
+            return np.empty(0, dtype=np.float32)
+
+        origin = (float(self.lidar._pos_x), float(self.lidar._pos_y))
+        edges = []
+
+        for obs in self.obstacles:
+            for i in range(len(obs)):
+                edges.append((obs[i], obs[(i + 1) % len(obs)]))
+
+        for border in self.map_border:
+            for i in range(len(border)):
+                edges.append((border[i], border[(i + 1) % len(border)]))
+
+        geom_ranges = np.full(beam_angles_deg.shape, LIDAR_RANGE, dtype=np.float32)
+        for idx, angle in enumerate(beam_angles_deg):
+            absolute_angle = np.radians(float(self.asv_h) + float(angle))
+            end_x = origin[0] + LIDAR_RANGE * np.sin(absolute_angle)
+            end_y = origin[1] + LIDAR_RANGE * np.cos(absolute_angle)
+
+            closest_distance = float(LIDAR_RANGE)
+            for edge in edges:
+                intersection = self.lidar.line_intersection(origin, (end_x, end_y), edge[0], edge[1])
+                if intersection is not None:
+                    dist = float(np.hypot(intersection[0] - origin[0], intersection[1] - origin[1]))
+                    closest_distance = min(closest_distance, dist)
+
+            geom_ranges[idx] = closest_distance
+
+        return geom_ranges
+
+    def _compute_clearance_features(self):
+        theta_deg = self.lidar.angles.astype(np.float32)
+        lidar_d = self.lidar.ranges.astype(np.float32)
+
+        raw_front_mask = np.abs(theta_deg) <= OA_FRONT_HALF_ANGLE_DEG
+        raw_front_ranges = lidar_d[raw_front_mask] if np.any(raw_front_mask) else lidar_d
+        raw_front_ranges = raw_front_ranges[np.isfinite(raw_front_ranges)]
+        if raw_front_ranges.size == 0:
+            raw_front_ranges = np.array([LIDAR_RANGE], dtype=np.float32)
+        raw_front_clear = float(np.percentile(raw_front_ranges, OA_FRONT_PERCENTILE))
+
+        geom_theta_deg = theta_deg[raw_front_mask] if np.any(raw_front_mask) else theta_deg
+        geom_ranges = self._geometry_ranges_for_angles(geom_theta_deg)
+        if geom_ranges.size == 0:
+            geom_theta_deg = np.array([0.0], dtype=np.float32)
+            geom_ranges = np.array([LIDAR_RANGE], dtype=np.float32)
+
+        left_mask = (geom_theta_deg >= -OA_FRONT_HALF_ANGLE_DEG) & (geom_theta_deg < -OA_CENTER_HALF_ANGLE_DEG)
+        center_mask = np.abs(geom_theta_deg) <= OA_CENTER_HALF_ANGLE_DEG
+        right_mask = (geom_theta_deg > OA_CENTER_HALF_ANGLE_DEG) & (geom_theta_deg <= OA_FRONT_HALF_ANGLE_DEG)
+
+        left_ranges = geom_ranges[left_mask] if np.any(left_mask) else np.array([LIDAR_RANGE], dtype=np.float32)
+        center_ranges = geom_ranges[center_mask] if np.any(center_mask) else np.array([LIDAR_RANGE], dtype=np.float32)
+        right_ranges = geom_ranges[right_mask] if np.any(right_mask) else np.array([LIDAR_RANGE], dtype=np.float32)
+
+        return {
+            "raw_front_clear": raw_front_clear,
+            "geom_front_clear": float(np.percentile(geom_ranges, OA_FRONT_PERCENTILE)),
+            "left_p10": float(np.percentile(left_ranges, OA_FRONT_PERCENTILE)),
+            "center_p10": float(np.percentile(center_ranges, OA_FRONT_PERCENTILE)),
+            "right_p10": float(np.percentile(right_ranges, OA_FRONT_PERCENTILE)),
+        }
+
+    def _lidar_sector_clear_with_memory(self, sector_ranges, prev_clear_m):
+        sector_ranges = sector_ranges[np.isfinite(sector_ranges)]
+        valid = sector_ranges[(sector_ranges >= LIDAR_MIN_RANGE) & (sector_ranges < LIDAR_RANGE)]
+
+        if valid.size:
+            instant_clear = float(np.percentile(valid, OA_FRONT_PERCENTILE))
+        else:
+            instant_clear = float(LIDAR_RANGE)
+
+        smoothed_clear = float(min(instant_clear, prev_clear_m + SECTOR_CLEAR_RECOVERY_M))
+        return instant_clear, smoothed_clear
+
+    def _compute_lidar_sector_observation_features(self):
+        theta_deg = self.lidar.angles.astype(np.float32)
+        lidar_d = self.lidar.ranges.astype(np.float32)
+
+        front_mask = np.abs(theta_deg) <= OA_FRONT_HALF_ANGLE_DEG
+        front_theta = theta_deg[front_mask] if np.any(front_mask) else theta_deg
+        front_ranges = lidar_d[front_mask] if np.any(front_mask) else lidar_d
+
+        left_mask = (front_theta >= -OA_FRONT_HALF_ANGLE_DEG) & (front_theta < -OA_CENTER_HALF_ANGLE_DEG)
+        center_mask = np.abs(front_theta) <= OA_CENTER_HALF_ANGLE_DEG
+        right_mask = (front_theta > OA_CENTER_HALF_ANGLE_DEG) & (front_theta <= OA_FRONT_HALF_ANGLE_DEG)
+
+        left_ranges = front_ranges[left_mask] if np.any(left_mask) else np.array([LIDAR_RANGE], dtype=np.float32)
+        center_ranges = front_ranges[center_mask] if np.any(center_mask) else np.array([LIDAR_RANGE], dtype=np.float32)
+        right_ranges = front_ranges[right_mask] if np.any(right_mask) else np.array([LIDAR_RANGE], dtype=np.float32)
+
+        left_instant, left_smoothed = self._lidar_sector_clear_with_memory(left_ranges, self.left_clear_lidar_m)
+        center_instant, center_smoothed = self._lidar_sector_clear_with_memory(center_ranges, self.center_clear_lidar_m)
+        right_instant, right_smoothed = self._lidar_sector_clear_with_memory(right_ranges, self.right_clear_lidar_m)
+
+        self.left_clear_lidar_m = left_smoothed
+        self.center_clear_lidar_m = center_smoothed
+        self.right_clear_lidar_m = right_smoothed
+
+        return {
+            "left_lidar_clear_m": left_smoothed,
+            "center_lidar_clear_m": center_smoothed,
+            "right_lidar_clear_m": right_smoothed,
+            "left_lidar_instant_m": left_instant,
+            "center_lidar_instant_m": center_instant,
+            "right_lidar_instant_m": right_instant,
+        }
+
+    def _update_compact_obs_state(self, lidar_sector_features, rpm_norm):
+        self.goal_dist_norm = float(np.clip(self.distance_to_goal / GOAL_DIST_MAX, 0.0, 1.0))
+        self.left_clear_norm = float(np.clip(lidar_sector_features["left_lidar_clear_m"] / OA_WARN_CLEARANCE, 0.0, 1.0))
+        self.center_clear_norm = float(np.clip(lidar_sector_features["center_lidar_clear_m"] / OA_WARN_CLEARANCE, 0.0, 1.0))
+        self.right_clear_norm = float(np.clip(lidar_sector_features["right_lidar_clear_m"] / OA_WARN_CLEARANCE, 0.0, 1.0))
+        rudder_deg = float(np.degrees(self.model._delta))
+        self.rudder_state_norm = float(np.clip(rudder_deg / MAX_RUD_ANGLE, -1.0, 1.0))
+        self.rpm_state_norm = float(np.clip(rpm_norm, 0.0, 1.0))
     
     def _draw_dashed_line(self, surface, color, start_pos, end_pos, width=1, dash_length=10, exclude_corner=True):
         # convert to numpy array
@@ -369,6 +525,9 @@ class ASVLidarEnv(gym.Env):
         self.prev_x = float(self.asv_x)
         self.prev_y = float(self.asv_y)
         self.speed_mps = 0.0
+        self.left_clear_lidar_m = float(LIDAR_RANGE)
+        self.center_clear_lidar_m = float(LIDAR_RANGE)
+        self.right_clear_lidar_m = float(LIDAR_RANGE)
 
         # Generate the path
         self.path = self._generate_path(self.start_x, self.start_y, self.goal_x, self.goal_y)
@@ -382,6 +541,10 @@ class ASVLidarEnv(gym.Env):
 
         # Initialize distance to goal
         self.distance_to_goal = float(np.linalg.norm([self.asv_x - self.goal_x, self.asv_y - self.goal_y]))
+        self.angle_diff = float(self._calculate_angle(self.asv_x, self.asv_y, self.asv_h, self.goal_x, self.goal_y))
+        self.lidar.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=self.obstacles, map_border=self.map_border)
+        lidar_sector_features = self._compute_lidar_sector_observation_features()
+        self._update_compact_obs_state(lidar_sector_features, rpm_norm=0.0)
 
         self.reward = 0
 
@@ -436,7 +599,7 @@ class ASVLidarEnv(gym.Env):
         # closest perpendicular distance from asv to path
         asv_pos = np.array([self.asv_x, self.asv_y])
         distance = np.linalg.norm(self.path - asv_pos, axis=1)
-        self.tgt = np.min(distance)
+        self.tgt = self._signed_cross_track_error(self.asv_x, self.asv_y)
 
         # extract (x,y) target
         closest_idx = np.argmin(distance)
@@ -466,9 +629,7 @@ class ASVLidarEnv(gym.Env):
         # pose-base speed
         U = self.speed_mps
         U_norm = U / U_MAX
-
-        goal_norm = float(np.clip((GOAL_BRAKE_RADIUS - self.distance_to_goal) / GOAL_BRAKE_RADIUS, 0.0, 1.0))
-        gamma_e_eff = GAMMA_E * (1.0 + GOAL_CTE_BOOST * goal_norm)
+        rpm_norm = float(rpm / RPM_MAX) if RPM_MAX > 0 else 0.0
 
         # Course error relative to the path direction (better than using heading-only)
         if U > 1e-6:
@@ -484,50 +645,24 @@ class ASVLidarEnv(gym.Env):
         chi_tilde = float(np.radians(chi_tilde_deg))
         cos_chi = float(np.cos(chi_tilde))
 
-        # r_pf = float(-1 + (U_norm * cos_chi + 1) * (np.exp(-GAMMA_E * ye) + 1))
-        r_pf = float(-1 + (U_norm * cos_chi + 1) * (np.exp(-gamma_e_eff * ye) + 1))
+        r_pf = float(-1 + (U_norm * cos_chi + 1) * (np.exp(-GAMMA_E * ye) + 1))
 
-        # Obstacle avoidance reward
-        lidar_d = self.lidar.ranges.astype(np.float32)
-        theta_deg = self.lidar.angles.astype(np.float32)
-
-        # front_mask = np.abs(theta_deg) <= OA_FRONT_HALF_ANGLE_DEG
-        # front_ranges = lidar_d[front_mask] if np.any(front_mask) else lidar_d
-        # front_ranges = front_ranges[np.isfinite(front_ranges)]
-        # if front_ranges.size == 0:
-        #     front_ranges = np.array([LIDAR_RANGE], dtype=np.float32)
-
-        # front_clear = np.percentile(front_ranges, OA_FRONT_PERCENTILE)
-
-        left_mask = (theta_deg >= -OA_FRONT_HALF_ANGLE_DEG) & (theta_deg < -OA_CENTER_HALF_ANGLE_DEG)
-        center_mask = np.abs(theta_deg) <= OA_CENTER_HALF_ANGLE_DEG
-        right_mask = (theta_deg > OA_CENTER_HALF_ANGLE_DEG) & (theta_deg <= OA_FRONT_HALF_ANGLE_DEG)
-
-        left_ranges = lidar_d[left_mask] if np.any(left_mask) else np.array([LIDAR_RANGE], dtype=np.float32)
-        center_ranges = lidar_d[center_mask] if np.any(center_mask) else np.array([LIDAR_RANGE], dtype=np.float32)
-        right_ranges = lidar_d[right_mask] if np.any(right_mask) else np.array([LIDAR_RANGE], dtype=np.float32)
-
-        left_ranges = left_ranges[np.isfinite(left_ranges)]
-        center_ranges = center_ranges[np.isfinite(center_ranges)]
-        right_ranges = right_ranges[np.isfinite(right_ranges)]
-
-        if left_ranges.size == 0:
-            left_ranges = np.array([LIDAR_RANGE], dtype=np.float32)
-        if center_ranges.size == 0:
-            center_ranges = np.array([LIDAR_RANGE], dtype=np.float32)
-        if right_ranges.size == 0:
-            right_ranges = np.array([LIDAR_RANGE], dtype=np.float32)
-
-        left_p10 = float(np.percentile(left_ranges, OA_FRONT_PERCENTILE))
-        center_p10 = float(np.percentile(center_ranges, OA_FRONT_PERCENTILE))
-        right_p10 = float(np.percentile(right_ranges, OA_FRONT_PERCENTILE))
+        clearance_features = self._compute_clearance_features()
+        lidar_sector_features = self._compute_lidar_sector_observation_features()
+        raw_front_clear = clearance_features["raw_front_clear"]
+        geom_front_clear = clearance_features["geom_front_clear"]
+        left_p10 = clearance_features["left_p10"]
+        center_p10 = clearance_features["center_p10"]
+        right_p10 = clearance_features["right_p10"]
 
         center_norm = (OA_WARN_CLEARANCE - center_p10) / max(OA_WARN_CLEARANCE - OA_CRIT_CLEARANCE, 1e-6)
         center_norm = float(np.clip(center_norm, 0.0, 1.0))
         r_center = -OA_CENTER_GAIN * (center_norm ** 2)
 
         gap_bias = float(np.tanh((right_p10 - left_p10) / OA_DIR_SCALE))
-        rudder_align = float(np.tanh(2.0 * rudder_cmd))
+        # ShipModel turns right for negative rudder and left for positive rudder.
+        turn_cmd = float(-rudder_cmd)
+        rudder_align = float(np.tanh(2.0 * turn_cmd))
         r_dir = OA_DIR_GAIN * center_norm * gap_bias * rudder_align
 
         if center_p10 < OA_NEAR_CLEARANCE:
@@ -537,25 +672,20 @@ class ASVLidarEnv(gym.Env):
             near_norm = 0.0
             r_near = 0.0
 
-        r_oa = r_center + r_dir + r_near
-
         threat = max(center_norm, near_norm)
+        r_speed_threat = -OA_SPEED_GAIN * threat * (U_norm ** 2)
+        r_oa = r_center + r_dir + r_near + r_speed_threat
         lam = LAMBDA_CLEAR - (LAMBDA_CLEAR - LAMBDA_THREAT) * threat
+        self._update_compact_obs_state(lidar_sector_features, rpm_norm)
 
-        goal_gate = 1.0 - threat
-        r_goal_near = GOAL_NEAR_GAIN * (goal_norm ** 2)
-        r_goal_slow = -GOAL_SPEED_GAIN * goal_norm * (U_norm ** 2)
-        r_goal = goal_gate * (r_goal_near + r_goal_slow)
-
-        # living penalty
-        r_exist = -0.5 * (2.0 * ALPHA_R + 1.0)   # = -0.6 with ALPHA_R = 0.1
+        r_exist = -ALPHA_R
 
         if collided:
             reward = float(R_COLLISION)
         elif reached_goal:
-            reward = float(R_GOAL + r_goal)
+            reward = float(R_GOAL)
         else:
-            reward = float(lam * r_pf + (1.0 - lam) * r_oa + r_exist + r_goal)
+            reward = float(lam * r_pf + (1.0 - lam) * r_oa + r_exist)
 
         terminated = self.check_done((self.asv_x, self.asv_y))
 
@@ -567,11 +697,13 @@ class ASVLidarEnv(gym.Env):
             "heading_deg": float(self.asv_h),
             "dhdg_raw": float(self.asv_w),
 
-            "front_clear": float(center_p10),
+            "front_clear": float(geom_front_clear),
             "oa_active": bool(center_norm > 0),
             "left_p10": float(left_p10),
             "center_p10": float(center_p10),
             "right_p10": float(right_p10),
+            "raw_front_clear": float(raw_front_clear),
+            "geom_front_clear": float(geom_front_clear),
             "center_norm": float(center_norm),
             "gap_bias": float(gap_bias),
             "rudder_align": float(rudder_align),
@@ -579,17 +711,23 @@ class ASVLidarEnv(gym.Env):
             "r_center": float(r_center),
             "r_dir": float(r_dir),
             "r_near": float(r_near),
-            "reward_pf_contrib": float(lam * r_pf),
-            "reward_oa_contrib": float((1.0 - lam) * r_oa),
+            "r_speed_threat": float(r_speed_threat),
             "r_pf": float(r_pf),
             "r_oa": float(r_oa),
             "threat": float(threat),
             "lam": float(lam),
-            "goal_norm": float(goal_norm),
-            "gamma_e_eff": float(gamma_e_eff),
-            "r_goal_near": float(r_goal_near),
-            "r_goal_slow": float(r_goal_slow),
-            "r_goal": float(r_goal),
+            "goal_dist_norm": float(self.goal_dist_norm),
+            "left_clear": float(self.left_clear_norm),
+            "center_clear": float(self.center_clear_norm),
+            "right_clear": float(self.right_clear_norm),
+            "lidar_left_clear_m": float(lidar_sector_features["left_lidar_clear_m"]),
+            "lidar_center_clear_m": float(lidar_sector_features["center_lidar_clear_m"]),
+            "lidar_right_clear_m": float(lidar_sector_features["right_lidar_clear_m"]),
+            "lidar_left_instant_m": float(lidar_sector_features["left_lidar_instant_m"]),
+            "lidar_center_instant_m": float(lidar_sector_features["center_lidar_instant_m"]),
+            "lidar_right_instant_m": float(lidar_sector_features["right_lidar_instant_m"]),
+            "rudder_state": float(self.rudder_state_norm),
+            "rpm_state": float(self.rpm_state_norm),
         }
 
         return self._get_obs(), reward, terminated, False, info

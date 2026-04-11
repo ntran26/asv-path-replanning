@@ -116,10 +116,21 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
     left_p10s: List[float] = []
     center_p10s: List[float] = []
     right_p10s: List[float] = []
+    obs_left_clears: List[float] = []
+    obs_center_clears: List[float] = []
+    obs_right_clears: List[float] = []
+    lidar_left_clears_m: List[float] = []
+    lidar_center_clears_m: List[float] = []
+    lidar_right_clears_m: List[float] = []
     r_pfs: List[float] = []
     r_oas: List[float] = []
     pf_contribs: List[float] = []
     oa_contribs: List[float] = []
+    threats: List[float] = []
+    goal_dist_norms: List[float] = []
+    lam_values: List[float] = []
+    rudder_states: List[float] = []
+    rpm_states: List[float] = []
     first_oa_step = None
 
     while steps < max_steps:
@@ -143,11 +154,22 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
         left_p10s.append(float(info.get("left_p10", float("inf"))))
         center_p10s.append(float(info.get("center_p10", float("inf"))))
         right_p10s.append(float(info.get("right_p10", float("inf"))))
+        obs_left_clears.append(float(info.get("left_clear", 0.0)))
+        obs_center_clears.append(float(info.get("center_clear", 0.0)))
+        obs_right_clears.append(float(info.get("right_clear", 0.0)))
+        lidar_left_clears_m.append(float(info.get("lidar_left_clear_m", float("inf"))))
+        lidar_center_clears_m.append(float(info.get("lidar_center_clear_m", float("inf"))))
+        lidar_right_clears_m.append(float(info.get("lidar_right_clear_m", float("inf"))))
 
         r_pfs.append(float(info.get("r_pf", 0.0)))
         r_oas.append(float(info.get("r_oa", 0.0)))
         pf_contribs.append(float(info.get("reward_pf_contrib", 0.0)))
         oa_contribs.append(float(info.get("reward_oa_contrib", 0.0)))
+        threats.append(float(info.get("threat", 0.0)))
+        goal_dist_norms.append(float(info.get("goal_dist_norm", 0.0)))
+        lam_values.append(float(info.get("lam", 0.0)))
+        rudder_states.append(float(info.get("rudder_state", 0.0)))
+        rpm_states.append(float(info.get("rpm_state", 0.0)))
 
         speeds.append(float(getattr(env, "speed_mps", 0.0)))
         rpms.append(action_to_rpm(float(action[1])))
@@ -185,10 +207,21 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
         "left_p10_min": float(np.min(left_p10s)) if left_p10s else float("inf"),
         "center_p10_min": float(np.min(center_p10s)) if center_p10s else float("inf"),
         "right_p10_min": float(np.min(right_p10s)) if right_p10s else float("inf"),
+        "min_obs_left_clear": float(np.min(obs_left_clears)) if obs_left_clears else float("inf"),
+        "min_obs_center_clear": float(np.min(obs_center_clears)) if obs_center_clears else float("inf"),
+        "min_obs_right_clear": float(np.min(obs_right_clears)) if obs_right_clears else float("inf"),
+        "min_lidar_left_clear_m": float(np.min(lidar_left_clears_m)) if lidar_left_clears_m else float("inf"),
+        "min_lidar_center_clear_m": float(np.min(lidar_center_clears_m)) if lidar_center_clears_m else float("inf"),
+        "min_lidar_right_clear_m": float(np.min(lidar_right_clears_m)) if lidar_right_clears_m else float("inf"),
         "mean_r_pf": float(np.mean(r_pfs)) if r_pfs else 0.0,
         "mean_r_oa": float(np.mean(r_oas)) if r_oas else 0.0,
         "mean_pf_contrib": float(np.mean(pf_contribs)) if pf_contribs else 0.0,
         "mean_oa_contrib": float(np.mean(oa_contribs)) if oa_contribs else 0.0,
+        "mean_threat": float(np.mean(threats)) if threats else 0.0,
+        "mean_goal_dist_norm": float(np.mean(goal_dist_norms)) if goal_dist_norms else 0.0,
+        "mean_lam": float(np.mean(lam_values)) if lam_values else 0.0,
+        "mean_rudder_state": float(np.mean(rudder_states)) if rudder_states else 0.0,
+        "mean_rpm_state": float(np.mean(rpm_states)) if rpm_states else 0.0,
         "final_x": float(env.asv_x),
         "final_y": float(env.asv_y),
         "final_heading": float(env.asv_h),
@@ -214,6 +247,17 @@ def evaluate_benchmark(model, env: ASVLidarEnv, cases: List[int], max_steps: int
         "mean_oa_active_frac": float(np.mean([row["oa_active_frac"] for row in rows])) if rows else 0.0,
         "mean_pf_contrib": float(np.mean([row["mean_pf_contrib"] for row in rows])) if rows else 0.0,
         "mean_oa_contrib": float(np.mean([row["mean_oa_contrib"] for row in rows])) if rows else 0.0,
+        "mean_threat": float(np.mean([row["mean_threat"] for row in rows])) if rows else 0.0,
+        "mean_goal_dist_norm": float(np.mean([row["mean_goal_dist_norm"] for row in rows])) if rows else 0.0,
+        "mean_lam": float(np.mean([row["mean_lam"] for row in rows])) if rows else 0.0,
+        "mean_rudder_state": float(np.mean([row["mean_rudder_state"] for row in rows])) if rows else 0.0,
+        "mean_rpm_state": float(np.mean([row["mean_rpm_state"] for row in rows])) if rows else 0.0,
+        "min_obs_left_clear": float(np.min([row["min_obs_left_clear"] for row in rows])) if rows else float("inf"),
+        "min_obs_center_clear": float(np.min([row["min_obs_center_clear"] for row in rows])) if rows else float("inf"),
+        "min_obs_right_clear": float(np.min([row["min_obs_right_clear"] for row in rows])) if rows else float("inf"),
+        "min_lidar_left_clear_m": float(np.min([row["min_lidar_left_clear_m"] for row in rows])) if rows else float("inf"),
+        "min_lidar_center_clear_m": float(np.min([row["min_lidar_center_clear_m"] for row in rows])) if rows else float("inf"),
+        "min_lidar_right_clear_m": float(np.min([row["min_lidar_right_clear_m"] for row in rows])) if rows else float("inf"),
         "min_left_p10": float(np.min([row["left_p10_min"] for row in rows])) if rows else float("inf"),
         "min_center_p10": float(np.min([row["center_p10_min"] for row in rows])) if rows else float("inf"),
         "min_right_p10": float(np.min([row["right_p10_min"] for row in rows])) if rows else float("inf"),
@@ -304,6 +348,17 @@ class FixedBenchmarkCallback(BaseCallback):
         self.logger.record("benchmark/border_rate", summary["border_rate"])
         self.logger.record("benchmark/timeout_rate", summary["timeout_rate"])
         self.logger.record("benchmark/min_p10_front", summary["min_p10_front"])
+        self.logger.record("benchmark/mean_threat", summary["mean_threat"])
+        self.logger.record("benchmark/mean_goal_dist_norm", summary["mean_goal_dist_norm"])
+        self.logger.record("benchmark/mean_lam", summary["mean_lam"])
+        self.logger.record("benchmark/mean_rudder_state", summary["mean_rudder_state"])
+        self.logger.record("benchmark/mean_rpm_state", summary["mean_rpm_state"])
+        self.logger.record("benchmark/min_obs_left_clear", summary["min_obs_left_clear"])
+        self.logger.record("benchmark/min_obs_center_clear", summary["min_obs_center_clear"])
+        self.logger.record("benchmark/min_obs_right_clear", summary["min_obs_right_clear"])
+        self.logger.record("benchmark/min_lidar_left_clear_m", summary["min_lidar_left_clear_m"])
+        self.logger.record("benchmark/min_lidar_center_clear_m", summary["min_lidar_center_clear_m"])
+        self.logger.record("benchmark/min_lidar_right_clear_m", summary["min_lidar_right_clear_m"])
 
         if self.verbose:
             print(
