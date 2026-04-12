@@ -1,0 +1,34 @@
+{
+  "motion": {
+    "peak_u_body_mps": {
+      "real": 2.303828951408619,
+      "sim": 1.644327158240219,
+      "rel_error": 0.2862633498746355
+    },
+    "initial_accel_0_2_after_motion_mps2": {
+      "real": 0.27225858101668204,
+      "sim": 0.23123598436564674,
+      "rel_error": 0.15067512839392097
+    },
+    "initial_accel_0_5_after_motion_mps2": {
+      "real": 0.10448637060160684,
+      "sim": 0.22755641705895155,
+      "rel_error": 1.1778574157446338
+    },
+    "distance_at_10s_after_motion_m": {
+      "real": 10.143419093577025,
+      "sim": 10.026999455686521,
+      "rel_error": 0.01147735658129539
+    },
+    "time_to_50pct_peak_u_after_motion_s": {
+      "real": 1.9774749999996857,
+      "sim": 3.3,
+      "rel_error": 0.668794801451611
+    },
+    "time_to_90pct_peak_u_after_motion_s": {
+      "real": 13.666803000000073,
+      "sim": 8.700000000000001,
+      "rel_error": 0.3634209844101832
+    }
+  }
+}

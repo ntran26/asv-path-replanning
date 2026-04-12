@@ -36,8 +36,26 @@ MAX_RUD_ANGLE = 40.0
 MAX_RUD_RATE_DPS = 20.0
 
 # Bridge between the simplified repo command and the MATLAB input units.
-RPM_COMMAND_SCALE = 60.0
+RPM_COMMAND_SCALE = 100.0
 THRUSTER_COMMAND_SCALE = 60.0
+
+# Practical operating point from the current tuned benchmark.
+RECOMMENDED_COMMAND_RPM_MAX = 15.0
+RECOMMENDED_PROP_RPM_MAX = RPM_COMMAND_SCALE * RECOMMENDED_COMMAND_RPM_MAX
+RECOMMENDED_PEAK_SPEED_MPS = 1.65
+
+# Focused calibration knobs around the fixed MATLAB coefficients.
+# These defaults are taken from the current stable/tuned region found
+# against the project straight-line and turning benchmarks.
+PROPELLER_THRUST_SCALE = 1.4
+RUDDER_FORCE_SCALE = 0.15
+RUDDER_YAW_SCALE = 1.5
+RUDDER_X_DRAG_SCALE = 0.02
+LINEAR_SURGE_DAMP = 1.5
+LINEAR_YAW_DAMP = 0.0
+ROLL_DAMP_SCALE = 4.0
+ROLL_RESTORE_SCALE = 1.0
+BOW_THRUSTER_SCALE = 1.0
 
 MIN_FLOW_SPEED = 0.05
 MIN_ADVANCE_RATIO = 1e-4
@@ -46,7 +64,7 @@ MAX_SWAY_SPEED = 3.0
 MAX_ROLL_RATE_RAD = math.radians(180.0)
 MAX_YAW_RATE_RAD = math.radians(180.0)
 MAX_ROLL_ANGLE_RAD = math.radians(45.0)
-MAX_SHAFT_RPS = 1000.0 / 60.0
+MAX_SHAFT_RATE_RPSPS = 1000.0 / 60.0
 
 
 class ShipModel:
@@ -119,9 +137,6 @@ class ShipModel:
         s1[3] = float(np.clip(s1[3], -MAX_YAW_RATE_RAD, MAX_YAW_RATE_RAD))
         s1[6] = float(np.clip(s1[6], -MAX_ROLL_ANGLE_RAD, MAX_ROLL_ANGLE_RAD))
         s1[8] = float(np.clip(s1[8], -math.radians(MAX_RUD_ANGLE), math.radians(MAX_RUD_ANGLE)))
-        s1[9] = float(np.clip(s1[9], -MAX_SHAFT_RPS, MAX_SHAFT_RPS))
-        s1[10] = float(np.clip(s1[10], -MAX_SHAFT_RPS, MAX_SHAFT_RPS))
-
         self._set_state_vector(s1)
         dx = self._x - x_prev
         dy = self._y - y_prev
@@ -187,8 +202,8 @@ class ShipModel:
 
         n1_target = n1_cmd_rpm / 60.0
         n2_target = n2_cmd_rpm / 60.0
-        n1_dot = float(np.clip(n1_target - n1, -MAX_SHAFT_RPS, MAX_SHAFT_RPS))
-        n2_dot = float(np.clip(n2_target - n2, -MAX_SHAFT_RPS, MAX_SHAFT_RPS))
+        n1_dot = float(np.clip(n1_target - n1, -MAX_SHAFT_RATE_RPSPS, MAX_SHAFT_RATE_RPSPS))
+        n2_dot = float(np.clip(n2_target - n2, -MAX_SHAFT_RATE_RPSPS, MAX_SHAFT_RATE_RPSPS))
 
         # Parameters from the MATLAB file.
         beam = 0.5
@@ -287,16 +302,29 @@ class ShipModel:
         vd = v / u_mag
         rd = r * l_ship / u_mag
 
-        if abs(n1_target) < MIN_ADVANCE_RATIO:
+        # Use actual shaft states for force generation so actuator dynamics
+        # matter physically. The commands only drive n1_dot / n2_dot.
+        n1_force = float(np.sign(n1) * max(abs(n1), MIN_ADVANCE_RATIO)) if abs(n1) >= MIN_ADVANCE_RATIO else 0.0
+        n2_force = float(np.sign(n2) * max(abs(n2), MIN_ADVANCE_RATIO)) if abs(n2) >= MIN_ADVANCE_RATIO else 0.0
+
+        if abs(n1_force) < MIN_ADVANCE_RATIO:
             j_adv = 0.0
             kt = 0.0
             xd_p = 0.0
             ud_r = epsi * onew
         else:
-            j_adv = onew * u / max(abs(n1_target) * d_prop, MIN_ADVANCE_RATIO)
+            j_adv = onew * u / max(abs(n1_force) * d_prop, MIN_ADVANCE_RATIO)
             a0, a1, a2 = 0.3267, -0.2297, -0.1607
             kt = a0 + a1 * j_adv + a2 * j_adv * j_adv
-            xd_p = abs(n1_target) * n1_target * onet * kt * (d_prop**4) / (0.5 * l_ship * draft * u_mag * u_mag)
+            xd_p = (
+                PROPELLER_THRUST_SCALE
+                * abs(n1_force)
+                * n1_force
+                * onet
+                * kt
+                * (d_prop**4)
+                / (0.5 * l_ship * draft * u_mag * u_mag)
+            )
             j_sq = max(j_adv * j_adv, MIN_ADVANCE_RATIO * MIN_ADVANCE_RATIO)
             prop_term = max(1.0 + 8.0 * kt / (math.pi * j_sq), 0.0)
             ud_r = epsi * onew * math.sqrt(eta_r * ((1.0 + kappa * math.sqrt(prop_term) - 1.0) ** 2) + (1.0 - eta_r))
@@ -307,9 +335,9 @@ class ShipModel:
         fd_n = -(area_r_over_ld) * (6.13 * lambda_r / (2.25 + lambda_r)) * (ud_total_r**2) * math.sin(alpha_r)
 
         xd_r = onet_r * fd_n * math.sin(delta) * math.cos(phi)
-        yd_r = (1.0 + a_h) * fd_n * math.cos(delta) * math.cos(phi)
+        yd_r = RUDDER_FORCE_SCALE * (1.0 + a_h) * fd_n * math.cos(delta) * math.cos(phi)
         kd_r = z_r * yd_r / l_ship
-        nd_r = (x_r + a_h * x_h) * fd_n * math.cos(delta) * math.cos(phi)
+        nd_r = RUDDER_FORCE_SCALE * RUDDER_YAW_SCALE * (x_r + a_h * x_h) * fd_n * math.cos(delta) * math.cos(phi)
 
         xd_h = (
             xd0 * (1.0 + cx0 * abs(phi))
@@ -359,17 +387,25 @@ class ShipModel:
         c44 = g * m * gm
         damping_a = 0.5
         b44 = 2.0 * damping_a / math.pi * math.sqrt(max(g * m * gm * (i_x + j_x), 0.0))
-        kd_h2 = z_g * yd_h - b44 * p - c44 * phi - (z_r - z_g) * yd_r
+        # Keep the hydrodynamic cross-coupling in the non-dimensional block,
+        # but apply roll damping/restoring directly as dimensional moments.
+        kd_h2 = z_g * yd_h - (z_r - z_g) * yd_r
 
         x_b = 0.45
         z_b = -0.05
         k_bt = 0.026
-        f_bt = abs(n2_target) * n2_target * k_bt / (0.5 * rho * l_ship * draft * u_mag * u_mag)
+        f_bt = (
+            BOW_THRUSTER_SCALE
+            * abs(n2_force)
+            * n2_force
+            * k_bt
+            / (0.5 * rho * l_ship * draft * u_mag * u_mag)
+        )
         yd_b = f_bt
         kd_b = z_b * f_bt / l_ship
         nb_b = x_b * f_bt / l_ship
 
-        xd = xd_h + xd_p + xd_r
+        xd = xd_h + xd_p + RUDDER_X_DRAG_SCALE * xd_r
         yd = yd_h + yd_r + yd_b
         kd = kd_h + kd_h2 + kd_r + kd_b
         nd = nd_h + nd_r - x_g * yd + nb_b
@@ -379,9 +415,18 @@ class ShipModel:
         force_scale_k = 0.5 * rho * l_ship * draft * draft * u_mag * u_mag
 
         vdot = (yd * force_scale_x - m11 * u * r) / m22
-        udot = (xd * force_scale_x + m22 * v * r) / m11
-        pdot = (kd * force_scale_k + (z_h - z_g) * (my * vdot + mx * u * r)) / m33
-        rdot = nd * force_scale_n / m44
+        surge_linear_force = -LINEAR_SURGE_DAMP * u
+        yaw_linear_moment = -LINEAR_YAW_DAMP * r
+        udot = (xd * force_scale_x + surge_linear_force + m22 * v * r) / m11
+        roll_damping_moment = -ROLL_DAMP_SCALE * b44 * p
+        roll_restoring_moment = -ROLL_RESTORE_SCALE * c44 * phi
+        pdot = (
+            kd * force_scale_k
+            + roll_damping_moment
+            + roll_restoring_moment
+            + (z_h - z_g) * (my * vdot + mx * u * r)
+        ) / m33
+        rdot = (nd * force_scale_n + yaw_linear_moment) / m44
         xdot = math.cos(psi) * u - math.sin(psi) * v * math.cos(phi)
         ydot = math.sin(psi) * u + math.cos(psi) * v * math.cos(phi)
         phidot = p
@@ -403,4 +448,3 @@ class ShipModel:
             ],
             dtype=float,
         )
-

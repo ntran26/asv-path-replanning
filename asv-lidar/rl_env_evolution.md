@@ -99,7 +99,7 @@ Before deeper reward redesign, several consistency issues had to be fixed.
 `dhdg` was changed from a raw yaw-rate style exposure to a normalized signal:
 
 $$
-\mathrm{dhdg} = \operatorname{clip}\left(\frac{\dot{\psi}}{180}, -1, 1\right)
+\mathrm{dhdg} = \mathrm{clip}\left(\frac{\dot{\psi}}{180}, -1, 1\right)
 $$
 
 Why:
@@ -113,7 +113,7 @@ Why:
 `target_heading` had to be recomputed every step using the current pose and goal:
 
 $$
-\Delta \psi_{\mathrm{goal}} = \operatorname{wrap}_{[-180,180]}\left(\psi_{\mathrm{target}} - \psi\right)
+\Delta \psi_{\mathrm{goal}} = \mathrm{wrap}_{[-180,180]}\left(\psi_{\mathrm{target}} - \psi\right)
 $$
 
 Why:
@@ -151,7 +151,7 @@ $$
 Then a robust summary statistic was used instead of a beamwise sum:
 
 $$
-d_{\mathrm{front}} = \operatorname{Percentile}_{10}\left(\left\{ d_i \mid i \in F \right\}\right)
+d_{\mathrm{front}} = \mathrm{Percentile}_{10}\left(\left\{ d_i \mid i \in F \right\}\right)
 $$
 
 ### 4.2 Barrier-Style OA Term
@@ -197,7 +197,7 @@ The main sector clearances were defined from a 10th-percentile beam statistic:
 $$
 \begin{aligned}
 d_L,\; d_C,\; d_R \\
-d_C &= \operatorname{Percentile}_{10}\left(\left\{ d_i \mid \lvert \theta_i \rvert \le \theta_c \right\}\right)
+d_C &= \mathrm{Percentile}_{10}\left(\left\{ d_i \mid \lvert \theta_i \rvert \le \theta_c \right\}\right)
 \end{aligned}
 $$
 
@@ -209,7 +209,7 @@ The center sector became the main collision barrier:
 
 $$
 \begin{aligned}
-z_c &= \operatorname{clip}\left(\frac{d_{\mathrm{warn}} - d_C}{d_{\mathrm{warn}} - d_{\mathrm{crit}}}, 0, 1\right) \\
+z_c &= \mathrm{clip}\left(\frac{d_{\mathrm{warn}} - d_C}{d_{\mathrm{warn}} - d_{\mathrm{crit}}}, 0, 1\right) \\
 r_{\mathrm{center}} &= -k_c z_c^2
 \end{aligned}
 $$
@@ -218,7 +218,7 @@ Near-collision strengthening was added with a second term:
 
 $$
 \begin{aligned}
-z_n &= \operatorname{clip}\left(\frac{d_{\mathrm{near}} - d_C}{d_{\mathrm{near}}}, 0, 1\right) \\
+z_n &= \mathrm{clip}\left(\frac{d_{\mathrm{near}} - d_C}{d_{\mathrm{near}}}, 0, 1\right) \\
 r_{\mathrm{near}} &= -k_n z_n^2
 \end{aligned}
 $$
@@ -422,7 +422,7 @@ The current observation uses both persistent and fresh LiDAR-sector information:
 The earlier asymmetry term was:
 
 $$
-\mathrm{gap\_asymmetry} = \operatorname{clip}\left(\frac{d_{R,\mathrm{mem}} - d_{L,\mathrm{mem}}}{d_{\mathrm{warn}}}, -1, 1\right)
+\mathrm{gap\_asymmetry} = \mathrm{clip}\left(\frac{d_{R,\mathrm{mem}} - d_{L,\mathrm{mem}}}{d_{\mathrm{warn}}}, -1, 1\right)
 $$
 
 The latest LiDAR-sector fix goes one step further. Each sector now carries both:
@@ -434,11 +434,11 @@ In plain form:
 
 $$
 \begin{aligned}
-\mathrm{blocked\_clear} &= \operatorname{Percentile}_{10}\left(\mathrm{valid\_returns}\right) \\
-\mathrm{open\_clear} &= \operatorname{Percentile}_{80}\left(\mathrm{all\_sector\_returns}\right) \\
+\mathrm{blocked\_clear} &= \mathrm{Percentile}_{10}\left(\mathrm{valid\_returns}\right) \\
+\mathrm{open\_clear} &= \mathrm{Percentile}_{80}\left(\mathrm{all\_sector\_returns}\right) \\
 \mathrm{open\_fraction} &= \mathrm{fraction\_of\_sector\_with\_range} \ge \mathrm{sector\_open\_clearance} \\
 \mathrm{no\_return\_fraction} &= \mathrm{fraction\_of\_sector\_with\_range} \ge \mathrm{lidar\_max\_range} \\
-\mathrm{openness} &= \operatorname{clip}\left(\max(\mathrm{open\_fraction}, \mathrm{no\_return\_fraction}), 0, 1\right) \\
+\mathrm{openness} &= \mathrm{clip}\left(\max(\mathrm{open\_fraction}, \mathrm{no\_return\_fraction}), 0, 1\right) \\
 \mathrm{instant\_clear} &= \mathrm{blocked\_clear} + \mathrm{openness}\,\max\left(0, \mathrm{open\_clear} - \mathrm{blocked\_clear}\right) \\
 \mathrm{smoothed\_clear} &= \min\left(\mathrm{instant\_clear}, \mathrm{prev\_clear} + \mathrm{recovery\_step}\right)
 \end{aligned}

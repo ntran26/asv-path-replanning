@@ -1,0 +1,22 @@
+{
+  "rpm_start_idx": 0,
+  "rpm_start_t_sec": 0.0,
+  "motion_start_idx": 10,
+  "motion_start_t_sec": 1.0,
+  "motion_lag_s": 1.0,
+  "u_body_at_2s_after_motion_mps": 0.5132961876411046,
+  "u_body_at_5s_after_motion_mps": 1.1372960414185964,
+  "u_body_at_10s_after_motion_mps": 1.5395342563742853,
+  "distance_at_5s_after_motion_m": 3.097038839443195,
+  "distance_at_10s_after_motion_m": 10.026999455686521,
+  "initial_accel_0_2_after_motion_mps2": 0.23123598436564674,
+  "initial_accel_0_5_after_motion_mps2": 0.22755641705895155,
+  "peak_u_body_mps": 1.644327158240219,
+  "time_to_50pct_peak_u_after_motion_s": 3.3,
+  "time_to_90pct_peak_u_after_motion_s": 8.700000000000001,
+  "u_body_at_2s_after_rpm_mps": 0.25994166629946197,
+  "u_body_at_5s_after_rpm_mps": 0.9677270643632665,
+  "u_body_at_10s_after_rpm_mps": 1.4992245002412947,
+  "distance_at_5s_after_rpm_m": 2.059125986318378,
+  "distance_at_10s_after_rpm_m": 8.524486526231364
+}

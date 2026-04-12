@@ -26,6 +26,11 @@ Optional:
 DEFAULT_BENCHMARK_CASES = [0, 1, 2, 3, 4, 5]
 DEFAULT_EVAL_FREQ = 50_000
 DEFAULT_EVAL_MAX_STEPS = 600
+DEFAULT_CURRICULUM_CASES = [
+    [0],
+    [0, 1, 2],
+    [0, 1, 2, 3, 4, 5],
+]
 
 
 # -----------------------------------------------------------------------------
@@ -122,7 +127,12 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
     obs_left_clears_instant: List[float] = []
     obs_center_clears_instant: List[float] = []
     obs_right_clears_instant: List[float] = []
+    obs_left_blocked: List[float] = []
+    obs_center_blocked: List[float] = []
+    obs_right_blocked: List[float] = []
     gap_asymmetries: List[float] = []
+    gap_open_asymmetries: List[float] = []
+    gap_blocked_asymmetries: List[float] = []
     lidar_left_clears_m: List[float] = []
     lidar_center_clears_m: List[float] = []
     lidar_right_clears_m: List[float] = []
@@ -141,6 +151,20 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
     lam_values: List[float] = []
     rudder_states: List[float] = []
     rpm_states: List[float] = []
+    gap_strengths: List[float] = []
+    r_commits: List[float] = []
+    r_recenters: List[float] = []
+    recenter_gates: List[float] = []
+    path_progress_steps: List[float] = []
+    goal_progress_steps: List[float] = []
+    track_qualities: List[float] = []
+    r_pf_progress_terms: List[float] = []
+    r_pf_track_terms: List[float] = []
+    guide_headings: List[float] = []
+    guide_turn_prefs: List[float] = []
+    guide_clears: List[float] = []
+    guide_alignments: List[float] = []
+    guide_progress_steps: List[float] = []
     first_oa_step = None
 
     while steps < max_steps:
@@ -170,7 +194,12 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
         obs_left_clears_instant.append(float(info.get("left_clear_instant", 0.0)))
         obs_center_clears_instant.append(float(info.get("center_clear_instant", 0.0)))
         obs_right_clears_instant.append(float(info.get("right_clear_instant", 0.0)))
+        obs_left_blocked.append(float(info.get("left_blocked", 0.0)))
+        obs_center_blocked.append(float(info.get("center_blocked", 0.0)))
+        obs_right_blocked.append(float(info.get("right_blocked", 0.0)))
         gap_asymmetries.append(float(info.get("gap_asymmetry", 0.0)))
+        gap_open_asymmetries.append(float(info.get("gap_open_asymmetry", 0.0)))
+        gap_blocked_asymmetries.append(float(info.get("gap_blocked_asymmetry", 0.0)))
         lidar_left_clears_m.append(float(info.get("lidar_left_clear_m", float("inf"))))
         lidar_center_clears_m.append(float(info.get("lidar_center_clear_m", float("inf"))))
         lidar_right_clears_m.append(float(info.get("lidar_right_clear_m", float("inf"))))
@@ -190,6 +219,20 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
         lam_values.append(float(info.get("lam", 0.0)))
         rudder_states.append(float(info.get("rudder_state", 0.0)))
         rpm_states.append(float(info.get("rpm_state", 0.0)))
+        gap_strengths.append(float(info.get("gap_strength", 0.0)))
+        r_commits.append(float(info.get("r_commit", 0.0)))
+        r_recenters.append(float(info.get("r_recenter", 0.0)))
+        recenter_gates.append(float(info.get("recenter_gate", 0.0)))
+        path_progress_steps.append(float(info.get("path_progress_step", 0.0)))
+        goal_progress_steps.append(float(info.get("goal_progress_step", 0.0)))
+        track_qualities.append(float(info.get("track_quality", 0.0)))
+        r_pf_progress_terms.append(float(info.get("r_pf_progress", 0.0)))
+        r_pf_track_terms.append(float(info.get("r_pf_track", 0.0)))
+        guide_headings.append(float(info.get("guide_heading", 0.0)))
+        guide_turn_prefs.append(float(info.get("guide_turn_pref", 0.0)))
+        guide_clears.append(float(info.get("guide_clear_m", 0.0)))
+        guide_alignments.append(float(info.get("guide_alignment", 0.0)))
+        guide_progress_steps.append(float(info.get("guide_progress_step", 0.0)))
 
         speeds.append(float(getattr(env, "speed_mps", 0.0)))
         rpms.append(action_to_rpm(float(action[1])))
@@ -239,7 +282,12 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
         "max_obs_left_clear_instant": float(np.max(obs_left_clears_instant)) if obs_left_clears_instant else 0.0,
         "max_obs_center_clear_instant": float(np.max(obs_center_clears_instant)) if obs_center_clears_instant else 0.0,
         "max_obs_right_clear_instant": float(np.max(obs_right_clears_instant)) if obs_right_clears_instant else 0.0,
+        "min_obs_left_blocked": float(np.min(obs_left_blocked)) if obs_left_blocked else float("inf"),
+        "min_obs_center_blocked": float(np.min(obs_center_blocked)) if obs_center_blocked else float("inf"),
+        "min_obs_right_blocked": float(np.min(obs_right_blocked)) if obs_right_blocked else float("inf"),
         "mean_abs_gap_asymmetry": float(np.mean(np.abs(gap_asymmetries))) if gap_asymmetries else 0.0,
+        "mean_abs_gap_open_asymmetry": float(np.mean(np.abs(gap_open_asymmetries))) if gap_open_asymmetries else 0.0,
+        "mean_abs_gap_blocked_asymmetry": float(np.mean(np.abs(gap_blocked_asymmetries))) if gap_blocked_asymmetries else 0.0,
         "min_lidar_left_clear_m": float(np.min(lidar_left_clears_m)) if lidar_left_clears_m else float("inf"),
         "min_lidar_center_clear_m": float(np.min(lidar_center_clears_m)) if lidar_center_clears_m else float("inf"),
         "min_lidar_right_clear_m": float(np.min(lidar_right_clears_m)) if lidar_right_clears_m else float("inf"),
@@ -258,6 +306,20 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
         "mean_lam": float(np.mean(lam_values)) if lam_values else 0.0,
         "mean_rudder_state": float(np.mean(rudder_states)) if rudder_states else 0.0,
         "mean_rpm_state": float(np.mean(rpm_states)) if rpm_states else 0.0,
+        "mean_gap_strength": float(np.mean(gap_strengths)) if gap_strengths else 0.0,
+        "mean_r_commit": float(np.mean(r_commits)) if r_commits else 0.0,
+        "mean_r_recenter": float(np.mean(r_recenters)) if r_recenters else 0.0,
+        "mean_recenter_gate": float(np.mean(recenter_gates)) if recenter_gates else 0.0,
+        "mean_path_progress_step": float(np.mean(path_progress_steps)) if path_progress_steps else 0.0,
+        "mean_goal_progress_step": float(np.mean(goal_progress_steps)) if goal_progress_steps else 0.0,
+        "mean_track_quality": float(np.mean(track_qualities)) if track_qualities else 0.0,
+        "mean_r_pf_progress": float(np.mean(r_pf_progress_terms)) if r_pf_progress_terms else 0.0,
+        "mean_r_pf_track": float(np.mean(r_pf_track_terms)) if r_pf_track_terms else 0.0,
+        "mean_abs_guide_heading": float(np.mean(np.abs(guide_headings))) if guide_headings else 0.0,
+        "mean_abs_guide_turn_pref": float(np.mean(np.abs(guide_turn_prefs))) if guide_turn_prefs else 0.0,
+        "mean_guide_clear_m": float(np.mean(guide_clears)) if guide_clears else 0.0,
+        "mean_guide_alignment": float(np.mean(guide_alignments)) if guide_alignments else 0.0,
+        "mean_guide_progress_step": float(np.mean(guide_progress_steps)) if guide_progress_steps else 0.0,
         "final_x": float(env.asv_x),
         "final_y": float(env.asv_y),
         "final_heading": float(env.asv_h),
@@ -288,6 +350,20 @@ def evaluate_benchmark(model, env: ASVLidarEnv, cases: List[int], max_steps: int
         "mean_lam": float(np.mean([row["mean_lam"] for row in rows])) if rows else 0.0,
         "mean_rudder_state": float(np.mean([row["mean_rudder_state"] for row in rows])) if rows else 0.0,
         "mean_rpm_state": float(np.mean([row["mean_rpm_state"] for row in rows])) if rows else 0.0,
+        "mean_gap_strength": float(np.mean([row["mean_gap_strength"] for row in rows])) if rows else 0.0,
+        "mean_r_commit": float(np.mean([row["mean_r_commit"] for row in rows])) if rows else 0.0,
+        "mean_r_recenter": float(np.mean([row["mean_r_recenter"] for row in rows])) if rows else 0.0,
+        "mean_recenter_gate": float(np.mean([row["mean_recenter_gate"] for row in rows])) if rows else 0.0,
+        "mean_path_progress_step": float(np.mean([row["mean_path_progress_step"] for row in rows])) if rows else 0.0,
+        "mean_goal_progress_step": float(np.mean([row["mean_goal_progress_step"] for row in rows])) if rows else 0.0,
+        "mean_track_quality": float(np.mean([row["mean_track_quality"] for row in rows])) if rows else 0.0,
+        "mean_r_pf_progress": float(np.mean([row["mean_r_pf_progress"] for row in rows])) if rows else 0.0,
+        "mean_r_pf_track": float(np.mean([row["mean_r_pf_track"] for row in rows])) if rows else 0.0,
+        "mean_abs_guide_heading": float(np.mean([row["mean_abs_guide_heading"] for row in rows])) if rows else 0.0,
+        "mean_abs_guide_turn_pref": float(np.mean([row["mean_abs_guide_turn_pref"] for row in rows])) if rows else 0.0,
+        "mean_guide_clear_m": float(np.mean([row["mean_guide_clear_m"] for row in rows])) if rows else 0.0,
+        "mean_guide_alignment": float(np.mean([row["mean_guide_alignment"] for row in rows])) if rows else 0.0,
+        "mean_guide_progress_step": float(np.mean([row["mean_guide_progress_step"] for row in rows])) if rows else 0.0,
         "min_obs_left_clear": float(np.min([row["min_obs_left_clear"] for row in rows])) if rows else float("inf"),
         "min_obs_center_clear": float(np.min([row["min_obs_center_clear"] for row in rows])) if rows else float("inf"),
         "min_obs_right_clear": float(np.min([row["min_obs_right_clear"] for row in rows])) if rows else float("inf"),
@@ -300,7 +376,12 @@ def evaluate_benchmark(model, env: ASVLidarEnv, cases: List[int], max_steps: int
         "max_obs_left_clear_instant": float(np.max([row["max_obs_left_clear_instant"] for row in rows])) if rows else 0.0,
         "max_obs_center_clear_instant": float(np.max([row["max_obs_center_clear_instant"] for row in rows])) if rows else 0.0,
         "max_obs_right_clear_instant": float(np.max([row["max_obs_right_clear_instant"] for row in rows])) if rows else 0.0,
+        "min_obs_left_blocked": float(np.min([row["min_obs_left_blocked"] for row in rows])) if rows else float("inf"),
+        "min_obs_center_blocked": float(np.min([row["min_obs_center_blocked"] for row in rows])) if rows else float("inf"),
+        "min_obs_right_blocked": float(np.min([row["min_obs_right_blocked"] for row in rows])) if rows else float("inf"),
         "mean_abs_gap_asymmetry": float(np.mean([row["mean_abs_gap_asymmetry"] for row in rows])) if rows else 0.0,
+        "mean_abs_gap_open_asymmetry": float(np.mean([row["mean_abs_gap_open_asymmetry"] for row in rows])) if rows else 0.0,
+        "mean_abs_gap_blocked_asymmetry": float(np.mean([row["mean_abs_gap_blocked_asymmetry"] for row in rows])) if rows else 0.0,
         "min_lidar_left_clear_m": float(np.min([row["min_lidar_left_clear_m"] for row in rows])) if rows else float("inf"),
         "min_lidar_center_clear_m": float(np.min([row["min_lidar_center_clear_m"] for row in rows])) if rows else float("inf"),
         "min_lidar_right_clear_m": float(np.min([row["min_lidar_right_clear_m"] for row in rows])) if rows else float("inf"),
@@ -405,6 +486,20 @@ class FixedBenchmarkCallback(BaseCallback):
         self.logger.record("benchmark/mean_lam", summary["mean_lam"])
         self.logger.record("benchmark/mean_rudder_state", summary["mean_rudder_state"])
         self.logger.record("benchmark/mean_rpm_state", summary["mean_rpm_state"])
+        self.logger.record("benchmark/mean_gap_strength", summary["mean_gap_strength"])
+        self.logger.record("benchmark/mean_r_commit", summary["mean_r_commit"])
+        self.logger.record("benchmark/mean_r_recenter", summary["mean_r_recenter"])
+        self.logger.record("benchmark/mean_recenter_gate", summary["mean_recenter_gate"])
+        self.logger.record("benchmark/mean_path_progress_step", summary["mean_path_progress_step"])
+        self.logger.record("benchmark/mean_goal_progress_step", summary["mean_goal_progress_step"])
+        self.logger.record("benchmark/mean_track_quality", summary["mean_track_quality"])
+        self.logger.record("benchmark/mean_r_pf_progress", summary["mean_r_pf_progress"])
+        self.logger.record("benchmark/mean_r_pf_track", summary["mean_r_pf_track"])
+        self.logger.record("benchmark/mean_abs_guide_heading", summary["mean_abs_guide_heading"])
+        self.logger.record("benchmark/mean_abs_guide_turn_pref", summary["mean_abs_guide_turn_pref"])
+        self.logger.record("benchmark/mean_guide_clear_m", summary["mean_guide_clear_m"])
+        self.logger.record("benchmark/mean_guide_alignment", summary["mean_guide_alignment"])
+        self.logger.record("benchmark/mean_guide_progress_step", summary["mean_guide_progress_step"])
         self.logger.record("benchmark/min_obs_left_clear", summary["min_obs_left_clear"])
         self.logger.record("benchmark/min_obs_center_clear", summary["min_obs_center_clear"])
         self.logger.record("benchmark/min_obs_right_clear", summary["min_obs_right_clear"])
@@ -417,7 +512,12 @@ class FixedBenchmarkCallback(BaseCallback):
         self.logger.record("benchmark/max_obs_left_clear_instant", summary["max_obs_left_clear_instant"])
         self.logger.record("benchmark/max_obs_center_clear_instant", summary["max_obs_center_clear_instant"])
         self.logger.record("benchmark/max_obs_right_clear_instant", summary["max_obs_right_clear_instant"])
+        self.logger.record("benchmark/min_obs_left_blocked", summary["min_obs_left_blocked"])
+        self.logger.record("benchmark/min_obs_center_blocked", summary["min_obs_center_blocked"])
+        self.logger.record("benchmark/min_obs_right_blocked", summary["min_obs_right_blocked"])
         self.logger.record("benchmark/mean_abs_gap_asymmetry", summary["mean_abs_gap_asymmetry"])
+        self.logger.record("benchmark/mean_abs_gap_open_asymmetry", summary["mean_abs_gap_open_asymmetry"])
+        self.logger.record("benchmark/mean_abs_gap_blocked_asymmetry", summary["mean_abs_gap_blocked_asymmetry"])
         self.logger.record("benchmark/min_lidar_left_clear_m", summary["min_lidar_left_clear_m"])
         self.logger.record("benchmark/min_lidar_center_clear_m", summary["min_lidar_center_clear_m"])
         self.logger.record("benchmark/min_lidar_right_clear_m", summary["min_lidar_right_clear_m"])
@@ -441,6 +541,35 @@ class FixedBenchmarkCallback(BaseCallback):
 
         return True
 
+
+class CurriculumCallback(BaseCallback):
+    def __init__(self, stage_end_steps: List[int], stage_cases: List[List[int]], verbose: int = 1):
+        super().__init__(verbose)
+        if len(stage_end_steps) != len(stage_cases):
+            raise ValueError("stage_end_steps and stage_cases must have the same length")
+        self.stage_end_steps = [int(x) for x in stage_end_steps]
+        self.stage_cases = [list(map(int, cases)) for cases in stage_cases]
+        self.current_stage = 0
+
+    def _apply_stage(self, stage_idx: int) -> None:
+        cases = self.stage_cases[stage_idx]
+        self.training_env.env_method("set_train_case_pool", cases)
+        if self.verbose:
+            print(f"[CURRICULUM] stage={stage_idx + 1}/{len(self.stage_cases)} cases={cases} @ step={self.num_timesteps}")
+
+    def _on_training_start(self) -> None:
+        self.current_stage = 0
+        self._apply_stage(self.current_stage)
+
+    def _on_step(self) -> bool:
+        while self.current_stage < len(self.stage_end_steps) - 1 and self.num_timesteps >= self.stage_end_steps[self.current_stage]:
+            self.current_stage += 1
+            self._apply_stage(self.current_stage)
+
+        self.logger.record("curriculum/stage", float(self.current_stage + 1))
+        self.logger.record("curriculum/num_cases", float(len(self.stage_cases[self.current_stage])))
+        return True
+
 # -----------------------------------------------------------------------------
 # Setup helpers
 # -----------------------------------------------------------------------------
@@ -459,12 +588,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--eval-max-steps", type=int, default=DEFAULT_EVAL_MAX_STEPS)
     parser.add_argument("--save-freq", type=int, default=500_000)
     parser.add_argument("--benchmark-cases", type=int, nargs="*", default=DEFAULT_BENCHMARK_CASES)
+    parser.add_argument("--curriculum", dest="curriculum", action="store_true")
+    parser.add_argument("--no-curriculum", dest="curriculum", action="store_false")
+    parser.set_defaults(curriculum=True)
 
     return parser.parse_args()
 
-def make_train_env(seed: int, rank: int):
+def make_train_env(seed: int, rank: int, case_pool=None):
     def _init():
         env = ASVLidarEnv(render_mode=None)
+        if case_pool is not None:
+            env.set_train_case_pool(case_pool)
         env.reset(seed=seed + rank)
         return env
     return _init
@@ -534,7 +668,18 @@ def main() -> None:
     model_path = args.model_path or f"{algo}_asv_model.zip"
 
     if args.mode == "train":
-        env_fns = [make_train_env(args.seed, i) for i in range(args.num_envs)]
+        if args.curriculum:
+            stage_ends = [
+                max(1, int(args.timesteps * 0.25)),
+                max(1, int(args.timesteps * 0.60)),
+                int(args.timesteps),
+            ]
+            initial_case_pool = DEFAULT_CURRICULUM_CASES[0]
+        else:
+            stage_ends = []
+            initial_case_pool = None
+
+        env_fns = [make_train_env(args.seed, i, case_pool=initial_case_pool) for i in range(args.num_envs)]
         vec_env = VecMonitor(SubprocVecEnv(env_fns), filename="train_monitor.csv")
 
         model = build_model(algo, vec_env, args.num_envs)
@@ -560,10 +705,21 @@ def main() -> None:
             verbose=1,
         )
 
+        callbacks = [checkpoint_cb, benchmark_cb]
+        if args.curriculum:
+            callbacks.insert(
+                0,
+                CurriculumCallback(
+                    stage_end_steps=stage_ends,
+                    stage_cases=DEFAULT_CURRICULUM_CASES,
+                    verbose=1,
+                ),
+            )
+
         model.learn(
             total_timesteps=int(args.timesteps),
             tb_log_name=f"asv_{algo}",
-            callback=CallbackList([checkpoint_cb, benchmark_cb]),
+            callback=CallbackList(callbacks),
             progress_bar=True,
         )
         model.save(model_path)
