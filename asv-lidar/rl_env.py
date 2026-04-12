@@ -33,6 +33,8 @@ LAMBDA_THREAT = 0.25
 OA_FRONT_HALF_ANGLE_DEG = 45
 OA_FRONT_PERCENTILE = 10
 OA_CENTER_HALF_ANGLE_DEG = 20
+SECTOR_OPEN_PERCENTILE = 80
+SECTOR_OPEN_CLEARANCE = 3.0
 OA_WARN_CLEARANCE = 4.5
 OA_CRIT_CLEARANCE = 1.5
 OA_NEAR_CLEARANCE = 1.8
@@ -441,15 +443,34 @@ class ASVLidarEnv(gym.Env):
 
     def _lidar_sector_clear_with_memory(self, sector_ranges, prev_clear_m):
         sector_ranges = sector_ranges[np.isfinite(sector_ranges)]
+        if sector_ranges.size == 0:
+            sector_ranges = np.array([LIDAR_RANGE], dtype=np.float32)
+
         valid = sector_ranges[(sector_ranges >= LIDAR_MIN_RANGE) & (sector_ranges < LIDAR_RANGE)]
 
         if valid.size:
-            instant_clear = float(np.percentile(valid, OA_FRONT_PERCENTILE))
+            blocked_clear = float(np.percentile(valid, OA_FRONT_PERCENTILE))
         else:
-            instant_clear = float(LIDAR_RANGE)
+            blocked_clear = float(LIDAR_RANGE)
 
+        open_clear = float(np.percentile(sector_ranges, SECTOR_OPEN_PERCENTILE))
+        open_fraction = float(np.mean(sector_ranges >= SECTOR_OPEN_CLEARANCE))
+        no_return_fraction = float(np.mean(sector_ranges >= LIDAR_RANGE))
+        openness = float(np.clip(max(open_fraction, no_return_fraction), 0.0, 1.0))
+
+        # Blend local blockage with sector openness so the policy can still see
+        # which side has usable free space, even with the LiDAR blind zone.
+        instant_clear = float(blocked_clear + openness * max(0.0, open_clear - blocked_clear))
         smoothed_clear = float(min(instant_clear, prev_clear_m + SECTOR_CLEAR_RECOVERY_M))
-        return instant_clear, smoothed_clear
+
+        return {
+            "blocked_clear_m": blocked_clear,
+            "open_clear_m": open_clear,
+            "open_fraction": open_fraction,
+            "no_return_fraction": no_return_fraction,
+            "instant_clear_m": instant_clear,
+            "smoothed_clear_m": smoothed_clear,
+        }
 
     def _compute_lidar_sector_observation_features(self):
         theta_deg = self.lidar.angles.astype(np.float32)
@@ -467,21 +488,33 @@ class ASVLidarEnv(gym.Env):
         center_ranges = front_ranges[center_mask] if np.any(center_mask) else np.array([LIDAR_RANGE], dtype=np.float32)
         right_ranges = front_ranges[right_mask] if np.any(right_mask) else np.array([LIDAR_RANGE], dtype=np.float32)
 
-        left_instant, left_smoothed = self._lidar_sector_clear_with_memory(left_ranges, self.left_clear_lidar_m)
-        center_instant, center_smoothed = self._lidar_sector_clear_with_memory(center_ranges, self.center_clear_lidar_m)
-        right_instant, right_smoothed = self._lidar_sector_clear_with_memory(right_ranges, self.right_clear_lidar_m)
+        left_stats = self._lidar_sector_clear_with_memory(left_ranges, self.left_clear_lidar_m)
+        center_stats = self._lidar_sector_clear_with_memory(center_ranges, self.center_clear_lidar_m)
+        right_stats = self._lidar_sector_clear_with_memory(right_ranges, self.right_clear_lidar_m)
 
-        self.left_clear_lidar_m = left_smoothed
-        self.center_clear_lidar_m = center_smoothed
-        self.right_clear_lidar_m = right_smoothed
+        self.left_clear_lidar_m = left_stats["smoothed_clear_m"]
+        self.center_clear_lidar_m = center_stats["smoothed_clear_m"]
+        self.right_clear_lidar_m = right_stats["smoothed_clear_m"]
 
         return {
-            "left_lidar_clear_m": left_smoothed,
-            "center_lidar_clear_m": center_smoothed,
-            "right_lidar_clear_m": right_smoothed,
-            "left_lidar_instant_m": left_instant,
-            "center_lidar_instant_m": center_instant,
-            "right_lidar_instant_m": right_instant,
+            "left_lidar_clear_m": left_stats["smoothed_clear_m"],
+            "center_lidar_clear_m": center_stats["smoothed_clear_m"],
+            "right_lidar_clear_m": right_stats["smoothed_clear_m"],
+            "left_lidar_instant_m": left_stats["instant_clear_m"],
+            "center_lidar_instant_m": center_stats["instant_clear_m"],
+            "right_lidar_instant_m": right_stats["instant_clear_m"],
+            "left_lidar_blocked_m": left_stats["blocked_clear_m"],
+            "center_lidar_blocked_m": center_stats["blocked_clear_m"],
+            "right_lidar_blocked_m": right_stats["blocked_clear_m"],
+            "left_lidar_open_m": left_stats["open_clear_m"],
+            "center_lidar_open_m": center_stats["open_clear_m"],
+            "right_lidar_open_m": right_stats["open_clear_m"],
+            "left_lidar_open_fraction": left_stats["open_fraction"],
+            "center_lidar_open_fraction": center_stats["open_fraction"],
+            "right_lidar_open_fraction": right_stats["open_fraction"],
+            "left_lidar_no_return_fraction": left_stats["no_return_fraction"],
+            "center_lidar_no_return_fraction": center_stats["no_return_fraction"],
+            "right_lidar_no_return_fraction": right_stats["no_return_fraction"],
         }
 
     def _update_compact_obs_state(self, lidar_sector_features, rpm_norm):
@@ -748,6 +781,15 @@ class ASVLidarEnv(gym.Env):
             "lidar_left_instant_m": float(lidar_sector_features["left_lidar_instant_m"]),
             "lidar_center_instant_m": float(lidar_sector_features["center_lidar_instant_m"]),
             "lidar_right_instant_m": float(lidar_sector_features["right_lidar_instant_m"]),
+            "lidar_left_blocked_m": float(lidar_sector_features["left_lidar_blocked_m"]),
+            "lidar_center_blocked_m": float(lidar_sector_features["center_lidar_blocked_m"]),
+            "lidar_right_blocked_m": float(lidar_sector_features["right_lidar_blocked_m"]),
+            "lidar_left_open_m": float(lidar_sector_features["left_lidar_open_m"]),
+            "lidar_center_open_m": float(lidar_sector_features["center_lidar_open_m"]),
+            "lidar_right_open_m": float(lidar_sector_features["right_lidar_open_m"]),
+            "lidar_left_open_fraction": float(lidar_sector_features["left_lidar_open_fraction"]),
+            "lidar_center_open_fraction": float(lidar_sector_features["center_lidar_open_fraction"]),
+            "lidar_right_open_fraction": float(lidar_sector_features["right_lidar_open_fraction"]),
             "rudder_state": float(self.rudder_state_norm),
             "rpm_state": float(self.rpm_state_norm),
         }

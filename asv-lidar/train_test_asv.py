@@ -126,6 +126,12 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
     lidar_left_clears_m: List[float] = []
     lidar_center_clears_m: List[float] = []
     lidar_right_clears_m: List[float] = []
+    lidar_left_blocked_m: List[float] = []
+    lidar_center_blocked_m: List[float] = []
+    lidar_right_blocked_m: List[float] = []
+    lidar_left_open_fracs: List[float] = []
+    lidar_center_open_fracs: List[float] = []
+    lidar_right_open_fracs: List[float] = []
     r_pfs: List[float] = []
     r_oas: List[float] = []
     pf_contribs: List[float] = []
@@ -168,6 +174,12 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
         lidar_left_clears_m.append(float(info.get("lidar_left_clear_m", float("inf"))))
         lidar_center_clears_m.append(float(info.get("lidar_center_clear_m", float("inf"))))
         lidar_right_clears_m.append(float(info.get("lidar_right_clear_m", float("inf"))))
+        lidar_left_blocked_m.append(float(info.get("lidar_left_blocked_m", float("inf"))))
+        lidar_center_blocked_m.append(float(info.get("lidar_center_blocked_m", float("inf"))))
+        lidar_right_blocked_m.append(float(info.get("lidar_right_blocked_m", float("inf"))))
+        lidar_left_open_fracs.append(float(info.get("lidar_left_open_fraction", 0.0)))
+        lidar_center_open_fracs.append(float(info.get("lidar_center_open_fraction", 0.0)))
+        lidar_right_open_fracs.append(float(info.get("lidar_right_open_fraction", 0.0)))
 
         r_pfs.append(float(info.get("r_pf", 0.0)))
         r_oas.append(float(info.get("r_oa", 0.0)))
@@ -218,13 +230,25 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
         "min_obs_left_clear": float(np.min(obs_left_clears)) if obs_left_clears else float("inf"),
         "min_obs_center_clear": float(np.min(obs_center_clears)) if obs_center_clears else float("inf"),
         "min_obs_right_clear": float(np.min(obs_right_clears)) if obs_right_clears else float("inf"),
+        "max_obs_left_clear": float(np.max(obs_left_clears)) if obs_left_clears else 0.0,
+        "max_obs_center_clear": float(np.max(obs_center_clears)) if obs_center_clears else 0.0,
+        "max_obs_right_clear": float(np.max(obs_right_clears)) if obs_right_clears else 0.0,
         "min_obs_left_clear_instant": float(np.min(obs_left_clears_instant)) if obs_left_clears_instant else float("inf"),
         "min_obs_center_clear_instant": float(np.min(obs_center_clears_instant)) if obs_center_clears_instant else float("inf"),
         "min_obs_right_clear_instant": float(np.min(obs_right_clears_instant)) if obs_right_clears_instant else float("inf"),
+        "max_obs_left_clear_instant": float(np.max(obs_left_clears_instant)) if obs_left_clears_instant else 0.0,
+        "max_obs_center_clear_instant": float(np.max(obs_center_clears_instant)) if obs_center_clears_instant else 0.0,
+        "max_obs_right_clear_instant": float(np.max(obs_right_clears_instant)) if obs_right_clears_instant else 0.0,
         "mean_abs_gap_asymmetry": float(np.mean(np.abs(gap_asymmetries))) if gap_asymmetries else 0.0,
         "min_lidar_left_clear_m": float(np.min(lidar_left_clears_m)) if lidar_left_clears_m else float("inf"),
         "min_lidar_center_clear_m": float(np.min(lidar_center_clears_m)) if lidar_center_clears_m else float("inf"),
         "min_lidar_right_clear_m": float(np.min(lidar_right_clears_m)) if lidar_right_clears_m else float("inf"),
+        "min_lidar_left_blocked_m": float(np.min(lidar_left_blocked_m)) if lidar_left_blocked_m else float("inf"),
+        "min_lidar_center_blocked_m": float(np.min(lidar_center_blocked_m)) if lidar_center_blocked_m else float("inf"),
+        "min_lidar_right_blocked_m": float(np.min(lidar_right_blocked_m)) if lidar_right_blocked_m else float("inf"),
+        "mean_lidar_left_open_fraction": float(np.mean(lidar_left_open_fracs)) if lidar_left_open_fracs else 0.0,
+        "mean_lidar_center_open_fraction": float(np.mean(lidar_center_open_fracs)) if lidar_center_open_fracs else 0.0,
+        "mean_lidar_right_open_fraction": float(np.mean(lidar_right_open_fracs)) if lidar_right_open_fracs else 0.0,
         "mean_r_pf": float(np.mean(r_pfs)) if r_pfs else 0.0,
         "mean_r_oa": float(np.mean(r_oas)) if r_oas else 0.0,
         "mean_pf_contrib": float(np.mean(pf_contribs)) if pf_contribs else 0.0,
@@ -267,13 +291,25 @@ def evaluate_benchmark(model, env: ASVLidarEnv, cases: List[int], max_steps: int
         "min_obs_left_clear": float(np.min([row["min_obs_left_clear"] for row in rows])) if rows else float("inf"),
         "min_obs_center_clear": float(np.min([row["min_obs_center_clear"] for row in rows])) if rows else float("inf"),
         "min_obs_right_clear": float(np.min([row["min_obs_right_clear"] for row in rows])) if rows else float("inf"),
+        "max_obs_left_clear": float(np.max([row["max_obs_left_clear"] for row in rows])) if rows else 0.0,
+        "max_obs_center_clear": float(np.max([row["max_obs_center_clear"] for row in rows])) if rows else 0.0,
+        "max_obs_right_clear": float(np.max([row["max_obs_right_clear"] for row in rows])) if rows else 0.0,
         "min_obs_left_clear_instant": float(np.min([row["min_obs_left_clear_instant"] for row in rows])) if rows else float("inf"),
         "min_obs_center_clear_instant": float(np.min([row["min_obs_center_clear_instant"] for row in rows])) if rows else float("inf"),
         "min_obs_right_clear_instant": float(np.min([row["min_obs_right_clear_instant"] for row in rows])) if rows else float("inf"),
+        "max_obs_left_clear_instant": float(np.max([row["max_obs_left_clear_instant"] for row in rows])) if rows else 0.0,
+        "max_obs_center_clear_instant": float(np.max([row["max_obs_center_clear_instant"] for row in rows])) if rows else 0.0,
+        "max_obs_right_clear_instant": float(np.max([row["max_obs_right_clear_instant"] for row in rows])) if rows else 0.0,
         "mean_abs_gap_asymmetry": float(np.mean([row["mean_abs_gap_asymmetry"] for row in rows])) if rows else 0.0,
         "min_lidar_left_clear_m": float(np.min([row["min_lidar_left_clear_m"] for row in rows])) if rows else float("inf"),
         "min_lidar_center_clear_m": float(np.min([row["min_lidar_center_clear_m"] for row in rows])) if rows else float("inf"),
         "min_lidar_right_clear_m": float(np.min([row["min_lidar_right_clear_m"] for row in rows])) if rows else float("inf"),
+        "min_lidar_left_blocked_m": float(np.min([row["min_lidar_left_blocked_m"] for row in rows])) if rows else float("inf"),
+        "min_lidar_center_blocked_m": float(np.min([row["min_lidar_center_blocked_m"] for row in rows])) if rows else float("inf"),
+        "min_lidar_right_blocked_m": float(np.min([row["min_lidar_right_blocked_m"] for row in rows])) if rows else float("inf"),
+        "mean_lidar_left_open_fraction": float(np.mean([row["mean_lidar_left_open_fraction"] for row in rows])) if rows else 0.0,
+        "mean_lidar_center_open_fraction": float(np.mean([row["mean_lidar_center_open_fraction"] for row in rows])) if rows else 0.0,
+        "mean_lidar_right_open_fraction": float(np.mean([row["mean_lidar_right_open_fraction"] for row in rows])) if rows else 0.0,
         "min_left_p10": float(np.min([row["left_p10_min"] for row in rows])) if rows else float("inf"),
         "min_center_p10": float(np.min([row["center_p10_min"] for row in rows])) if rows else float("inf"),
         "min_right_p10": float(np.min([row["right_p10_min"] for row in rows])) if rows else float("inf"),
@@ -372,13 +408,25 @@ class FixedBenchmarkCallback(BaseCallback):
         self.logger.record("benchmark/min_obs_left_clear", summary["min_obs_left_clear"])
         self.logger.record("benchmark/min_obs_center_clear", summary["min_obs_center_clear"])
         self.logger.record("benchmark/min_obs_right_clear", summary["min_obs_right_clear"])
+        self.logger.record("benchmark/max_obs_left_clear", summary["max_obs_left_clear"])
+        self.logger.record("benchmark/max_obs_center_clear", summary["max_obs_center_clear"])
+        self.logger.record("benchmark/max_obs_right_clear", summary["max_obs_right_clear"])
         self.logger.record("benchmark/min_obs_left_clear_instant", summary["min_obs_left_clear_instant"])
         self.logger.record("benchmark/min_obs_center_clear_instant", summary["min_obs_center_clear_instant"])
         self.logger.record("benchmark/min_obs_right_clear_instant", summary["min_obs_right_clear_instant"])
+        self.logger.record("benchmark/max_obs_left_clear_instant", summary["max_obs_left_clear_instant"])
+        self.logger.record("benchmark/max_obs_center_clear_instant", summary["max_obs_center_clear_instant"])
+        self.logger.record("benchmark/max_obs_right_clear_instant", summary["max_obs_right_clear_instant"])
         self.logger.record("benchmark/mean_abs_gap_asymmetry", summary["mean_abs_gap_asymmetry"])
         self.logger.record("benchmark/min_lidar_left_clear_m", summary["min_lidar_left_clear_m"])
         self.logger.record("benchmark/min_lidar_center_clear_m", summary["min_lidar_center_clear_m"])
         self.logger.record("benchmark/min_lidar_right_clear_m", summary["min_lidar_right_clear_m"])
+        self.logger.record("benchmark/min_lidar_left_blocked_m", summary["min_lidar_left_blocked_m"])
+        self.logger.record("benchmark/min_lidar_center_blocked_m", summary["min_lidar_center_blocked_m"])
+        self.logger.record("benchmark/min_lidar_right_blocked_m", summary["min_lidar_right_blocked_m"])
+        self.logger.record("benchmark/mean_lidar_left_open_fraction", summary["mean_lidar_left_open_fraction"])
+        self.logger.record("benchmark/mean_lidar_center_open_fraction", summary["mean_lidar_center_open_fraction"])
+        self.logger.record("benchmark/mean_lidar_right_open_fraction", summary["mean_lidar_right_open_fraction"])
 
         if self.verbose:
             print(

@@ -22,7 +22,7 @@ The environment sits on top of:
 - `test_run.py`: fixed evaluation scenarios,
 - `train_test_asv.py`: PPO/SAC training and benchmark logging.
 
-The main research problem inside `rl_env.py` has been:  
+The main research problem inside `rl_env.py` has been:
 how to shape the reward and observation so the policy both tracks the route and makes decisive obstacle-avoidance decisions.
 
 ## 2. Baseline Environment And Initial Reward
@@ -42,18 +42,18 @@ This was enough to make learning possible, but not always enough to make behavio
 
 ### 2.2 Initial Path-Following Reward
 
-The path-following reward had the general form
+The path-following reward had the general form:
 
-\[
-r_{pf} = -1 + (U_n \cos\tilde{\chi} + 1)\left(e^{-\gamma_e |y_e|} + 1\right)
-\]
+$$
+r_{\mathrm{pf}} = -1 + \left(U_n \cos(\tilde{\chi}) + 1\right)\left(\exp\left(-\gamma_e \lvert y_e \rvert\right) + 1\right)
+$$
 
 where:
 
-- \(U_n\) is normalized speed,
-- \(\tilde{\chi}\) is path/course error,
-- \(y_e\) is cross-track error,
-- \(\gamma_e\) weights the cross-track penalty.
+- $U_n$ is normalized speed,
+- $\tilde{\chi}$ is path/course error,
+- $y_e$ is cross-track error,
+- $\gamma_e$ weights the cross-track penalty.
 
 This structure was retained because it captures the intended guidance behavior well:
 
@@ -65,24 +65,20 @@ This structure was retained because it captures the intended guidance behavior w
 
 The earliest OA reward used all LiDAR beams with an angle weight and inverse-distance penalty:
 
-\[
-w_i = \frac{1}{1 + |\gamma_\theta \theta_i|}
-\]
-
-\[
-p_i = \frac{1}{\gamma_x \max(d_i,\epsilon_x)^2}
-\]
-
-\[
-r_{oa}^{old} = -\frac{\sum_i w_i p_i}{\sum_i w_i}
-\]
+$$
+\begin{aligned}
+w_i &= \frac{1}{1 + \lvert \gamma_\theta \theta_i \rvert} \\
+p_i &= \frac{1}{\gamma_x \max(d_i, \varepsilon_x)^2} \\
+r_{\mathrm{oa,old}} &= -\frac{\sum_i w_i p_i}{\sum_i w_i}
+\end{aligned}
+$$
 
 where:
 
-- \(d_i\) is beam distance,
-- \(\theta_i\) is beam angle,
-- \(w_i\) downweights side beams,
-- \(p_i\) penalizes short distances.
+- $d_i$ is beam distance,
+- $\theta_i$ is beam angle,
+- $w_i$ downweights side beams,
+- $p_i$ penalizes short distances.
 
 ### 2.4 Why This Was Revisited
 
@@ -102,9 +98,9 @@ Before deeper reward redesign, several consistency issues had to be fixed.
 
 `dhdg` was changed from a raw yaw-rate style exposure to a normalized signal:
 
-\[
-dhdg = \mathrm{clip}\left(\frac{\dot{\psi}}{180}, -1, 1\right)
-\]
+$$
+\mathrm{dhdg} = \operatorname{clip}\left(\frac{\dot{\psi}}{180}, -1, 1\right)
+$$
 
 Why:
 
@@ -116,9 +112,9 @@ Why:
 
 `target_heading` had to be recomputed every step using the current pose and goal:
 
-\[
-\Delta \psi_{goal} = \mathrm{wrap}_{[-180,180]}\left(\psi_{target} - \psi\right)
-\]
+$$
+\Delta \psi_{\mathrm{goal}} = \operatorname{wrap}_{[-180,180]}\left(\psi_{\mathrm{target}} - \psi\right)
+$$
 
 Why:
 
@@ -129,9 +125,9 @@ Why:
 
 `tgt` moved from an unsigned nearest-path distance to a signed cross-track error:
 
-\[
-y_e = \frac{(x_g-x_s)(y-y_s) - (y_g-y_s)(x-x_s)}{\sqrt{(x_g-x_s)^2+(y_g-y_s)^2}}
-\]
+$$
+y_e = \frac{(x_g - x_s)(y - y_s) - (y_g - y_s)(x - x_s)}{\sqrt{(x_g - x_s)^2 + (y_g - y_s)^2}}
+$$
 
 Why:
 
@@ -146,29 +142,28 @@ To reduce the narrow-channel noise, OA shifted from “all beams always contribu
 
 ### 4.1 Front-Sector Clearance
 
-A forward sector was defined, originally with a half-angle of roughly \(45^\circ\):
+A forward sector was defined, originally with a half-angle of roughly $45^\circ$:
 
-\[
-\mathcal{F} = \{i \mid |\theta_i| \le \theta_f\}
-\]
+$$
+F = \left\{ i \mid \lvert \theta_i \rvert \le \theta_f \right\}
+$$
 
 Then a robust summary statistic was used instead of a beamwise sum:
 
-\[
-d_{front} = \mathrm{Percentile}_{10}\{d_i\}_{i \in \mathcal{F}}
-\]
+$$
+d_{\mathrm{front}} = \operatorname{Percentile}_{10}\left(\left\{ d_i \mid i \in F \right\}\right)
+$$
 
 ### 4.2 Barrier-Style OA Term
 
 The next OA idea became:
 
-\[
-\delta_{oa} = \max\left(0,\frac{d_{safe}-d_{front}}{d_{safe}}\right)
-\]
-
-\[
-r_{oa} = -\delta_{oa}^2
-\]
+$$
+\begin{aligned}
+\delta_{\mathrm{oa}} &= \max\left(0, \frac{d_{\mathrm{safe}} - d_{\mathrm{front}}}{d_{\mathrm{safe}}}\right) \\
+r_{\mathrm{oa}} &= -\delta_{\mathrm{oa}}^2
+\end{aligned}
+$$
 
 Why this helped:
 
@@ -199,73 +194,67 @@ The front swath was split into:
 
 The main sector clearances were defined from a 10th-percentile beam statistic:
 
-\[
-d_L,\; d_C,\; d_R
-\]
+$$
+\begin{aligned}
+d_L,\; d_C,\; d_R \\
+d_C &= \operatorname{Percentile}_{10}\left(\left\{ d_i \mid \lvert \theta_i \rvert \le \theta_c \right\}\right)
+\end{aligned}
+$$
 
-with
-
-\[
-d_C = \mathrm{Percentile}_{10}\{d_i\}_{|\theta_i|\le\theta_c}
-\]
-
-and similar definitions for \(d_L\) and \(d_R\).
+and similar definitions for `d_L` and `d_R`.
 
 ### 5.2 Center-Barrier OA
 
 The center sector became the main collision barrier:
 
-\[
-z_c = \mathrm{clip}\left(\frac{d_{warn} - d_C}{d_{warn}-d_{crit}}, 0, 1\right)
-\]
-
-\[
-r_{center} = -k_c z_c^2
-\]
+$$
+\begin{aligned}
+z_c &= \operatorname{clip}\left(\frac{d_{\mathrm{warn}} - d_C}{d_{\mathrm{warn}} - d_{\mathrm{crit}}}, 0, 1\right) \\
+r_{\mathrm{center}} &= -k_c z_c^2
+\end{aligned}
+$$
 
 Near-collision strengthening was added with a second term:
 
-\[
-z_n = \mathrm{clip}\left(\frac{d_{near} - d_C}{d_{near}}, 0, 1\right)
-\]
-
-\[
-r_{near} = -k_n z_n^2
-\]
+$$
+\begin{aligned}
+z_n &= \operatorname{clip}\left(\frac{d_{\mathrm{near}} - d_C}{d_{\mathrm{near}}}, 0, 1\right) \\
+r_{\mathrm{near}} &= -k_n z_n^2
+\end{aligned}
+$$
 
 ### 5.3 Directional Steering Reward
 
-Directional asymmetry was then expressed through
+Directional asymmetry was then expressed through:
 
-\[
+$$
 g = \tanh\left(\frac{d_R - d_L}{s_g}\right)
-\]
+$$
 
 and aligned with the rudder command:
 
-\[
-r_{dir} = k_d \, z_c \, g \, u
-\]
+$$
+r_{\mathrm{dir}} = k_d z_c g u
+$$
 
-where \(u\) is a bounded steering-alignment term.
+where `u` is a bounded steering-alignment term.
 
 ### 5.4 Threat-Adaptive Blend
 
 Instead of one fixed reward blend, the reward switched between “clear-water” and “threat” modes:
 
-\[
-threat = \max(z_c, z_n)
-\]
+$$
+\begin{aligned}
+\mathrm{threat} &= \max(z_c, z_n) \\
+\lambda &= \lambda_{\mathrm{clear}} - \left(\lambda_{\mathrm{clear}} - \lambda_{\mathrm{threat}}\right)\mathrm{threat}
+\end{aligned}
+$$
 
-\[
-\lambda = \lambda_{clear} - (\lambda_{clear} - \lambda_{threat}) \cdot threat
-\]
+and the total reward became:
 
-and the total reward became
-
-\[
-r = \lambda r_{pf} + (1-\lambda) r_{oa} + r_{exist}
-\]
+$$
+r = \lambda r_{\mathrm{pf}} + (1 - \lambda) r_{\mathrm{oa}} + r_{\mathrm{exist}}
+$$
 
 This was a major conceptual improvement because:
 
@@ -278,8 +267,8 @@ This was a major conceptual improvement because:
 
 `asv_lidar.py` was updated to match the real sensor behavior:
 
-- valid range only in \([1\,m, 16\,m]\),
-- any return below \(1\,m\) or above \(16\,m\) is reported as \(16\,m\).
+- valid range only in `[1 m, 16 m]`,
+- any return below `1 m` or above `16 m` is reported as `16 m`.
 
 That means the raw LiDAR cannot distinguish:
 
@@ -288,11 +277,11 @@ That means the raw LiDAR cannot distinguish:
 
 ### 6.2 Consequence For OA Reward
 
-This made raw LiDAR unreliable for reward shaping near collision.  
+This made raw LiDAR unreliable for reward shaping near collision.
 So the environment adopted a split:
 
-- **reward shaping** uses geometry-based clearances,
-- **observation** is allowed to move closer to the real sensor.
+- reward shaping uses geometry-based clearances,
+- observation is allowed to move closer to the real sensor.
 
 This was implemented through helper logic that computes true unsaturated geometry ranges for the relevant angles inside `rl_env.py`.
 
@@ -311,23 +300,23 @@ The reward was simplified to a cleaner core.
 
 The current path term remains:
 
-\[
-r_{pf} = -1 + (U_n \cos\tilde{\chi} + 1)\left(e^{-\gamma_e |y_e|} + 1\right)
-\]
+$$
+r_{\mathrm{pf}} = -1 + \left(U_n \cos(\tilde{\chi}) + 1\right)\left(\exp\left(-\gamma_e \lvert y_e \rvert\right) + 1\right)
+$$
 
 ### 7.2 Current OA Reward
 
 The current OA reward in the simplified design is:
 
-\[
-r_{oa} = r_{center} + r_{dir} + r_{near} + r_{speed}
-\]
+$$
+r_{\mathrm{oa}} = r_{\mathrm{center}} + r_{\mathrm{dir}} + r_{\mathrm{near}} + r_{\mathrm{speed}}
+$$
 
-with
+with:
 
-\[
-r_{speed} = -k_v \, threat \, U_n^2
-\]
+$$
+r_{\mathrm{speed}} = -k_v \,\mathrm{threat}\, U_n^2
+$$
 
 The important point is that several extra shaping terms were removed, including:
 
@@ -340,14 +329,14 @@ The important point is that several extra shaping terms were removed, including:
 
 The current total reward is now intentionally simple:
 
-\[
+$$
 r =
 \begin{cases}
-R_{collision}, & \text{if collision}\\[4pt]
-R_{goal}, & \text{if goal reached}\\[4pt]
-\lambda r_{pf} + (1-\lambda)r_{oa} - \alpha_R, & \text{otherwise}
+R_{\mathrm{collision}}, & \text{if collision} \\
+R_{\mathrm{goal}}, & \text{if goal reached} \\
+\lambda r_{\mathrm{pf}} + (1 - \lambda) r_{\mathrm{oa}} - \alpha_R, & \text{otherwise}
 \end{cases}
-\]
+$$
 
 Why this was an improvement:
 
@@ -361,7 +350,7 @@ Once reward-only tuning started to plateau, the next major shift was to improve 
 
 ### 8.1 Why Observation Needed To Change
 
-The policy previously had to infer too much from raw beams and a few navigation variables.  
+The policy previously had to infer too much from raw beams and a few navigation variables.
 So several compact low-dimensional features were added:
 
 - normalized distance to goal,
@@ -381,7 +370,7 @@ These are cheap to compute and much easier for PPO to exploit than forcing it to
 
 ### 8.3 First Version: Geometry-Derived Sector Observation
 
-The first compact sector observation used geometry-based sector summaries.  
+The first compact sector observation used geometry-based sector summaries.
 This helped learning, but it was not fully deployable because the real vessel will only have sensor returns, not simulator geometry.
 
 ## 9. Phase 7: LiDAR-Derived Sector Observation With Hysteresis
@@ -392,21 +381,21 @@ To make the observation more realistic for deployment, the compact sector featur
 
 The front sector is split into left, center, right using LiDAR beam angles, and each sector uses a percentile-based clearance estimate.
 
-However, because the real LiDAR reports any reading below \(1\,m\) as \(16\,m\), a pure instantaneous statistic is too brittle.
+However, because the real LiDAR reports any reading below `1 m` as `16 m`, a pure instantaneous statistic is too brittle.
 
 ### 9.2 Hysteresis / Memory
 
 To avoid an immediate jump from “near obstacle” to “fully clear”, a bounded recovery rule is used:
 
-\[
-d^{mem}_{k+1} = \min\left(d^{inst}_{k+1},\; d^{mem}_{k} + \Delta_{rec}\right)
-\]
+$$
+d_{\mathrm{mem}}(k + 1) = \min\left(d_{\mathrm{inst}}(k + 1), d_{\mathrm{mem}}(k) + \Delta_{\mathrm{rec}}\right)
+$$
 
 where:
 
-- \(d^{inst}\) is the current LiDAR sector clearance estimate,
-- \(d^{mem}\) is the memory-filtered value,
-- \(\Delta_{rec}\) is a small recovery increment per step.
+- `d_inst` is the current LiDAR sector clearance estimate,
+- `d_mem` is the memory-filtered value,
+- `Delta_rec` is a small recovery increment per step.
 
 This means:
 
@@ -415,7 +404,7 @@ This means:
 
 ### 9.3 Why This Was Better Than Pure LiDAR-Sector Smoothing Alone
 
-Hysteresis preserves deployability, but by itself it can flatten the observation too much.  
+Hysteresis preserves deployability, but by itself it can flatten the observation too much.
 So the latest design adds:
 
 - smoothed sector clears,
@@ -430,17 +419,36 @@ The current observation uses both persistent and fresh LiDAR-sector information:
 - `left_clear_instant`, `center_clear_instant`, `right_clear_instant`: instantaneous sector clears,
 - `gap_asymmetry`: directional left-right clearance contrast.
 
-The asymmetry term is
+The earlier asymmetry term was:
 
-\[
-gap\_asymmetry = \mathrm{clip}\left(\frac{d_R^{mem} - d_L^{mem}}{d_{warn}}, -1, 1\right)
-\]
+$$
+\mathrm{gap\_asymmetry} = \operatorname{clip}\left(\frac{d_{R,\mathrm{mem}} - d_{L,\mathrm{mem}}}{d_{\mathrm{warn}}}, -1, 1\right)
+$$
+
+The latest LiDAR-sector fix goes one step further. Each sector now carries both:
+
+- a blocked-side cue from the lower-tail valid returns,
+- an open-space cue from a high percentile plus open-fraction information.
+
+In plain form:
+
+$$
+\begin{aligned}
+\mathrm{blocked\_clear} &= \operatorname{Percentile}_{10}\left(\mathrm{valid\_returns}\right) \\
+\mathrm{open\_clear} &= \operatorname{Percentile}_{80}\left(\mathrm{all\_sector\_returns}\right) \\
+\mathrm{open\_fraction} &= \mathrm{fraction\_of\_sector\_with\_range} \ge \mathrm{sector\_open\_clearance} \\
+\mathrm{no\_return\_fraction} &= \mathrm{fraction\_of\_sector\_with\_range} \ge \mathrm{lidar\_max\_range} \\
+\mathrm{openness} &= \operatorname{clip}\left(\max(\mathrm{open\_fraction}, \mathrm{no\_return\_fraction}), 0, 1\right) \\
+\mathrm{instant\_clear} &= \mathrm{blocked\_clear} + \mathrm{openness}\,\max\left(0, \mathrm{open\_clear} - \mathrm{blocked\_clear}\right) \\
+\mathrm{smoothed\_clear} &= \min\left(\mathrm{instant\_clear}, \mathrm{prev\_clear} + \mathrm{recovery\_step}\right)
+\end{aligned}
+$$
 
 Why this is the current preferred approach:
 
 - it stays sensor-faithful for deployment,
 - it still carries persistent information through the blind zone,
-- it gives the policy an explicit directional cue,
+- it preserves which side is more open,
 - it is computationally cheap.
 
 ## 11. Related File Evolution
@@ -451,14 +459,14 @@ This file changed in one major way:
 
 - it now enforces the real sensor range model:
 
-\[
-d_{reported} =
+$$
+d_{\mathrm{reported}} =
 \begin{cases}
-16, & d < 1 \\
-16, & d > 16 \\
-d, & 1 \le d \le 16
+16, & \text{if } d < 1 \\
+16, & \text{if } d > 16 \\
+d, & \text{otherwise}
 \end{cases}
-\]
+$$
 
 This was essential because many reward/observation choices depend on whether the LiDAR is idealized or realistic.
 
@@ -475,29 +483,29 @@ Major additions included logging of:
 - actuator-state summaries,
 - latest LiDAR-sector observation fields.
 
-This file became important because the learning problem was not separable from the diagnosis problem.  
+This file became important because the learning problem was not separable from the diagnosis problem.
 Without these metrics, many regressions would have been hard to interpret.
 
 ## 12. What Improved Over Time
 
 The significant improvements across these phases were:
 
-1. **Less reward noise**
+1. Less reward noise
    The OA term moved away from a global all-beam penalty toward a threat-focused barrier.
 
-2. **Better directional reasoning**
+2. Better directional reasoning
    Left/center/right sectorization made it possible to encode “which side is more open”.
 
-3. **Better state consistency**
+3. Better state consistency
    Normalized yaw rate, restored target-heading updates, and signed cross-track error all removed silent learning issues.
 
-4. **Cleaner reward**
+4. Cleaner reward
    Simplifying the total reward made it easier to interpret benchmark behavior and reduced incentive conflicts.
 
-5. **More informative observation**
+5. More informative observation
    Compact navigation and sector features reduced the burden on the policy network.
 
-6. **Better deployment alignment**
+6. Better deployment alignment
    The latest observation is now based on LiDAR-derived sector summaries rather than simulator geometry.
 
 ## 13. Main Lesson From The Evolution
@@ -521,8 +529,8 @@ In other words:
 
 The present design can be summarized as:
 
-- **reward**: geometry-stable, threat-adaptive, relatively simple,
-- **observation**: LiDAR-faithful but augmented with compact sector summaries and directional cues,
-- **benchmarking**: rich enough to diagnose whether failures come from path following, obstacle negotiation, or sensor compression effects.
+- reward: geometry-stable, threat-adaptive, relatively simple,
+- observation: LiDAR-faithful but augmented with compact sector summaries and directional cues,
+- benchmarking: rich enough to diagnose whether failures come from path following, obstacle negotiation, or sensor compression effects.
 
 That makes the current version a much stronger foundation for the next stage, including later transfer to the dynamic-obstacle environment.
