@@ -119,6 +119,10 @@ class ASVLidarEnv(gym.Env):
         self.left_clear_norm = 1.0
         self.center_clear_norm = 1.0
         self.right_clear_norm = 1.0
+        self.left_clear_instant_norm = 1.0
+        self.center_clear_instant_norm = 1.0
+        self.right_clear_instant_norm = 1.0
+        self.gap_asymmetry = 0.0
         self.rudder_state_norm = 0.0
         self.rpm_state_norm = 0.0
         self.left_clear_lidar_m = float(LIDAR_RANGE)
@@ -139,6 +143,8 @@ class ASVLidarEnv(gym.Env):
             target_heading: heading error with respect to the destination point
             goal_dist: normalized distance-to-goal
             left/center/right_clear: compact LiDAR-derived sector clearances with hysteresis
+            left/center/right_clear_instant: instantaneous LiDAR sector clearances
+            gap_asymmetry: normalized right-vs-left clearance bias
             rudder_state: current actual rudder state (normalized)
             rpm_state: current rpm command state (normalized)
         """
@@ -155,6 +161,10 @@ class ASVLidarEnv(gym.Env):
                 "left_clear": Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
                 "center_clear": Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
                 "right_clear": Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
+                "left_clear_instant": Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
+                "center_clear_instant": Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
+                "right_clear_instant": Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
+                "gap_asymmetry": Box(low=-1.0, high=1.0, shape=(1,), dtype=np.float32),
                 "rudder_state": Box(low=-1.0, high=1.0, shape=(1,), dtype=np.float32),
                 "rpm_state": Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
             }
@@ -202,6 +212,10 @@ class ASVLidarEnv(gym.Env):
             'left_clear': np.array([self.left_clear_norm], dtype=np.float32),
             'center_clear': np.array([self.center_clear_norm], dtype=np.float32),
             'right_clear': np.array([self.right_clear_norm], dtype=np.float32),
+            'left_clear_instant': np.array([self.left_clear_instant_norm], dtype=np.float32),
+            'center_clear_instant': np.array([self.center_clear_instant_norm], dtype=np.float32),
+            'right_clear_instant': np.array([self.right_clear_instant_norm], dtype=np.float32),
+            'gap_asymmetry': np.array([self.gap_asymmetry], dtype=np.float32),
             'rudder_state': np.array([self.rudder_state_norm], dtype=np.float32),
             'rpm_state': np.array([self.rpm_state_norm], dtype=np.float32),
         }
@@ -475,6 +489,10 @@ class ASVLidarEnv(gym.Env):
         self.left_clear_norm = float(np.clip(lidar_sector_features["left_lidar_clear_m"] / OA_WARN_CLEARANCE, 0.0, 1.0))
         self.center_clear_norm = float(np.clip(lidar_sector_features["center_lidar_clear_m"] / OA_WARN_CLEARANCE, 0.0, 1.0))
         self.right_clear_norm = float(np.clip(lidar_sector_features["right_lidar_clear_m"] / OA_WARN_CLEARANCE, 0.0, 1.0))
+        self.left_clear_instant_norm = float(np.clip(lidar_sector_features["left_lidar_instant_m"] / OA_WARN_CLEARANCE, 0.0, 1.0))
+        self.center_clear_instant_norm = float(np.clip(lidar_sector_features["center_lidar_instant_m"] / OA_WARN_CLEARANCE, 0.0, 1.0))
+        self.right_clear_instant_norm = float(np.clip(lidar_sector_features["right_lidar_instant_m"] / OA_WARN_CLEARANCE, 0.0, 1.0))
+        self.gap_asymmetry = float(np.clip((lidar_sector_features["right_lidar_clear_m"] - lidar_sector_features["left_lidar_clear_m"]) / OA_WARN_CLEARANCE, -1.0, 1.0))
         rudder_deg = float(np.degrees(self.model._delta))
         self.rudder_state_norm = float(np.clip(rudder_deg / MAX_RUD_ANGLE, -1.0, 1.0))
         self.rpm_state_norm = float(np.clip(rpm_norm, 0.0, 1.0))
@@ -720,6 +738,10 @@ class ASVLidarEnv(gym.Env):
             "left_clear": float(self.left_clear_norm),
             "center_clear": float(self.center_clear_norm),
             "right_clear": float(self.right_clear_norm),
+            "left_clear_instant": float(self.left_clear_instant_norm),
+            "center_clear_instant": float(self.center_clear_instant_norm),
+            "right_clear_instant": float(self.right_clear_instant_norm),
+            "gap_asymmetry": float(self.gap_asymmetry),
             "lidar_left_clear_m": float(lidar_sector_features["left_lidar_clear_m"]),
             "lidar_center_clear_m": float(lidar_sector_features["center_lidar_clear_m"]),
             "lidar_right_clear_m": float(lidar_sector_features["right_lidar_clear_m"]),

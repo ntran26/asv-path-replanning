@@ -119,6 +119,10 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
     obs_left_clears: List[float] = []
     obs_center_clears: List[float] = []
     obs_right_clears: List[float] = []
+    obs_left_clears_instant: List[float] = []
+    obs_center_clears_instant: List[float] = []
+    obs_right_clears_instant: List[float] = []
+    gap_asymmetries: List[float] = []
     lidar_left_clears_m: List[float] = []
     lidar_center_clears_m: List[float] = []
     lidar_right_clears_m: List[float] = []
@@ -157,6 +161,10 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
         obs_left_clears.append(float(info.get("left_clear", 0.0)))
         obs_center_clears.append(float(info.get("center_clear", 0.0)))
         obs_right_clears.append(float(info.get("right_clear", 0.0)))
+        obs_left_clears_instant.append(float(info.get("left_clear_instant", 0.0)))
+        obs_center_clears_instant.append(float(info.get("center_clear_instant", 0.0)))
+        obs_right_clears_instant.append(float(info.get("right_clear_instant", 0.0)))
+        gap_asymmetries.append(float(info.get("gap_asymmetry", 0.0)))
         lidar_left_clears_m.append(float(info.get("lidar_left_clear_m", float("inf"))))
         lidar_center_clears_m.append(float(info.get("lidar_center_clear_m", float("inf"))))
         lidar_right_clears_m.append(float(info.get("lidar_right_clear_m", float("inf"))))
@@ -210,6 +218,10 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
         "min_obs_left_clear": float(np.min(obs_left_clears)) if obs_left_clears else float("inf"),
         "min_obs_center_clear": float(np.min(obs_center_clears)) if obs_center_clears else float("inf"),
         "min_obs_right_clear": float(np.min(obs_right_clears)) if obs_right_clears else float("inf"),
+        "min_obs_left_clear_instant": float(np.min(obs_left_clears_instant)) if obs_left_clears_instant else float("inf"),
+        "min_obs_center_clear_instant": float(np.min(obs_center_clears_instant)) if obs_center_clears_instant else float("inf"),
+        "min_obs_right_clear_instant": float(np.min(obs_right_clears_instant)) if obs_right_clears_instant else float("inf"),
+        "mean_abs_gap_asymmetry": float(np.mean(np.abs(gap_asymmetries))) if gap_asymmetries else 0.0,
         "min_lidar_left_clear_m": float(np.min(lidar_left_clears_m)) if lidar_left_clears_m else float("inf"),
         "min_lidar_center_clear_m": float(np.min(lidar_center_clears_m)) if lidar_center_clears_m else float("inf"),
         "min_lidar_right_clear_m": float(np.min(lidar_right_clears_m)) if lidar_right_clears_m else float("inf"),
@@ -255,6 +267,10 @@ def evaluate_benchmark(model, env: ASVLidarEnv, cases: List[int], max_steps: int
         "min_obs_left_clear": float(np.min([row["min_obs_left_clear"] for row in rows])) if rows else float("inf"),
         "min_obs_center_clear": float(np.min([row["min_obs_center_clear"] for row in rows])) if rows else float("inf"),
         "min_obs_right_clear": float(np.min([row["min_obs_right_clear"] for row in rows])) if rows else float("inf"),
+        "min_obs_left_clear_instant": float(np.min([row["min_obs_left_clear_instant"] for row in rows])) if rows else float("inf"),
+        "min_obs_center_clear_instant": float(np.min([row["min_obs_center_clear_instant"] for row in rows])) if rows else float("inf"),
+        "min_obs_right_clear_instant": float(np.min([row["min_obs_right_clear_instant"] for row in rows])) if rows else float("inf"),
+        "mean_abs_gap_asymmetry": float(np.mean([row["mean_abs_gap_asymmetry"] for row in rows])) if rows else 0.0,
         "min_lidar_left_clear_m": float(np.min([row["min_lidar_left_clear_m"] for row in rows])) if rows else float("inf"),
         "min_lidar_center_clear_m": float(np.min([row["min_lidar_center_clear_m"] for row in rows])) if rows else float("inf"),
         "min_lidar_right_clear_m": float(np.min([row["min_lidar_right_clear_m"] for row in rows])) if rows else float("inf"),
@@ -356,6 +372,10 @@ class FixedBenchmarkCallback(BaseCallback):
         self.logger.record("benchmark/min_obs_left_clear", summary["min_obs_left_clear"])
         self.logger.record("benchmark/min_obs_center_clear", summary["min_obs_center_clear"])
         self.logger.record("benchmark/min_obs_right_clear", summary["min_obs_right_clear"])
+        self.logger.record("benchmark/min_obs_left_clear_instant", summary["min_obs_left_clear_instant"])
+        self.logger.record("benchmark/min_obs_center_clear_instant", summary["min_obs_center_clear_instant"])
+        self.logger.record("benchmark/min_obs_right_clear_instant", summary["min_obs_right_clear_instant"])
+        self.logger.record("benchmark/mean_abs_gap_asymmetry", summary["mean_abs_gap_asymmetry"])
         self.logger.record("benchmark/min_lidar_left_clear_m", summary["min_lidar_left_clear_m"])
         self.logger.record("benchmark/min_lidar_center_clear_m", summary["min_lidar_center_clear_m"])
         self.logger.record("benchmark/min_lidar_right_clear_m", summary["min_lidar_right_clear_m"])
