@@ -68,11 +68,6 @@ class TestCase:
             x = 9
             self.obs.append([(x-self.obs_size, y-self.obs_size), (x+self.obs_size, y-self.obs_size), 
                              (x+self.obs_size, y+self.obs_size), (x-self.obs_size, y+self.obs_size)])
-        elif test_case == 6:    # stage-1 deterministic single obstacle, slightly left of path
-            x = 4
-            y = 12.5
-            self.obs.append([(x-self.obs_size, y-self.obs_size), (x+self.obs_size, y-self.obs_size), 
-                             (x+self.obs_size, y+self.obs_size), (x-self.obs_size, y+self.obs_size)])
         elif test_case == 99:
             # load data file
             with open(self.env_data, "r") as f:
@@ -94,11 +89,6 @@ class TestCase:
             self.start_y = 2
             self.goal_x = 8
             self.goal_y = 22
-        elif test_case == 6:
-            self.start_x = 5
-            self.start_y = 2
-            self.goal_x = 5
-            self.goal_y = 20
         elif test_case == 99:
             # load data file
             with open(self.env_data, "r") as f:

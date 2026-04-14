@@ -4,17 +4,16 @@ import numpy as np
 import pygame
 import pygame.freetype
 from ship_model_selector import (
-    ShipModel,
     SHIP_MODEL_VARIANT,
+    ShipModel,
     MODEL_RPM_MAX,
     MODEL_U_MAX,
-    MODEL_COMMAND_SCALE,
-    MODEL_INTERNAL_RPM_MAX,
     MAX_RUD_ANGLE,
     VESSEL_LENGTH,
     VESSEL_WIDTH,
     HULL_MARGIN,
     HULL_FORWARD_SHIFT,
+    model_rudder_deg,
 )
 from asv_lidar import Lidar, LIDAR_RANGE, LIDAR_BEAMS
 from test_run import TestCase
@@ -26,7 +25,7 @@ from datetime import datetime
 
 RENDER_SCALE = 25
 TEST_CASE = None
-START_X = 5
+START_X = 9
 START_Y = 2
 
 # System parameters
@@ -49,7 +48,7 @@ R_COLLISION = -2000.0
 RPM_MIN = 0
 RPM_MAX = float(MODEL_RPM_MAX)
 U_MAX = float(MODEL_U_MAX)
-print(f"Using ship model variant: {SHIP_MODEL_VARIANT} | RPM_MAX={RPM_MAX:.1f} | U_MAX={U_MAX:.2f} m/s")
+print(f"Estimated U_MAX = {U_MAX:.3f} m/s")
 MAX_IN = 1
 MIN_IN = -1
 
@@ -72,81 +71,20 @@ TEST_SCENARIOS = {
         "throttle_cmd": 1.0,    # normalized [-1,1]
         "duration_s": 30.0,
         "record_video": False,
-        "lead_in_s": 0.0,
-        "lead_in_rudder_cmd": 0.0,
-        "lead_in_throttle_cmd": 1.0,
-        "map_width": 10.0,
-        "map_height": 25.0,
-        "start_x": float(START_X),
-        "start_y": 2.0,
-        "goal_x": 1.0,
-        "goal_y": 20.0,
-        "initial_heading_deg": 0.0,
-        "terminate_on_collision": True,
     },
     "turning_circle_port": {
-        "rudder_cmd": 0.30,     # with current mapping *100 => +30 deg
+        "rudder_cmd": -0.30,    # 30% of max rudder toward port
         "throttle_cmd": 1.0,
         "duration_s": 60.0,
         "record_video": True,
-        "lead_in_s": 5.0,
-        "lead_in_rudder_cmd": 0.0,
-        "lead_in_throttle_cmd": 1.0,
-        "map_width": 10.0,
-        "map_height": 25.0,
-        "start_x": 9.0,
-        "start_y": 2.0,
-        "goal_x": 5.0,
-        "goal_y": 22.0,
-        "initial_heading_deg": 0.0,
-        "terminate_on_collision": True,
     },
     "turning_circle_stbd": {
-        "rudder_cmd": -0.30,    # -30 deg
+        "rudder_cmd": 0.30,     # 30% of max rudder toward starboard
         "throttle_cmd": 1.0,
         "duration_s": 60.0,
         "record_video": True,
-        "lead_in_s": 5.0,
-        "lead_in_rudder_cmd": 0.0,
-        "lead_in_throttle_cmd": 1.0,
-        "map_width": 10.0,
-        "map_height": 25.0,
-        "start_x": 0.8,
-        "start_y": 7.0,
-        "goal_x": 5.0,
-        "goal_y": 22.0,
-        "initial_heading_deg": 0.0,
-        "terminate_on_collision": True,
     },
 }
-
-def build_scenario_action(scenario_cfg, elapsed_time_s):
-    lead_in_s = float(scenario_cfg.get("lead_in_s", 0.0))
-    if elapsed_time_s < lead_in_s:
-        rudder_cmd = float(scenario_cfg.get("lead_in_rudder_cmd", 0.0))
-        throttle_cmd = float(scenario_cfg.get("lead_in_throttle_cmd", scenario_cfg["throttle_cmd"]))
-    else:
-        rudder_cmd = float(scenario_cfg["rudder_cmd"])
-        throttle_cmd = float(scenario_cfg["throttle_cmd"])
-    return np.array([rudder_cmd, throttle_cmd], dtype=np.float32)
-
-
-def model_heading_deg_to_display(model_heading_deg):
-    # ship_model_selector already adapts Bluefin 4DOF outputs to the repo's
-    # historical display convention, so no extra conversion is needed here.
-    return float(model_heading_deg) % 360.0
-
-
-def display_heading_deg_to_model(display_heading_deg):
-    # The selector wrapper converts public outputs into repo convention, but
-    # this direct internal initialization still needs the raw 4DOF frame.
-    if SHIP_MODEL_VARIANT == "bluefin_4dof":
-        return (90.0 - float(display_heading_deg)) % 360.0
-    return float(display_heading_deg) % 360.0
-
-
-def model_yaw_rate_degps_to_display(model_yaw_rate_degps):
-    return float(model_yaw_rate_degps)
 
 class ASVLidarEnv(gym.Env):
     metadata = {"render_modes": ["human"]}
@@ -155,16 +93,14 @@ class ASVLidarEnv(gym.Env):
         self.map_width = MAP_WIDTH
         self.map_height = MAP_HEIGHT
 
+        self.asv_path = []
+
         pygame.init()
         self.render_mode = render_mode
+        self.world_size = (self.map_width, self.map_height)
         self.render_scale = RENDER_SCALE
-        self.world_size = (float(self.map_width), float(self.map_height))
-        self.window_size = (
-            int(round(self.map_width * self.render_scale)),
-            int(round(self.map_height * self.render_scale)),
-        )
-
-        self.asv_path = []
+        self.window_size = (int(self.map_width * self.render_scale),
+                            int(self.map_height * self.render_scale))
 
         self.icon = None
         self.fps_clock = pygame.time.Clock()
@@ -192,31 +128,8 @@ class ASVLidarEnv(gym.Env):
 
         self.model = ShipModel()
         self.scenario = TestCase()
-        self.active_scenario_cfg = None
-        self.terminate_on_collision = True
-        self.initial_heading_deg = 0.0
 
-        self.observation_space = self._make_observation_space()
-
-        self.action_space = Box(
-            low=np.array([-1.0, -1.0], dtype=np.float32),
-            high=np.array([1.0, 1.0], dtype=np.float32),
-            dtype=np.float32,
-        )
-
-        self.lidar = Lidar()
-        self.max_obs = MAX_OBS
-
-        self.record_video = True
-        self.video_writer = None
-        self.frame_size = self.window_size
-        self.video_fps = RENDER_FPS
-
-        self.test_case = TEST_CASE
-        self._apply_scenario_overrides(None)
-
-    def _make_observation_space(self):
-        return Dict(
+        self.observation_space = Dict(
             {
                 "lidar": Box(low=0, high=LIDAR_RANGE, shape=(LIDAR_BEAMS,), dtype=np.float32),
                 "pos": Box(low=np.array([0, 0]), high=np.array(self.world_size), shape=(2,), dtype=np.float32),
@@ -228,25 +141,14 @@ class ASVLidarEnv(gym.Env):
             }
         )
 
-    def _apply_scenario_overrides(self, scenario_cfg):
-        cfg = scenario_cfg or {}
-
-        self.map_width = float(cfg.get("map_width", MAP_WIDTH))
-        self.map_height = float(cfg.get("map_height", MAP_HEIGHT))
-        self.world_size = (self.map_width, self.map_height)
-        self.window_size = (
-            int(round(self.map_width * self.render_scale)),
-            int(round(self.map_height * self.render_scale)),
+        self.action_space = Box(
+            low=np.array([-1.0, -1.0], dtype=np.float32),
+            high=np.array([1.0, 1.0], dtype=np.float32),
+            dtype=np.float32,
         )
-        self.frame_size = self.window_size
-        self.observation_space = self._make_observation_space()
 
-        self.start_x = float(cfg.get("start_x", START_X))
-        self.start_y = float(cfg.get("start_y", START_Y))
-        self.goal_x = float(cfg.get("goal_x", 1.0))
-        self.goal_y = float(cfg.get("goal_y", 20.0))
-        self.initial_heading_deg = float(cfg.get("initial_heading_deg", 0.0))
-        self.terminate_on_collision = bool(cfg.get("terminate_on_collision", True))
+        self.lidar = Lidar()
+        self.max_obs = MAX_OBS
 
         self.map_border = [
             [(0, 0), (0, self.map_height), (0, 0), (0, self.map_height)],
@@ -255,10 +157,12 @@ class ASVLidarEnv(gym.Env):
             [(0, 0), (self.map_width, 0), (0, 0), (self.map_width, 0)],
         ]
 
-        if self.render_mode in self.metadata["render_modes"]:
-            self.surface = pygame.Surface(self.window_size)
-            if self.display is not None:
-                self.display = pygame.display.set_mode(self.window_size)
+        self.record_video = True
+        self.video_writer = None
+        self.frame_size = self.window_size
+        self.video_fps = RENDER_FPS
+
+        self.test_case = TEST_CASE
 
     def _get_obs(self):
         return {
@@ -327,7 +231,7 @@ class ASVLidarEnv(gym.Env):
         ys = [p[1] for p in hull]
 
         if min(xs) < 0 or max(xs) > self.map_width or min(ys) < 0 or max(ys) > self.map_height:
-            return True
+            return True, "border"
 
         hx0, hx1 = min(xs), max(xs)
         hy0, hy1 = min(ys), max(ys)
@@ -341,9 +245,9 @@ class ASVLidarEnv(gym.Env):
             if hx1 < ox0 or ox1 < hx0 or hy1 < oy0 or oy1 < hy0:
                 continue
             if self._polys_intersect_sat(hull, obs):
-                return True
+                return True, "obstacle"
 
-        return False
+        return False, None
 
     def _generate_path(self, start_x, start_y, goal_x, goal_y):
         path_length = max(2, int(np.hypot(abs(goal_x - start_x), abs(goal_y - start_y))))
@@ -375,19 +279,22 @@ class ASVLidarEnv(gym.Env):
         if seed is not None:
             np.random.seed(seed)
 
-        self._apply_scenario_overrides(self.active_scenario_cfg)
         self.elapsed_time = 0.0
-        self.asv_h = float(self.initial_heading_deg)
+        self.asv_h = 0.0
         self.asv_w = 0.0
         self.tgt = 0.0
         self.angle_diff = 0.0
 
         self.model = ShipModel()
-        self.model._u = 0.0
-        self.model._v = 0.0
-        self.model._psi = np.radians(display_heading_deg_to_model(self.asv_h))
-        self.model._h = self.model._psi
         self.lidar.reset()
+
+        if self.test_case is None:
+            self.start_x = START_X
+            self.start_y = START_Y
+            self.goal_x = 1
+            self.goal_y = 20
+        else:
+            self.start_x, self.start_y, self.goal_x, self.goal_y = self.scenario.position(test_case=self.test_case)
 
         self.asv_x = self.start_x
         self.asv_y = self.start_y
@@ -412,7 +319,8 @@ class ASVLidarEnv(gym.Env):
         return self._get_obs(), {}
 
     def check_done(self, position):
-        if self.terminate_on_collision and self._check_collision_geom():
+        collided, _ = self._check_collision_geom()
+        if collided:
             return True
         return False
 
@@ -421,9 +329,8 @@ class ASVLidarEnv(gym.Env):
         rudder_cmd = float(np.clip(action[0], MIN_IN, MAX_IN))
         throttle_cmd = float(np.clip(action[1], MIN_IN, MAX_IN))
 
-        # IMPORTANT:
-        # if you want real degrees here, use 30 not 100.
-        # With action[0]=0.30 -> 30 deg
+        # The ship models take rudder as percent of max rudder in [-100, 100].
+        # So action[0]=0.30 commands 30% of MAX_RUD_ANGLE, not 30 deg.
         rudder = rudder_cmd * 100
 
         rpm = (throttle_cmd - MIN_IN) * ((RPM_MAX - RPM_MIN) / (MAX_IN - MIN_IN)) + RPM_MIN
@@ -434,8 +341,8 @@ class ASVLidarEnv(gym.Env):
         dx, dy, h, w = self.model.update(rpm, rudder, UPDATE_RATE)
         self.asv_x += dx
         self.asv_y += dy
-        self.asv_h = model_heading_deg_to_display(h)
-        self.asv_w = model_yaw_rate_degps_to_display(w)
+        self.asv_h = h
+        self.asv_w = w
 
         dx_pos = float(self.asv_x) - x_prev
         dy_pos = float(self.asv_y) - y_prev
@@ -457,7 +364,7 @@ class ASVLidarEnv(gym.Env):
         self.asv_path.append((self.asv_x, self.asv_y))
         self.distance_to_goal = np.linalg.norm([self.asv_x - self.goal_x, self.asv_y - self.goal_y])
 
-        collided = bool(self._check_collision_geom())
+        collided, collision_type = self._check_collision_geom()
         reached_goal = bool(self.distance_to_goal <= VESSEL_LENGTH)
 
         r_exist = -0.1
@@ -486,9 +393,11 @@ class ASVLidarEnv(gym.Env):
             "distance_to_goal": float(self.distance_to_goal),
             "tgt": float(self.tgt),
             "collided": bool(collided),
+            "collision": bool(collided),
+            "collision_type": collision_type,
             "reached_goal": bool(reached_goal),
             "rpm": float(rpm),
-            "rudder_deg": float((rudder / 100.0) * MAX_RUD_ANGLE),
+            "rudder_deg": float(model_rudder_deg(self.model)),
         }
 
         return self._get_obs(), reward, terminated, False, info
@@ -623,15 +532,15 @@ def first_abs_crossing_time(samples_t, samples_val, threshold):
 def run_test_scenario(env, scenario_name, scenario_cfg, out_dir="test_results"):
     os.makedirs(out_dir, exist_ok=True)
 
-    env.active_scenario_cfg = scenario_cfg
     env.record_video = bool(scenario_cfg.get("record_video", False))
-    if env.video_writer is not None:
-        env.video_writer.release()
-        env.video_writer = None
     obs, _ = env.reset()
+
+    action = np.array(
+        [scenario_cfg["rudder_cmd"], scenario_cfg["throttle_cmd"]],
+        dtype=np.float32
+    )
     duration_s = float(scenario_cfg["duration_s"])
     max_steps = int(np.ceil(duration_s / UPDATE_RATE))
-    lead_in_s = float(scenario_cfg.get("lead_in_s", 0.0))
 
     series = {
         "t_sec": [],
@@ -641,29 +550,23 @@ def run_test_scenario(env, scenario_name, scenario_cfg, out_dir="test_results"):
         "yaw_rate_degps": [],
         "speed_mps": [],
         "rpm": [],
-        "internal_prop_rpm": [],
         "rudder_deg": [],
     }
 
     total_reward = 0.0
     terminated = False
-    termination_reason = "completed_duration"
-    last_info = None
 
     for _ in range(max_steps):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminated = True
-                termination_reason = "window_closed"
                 break
 
         if terminated:
             break
 
-        action = build_scenario_action(scenario_cfg, env.elapsed_time)
         obs, rew, term, trunc, info = env.step(action)
         total_reward += rew
-        last_info = info
 
         series["t_sec"].append(float(env.elapsed_time))
         series["x_m"].append(float(env.asv_x))
@@ -672,19 +575,10 @@ def run_test_scenario(env, scenario_name, scenario_cfg, out_dir="test_results"):
         series["yaw_rate_degps"].append(float(env.asv_w))
         series["speed_mps"].append(float(env.speed_mps))
         series["rpm"].append(float(info["rpm"]))
-        series["internal_prop_rpm"].append(float(info["internal_prop_rpm"]))
         series["rudder_deg"].append(float(info["rudder_deg"]))
 
         if term or trunc:
             terminated = True
-            if info["collided"]:
-                termination_reason = "collision"
-            elif info["reached_goal"]:
-                termination_reason = "reached_goal"
-            elif trunc:
-                termination_reason = "truncated"
-            else:
-                termination_reason = "terminated"
             break
 
     # summary metrics
@@ -705,32 +599,19 @@ def run_test_scenario(env, scenario_name, scenario_cfg, out_dir="test_results"):
         "meta": {
             "scenario_name": scenario_name,
             "timestamp": datetime.now().isoformat(),
+            "ship_model_variant": SHIP_MODEL_VARIANT,
             "UPDATE_RATE": UPDATE_RATE,
             "RPM_MIN": RPM_MIN,
             "RPM_MAX": RPM_MAX,
-            "ship_model_variant": SHIP_MODEL_VARIANT,
-            "RPM_COMMAND_SCALE": float(MODEL_COMMAND_SCALE),
-            "recommended_command_rpm_max": float(MODEL_RPM_MAX),
-            "recommended_prop_rpm_max": float(MODEL_INTERNAL_RPM_MAX),
             "estimated_U_MAX_mps": float(U_MAX),
+            "max_rudder_angle_deg": float(MAX_RUD_ANGLE),
             "duration_cmd_s": duration_s,
             "rudder_cmd_norm": float(scenario_cfg["rudder_cmd"]),
             "throttle_cmd_norm": float(scenario_cfg["throttle_cmd"]),
-            "lead_in_s": lead_in_s,
-            "lead_in_rudder_cmd_norm": float(scenario_cfg.get("lead_in_rudder_cmd", 0.0)),
-            "lead_in_throttle_cmd_norm": float(scenario_cfg.get("lead_in_throttle_cmd", scenario_cfg["throttle_cmd"])),
-            "map_width_m": float(env.map_width),
-            "map_height_m": float(env.map_height),
-            "start_x_m": float(env.start_x),
-            "start_y_m": float(env.start_y),
-            "goal_x_m": float(env.goal_x),
-            "goal_y_m": float(env.goal_y),
-            "terminate_on_collision": bool(env.terminate_on_collision),
         },
         "summary": {
             "elapsed_time_s": float(env.elapsed_time),
             "terminated_early": bool(terminated and env.elapsed_time < duration_s),
-            "termination_reason": termination_reason,
             "total_reward": float(total_reward),
             "peak_speed_mps": peak_speed,
             "steady_speed_mps": steady_speed,
@@ -743,7 +624,6 @@ def run_test_scenario(env, scenario_name, scenario_cfg, out_dir="test_results"):
             "final_x_m": float(env.asv_x),
             "final_y_m": float(env.asv_y),
             "final_heading_deg": float(env.asv_h),
-            "final_collision_flag": bool(last_info["collided"]) if last_info is not None else False,
         },
         "timeseries": series,
     }
@@ -773,12 +653,3 @@ if __name__ == "__main__":
 
     finally:
         env.close()
-
-    # # Save path taken as image
-    # path_surface = pygame.Surface((env.map_width, env.map_height))
-    # path_surface.fill((255,255,255))
-
-    # for i in range(1, len(env.asv_path)):
-    #     pygame.draw.circle(path_surface, (0, 0, 200), env.asv_path[i], 3)
-    
-    # pygame.image.save(path_surface, "asv_path_result.png")
