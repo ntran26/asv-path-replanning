@@ -132,7 +132,8 @@ class ShipModel:
             "yaw_rate_degps": float(math.degrees(self._w)),
             "heading_rad": float(self._h),
             "heading_deg": float(math.degrees(self._h) % 360.0),
-            "rudder_deg": float(math.degrees(self._delta)),
+            # Public convention: negative rudder = port, positive = starboard.
+            "rudder_deg": float(-math.degrees(self._delta)),
             "x_m": float(self._x),
             "y_m": float(self._y),
             "speed_mps": float(math.hypot(self._v, self._v_sway)),
@@ -185,6 +186,11 @@ class ShipModel:
     def _clip_rudder_percent(rud: float) -> float:
         return float(np.clip(rud, -100.0, 100.0))
 
+    @classmethod
+    def _external_rudder_percent_to_internal(cls, rud: float) -> float:
+        # Internal hydrodynamic sign is opposite to the repo/user-facing one.
+        return -cls._clip_rudder_percent(rud)
+
     @staticmethod
     def _max_rudder_rad() -> float:
         return math.radians(MAX_RUD_ANGLE)
@@ -210,7 +216,7 @@ class ShipModel:
     def _derivatives(self, s: np.ndarray, rpm: float, rud: float, thruster_rpm: float) -> np.ndarray:
         u, v, r, psi, delta, x, y = [float(z) for z in s]
 
-        delta_cmd = self._clip_rudder_percent(rud) / 100.0 * self._max_rudder_rad()
+        delta_cmd = self._external_rudder_percent_to_internal(rud) / 100.0 * self._max_rudder_rad()
         delta_dot = float(np.clip(delta_cmd - delta, -self._max_rudder_rate_radps(), self._max_rudder_rate_radps()))
 
         u_eff = max(u, 0.0)

@@ -3,12 +3,14 @@ from gymnasium.spaces import Dict, Box
 import numpy as np
 import pygame
 import pygame.freetype
-from ship_model_bluefin_4dof import (
+from ship_model_selector import (
     ShipModel,
-    RECOMMENDED_COMMAND_RPM_MAX,
-    RECOMMENDED_PROP_RPM_MAX,
-    RECOMMENDED_PEAK_SPEED_MPS,
-    RPM_COMMAND_SCALE,
+    SHIP_MODEL_VARIANT,
+    MODEL_RPM_MAX,
+    MODEL_U_MAX,
+    MODEL_COMMAND_SCALE,
+    MODEL_INTERNAL_RPM_MAX,
+    MAX_RUD_ANGLE,
     VESSEL_LENGTH,
     VESSEL_WIDTH,
     HULL_MARGIN,
@@ -45,13 +47,9 @@ R_COLLISION = -2000.0
 
 # Speed control (rpm)
 RPM_MIN = 0
-RPM_MAX = float(RECOMMENDED_COMMAND_RPM_MAX)
-U_MAX = float(RECOMMENDED_PEAK_SPEED_MPS)
-print(
-    "Using Bluefin 4DOF model with recommended command RPM max "
-    f"{RPM_MAX:.1f} (internal shaft command about {RECOMMENDED_PROP_RPM_MAX:.0f} rpm). "
-    f"Expected peak speed is about {U_MAX:.2f} m/s."
-)
+RPM_MAX = float(MODEL_RPM_MAX)
+U_MAX = float(MODEL_U_MAX)
+print(f"Using ship model variant: {SHIP_MODEL_VARIANT} | RPM_MAX={RPM_MAX:.1f} | U_MAX={U_MAX:.2f} m/s")
 MAX_IN = 1
 MIN_IN = -1
 
@@ -134,17 +132,21 @@ def build_scenario_action(scenario_cfg, elapsed_time_s):
 
 
 def model_heading_deg_to_display(model_heading_deg):
-    # Bluefin 4DOF uses 0 deg along +x, CCW-positive.
-    # This test harness uses 0 deg toward +y, clockwise-positive.
-    return (90.0 - float(model_heading_deg)) % 360.0
+    # ship_model_selector already adapts Bluefin 4DOF outputs to the repo's
+    # historical display convention, so no extra conversion is needed here.
+    return float(model_heading_deg) % 360.0
 
 
 def display_heading_deg_to_model(display_heading_deg):
-    return (90.0 - float(display_heading_deg)) % 360.0
+    # The selector wrapper converts public outputs into repo convention, but
+    # this direct internal initialization still needs the raw 4DOF frame.
+    if SHIP_MODEL_VARIANT == "bluefin_4dof":
+        return (90.0 - float(display_heading_deg)) % 360.0
+    return float(display_heading_deg) % 360.0
 
 
 def model_yaw_rate_degps_to_display(model_yaw_rate_degps):
-    return -float(model_yaw_rate_degps)
+    return float(model_yaw_rate_degps)
 
 class ASVLidarEnv(gym.Env):
     metadata = {"render_modes": ["human"]}
@@ -486,8 +488,7 @@ class ASVLidarEnv(gym.Env):
             "collided": bool(collided),
             "reached_goal": bool(reached_goal),
             "rpm": float(rpm),
-            "internal_prop_rpm": float(rpm * RPM_COMMAND_SCALE),
-            "rudder_deg": float(rudder),
+            "rudder_deg": float((rudder / 100.0) * MAX_RUD_ANGLE),
         }
 
         return self._get_obs(), reward, terminated, False, info
@@ -707,9 +708,10 @@ def run_test_scenario(env, scenario_name, scenario_cfg, out_dir="test_results"):
             "UPDATE_RATE": UPDATE_RATE,
             "RPM_MIN": RPM_MIN,
             "RPM_MAX": RPM_MAX,
-            "RPM_COMMAND_SCALE": float(RPM_COMMAND_SCALE),
-            "recommended_command_rpm_max": float(RECOMMENDED_COMMAND_RPM_MAX),
-            "recommended_prop_rpm_max": float(RECOMMENDED_PROP_RPM_MAX),
+            "ship_model_variant": SHIP_MODEL_VARIANT,
+            "RPM_COMMAND_SCALE": float(MODEL_COMMAND_SCALE),
+            "recommended_command_rpm_max": float(MODEL_RPM_MAX),
+            "recommended_prop_rpm_max": float(MODEL_INTERNAL_RPM_MAX),
             "estimated_U_MAX_mps": float(U_MAX),
             "duration_cmd_s": duration_s,
             "rudder_cmd_norm": float(scenario_cfg["rudder_cmd"]),

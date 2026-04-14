@@ -393,6 +393,27 @@ class ASVRewardSearchEnv(ASVLidarEnv):
                 return True
         return False
 
+    def _collision_reason(self) -> str | None:
+        hull = self._hull_polygon_world()
+        xs = [p[0] for p in hull]
+        ys = [p[1] for p in hull]
+
+        if min(xs) < 0 or max(xs) > self.map_width or min(ys) < 0 or max(ys) > self.map_height:
+            return "border"
+
+        hx0, hx1 = min(xs), max(xs)
+        hy0, hy1 = min(ys), max(ys)
+        for obs in self.obstacles:
+            oxs = [p[0] for p in obs]
+            oys = [p[1] for p in obs]
+            ox0, ox1 = min(oxs), max(oxs)
+            oy0, oy1 = min(oys), max(oys)
+            if hx1 < ox0 or ox1 < hx0 or hy1 < oy0 or oy1 < hy0:
+                continue
+            if self._polys_intersect_sat(hull, obs):
+                return "obstacle"
+        return None
+
     def _pool_lidar_sectors(self) -> np.ndarray:
         ranges = np.asarray(self.lidar.ranges, dtype=np.float32)
         angles = np.asarray(self.lidar.angles, dtype=np.float32)
@@ -910,12 +931,16 @@ class ASVRewardSearchEnv(ASVLidarEnv):
 
         sector_features = self._update_search_state(rudder_cmd=rudder_cmd, rpm_norm=rpm_norm)
         clearance = self._compute_reward_clearance_features()
-        collided = bool(self._check_collision_geom())
+        collision_type = self._collision_reason()
+        collided = bool(collision_type is not None)
         reached_goal = bool(self.distance_to_goal <= (VESSEL_LENGTH / 2.0))
 
         u_norm = float(np.clip(self.speed_mps / max(U_MAX, 1e-6), 0.0, 1.0))
         r_goal = float(self.reward_cfg["goal_reward"] if reached_goal else 0.0)
         r_exist = float(self.reward_cfg["exist_penalty"])
+        front_min_compat = float(clearance["raw_front_clear"])
+        front_p10_compat = float(clearance["geom_front_clear"])
+        near_flag_compat = 0.0
 
         if self.reward_mode == "baseline":
             r_heading = float(np.cos(np.radians(self.heading_error)))
@@ -948,6 +973,7 @@ class ASVRewardSearchEnv(ASVLidarEnv):
             center_norm = float(np.clip((warn - center_clear) / max(warn - crit, 1e-6), 0.0, 1.0))
             near_norm = float(np.clip((near_clear - center_clear) / max(near_clear, 1e-6), 0.0, 1.0))
             gap_bias = float(np.tanh((right_clear - left_clear) / max(self.reward_cfg["dir_scale"], 1e-6)))
+            near_flag_compat = float(center_clear <= near_clear)
             turn_cmd = float(-rudder_cmd)
             turn_align = float(gap_bias * turn_cmd)
             r_center = float(-self.reward_cfg["center_gain"] * (center_norm ** 2))
@@ -1043,6 +1069,15 @@ class ASVRewardSearchEnv(ASVLidarEnv):
             "ref_throttle_cmd": float(self.ref_throttle_cmd),
             "reward_mode": self.reward_mode,
             "obs_mode": self.obs_mode,
+            # Keep benchmark/eval tooling compatible with rl_env.py-style info.
+            "collided": bool(collided),
+            "collision": bool(collided),
+            "collision_type": collision_type,
+            "reached_goal": bool(reached_goal),
+            "distance_to_goal": float(self.distance_to_goal),
+            "front_min": front_min_compat,
+            "front_p10": front_p10_compat,
+            "near_flag": near_flag_compat,
         }
         info.update(sector_features)
 

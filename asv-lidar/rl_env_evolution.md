@@ -1,536 +1,524 @@
 # `rl_env.py` Evolution Notes
 
-This note summarizes the significant evolution of `asv-lidar/rl_env.py` and the related files that changed with it:
+This note summarizes the major design changes that led to the current `asv-lidar/rl_env.py` branch.
 
-- `asv-lidar/train_test_asv.py`
+Related files that evolved with it:
+
 - `asv-lidar/asv_lidar.py`
+- `asv-lidar/train_test_asv.py`
+- `asv-lidar/test_run.py`
+- `asv-lidar/ship_model_selector.py`
+- `asv-lidar/ship_model.py`
+- `asv-lidar/ship_model_bluefin_4dof.py`
 
-It focuses on the major design phases from the first reward-function analysis through the latest LiDAR-sector observation design. It intentionally skips small coefficient-only edits unless they changed the method in a meaningful way.
+It focuses on the significant method changes rather than every coefficient tweak.
 
 ## 1. Project Context
 
 The environment models an autonomous surface vessel (ASV) that must:
 
-1. follow a nominal path from start to goal,
-2. avoid static obstacles,
-3. use LiDAR-like sensing and realistic ship dynamics.
+1. follow a nominal start-to-goal path,
+2. avoid static obstacles and map borders,
+3. learn from LiDAR-like sensing under realistic actuator and hull dynamics.
 
-The environment sits on top of:
+The core design tension has always been:
 
-- `ship_model.py`: nonlinear vessel dynamics and actuator response,
-- `asv_lidar.py`: LiDAR beam simulation,
-- `test_run.py`: fixed evaluation scenarios,
-- `train_test_asv.py`: PPO/SAC training and benchmark logging.
+- keep the observation close to the physical sensor,
+- keep the reward informative enough for RL,
+- and avoid silently mixing inconsistent geometry, sensor, and action conventions.
 
-The main research problem inside `rl_env.py` has been:
-how to shape the reward and observation so the policy both tracks the route and makes decisive obstacle-avoidance decisions.
+## 2. Early Reward-Centric Phase
 
-## 2. Baseline Environment And Initial Reward
+The earlier branch relied heavily on reward shaping to get obstacle avoidance working.
 
-### 2.1 Initial Observation Structure
+### 2.1 Path-Following Reward
 
-The earlier environment exposed a fairly compact observation:
+The path term had the paper-style form:
 
-- full LiDAR beam vector,
-- ASV position and heading,
-- yaw-rate,
-- speed,
-- path offset `tgt`,
-- target-heading error.
-
-This was enough to make learning possible, but not always enough to make behavior stable. In particular, the policy had to infer too much from raw beams alone.
-
-### 2.2 Initial Path-Following Reward
-
-The path-following reward had the general form:
-
-$$
-r_{\mathrm{pf}} = -1 + \left(U_n \cos(\tilde{\chi}) + 1\right)\left(\exp\left(-\gamma_e \lvert y_e \rvert\right) + 1\right)
-$$
+```text
+r_pf = -1 + (U_norm * cos(chi_tilde) + 1) * (exp(-gamma_e * |y_e|) + 1)
+```
 
 where:
 
-- $U_n$ is normalized speed,
-- $\tilde{\chi}$ is path/course error,
-- $y_e$ is cross-track error,
-- $\gamma_e$ weights the cross-track penalty.
+- `U_norm` is normalized speed,
+- `chi_tilde` is course error relative to the path,
+- `y_e` is signed cross-track error.
 
-This structure was retained because it captures the intended guidance behavior well:
+### 2.2 Obstacle-Avoidance Reward
 
-- move forward along the path,
-- prefer low course error,
-- prefer small lateral error.
+The obstacle term used beamwise inverse-distance penalties:
 
-### 2.3 Initial Obstacle-Avoidance Reward
+```text
+w_i   = 1 / (1 + |gamma_theta * theta_i|)
+pen_i = 1 / (gamma_x * max(d_i, epsilon_x)^2)
+r_oa  = - sum(w_i * pen_i) / sum(w_i)
+```
 
-The earliest OA reward used all LiDAR beams with an angle weight and inverse-distance penalty:
+This was conceptually clean, but in a narrow channel it was noisy:
 
-$$
-\begin{aligned}
-w_i &= \frac{1}{1 + \lvert \gamma_\theta \theta_i \rvert} \\
-p_i &= \frac{1}{\gamma_x \max(d_i, \varepsilon_x)^2} \\
-r_{\mathrm{oa,old}} &= -\frac{\sum_i w_i p_i}{\sum_i w_i}
-\end{aligned}
-$$
+- border returns constantly contributed penalty,
+- the agent often learned weak or ambiguous side choice,
+- benchmark success frequently regressed after early improvements.
 
-where:
+## 3. State-Consistency Fixes
 
-- $d_i$ is beam distance,
-- $\theta_i$ is beam angle,
-- $w_i$ downweights side beams,
-- $p_i$ penalizes short distances.
+Before larger redesigns, several state bugs and omissions were fixed.
 
-### 2.4 Why This Was Revisited
+### 3.1 Restoring Goal-Heading Updates
 
-This worked in principle, but in a narrow channel it was too noisy:
+`target_heading` was restored so it updated every step from the current pose to the goal.
 
-- side walls constantly contributed penalty,
-- tiny heading changes created reward jitter,
-- the policy could not clearly distinguish “corridor walls” from “collision threat ahead”.
+### 3.2 Signed Cross-Track Error
 
-That led to the first major OA redesign.
+`tgt` moved from unsigned nearest distance to signed cross-track error:
 
-## 3. Phase 1: Consistency Fixes In State And Observation
+```text
+y_e = ((x_g - x_s)(y - y_s) - (y_g - y_s)(x - x_s)) / ||goal - start||
+```
 
-Before deeper reward redesign, several consistency issues had to be fixed.
+This gave the policy the side-of-path information it needs for recovery.
 
-### 3.1 Normalized `dhdg`
+### 3.3 Hidden Dynamics In Observation
 
-`dhdg` was changed from a raw yaw-rate style exposure to a normalized signal:
+To make the observation closer to Markov, the following were added:
 
-$$
-\mathrm{dhdg} = \mathrm{clip}\left(\frac{\dot{\psi}}{180}, -1, 1\right)
-$$
+- `u_body`
+- `v_body`
+- `rudder_state`
 
-Why:
+These exposed actuator lag and sway dynamics that were previously hidden inside the ship model.
 
-- signed yaw rate matters,
-- normalization helps PPO numerics,
-- the previous observation range did not match the actual ship model behavior.
+## 4. Sector and Guidance Experiments
 
-### 3.2 Restoring `angle_diff`
+Several intermediate branches explored:
 
-`target_heading` had to be recomputed every step using the current pose and goal:
+- left / center / right LiDAR summaries,
+- threat-gated directional rewards,
+- recentering terms,
+- temporary heading guides,
+- simple two-layer guidance schemes.
 
-$$
-\Delta \psi_{\mathrm{goal}} = \mathrm{wrap}_{[-180,180]}\left(\psi_{\mathrm{target}} - \psi\right)
-$$
+These experiments helped diagnose the problem, but they also showed an important pattern:
 
-Why:
+- many runs achieved a useful behavior early,
+- then regressed later under PPO,
+- and reward complexity often made the behavior harder to interpret rather than more robust.
 
-- a stale heading-to-go observation weakens goal reacquisition,
-- this directly contributed to some overshoot and border-drift behavior.
+The main lesson from that phase was:
 
-### 3.3 Signed Cross-Track Error
+```text
+reward shaping alone was not the real bottleneck
+```
 
-`tgt` moved from an unsigned nearest-path distance to a signed cross-track error:
+That pushed the design toward a cleaner paper-style baseline with better observation handling.
 
-$$
-y_e = \frac{(x_g - x_s)(y - y_s) - (y_g - y_s)(x - x_s)}{\sqrt{(x_g - x_s)^2 + (y_g - y_s)^2}}
-$$
+## 5. LiDAR Realism Rework
 
-Why:
+One of the biggest changes was aligning the simulated LiDAR with the physical sensor limitation:
 
-- the policy needs to know which side of the path it is on,
-- absolute error alone cannot support efficient recovery.
+```text
+valid sensor range: 1 m <= d <= 16 m
+```
 
-These changes did not solve obstacle avoidance by themselves, but they improved state consistency and removed several avoidable learning handicaps.
+### 5.1 Observed LiDAR
 
-## 4. Phase 2: OA Redesign From All-Beam Penalty To Clearance Barrier
+In the current `asv_lidar.py`, the observed beam value is:
 
-To reduce the narrow-channel noise, OA shifted from “all beams always contribute” to “forward clearance triggers the penalty”.
+```text
+reported_range =
+    16, if true_range < 1
+    16, if true_range > 16
+    true_range, otherwise
+```
 
-### 4.1 Front-Sector Clearance
-
-A forward sector was defined, originally with a half-angle of roughly $45^\circ$:
-
-$$
-F = \left\{ i \mid \lvert \theta_i \rvert \le \theta_f \right\}
-$$
-
-Then a robust summary statistic was used instead of a beamwise sum:
-
-$$
-d_{\mathrm{front}} = \mathrm{Percentile}_{10}\left(\left\{ d_i \mid i \in F \right\}\right)
-$$
-
-### 4.2 Barrier-Style OA Term
-
-The next OA idea became:
-
-$$
-\begin{aligned}
-\delta_{\mathrm{oa}} &= \max\left(0, \frac{d_{\mathrm{safe}} - d_{\mathrm{front}}}{d_{\mathrm{safe}}}\right) \\
-r_{\mathrm{oa}} &= -\delta_{\mathrm{oa}}^2
-\end{aligned}
-$$
-
-Why this helped:
-
-- no penalty when there is adequate forward clearance,
-- much less wall-induced reward jitter,
-- cleaner learning signal than the weighted inverse-distance sum.
-
-### 4.3 Limitation
-
-This formulation reduced noise, but it was too non-directional:
-
-- it could say “front is blocked”,
-- but not clearly “turn left” or “turn right”.
-
-That led to a directional OA redesign.
-
-## 5. Phase 3: Directional OA With Left / Center / Right Sectors
-
-The next important step was to introduce explicit sector reasoning.
-
-### 5.1 Sectorization
-
-The front swath was split into:
-
-- left sector,
-- center sector,
-- right sector.
-
-The main sector clearances were defined from a 10th-percentile beam statistic:
-
-$$
-\begin{aligned}
-d_L,\; d_C,\; d_R \\
-d_C &= \mathrm{Percentile}_{10}\left(\left\{ d_i \mid \lvert \theta_i \rvert \le \theta_c \right\}\right)
-\end{aligned}
-$$
-
-and similar definitions for `d_L` and `d_R`.
-
-### 5.2 Center-Barrier OA
-
-The center sector became the main collision barrier:
-
-$$
-\begin{aligned}
-z_c &= \mathrm{clip}\left(\frac{d_{\mathrm{warn}} - d_C}{d_{\mathrm{warn}} - d_{\mathrm{crit}}}, 0, 1\right) \\
-r_{\mathrm{center}} &= -k_c z_c^2
-\end{aligned}
-$$
-
-Near-collision strengthening was added with a second term:
-
-$$
-\begin{aligned}
-z_n &= \mathrm{clip}\left(\frac{d_{\mathrm{near}} - d_C}{d_{\mathrm{near}}}, 0, 1\right) \\
-r_{\mathrm{near}} &= -k_n z_n^2
-\end{aligned}
-$$
-
-### 5.3 Directional Steering Reward
-
-Directional asymmetry was then expressed through:
-
-$$
-g = \tanh\left(\frac{d_R - d_L}{s_g}\right)
-$$
-
-and aligned with the rudder command:
-
-$$
-r_{\mathrm{dir}} = k_d z_c g u
-$$
-
-where `u` is a bounded steering-alignment term.
-
-### 5.4 Threat-Adaptive Blend
-
-Instead of one fixed reward blend, the reward switched between “clear-water” and “threat” modes:
-
-$$
-\begin{aligned}
-\mathrm{threat} &= \max(z_c, z_n) \\
-\lambda &= \lambda_{\mathrm{clear}} - \left(\lambda_{\mathrm{clear}} - \lambda_{\mathrm{threat}}\right)\mathrm{threat}
-\end{aligned}
-$$
-
-and the total reward became:
-
-$$
-r = \lambda r_{\mathrm{pf}} + (1 - \lambda) r_{\mathrm{oa}} + r_{\mathrm{exist}}
-$$
-
-This was a major conceptual improvement because:
-
-- path following dominates when safe,
-- OA gains authority under real threat.
-
-## 6. Phase 4: Geometry-Based OA Reward After Real LiDAR Limits Were Added
-
-### 6.1 Sensor Model Change
-
-`asv_lidar.py` was updated to match the real sensor behavior:
-
-- valid range only in `[1 m, 16 m]`,
-- any return below `1 m` or above `16 m` is reported as `16 m`.
-
-That means the raw LiDAR cannot distinguish:
+So the observation is intentionally ambiguous:
 
 - “too close to measure” and
-- “nothing detected”.
+- “no obstacle within max range”
 
-### 6.2 Consequence For OA Reward
+both appear as `16 m`.
 
-This made raw LiDAR unreliable for reward shaping near collision.
-So the environment adopted a split:
+### 5.2 Internal True LiDAR
 
-- reward shaping uses geometry-based clearances,
-- observation is allowed to move closer to the real sensor.
+To avoid destroying the reward gradient near obstacles, `asv_lidar.py` now stores:
 
-This was implemented through helper logic that computes true unsaturated geometry ranges for the relevant angles inside `rl_env.py`.
+- `ranges`: the hardware-faithful observed scan
+- `true_ranges`: the unclipped simulated ranges
 
-Why this was useful:
+This separation was one of the most important architectural improvements in the project.
 
-- the policy still gets a stable training signal,
-- the reward is not fooled by the LiDAR blind zone.
+Why it matters:
 
-## 7. Phase 5: Reward Simplification
+- observation stays deployable,
+- reward can still respond smoothly to near obstacles,
+- collision truth no longer depends on sensor aliasing.
 
-After many coefficient-level reward tweaks, it became clear that too much shaping was making the system harder to reason about.
+## 6. Geometry-Based Collision Restored
 
-The reward was simplified to a cleaner core.
+Earlier branches temporarily used LiDAR-threshold collision logic. That was later removed because it made the environment depend on a sensor ambiguity rather than true contact.
 
-### 7.1 Current Path-Following Reward
+The current branch restores geometry-based collision:
 
-The current path term remains:
+```text
+terminated = collided_by_geometry or reached_goal
+```
 
-$$
-r_{\mathrm{pf}} = -1 + \left(U_n \cos(\tilde{\chi}) + 1\right)\left(\exp\left(-\gamma_e \lvert y_e \rvert\right) + 1\right)
-$$
+The hull polygon is built from:
 
-### 7.2 Current OA Reward
+- `VESSEL_LENGTH`
+- `VESSEL_WIDTH`
+- `HULL_MARGIN`
+- `HULL_FORWARD_SHIFT`
 
-The current OA reward in the simplified design is:
+and then checked against:
 
-$$
-r_{\mathrm{oa}} = r_{\mathrm{center}} + r_{\mathrm{dir}} + r_{\mathrm{near}} + r_{\mathrm{speed}}
-$$
+- obstacle polygons
+- map border
+
+using polygon-intersection logic.
+
+This is the current recommended split:
+
+- observation: sensor-faithful
+- reward: uses internal true distances
+- collision: geometry truth
+
+## 7. Current Paper-Style Reward
+
+The current branch returns to a simpler paper-style reward with fixed lambda.
+
+### 7.1 Path-Following Term
+
+The current path term is:
+
+```text
+r_pf = -1 + (U_norm * cos(chi_tilde) + 1) * (exp(-GAMMA_E * |tgt|) + 1)
+```
 
 with:
 
-$$
-r_{\mathrm{speed}} = -k_v \,\mathrm{threat}\, U_n^2
-$$
+```text
+if U > 1e-6:
+    course_deg = atan2(dx_pos, dy_pos)
+else:
+    course_deg = heading_deg
 
-The important point is that several extra shaping terms were removed, including:
+path_course_deg = atan2(goal_x - start_x, goal_y - start_y)
+chi_tilde_deg = wrap(course_deg - path_course_deg)
+cos(chi_tilde) = cos(deg2rad(chi_tilde_deg))
+```
 
-- over-specific goal shaping terms,
-- multiple border-specific reward terms,
-- several commitment / wrong-way penalty variants,
-- extra RPM-threat shaping terms.
+This is important because the heading convention of the repo is:
 
-### 7.3 Current Total Reward
+```text
+heading 0 deg means motion along +y
+dx = d * sin(h)
+dy = d * cos(h)
+```
 
-The current total reward is now intentionally simple:
+### 7.2 Obstacle-Avoidance Term
 
-$$
-r =
-\begin{cases}
-R_{\mathrm{collision}}, & \text{if collision} \\
-R_{\mathrm{goal}}, & \text{if goal reached} \\
-\lambda r_{\mathrm{pf}} + (1 - \lambda) r_{\mathrm{oa}} - \alpha_R, & \text{otherwise}
-\end{cases}
-$$
+The current OA term uses the internal true LiDAR distances:
 
-Why this was an improvement:
+```text
+w_i   = 1 / (1 + |GAMMA_THETA * theta_i|)
+x_i   = clip(true_range_i, EPSILON_X, LIDAR_RANGE)
+pen_i = 1 / (GAMMA_X * x_i^2)
+r_oa  = - sum(w_i * pen_i) / sum(w_i)
+```
 
-- fewer conflicting incentives,
+This keeps the paper-style form while avoiding blind-zone reward collapse.
+
+### 7.3 Living Penalty
+
+The living penalty is:
+
+```text
+r_exist = -lambda * (2 * ALPHA_R + 1)
+```
+
+### 7.4 Total Reward
+
+The total reward is now:
+
+```text
+if collided:
+    reward = (1 - lambda) * R_COLLISION
+else:
+    reward = lambda * r_pf + (1 - lambda) * r_oa + r_exist
+```
+
+The current branch does not add a separate goal bonus term.
+
+This was a deliberate simplification:
+
+- fewer overlapping incentives,
 - easier benchmark interpretation,
-- easier comparison between runs.
+- closer alignment with the reference paper baseline.
 
-## 8. Phase 6: Observation Redesign
+## 8. Current Observation Design
 
-Once reward-only tuning started to plateau, the next major shift was to improve the observation.
+The current observation keeps both raw LiDAR and compact summaries.
 
-### 8.1 Why Observation Needed To Change
+### 8.1 Raw and Sector LiDAR
 
-The policy previously had to infer too much from raw beams and a few navigation variables.
-So several compact low-dimensional features were added:
+The observation includes:
 
-- normalized distance to goal,
-- compact sector summaries,
-- actuator-state exposure.
+- `lidar`: raw 90-beam observed LiDAR
+- `lidar_sectors`: 18 pooled sector values
 
-### 8.2 Added Compact Features
+Sector pooling is computed from observed LiDAR only:
 
-The observation now includes:
+```text
+sector_value = percentile_10(beam_ranges_in_sector)
+```
 
-- `goal_dist`
-- `left_clear`, `center_clear`, `right_clear`
+This gives the policy:
+
+- full beam-level structure,
+- plus a cheaper coarse representation.
+
+### 8.2 LiDAR Summary Features
+
+The observation also includes compact front/side summaries:
+
+- `front_min`
+- `front_p10`
+- `left_min`
+- `right_min`
+- `near_flag`
+
+These are built from the observed LiDAR with valid-range filtering:
+
+```text
+valid = 1 <= lidar_d <= 16
+```
+
+Then:
+
+```text
+front_min = min(valid front beams) or 16
+front_p10 = p10(valid front beams) or 16
+left_min  = min(valid left beams) or 16
+right_min = min(valid right beams) or 16
+near_flag = 1 if front_min < 2 else 0
+```
+
+This keeps the observation lightweight while still exposing near-field structure.
+
+### 8.3 Vehicle-State Channels
+
+The observation also contains:
+
+- `pos`
+- `hdg`
+- `u_body`
+- `v_body`
 - `rudder_state`
-- `rpm_state`
+- `speed`
+- `dhdg`
+- `tgt`
+- `target_heading`
+- `distance_to_goal`
 
-These are cheap to compute and much easier for PPO to exploit than forcing it to infer everything only from the beam vector.
+That combination is the current compromise between:
 
-### 8.3 First Version: Geometry-Derived Sector Observation
+- sensor realism,
+- low-dimensional navigation cues,
+- and approximate Markov sufficiency.
 
-The first compact sector observation used geometry-based sector summaries.
-This helped learning, but it was not fully deployable because the real vessel will only have sensor returns, not simulator geometry.
+## 9. Training Stages
 
-## 9. Phase 7: LiDAR-Derived Sector Observation With Hysteresis
+The current branch now supports three explicit training stages inside `rl_env.py`.
 
-To make the observation more realistic for deployment, the compact sector features were switched to LiDAR-derived values.
+### 9.1 Stage 1
 
-### 9.1 Sector Computation
+Fixed start / goal and one deterministic obstacle:
 
-The front sector is split into left, center, right using LiDAR beam angles, and each sector uses a percentile-based clearance estimate.
+```text
+start = (5.0, 2.0)
+goal  = (5.0, 20.0)
+obstacle = [(3.5, 12.0), (4.5, 12.0), (4.5, 13.0), (3.5, 13.0)]
+```
 
-However, because the real LiDAR reports any reading below `1 m` as `16 m`, a pure instantaneous statistic is too brittle.
+This is the simplest curriculum setup.
 
-### 9.2 Hysteresis / Memory
+### 9.2 Stage 2
 
-To avoid an immediate jump from “near obstacle” to “fully clear”, a bounded recovery rule is used:
+Fixed start / goal, but one random obstacle sampled in a bounded region.
 
-$$
-d_{\mathrm{mem}}(k + 1) = \min\left(d_{\mathrm{inst}}(k + 1), d_{\mathrm{mem}}(k) + \Delta_{\mathrm{rec}}\right)
-$$
+### 9.3 Stage 3
 
-where:
+The full random training setup:
 
-- `d_inst` is the current LiDAR sector clearance estimate,
-- `d_mem` is the memory-filtered value,
-- `Delta_rec` is a small recovery increment per step.
+- random start / goal
+- random number of obstacles
 
-This means:
+The goal of this design is to stop asking PPO to solve the hardest distribution from the very first update.
 
-- sectors can collapse quickly when danger appears,
-- but they recover gradually after the sensor loses close contact.
+## 10. Ship-Model Selection Layer
 
-### 9.3 Why This Was Better Than Pure LiDAR-Sector Smoothing Alone
+Another major improvement was the addition of:
 
-Hysteresis preserves deployability, but by itself it can flatten the observation too much.
-So the latest design adds:
+- `ship_model_selector.py`
 
-- smoothed sector clears,
-- instantaneous sector clears,
-- explicit left-right asymmetry.
+This file now provides a one-line switch between:
 
-## 10. Latest Observation Design
+- `standard_3dof`
+- `bluefin_4dof`
 
-The current observation uses both persistent and fresh LiDAR-sector information:
+and exports:
 
-- `left_clear`, `center_clear`, `right_clear`: smoothed sector clears,
-- `left_clear_instant`, `center_clear_instant`, `right_clear_instant`: instantaneous sector clears,
-- `gap_asymmetry`: directional left-right clearance contrast.
+- the active `ShipModel`
+- model-specific `RPM_MAX`
+- model-specific `U_MAX`
+- body-state accessors
+- a rudder-state accessor
+- geometry constants
 
-The earlier asymmetry term was:
+This avoids scattering model-specific assumptions throughout the repo.
 
-$$
-\mathrm{gap\_asymmetry} = \mathrm{clip}\left(\frac{d_{R,\mathrm{mem}} - d_{L,\mathrm{mem}}}{d_{\mathrm{warn}}}, -1, 1\right)
-$$
+## 11. Bluefin 4DOF Compatibility
 
-The latest LiDAR-sector fix goes one step further. Each sector now carries both:
+The raw `ship_model_bluefin_4dof.py` is not a perfect direct replacement by itself because:
 
-- a blocked-side cue from the lower-tail valid returns,
-- an open-space cue from a high percentile plus open-fraction information.
+- its internal heading convention differs from the repo convention,
+- and its raw startup behavior can be numerically aggressive at full rudder from rest.
 
-In plain form:
+The selector wrapper solves this by:
 
-$$
-\begin{aligned}
-\mathrm{blocked\_clear} &= \mathrm{Percentile}_{10}\left(\mathrm{valid\_returns}\right) \\
-\mathrm{open\_clear} &= \mathrm{Percentile}_{80}\left(\mathrm{all\_sector\_returns}\right) \\
-\mathrm{open\_fraction} &= \mathrm{fraction\_of\_sector\_with\_range} \ge \mathrm{sector\_open\_clearance} \\
-\mathrm{no\_return\_fraction} &= \mathrm{fraction\_of\_sector\_with\_range} \ge \mathrm{lidar\_max\_range} \\
-\mathrm{openness} &= \mathrm{clip}\left(\max(\mathrm{open\_fraction}, \mathrm{no\_return\_fraction}), 0, 1\right) \\
-\mathrm{instant\_clear} &= \mathrm{blocked\_clear} + \mathrm{openness}\,\max\left(0, \mathrm{open\_clear} - \mathrm{blocked\_clear}\right) \\
-\mathrm{smoothed\_clear} &= \min\left(\mathrm{instant\_clear}, \mathrm{prev\_clear} + \mathrm{recovery\_step}\right)
-\end{aligned}
-$$
+- converting between the raw and repo heading conventions,
+- exposing the same public interface as the standard model,
+- damping rudder authority at very low speed for stability.
 
-Why this is the current preferred approach:
+So in the current branch:
 
-- it stays sensor-faithful for deployment,
-- it still carries persistent information through the blind zone,
-- it preserves which side is more open,
-- it is computationally cheap.
+```text
+Bluefin 4DOF is intended to be used through ship_model_selector.py
+```
 
-## 11. Related File Evolution
+not imported raw into `rl_env.py`.
 
-### 11.1 `asv_lidar.py`
+## 12. Repo-Wide Rudder-Sign Cleanup
 
-This file changed in one major way:
+One subtle but important consistency fix was the rudder convention.
 
-- it now enforces the real sensor range model:
+Previously, the main models behaved such that:
 
-$$
-d_{\mathrm{reported}} =
-\begin{cases}
-16, & \text{if } d < 1 \\
-16, & \text{if } d > 16 \\
-d, & \text{otherwise}
-\end{cases}
-$$
+```text
+negative command -> starboard
+positive command -> port
+```
 
-This was essential because many reward/observation choices depend on whether the LiDAR is idealized or realistic.
+which was opposite to the desired nautical convention.
 
-### 11.2 `train_test_asv.py`
+The current public convention is now:
 
-The trainer evolved from a simple train/test harness into a benchmark-and-diagnostics tool.
+```text
+negative rudder = port
+positive rudder = starboard
+```
 
-Major additions included logging of:
+This was implemented at the ship-model interface level, not only in the RL env.
 
-- success / obstacle / border rates,
-- path-following and OA contributions,
-- OA activation fraction,
-- sector-clearance summaries,
-- actuator-state summaries,
-- latest LiDAR-sector observation fields.
+That means:
 
-This file became important because the learning problem was not separable from the diagnosis problem.
-Without these metrics, many regressions would have been hard to interpret.
+- `ShipModel.update(..., rud, ...)` now interprets the public sign consistently
+- `state_dict()["rudder_deg"]` also reports the public sign consistently
+- `rudder_state` in the observation matches the same convention
 
-## 12. What Improved Over Time
+This removed a hidden inconsistency that would otherwise keep leaking into downstream scripts.
 
-The significant improvements across these phases were:
+## 13. Benchmark and Logging Evolution
 
-1. Less reward noise
-   The OA term moved away from a global all-beam penalty toward a threat-focused barrier.
+`train_test_asv.py` evolved from a simple train/test script into a proper benchmark harness.
 
-2. Better directional reasoning
-   Left/center/right sectorization made it possible to encode “which side is more open”.
+The current benchmark now logs:
 
-3. Better state consistency
-   Normalized yaw rate, restored target-heading updates, and signed cross-track error all removed silent learning issues.
+- success rate
+- collision rate
+- border rate
+- timeout rate
+- mean reward
+- mean speed
+- mean distance to goal
+- front clearance metrics
+- reward components
+- cross-track and heading errors
 
-4. Cleaner reward
-   Simplifying the total reward made it easier to interpret benchmark behavior and reduced incentive conflicts.
+It also:
 
-5. More informative observation
-   Compact navigation and sector features reduced the burden on the policy network.
+- saves benchmark history to JSON
+- appends summary rows to CSV
+- exports plots
+- saves the best benchmark checkpoint
 
-6. Better deployment alignment
-   The latest observation is now based on LiDAR-derived sector summaries rather than simulator geometry.
+The earlier automatic early-stop logic was later removed so longer runs can proceed without forced termination.
 
-## 13. Main Lesson From The Evolution
+## 14. Current Design Summary
 
-The biggest lesson was that reward shaping alone was not enough.
+The current branch can be summarized as:
 
-The environment improved most when the design moved in this order:
+### Environment
 
-1. fix inconsistent state signals,
-2. reduce OA reward noise,
-3. simplify the reward,
-4. add better low-dimensional observations,
-5. make those observations closer to the real sensor.
+- geometry-based collision
+- goal radius = `VESSEL_LENGTH / 2`
+- stage-based training progression
 
-In other words:
+### Sensor
 
-- first reward redesign helped,
-- but the larger breakthroughs came when reward and observation were treated together.
+- raw LiDAR observation is hardware-faithful
+- blind-zone ambiguity is preserved in the observation
+- true unclipped LiDAR is kept separately for reward shaping
 
-## 14. Current Status
+### Reward
 
-The present design can be summarized as:
+- paper-style `r_pf`
+- paper-style `r_oa`
+- living penalty
+- fixed `lambda`
+- no extra planner-specific shaping layers
 
-- reward: geometry-stable, threat-adaptive, relatively simple,
-- observation: LiDAR-faithful but augmented with compact sector summaries and directional cues,
-- benchmarking: rich enough to diagnose whether failures come from path following, obstacle negotiation, or sensor compression effects.
+### Observation
 
-That makes the current version a much stronger foundation for the next stage, including later transfer to the dynamic-obstacle environment.
+- raw 90-beam LiDAR
+- sector-pooled LiDAR
+- front/side LiDAR summaries
+- vehicle pose, heading, speed, yaw rate
+- hidden body-state channels
+
+### Dynamics
+
+- single-point model switching through `ship_model_selector.py`
+- consistent public rudder sign across the main stack
+
+## 15. Main Lessons From The Current Branch
+
+The strongest lessons from the evolution so far are:
+
+1. Sensor realism and reward smoothness should be separated.
+   Observation should mimic the real sensor; reward should still have access to simulator truth when needed.
+
+2. Collision should come from geometry, not sensor aliasing.
+   A blind zone is an observation problem, not a contact-truth problem.
+
+3. Reward simplification helped more than stacking more shaping terms.
+
+4. Hidden-state exposure and sign consistency matter.
+   Small state and convention mismatches can silently block learning.
+
+5. Curriculum is necessary.
+   Stage-based training is a cleaner way to build capability than repeatedly overfitting the reward.
+
+## 16. Current Status
+
+The current `rl_env.py` is best viewed as a clean, sensor-faithful paper-style baseline with:
+
+- geometry-grounded termination,
+- LiDAR observation plus compact summaries,
+- internal true-distance reward shaping,
+- stage-based training,
+- and selector-based support for both 3DOF and Bluefin 4DOF models.
+
+That makes it a much stronger foundation for the next round of experiments than the earlier reward-heavy branches.

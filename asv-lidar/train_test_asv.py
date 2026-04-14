@@ -10,6 +10,7 @@ Plot benchmark:
 
 Optional:
   --num-envs 8 --eval-freq 50000 --save-freq 500000
+  python train_test_asv.py --mode train --algo ppo --timesteps 500000 --train-stage 1 --eval-freq 50000
 """
 
 import os
@@ -26,8 +27,8 @@ from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import SubprocVecEnv, VecMonitor
 from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback, CallbackList
 
-from rl_env import ASVLidarEnv, RPM_MAX, RPM_MIN, COLLISION_RANGE
-from ship_model import VESSEL_LENGTH, MAX_RUD_ANGLE
+from rl_env import ASVLidarEnv, RPM_MAX, RPM_MIN
+from ship_model_selector import VESSEL_LENGTH, MAX_RUD_ANGLE
 
 DEFAULT_BENCHMARK_CASES = [0, 1, 2, 3, 4, 5]
 DEFAULT_EVAL_FREQ = 50_000
@@ -35,7 +36,7 @@ DEFAULT_EVAL_MAX_STEPS = 600
 DEFAULT_PLOT_DIR = "benchmark_plots"
 DEFAULT_BEST_MODEL_PATH = os.path.join("models", "best_benchmark_model")
 DEFAULT_BEST_BENCHMARK_JSON = "best_benchmark_result.json"
-DEFAULT_EARLY_STOP_PATIENCE = 3
+DEFAULT_TRAIN_STAGE = 3
 
 
 def action_to_rpm(throttle_cmd: float) -> float:
@@ -65,16 +66,15 @@ def lidar_front_stats(env: ASVLidarEnv) -> Dict[str, float]:
     return out
 
 
-def infer_term_reason(env: ASVLidarEnv, terminated: bool, truncated: bool, hit_max_steps: bool) -> str:
+def infer_term_reason(env: ASVLidarEnv, last_info: Dict[str, Any], terminated: bool, truncated: bool, hit_max_steps: bool) -> str:
     if hit_max_steps or truncated:
         return "timeout"
 
-    ranges = np.asarray(env.lidar.ranges, dtype=np.float32)
-    finite = ranges[np.isfinite(ranges)]
-    if finite.size and float(np.min(finite)) < COLLISION_RANGE:
-        return "collision"
+    if bool(last_info.get("collided", False)):
+        collision_type = str(last_info.get("collision_type", "obstacle") or "obstacle")
+        return "border" if collision_type == "border" else "collision"
 
-    if getattr(env, "distance_to_goal", float("inf")) <= (VESSEL_LENGTH / 2.0):
+    if bool(last_info.get("reached_goal", False)) or getattr(env, "distance_to_goal", float("inf")) <= (VESSEL_LENGTH / 2.0):
         return "goal"
 
     if terminated:
@@ -91,25 +91,29 @@ def rollout_episode(actor, env: ASVLidarEnv, case_id: int, max_steps: int, deter
     steps = 0
     terminated = False
     truncated = False
+    last_info: Dict[str, Any] = {}
 
     speeds: List[float] = []
     rpms: List[float] = []
     rudders: List[float] = []
     min_lidars: List[float] = []
     front_p10s: List[float] = []
+    front_mins: List[float] = []
+    near_flags: List[float] = []
     r_pfs: List[float] = []
     r_oas: List[float] = []
     r_exists: List[float] = []
-    r_goals: List[float] = []
     lambdas: List[float] = []
     abs_tgts: List[float] = []
     abs_heading_errors: List[float] = []
+    distances_to_goal: List[float] = []
 
     while steps < max_steps:
         action, _ = actor.predict(obs, deterministic=deterministic)
         action = np.asarray(action, dtype=np.float32).reshape(-1)
 
         obs, reward, terminated, truncated, info = env.step(action)
+        last_info = info
         total_reward += float(reward)
         steps += 1
 
@@ -119,20 +123,22 @@ def rollout_episode(actor, env: ASVLidarEnv, case_id: int, max_steps: int, deter
         r_pfs.append(float(info.get("r_pf", 0.0)))
         r_oas.append(float(info.get("r_oa", 0.0)))
         r_exists.append(float(info.get("r_exist", 0.0)))
-        r_goals.append(float(info.get("r_goal", 0.0)))
         lambdas.append(float(info.get("lambda_reward", 0.0)))
         abs_tgts.append(abs(float(info.get("cross_track_error", 0.0))))
         abs_heading_errors.append(abs(float(info.get("heading_error", 0.0))))
+        front_mins.append(float(info.get("front_min", np.inf)))
+        front_p10s.append(float(info.get("front_p10", np.inf)))
+        near_flags.append(float(info.get("near_flag", 0.0)))
+        distances_to_goal.append(float(info.get("distance_to_goal", np.inf)))
 
         ls = lidar_front_stats(env)
         min_lidars.append(ls["min_lidar"])
-        front_p10s.append(ls["p10_front"])
 
         if terminated or truncated:
             break
 
     hit_max_steps = steps >= max_steps and not (terminated or truncated)
-    term_reason = infer_term_reason(env, terminated, truncated, hit_max_steps)
+    term_reason = infer_term_reason(env, last_info, terminated, truncated, hit_max_steps)
 
     return {
         "case": int(case_id),
@@ -145,13 +151,15 @@ def rollout_episode(actor, env: ASVLidarEnv, case_id: int, max_steps: int, deter
         "mean_abs_rudder": float(np.mean(np.abs(rudders))) if rudders else 0.0,
         "min_lidar": float(np.min(min_lidars)) if min_lidars else float("inf"),
         "p10_front": float(np.min(front_p10s)) if front_p10s else float("inf"),
+        "front_min": float(np.min(front_mins)) if front_mins else float("inf"),
+        "mean_distance_to_goal": float(np.mean(distances_to_goal)) if distances_to_goal else float("inf"),
+        "mean_near_flag": float(np.mean(near_flags)) if near_flags else 0.0,
         "d_end": float(getattr(env, "distance_to_goal", float("inf"))),
         "start": [float(env.start_x), float(env.start_y)],
         "goal": [float(env.goal_x), float(env.goal_y)],
         "mean_r_pf": float(np.mean(r_pfs)) if r_pfs else 0.0,
         "mean_r_oa": float(np.mean(r_oas)) if r_oas else 0.0,
         "mean_r_exist": float(np.mean(r_exists)) if r_exists else 0.0,
-        "mean_r_goal": float(np.mean(r_goals)) if r_goals else 0.0,
         "mean_lambda": float(np.mean(lambdas)) if lambdas else 0.0,
         "mean_abs_tgt": float(np.mean(abs_tgts)) if abs_tgts else 0.0,
         "mean_abs_heading_error": float(np.mean(abs_heading_errors)) if abs_heading_errors else 0.0,
@@ -170,20 +178,22 @@ def evaluate_benchmark(actor, env: ASVLidarEnv, cases: List[int], max_steps: int
         "mean_reward": float(np.mean([row["ep_reward"] for row in rows])) if rows else 0.0,
         "mean_ep_len": float(np.mean([row["ep_len"] for row in rows])) if rows else 0.0,
         "mean_speed": float(np.mean([row["mean_speed"] for row in rows])) if rows else 0.0,
+        "mean_distance_to_goal": float(np.mean([row["mean_distance_to_goal"] for row in rows])) if rows else float("inf"),
+        "min_front_min": float(np.min([row["front_min"] for row in rows])) if rows else float("inf"),
         "min_p10_front": float(np.min([row["p10_front"] for row in rows])) if rows else float("inf"),
         "min_lidar": float(np.min([row["min_lidar"] for row in rows])) if rows else float("inf"),
         "goal_rate": float(np.mean([r == "goal" for r in term_reasons])) if rows else 0.0,
         "collision_rate": float(np.mean([r == "collision" for r in term_reasons])) if rows else 0.0,
         "obstacle_rate": float(np.mean([r == "collision" for r in term_reasons])) if rows else 0.0,
-        "border_rate": 0.0,
+        "border_rate": float(np.mean([r == "border" for r in term_reasons])) if rows else 0.0,
         "timeout_rate": float(np.mean([r == "timeout" for r in term_reasons])) if rows else 0.0,
         "mean_r_pf": float(np.mean([row["mean_r_pf"] for row in rows])) if rows else 0.0,
         "mean_r_oa": float(np.mean([row["mean_r_oa"] for row in rows])) if rows else 0.0,
         "mean_r_exist": float(np.mean([row["mean_r_exist"] for row in rows])) if rows else 0.0,
-        "mean_r_goal": float(np.mean([row["mean_r_goal"] for row in rows])) if rows else 0.0,
         "mean_lambda": float(np.mean([row["mean_lambda"] for row in rows])) if rows else 0.0,
         "mean_abs_tgt": float(np.mean([row["mean_abs_tgt"] for row in rows])) if rows else 0.0,
         "mean_abs_heading_error": float(np.mean([row["mean_abs_heading_error"] for row in rows])) if rows else 0.0,
+        "mean_near_flag": float(np.mean([row["mean_near_flag"] for row in rows])) if rows else 0.0,
     }
     return {"rows": rows, "summary": summary}
 
@@ -260,7 +270,6 @@ def plot_benchmark_history(history_path: str, output_dir: str) -> List[str]:
     axes[0].plot(timesteps, series("mean_r_pf"), marker="o", linewidth=2, label="mean_r_pf")
     axes[0].plot(timesteps, series("mean_r_oa"), marker="o", linewidth=2, label="mean_r_oa")
     axes[0].plot(timesteps, series("mean_r_exist"), marker="o", linewidth=2, label="mean_r_exist")
-    axes[0].plot(timesteps, series("mean_r_goal"), marker="o", linewidth=2, label="mean_r_goal")
     axes[0].set_ylabel("Reward Term")
     axes[0].set_title("Reward Components")
     axes[0].grid(True, alpha=0.3)
@@ -284,8 +293,8 @@ def plot_benchmark_history(history_path: str, output_dir: str) -> List[str]:
     plot_specs = [
         ("mean_abs_tgt", "Mean |Cross-Track Error|"),
         ("mean_abs_heading_error", "Mean |Heading Error|"),
-        ("mean_speed", "Mean Speed"),
-        ("min_p10_front", "Min Front P10"),
+        ("mean_distance_to_goal", "Mean Distance To Goal"),
+        ("min_front_min", "Min Front Clearance"),
     ]
     for ax, (key, title) in zip(flat_axes, plot_specs):
         ax.plot(timesteps, series(key), marker="o", linewidth=2)
@@ -347,7 +356,6 @@ class FixedBenchmarkCallback(BaseCallback):
         out_csv: str = "benchmark_summary.csv",
         best_model_path: str = DEFAULT_BEST_MODEL_PATH,
         best_json: str = DEFAULT_BEST_BENCHMARK_JSON,
-        early_stop_patience: int = DEFAULT_EARLY_STOP_PATIENCE,
         verbose: int = 1,
     ):
         super().__init__(verbose)
@@ -359,18 +367,17 @@ class FixedBenchmarkCallback(BaseCallback):
         self.out_csv = out_csv
         self.best_model_path = best_model_path
         self.best_json = best_json
-        self.early_stop_patience = int(early_stop_patience)
         self.history: List[Dict[str, Any]] = []
         self._csv_initialized = False
         self.best_metric: Tuple[float, ...] | None = None
         self.best_summary: Dict[str, Any] | None = None
-        self.no_improve_evals = 0
 
     def _metric_tuple(self, summary: Dict[str, Any]) -> Tuple[float, ...]:
         return (
             float(summary["success_rate"]),
             float(summary["goal_rate"]),
             -float(summary["collision_rate"]),
+            -float(summary["border_rate"]),
             -float(summary["timeout_rate"]),
             float(summary["mean_reward"]),
         )
@@ -402,6 +409,8 @@ class FixedBenchmarkCallback(BaseCallback):
                         "mean_reward",
                         "mean_ep_len",
                         "mean_speed",
+                        "mean_distance_to_goal",
+                        "min_front_min",
                         "min_p10_front",
                         "min_lidar",
                         "goal_rate",
@@ -412,10 +421,10 @@ class FixedBenchmarkCallback(BaseCallback):
                         "mean_r_pf",
                         "mean_r_oa",
                         "mean_r_exist",
-                        "mean_r_goal",
                         "mean_lambda",
                         "mean_abs_tgt",
                         "mean_abs_heading_error",
+                        "mean_near_flag",
                     ]
                 )
         self._csv_initialized = True
@@ -431,6 +440,8 @@ class FixedBenchmarkCallback(BaseCallback):
                     row["mean_reward"],
                     row["mean_ep_len"],
                     row["mean_speed"],
+                    row["mean_distance_to_goal"],
+                    row["min_front_min"],
                     row["min_p10_front"],
                     row["min_lidar"],
                     row["goal_rate"],
@@ -441,10 +452,10 @@ class FixedBenchmarkCallback(BaseCallback):
                     row["mean_r_pf"],
                     row["mean_r_oa"],
                     row["mean_r_exist"],
-                    row["mean_r_goal"],
                     row["mean_lambda"],
                     row["mean_abs_tgt"],
                     row["mean_abs_heading_error"],
+                    row["mean_near_flag"],
                 ]
             )
 
@@ -466,37 +477,36 @@ class FixedBenchmarkCallback(BaseCallback):
         self.logger.record("benchmark/obstacle_rate", summary["obstacle_rate"])
         self.logger.record("benchmark/border_rate", summary["border_rate"])
         self.logger.record("benchmark/timeout_rate", summary["timeout_rate"])
+        self.logger.record("benchmark/mean_distance_to_goal", summary["mean_distance_to_goal"])
+        self.logger.record("benchmark/min_front_min", summary["min_front_min"])
         self.logger.record("benchmark/min_p10_front", summary["min_p10_front"])
         self.logger.record("benchmark/mean_r_pf", summary["mean_r_pf"])
         self.logger.record("benchmark/mean_r_oa", summary["mean_r_oa"])
         self.logger.record("benchmark/mean_r_exist", summary["mean_r_exist"])
-        self.logger.record("benchmark/mean_r_goal", summary["mean_r_goal"])
         self.logger.record("benchmark/mean_lambda", summary["mean_lambda"])
         self.logger.record("benchmark/mean_abs_tgt", summary["mean_abs_tgt"])
         self.logger.record("benchmark/mean_abs_heading_error", summary["mean_abs_heading_error"])
+        self.logger.record("benchmark/mean_near_flag", summary["mean_near_flag"])
 
         metric = self._metric_tuple(summary)
         improved = self.best_metric is None or metric > self.best_metric
         if improved:
             self.best_metric = metric
             self.best_summary = summary
-            self.no_improve_evals = 0
             self._save_best_model(result, summary)
             if self.verbose:
                 print(
                     f"[BEST @ {self.num_timesteps}] "
                     f"success={summary['success_rate']:.2f} "
                     f"goal={summary['goal_rate']:.2f} "
-                    f"collision={summary['collision_rate']:.2f}"
+                    f"collision={summary['collision_rate']:.2f} "
+                    f"border={summary['border_rate']:.2f}"
                 )
-        else:
-            self.no_improve_evals += 1
 
         self.logger.record(
             "benchmark/best_success_rate",
             0.0 if self.best_summary is None else float(self.best_summary["success_rate"]),
         )
-        self.logger.record("benchmark/no_improve_evals", float(self.no_improve_evals))
 
         if self.verbose:
             print(
@@ -504,16 +514,9 @@ class FixedBenchmarkCallback(BaseCallback):
                 f"success={summary['success_rate']:.2f} "
                 f"reward={summary['mean_reward']:.2f} "
                 f"collision={summary['collision_rate']:.2f} "
+                f"border={summary['border_rate']:.2f} "
                 f"timeout={summary['timeout_rate']:.2f}"
             )
-        if self.early_stop_patience > 0 and self.no_improve_evals >= self.early_stop_patience:
-            if self.verbose:
-                print(
-                    f"[EARLY STOP @ {self.num_timesteps}] "
-                    f"no improvement for {self.no_improve_evals} benchmark evaluations. "
-                    f"Best success={0.0 if self.best_summary is None else self.best_summary['success_rate']:.2f}"
-                )
-            return False
         return True
 
 
@@ -534,13 +537,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--plot-dir", type=str, default=DEFAULT_PLOT_DIR)
     parser.add_argument("--best-model-path", type=str, default=DEFAULT_BEST_MODEL_PATH)
     parser.add_argument("--best-benchmark-json", type=str, default=DEFAULT_BEST_BENCHMARK_JSON)
-    parser.add_argument("--early-stop-patience", type=int, default=DEFAULT_EARLY_STOP_PATIENCE)
+    parser.add_argument("--train-stage", type=int, choices=[1, 2, 3], default=DEFAULT_TRAIN_STAGE)
     return parser.parse_args()
 
 
-def make_train_env(seed: int, rank: int):
+def make_train_env(seed: int, rank: int, train_stage: int):
     def _init():
-        env = ASVLidarEnv(render_mode=None)
+        env = ASVLidarEnv(render_mode=None, train_stage=train_stage)
         env.reset(seed=seed + rank)
         return env
     return _init
@@ -576,11 +579,12 @@ def main() -> None:
     model_path = args.model_path or "ppo_asv_model.zip"
 
     if args.mode == "train":
-        env_fns = [make_train_env(args.seed, i) for i in range(args.num_envs)]
+        print(f"Training with train_stage={args.train_stage}")
+        env_fns = [make_train_env(args.seed, i, args.train_stage) for i in range(args.num_envs)]
         vec_env = VecMonitor(SubprocVecEnv(env_fns), filename="train_monitor.csv")
         model = build_model(vec_env)
 
-        eval_env = ASVLidarEnv(render_mode=None)
+        eval_env = ASVLidarEnv(render_mode=None, train_stage=args.train_stage)
         eval_env.reset(seed=args.seed + 10_000)
 
         checkpoint_cb = CheckpointCallback(
@@ -599,7 +603,6 @@ def main() -> None:
             out_csv="benchmark_summary.csv",
             best_model_path=args.best_model_path,
             best_json=args.best_benchmark_json,
-            early_stop_patience=args.early_stop_patience,
             verbose=1,
         )
 
@@ -625,7 +628,7 @@ def main() -> None:
 
     if args.mode == "test":
         model = load_model(model_path)
-        env = ASVLidarEnv(render_mode="human")
+        env = ASVLidarEnv(render_mode="human", train_stage=args.train_stage)
         env.test_case = args.test_case
 
         obs, _ = env.reset()
@@ -658,7 +661,7 @@ def main() -> None:
 
     if args.mode == "eval":
         model = load_model(model_path)
-        eval_env = ASVLidarEnv(render_mode=None)
+        eval_env = ASVLidarEnv(render_mode=None, train_stage=args.train_stage)
         eval_env.reset(seed=args.seed + 10_000)
         result = evaluate_benchmark(model, eval_env, args.benchmark_cases, args.eval_max_steps)
 

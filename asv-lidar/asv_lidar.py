@@ -1,6 +1,6 @@
 import pygame
 import numpy as np
-from ship_model import VESSEL_LENGTH
+from ship_model_selector import VESSEL_LENGTH
 
 LIDAR_MIN_RANGE = 1.0
 LIDAR_RANGE = 16
@@ -25,6 +25,7 @@ class Lidar:
 
         self._angles = np.linspace(-LIDAR_SWATH / 2, LIDAR_SWATH / 2, LIDAR_BEAMS, endpoint=False, dtype=np.float64)
         self._ranges = np.ones_like(self._angles) * LIDAR_RANGE
+        self._true_ranges = np.ones_like(self._angles) * LIDAR_RANGE
 
     @property
     def angles(self):
@@ -35,6 +36,11 @@ class Lidar:
     def ranges(self):
         """Return a copy of sensor range readings."""
         return self._ranges.copy()
+
+    @property
+    def true_ranges(self):
+        """Return unclipped simulated ranges used internally by the environment."""
+        return self._true_ranges.copy()
     
     def scan(self, pos, hdg, obstacles=None, map_border=None) -> np.ndarray:
         """
@@ -46,9 +52,10 @@ class Lidar:
             obstacles (list): list of pygame.Rect obstacles.
         Returns:
             numpy.ndarray: array of ranges from sensor to obstacles.
-                Readings beyond the physical max range are reported as LIDAR_RANGE.
-                Distances inside 1 m are preserved so the environment can terminate
-                on a LiDAR-threshold collision condition.
+                Observed readings follow the physical sensor behavior:
+                any return below LIDAR_MIN_RANGE or above LIDAR_RANGE is
+                reported as LIDAR_RANGE. The unclipped simulated ranges are
+                stored separately in `true_ranges` for internal use.
         """
         # self._pos_x = pos[0]
         # self._pos_y = pos[1]
@@ -93,9 +100,16 @@ class Lidar:
                     closest_distance = min(closest_distance, dist)
 
             if (not np.isfinite(closest_distance)) or closest_distance > LIDAR_RANGE:
-                self._ranges[idx] = LIDAR_RANGE
+                true_distance = float(LIDAR_RANGE)
             else:
-                self._ranges[idx] = max(float(closest_distance), 0.0)
+                true_distance = max(float(closest_distance), 0.0)
+
+            self._true_ranges[idx] = true_distance
+
+            if true_distance < LIDAR_MIN_RANGE or true_distance > LIDAR_RANGE:
+                self._ranges[idx] = float(LIDAR_RANGE)
+            else:
+                self._ranges[idx] = true_distance
         
         return self._ranges.copy()
 

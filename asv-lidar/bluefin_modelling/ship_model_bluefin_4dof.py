@@ -33,23 +33,23 @@ LIDAR_OFFSET_M = VESSEL_LENGTH / 2.0
 
 MASS = 64.55
 MAX_RUD_ANGLE = 40.0
-MAX_RUD_RATE_DPS = 20.0
+MAX_RUD_RATE_DPS = 15.0
 
 # Bridge between the simplified repo command and the MATLAB input units.
 RPM_COMMAND_SCALE = 90.0
 THRUSTER_COMMAND_SCALE = 60.0
 
 # Practical operating point from the current tuned benchmark.
-RECOMMENDED_COMMAND_RPM_MAX = 15.0
+RECOMMENDED_COMMAND_RPM_MAX = 18.0
 RECOMMENDED_PROP_RPM_MAX = RPM_COMMAND_SCALE * RECOMMENDED_COMMAND_RPM_MAX
-RECOMMENDED_PEAK_SPEED_MPS = 1.56
+RECOMMENDED_PEAK_SPEED_MPS = 2.03
 
 # Focused calibration knobs around the fixed MATLAB coefficients.
 # These defaults are taken from the current fine-tuned region found
 # against the project straight-line and turning benchmarks.
 PROPELLER_THRUST_SCALE = 2.2
 PROPELLER_ADVANCE_SCALE = 1.0
-RUDDER_FORCE_SCALE = 0.12
+RUDDER_FORCE_SCALE = 0.10
 RUDDER_YAW_SCALE = 1.7
 RUDDER_INFLOW_SCALE = 1.0
 RUDDER_X_DRAG_SCALE = 0.01

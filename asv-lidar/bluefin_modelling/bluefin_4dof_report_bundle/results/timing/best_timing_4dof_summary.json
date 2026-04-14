@@ -1,0 +1,19 @@
+{
+  "baseline_fine_joint_score": 5.031266955857652,
+  "baseline_fine_turn_score": 1.1135204988490035,
+  "baseline_fine_timing_turn_score": 2.180887604340785,
+  "baseline_fine_timing_joint_score": 6.0986340613494345,
+  "best_timing_joint_score": 5.764567134146115,
+  "best_timing_turn_score": 1.8468206771374664,
+  "best_standard_joint_score": 5.163287922545905,
+  "best_standard_turn_score": 1.2455414655372565,
+  "timing_improvement_vs_baseline": -0.33406692720331943,
+  "beats_baseline_on_timing_objective": true,
+  "baseline_time_to_90deg_after_turn_s": 6.3,
+  "baseline_time_to_180deg_after_turn_s": 11.0,
+  "best_time_to_90deg_after_turn_s": 7.000000000000001,
+  "best_time_to_180deg_after_turn_s": 12.099999999999998,
+  "real_time_to_90deg_after_turn_s": 9.386873999996169,
+  "real_time_to_180deg_after_turn_s": 13.287444999994477,
+  "previous_fine_improvement_vs_focus": -0.5414305717085215
+}
