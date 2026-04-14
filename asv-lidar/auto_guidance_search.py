@@ -53,7 +53,82 @@ VARIANTS: List[Dict[str, Any]] = [
             "gap_min_beams": 3,
         },
     },
-]
+    {
+        "name": "geom_beam_search",
+        "guide_mode": "geom_beam",
+        "guide_cfg": {
+            "beam_max_search_deg": 90.0,
+        },
+    },
+    {
+        "name": "sector_lock",
+        "guide_mode": "sector_lock",
+        "guide_cfg": {
+            "lock_threat_enter": 0.18,
+            "lock_threat_exit": 0.08,
+            "lock_min_steps": 24,
+        },
+    },
+    {
+        "name": "waypoint_grid",
+        "guide_mode": "waypoint",
+        "guide_cfg": {},
+    },
+    {
+        "name": "waypoint_aggressive",
+        "guide_mode": "waypoint",
+        "guide_cfg": {
+            "waypoint_safe_gain": 1.35,
+            "waypoint_progress_gain": 0.60,
+            "waypoint_side_gain": 0.35,
+            "waypoint_lock_threat_enter": 0.16,
+            "waypoint_lock_threat_exit": 0.06,
+            "waypoint_lock_min_steps": 26,
+        },
+    },
+    {
+        "name": "geom_waypoint_grid",
+        "guide_mode": "geom_waypoint",
+        "guide_cfg": {},
+    },
+    {
+        "name": "waypoint_shield",
+        "guide_mode": "waypoint",
+        "guide_cfg": {
+            "waypoint_safe_gain": 1.35,
+            "waypoint_progress_gain": 0.60,
+            "waypoint_side_gain": 0.35,
+            "waypoint_lock_threat_enter": 0.16,
+            "waypoint_lock_threat_exit": 0.06,
+            "waypoint_lock_min_steps": 26,
+        },
+        "shield_mode": "guide",
+        "shield_cfg": {
+            "threat_enter": 0.16,
+            "rudder_base": 0.40,
+            "rudder_threat_gain": 0.55,
+            "throttle_threat_gain": 1.35,
+            "throttle_clear_gain": 0.90,
+        },
+    },
+    {
+        "name": "sector_lock_shield",
+        "guide_mode": "sector_lock",
+        "guide_cfg": {
+            "lock_threat_enter": 0.18,
+            "lock_threat_exit": 0.08,
+            "lock_min_steps": 24,
+        },
+        "shield_mode": "guide",
+        "shield_cfg": {
+            "threat_enter": 0.18,
+            "rudder_base": 0.38,
+            "rudder_threat_gain": 0.50,
+            "throttle_threat_gain": 1.25,
+            "throttle_clear_gain": 0.85,
+        },
+    },
+] 
 
 
 def parse_args() -> argparse.Namespace:
@@ -100,6 +175,8 @@ def run_variant(args: argparse.Namespace, variant: Dict[str, Any], run_root: Pat
     env_kwargs = {
         "guide_mode": variant["guide_mode"],
         "guide_cfg": deepcopy(variant.get("guide_cfg", {})),
+        "shield_mode": variant.get("shield_mode", "none"),
+        "shield_cfg": deepcopy(variant.get("shield_cfg", {})),
     }
 
     stage_ends = [

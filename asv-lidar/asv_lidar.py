@@ -4,7 +4,7 @@ from ship_model import VESSEL_LENGTH
 
 LIDAR_MIN_RANGE = 1.0
 LIDAR_RANGE = 16
-LIDAR_SWATH = 270
+LIDAR_SWATH = 360
 LIDAR_BEAMS = 90
 
 class Lidar:
@@ -23,7 +23,7 @@ class Lidar:
         self._pos_y = 0
         self._hdg = 0
 
-        self._angles = np.linspace(-LIDAR_SWATH/2, LIDAR_SWATH/2, LIDAR_BEAMS, dtype=np.float64)
+        self._angles = np.linspace(-LIDAR_SWATH / 2, LIDAR_SWATH / 2, LIDAR_BEAMS, endpoint=False, dtype=np.float64)
         self._ranges = np.ones_like(self._angles) * LIDAR_RANGE
 
     @property
@@ -46,8 +46,9 @@ class Lidar:
             obstacles (list): list of pygame.Rect obstacles.
         Returns:
             numpy.ndarray: array of ranges from sensor to obstacles.
-                Readings outside the physical sensor range [LIDAR_MIN_RANGE, LIDAR_RANGE]
-                are reported as LIDAR_RANGE.
+                Readings beyond the physical max range are reported as LIDAR_RANGE.
+                Distances inside 1 m are preserved so the environment can terminate
+                on a LiDAR-threshold collision condition.
         """
         # self._pos_x = pos[0]
         # self._pos_y = pos[1]
@@ -91,12 +92,10 @@ class Lidar:
                     dist = np.hypot(intersection[0] - self._pos_x, intersection[1] - self._pos_y)
                     closest_distance = min(closest_distance, dist)
 
-            # Match the real sensor: anything inside the blind zone or beyond max range
-            # is reported as the maximum range value.
-            if (not np.isfinite(closest_distance)) or closest_distance < LIDAR_MIN_RANGE or closest_distance > LIDAR_RANGE:
+            if (not np.isfinite(closest_distance)) or closest_distance > LIDAR_RANGE:
                 self._ranges[idx] = LIDAR_RANGE
             else:
-                self._ranges[idx] = closest_distance
+                self._ranges[idx] = max(float(closest_distance), 0.0)
         
         return self._ranges.copy()
 

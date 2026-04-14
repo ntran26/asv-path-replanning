@@ -36,25 +36,27 @@ MAX_RUD_ANGLE = 40.0
 MAX_RUD_RATE_DPS = 20.0
 
 # Bridge between the simplified repo command and the MATLAB input units.
-RPM_COMMAND_SCALE = 100.0
+RPM_COMMAND_SCALE = 90.0
 THRUSTER_COMMAND_SCALE = 60.0
 
 # Practical operating point from the current tuned benchmark.
 RECOMMENDED_COMMAND_RPM_MAX = 15.0
 RECOMMENDED_PROP_RPM_MAX = RPM_COMMAND_SCALE * RECOMMENDED_COMMAND_RPM_MAX
-RECOMMENDED_PEAK_SPEED_MPS = 1.65
+RECOMMENDED_PEAK_SPEED_MPS = 1.56
 
 # Focused calibration knobs around the fixed MATLAB coefficients.
-# These defaults are taken from the current stable/tuned region found
+# These defaults are taken from the current fine-tuned region found
 # against the project straight-line and turning benchmarks.
-PROPELLER_THRUST_SCALE = 1.4
-RUDDER_FORCE_SCALE = 0.15
-RUDDER_YAW_SCALE = 1.5
-RUDDER_X_DRAG_SCALE = 0.02
+PROPELLER_THRUST_SCALE = 2.2
+PROPELLER_ADVANCE_SCALE = 1.0
+RUDDER_FORCE_SCALE = 0.12
+RUDDER_YAW_SCALE = 1.7
+RUDDER_INFLOW_SCALE = 1.0
+RUDDER_X_DRAG_SCALE = 0.01
 LINEAR_SURGE_DAMP = 1.5
 LINEAR_YAW_DAMP = 0.0
 ROLL_DAMP_SCALE = 4.0
-ROLL_RESTORE_SCALE = 1.0
+ROLL_RESTORE_SCALE = 1.2
 BOW_THRUSTER_SCALE = 1.0
 
 MIN_FLOW_SPEED = 0.05
@@ -311,9 +313,9 @@ class ShipModel:
             j_adv = 0.0
             kt = 0.0
             xd_p = 0.0
-            ud_r = epsi * onew
+            ud_r = RUDDER_INFLOW_SCALE * epsi * onew
         else:
-            j_adv = onew * u / max(abs(n1_force) * d_prop, MIN_ADVANCE_RATIO)
+            j_adv = PROPELLER_ADVANCE_SCALE * onew * u / max(abs(n1_force) * d_prop, MIN_ADVANCE_RATIO)
             a0, a1, a2 = 0.3267, -0.2297, -0.1607
             kt = a0 + a1 * j_adv + a2 * j_adv * j_adv
             xd_p = (
@@ -327,7 +329,9 @@ class ShipModel:
             )
             j_sq = max(j_adv * j_adv, MIN_ADVANCE_RATIO * MIN_ADVANCE_RATIO)
             prop_term = max(1.0 + 8.0 * kt / (math.pi * j_sq), 0.0)
-            ud_r = epsi * onew * math.sqrt(eta_r * ((1.0 + kappa * math.sqrt(prop_term) - 1.0) ** 2) + (1.0 - eta_r))
+            ud_r = RUDDER_INFLOW_SCALE * epsi * onew * math.sqrt(
+                eta_r * ((1.0 + kappa * math.sqrt(prop_term) - 1.0) ** 2) + (1.0 - eta_r)
+            )
 
         vd_r = -g_r * (drift - ld_r * rd + (p * (z_r - z_g) / u_mag))
         ud_total_r = math.hypot(ud_r, vd_r)

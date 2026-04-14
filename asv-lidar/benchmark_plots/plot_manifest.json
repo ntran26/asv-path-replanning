@@ -1,0 +1,11 @@
+{
+  "history_path": "benchmark_history.json",
+  "latest_timesteps": 2000000,
+  "files": [
+    "benchmark_plots\\benchmark_rates.png",
+    "benchmark_plots\\benchmark_performance.png",
+    "benchmark_plots\\benchmark_reward_terms.png",
+    "benchmark_plots\\benchmark_tracking.png",
+    "benchmark_plots\\benchmark_latest_cases.png"
+  ]
+}

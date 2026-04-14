@@ -1,107 +1,89 @@
+"""
+Train:
+    python train_test_asv.py --mode train --algo ppo --timesteps 1000000
+
+Test (render):
+    python train_test_asv.py --mode test --algo ppo
+
+Plot benchmark:
+    python train_test_asv.py --mode plot --plot-input benchmark_history.json --plot-dir benchmark_plots
+
+Optional:
+  --num-envs 8 --eval-freq 50000 --save-freq 500000
+"""
+
 import os
 import csv
 import json
 import argparse
 import multiprocessing
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
+import matplotlib.pyplot as plt
 import numpy as np
-from stable_baselines3 import PPO, SAC
+import torch.nn as nn
+from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import SubprocVecEnv, VecMonitor
 from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback, CallbackList
 
-from rl_env import ASVLidarEnv, RPM_MAX, RPM_MIN
-
-"""
-Train:
-  python train_test_asv.py --mode train --algo ppo --timesteps 1000000
-
-Test (render):
-  python train_test_asv.py --mode test --algo ppo
-
-Optional:
-  --num-envs 8 --eval-freq 50000 --n-eval-episodes 5 --save-freq 500000
-"""
+from rl_env import ASVLidarEnv, RPM_MAX, RPM_MIN, COLLISION_RANGE
+from ship_model import VESSEL_LENGTH, MAX_RUD_ANGLE
 
 DEFAULT_BENCHMARK_CASES = [0, 1, 2, 3, 4, 5]
 DEFAULT_EVAL_FREQ = 50_000
 DEFAULT_EVAL_MAX_STEPS = 600
-DEFAULT_CURRICULUM_CASES = [
-    [0],
-    [0, 1, 2],
-    [0, 1, 2, 3, 4, 5],
-]
+DEFAULT_PLOT_DIR = "benchmark_plots"
+DEFAULT_BEST_MODEL_PATH = os.path.join("models", "best_benchmark_model")
+DEFAULT_BEST_BENCHMARK_JSON = "best_benchmark_result.json"
+DEFAULT_EARLY_STOP_PATIENCE = 3
 
 
-# -----------------------------------------------------------------------------
-# Utility helpers
-# -----------------------------------------------------------------------------
 def action_to_rpm(throttle_cmd: float) -> float:
     throttle_cmd = float(np.clip(throttle_cmd, -1.0, 1.0))
     return float(RPM_MIN + (throttle_cmd + 1.0) * 0.5 * (RPM_MAX - RPM_MIN))
 
+
 def action_to_rudder_deg(rudder_cmd: float) -> float:
     rudder_cmd = float(np.clip(rudder_cmd, -1.0, 1.0))
-    return float(rudder_cmd * 40.0)
+    return float(rudder_cmd * float(MAX_RUD_ANGLE))
+
 
 def lidar_front_stats(env: ASVLidarEnv) -> Dict[str, float]:
     out = {"min_lidar": float("inf"), "p10_front": float("inf")}
-
-    if not hasattr(env, "lidar"):
-        return out
-
     ranges = np.asarray(env.lidar.ranges, dtype=np.float32)
     angles = np.asarray(env.lidar.angles, dtype=np.float32)
 
-    ranges[ranges <= 0.0] = np.inf
     finite = ranges[np.isfinite(ranges)]
     if finite.size:
         out["min_lidar"] = float(np.min(finite))
 
     front_mask = np.abs(angles) <= 45.0
-    if np.any(front_mask):
-        front = ranges[front_mask]
-    else:
-        front = ranges
-
+    front = ranges[front_mask] if np.any(front_mask) else ranges
     front = front[np.isfinite(front)]
     if front.size:
         out["p10_front"] = float(np.percentile(front, 10))
-
     return out
+
 
 def infer_term_reason(env: ASVLidarEnv, terminated: bool, truncated: bool, hit_max_steps: bool) -> str:
     if hit_max_steps or truncated:
         return "timeout"
 
-    collided = False
-    if hasattr(env, "_check_collision_geom"):
-        try:
-            collided = bool(env._check_collision_geom())
-        except Exception:
-            collided = False
+    ranges = np.asarray(env.lidar.ranges, dtype=np.float32)
+    finite = ranges[np.isfinite(ranges)]
+    if finite.size and float(np.min(finite)) < COLLISION_RANGE:
+        return "collision"
 
-    if collided:
-        # separate border / obstacle when possible
-        try:
-            hull = env._hull_polygon_world()
-            xs = [p[0] for p in hull]
-            ys = [p[1] for p in hull]
-            if min(xs) < 0 or max(xs) > env.map_width or min(ys) < 0 or max(ys) > env.map_height:
-                return "border"
-        except Exception:
-            pass
-        return "obstacle"
-
-    if getattr(env, "distance_to_goal", float("inf")) <= getattr(__import__("ship_model"), "VESSEL_LENGTH", 1.0):
+    if getattr(env, "distance_to_goal", float("inf")) <= (VESSEL_LENGTH / 2.0):
         return "goal"
 
     if terminated:
-        return "goal"
+        return "collision"
 
     return "timeout"
 
-def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deterministic: bool = True) -> Dict[str, Any]:
+
+def rollout_episode(actor, env: ASVLidarEnv, case_id: int, max_steps: int, deterministic: bool = True) -> Dict[str, Any]:
     env.test_case = case_id
     obs, _ = env.reset()
 
@@ -113,130 +95,34 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
     speeds: List[float] = []
     rpms: List[float] = []
     rudders: List[float] = []
-    front_p10s: List[float] = []
     min_lidars: List[float] = []
-    signed_rudders: List[float] = []
-    front_clears: List[float] = []
-    oa_active_flags: List[float] = []
-    left_p10s: List[float] = []
-    center_p10s: List[float] = []
-    right_p10s: List[float] = []
-    obs_left_clears: List[float] = []
-    obs_center_clears: List[float] = []
-    obs_right_clears: List[float] = []
-    obs_left_clears_instant: List[float] = []
-    obs_center_clears_instant: List[float] = []
-    obs_right_clears_instant: List[float] = []
-    obs_left_blocked: List[float] = []
-    obs_center_blocked: List[float] = []
-    obs_right_blocked: List[float] = []
-    gap_asymmetries: List[float] = []
-    gap_open_asymmetries: List[float] = []
-    gap_blocked_asymmetries: List[float] = []
-    lidar_left_clears_m: List[float] = []
-    lidar_center_clears_m: List[float] = []
-    lidar_right_clears_m: List[float] = []
-    lidar_left_blocked_m: List[float] = []
-    lidar_center_blocked_m: List[float] = []
-    lidar_right_blocked_m: List[float] = []
-    lidar_left_open_fracs: List[float] = []
-    lidar_center_open_fracs: List[float] = []
-    lidar_right_open_fracs: List[float] = []
+    front_p10s: List[float] = []
     r_pfs: List[float] = []
     r_oas: List[float] = []
-    pf_contribs: List[float] = []
-    oa_contribs: List[float] = []
-    threats: List[float] = []
-    goal_dist_norms: List[float] = []
-    lam_values: List[float] = []
-    rudder_states: List[float] = []
-    rpm_states: List[float] = []
-    gap_strengths: List[float] = []
-    r_commits: List[float] = []
-    r_recenters: List[float] = []
-    recenter_gates: List[float] = []
-    path_progress_steps: List[float] = []
-    goal_progress_steps: List[float] = []
-    track_qualities: List[float] = []
-    r_pf_progress_terms: List[float] = []
-    r_pf_track_terms: List[float] = []
-    guide_headings: List[float] = []
-    guide_turn_prefs: List[float] = []
-    guide_clears: List[float] = []
-    guide_alignments: List[float] = []
-    guide_progress_steps: List[float] = []
-    first_oa_step = None
+    r_exists: List[float] = []
+    r_goals: List[float] = []
+    lambdas: List[float] = []
+    abs_tgts: List[float] = []
+    abs_heading_errors: List[float] = []
 
     while steps < max_steps:
-        action, _ = model.predict(obs, deterministic=deterministic)
+        action, _ = actor.predict(obs, deterministic=deterministic)
         action = np.asarray(action, dtype=np.float32).reshape(-1)
 
         obs, reward, terminated, truncated, info = env.step(action)
         total_reward += float(reward)
         steps += 1
 
-        signed_rudder = action_to_rudder_deg(float(action[0]))
-        signed_rudders.append(signed_rudder)
-
-        front_clears.append(float(info.get("front_clear", float("inf"))))
-        oa_now = bool(info.get("oa_active", False))
-        oa_active_flags.append(1.0 if oa_now else 0.0)
-
-        if oa_now and first_oa_step is None:
-            first_oa_step = steps
-
-        left_p10s.append(float(info.get("left_p10", float("inf"))))
-        center_p10s.append(float(info.get("center_p10", float("inf"))))
-        right_p10s.append(float(info.get("right_p10", float("inf"))))
-        obs_left_clears.append(float(info.get("left_clear", 0.0)))
-        obs_center_clears.append(float(info.get("center_clear", 0.0)))
-        obs_right_clears.append(float(info.get("right_clear", 0.0)))
-        obs_left_clears_instant.append(float(info.get("left_clear_instant", 0.0)))
-        obs_center_clears_instant.append(float(info.get("center_clear_instant", 0.0)))
-        obs_right_clears_instant.append(float(info.get("right_clear_instant", 0.0)))
-        obs_left_blocked.append(float(info.get("left_blocked", 0.0)))
-        obs_center_blocked.append(float(info.get("center_blocked", 0.0)))
-        obs_right_blocked.append(float(info.get("right_blocked", 0.0)))
-        gap_asymmetries.append(float(info.get("gap_asymmetry", 0.0)))
-        gap_open_asymmetries.append(float(info.get("gap_open_asymmetry", 0.0)))
-        gap_blocked_asymmetries.append(float(info.get("gap_blocked_asymmetry", 0.0)))
-        lidar_left_clears_m.append(float(info.get("lidar_left_clear_m", float("inf"))))
-        lidar_center_clears_m.append(float(info.get("lidar_center_clear_m", float("inf"))))
-        lidar_right_clears_m.append(float(info.get("lidar_right_clear_m", float("inf"))))
-        lidar_left_blocked_m.append(float(info.get("lidar_left_blocked_m", float("inf"))))
-        lidar_center_blocked_m.append(float(info.get("lidar_center_blocked_m", float("inf"))))
-        lidar_right_blocked_m.append(float(info.get("lidar_right_blocked_m", float("inf"))))
-        lidar_left_open_fracs.append(float(info.get("lidar_left_open_fraction", 0.0)))
-        lidar_center_open_fracs.append(float(info.get("lidar_center_open_fraction", 0.0)))
-        lidar_right_open_fracs.append(float(info.get("lidar_right_open_fraction", 0.0)))
-
-        r_pfs.append(float(info.get("r_pf", 0.0)))
-        r_oas.append(float(info.get("r_oa", 0.0)))
-        pf_contribs.append(float(info.get("reward_pf_contrib", 0.0)))
-        oa_contribs.append(float(info.get("reward_oa_contrib", 0.0)))
-        threats.append(float(info.get("threat", 0.0)))
-        goal_dist_norms.append(float(info.get("goal_dist_norm", 0.0)))
-        lam_values.append(float(info.get("lam", 0.0)))
-        rudder_states.append(float(info.get("rudder_state", 0.0)))
-        rpm_states.append(float(info.get("rpm_state", 0.0)))
-        gap_strengths.append(float(info.get("gap_strength", 0.0)))
-        r_commits.append(float(info.get("r_commit", 0.0)))
-        r_recenters.append(float(info.get("r_recenter", 0.0)))
-        recenter_gates.append(float(info.get("recenter_gate", 0.0)))
-        path_progress_steps.append(float(info.get("path_progress_step", 0.0)))
-        goal_progress_steps.append(float(info.get("goal_progress_step", 0.0)))
-        track_qualities.append(float(info.get("track_quality", 0.0)))
-        r_pf_progress_terms.append(float(info.get("r_pf_progress", 0.0)))
-        r_pf_track_terms.append(float(info.get("r_pf_track", 0.0)))
-        guide_headings.append(float(info.get("guide_heading", 0.0)))
-        guide_turn_prefs.append(float(info.get("guide_turn_pref", 0.0)))
-        guide_clears.append(float(info.get("guide_clear_m", 0.0)))
-        guide_alignments.append(float(info.get("guide_alignment", 0.0)))
-        guide_progress_steps.append(float(info.get("guide_progress_step", 0.0)))
-
-        speeds.append(float(getattr(env, "speed_mps", 0.0)))
+        speeds.append(float(info.get("speed_mps", 0.0)))
         rpms.append(action_to_rpm(float(action[1])))
         rudders.append(action_to_rudder_deg(float(action[0])))
+        r_pfs.append(float(info.get("r_pf", 0.0)))
+        r_oas.append(float(info.get("r_oa", 0.0)))
+        r_exists.append(float(info.get("r_exist", 0.0)))
+        r_goals.append(float(info.get("r_goal", 0.0)))
+        lambdas.append(float(info.get("lambda_reward", 0.0)))
+        abs_tgts.append(abs(float(info.get("cross_track_error", 0.0))))
+        abs_heading_errors.append(abs(float(info.get("heading_error", 0.0))))
 
         ls = lidar_front_stats(env)
         min_lidars.append(ls["min_lidar"])
@@ -262,72 +148,21 @@ def rollout_episode(model, env: ASVLidarEnv, case_id: int, max_steps: int, deter
         "d_end": float(getattr(env, "distance_to_goal", float("inf"))),
         "start": [float(env.start_x), float(env.start_y)],
         "goal": [float(env.goal_x), float(env.goal_y)],
-        "mean_signed_rudder": float(np.mean(signed_rudders)) if signed_rudders else 0.0,
-        "max_abs_rudder": float(np.max(np.abs(signed_rudders))) if signed_rudders else 0.0,
-        "min_front_clear": float(np.min(front_clears)) if front_clears else float("inf"),
-        "oa_active_frac": float(np.mean(oa_active_flags)) if oa_active_flags else 0.0,
-        "first_oa_step": int(first_oa_step) if first_oa_step is not None else -1,
-        "left_p10_min": float(np.min(left_p10s)) if left_p10s else float("inf"),
-        "center_p10_min": float(np.min(center_p10s)) if center_p10s else float("inf"),
-        "right_p10_min": float(np.min(right_p10s)) if right_p10s else float("inf"),
-        "min_obs_left_clear": float(np.min(obs_left_clears)) if obs_left_clears else float("inf"),
-        "min_obs_center_clear": float(np.min(obs_center_clears)) if obs_center_clears else float("inf"),
-        "min_obs_right_clear": float(np.min(obs_right_clears)) if obs_right_clears else float("inf"),
-        "max_obs_left_clear": float(np.max(obs_left_clears)) if obs_left_clears else 0.0,
-        "max_obs_center_clear": float(np.max(obs_center_clears)) if obs_center_clears else 0.0,
-        "max_obs_right_clear": float(np.max(obs_right_clears)) if obs_right_clears else 0.0,
-        "min_obs_left_clear_instant": float(np.min(obs_left_clears_instant)) if obs_left_clears_instant else float("inf"),
-        "min_obs_center_clear_instant": float(np.min(obs_center_clears_instant)) if obs_center_clears_instant else float("inf"),
-        "min_obs_right_clear_instant": float(np.min(obs_right_clears_instant)) if obs_right_clears_instant else float("inf"),
-        "max_obs_left_clear_instant": float(np.max(obs_left_clears_instant)) if obs_left_clears_instant else 0.0,
-        "max_obs_center_clear_instant": float(np.max(obs_center_clears_instant)) if obs_center_clears_instant else 0.0,
-        "max_obs_right_clear_instant": float(np.max(obs_right_clears_instant)) if obs_right_clears_instant else 0.0,
-        "min_obs_left_blocked": float(np.min(obs_left_blocked)) if obs_left_blocked else float("inf"),
-        "min_obs_center_blocked": float(np.min(obs_center_blocked)) if obs_center_blocked else float("inf"),
-        "min_obs_right_blocked": float(np.min(obs_right_blocked)) if obs_right_blocked else float("inf"),
-        "mean_abs_gap_asymmetry": float(np.mean(np.abs(gap_asymmetries))) if gap_asymmetries else 0.0,
-        "mean_abs_gap_open_asymmetry": float(np.mean(np.abs(gap_open_asymmetries))) if gap_open_asymmetries else 0.0,
-        "mean_abs_gap_blocked_asymmetry": float(np.mean(np.abs(gap_blocked_asymmetries))) if gap_blocked_asymmetries else 0.0,
-        "min_lidar_left_clear_m": float(np.min(lidar_left_clears_m)) if lidar_left_clears_m else float("inf"),
-        "min_lidar_center_clear_m": float(np.min(lidar_center_clears_m)) if lidar_center_clears_m else float("inf"),
-        "min_lidar_right_clear_m": float(np.min(lidar_right_clears_m)) if lidar_right_clears_m else float("inf"),
-        "min_lidar_left_blocked_m": float(np.min(lidar_left_blocked_m)) if lidar_left_blocked_m else float("inf"),
-        "min_lidar_center_blocked_m": float(np.min(lidar_center_blocked_m)) if lidar_center_blocked_m else float("inf"),
-        "min_lidar_right_blocked_m": float(np.min(lidar_right_blocked_m)) if lidar_right_blocked_m else float("inf"),
-        "mean_lidar_left_open_fraction": float(np.mean(lidar_left_open_fracs)) if lidar_left_open_fracs else 0.0,
-        "mean_lidar_center_open_fraction": float(np.mean(lidar_center_open_fracs)) if lidar_center_open_fracs else 0.0,
-        "mean_lidar_right_open_fraction": float(np.mean(lidar_right_open_fracs)) if lidar_right_open_fracs else 0.0,
         "mean_r_pf": float(np.mean(r_pfs)) if r_pfs else 0.0,
         "mean_r_oa": float(np.mean(r_oas)) if r_oas else 0.0,
-        "mean_pf_contrib": float(np.mean(pf_contribs)) if pf_contribs else 0.0,
-        "mean_oa_contrib": float(np.mean(oa_contribs)) if oa_contribs else 0.0,
-        "mean_threat": float(np.mean(threats)) if threats else 0.0,
-        "mean_goal_dist_norm": float(np.mean(goal_dist_norms)) if goal_dist_norms else 0.0,
-        "mean_lam": float(np.mean(lam_values)) if lam_values else 0.0,
-        "mean_rudder_state": float(np.mean(rudder_states)) if rudder_states else 0.0,
-        "mean_rpm_state": float(np.mean(rpm_states)) if rpm_states else 0.0,
-        "mean_gap_strength": float(np.mean(gap_strengths)) if gap_strengths else 0.0,
-        "mean_r_commit": float(np.mean(r_commits)) if r_commits else 0.0,
-        "mean_r_recenter": float(np.mean(r_recenters)) if r_recenters else 0.0,
-        "mean_recenter_gate": float(np.mean(recenter_gates)) if recenter_gates else 0.0,
-        "mean_path_progress_step": float(np.mean(path_progress_steps)) if path_progress_steps else 0.0,
-        "mean_goal_progress_step": float(np.mean(goal_progress_steps)) if goal_progress_steps else 0.0,
-        "mean_track_quality": float(np.mean(track_qualities)) if track_qualities else 0.0,
-        "mean_r_pf_progress": float(np.mean(r_pf_progress_terms)) if r_pf_progress_terms else 0.0,
-        "mean_r_pf_track": float(np.mean(r_pf_track_terms)) if r_pf_track_terms else 0.0,
-        "mean_abs_guide_heading": float(np.mean(np.abs(guide_headings))) if guide_headings else 0.0,
-        "mean_abs_guide_turn_pref": float(np.mean(np.abs(guide_turn_prefs))) if guide_turn_prefs else 0.0,
-        "mean_guide_clear_m": float(np.mean(guide_clears)) if guide_clears else 0.0,
-        "mean_guide_alignment": float(np.mean(guide_alignments)) if guide_alignments else 0.0,
-        "mean_guide_progress_step": float(np.mean(guide_progress_steps)) if guide_progress_steps else 0.0,
+        "mean_r_exist": float(np.mean(r_exists)) if r_exists else 0.0,
+        "mean_r_goal": float(np.mean(r_goals)) if r_goals else 0.0,
+        "mean_lambda": float(np.mean(lambdas)) if lambdas else 0.0,
+        "mean_abs_tgt": float(np.mean(abs_tgts)) if abs_tgts else 0.0,
+        "mean_abs_heading_error": float(np.mean(abs_heading_errors)) if abs_heading_errors else 0.0,
         "final_x": float(env.asv_x),
         "final_y": float(env.asv_y),
         "final_heading": float(env.asv_h),
     }
 
-def evaluate_benchmark(model, env: ASVLidarEnv, cases: List[int], max_steps: int) -> Dict[str, Any]:
-    rows = [rollout_episode(model, env, case_id=case, max_steps=max_steps) for case in cases]
 
+def evaluate_benchmark(actor, env: ASVLidarEnv, cases: List[int], max_steps: int) -> Dict[str, Any]:
+    rows = [rollout_episode(actor, env, case_id=case, max_steps=max_steps) for case in cases]
     term_reasons = [row["term_reason"] for row in rows]
     summary = {
         "n_cases": len(rows),
@@ -338,68 +173,169 @@ def evaluate_benchmark(model, env: ASVLidarEnv, cases: List[int], max_steps: int
         "min_p10_front": float(np.min([row["p10_front"] for row in rows])) if rows else float("inf"),
         "min_lidar": float(np.min([row["min_lidar"] for row in rows])) if rows else float("inf"),
         "goal_rate": float(np.mean([r == "goal" for r in term_reasons])) if rows else 0.0,
-        "obstacle_rate": float(np.mean([r == "obstacle" for r in term_reasons])) if rows else 0.0,
-        "border_rate": float(np.mean([r == "border" for r in term_reasons])) if rows else 0.0,
+        "collision_rate": float(np.mean([r == "collision" for r in term_reasons])) if rows else 0.0,
+        "obstacle_rate": float(np.mean([r == "collision" for r in term_reasons])) if rows else 0.0,
+        "border_rate": 0.0,
         "timeout_rate": float(np.mean([r == "timeout" for r in term_reasons])) if rows else 0.0,
-        "min_front_clear": float(np.min([row["min_front_clear"] for row in rows])) if rows else float("inf"),
-        "mean_oa_active_frac": float(np.mean([row["oa_active_frac"] for row in rows])) if rows else 0.0,
-        "mean_pf_contrib": float(np.mean([row["mean_pf_contrib"] for row in rows])) if rows else 0.0,
-        "mean_oa_contrib": float(np.mean([row["mean_oa_contrib"] for row in rows])) if rows else 0.0,
-        "mean_threat": float(np.mean([row["mean_threat"] for row in rows])) if rows else 0.0,
-        "mean_goal_dist_norm": float(np.mean([row["mean_goal_dist_norm"] for row in rows])) if rows else 0.0,
-        "mean_lam": float(np.mean([row["mean_lam"] for row in rows])) if rows else 0.0,
-        "mean_rudder_state": float(np.mean([row["mean_rudder_state"] for row in rows])) if rows else 0.0,
-        "mean_rpm_state": float(np.mean([row["mean_rpm_state"] for row in rows])) if rows else 0.0,
-        "mean_gap_strength": float(np.mean([row["mean_gap_strength"] for row in rows])) if rows else 0.0,
-        "mean_r_commit": float(np.mean([row["mean_r_commit"] for row in rows])) if rows else 0.0,
-        "mean_r_recenter": float(np.mean([row["mean_r_recenter"] for row in rows])) if rows else 0.0,
-        "mean_recenter_gate": float(np.mean([row["mean_recenter_gate"] for row in rows])) if rows else 0.0,
-        "mean_path_progress_step": float(np.mean([row["mean_path_progress_step"] for row in rows])) if rows else 0.0,
-        "mean_goal_progress_step": float(np.mean([row["mean_goal_progress_step"] for row in rows])) if rows else 0.0,
-        "mean_track_quality": float(np.mean([row["mean_track_quality"] for row in rows])) if rows else 0.0,
-        "mean_r_pf_progress": float(np.mean([row["mean_r_pf_progress"] for row in rows])) if rows else 0.0,
-        "mean_r_pf_track": float(np.mean([row["mean_r_pf_track"] for row in rows])) if rows else 0.0,
-        "mean_abs_guide_heading": float(np.mean([row["mean_abs_guide_heading"] for row in rows])) if rows else 0.0,
-        "mean_abs_guide_turn_pref": float(np.mean([row["mean_abs_guide_turn_pref"] for row in rows])) if rows else 0.0,
-        "mean_guide_clear_m": float(np.mean([row["mean_guide_clear_m"] for row in rows])) if rows else 0.0,
-        "mean_guide_alignment": float(np.mean([row["mean_guide_alignment"] for row in rows])) if rows else 0.0,
-        "mean_guide_progress_step": float(np.mean([row["mean_guide_progress_step"] for row in rows])) if rows else 0.0,
-        "min_obs_left_clear": float(np.min([row["min_obs_left_clear"] for row in rows])) if rows else float("inf"),
-        "min_obs_center_clear": float(np.min([row["min_obs_center_clear"] for row in rows])) if rows else float("inf"),
-        "min_obs_right_clear": float(np.min([row["min_obs_right_clear"] for row in rows])) if rows else float("inf"),
-        "max_obs_left_clear": float(np.max([row["max_obs_left_clear"] for row in rows])) if rows else 0.0,
-        "max_obs_center_clear": float(np.max([row["max_obs_center_clear"] for row in rows])) if rows else 0.0,
-        "max_obs_right_clear": float(np.max([row["max_obs_right_clear"] for row in rows])) if rows else 0.0,
-        "min_obs_left_clear_instant": float(np.min([row["min_obs_left_clear_instant"] for row in rows])) if rows else float("inf"),
-        "min_obs_center_clear_instant": float(np.min([row["min_obs_center_clear_instant"] for row in rows])) if rows else float("inf"),
-        "min_obs_right_clear_instant": float(np.min([row["min_obs_right_clear_instant"] for row in rows])) if rows else float("inf"),
-        "max_obs_left_clear_instant": float(np.max([row["max_obs_left_clear_instant"] for row in rows])) if rows else 0.0,
-        "max_obs_center_clear_instant": float(np.max([row["max_obs_center_clear_instant"] for row in rows])) if rows else 0.0,
-        "max_obs_right_clear_instant": float(np.max([row["max_obs_right_clear_instant"] for row in rows])) if rows else 0.0,
-        "min_obs_left_blocked": float(np.min([row["min_obs_left_blocked"] for row in rows])) if rows else float("inf"),
-        "min_obs_center_blocked": float(np.min([row["min_obs_center_blocked"] for row in rows])) if rows else float("inf"),
-        "min_obs_right_blocked": float(np.min([row["min_obs_right_blocked"] for row in rows])) if rows else float("inf"),
-        "mean_abs_gap_asymmetry": float(np.mean([row["mean_abs_gap_asymmetry"] for row in rows])) if rows else 0.0,
-        "mean_abs_gap_open_asymmetry": float(np.mean([row["mean_abs_gap_open_asymmetry"] for row in rows])) if rows else 0.0,
-        "mean_abs_gap_blocked_asymmetry": float(np.mean([row["mean_abs_gap_blocked_asymmetry"] for row in rows])) if rows else 0.0,
-        "min_lidar_left_clear_m": float(np.min([row["min_lidar_left_clear_m"] for row in rows])) if rows else float("inf"),
-        "min_lidar_center_clear_m": float(np.min([row["min_lidar_center_clear_m"] for row in rows])) if rows else float("inf"),
-        "min_lidar_right_clear_m": float(np.min([row["min_lidar_right_clear_m"] for row in rows])) if rows else float("inf"),
-        "min_lidar_left_blocked_m": float(np.min([row["min_lidar_left_blocked_m"] for row in rows])) if rows else float("inf"),
-        "min_lidar_center_blocked_m": float(np.min([row["min_lidar_center_blocked_m"] for row in rows])) if rows else float("inf"),
-        "min_lidar_right_blocked_m": float(np.min([row["min_lidar_right_blocked_m"] for row in rows])) if rows else float("inf"),
-        "mean_lidar_left_open_fraction": float(np.mean([row["mean_lidar_left_open_fraction"] for row in rows])) if rows else 0.0,
-        "mean_lidar_center_open_fraction": float(np.mean([row["mean_lidar_center_open_fraction"] for row in rows])) if rows else 0.0,
-        "mean_lidar_right_open_fraction": float(np.mean([row["mean_lidar_right_open_fraction"] for row in rows])) if rows else 0.0,
-        "min_left_p10": float(np.min([row["left_p10_min"] for row in rows])) if rows else float("inf"),
-        "min_center_p10": float(np.min([row["center_p10_min"] for row in rows])) if rows else float("inf"),
-        "min_right_p10": float(np.min([row["right_p10_min"] for row in rows])) if rows else float("inf"),
+        "mean_r_pf": float(np.mean([row["mean_r_pf"] for row in rows])) if rows else 0.0,
+        "mean_r_oa": float(np.mean([row["mean_r_oa"] for row in rows])) if rows else 0.0,
+        "mean_r_exist": float(np.mean([row["mean_r_exist"] for row in rows])) if rows else 0.0,
+        "mean_r_goal": float(np.mean([row["mean_r_goal"] for row in rows])) if rows else 0.0,
+        "mean_lambda": float(np.mean([row["mean_lambda"] for row in rows])) if rows else 0.0,
+        "mean_abs_tgt": float(np.mean([row["mean_abs_tgt"] for row in rows])) if rows else 0.0,
+        "mean_abs_heading_error": float(np.mean([row["mean_abs_heading_error"] for row in rows])) if rows else 0.0,
     }
     return {"rows": rows, "summary": summary}
 
-# -----------------------------------------------------------------------------
-# Fixed benchmark callback
-# -----------------------------------------------------------------------------
+
+def _save_plot(fig, output_path: str) -> None:
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+
+
+def plot_benchmark_history(history_path: str, output_dir: str) -> List[str]:
+    if not os.path.exists(history_path):
+        raise FileNotFoundError(f"Benchmark history not found: {history_path}")
+
+    with open(history_path, "r", encoding="utf-8") as f:
+        history = json.load(f)
+
+    if not history:
+        raise ValueError(f"Benchmark history is empty: {history_path}")
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    timesteps = [int(entry["timesteps"]) for entry in history]
+    summaries = [entry["summary"] for entry in history]
+    latest_rows = history[-1].get("rows", [])
+
+    def series(key: str, default=0.0):
+        values = []
+        for summary in summaries:
+            values.append(float(summary.get(key, default)))
+        return values
+
+    saved_paths: List[str] = []
+
+    # 1. Success / failure rates
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(timesteps, series("success_rate"), marker="o", linewidth=2, label="success")
+    ax.plot(timesteps, series("goal_rate"), marker="o", linewidth=2, label="goal")
+    ax.plot(timesteps, series("collision_rate", default=np.nan), marker="o", linewidth=2, label="collision")
+    ax.plot(timesteps, series("timeout_rate"), marker="o", linewidth=2, label="timeout")
+    ax.set_title("Benchmark Rates vs Timesteps")
+    ax.set_xlabel("Timesteps")
+    ax.set_ylabel("Rate")
+    ax.set_ylim(-0.02, 1.02)
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+    rates_path = os.path.join(output_dir, "benchmark_rates.png")
+    _save_plot(fig, rates_path)
+    saved_paths.append(rates_path)
+
+    # 2. Reward / episode length / speed
+    fig, axes = plt.subplots(3, 1, figsize=(10, 10), sharex=True)
+    axes[0].plot(timesteps, series("mean_reward"), marker="o", linewidth=2, color="tab:blue")
+    axes[0].set_ylabel("Mean Reward")
+    axes[0].grid(True, alpha=0.3)
+    axes[0].set_title("Benchmark Performance")
+
+    axes[1].plot(timesteps, series("mean_ep_len"), marker="o", linewidth=2, color="tab:orange")
+    axes[1].set_ylabel("Mean Episode Length")
+    axes[1].grid(True, alpha=0.3)
+
+    axes[2].plot(timesteps, series("mean_speed"), marker="o", linewidth=2, color="tab:green")
+    axes[2].set_ylabel("Mean Speed (m/s)")
+    axes[2].set_xlabel("Timesteps")
+    axes[2].grid(True, alpha=0.3)
+
+    perf_path = os.path.join(output_dir, "benchmark_performance.png")
+    _save_plot(fig, perf_path)
+    saved_paths.append(perf_path)
+
+    # 3. Reward components / lambda
+    fig, axes = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+    axes[0].plot(timesteps, series("mean_r_pf"), marker="o", linewidth=2, label="mean_r_pf")
+    axes[0].plot(timesteps, series("mean_r_oa"), marker="o", linewidth=2, label="mean_r_oa")
+    axes[0].plot(timesteps, series("mean_r_exist"), marker="o", linewidth=2, label="mean_r_exist")
+    axes[0].plot(timesteps, series("mean_r_goal"), marker="o", linewidth=2, label="mean_r_goal")
+    axes[0].set_ylabel("Reward Term")
+    axes[0].set_title("Reward Components")
+    axes[0].grid(True, alpha=0.3)
+    axes[0].legend()
+
+    axes[1].plot(timesteps, series("mean_lambda"), marker="o", linewidth=2, color="tab:purple", label="mean_lambda")
+    axes[1].plot(timesteps, series("mean_abs_tgt"), marker="o", linewidth=2, color="tab:red", label="mean_abs_tgt")
+    axes[1].plot(timesteps, series("mean_abs_heading_error"), marker="o", linewidth=2, color="tab:brown", label="mean_abs_heading_error")
+    axes[1].set_ylabel("Weight / Gate")
+    axes[1].set_xlabel("Timesteps")
+    axes[1].grid(True, alpha=0.3)
+    axes[1].legend()
+
+    reward_path = os.path.join(output_dir, "benchmark_reward_terms.png")
+    _save_plot(fig, reward_path)
+    saved_paths.append(reward_path)
+
+    # 4. Tracking / progress / lidar safety metrics
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8), sharex=True)
+    flat_axes = axes.flatten()
+    plot_specs = [
+        ("mean_abs_tgt", "Mean |Cross-Track Error|"),
+        ("mean_abs_heading_error", "Mean |Heading Error|"),
+        ("mean_speed", "Mean Speed"),
+        ("min_p10_front", "Min Front P10"),
+    ]
+    for ax, (key, title) in zip(flat_axes, plot_specs):
+        ax.plot(timesteps, series(key), marker="o", linewidth=2)
+        ax.set_title(title)
+        ax.set_xlabel("Timesteps")
+        ax.grid(True, alpha=0.3)
+
+    tracking_path = os.path.join(output_dir, "benchmark_tracking.png")
+    _save_plot(fig, tracking_path)
+    saved_paths.append(tracking_path)
+
+    # 5. Latest checkpoint per-case outcome bar chart
+    if latest_rows:
+        fig, ax = plt.subplots(figsize=(10, 5))
+        case_ids = [int(row["case"]) for row in latest_rows]
+        rewards = [float(row["ep_reward"]) for row in latest_rows]
+        reason_colors = {
+            "goal": "tab:green",
+            "collision": "tab:red",
+            "border": "tab:orange",
+            "timeout": "tab:gray",
+        }
+        colors = [reason_colors.get(row.get("term_reason", ""), "tab:blue") for row in latest_rows]
+        ax.bar(case_ids, rewards, color=colors)
+        for case_id, row in zip(case_ids, latest_rows):
+            ax.text(case_id, rewards[case_ids.index(case_id)], row["term_reason"], ha="center", va="bottom", fontsize=8, rotation=90)
+        ax.set_title(f"Latest Checkpoint Per-Case Reward ({timesteps[-1]} steps)")
+        ax.set_xlabel("Case")
+        ax.set_ylabel("Episode Reward")
+        ax.grid(True, axis="y", alpha=0.3)
+        latest_path = os.path.join(output_dir, "benchmark_latest_cases.png")
+        _save_plot(fig, latest_path)
+        saved_paths.append(latest_path)
+
+    manifest_path = os.path.join(output_dir, "plot_manifest.json")
+    with open(manifest_path, "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "history_path": history_path,
+                "latest_timesteps": timesteps[-1],
+                "files": saved_paths,
+            },
+            f,
+            indent=2,
+        )
+    saved_paths.append(manifest_path)
+
+    return saved_paths
+
+
 class FixedBenchmarkCallback(BaseCallback):
     def __init__(
         self,
@@ -409,6 +345,9 @@ class FixedBenchmarkCallback(BaseCallback):
         max_steps: int = DEFAULT_EVAL_MAX_STEPS,
         out_json: str = "benchmark_history.json",
         out_csv: str = "benchmark_summary.csv",
+        best_model_path: str = DEFAULT_BEST_MODEL_PATH,
+        best_json: str = DEFAULT_BEST_BENCHMARK_JSON,
+        early_stop_patience: int = DEFAULT_EARLY_STOP_PATIENCE,
         verbose: int = 1,
     ):
         super().__init__(verbose)
@@ -418,8 +357,36 @@ class FixedBenchmarkCallback(BaseCallback):
         self.max_steps = int(max_steps)
         self.out_json = out_json
         self.out_csv = out_csv
+        self.best_model_path = best_model_path
+        self.best_json = best_json
+        self.early_stop_patience = int(early_stop_patience)
         self.history: List[Dict[str, Any]] = []
         self._csv_initialized = False
+        self.best_metric: Tuple[float, ...] | None = None
+        self.best_summary: Dict[str, Any] | None = None
+        self.no_improve_evals = 0
+
+    def _metric_tuple(self, summary: Dict[str, Any]) -> Tuple[float, ...]:
+        return (
+            float(summary["success_rate"]),
+            float(summary["goal_rate"]),
+            -float(summary["collision_rate"]),
+            -float(summary["timeout_rate"]),
+            float(summary["mean_reward"]),
+        )
+
+    def _save_best_model(self, result: Dict[str, Any], summary: Dict[str, Any]) -> None:
+        os.makedirs(os.path.dirname(self.best_model_path) or ".", exist_ok=True)
+        self.model.save(self.best_model_path)
+        payload = {
+            "timesteps": int(self.num_timesteps),
+            "metric": list(self.best_metric) if self.best_metric is not None else None,
+            "summary": summary,
+            "rows": result["rows"],
+            "model_path": f"{self.best_model_path}.zip",
+        }
+        with open(self.best_json, "w", encoding="utf-8") as f:
+            json.dump(payload, f, indent=2)
 
     def _init_csv(self) -> None:
         if self._csv_initialized:
@@ -427,41 +394,59 @@ class FixedBenchmarkCallback(BaseCallback):
         write_header = not os.path.exists(self.out_csv)
         with open(self.out_csv, "a", newline="") as f:
             if write_header:
-                import csv
-                csv.writer(f).writerow([
-                    "timesteps",
-                    "n_cases",
-                    "success_rate",
-                    "mean_reward",
-                    "mean_ep_len",
-                    "mean_speed",
-                    "min_p10_front",
-                    "min_lidar",
-                    "goal_rate",
-                    "obstacle_rate",
-                    "border_rate",
-                    "timeout_rate",
-                ])
+                csv.writer(f).writerow(
+                    [
+                        "timesteps",
+                        "n_cases",
+                        "success_rate",
+                        "mean_reward",
+                        "mean_ep_len",
+                        "mean_speed",
+                        "min_p10_front",
+                        "min_lidar",
+                        "goal_rate",
+                        "collision_rate",
+                        "obstacle_rate",
+                        "border_rate",
+                        "timeout_rate",
+                        "mean_r_pf",
+                        "mean_r_oa",
+                        "mean_r_exist",
+                        "mean_r_goal",
+                        "mean_lambda",
+                        "mean_abs_tgt",
+                        "mean_abs_heading_error",
+                    ]
+                )
         self._csv_initialized = True
 
     def _append_csv(self, row: Dict[str, Any]) -> None:
         self._init_csv()
-        import csv
         with open(self.out_csv, "a", newline="") as f:
-            csv.writer(f).writerow([
-                row["timesteps"],
-                row["n_cases"],
-                row["success_rate"],
-                row["mean_reward"],
-                row["mean_ep_len"],
-                row["mean_speed"],
-                row["min_p10_front"],
-                row["min_lidar"],
-                row["goal_rate"],
-                row["obstacle_rate"],
-                row["border_rate"],
-                row["timeout_rate"],
-            ])
+            csv.writer(f).writerow(
+                [
+                    row["timesteps"],
+                    row["n_cases"],
+                    row["success_rate"],
+                    row["mean_reward"],
+                    row["mean_ep_len"],
+                    row["mean_speed"],
+                    row["min_p10_front"],
+                    row["min_lidar"],
+                    row["goal_rate"],
+                    row["collision_rate"],
+                    row["obstacle_rate"],
+                    row["border_rate"],
+                    row["timeout_rate"],
+                    row["mean_r_pf"],
+                    row["mean_r_oa"],
+                    row["mean_r_exist"],
+                    row["mean_r_goal"],
+                    row["mean_lambda"],
+                    row["mean_abs_tgt"],
+                    row["mean_abs_heading_error"],
+                ]
+            )
 
     def _on_step(self) -> bool:
         if self.eval_freq <= 0 or self.num_timesteps % self.eval_freq != 0:
@@ -477,212 +462,123 @@ class FixedBenchmarkCallback(BaseCallback):
 
         self.logger.record("benchmark/success_rate", summary["success_rate"])
         self.logger.record("benchmark/mean_reward", summary["mean_reward"])
+        self.logger.record("benchmark/collision_rate", summary["collision_rate"])
         self.logger.record("benchmark/obstacle_rate", summary["obstacle_rate"])
         self.logger.record("benchmark/border_rate", summary["border_rate"])
         self.logger.record("benchmark/timeout_rate", summary["timeout_rate"])
         self.logger.record("benchmark/min_p10_front", summary["min_p10_front"])
-        self.logger.record("benchmark/mean_threat", summary["mean_threat"])
-        self.logger.record("benchmark/mean_goal_dist_norm", summary["mean_goal_dist_norm"])
-        self.logger.record("benchmark/mean_lam", summary["mean_lam"])
-        self.logger.record("benchmark/mean_rudder_state", summary["mean_rudder_state"])
-        self.logger.record("benchmark/mean_rpm_state", summary["mean_rpm_state"])
-        self.logger.record("benchmark/mean_gap_strength", summary["mean_gap_strength"])
-        self.logger.record("benchmark/mean_r_commit", summary["mean_r_commit"])
-        self.logger.record("benchmark/mean_r_recenter", summary["mean_r_recenter"])
-        self.logger.record("benchmark/mean_recenter_gate", summary["mean_recenter_gate"])
-        self.logger.record("benchmark/mean_path_progress_step", summary["mean_path_progress_step"])
-        self.logger.record("benchmark/mean_goal_progress_step", summary["mean_goal_progress_step"])
-        self.logger.record("benchmark/mean_track_quality", summary["mean_track_quality"])
-        self.logger.record("benchmark/mean_r_pf_progress", summary["mean_r_pf_progress"])
-        self.logger.record("benchmark/mean_r_pf_track", summary["mean_r_pf_track"])
-        self.logger.record("benchmark/mean_abs_guide_heading", summary["mean_abs_guide_heading"])
-        self.logger.record("benchmark/mean_abs_guide_turn_pref", summary["mean_abs_guide_turn_pref"])
-        self.logger.record("benchmark/mean_guide_clear_m", summary["mean_guide_clear_m"])
-        self.logger.record("benchmark/mean_guide_alignment", summary["mean_guide_alignment"])
-        self.logger.record("benchmark/mean_guide_progress_step", summary["mean_guide_progress_step"])
-        self.logger.record("benchmark/min_obs_left_clear", summary["min_obs_left_clear"])
-        self.logger.record("benchmark/min_obs_center_clear", summary["min_obs_center_clear"])
-        self.logger.record("benchmark/min_obs_right_clear", summary["min_obs_right_clear"])
-        self.logger.record("benchmark/max_obs_left_clear", summary["max_obs_left_clear"])
-        self.logger.record("benchmark/max_obs_center_clear", summary["max_obs_center_clear"])
-        self.logger.record("benchmark/max_obs_right_clear", summary["max_obs_right_clear"])
-        self.logger.record("benchmark/min_obs_left_clear_instant", summary["min_obs_left_clear_instant"])
-        self.logger.record("benchmark/min_obs_center_clear_instant", summary["min_obs_center_clear_instant"])
-        self.logger.record("benchmark/min_obs_right_clear_instant", summary["min_obs_right_clear_instant"])
-        self.logger.record("benchmark/max_obs_left_clear_instant", summary["max_obs_left_clear_instant"])
-        self.logger.record("benchmark/max_obs_center_clear_instant", summary["max_obs_center_clear_instant"])
-        self.logger.record("benchmark/max_obs_right_clear_instant", summary["max_obs_right_clear_instant"])
-        self.logger.record("benchmark/min_obs_left_blocked", summary["min_obs_left_blocked"])
-        self.logger.record("benchmark/min_obs_center_blocked", summary["min_obs_center_blocked"])
-        self.logger.record("benchmark/min_obs_right_blocked", summary["min_obs_right_blocked"])
-        self.logger.record("benchmark/mean_abs_gap_asymmetry", summary["mean_abs_gap_asymmetry"])
-        self.logger.record("benchmark/mean_abs_gap_open_asymmetry", summary["mean_abs_gap_open_asymmetry"])
-        self.logger.record("benchmark/mean_abs_gap_blocked_asymmetry", summary["mean_abs_gap_blocked_asymmetry"])
-        self.logger.record("benchmark/min_lidar_left_clear_m", summary["min_lidar_left_clear_m"])
-        self.logger.record("benchmark/min_lidar_center_clear_m", summary["min_lidar_center_clear_m"])
-        self.logger.record("benchmark/min_lidar_right_clear_m", summary["min_lidar_right_clear_m"])
-        self.logger.record("benchmark/min_lidar_left_blocked_m", summary["min_lidar_left_blocked_m"])
-        self.logger.record("benchmark/min_lidar_center_blocked_m", summary["min_lidar_center_blocked_m"])
-        self.logger.record("benchmark/min_lidar_right_blocked_m", summary["min_lidar_right_blocked_m"])
-        self.logger.record("benchmark/mean_lidar_left_open_fraction", summary["mean_lidar_left_open_fraction"])
-        self.logger.record("benchmark/mean_lidar_center_open_fraction", summary["mean_lidar_center_open_fraction"])
-        self.logger.record("benchmark/mean_lidar_right_open_fraction", summary["mean_lidar_right_open_fraction"])
+        self.logger.record("benchmark/mean_r_pf", summary["mean_r_pf"])
+        self.logger.record("benchmark/mean_r_oa", summary["mean_r_oa"])
+        self.logger.record("benchmark/mean_r_exist", summary["mean_r_exist"])
+        self.logger.record("benchmark/mean_r_goal", summary["mean_r_goal"])
+        self.logger.record("benchmark/mean_lambda", summary["mean_lambda"])
+        self.logger.record("benchmark/mean_abs_tgt", summary["mean_abs_tgt"])
+        self.logger.record("benchmark/mean_abs_heading_error", summary["mean_abs_heading_error"])
+
+        metric = self._metric_tuple(summary)
+        improved = self.best_metric is None or metric > self.best_metric
+        if improved:
+            self.best_metric = metric
+            self.best_summary = summary
+            self.no_improve_evals = 0
+            self._save_best_model(result, summary)
+            if self.verbose:
+                print(
+                    f"[BEST @ {self.num_timesteps}] "
+                    f"success={summary['success_rate']:.2f} "
+                    f"goal={summary['goal_rate']:.2f} "
+                    f"collision={summary['collision_rate']:.2f}"
+                )
+        else:
+            self.no_improve_evals += 1
+
+        self.logger.record(
+            "benchmark/best_success_rate",
+            0.0 if self.best_summary is None else float(self.best_summary["success_rate"]),
+        )
+        self.logger.record("benchmark/no_improve_evals", float(self.no_improve_evals))
 
         if self.verbose:
             print(
                 f"[BENCHMARK @ {self.num_timesteps}] "
                 f"success={summary['success_rate']:.2f} "
                 f"reward={summary['mean_reward']:.2f} "
-                f"obs={summary['obstacle_rate']:.2f} "
-                f"border={summary['border_rate']:.2f} "
-                f"timeout={summary['timeout_rate']:.2f} "
-                f"min_p10_front={summary['min_p10_front']:.2f}"
+                f"collision={summary['collision_rate']:.2f} "
+                f"timeout={summary['timeout_rate']:.2f}"
             )
-
+        if self.early_stop_patience > 0 and self.no_improve_evals >= self.early_stop_patience:
+            if self.verbose:
+                print(
+                    f"[EARLY STOP @ {self.num_timesteps}] "
+                    f"no improvement for {self.no_improve_evals} benchmark evaluations. "
+                    f"Best success={0.0 if self.best_summary is None else self.best_summary['success_rate']:.2f}"
+                )
+            return False
         return True
 
 
-class CurriculumCallback(BaseCallback):
-    def __init__(self, stage_end_steps: List[int], stage_cases: List[List[int]], verbose: int = 1):
-        super().__init__(verbose)
-        if len(stage_end_steps) != len(stage_cases):
-            raise ValueError("stage_end_steps and stage_cases must have the same length")
-        self.stage_end_steps = [int(x) for x in stage_end_steps]
-        self.stage_cases = [list(map(int, cases)) for cases in stage_cases]
-        self.current_stage = 0
-
-    def _apply_stage(self, stage_idx: int) -> None:
-        cases = self.stage_cases[stage_idx]
-        self.training_env.env_method("set_train_case_pool", cases)
-        if self.verbose:
-            print(f"[CURRICULUM] stage={stage_idx + 1}/{len(self.stage_cases)} cases={cases} @ step={self.num_timesteps}")
-
-    def _on_training_start(self) -> None:
-        self.current_stage = 0
-        self._apply_stage(self.current_stage)
-
-    def _on_step(self) -> bool:
-        while self.current_stage < len(self.stage_end_steps) - 1 and self.num_timesteps >= self.stage_end_steps[self.current_stage]:
-            self.current_stage += 1
-            self._apply_stage(self.current_stage)
-
-        self.logger.record("curriculum/stage", float(self.current_stage + 1))
-        self.logger.record("curriculum/num_cases", float(len(self.stage_cases[self.current_stage])))
-        return True
-
-# -----------------------------------------------------------------------------
-# Setup helpers
-# -----------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", choices=["train", "test", "eval"], default="test")
-    parser.add_argument("--algo", choices=["ppo", "sac"], default="ppo")
+    parser.add_argument("--mode", choices=["train", "test", "eval", "plot"], default="test")
+    parser.add_argument("--algo", choices=["ppo"], default="ppo")
     parser.add_argument("--timesteps", type=int, default=1_000_000)
     parser.add_argument("--num-envs", type=int, default=8)
     parser.add_argument("--seed", type=int, default=0)
-
     parser.add_argument("--model-path", type=str, default=None)
     parser.add_argument("--test-case", type=int, default=None)
-
     parser.add_argument("--eval-freq", type=int, default=DEFAULT_EVAL_FREQ)
     parser.add_argument("--eval-max-steps", type=int, default=DEFAULT_EVAL_MAX_STEPS)
     parser.add_argument("--save-freq", type=int, default=500_000)
     parser.add_argument("--benchmark-cases", type=int, nargs="*", default=DEFAULT_BENCHMARK_CASES)
-    parser.add_argument("--curriculum", dest="curriculum", action="store_true")
-    parser.add_argument("--no-curriculum", dest="curriculum", action="store_false")
-    parser.set_defaults(curriculum=True)
-
+    parser.add_argument("--plot-input", type=str, default="benchmark_history.json")
+    parser.add_argument("--plot-dir", type=str, default=DEFAULT_PLOT_DIR)
+    parser.add_argument("--best-model-path", type=str, default=DEFAULT_BEST_MODEL_PATH)
+    parser.add_argument("--best-benchmark-json", type=str, default=DEFAULT_BEST_BENCHMARK_JSON)
+    parser.add_argument("--early-stop-patience", type=int, default=DEFAULT_EARLY_STOP_PATIENCE)
     return parser.parse_args()
 
-def make_train_env(seed: int, rank: int, case_pool=None):
+
+def make_train_env(seed: int, rank: int):
     def _init():
         env = ASVLidarEnv(render_mode=None)
-        if case_pool is not None:
-            env.set_train_case_pool(case_pool)
         env.reset(seed=seed + rank)
         return env
     return _init
 
-def build_model(algo: str, env, num_envs: int):
-    algo = algo.lower()
-    learning_rate = 3e-4
-    batch_size = 256
-    gamma = 0.99
-    gae_lambda = 0.95
-    clip_range = 0.2
-    ent_coef = 0.0
-    vf_coef = 0.5
-    n_epochs = 10
-    n_steps = 2048
 
-    if algo == "ppo":
-        return PPO(
-            "MultiInputPolicy",
-            env,
-            verbose=1,
-            tensorboard_log="./ppo_log/",
-            learning_rate=learning_rate,
-            n_steps=n_steps,
-            batch_size=batch_size,
-            n_epochs=n_epochs,
-            gamma=gamma,
-            gae_lambda=gae_lambda,
-            clip_range=clip_range,
-            ent_coef=ent_coef,
-            vf_coef=vf_coef,
-        )
+def build_model(env):
+    policy_kwargs = dict(net_arch=dict(pi=[64, 64], vf=[64, 64]), activation_fn=nn.Tanh)
+    return PPO(
+        "MultiInputPolicy",
+        env,
+        verbose=1,
+        tensorboard_log="./ppo_log/",
+        learning_rate=2e-4,
+        n_steps=1024,
+        batch_size=256,
+        n_epochs=10,
+        gamma=0.999,
+        gae_lambda=0.95,
+        clip_range=0.2,
+        ent_coef=0.01,
+        vf_coef=0.5,
+        policy_kwargs=policy_kwargs,
+    )
 
-    if algo == "sac":
-        return SAC(
-            "MultiInputPolicy",
-            env,
-            verbose=1,
-            tensorboard_log="./sac_log/",
-            learning_rate=learning_rate,
-            batch_size=batch_size,
-            gamma=gamma,
-            buffer_size=1_000_000,
-            train_freq=1,
-            gradient_steps=1,
-            ent_coef="auto",
-        )
 
-    raise ValueError(f"Unsupported algo: {algo}")
+def load_model(model_path: str):
+    return PPO.load(model_path)
 
-def load_model(algo: str, model_path: str):
-    algo = algo.lower()
-    if algo == "ppo":
-        return PPO.load(model_path)
-    if algo == "sac":
-        return SAC.load(model_path)
-    raise ValueError(f"Unsupported algo: {algo}")
 
-# -----------------------------------------------------------------------------
-# Main
-# -----------------------------------------------------------------------------
 def main() -> None:
     multiprocessing.freeze_support()
     args = parse_args()
-
-    algo = args.algo.lower()
-    model_path = args.model_path or f"{algo}_asv_model.zip"
+    model_path = args.model_path or "ppo_asv_model.zip"
 
     if args.mode == "train":
-        if args.curriculum:
-            stage_ends = [
-                max(1, int(args.timesteps * 0.25)),
-                max(1, int(args.timesteps * 0.60)),
-                int(args.timesteps),
-            ]
-            initial_case_pool = DEFAULT_CURRICULUM_CASES[0]
-        else:
-            stage_ends = []
-            initial_case_pool = None
-
-        env_fns = [make_train_env(args.seed, i, case_pool=initial_case_pool) for i in range(args.num_envs)]
+        env_fns = [make_train_env(args.seed, i) for i in range(args.num_envs)]
         vec_env = VecMonitor(SubprocVecEnv(env_fns), filename="train_monitor.csv")
-
-        model = build_model(algo, vec_env, args.num_envs)
+        model = build_model(vec_env)
 
         eval_env = ASVLidarEnv(render_mode=None)
         eval_env.reset(seed=args.seed + 10_000)
@@ -690,11 +586,10 @@ def main() -> None:
         checkpoint_cb = CheckpointCallback(
             save_freq=max(int(args.save_freq // max(args.num_envs, 1)), 1),
             save_path="models",
-            name_prefix=f"{algo}_model",
-            save_replay_buffer=(algo == "sac"),
+            name_prefix="ppo_model",
+            save_replay_buffer=False,
             save_vecnormalize=False,
         )
-
         benchmark_cb = FixedBenchmarkCallback(
             eval_env=eval_env,
             cases=args.benchmark_cases,
@@ -702,35 +597,34 @@ def main() -> None:
             max_steps=args.eval_max_steps,
             out_json="benchmark_history.json",
             out_csv="benchmark_summary.csv",
+            best_model_path=args.best_model_path,
+            best_json=args.best_benchmark_json,
+            early_stop_patience=args.early_stop_patience,
             verbose=1,
         )
 
-        callbacks = [checkpoint_cb, benchmark_cb]
-        if args.curriculum:
-            callbacks.insert(
-                0,
-                CurriculumCallback(
-                    stage_end_steps=stage_ends,
-                    stage_cases=DEFAULT_CURRICULUM_CASES,
-                    verbose=1,
-                ),
-            )
-
         model.learn(
             total_timesteps=int(args.timesteps),
-            tb_log_name=f"asv_{algo}",
-            callback=CallbackList(callbacks),
+            tb_log_name="asv_ppo",
+            callback=CallbackList([checkpoint_cb, benchmark_cb]),
             progress_bar=True,
         )
         model.save(model_path)
         print(f"Saved model -> {model_path}")
+        try:
+            saved = plot_benchmark_history("benchmark_history.json", args.plot_dir)
+            print("Saved benchmark plots:")
+            for path in saved:
+                print(f"  {path}")
+        except Exception as exc:
+            print(f"Plot export skipped: {exc}")
 
         vec_env.close()
         eval_env.close()
         return
 
     if args.mode == "test":
-        model = load_model(algo, model_path)
+        model = load_model(model_path)
         env = ASVLidarEnv(render_mode="human")
         env.test_case = args.test_case
 
@@ -740,7 +634,7 @@ def main() -> None:
 
         while not done:
             action, _ = model.predict(obs, deterministic=True)
-            obs, reward, terminated, truncated, info = env.step(action)
+            obs, reward, terminated, truncated, _ = env.step(action)
             total_reward += float(reward)
             done = bool(terminated or truncated)
             print(f"action={np.asarray(action).round(3).tolist()} reward={reward:.3f}")
@@ -748,7 +642,7 @@ def main() -> None:
         print(f"Test case {args.test_case} completed. Total reward: {total_reward:.2f}")
 
         result = {
-            "test_case": int(args.test_case),
+            "test_case": int(args.test_case) if args.test_case is not None else -1,
             "heading": float(env.asv_h),
             "start": [float(env.start_x), float(env.start_y)],
             "goal": [float(env.goal_x), float(env.goal_y)],
@@ -763,10 +657,9 @@ def main() -> None:
         return
 
     if args.mode == "eval":
-        model = load_model(algo, model_path)
+        model = load_model(model_path)
         eval_env = ASVLidarEnv(render_mode=None)
         eval_env.reset(seed=args.seed + 10_000)
-
         result = evaluate_benchmark(model, eval_env, args.benchmark_cases, args.eval_max_steps)
 
         print("Benchmark summary:")
@@ -782,7 +675,22 @@ def main() -> None:
         with open("benchmark_eval.json", "w") as f:
             json.dump(result, f, indent=2)
 
+        try:
+            saved = plot_benchmark_history(args.plot_input, args.plot_dir)
+            print("Saved benchmark plots:")
+            for path in saved:
+                print(f"  {path}")
+        except Exception as exc:
+            print(f"Plot export skipped: {exc}")
+
         eval_env.close()
+        return
+
+    if args.mode == "plot":
+        saved = plot_benchmark_history(args.plot_input, args.plot_dir)
+        print("Saved benchmark plots:")
+        for path in saved:
+            print(f"  {path}")
         return
 
 if __name__ == "__main__":

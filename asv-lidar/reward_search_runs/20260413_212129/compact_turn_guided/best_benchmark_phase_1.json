@@ -1,0 +1,228 @@
+{
+  "timesteps": 2500,
+  "metric": [
+    0.5,
+    0.5,
+    -0.5,
+    -0.0,
+    -0.0,
+    -468.4963004084196
+  ],
+  "summary": {
+    "timesteps": 2500,
+    "n_cases": 6,
+    "success_rate": 0.5,
+    "mean_reward": -468.4963004084196,
+    "mean_ep_len": 146.33333333333334,
+    "mean_speed": 0.8730389292381258,
+    "min_p10_front": 1.012770414352417,
+    "min_lidar": 1.0004783868789673,
+    "goal_rate": 0.5,
+    "obstacle_rate": 0.5,
+    "border_rate": 0.0,
+    "timeout_rate": 0.0,
+    "mean_r_pf": 1.3422317665166545,
+    "mean_r_oa": -0.3872462983438028,
+    "mean_r_heading": 0.14727647154300674,
+    "mean_r_exist": -0.08,
+    "mean_r_goal": 0.6474861958732926,
+    "mean_lambda": 0.6951991197995033,
+    "mean_abs_tgt": 0.17659278305883652,
+    "mean_abs_heading_error": 2.73759966944889
+  },
+  "rows": [
+    {
+      "case": 0,
+      "ep_reward": 516.2432683069369,
+      "ep_len": 186,
+      "term_reason": "goal",
+      "success": 1,
+      "mean_speed": 0.9891196743039752,
+      "mean_rpm": 11.441939750986714,
+      "mean_abs_rudder": 0.0605973060573301,
+      "min_lidar": 3.7410593032836914,
+      "p10_front": 3.752067732810974,
+      "d_end": 1.602471656538556,
+      "start": [
+        5.0,
+        2.0
+      ],
+      "goal": [
+        5.0,
+        22.0
+      ],
+      "mean_r_pf": 1.411041730113945,
+      "mean_r_oa": -0.002330527621171129,
+      "mean_r_heading": 0.17923655909580896,
+      "mean_r_exist": -0.07999999999999999,
+      "mean_r_goal": 1.2903225806451613,
+      "mean_lambda": 0.797374211443795,
+      "mean_abs_tgt": 0.008622453098252335,
+      "mean_abs_heading_error": 0.1301203885174494,
+      "final_x": 5.016385591429293,
+      "final_y": 20.39761211861705,
+      "final_heading": 359.9164478169579
+    },
+    {
+      "case": 1,
+      "ep_reward": -1417.4767574930265,
+      "ep_len": 117,
+      "term_reason": "obstacle",
+      "success": 0,
+      "mean_speed": 0.7774548218764322,
+      "mean_rpm": 11.46933417327893,
+      "mean_abs_rudder": 0.07227927622480844,
+      "min_lidar": 1.009886622428894,
+      "p10_front": 1.012770414352417,
+      "d_end": 10.903788313975495,
+      "start": [
+        5.0,
+        2.0
+      ],
+      "goal": [
+        5.0,
+        22.0
+      ],
+      "mean_r_pf": 1.3235588497997406,
+      "mean_r_oa": -0.5810959255962439,
+      "mean_r_heading": 0.1398895351272723,
+      "mean_r_exist": -0.08,
+      "mean_r_goal": 0.0,
+      "mean_lambda": 0.661842438460076,
+      "mean_abs_tgt": 0.003104453835775554,
+      "mean_abs_heading_error": 0.06349479560341285,
+      "final_x": 5.009283209563079,
+      "final_y": 11.096215637770124,
+      "final_heading": 359.9749181380881
+    },
+    {
+      "case": 2,
+      "ep_reward": 492.8868811017142,
+      "ep_len": 185,
+      "term_reason": "goal",
+      "success": 1,
+      "mean_speed": 0.989058336627176,
+      "mean_rpm": 11.44480112927991,
+      "mean_abs_rudder": 0.19503937739048255,
+      "min_lidar": 1.0004783868789673,
+      "p10_front": 1.1157541394233703,
+      "d_end": 1.703307704244165,
+      "start": [
+        5.0,
+        2.0
+      ],
+      "goal": [
+        5.0,
+        22.0
+      ],
+      "mean_r_pf": 1.4097099428635018,
+      "mean_r_oa": -0.08736175652127393,
+      "mean_r_heading": 0.16782294738827425,
+      "mean_r_exist": -0.07999999999999999,
+      "mean_r_goal": 1.2972972972972974,
+      "mean_lambda": 0.7580848267735661,
+      "mean_abs_tgt": 0.018778662727777902,
+      "mean_abs_heading_error": 0.33545053866296026,
+      "final_x": 5.0498347416665705,
+      "final_y": 20.297421474979625,
+      "final_heading": 359.4381203541214
+    },
+    {
+      "case": 3,
+      "ep_reward": 490.4221128972497,
+      "ep_len": 185,
+      "term_reason": "goal",
+      "success": 1,
+      "mean_speed": 0.9920872701151576,
+      "mean_rpm": 11.51075536608696,
+      "mean_abs_rudder": 0.16842766081587085,
+      "min_lidar": 1.006084680557251,
+      "p10_front": 1.1197446227073669,
+      "d_end": 1.6465338057996386,
+      "start": [
+        5.0,
+        2.0
+      ],
+      "goal": [
+        5.0,
+        22.0
+      ],
+      "mean_r_pf": 1.4125407025880135,
+      "mean_r_oa": -0.10086353919786173,
+      "mean_r_heading": 0.16665874176519346,
+      "mean_r_exist": -0.07999999999999999,
+      "mean_r_goal": 1.2972972972972974,
+      "mean_lambda": 0.7540515153446714,
+      "mean_abs_tgt": 0.006502304169554653,
+      "mean_abs_heading_error": 0.14209782314580888,
+      "final_x": 4.984676683961571,
+      "final_y": 20.353537498262828,
+      "final_heading": 0.4393532313524612
+    },
+    {
+      "case": 4,
+      "ep_reward": -1502.2654241876924,
+      "ep_len": 76,
+      "term_reason": "obstacle",
+      "success": 0,
+      "mean_speed": 0.5959541040350573,
+      "mean_rpm": 11.499801678092856,
+      "mean_abs_rudder": 0.10591721753467266,
+      "min_lidar": 1.0028365850448608,
+      "p10_front": 1.0174028515815734,
+      "d_end": 15.470749555792018,
+      "start": [
+        5.0,
+        2.0
+      ],
+      "goal": [
+        5.0,
+        22.0
+      ],
+      "mean_r_pf": 1.2482396345927098,
+      "mean_r_oa": -1.125736954980194,
+      "mean_r_heading": 0.09487552889979546,
+      "mean_r_exist": -0.08,
+      "mean_r_goal": 0.0,
+      "mean_lambda": 0.5067935275069453,
+      "mean_abs_tgt": 0.0006310742040539672,
+      "mean_abs_heading_error": 0.027698194731038638,
+      "final_x": 5.001804009982019,
+      "final_y": 6.529250549388796,
+      "final_heading": 359.9322118426239
+    },
+    {
+      "case": 5,
+      "ep_reward": -1390.7878830756997,
+      "ep_len": 129,
+      "term_reason": "obstacle",
+      "success": 0,
+      "mean_speed": 0.8945593684709562,
+      "mean_rpm": 12.35100873386444,
+      "mean_abs_rudder": 2.974964796110641,
+      "min_lidar": 1.0019100904464722,
+      "p10_front": 1.0128040552139281,
+      "d_end": 9.816092092960584,
+      "start": [
+        2.0,
+        2.0
+      ],
+      "goal": [
+        8.0,
+        22.0
+      ],
+      "mean_r_pf": 1.2482997391420165,
+      "mean_r_oa": -0.4260890861460723,
+      "mean_r_heading": 0.13517551698169603,
+      "mean_r_exist": -0.08,
+      "mean_r_goal": 0.0,
+      "mean_lambda": 0.6930481992679665,
+      "mean_abs_tgt": 1.0219177503176047,
+      "mean_abs_heading_error": 15.72673627603267,
+      "final_x": 3.164124276744039,
+      "final_y": 13.457753810226086,
+      "final_heading": 13.402110984876945
+    }
+  ],
+  "model_path": "reward_search_runs\\20260413_212129\\compact_turn_guided\\best_phase_1.zip"
+}
