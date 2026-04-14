@@ -48,13 +48,15 @@ STAGE2_OBS_Y_MIN = 8.0
 STAGE2_OBS_Y_MAX = MAP_HEIGHT - 8.0
 
 # Paper-style reward parameters.
-GAMMA_E = 0.05
+GAMMA_E = 0.15
 GAMMA_THETA = 4.0
 GAMMA_X = 0.005
 EPSILON_X = 1.0
 ALPHA_R = 0.1
 LAMBDA_REWARD = 0.50
+OA_FORWARD_HALF_ANGLE_DEG = 90.0
 R_COLLISION = -2000.0
+R_GOAL = 2000.0
 
 # Speed control (rpm)
 RPM_MIN = 0
@@ -497,15 +499,21 @@ class ASVLidarEnv(gym.Env):
 
         lidar_true = self.lidar.true_ranges.astype(np.float32)
         theta = np.radians(self.lidar.angles.astype(np.float32))
-        weights = 1.0 / (1.0 + np.abs(GAMMA_THETA * theta))
-        x = np.clip(lidar_true, EPSILON_X, LIDAR_RANGE)
+        forward_mask = np.abs(np.degrees(theta)) <= OA_FORWARD_HALF_ANGLE_DEG
+        theta_forward = theta[forward_mask]
+        lidar_forward = lidar_true[forward_mask]
+        weights = 1.0 / (1.0 + np.abs(GAMMA_THETA * theta_forward))
+        x = np.clip(lidar_forward, EPSILON_X, LIDAR_RANGE)
         penalties = 1.0 / (GAMMA_X * x**2)
         r_oa = -float(np.sum(weights * penalties) / (np.sum(weights) + 1e-6))
 
         r_exist = float(-lam * (2.0 * ALPHA_R + 1.0))
+        r_goal = float(R_GOAL if reached_goal else 0.0)
 
         if collided:
-            reward = float((1.0 - lam) * R_COLLISION)
+            reward = float(R_COLLISION)
+        elif reached_goal:
+            reward = float(r_goal)
         else:
             reward = float(lam * r_pf + (1.0 - lam) * r_oa + r_exist)
 
@@ -519,6 +527,7 @@ class ASVLidarEnv(gym.Env):
             "r_pf": float(r_pf),
             "r_oa": float(r_oa),
             "r_exist": float(r_exist),
+            "r_goal": float(r_goal),
             "lambda_reward": float(lam),
             "reward": float(reward),
             "ye": float(ye),

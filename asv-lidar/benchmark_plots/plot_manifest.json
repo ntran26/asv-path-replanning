@@ -1,6 +1,6 @@
 {
   "history_path": "benchmark_history.json",
-  "latest_timesteps": 125000,
+  "latest_timesteps": 1000000,
   "files": [
     "benchmark_plots\\benchmark_rates.png",
     "benchmark_plots\\benchmark_performance.png",
