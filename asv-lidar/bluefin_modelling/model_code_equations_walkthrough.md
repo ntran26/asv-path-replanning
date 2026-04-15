@@ -838,14 +838,27 @@ ROLL_RESTORE_SCALE = 1.2
 **Equation**
 
 $$
-\begin{array}{l}
-\mathrm{rpm}_{MATLAB} = \mathrm{RPM\_COMMAND\_SCALE} \cdot \mathrm{rpm}_{repo} \\
-n_{1c} = \frac{\mathrm{rpm}_{MATLAB}}{60} \\
-X_P^{new} = k_{prop} X_P^{MATLAB} \\
-Y_R^{new} = k_{rud} Y_R^{MATLAB} \\
-N_R^{new} = k_{yaw} N_R^{MATLAB} \\
+\mathrm{rpm}_{MATLAB} = \mathrm{RPM\_COMMAND\_SCALE} \cdot \mathrm{rpm}_{repo}
+$$
+
+$$
+n_{1c} = \frac{\mathrm{rpm}_{MATLAB}}{60}
+$$
+
+$$
+X_P^{new} = k_{prop} X_P^{MATLAB}
+$$
+
+$$
+Y_R^{new} = k_{rud} Y_R^{MATLAB}
+$$
+
+$$
+N_R^{new} = k_{yaw} N_R^{MATLAB}
+$$
+
+$$
 K_{roll}^{new} = k_{damp} K_{damp} + k_{restore} K_{restore}
-\end{array}
 $$
 
 **Explanation**
