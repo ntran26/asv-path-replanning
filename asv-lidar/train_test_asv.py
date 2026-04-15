@@ -11,7 +11,6 @@ from stable_baselines3.common.vec_env import SubprocVecEnv, VecMonitor
 from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback, CallbackList
 
 from rl_env import ASVLidarEnv, RPM_MAX, RPM_MIN
-from ship_model_selector import MAX_RUD_ANGLE, VESSEL_LENGTH
 
 """
 Train:
@@ -35,7 +34,7 @@ def action_to_rpm(throttle_cmd: float) -> float:
 def action_to_rudder_deg(rudder_cmd: float) -> float:
     """Map normalized rudder [-1,1] to degrees (same mapping as env.step)."""
     rudder_cmd = float(np.clip(rudder_cmd, -1.0, 1.0))
-    return float(rudder_cmd * float(MAX_RUD_ANGLE))
+    return float(rudder_cmd * 30)
 
 # -------------------------------
 # Domain-specific evaluation helpers
@@ -101,11 +100,7 @@ def termination_reason(env: ASVLidarEnv, done: bool, hit_max_steps: bool) -> str
     collided = False
     if hasattr(env, "_check_collision_geom"):
         try:
-            collision_result = env._check_collision_geom()
-            if isinstance(collision_result, tuple):
-                collided = bool(collision_result[0])
-            else:
-                collided = bool(collision_result)
+            collided = bool(env._check_collision_geom())
         except Exception:
             collided = False
 
@@ -113,7 +108,7 @@ def termination_reason(env: ASVLidarEnv, done: bool, hit_max_steps: bool) -> str
         return "obstacle"
 
     # If the env terminated but we didn't detect border/collision, treat as goal
-    if done and getattr(env, "distance_to_goal", float("inf")) <= float(VESSEL_LENGTH):
+    if done:
         return "goal"
 
     return "terminated" if done else "timeout"

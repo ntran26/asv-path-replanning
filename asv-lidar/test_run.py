@@ -29,7 +29,7 @@ class TestCase:
         self.env_data = ENV_DATA
 
     def obstacles(self, test_case):
-        if test_case == 0:
+        if test_case == 0 or test_case == 6 or test_case == 7:
             self.obs = []
         elif test_case == 1:    # middle
             x = 5

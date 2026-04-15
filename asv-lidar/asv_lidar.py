@@ -160,3 +160,4 @@ class Lidar:
             y = self._pos_y + self._ranges[idx] * np.cos(absolute_angle)
             end = world_to_screen((x, y))
             pygame.draw.aaline(surface, (90, 90, 200), origin, end)
+            
