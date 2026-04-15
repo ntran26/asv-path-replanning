@@ -9,8 +9,8 @@ Test case 2: start & goal at center, single obstacle on path
 Test case 3: start & goal at center, single obstacle to the left of path
 Test case 4: start & goal at center, single obstacle to the right of path
 Test case 5: start & goal at center, 3 obstacles scatter along the path
-Test case 6: stage-1 deterministic single obstacle slightly left of the path
-
+Test case 6: no obstacles, start at center, goal at left corner
+Test case 7: no obstacles, start at center, goal at right corner
 Test case 99: take the setup from recorded data of a random obstacles scenario (test case 0)
 """
 
@@ -87,7 +87,17 @@ class TestCase:
         elif test_case == 5:
             self.start_x = 2
             self.start_y = 2
-            self.goal_x = 8
+            self.goal_x = 7
+            self.goal_y = 22
+        elif test_case == 6:
+            self.start_x = 5
+            self.start_y = 2
+            self.goal_x = 3
+            self.goal_y = 22
+        elif test_case == 7:
+            self.start_x = 5
+            self.start_y = 2
+            self.goal_x = 7
             self.goal_y = 22
         elif test_case == 99:
             # load data file

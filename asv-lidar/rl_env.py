@@ -131,7 +131,7 @@ class ASVLidarEnv(gym.Env):
                 "pos"  : Box(low=np.array([0,0]),high=np.array(self.world_size),shape=(2,),dtype=np.float32),
                 "hdg"  : Box(low=0,high=360,shape=(1,),dtype=np.float32),
                 "dhdg" : Box(low=-180.0,high=180.0,shape=(1,),dtype=np.float32),
-                "speed"  : Box(low=0.0, high=10.0, shape=(1,), dtype=np.float32),
+                "speed"  : Box(low=0.0, high=5.0, shape=(1,), dtype=np.float32),
                 "u_body": Box(low=-float(MAX_SURGE_SPEED), high=float(MAX_SURGE_SPEED), shape=(1,), dtype=np.float32),
                 "v_body": Box(low=-float(MAX_SWAY_SPEED), high=float(MAX_SWAY_SPEED), shape=(1,), dtype=np.float32),
                 "rudder_state": Box(low=-float(MAX_RUD_ANGLE), high=float(MAX_RUD_ANGLE), shape=(1,), dtype=np.float32),
@@ -141,7 +141,7 @@ class ASVLidarEnv(gym.Env):
                     shape=(1,),
                     dtype=np.float32
                 ),
-                "tgt"  : Box(low=-50,high=50,shape=(1,),dtype=np.float32),
+                "tgt"  : Box(low=0,high=self.map_width/2,shape=(1,),dtype=np.float32),
                 "target_heading": Box(low=-180,high=180,shape=(1,),dtype=np.float32)
             }
         )
@@ -460,39 +460,6 @@ class ASVLidarEnv(gym.Env):
         # Define terminal flags
         collided, collision_type = self._check_collision_geom()
         reached_goal = bool(self.distance_to_goal <= VESSEL_LENGTH)
-
-        # r_exist = -0.1
-
-        # # heading alignment reward (reward = 1 if aligned, -1 if opposite)
-        # angle_diff_rad = np.radians(self.angle_diff)
-        # r_heading = np.cos(angle_diff_rad)
-
-        # # path following reward
-        # r_pf = np.exp(-0.05 * abs(self.tgt))
-
-        # # obstacle avoidance reward
-        # lidar_list = self.lidar.ranges.astype(np.float32)
-        # r_oa = 0
-        # for i, dist in enumerate(lidar_list):
-        #     theta = self.lidar.angles[i]    # angle of lidar beam
-        #     weight = 1 / (1 + abs(theta))   # prioritize beams closer to center/front
-        #     r_oa += weight / max(dist, 1)
-        # r_oa = -r_oa / len(lidar_list)
-
-        # # if the agent reaches goal
-        # self.distance_to_goal = np.linalg.norm([self.asv_x - self.goal_x, self.asv_y - self.goal_y])
-        # if reached_goal:
-        #     r_goal = 50
-        # else:
-        #     r_goal = 0
-
-        # # Combined rewards
-        # lambda_ = 0.5       # weighting factor
-
-        # if collided:
-        #     reward = -1000
-        # else:
-        #     reward = lambda_ * r_pf + (1 - lambda_) * r_oa + r_heading + r_exist + r_goal
         
         lam = LAMBDA_REWARD
 
@@ -541,13 +508,6 @@ class ASVLidarEnv(gym.Env):
             reward = float(lam * r_pf + (1.0 - lam) * r_oa + r_exist)
 
         terminated = bool(collided or reached_goal)
-        # info = {
-        #     # navigation + terminal diagnostics
-        #     "distance_to_goal": float(self.distance_to_goal),
-        #     "tgt": float(self.tgt),
-        #     "collided": bool(collided),
-        #     "reached_goal": bool(reached_goal),
-        # }
 
         info = {
             # reward mix + components
