@@ -210,7 +210,9 @@ class ShipModel:
     def _derivatives(self, s: np.ndarray, rpm: float, rud: float, thruster_rpm: float) -> np.ndarray:
         u, v, r, psi, delta, x, y = [float(z) for z in s]
 
-        delta_cmd = self._clip_rudder_percent(rud) / 100.0 * self._max_rudder_rad()
+        # Change delta sign to work with "ppo_best.zip"
+        # delta_cmd = self._clip_rudder_percent(rud) / 100.0 * self._max_rudder_rad()
+        delta_cmd = -self._clip_rudder_percent(rud) / 100.0 * self._max_rudder_rad()
         delta_dot = float(np.clip(delta_cmd - delta, -self._max_rudder_rate_radps(), self._max_rudder_rate_radps()))
 
         u_eff = max(u, 0.0)
