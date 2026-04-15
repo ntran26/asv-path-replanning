@@ -12,6 +12,8 @@ from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback,
 
 from rl_env import ASVLidarEnv, RPM_MAX, RPM_MIN
 
+EVAL_TEST_CASES = [1, 2, 3, 4, 5, 6, 7]
+
 """
 Train:
   python train_test_asv.py --mode train --algo ppo --timesteps 1000000
@@ -294,8 +296,13 @@ class EvalMetricsCallback(BaseCallback):
         super().__init__(verbose)
         self.eval_env = eval_env
         self.eval_freq = int(eval_freq)
-        self.n_eval_episodes = int(n_eval_episodes)
+        self.eval_cases = list(EVAL_TEST_CASES)
+        self.n_eval_episodes = len(self.eval_cases)
         self.max_steps = int(max_steps)
+
+        self.best_success_rate = -1.0
+        self.best_mean_reward = -np.inf
+        self.best_model_path = "best_model.zip"
 
         self.csv_path = csv_path
         self.json_path = json_path
@@ -375,13 +382,15 @@ class EvalMetricsCallback(BaseCallback):
             return True
 
         ep_metrics: List[Dict[str, Any]] = []
-        for ep_i in range(self.n_eval_episodes):
+        previous_test_case = getattr(self.eval_env, "test_case", None)
+        for ep_i, test_case in enumerate(self.eval_cases):
+            self.eval_env.test_case = int(test_case)
             m = eval_one_episode(self.model, self.eval_env, deterministic=True, max_steps=self.max_steps)
             ep_metrics.append(m)
 
             if self.verbose:
                 print(
-                    f"[EVAL @ {self.num_timesteps}] ep#{ep_i} "
+                    f"[EVAL @ {self.num_timesteps}] case#{test_case} "
                     f"R={m['ep_reward']:.1f} len={m['ep_len']} "
                     f"succ={m['success']} reason={m['term_reason']} "
                     f"d_end={m['d_end']:.1f} prog/step={m['progress_per_step']:.3f} "
@@ -392,7 +401,14 @@ class EvalMetricsCallback(BaseCallback):
 
             row = [self.num_timesteps, ep_i] + [m.get(k) for k in self.header[2:]]
             self._append_row(row)
-            self.rows.append({"timesteps": int(self.num_timesteps), "episode": int(ep_i), **m})
+            self.rows.append({
+                "timesteps": int(self.num_timesteps),
+                "episode": int(ep_i),
+                "test_case": int(test_case),
+                **m,
+            })
+
+        self.eval_env.test_case = previous_test_case
 
         # Aggregate summary
         def mean_of(key: str) -> float:
@@ -442,6 +458,24 @@ class EvalMetricsCallback(BaseCallback):
             json.dump(self.rows, f, indent=2)
         with open(self.summary_json_path, "w") as f:
             json.dump(self.summary_rows, f, indent=2)
+
+        # ---- BEST MODEL LOGIC ----
+        current_success = summary["success_rate"]
+        current_reward = summary["mean_ep_reward"]
+
+        # prioritize success_rate     
+        if current_success > self.best_success_rate:
+            self.best_success_rate = current_success
+            self.best_mean_reward = current_reward
+            self.model.save(f"best_model_{self.num_timesteps}.zip")
+            if self.verbose:
+                print(f"New BEST model (success_rate={current_success:.2f}) saved!")
+
+        elif current_success == self.best_success_rate and current_reward > self.best_mean_reward:
+            self.best_mean_reward = current_reward
+            self.model.save(f"best_model_{self.num_timesteps}.zip")
+            if self.verbose:
+                print(f"New BEST model (reward tie-break, success_rate={current_success:.2f}) saved!")
 
         # TensorBoard logging
         self.logger.record("eval/mean_ep_reward", summary["mean_ep_reward"])
