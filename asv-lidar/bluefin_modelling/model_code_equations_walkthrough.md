@@ -838,7 +838,7 @@ ROLL_RESTORE_SCALE = 1.2
 **Equation**
 
 $$
-\mathrm{rpm}_{MATLAB} = \mathrm{RPM\_COMMAND\_SCALE} \cdot \mathrm{rpm}_{repo}
+\mathrm{rpm}_{MATLAB} = \mathrm{SCALE} \cdot \mathrm{rpm}_{repo}
 $$
 
 $$
