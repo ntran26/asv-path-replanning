@@ -584,7 +584,7 @@ This file is the main MATLAB source behind the current 4DOF Python model.
 $$
 \begin{aligned}
 x &= [u, v, p, r, x, y, \phi, \psi, \delta, n_1, n_2]^T \\
-u_{\mathrm{in}} &= [\delta_c, n_{1,c}, n_{2,c}]^T
+u_{\mathrm{in}} &= [\delta_c, n_{1c}, n_{2c}]^T
 \end{aligned}
 $$
 
@@ -653,8 +653,8 @@ end
 $$
 \begin{aligned}
 \frac{d\delta}{dt} &= \mathrm{sat}(\delta_c - \delta) \\
-\frac{dn_1}{dt} &= \mathrm{sat}(n_{1,c} - n_1) \\
-\frac{dn_2}{dt} &= \mathrm{sat}(n_{2,c} - n_2)
+\frac{dn_1}{dt} &= \mathrm{sat}(n_{1c} - n_1) \\
+\frac{dn_2}{dt} &= \mathrm{sat}(n_{2c} - n_2)
 \end{aligned}
 $$
 
@@ -840,11 +840,11 @@ ROLL_RESTORE_SCALE = 1.2
 $$
 \begin{aligned}
 \mathrm{rpm}_{\mathrm{MATLAB}} &= \mathrm{RPM\_COMMAND\_SCALE} \cdot \mathrm{rpm}_{\mathrm{repo}} \\
-n_{1,c} &= \frac{\mathrm{rpm}_{\mathrm{MATLAB}}}{60} \\
-X_{P,\mathrm{new}} &= k_{\mathrm{prop}} X_{P,\mathrm{MATLAB}} \\
-Y_{R,\mathrm{new}} &= k_{\mathrm{rud}} Y_{R,\mathrm{MATLAB}} \\
-N_{R,\mathrm{new}} &= k_{\mathrm{yaw}} N_{R,\mathrm{MATLAB}} \\
-K_{\mathrm{roll,new}} &= k_{\mathrm{damp}} K_{\mathrm{damp}} + k_{\mathrm{restore}} K_{\mathrm{restore}}
+n_{1c} &= \frac{\mathrm{rpm}_{\mathrm{MATLAB}}}{60} \\
+X_P^{\mathrm{new}} &= k_{\mathrm{prop}} X_P^{\mathrm{MATLAB}} \\
+Y_R^{\mathrm{new}} &= k_{\mathrm{rud}} Y_R^{\mathrm{MATLAB}} \\
+N_R^{\mathrm{new}} &= k_{\mathrm{yaw}} N_R^{\mathrm{MATLAB}} \\
+K_{\mathrm{roll}}^{\mathrm{new}} &= k_{\mathrm{damp}} K_{\mathrm{damp}} + k_{\mathrm{restore}} K_{\mathrm{restore}}
 \end{aligned}
 $$
 
@@ -883,8 +883,8 @@ $$
 \begin{aligned}
 s &= [u, v, p, r, x, y, \phi, \psi, \delta, n_1, n_2]^T \\
 \delta_c &= \mathrm{sat}(\mathrm{rud})\,\delta_{\max} \\
-n_{1,c} &= \mathrm{rpm}_{\mathrm{repo}}\,k_{\mathrm{rpm}} \\
-n_{2,c} &= \mathrm{rpm}_{\mathrm{thr}}\,k_{\mathrm{thr}} \\
+n_{1c} &= \mathrm{rpm}_{\mathrm{repo}}\,k_{\mathrm{rpm}} \\
+n_{2c} &= \mathrm{rpm}_{\mathrm{thr}}\,k_{\mathrm{thr}} \\
 s_{k+1} &= \mathrm{RK4}\left(s_k, f(s, u_{\mathrm{in}})\right)
 \end{aligned}
 $$
@@ -955,7 +955,7 @@ $$
 \begin{aligned}
 J &= k_J \frac{(1 - w)u}{n_1 D_p} \\
 K_T &= a_0 + a_1 J + a_2 J^2 \\
-X_P &= k_{\mathrm{prop}} X_{P,\mathrm{MATLAB}} \\
+X_P &= k_{\mathrm{prop}} X_P^{\mathrm{MATLAB}} \\
 Y_R &= k_F (1 + a_H) F_N \cos(\delta)\cos(\phi) \\
 N_R &= k_F k_N (x_R + a_H x_H) F_N \cos(\delta)\cos(\phi)
 \end{aligned}
@@ -1005,14 +1005,43 @@ $$
 
 ### 7.1 What changes from one model to the next?
 
-| Stage | Main state idea | Main force idea | Main advantage | Main limitation |
-|---|---|---|---|---|
-| `ship_model.py` | forward speed + heading + yaw rate | one thrust, one drag, one turning moment | very fast and simple | not physically rich |
-| `Blue02.m` | surge, sway, yaw, rudder | separate hull, propeller, rudder terms | introduces real manoeuvring structure | internally inconsistent |
-| `ship_model_bluefin.py` | Python 3DOF | Blue02-inspired hull/prop/rudder split | practical Python structure | hard to tune cleanly |
-| `ship_model_bluefin_v2.py` | Python 3DOF with empirical shaping | speed-shaped thrust + split rudder gains | better match to logs | less literal as a MATLAB transfer |
-| `Bluefin4DOFModel02.m` | surge, sway, roll, yaw + actuators | nonlinear hull + prop + rudder + thruster + roll | richest vessel physics source | not directly repo-ready |
-| `ship_model_bluefin_4dof.py` | Python 4DOF | guarded/tunable port of MATLAB 4DOF | best current calibrated model | still needs validation margin for field truth |
+To keep GitHub printing clean on A4, the comparison is written as a stacked list instead of a wide table:
+
+1. `ship_model.py`
+   State idea: forward speed + heading + yaw rate.
+   Force idea: one thrust, one drag, one turning moment.
+   Advantage: very fast and simple.
+   Limitation: not physically rich.
+
+2. `Blue02.m`
+   State idea: surge, sway, yaw, rudder.
+   Force idea: separate hull, propeller, rudder terms.
+   Advantage: introduces real manoeuvring structure.
+   Limitation: internally inconsistent.
+
+3. `ship_model_bluefin.py`
+   State idea: Python 3DOF.
+   Force idea: Blue02-inspired hull/prop/rudder split.
+   Advantage: practical Python structure.
+   Limitation: hard to tune cleanly.
+
+4. `ship_model_bluefin_v2.py`
+   State idea: Python 3DOF with empirical shaping.
+   Force idea: speed-shaped thrust + split rudder gains.
+   Advantage: better match to logs.
+   Limitation: less literal as a MATLAB transfer.
+
+5. `Bluefin4DOFModel02.m`
+   State idea: surge, sway, roll, yaw + actuators.
+   Force idea: nonlinear hull + prop + rudder + thruster + roll.
+   Advantage: richest vessel physics source.
+   Limitation: not directly repo-ready.
+
+6. `ship_model_bluefin_4dof.py`
+   State idea: Python 4DOF.
+   Force idea: guarded/tunable port of MATLAB 4DOF.
+   Advantage: best current calibrated model.
+   Limitation: still needs validation margin for field truth.
 
 ### 7.2 Final takeaway
 
