@@ -839,12 +839,12 @@ ROLL_RESTORE_SCALE = 1.2
 
 $$
 \begin{aligned}
-\mathrm{rpm}_{\mathrm{MATLAB}} &= \mathrm{RPM\_COMMAND\_SCALE} \cdot \mathrm{rpm}_{\mathrm{repo}} \\
-n_{1c} &= \frac{\mathrm{rpm}_{\mathrm{MATLAB}}}{60} \\
-X_P^{\mathrm{new}} &= k_{\mathrm{prop}} X_P^{\mathrm{MATLAB}} \\
-Y_R^{\mathrm{new}} &= k_{\mathrm{rud}} Y_R^{\mathrm{MATLAB}} \\
-N_R^{\mathrm{new}} &= k_{\mathrm{yaw}} N_R^{\mathrm{MATLAB}} \\
-K_{\mathrm{roll}}^{\mathrm{new}} &= k_{\mathrm{damp}} K_{\mathrm{damp}} + k_{\mathrm{restore}} K_{\mathrm{restore}}
+\mathrm{rpm}_{MATLAB} &= \mathrm{RPM\_COMMAND\_SCALE} \cdot \mathrm{rpm}_{repo} \\
+n_{1c} &= \frac{\mathrm{rpm}_{MATLAB}}{60} \\
+X_P^{new} &= k_{prop} X_P^{MATLAB} \\
+Y_R^{new} &= k_{rud} Y_R^{MATLAB} \\
+N_R^{new} &= k_{yaw} N_R^{MATLAB} \\
+K_{roll}^{new} &= k_{damp} K_{damp} + k_{restore} K_{restore}
 \end{aligned}
 $$
 
@@ -1008,40 +1008,40 @@ $$
 To keep GitHub printing clean on A4, the comparison is written as a stacked list instead of a wide table:
 
 1. `ship_model.py`
-   State idea: forward speed + heading + yaw rate.
-   Force idea: one thrust, one drag, one turning moment.
-   Advantage: very fast and simple.
-   Limitation: not physically rich.
+   - State idea: forward speed + heading + yaw rate.
+   - Force idea: one thrust, one drag, one turning moment.
+   - Advantage: very fast and simple.
+   - Limitation: not physically rich.
 
 2. `Blue02.m`
-   State idea: surge, sway, yaw, rudder.
-   Force idea: separate hull, propeller, rudder terms.
-   Advantage: introduces real manoeuvring structure.
-   Limitation: internally inconsistent.
+   - State idea: surge, sway, yaw, rudder.
+   - Force idea: separate hull, propeller, rudder terms.
+   - Advantage: introduces real manoeuvring structure.
+   - Limitation: internally inconsistent.
 
 3. `ship_model_bluefin.py`
-   State idea: Python 3DOF.
-   Force idea: Blue02-inspired hull/prop/rudder split.
-   Advantage: practical Python structure.
-   Limitation: hard to tune cleanly.
+   - State idea: Python 3DOF.
+   - Force idea: Blue02-inspired hull/prop/rudder split.
+   - Advantage: practical Python structure.
+   - Limitation: hard to tune cleanly.
 
 4. `ship_model_bluefin_v2.py`
-   State idea: Python 3DOF with empirical shaping.
-   Force idea: speed-shaped thrust + split rudder gains.
-   Advantage: better match to logs.
-   Limitation: less literal as a MATLAB transfer.
+   - State idea: Python 3DOF with empirical shaping.
+   - Force idea: speed-shaped thrust + split rudder gains.
+   - Advantage: better match to logs.
+   - Limitation: less literal as a MATLAB transfer.
 
 5. `Bluefin4DOFModel02.m`
-   State idea: surge, sway, roll, yaw + actuators.
-   Force idea: nonlinear hull + prop + rudder + thruster + roll.
-   Advantage: richest vessel physics source.
-   Limitation: not directly repo-ready.
+   - State idea: surge, sway, roll, yaw + actuators.
+   - Force idea: nonlinear hull + prop + rudder + thruster + roll.
+   - Advantage: richest vessel physics source.
+   - Limitation: not directly repo-ready.
 
 6. `ship_model_bluefin_4dof.py`
-   State idea: Python 4DOF.
-   Force idea: guarded/tunable port of MATLAB 4DOF.
-   Advantage: best current calibrated model.
-   Limitation: still needs validation margin for field truth.
+   - State idea: Python 4DOF.
+   - Force idea: guarded/tunable port of MATLAB 4DOF.
+   - Advantage: best current calibrated model.
+   - Limitation: still needs validation margin for field truth.
 
 ### 7.2 Final takeaway
 
