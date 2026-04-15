@@ -328,5 +328,27 @@
     "mean_cos_chi": 0.0,
     "mean_lambda": 0.5,
     "reward_info_rate": 1.0
+  },
+  {
+    "timesteps": 800000,
+    "mean_ep_reward": -829.3733807302011,
+    "std_ep_reward": 650.4134628848185,
+    "mean_ep_len": 147.33333333333334,
+    "success_rate": 0.6666666666666666,
+    "collision_rate": 0.3333333333333333,
+    "border_rate": 0.0,
+    "obstacle_rate": 0.3333333333333333,
+    "timeout_rate": 0.0,
+    "mean_progress_per_step": 0.08752560443663736,
+    "mean_d_end": 4.865230770667542,
+    "mean_speed": 0.8824688158242763,
+    "min_min_lidar_all": 0.19079019129276276,
+    "min_p10_front": 0.1916981428861618,
+    "mean_r_pf": 1.3371930408729125,
+    "mean_r_oa": -8.017350705608628,
+    "mean_r_exist": -0.5999999999999999,
+    "mean_cos_chi": 0.0,
+    "mean_lambda": 0.5,
+    "reward_info_rate": 1.0
   }
 ]
