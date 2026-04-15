@@ -9,8 +9,8 @@ Test case 2: start & goal at center, single obstacle on path
 Test case 3: start & goal at center, single obstacle to the left of path
 Test case 4: start & goal at center, single obstacle to the right of path
 Test case 5: start & goal at center, 3 obstacles scatter along the path
-Test case 6: start & goal at each corner, 4 obstacles cover the path, leaving a single blank space
-
+Test case 6: no obstacles, start at center, goal at left corner
+Test case 7: no obstacles, start at center, goal at right corner
 Test case 99: take the setup from recorded data of a random obstacles scenario (test case 0)
 """
 
@@ -29,7 +29,7 @@ class TestCase:
         self.env_data = ENV_DATA
 
     def obstacles(self, test_case):
-        if test_case == 0:
+        if test_case == 0 or test_case == 6 or test_case == 7:
             self.obs = []
         elif test_case == 1:    # middle
             x = 5
@@ -48,7 +48,7 @@ class TestCase:
                              (x+self.obs_size, y+self.obs_size), (x-self.obs_size, y+self.obs_size)])
         elif test_case == 4:    # 3 obstacles
             x = 5
-            y = 5
+            y = 8
             self.obs.append([(x-self.obs_size, y-self.obs_size), (x+self.obs_size, y-self.obs_size), 
                              (x+self.obs_size, y+self.obs_size), (x-self.obs_size, y+self.obs_size)])
             x = 8
@@ -61,7 +61,7 @@ class TestCase:
                              (x+self.obs_size, y+self.obs_size), (x-self.obs_size, y+self.obs_size)])
         elif test_case == 5:    # horizontal obstacles
             x = 3.5
-            y = 10
+            y = 15
             obs_size_x = 3      # make obstacle longer horizonatally
             self.obs.append([(x-obs_size_x, y-self.obs_size), (x+obs_size_x, y-self.obs_size), 
                              (x+obs_size_x, y+self.obs_size), (x-obs_size_x, y+self.obs_size)])
@@ -81,14 +81,24 @@ class TestCase:
     def position(self, test_case):
         if test_case >= 0 and test_case <= 4:
             self.start_x = 5
-            self.start_y = 1
+            self.start_y = 2
             self.goal_x = 5
-            self.goal_y = 24
+            self.goal_y = 22
         elif test_case == 5:
             self.start_x = 2
-            self.start_y = 1
-            self.goal_x = 8
-            self.goal_y = 24
+            self.start_y = 2
+            self.goal_x = 7
+            self.goal_y = 22
+        elif test_case == 6:
+            self.start_x = 5
+            self.start_y = 2
+            self.goal_x = 3
+            self.goal_y = 22
+        elif test_case == 7:
+            self.start_x = 5
+            self.start_y = 2
+            self.goal_x = 7
+            self.goal_y = 22
         elif test_case == 99:
             # load data file
             with open(self.env_data, "r") as f:

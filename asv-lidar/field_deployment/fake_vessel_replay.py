@@ -1,5 +1,5 @@
 """
-Run: python fake_vessel_replay.py --log data/test_2.log --loop
+Run: python fake_vessel_replay.py --log data/test_4.log --loop
 """
 
 import socket

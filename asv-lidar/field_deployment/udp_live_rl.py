@@ -1,5 +1,5 @@
 """
-Run: python udp_live_rl.py --server-ip "10.201.208.224" --test-case 0
+Run: python udp_live_rl.py --server-ip "10.201.208.224" --record-log trial.log --test-case 0
 """
 import time
 import socket
@@ -373,9 +373,10 @@ def main():
                         # latest_cmd = latest_action*100
 
                         def rudder_to_cmd(a):
-                            return 80 * a - 20      # [-100, 60]
+                            # return 80 * a - 20      # [-100, 60]
+                            return a*100          # [-100, 100]
                         def thrust_to_cmd(b):
-                            return np.clip(100*b, 50, 100)  # [50, 100]
+                            return np.clip(100*b, 0, 100)  # [0, 100]
 
                         rudder_cmd = rudder_to_cmd(latest_action[0])
                         thrust_cmd = thrust_to_cmd(latest_action[1])
