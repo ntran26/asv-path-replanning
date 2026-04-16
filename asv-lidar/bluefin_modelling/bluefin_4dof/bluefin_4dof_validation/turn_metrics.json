@@ -1,0 +1,12 @@
+{
+  "turn_metrics": {
+    "turn_start_idx": 16,
+    "turn_start_t_sec": 1.6,
+    "peak_abs_yaw_rate_degps": 18.975034530290184,
+    "time_to_90deg_after_turn_s": 6.800000000000001,
+    "time_to_180deg_after_turn_s": 11.8,
+    "radius_first_90deg_m": 4.249827974850196,
+    "radius_first_180deg_m": 3.381443084353435,
+    "u_body_10s_after_turn_mps": 0.9012533197123581
+  }
+}

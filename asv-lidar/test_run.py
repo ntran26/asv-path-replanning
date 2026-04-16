@@ -11,6 +11,7 @@ Test case 4: start & goal at center, single obstacle to the right of path
 Test case 5: start & goal at center, 3 obstacles scatter along the path
 Test case 6: no obstacles, start at center, goal at left corner
 Test case 7: no obstacles, start at center, goal at right corner
+
 Test case 99: take the setup from recorded data of a random obstacles scenario (test case 0)
 """
 

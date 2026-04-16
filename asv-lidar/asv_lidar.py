@@ -92,11 +92,11 @@ class Lidar:
             # Update the range reading for this beam
             self._ranges[idx] = closest_distance
 
-            # For realistic lidar simulation
-            if closest_distance < 1.0 or closest_distance > 16.0:
-                self._ranges[idx] = LIDAR_RANGE
-            else:
-                self._ranges[idx] = closest_distance
+            # # For realistic lidar simulation
+            # if closest_distance < 1.0 or closest_distance > 16.0:
+            #     self._ranges[idx] = LIDAR_RANGE
+            # else:
+            #     self._ranges[idx] = closest_distance
         
         return self._ranges.copy()
 
@@ -137,26 +137,6 @@ class Lidar:
             return (intersection_x, intersection_y)
 
         return None
-        
-    # def render(self, surface: pygame.Surface, scale: float=1.0):
-    #     """
-    #     Render the LIDAR beams as lines on the given surface
-
-    #     Args:
-    #         surface (pygame.Surface): The surface on which to render the beams
-    #     """
-    #     for idx, angle in enumerate(self._angles):
-    #         # Calculate the absolute angle in radians.
-    #         absolute_angle = np.radians(self._hdg + angle)
-    #         # Compute the endpoint for the current beam using its range reading.
-    #         x = self._pos_x + self._ranges[idx] * np.sin(absolute_angle)
-    #         y = self._pos_y + self._ranges[idx] * np.cos(absolute_angle)
-    #         pygame.draw.aaline(
-    #             surface,
-    #             (90, 90, 200),
-    #             (self._pos_x * scale, self._pos_y * scale),
-    #             (x * scale, y * scale)
-    #         )
 
     def render(self, surface, world_to_screen):
         origin = world_to_screen((self._pos_x, self._pos_y))
@@ -165,5 +145,5 @@ class Lidar:
             x = self._pos_x + self._ranges[idx] * np.sin(absolute_angle)
             y = self._pos_y + self._ranges[idx] * np.cos(absolute_angle)
             end = world_to_screen((x, y))
-            pygame.draw.aaline(surface, (90, 90, 200), origin, end)
+            pygame.draw.aaline(surface, (90, 90, 200), origin, end, 1)
             
