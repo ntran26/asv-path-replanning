@@ -511,7 +511,7 @@ class ASVLidarEnv(gym.Env):
         w = 1.0 / (1.0 + np.abs(GAMMA_THETA * theta_rad))
 
         # < 1 for out-of-range, treat it as "far"
-        x = np.where(lidar_d < 1.0, LIDAR_RANGE, lidar_d)
+        x = np.where(lidar_d < 0.0, LIDAR_RANGE, lidar_d)
 
         pen = 1.0 / (GAMMA_X * (np.maximum(x, EPSILON_X) ** 2))
         r_oa = -float(np.sum(w * pen) / (np.sum(w) + 1e-6))

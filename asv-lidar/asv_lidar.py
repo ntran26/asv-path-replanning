@@ -89,8 +89,14 @@ class Lidar:
                     dist = np.hypot(intersection[0] - self._pos_x, intersection[1] - self._pos_y)
                     closest_distance = min(closest_distance, dist)
 
-            # Update the range reading for this beam.
+            # Update the range reading for this beam
             self._ranges[idx] = closest_distance
+
+            # For realistic lidar simulation
+            if closest_distance < 1.0 or closest_distance > 16.0:
+                self._ranges[idx] = LIDAR_RANGE
+            else:
+                self._ranges[idx] = closest_distance
         
         return self._ranges.copy()
 

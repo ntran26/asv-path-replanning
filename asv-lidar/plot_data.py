@@ -4,7 +4,7 @@ from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from PIL import Image
 from images import BOAT_ICON
 
-TEST_SCENARIO = 6
+TEST_SCENARIO = 5
 
 def load_data(filepath):
     with open(filepath, 'r') as f:
@@ -21,12 +21,13 @@ def add_boat_icon(ax, x, y, heading, zoom=1.25):
 datasets = [
     # ("PPO", "data/ppo_data_random_0.json", "purple", "dashdot"),
     # ("SAC", "data/sac_data_random_0.json", "blue", "solid"),
-    ("SAC, $ \lambda $ = 0.5", f"data/test_case_{TEST_SCENARIO}/sac_0_5_data.json", "orange", "dashed"),
-    ("SAC, $ \lambda $ = 0.6", f"data/test_case_{TEST_SCENARIO}/sac_0_6_data.json", "blue", "dotted"),
-    ("SAC, $ \lambda $ = 0.7", f"data/test_case_{TEST_SCENARIO}/sac_0_7_data.json", "magenta", "dashdot"),
-    ("SAC, $ \lambda $ = 0.8", f"data/test_case_{TEST_SCENARIO}/sac_0_8_data.json", "brown", (0, (3, 5, 1, 5, 1, 5))),
-    ("SAC, $ \lambda $ = 0.9", f"data/test_case_{TEST_SCENARIO}/sac_0_9_data.json", "green", (0, (3, 1, 1, 1))),
-    ("PPO, $ \lambda $ = 0.7 (best)", f"data/test_case_{TEST_SCENARIO}/ppo_best_data.json", "black", "dashdot")
+    # ("SAC, $ \lambda $ = 0.5", f"data/test_case_{TEST_SCENARIO}/sac_0_5_data.json", "orange", "dashed"),
+    # ("SAC, $ \lambda $ = 0.6", f"data/test_case_{TEST_SCENARIO}/sac_0_6_data.json", "blue", "dotted"),
+    # ("SAC, $ \lambda $ = 0.7", f"data/test_case_{TEST_SCENARIO}/sac_0_7_data.json", "magenta", "dashdot"),
+    # ("SAC, $ \lambda $ = 0.8", f"data/test_case_{TEST_SCENARIO}/sac_0_8_data.json", "brown", (0, (3, 5, 1, 5, 1, 5))),
+    # ("SAC, $ \lambda $ = 0.9", f"data/test_case_{TEST_SCENARIO}/sac_0_9_data.json", "green", (0, (3, 1, 1, 1))),
+    # ("PPO, $ \lambda $ = 0.7 (best)", f"data/test_case_{TEST_SCENARIO}/ppo_best_data.json", "black", "dashdot"),
+    ("PPO", f"case_{TEST_SCENARIO}.json", "blue", "solid"),
 ]
 
 # Use the first data file to set up the map
@@ -67,8 +68,10 @@ plt.xlabel("X")
 plt.ylabel("Y")
 plt.title(f"Test scenario {TEST_SCENARIO}")
 plt.legend()
-plt.xlim((0, 400))
-plt.ylim((600, 0))
+# plt.xlim((0, 400))
+# plt.ylim((600, 0))
+plt.xlim((0, 10))
+plt.ylim((0, 25))
 plt.grid(True)
 plt.grid(color='#dddddd', alpha=0.7)
 plt.savefig(f"Test scenario {TEST_SCENARIO}.png", dpi=300, bbox_inches='tight')
