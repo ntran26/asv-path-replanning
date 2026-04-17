@@ -131,7 +131,7 @@ class ASVLidarEnv(gym.Env):
                 "hdg"  : Box(low=0,high=360,shape=(1,),dtype=np.float32),
                 "dhdg" : Box(low=-36,high=36,shape=(1,),dtype=np.float32),
                 "speed"  : Box(low=0.0, high=10.0, shape=(1,), dtype=np.float32),
-                "tgt"  : Box(low=-self.task_width/2,high=self.task_width/2,shape=(1,),dtype=np.float32),
+                "tgt"  : Box(low=-self.map_width,high=self.map_width,shape=(1,),dtype=np.float32),
                 "boundary": Box(low=0.0, high=1.0, shape=(4,), dtype=np.float32),
                 "course_error": Box(low=-180, high=180, shape=(1,), dtype=np.float32),
             }
@@ -182,7 +182,7 @@ class ASVLidarEnv(gym.Env):
             'speed': np.array([self.speed_mps], dtype=np.float32),
             'tgt': np.array([self.tgt],dtype=np.float32),
             'boundary': boundary,
-            'course_error': self.course_error
+            'course_error': np.array([self.course_error], dtype=np.float32),
         }
 
     def _hull_polygon_world(self):

@@ -1,0 +1,11 @@
+{
+  "turn_rpm": 24.0,
+  "turn_rudder_deg": 25.0,
+  "RPM_INPUT_TO_SOLVER_RPM": 66.6666666667,
+  "PROPELLER_THRUST_SCALE": 1.0,
+  "RUDDER_FORCE_SCALE": 0.8,
+  "BOW_THRUSTER_SCALE": 1.0,
+  "ROLL_DAMP_SCALE": 1.0,
+  "ROLL_RESTORE_SCALE": 0.8,
+  "score_total": 2.0115042177576585
+}

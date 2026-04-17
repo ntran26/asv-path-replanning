@@ -660,8 +660,8 @@ if __name__ == "__main__":
         while not done:
             action, _ = model.predict(obs, deterministic=True)
             obs, reward, terminated, truncated, info = env.step(action)
-            # print(obs["lidar"])
-            print(action)
+            # print(action)
+            # print(env.lidar.ranges)
             done = bool(terminated or truncated)
             total_reward += float(reward)
 
