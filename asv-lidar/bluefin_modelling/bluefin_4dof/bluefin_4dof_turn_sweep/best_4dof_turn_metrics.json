@@ -2,11 +2,11 @@
   "turn_metrics": {
     "turn_start_idx": 17,
     "turn_start_t_sec": 1.7000000000000002,
-    "peak_abs_yaw_rate_degps": 17.79884981006626,
-    "time_to_90deg_after_turn_s": 7.6000000000000005,
-    "time_to_180deg_after_turn_s": 12.900000000000002,
-    "radius_first_90deg_m": 5.08185937590175,
-    "radius_first_180deg_m": 3.9779630261408196,
-    "u_body_10s_after_turn_mps": 0.9875332217981786
+    "peak_abs_yaw_rate_degps": 20.888152131573296,
+    "time_to_90deg_after_turn_s": 6.500000000000001,
+    "time_to_180deg_after_turn_s": 11.100000000000001,
+    "radius_first_90deg_m": 5.6305378509619874,
+    "radius_first_180deg_m": 4.240922648254334,
+    "u_body_10s_after_turn_mps": 1.1956810999890652
   }
 }

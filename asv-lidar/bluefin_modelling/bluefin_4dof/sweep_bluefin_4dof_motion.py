@@ -28,6 +28,7 @@ OUT_DIR = ROOT / "bluefin_4dof_motion_sweep"
 RPM_GRID = [12.0, 15.0, 18.0, 21.0]
 RPM_INPUT_TO_SOLVER_RPM_GRID = [50.0, 66.6666666667, 80.0, 90.0]
 PROPELLER_THRUST_SCALE_GRID = [0.8, 1.0, 1.2, 1.5]
+PROPELLER_ADVANCE_SCALE_GRID = [0.8, 1.0, 1.2, 1.4]
 
 DT = 0.1
 DURATION_S = 40.0
@@ -54,14 +55,20 @@ def main() -> None:
     real_motion, _ = load_default_real_benchmarks()
     rows: List[Dict[str, Any]] = []
 
-    for rpm, rpm_scale, prop_scale in itertools.product(
-        RPM_GRID, RPM_INPUT_TO_SOLVER_RPM_GRID, PROPELLER_THRUST_SCALE_GRID
+    for rpm, rpm_scale, prop_scale, advance_scale in itertools.product(
+        RPM_GRID,
+        RPM_INPUT_TO_SOLVER_RPM_GRID,
+        PROPELLER_THRUST_SCALE_GRID,
+        PROPELLER_ADVANCE_SCALE_GRID,
     ):
         params = {
             "RPM_INPUT_TO_SOLVER_RPM": rpm_scale,
             "PROPELLER_THRUST_SCALE": prop_scale,
+            "PROPELLER_ADVANCE_SCALE": advance_scale,
             # faithful defaults for all other scales
             "RUDDER_FORCE_SCALE": 1.0,
+            "RUDDER_YAW_SCALE": 1.0,
+            "LINEAR_YAW_DAMP": 0.0,
             "BOW_THRUSTER_SCALE": 1.0,
             "ROLL_DAMP_SCALE": 1.0,
             "ROLL_RESTORE_SCALE": 1.0,
@@ -73,6 +80,7 @@ def main() -> None:
             "rpm": rpm,
             "RPM_INPUT_TO_SOLVER_RPM": rpm_scale,
             "PROPELLER_THRUST_SCALE": prop_scale,
+            "PROPELLER_ADVANCE_SCALE": advance_scale,
             "score_total": score,
             **metrics,
         }
@@ -83,7 +91,10 @@ def main() -> None:
     best_params = {
         "RPM_INPUT_TO_SOLVER_RPM": best["RPM_INPUT_TO_SOLVER_RPM"],
         "PROPELLER_THRUST_SCALE": best["PROPELLER_THRUST_SCALE"],
+        "PROPELLER_ADVANCE_SCALE": best["PROPELLER_ADVANCE_SCALE"],
         "RUDDER_FORCE_SCALE": 1.0,
+        "RUDDER_YAW_SCALE": 1.0,
+        "LINEAR_YAW_DAMP": 0.0,
         "BOW_THRUSTER_SCALE": 1.0,
         "ROLL_DAMP_SCALE": 1.0,
         "ROLL_RESTORE_SCALE": 1.0,

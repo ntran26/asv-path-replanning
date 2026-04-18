@@ -1,0 +1,16 @@
+{
+  "motion_metrics": {
+    "motion_start_idx": 2,
+    "motion_start_t_sec": 0.2,
+    "u_body_at_2s_after_motion_mps": 0.61328243759659,
+    "u_body_at_5s_after_motion_mps": 1.1435026778782962,
+    "u_body_at_10s_after_motion_mps": 1.4775673903641662,
+    "distance_at_5s_after_motion_m": 3.4219400983086405,
+    "distance_at_10s_after_motion_m": 10.165219129758055,
+    "initial_accel_0_2_after_motion_mps2": 0.27569004466822755,
+    "initial_accel_0_5_after_motion_mps2": 0.2160313784371927,
+    "peak_u_body_mps": 1.5730881671893393,
+    "time_to_50pct_peak_u_after_motion_s": 2.8,
+    "time_to_90pct_peak_u_after_motion_s": 8.4
+  }
+}
