@@ -12,7 +12,8 @@ from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback,
 
 from rl_env import ASVLidarEnv, RPM_MAX, RPM_MIN
 
-EVAL_TEST_CASES = [1, 2, 3, 4, 5, 6, 7]
+# EVAL_TEST_CASES = [1, 2, 3, 4, 5, 6, 7]
+EVAL_TEST_CASES = [1, 2, 3, 6, 7]         # path following and single obstacle
 
 """
 Train:
@@ -36,7 +37,7 @@ def action_to_rpm(throttle_cmd: float) -> float:
 def action_to_rudder_deg(rudder_cmd: float) -> float:
     """Map normalized rudder [-1,1] to degrees (same mapping as env.step)."""
     rudder_cmd = float(np.clip(rudder_cmd, -1.0, 1.0))
-    return float(rudder_cmd * 30)
+    return float(rudder_cmd * 40)
 
 # -------------------------------
 # Domain-specific evaluation helpers
@@ -136,7 +137,7 @@ def eval_one_episode(model, env: ASVLidarEnv, deterministic: bool = True, max_st
     rpm_list: List[float] = []
     rudder_deg_list: List[float] = []
     tgt_list: List[float] = []
-    angle_diff_list: List[float] = []
+    course_error_list: List[float] = []
 
     min_lidar_list: List[float] = []
     p10_front_list: List[float] = []
@@ -174,7 +175,7 @@ def eval_one_episode(model, env: ASVLidarEnv, deterministic: bool = True, max_st
 
         # Task-state stats
         tgt_list.append(float(getattr(env, "tgt", 0.0)))
-        angle_diff_list.append(float(getattr(env, "angle_diff", 0.0)))
+        course_error_list.append(float(getattr(env, "course_error", 0.0)))
 
         # Lidar clearance stats
         cs = lidar_clearance_stats(env)
@@ -195,8 +196,10 @@ def eval_one_episode(model, env: ASVLidarEnv, deterministic: bool = True, max_st
                 r_oa_list.append(float(info["r_oa"]))
             if "r_exist" in info:
                 r_exist_list.append(float(info["r_exist"]))
-            if bool(info.get("collision", False)):
+            if bool(info.get("collided", False)):
                 collided_steps += 1
+            if "cos_chi" in info:
+                r_heading_list.append(float(info["cos_chi"]))
 
         if done:
             break
@@ -246,8 +249,8 @@ def eval_one_episode(model, env: ASVLidarEnv, deterministic: bool = True, max_st
         "mean_abs_tgt": safe_mean([abs(x) for x in tgt_list]),
         "max_abs_tgt": safe_max([abs(x) for x in tgt_list]),
 
-        "mean_abs_angle_diff": safe_mean([abs(x) for x in angle_diff_list]),
-        "max_abs_angle_diff": safe_max([abs(x) for x in angle_diff_list]),
+        "mean_abs_course_error": safe_mean([abs(x) for x in course_error_list]),
+        "max_abs_course_error": safe_max([abs(x) for x in course_error_list]),
 
         "min_lidar_all": safe_min(min_lidar_list),
         "p10_front": safe_min(p10_front_list),
@@ -296,12 +299,12 @@ class EvalMetricsCallback(BaseCallback):
         super().__init__(verbose)
         self.eval_env = eval_env
         self.eval_freq = int(eval_freq)
-        self.eval_cases = list(EVAL_TEST_CASES)
-        self.n_eval_episodes = len(self.eval_cases)
         self.max_steps = int(max_steps)
 
-        self.best_success_rate = -1.0
-        self.best_mean_reward = -np.inf
+        self.eval_cases = list(EVAL_TEST_CASES)
+        self.n_eval_episodes = len(self.eval_cases)
+
+        self.best_score = -np.inf
         self.best_model_path = "best_model.zip"
 
         self.csv_path = csv_path
@@ -324,7 +327,7 @@ class EvalMetricsCallback(BaseCallback):
             "mean_rpm", "min_rpm", "max_rpm",
             "mean_abs_rudder", "std_rudder",
             "mean_abs_tgt", "max_abs_tgt",
-            "mean_abs_angle_diff", "max_abs_angle_diff",
+            "mean_abs_course_error", "max_abs_course_error",
             "min_lidar_all", "p10_front",
             "mean_r_pf", "mean_r_oa", "mean_r_exist", "mean_cos_chi", "mean_lambda",
             "reward_per_step", "collision_steps", "has_reward_info",
@@ -340,9 +343,16 @@ class EvalMetricsCallback(BaseCallback):
             "mean_progress_per_step",
             "mean_d_end",
             "mean_speed",
+            "mean_abs_tgt",
+            "mean_abs_course_error",
             "min_min_lidar_all",
             "min_p10_front",
-            "mean_r_pf", "mean_r_oa", "mean_r_exist", "mean_cos_chi", "mean_lambda", "reward_info_rate",
+            "mean_r_pf", "mean_r_oa", "mean_r_exist", "mean_cos_chi", "mean_lambda",
+            "selection_score",
+            "selection_success_rate",
+            "selection_mean_abs_tgt",
+            "selection_mean_abs_course_error",
+            "reward_info_rate",
         ]
 
     def _init_csv(self):
@@ -386,6 +396,7 @@ class EvalMetricsCallback(BaseCallback):
         for ep_i, test_case in enumerate(self.eval_cases):
             self.eval_env.test_case = int(test_case)
             m = eval_one_episode(self.model, self.eval_env, deterministic=True, max_steps=self.max_steps)
+            m["test_case"] = int(test_case)
             ep_metrics.append(m)
 
             if self.verbose:
@@ -399,7 +410,7 @@ class EvalMetricsCallback(BaseCallback):
                     f"(r_pf={m['mean_r_pf']:.3f}, r_oa={m['mean_r_oa']:.3f}, r_exist={m['mean_r_exist']:.3f})"
                 )
 
-            row = [self.num_timesteps, ep_i] + [m.get(k) for k in self.header[2:]]
+            row = [self.num_timesteps, int(test_case)] + [m.get(k) for k in self.header[2:]]
             self._append_row(row)
             self.rows.append({
                 "timesteps": int(self.num_timesteps),
@@ -459,23 +470,48 @@ class EvalMetricsCallback(BaseCallback):
         with open(self.summary_json_path, "w") as f:
             json.dump(self.summary_rows, f, indent=2)
 
-        # ---- BEST MODEL LOGIC ----
-        current_success = summary["success_rate"]
-        current_reward = summary["mean_ep_reward"]
+        selection_metrics = [m for m in ep_metrics if m["test_case"] in self.eval_cases]
 
-        # prioritize success_rate     
-        if current_success > self.best_success_rate:
-            self.best_success_rate = current_success
-            self.best_mean_reward = current_reward
+        def sel_mean(key: str) -> float:
+            vals = [float(x.get(key, 0.0)) for x in selection_metrics]
+            return float(np.mean(vals)) if len(vals) else 0.0
+
+        selection_term_reasons = [str(x.get("term_reason", "")) for x in selection_metrics]
+        selection_success_rate = float(np.mean([int(x.get("success", 0)) for x in selection_metrics])) if len(selection_metrics) else 0.0
+        selection_border_rate = float(np.mean([1 if r == "border" else 0 for r in selection_term_reasons])) if len(selection_term_reasons) else 0.0
+        selection_obstacle_rate = float(np.mean([1 if r == "obstacle" else 0 for r in selection_term_reasons])) if len(selection_term_reasons) else 0.0
+        selection_mean_abs_tgt = sel_mean("mean_abs_tgt")
+        selection_mean_abs_course_error = sel_mean("mean_abs_course_error")
+
+        selection_score = (
+            5.0 * selection_success_rate
+            - 0.5 * selection_mean_abs_tgt
+            - 0.02 * selection_mean_abs_course_error
+            - 1.0 * selection_border_rate
+            - 0.5 * selection_obstacle_rate
+        )
+
+        summary["mean_abs_tgt"] = mean_of("mean_abs_tgt")
+        summary["mean_abs_course_error"] = mean_of("mean_abs_course_error")
+        summary["selection_score"] = float(selection_score)
+        summary["selection_success_rate"] = float(selection_success_rate)
+        summary["selection_mean_abs_tgt"] = float(selection_mean_abs_tgt)
+        summary["selection_mean_abs_course_error"] = float(selection_mean_abs_course_error)
+
+        current_score = summary["selection_score"]
+
+        if current_score > self.best_score:
+            self.best_score = current_score
+            self.model.save("best_model.zip")
             self.model.save(f"best_model_{self.num_timesteps}.zip")
             if self.verbose:
-                print(f"New BEST model (success_rate={current_success:.2f}) saved!")
-
-        elif current_success == self.best_success_rate and current_reward > self.best_mean_reward:
-            self.best_mean_reward = current_reward
-            self.model.save(f"best_model_{self.num_timesteps}.zip")
-            if self.verbose:
-                print(f"New BEST model (reward tie-break, success_rate={current_success:.2f}) saved!")
+                print(
+                    f"New BEST model saved! "
+                    f"score={current_score:.3f}, "
+                    f"sel_success={summary['selection_success_rate']:.3f}, "
+                    f"sel_tgt={summary['selection_mean_abs_tgt']:.3f}, "
+                    f"sel_course={summary['selection_mean_abs_course_error']:.3f}"
+                )
 
         # TensorBoard logging
         self.logger.record("eval/mean_ep_reward", summary["mean_ep_reward"])
@@ -496,6 +532,12 @@ class EvalMetricsCallback(BaseCallback):
         self.logger.record("eval/mean_cos_chi", summary["mean_cos_chi"])
         self.logger.record("eval/mean_lambda", summary["mean_lambda"])
         self.logger.record("eval/reward_info_rate", summary["reward_info_rate"])
+        self.logger.record("eval/mean_abs_tgt", summary["mean_abs_tgt"])
+        self.logger.record("eval/mean_abs_course_error", summary["mean_abs_course_error"])
+        self.logger.record("eval/selection_score", summary["selection_score"])
+        self.logger.record("eval/selection_success_rate", summary["selection_success_rate"])
+        self.logger.record("eval/selection_mean_abs_tgt", summary["selection_mean_abs_tgt"])
+        self.logger.record("eval/selection_mean_abs_course_error", summary["selection_mean_abs_course_error"])
 
         return True
 
@@ -694,11 +736,22 @@ if __name__ == "__main__":
         eval_env.reset(seed=args.seed + 10_000)
 
         rows = []
-        for ep_i in range(args.n_eval_episodes):
+        previous_test_case = getattr(eval_env, "test_case", None)
+
+        for test_case in EVAL_TEST_CASES:
+            eval_env.test_case = int(test_case)
             m = eval_one_episode(model, eval_env, deterministic=True, max_steps=args.eval_max_steps)
-            print(f"[EVAL] ep#{ep_i} R={m['ep_reward']:.1f} len={m['ep_len']} reason={m['term_reason']} "
-                f"prog/step={m['progress_per_step']:.3f} v_mean={m['mean_speed']:.2f}")
-            rows.append({"episode": ep_i, **m})
+            m["test_case"] = int(test_case)
+            print(
+                f"[EVAL] case#{test_case} "
+                f"R={m['ep_reward']:.1f} len={m['ep_len']} "
+                f"reason={m['term_reason']} prog/step={m['progress_per_step']:.3f} "
+                f"mean_abs_tgt={m['mean_abs_tgt']:.3f} "
+                f"mean_abs_course_error={m['mean_abs_course_error']:.3f}"
+            )
+            rows.append(m)
+
+        eval_env.test_case = previous_test_case
 
         with open("eval_only_metrics.json", "w") as f:
             json.dump(rows, f, indent=2)

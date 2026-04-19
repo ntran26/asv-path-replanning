@@ -23,13 +23,20 @@ TASK_WIDTH = 10
 TASK_HEIGHT = 25
 
 # Reward shaping parameters
-LAMBDA_REWARD = 0.5
-GAMMA_E = 0.05
+LAMBDA_REWARD = 0.9
+GAMMA_E = 0.05      # was 0.05
 GAMMA_THETA = 4.0
 GAMMA_X = 0.005
 EPSILON_X = 1.0
 ALPHA_R = 0.1
 R_COLLISION = -2000.0
+
+# Dynamic reward weighting
+LAMBDA_FAR = 0.85     # when clear: strongly favor path following
+LAMBDA_NEAR = 0.25    # when close to obstacle: favor obstacle avoidance
+LAMBDA_D_SAFE = 4.0   # [m] start shifting to obstacle mode below this
+LAMBDA_D_CRIT = 1.5   # [m] fully in obstacle mode at/under this
+FRONT_ARC_DEG = 45.0  # front sector used for adaptive lambda
 
 # Speed control (rpm)
 RPM_MIN = 0
@@ -399,7 +406,7 @@ class ASVLidarEnv(gym.Env):
         #     return True
         
         # the agent reaches goal
-        if self.distance_to_goal <= VESSEL_LENGTH:
+        if self.distance_to_goal <= VESSEL_LENGTH/2:
             return True
 
         return False
@@ -473,9 +480,7 @@ class ASVLidarEnv(gym.Env):
 
         # Define terminal flags
         collided = bool(self._check_collision_geom())
-        reached_goal = bool(self.distance_to_goal <= VESSEL_LENGTH)
-        
-        lam = LAMBDA_REWARD
+        reached_goal = bool(self.distance_to_goal <= VESSEL_LENGTH/2)
 
         # cross-track error
         ye = abs(self.tgt)
@@ -506,6 +511,7 @@ class ASVLidarEnv(gym.Env):
 
         # Obstacle avoidance reward
         lidar_d = self.lidar.ranges.astype(np.float32)
+        lidar_angles_deg = self.lidar.angles.astype(np.float32)
         theta_rad = np.radians(self.lidar.angles.astype(np.float32))
 
         w = 1.0 / (1.0 + np.abs(GAMMA_THETA * theta_rad))
@@ -516,12 +522,27 @@ class ASVLidarEnv(gym.Env):
         pen = 1.0 / (GAMMA_X * (np.maximum(x, EPSILON_X) ** 2))
         r_oa = -float(np.sum(w * pen) / (np.sum(w) + 1e-6))
 
+        # ---------- dynamic lambda ----------
+        front_mask = np.abs(lidar_angles_deg) <= FRONT_ARC_DEG
+        front_d = lidar_d[front_mask] if np.any(front_mask) else lidar_d
+        d_front = float(np.percentile(front_d, 10)) if front_d.size > 0 else float(LIDAR_RANGE)
+
+        if d_front >= LAMBDA_D_SAFE:
+            danger_alpha = 0.0
+        elif d_front <= LAMBDA_D_CRIT:
+            danger_alpha = 1.0
+        else:
+            danger_alpha = (LAMBDA_D_SAFE - d_front) / (LAMBDA_D_SAFE - LAMBDA_D_CRIT)
+
+        lam = float(LAMBDA_FAR * (1.0 - danger_alpha) + LAMBDA_NEAR * danger_alpha)
+        lam = LAMBDA_REWARD
+
         # living penalty
-        r_exist = -lam * (2.0 * ALPHA_R + 1.0)
+        r_exist = -LAMBDA_REWARD * (2.0 * ALPHA_R + 1.0)
 
         # combined reward
         if collided:
-            reward = float((1.0 - lam) * R_COLLISION)   # = -1000 when lam=0.5 and R_COLLISION=-2000
+            reward = float((1.0 - LAMBDA_REWARD) * R_COLLISION)   # = -1000 when lam=0.5 and R_COLLISION=-2000
         else:
             reward = float(lam * r_pf + (1.0 - lam) * r_oa + r_exist)
 
@@ -549,6 +570,8 @@ class ASVLidarEnv(gym.Env):
             "min_x_used": float(np.min(x)) if len(x) > 0 else float("inf"),
             "mean_w": float(np.mean(w)) if len(w) > 0 else 0.0,
             "mean_pen": float(np.mean(pen)) if len(pen) > 0 else 0.0,
+            "front_clearance_p10": float(d_front),
+            "danger_alpha": float(danger_alpha),
 
             # speed / control diagnostics
             "speed_mps": self.speed_mps,
