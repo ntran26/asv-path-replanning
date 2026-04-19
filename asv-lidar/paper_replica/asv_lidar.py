@@ -1,4 +1,3 @@
-
 import math
 import pygame
 import numpy as np
@@ -59,6 +58,27 @@ class Lidar:
     @property
     def sector_closeness(self) -> np.ndarray:
         return self._sector_closeness.copy()
+
+    @property
+    def sector_angles(self) -> np.ndarray:
+        """Return the center angle of each pooled sector, in degrees."""
+        sector_width = float(LIDAR_SWATH) / float(LIDAR_SECTORS)
+        return np.linspace(
+            -LIDAR_SWATH / 2.0 + sector_width / 2.0,
+            LIDAR_SWATH / 2.0 - sector_width / 2.0,
+            LIDAR_SECTORS,
+            dtype=np.float32,
+        )
+
+    @property
+    def sector_edges(self) -> np.ndarray:
+        """Return sector boundary angles, in degrees."""
+        return np.linspace(
+            -LIDAR_SWATH / 2.0,
+            LIDAR_SWATH / 2.0,
+            LIDAR_SECTORS + 1,
+            dtype=np.float32,
+        )
 
     @staticmethod
     def _cross(a, b) -> float:
@@ -175,15 +195,94 @@ class Lidar:
         self._pool_sectors()
         return self._ranges.copy()
 
+    @staticmethod
+    def _sector_color(closeness: float, *, alpha: int = 120) -> tuple[int, int, int, int]:
+        """Color map for the pooled observation value seen by the policy.
+
+        closeness = 0 means clear/max range; closeness = 1 means very close.
+        The returned color moves from blue/green to yellow/red as danger grows.
+        """
+        c = float(np.clip(closeness, 0.0, 1.0))
+        if c < 0.5:
+            # Clear -> caution: blue/green to yellow.
+            t = c / 0.5
+            r = int(40 + 190 * t)
+            g = int(180 + 40 * t)
+            b = int(220 * (1.0 - t))
+        else:
+            # Caution -> close obstacle: yellow to red.
+            t = (c - 0.5) / 0.5
+            r = int(230 + 25 * t)
+            g = int(220 * (1.0 - t))
+            b = 0
+        return (r, g, b, int(alpha))
+
+    def _beam_endpoint(self, angle_deg: float, range_m: float) -> tuple[float, float]:
+        absolute_angle = math.radians(self._hdg + float(angle_deg))
+        r = float(np.clip(range_m, 0.0, LIDAR_RANGE))
+        return (
+            self._pos_x + r * math.sin(absolute_angle),
+            self._pos_y + r * math.cos(absolute_angle),
+        )
+
     def render(self, surface, world_to_screen) -> None:
-        """Render raw beams for debugging."""
+        """Render raw beams plus the 25 pooled sector observations.
+
+        Visual layers:
+        1. Thin raw LiDAR beams: the full range scan before pooling.
+        2. Semi-transparent sector wedges: the 25 pooled observations seen by the policy.
+        3. Thick sector center rays + endpoint markers: pooled range/closeness per sector.
+
+        The sector color encodes `sector_closeness`:
+            blue/green = mostly clear, yellow = caution, red = close obstacle.
+        """
         origin = world_to_screen((self._pos_x, self._pos_y))
-        # Draw every 2nd beam to keep the render readable.
+
+        # 1) Raw full-resolution beams. Keep all beams visible, but dim them so
+        # the pooled observation layer remains readable.
         for idx, angle in enumerate(self._angles):
-            if idx % 2 != 0:
-                continue
-            absolute_angle = math.radians(self._hdg + float(angle))
-            x = self._pos_x + float(self._ranges[idx]) * math.sin(absolute_angle)
-            y = self._pos_y + float(self._ranges[idx]) * math.cos(absolute_angle)
-            end = world_to_screen((x, y))
-            pygame.draw.line(surface, (90, 90, 200), origin, end, 1)
+            raw_range = float(self._ranges[idx])
+            end = world_to_screen(self._beam_endpoint(float(angle), raw_range))
+            if raw_range >= LIDAR_RANGE * 0.995:
+                color = (55, 60, 85)
+            else:
+                color = (95, 115, 210)
+            pygame.draw.line(surface, color, origin, end, 1)
+
+        # 2) Pooled sector wedges. These show the compressed 25-sector view.
+        overlay = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
+        sector_edges = self.sector_edges
+        sector_centers = self.sector_angles
+
+        for i in range(LIDAR_SECTORS):
+            pooled_range = float(self._sector_ranges[i])
+            closeness = float(self._sector_closeness[i])
+
+            # Use the pooled sector range because this is the compressed
+            # distance represented by the observation feature.
+            left_px = world_to_screen(self._beam_endpoint(float(sector_edges[i]), pooled_range))
+            right_px = world_to_screen(self._beam_endpoint(float(sector_edges[i + 1]), pooled_range))
+
+            fill_alpha = int(18 + 95 * closeness)
+            fill_color = self._sector_color(closeness, alpha=fill_alpha)
+            pygame.draw.polygon(overlay, fill_color, [origin, left_px, right_px])
+
+        surface.blit(overlay, (0, 0))
+
+        # 3) Sector boundaries and pooled center rays. The center ray is the
+        # easiest way to read what one observation-sector contributes.
+        for edge_angle in sector_edges:
+            edge_end = world_to_screen(self._beam_endpoint(float(edge_angle), LIDAR_RANGE))
+            pygame.draw.line(surface, (80, 80, 90), origin, edge_end, 1)
+
+        for i, angle in enumerate(sector_centers):
+            pooled_range = float(self._sector_ranges[i])
+            closeness = float(self._sector_closeness[i])
+            color = self._sector_color(closeness, alpha=255)[:3]
+
+            center_end = world_to_screen(self._beam_endpoint(float(angle), pooled_range))
+            pygame.draw.line(surface, color, origin, center_end, 3)
+            pygame.draw.circle(surface, color, center_end, 3)
+
+        pygame.draw.circle(surface, (245, 245, 245), origin, 3)
+        pygame.draw.circle(surface, (20, 20, 20), origin, 3, 1)

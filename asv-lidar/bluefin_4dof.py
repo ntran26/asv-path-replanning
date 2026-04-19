@@ -1,5 +1,23 @@
 """Numerically guarded Python port of ``Bluefin4DOFModel02.m``.
 
+Final calibrated constants
+--------------------------
+This file stores the current best shared faithful-4DOF calibration from the
+latest motion and turn sweeps:
+    RPM_COMMAND_SCALE = 85.0
+    PROPELLER_THRUST_SCALE = 1.7
+    RUDDER_FORCE_SCALE = 0.6
+    RUDDER_X_DRAG_SCALE = 0.6
+    ROLL_DAMP_SCALE = 1.0
+    ROLL_RESTORE_SCALE = 1.4
+
+The validation commands that produced the current benchmark comparisons were:
+    straight_rpm = 15.0
+    turn_rpm = 18.0
+    turn_rudder_deg = 25.0
+These are test inputs, not model constants.
+
+
 This adapter keeps the current repo interface:
 
     model = ShipModel()
@@ -33,30 +51,30 @@ LIDAR_OFFSET_M = VESSEL_LENGTH / 2.0
 
 MASS = 64.55
 MAX_RUD_ANGLE = 40.0
-MAX_RUD_RATE_DPS = 15.0
+MAX_RUD_RATE_DPS = 20.0  # MATLAB Bluefin4DOFModel02 value
 
 # Bridge between the simplified repo command and the MATLAB input units.
-RPM_COMMAND_SCALE = 90.0
-THRUSTER_COMMAND_SCALE = 60.0
+RPM_COMMAND_SCALE = 85.0  # best shared 4DOF calibration: repo rpm -> MATLAB command rpm
+THRUSTER_COMMAND_SCALE = 85.0
 
 # Practical operating point from the current tuned benchmark.
 RECOMMENDED_COMMAND_RPM_MAX = 18.0
 RECOMMENDED_PROP_RPM_MAX = RPM_COMMAND_SCALE * RECOMMENDED_COMMAND_RPM_MAX
-RECOMMENDED_PEAK_SPEED_MPS = 2.03
+RECOMMENDED_PEAK_SPEED_MPS = 2.30  # real speed-test target envelope
 
 # Focused calibration knobs around the fixed MATLAB coefficients.
 # These defaults are taken from the current fine-tuned region found
 # against the project straight-line and turning benchmarks.
-PROPELLER_THRUST_SCALE = 2.2
-PROPELLER_ADVANCE_SCALE = 1.0
-RUDDER_FORCE_SCALE = 0.10
-RUDDER_YAW_SCALE = 1.7
+PROPELLER_THRUST_SCALE = 1.7  # best shared 4DOF calibration
+PROPELLER_ADVANCE_SCALE = 1.0  # neutral: not part of faithful-port refined sweep
+RUDDER_FORCE_SCALE = 0.6  # best shared 4DOF calibration
+RUDDER_YAW_SCALE = 1.0  # neutral for faithful-port calibration
 RUDDER_INFLOW_SCALE = 1.0
-RUDDER_X_DRAG_SCALE = 0.01
-LINEAR_SURGE_DAMP = 1.5
-LINEAR_YAW_DAMP = 0.0
-ROLL_DAMP_SCALE = 4.0
-ROLL_RESTORE_SCALE = 1.2
+RUDDER_X_DRAG_SCALE = 0.6  # mirrors rudder-force scaling for axial rudder term
+LINEAR_SURGE_DAMP = 0.0  # neutral for faithful-port calibration
+LINEAR_YAW_DAMP = 0.0  # neutral for faithful-port calibration
+ROLL_DAMP_SCALE = 1.0
+ROLL_RESTORE_SCALE = 1.4  # best shared 4DOF calibration
 BOW_THRUSTER_SCALE = 1.0
 
 MIN_FLOW_SPEED = 0.05
@@ -101,7 +119,8 @@ class ShipModel:
             "roll_deg": float(math.degrees(self._phi)),
             "heading_rad": float(self._psi),
             "heading_deg": float(math.degrees(self._psi) % 360.0),
-            "rudder_deg": float(math.degrees(self._delta)),
+            # Public convention: negative rudder = port, positive = starboard.
+            "rudder_deg": float(-math.degrees(self._delta)),
             "prop_rps": float(self._n1),
             "thruster_rps": float(self._n2),
             "x_m": float(self._x),
@@ -123,7 +142,8 @@ class ShipModel:
         x_prev = self._x
         y_prev = self._y
 
-        delta_cmd = float(np.clip(rud, -100.0, 100.0)) / 100.0 * math.radians(MAX_RUD_ANGLE)
+        # Internal MATLAB-style sign is opposite to the repo/user-facing one.
+        delta_cmd = float(-np.clip(rud, -100.0, 100.0)) / 100.0 * math.radians(MAX_RUD_ANGLE)
         n1_cmd_rpm = max(float(rpm), 0.0) * RPM_COMMAND_SCALE
         n2_cmd_rpm = float(thruster_rpm) * THRUSTER_COMMAND_SCALE
 

@@ -47,6 +47,8 @@ GAMMA_THETA = 4.0
 ALPHA_R = 0.1
 R_COLLISION = -1000.0
 R_EXIST = -0.6
+GAMMA_X = 0.005
+EPSILON_X = 1.0
 
 # Lambda conditioning (paper-style, one lambda per episode)
 LAMBDA_MIN = 1e-4
@@ -76,7 +78,7 @@ class ASVLidarEnv(gym.Env):
         lookahead_fraction: float = LOOKAHEAD_FRACTION,
         lambda_override: Optional[float] = None,
         test_case: Optional[int] = TEST_CASE,
-        record_video: bool = False,
+        record_video: bool = True,
     ) -> None:
         super().__init__()
         self.map_width = float(map_width)
@@ -541,10 +543,27 @@ class ASVLidarEnv(gym.Env):
         cos_chi = float(np.cos(np.radians(self.course_error)))
         r_pf = float(-1.0 + (U_norm * cos_chi + 1.0) * (math.exp(-GAMMA_E * ye) + 1.0))
 
-        sector_closeness = self.lidar.sector_closeness.astype(np.float32)
-        sector_angles_deg = np.linspace(-LIDAR_SWATH / 2.0, LIDAR_SWATH / 2.0, LIDAR_SECTORS, dtype=np.float32)
-        sector_weights = 1.0 / (1.0 + np.abs(GAMMA_THETA * np.radians(sector_angles_deg)))
-        r_oa = -float(np.sum(sector_weights * sector_closeness) / (np.sum(sector_weights) + 1e-6))
+        # sector_closeness = self.lidar.sector_closeness.astype(np.float32)
+        # sector_angles_deg = np.linspace(-LIDAR_SWATH / 2.0, LIDAR_SWATH / 2.0, LIDAR_SECTORS, dtype=np.float32)
+        # sector_weights = 1.0 / (1.0 + np.abs(GAMMA_THETA * np.radians(sector_angles_deg)))
+        # r_oa = -float(np.sum(sector_weights * sector_closeness) / (np.sum(sector_weights) + 1e-6))
+        
+        sector_d = self.lidar.sector_ranges.astype(np.float32)
+
+        sector_angles_deg = np.linspace(
+            -LIDAR_SWATH / 2.0,
+            LIDAR_SWATH / 2.0,
+            LIDAR_SECTORS,
+            dtype=np.float32,
+        )
+
+        theta_rad = np.radians(sector_angles_deg)
+        w = 1.0 / (1.0 + np.abs(GAMMA_THETA * theta_rad))
+
+        x = np.maximum(sector_d, EPSILON_X)
+        pen = 1.0 / (GAMMA_X * (x ** 2))
+
+        r_oa = -float(np.sum(w * pen) / (np.sum(w) + 1e-6))
 
         if collided:
             reward = float(R_COLLISION)
@@ -570,7 +589,10 @@ class ASVLidarEnv(gym.Env):
             "lookahead_course_error": float(self.lookahead_course_error),
             "cross_track_error": float(self.cross_track_error),
             "min_lidar": float(np.min(self.lidar.ranges)) if len(self.lidar.ranges) > 0 else float("inf"),
-            "mean_sector_closeness": float(np.mean(sector_closeness)) if len(sector_closeness) > 0 else 0.0,
+            "min_sector_range": float(np.min(sector_d)),
+            "p10_sector_range": float(np.percentile(sector_d, 10)),
+            "mean_sector_pen": float(np.mean(pen)),
+            # "mean_sector_closeness": float(np.mean(sector_closeness)) if len(sector_closeness) > 0 else 0.0,
             "rpm": float(rpm),
             "rudder_deg": float(rudder_cmd * 40.0),
             "distance_to_goal": float(self.distance_to_goal),
