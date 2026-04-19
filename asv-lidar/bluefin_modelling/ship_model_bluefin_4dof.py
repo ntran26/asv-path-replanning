@@ -104,7 +104,6 @@ class ShipModel:
         self._n1 = 0.0
         self._n2 = 0.0
 
-        # Compatibility fields expected elsewhere in the repo.
         self._v_sway = 0.0
         self._w = 0.0
         self._h = 0.0
@@ -160,6 +159,7 @@ class ShipModel:
         s1[6] = float(np.clip(s1[6], -MAX_ROLL_ANGLE_RAD, MAX_ROLL_ANGLE_RAD))
         s1[8] = float(np.clip(s1[8], -math.radians(MAX_RUD_ANGLE), math.radians(MAX_RUD_ANGLE)))
         self._set_state_vector(s1)
+        
         dx = self._x - x_prev
         dy = self._y - y_prev
         heading_deg = math.degrees(self._psi) % 360.0

@@ -12,13 +12,13 @@ It is written to support the journal/thesis documentation and to make the modell
 2. the more complete `Bluefin4DOFModel02.m` model and how it leads to `bluefin_4dof_final.py`;
 3. the page locations in Fossen's *Marine Control Systems* where the theory can be checked.
 
-The final Python file prepared with the latest refined faithful-4DOF configuration is:
+The final Python file prepared with the latest refined 4-DOF configuration is:
 
 ```text
-bluefin_4dof_final.py
+ship_model_bluefin_4dof.py
 ```
 
-## 1. Key references in *Marine Control Systems*
+## 1. Key references in *Marine Control Systems: Guidance, Navigation, and Control of Ships, Rigs and Underwater Vehicles*
 
 The exact Bluefin coefficients are not in Fossen's book. They come from the MATLAB files. Fossen's book provides the general marine-craft modelling framework used to interpret and structure those coefficients.
 
@@ -45,12 +45,12 @@ $$
 
 For the Bluefin work, the terms are interpreted as follows:
 
-- $M\dot{\nu}$: rigid-body and added-mass inertia;
-- $C(\nu)\nu$: centripetal/Coriolis-like velocity coupling;
-- $D(\nu)\nu$: hydrodynamic damping and manoeuvring derivatives;
-- $g(\eta)$: restoring effects, especially important for roll in 4DOF;
-- $\tau$: propeller, rudder, and thruster forces/moments;
-- $w$: disturbances such as wind, waves, and current, not included in the current calm-water calibration.
+- $M\dot{\nu}$: rigid-body and added-mass inertia
+- $C(\nu)\nu$: centripetal/Coriolis-like velocity coupling
+- $D(\nu)\nu$: hydrodynamic damping and manoeuvring derivatives
+- $g(\eta)$: restoring effects, especially important for roll in 4DOF
+- $\tau$: propeller, rudder, and thruster forces/moments
+- $w$: disturbances such as wind, waves, and current, not included in the current calm-water calibration
 
 The Bluefin MATLAB scripts do not necessarily write the equations in matrix form. Instead, they expand the model into component equations for $X$, $Y$, $K$, and $N$, where:
 
@@ -73,7 +73,7 @@ $$
 \nu = [u,\ v,\ r]^T,\qquad \eta = [x,\ y,\ \psi]^T
 $$
 
-Fossen explains this model class under "3 DOF Horizontal Model", where he states that horizontal ship motion is usually described by surge, sway, and yaw.
+Fossen explains this model class under "3-DOF Horizontal Model", where he states that horizontal ship motion is usually described by surge, sway, and yaw.
 
 ### 3.2 Inertia and added mass
 
@@ -141,9 +141,9 @@ This matches Fossen's actuator explanation: an aft rudder produces a lateral for
 
 This is why the Python path first used a simplified 3DOF-inspired model (`ship_model_bluefin_v2.py`) and then moved to a 4DOF candidate.
 
-## 4. `ship_model_bluefin_v2.py`: how it was constructed from the 3DOF theory
+## 4. `ship_model_bluefin_v2.py`: how it was constructed from the 3-DOF theory
 
-`ship_model_bluefin_v2.py` is not a literal copy of `Blue02.m`. It is a **control-oriented 3DOF model** inspired by Bluefin constants and by the 3DOF theory.
+`ship_model_bluefin_v2.py` is not a literal copy of `Blue02.m`. It is a **control-oriented 3-DOF model** inspired by Bluefin constants and by the 3-DOF theory.
 
 ### 4.1 State and public interface
 
@@ -155,9 +155,49 @@ $$
 
 In the code, this is implemented by:
 
-- `reset()` and stored fields: lines 118-125;
-- `state_dict()`: lines 127-139;
-- `_state_vector()` and `_set_state_vector()`: lines 166-179.
+- `reset()` and stored fields
+```python
+def reset(self) -> None:
+    self._v = 0.0
+    self._v_sway = 0.0
+    self._w = 0.0
+    self._h = 0.0
+    self._delta = 0.0
+    self._x = 0.0
+    self._y = 0.0
+```
+- `state_dict()`
+```python
+def state_dict(self) -> Dict[str, float]:
+    return {
+        "u_body_mps": float(self._v),
+        "v_body_mps": float(self._v_sway),
+        "yaw_rate_radps": float(self._w),
+        "yaw_rate_degps": float(math.degrees(self._w)),
+        "heading_rad": float(self._h),
+        "heading_deg": float(math.degrees(self._h) % 360.0),
+        "rudder_deg": float(math.degrees(self._delta)),
+        "x_m": float(self._x),
+        "y_m": float(self._y),
+        "speed_mps": float(math.hypot(self._v, self._v_sway)),
+    }
+```
+- `_state_vector()` and `_set_state_vector()`
+```python
+def _state_vector(self) -> np.ndarray:
+    return np.array([
+        self._v, self._v_sway, self._w, self._h, self._delta, self._x, self._y
+    ], dtype=float)
+
+def _set_state_vector(self, s: np.ndarray) -> None:
+    self._v = float(s[0])
+    self._v_sway = float(s[1])
+    self._w = float(s[2])
+    self._h = float(s[3])
+    self._delta = float(s[4])
+    self._x = float(s[5])
+    self._y = float(s[6])
+```
 
 The public interface is:
 
@@ -165,38 +205,80 @@ The public interface is:
 dx, dy, heading_deg, yaw_rate_degps = model.update(rpm, rud, dt)
 ```
 
-This is implemented at lines 141-164. It keeps the same input/output format as the older Gym environment while hiding the internal dynamics.
+It keeps the same input/output format as the older Gym environment while hiding the internal dynamics.
 
 ### 4.2 RK4 integration
 
-The model uses Runge-Kutta integration at lines 148-152:
+The model uses Runge-Kutta integration:
 
 $$
 x_{k+1}=x_k+\frac{\Delta t}{6}(k_1+2k_2+2k_3+k_4)
 $$
 
+```python
+k1 = self._derivatives(s0, rpm, rud, thruster_rpm)
+k2 = self._derivatives(s0 + 0.5 * dt * k1, rpm, rud, thruster_rpm)
+k3 = self._derivatives(s0 + 0.5 * dt * k2, rpm, rud, thruster_rpm)
+k4 = self._derivatives(s0 + dt * k3, rpm, rud, thruster_rpm)
+s1 = s0 + (dt / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
+```
+
 This is a numerical improvement over a simple Euler step. It was used because the nonlinear rudder and thrust equations can be stiff enough that Euler integration gives unstable or inaccurate results at the 10 Hz simulation rate.
 
 ### 4.3 Speed-shaped propeller law
 
-In v2, the propeller force is implemented at lines 196-208 as:
+In v2, the propeller force is implemented as:
 
 $$
 X_P = (1-t_P)K_T n|n|
 \frac{1+k_b e^{-u/U_b}}{1+k_d u^2}
 $$
 
+```python
+def _propeller_force(self, rpm: float, u_eff: float) -> float:
+    n = max(rpm, 0.0)
+    static_term = THRUST_COEF * n * abs(n)
+    low_speed_boost = 1.0 + THRUST_LOW_SPEED_BOOST * math.exp(-u_eff / max(THRUST_BOOST_U0, 1e-6))
+    high_speed_decay = 1.0 / (1.0 + THRUST_HIGH_SPEED_DECAY * u_eff * u_eff)
+    return (1.0 - TP) * static_term * low_speed_boost * high_speed_decay
+```
+
 This was added because a simple constant $rpm^2$ thrust law could not match both early acceleration and the final speed envelope. The idea is consistent with Fossen's forward-speed equation, where surge dynamics include both control force and linear/quadratic resistance. 
 
 ### 4.4 Hull damping and manoeuvring derivatives
 
-The v2 model computes hull surge damping at lines 221-228 and sway/yaw damping at lines 230-240. These terms are the Python equivalent of the MATLAB hull-polynomial terms, but simplified and tuned.
+The v2 model computes hull surge damping and sway/yaw damping. 
+
+```python
+# Hull surge force
+cf = self._safe_log_cf()
+x_visc = -DRAG_COEF * 0.5 * rho * SW * cf * u_eff * abs(u_eff)
+x_cross = -DRAG_COEF * 0.5 * rho * L * DRAFT * U * U * (
+    XVV * (math.sin(beta) ** 2) + XVR * abs(math.sin(beta)) * abs(r_nd) + XRR * (r_nd ** 2)
+)
+x_lin = -LINEAR_SURGE_DAMP * u_eff
+x_hull = x_visc + x_cross + x_lin
+
+# Hull sway / yaw damping
+y_hull = -TURN_COEF * (
+    0.5 * rho * L * DRAFT * U * U * (
+        YV * beta + YVV * abs(beta) * beta + YR * r_nd + YRR * abs(r_nd) * r_nd + YVR * beta * abs(r_nd)
+    ) + LINEAR_SWAY_DAMP * v
+)
+n_hull = -TURN_COEF * (
+    0.5 * rho * (L ** 2) * DRAFT * U * U * (
+        NV * beta + NVV * abs(beta) * beta + NR * r_nd + NRR * abs(r_nd) * r_nd + NVR * abs(beta) * r_nd
+    ) + LINEAR_YAW_DAMP * r
+)
+```
+
+These terms are the Python equivalent of the MATLAB hull-polynomial terms, but simplified and tuned.
 
 The form follows the idea that hull resistance and manoeuvring forces are velocity-dependent, as discussed in Fossen's hydrodynamic damping section.
 
 ### 4.5 Rudder split: axial loss, sway force, yaw moment
 
-The v2 rudder block is implemented at lines 249-265:
+The v2 rudder block implemented:
 
 - rudder inflow $u_R,v_R$
 - angle of attack $\alpha_R$
@@ -204,6 +286,26 @@ The v2 rudder block is implemented at lines 249-265:
 - axial drag $X_R$
 - sway force $Y_R$
 - yaw moment $N_R$
+
+```python
+# Rudder inflow and normal force
+n_prop = max(rpm, 0.0) / 60.0
+u_r = max(MIN_FLOW_SPEED, (1.0 - WR) * u_eff + 0.6 * KX * n_prop)
+v_r = v + L_R * r
+alpha_r = delta - math.atan2(v_r, u_r)
+
+f_n = RUDDER_FORCE_SCALE * 0.5 * rho * AR * FALP * (u_r * u_r + v_r * v_r) * math.sin(alpha_r)
+
+# Split rudder effect into axial loss, sway, and yaw separately.
+x_rud = -RUDDER_X_DRAG_SCALE * abs(f_n) * abs(math.sin(delta))
+y_rud = -(1.0 + AH) * f_n * math.cos(delta)
+rudder_arm = abs(X_RUDDER + AH * X_HULL)
+n_rud = -RUDDER_YAW_SCALE * rudder_arm * f_n * math.cos(delta)
+
+x_total = x_hull + x_prop + x_rud
+y_total = y_hull + y_rud
+n_total = n_hull + n_rud + n_thr_moment
+```
 
 The key v2 modelling decision was to separate:
 
@@ -347,7 +449,7 @@ The force is then resolved into surge, sway, roll, and yaw contributions. This i
 
 The MATLAB file adds a bow-thruster force $F_{BT}$, contributing to sway, roll, and yaw through its moment arms. This is consistent with Fossen's description of tunnel thrusters as transverse actuators producing $F_y$ for low-speed manoeuvring and dynamic positioning.
 
-## 6. `bluefin_4dof_final.py`: how the Python file maps to the 4DOF theory
+## 6. `bluefin_4dof_final.py`: how the Python file maps to the 4-DOF theory
 
 The final Python file keeps the same public interface as the v2 model:
 
@@ -386,10 +488,84 @@ $$
 
 In the Python file this is implemented in:
 
-- `reset()`: lines 76-110
-- `state_dict()`: lines 112-128
-- `_state_vector()`: lines 169-185
-- `_set_state_vector()`: lines 187-202
+- `reset()`
+```python
+def reset(self) -> None:
+    self._u = 0.0
+    self._v = 0.0
+    self._p = 0.0
+    self._r = 0.0
+    self._x = 0.0
+    self._y = 0.0
+    self._phi = 0.0
+    self._psi = 0.0
+    self._delta = 0.0
+    self._n1 = 0.0
+    self._n2 = 0.0
+
+    self._v_sway = 0.0
+    self._w = 0.0
+    self._h = 0.0
+```
+- `state_dict()`
+```python
+def state_dict(self) -> Dict[str, float]:
+    return {
+        "u_body_mps": float(self._u),
+        "v_body_mps": float(self._v),
+        "roll_rate_radps": float(self._p),
+        "yaw_rate_radps": float(self._r),
+        "yaw_rate_degps": float(math.degrees(self._r)),
+        "roll_deg": float(math.degrees(self._phi)),
+        "heading_rad": float(self._psi),
+        "heading_deg": float(math.degrees(self._psi) % 360.0),
+        # Public convention: negative rudder = port, positive = starboard.
+        "rudder_deg": float(-math.degrees(self._delta)),
+        "prop_rps": float(self._n1),
+        "thruster_rps": float(self._n2),
+        "x_m": float(self._x),
+        "y_m": float(self._y),
+    }
+```
+- `_state_vector()`
+```python
+def _state_vector(self) -> np.ndarray:
+    return np.array(
+        [
+            self._u,
+            self._v,
+            self._p,
+            self._r,
+            self._x,
+            self._y,
+            self._phi,
+            self._psi,
+            self._delta,
+            self._n1,
+            self._n2,
+        ],
+        dtype=float,
+    )
+```
+- `_set_state_vector()`
+```python
+def _set_state_vector(self, s: np.ndarray) -> None:
+    self._u = float(s[0])
+    self._v = float(s[1])
+    self._p = float(s[2])
+    self._r = float(s[3])
+    self._x = float(s[4])
+    self._y = float(s[5])
+    self._phi = float(s[6])
+    self._psi = float(s[7])
+    self._delta = float(s[8])
+    self._n1 = float(s[9])
+    self._n2 = float(s[10])
+
+    self._v_sway = self._v
+    self._w = self._r
+    self._h = self._psi
+```
 
 The compatibility fields `_v_sway`, `_w`, and `_h` make the 4DOF model compatible with scripts written for older models.
 
@@ -397,55 +573,381 @@ The compatibility fields `_v_sway`, `_w`, and `_h` make the 4DOF model compatibl
 
 The Python `update()` method maps the public control command into MATLAB-style internal inputs:
 
-- line 146: rudder percentage becomes internal rudder angle;
-- line 147: repo-facing rpm becomes MATLAB command rpm;
-- line 148: optional bow-thruster command becomes MATLAB command rpm.
-
-The sign bridge is explicit:
+- Rudder percentage becomes internal rudder angle;
+- Repo-facing rpm becomes MATLAB command rpm;
+- Optional bow-thruster command becomes MATLAB command rpm.
 
 ```python
-delta_cmd = -rud / 100 * MAX_RUD_ANGLE
+delta_cmd = float(-np.clip(rud, -100.0, 100.0)) / 100.0 * math.radians(MAX_RUD_ANGLE)
+n1_cmd_rpm = max(float(rpm), 0.0) * RPM_COMMAND_SCALE
+n2_cmd_rpm = float(thruster_rpm) * THRUSTER_COMMAND_SCALE
 ```
 
 This means the public repo convention can stay consistent even if the MATLAB internal sign is opposite. This is important because Fossen notes that rudder sign convention is model-defined; what matters is consistency between rudder and yaw rate.
 
 ### 6.4 RK4 integration and guards
 
-The Python code uses RK4 at lines 150-154. It clips extreme states at lines 156-162. These protections are not part of the theory; they are practical numerical safeguards to make the model usable from rest and in repeated RL/sweep simulations.
+The Python code uses RK4.
+
+```python
+k1 = self._derivatives(s0, delta_cmd, n1_cmd_rpm, n2_cmd_rpm)
+k2 = self._derivatives(s0 + 0.5 * dt * k1, delta_cmd, n1_cmd_rpm, n2_cmd_rpm)
+k3 = self._derivatives(s0 + 0.5 * dt * k2, delta_cmd, n1_cmd_rpm, n2_cmd_rpm)
+k4 = self._derivatives(s0 + dt * k3, delta_cmd, n1_cmd_rpm, n2_cmd_rpm)
+s1 = s0 + (dt / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
+```
+
+It also clips extreme states.
+
+```python
+s1[0] = float(np.clip(s1[0], -1.0, MAX_SURGE_SPEED))
+s1[1] = float(np.clip(s1[1], -MAX_SWAY_SPEED, MAX_SWAY_SPEED))
+s1[2] = float(np.clip(s1[2], -MAX_ROLL_RATE_RAD, MAX_ROLL_RATE_RAD))
+s1[3] = float(np.clip(s1[3], -MAX_YAW_RATE_RAD, MAX_YAW_RATE_RAD))
+s1[6] = float(np.clip(s1[6], -MAX_ROLL_ANGLE_RAD, MAX_ROLL_ANGLE_RAD))
+s1[8] = float(np.clip(s1[8], -math.radians(MAX_RUD_ANGLE), math.radians(MAX_RUD_ANGLE)))
+self._set_state_vector(s1)
+```
+
+These protections are not part of the theory; they are practical numerical safeguards to make the model usable from rest and in repeated RL/sweep simulations.
 
 ### 6.5 Derivative function
 
-The physics is implemented in `_derivatives()` from line 204 onward.
+The physics is implemented in `_derivatives()`. The block structure is:
 
-The block structure is:
+**Unpack state**
+```python
+u, v, p, r, xpos, ypos, phi, psi, delta, n1, n2 = [float(z) for z in s]
+```
+$$ x=[u,v,p,r,x,y,\phi,\psi,\delta,n_1,n_2]^T $$
 
-| Python block | Lines | Theory / MATLAB source |
-|---|---:|---|
-| Unpack state | 211 | $x=[u,v,p,r,x,y,\phi,\psi,\delta,n_1,n_2]^T$ |
-| Speed and drift angle | 213-215 | $U=\sqrt{u^2+v^2}$, $\beta=-\arcsin(v/U)$ |
-| Rudder actuator | 217-223 | $\dot{\delta}=\mathrm{sat}(\delta_c-\delta)$ |
-| Shaft dynamics | 225-228 | $\dot{n}_1,\dot{n}_2$ saturation |
-| Physical constants | 230-259 | Bluefin4DOFModel02 coefficients |
-| Hull coefficients | 261-306 | MATLAB polynomial hull derivatives |
-| Inertia terms | 308-321 | $m_{11}=m+m_x$, $m_{22}=m+m_y$, $m_{33}=I_x+J_x$, $m_{44}=I_z+J_z$ |
-| Propeller model | 327-354 | advance-ratio $J$, thrust coefficient $K_T$, propeller surge force |
-| Rudder model | 356-364 | rudder inflow, $\alpha_R$, $F_N$, $X_R,Y_R,K_R,N_R$ |
-| Hull forces/moments | 366-408 | $X_{dH},Y_{dH},K_{dH},N_{dH}$ |
-| Roll restoring/damping | 411-416, 445-451 | $C_{44}=g\,m\,GM$, roll damping/restoring moments |
-| Bow thruster | 418-430 | $Y_B,K_B,N_B$ |
-| Total forces/moments | 432-435 | $X,Y,K,N$ sums |
-| Accelerations | 441-453 | $\dot{u},\dot{v},\dot{p},\dot{r}$ |
-| Kinematics | 454-457 | earth-fixed $\dot{x},\dot{y},\dot{\phi},\dot{\psi}$ |
-| Return derivative vector | 459 onward | full state derivative |
+**Speed and drift angle**
+```python
+l_ship = 1.725
+u_mag = max(math.hypot(u, v), MIN_FLOW_SPEED)
+drift = -math.asin(float(np.clip(v / u_mag, -1.0, 1.0)))
+```
+$$ U=\sqrt{u^2+v^2},\qquad \beta=-\arcsin(v/U) $$
 
-### 6.6 Why the 4DOF model is useful even if v2 remains competitive
+**Rudder actuator**
+```python
+delta_dot = float(
+    np.clip(
+        delta_cmd - delta,
+        -math.radians(MAX_RUD_RATE_DPS),
+        math.radians(MAX_RUD_RATE_DPS),
+    )
+)
+```
+$$ \dot{\delta}=\mathrm{sat}(\delta_c-\delta) $$
+
+**Shaft dynamics**
+```python
+n1_target = n1_cmd_rpm / 60.0
+n2_target = n2_cmd_rpm / 60.0
+n1_dot = float(np.clip(n1_target - n1, -MAX_SHAFT_RATE_RPSPS, MAX_SHAFT_RATE_RPSPS))
+n2_dot = float(np.clip(n2_target - n2, -MAX_SHAFT_RATE_RPSPS, MAX_SHAFT_RATE_RPSPS))
+```
+$$ \dot{n}_1,\qquad\dot{n}_2 $$
+
+**Physical constants**
+```python
+# Parameters from the MATLAB file.
+beam = 0.5
+draft = 0.193
+disp = 0.06455
+x_g = -0.1
+d_prop = 0.1
+lambda_r = 1.4697
+eta = 0.879
+area_r = 0.0091
+area_r_over_ld = area_r / (l_ship * draft)
+x_r = -1.05309
+gm = 1.87
+z_g = 0.005
+z_r = -0.01
+z_h = 0.02
+cf = 1.0
+
+onet = 0.859 * cf
+onew = 0.806 * cf
+onet_r = 0.857 * cf
+one_a_h = 1.403 * cf
+a_h = one_a_h - 1.0
+x_h = -0.646 * cf
+g_r0 = 0.394 * cf
+c_g = -0.53 * cf
+g_r = g_r0 * (1.0 + c_g * abs(phi)) * cf
+ld_r = -0.795 * cf
+epsi = 0.740 * cf
+kappa = 0.810 * cf
+eta_r = 0.140 * cf
+```
+
+**Hull coefficients**
+```python
+xd0 = -0.0212 * cf
+cx0 = -0.02 * cf
+xdrph = 0.0092 * cf
+xdbb = -0.0348 * cf
+cxbb = 2.10 * cf
+xdbrmdy = -0.0957 * cf
+xdrr = -0.0070 * cf
+cxrr = 3.74 * cf
+xdbbbb = -0.0018 * cf
+
+ydph = 0.0053 * cf
+ydb = 0.2501 * cf
+cyb = -0.14 * cf
+ydrmdx = 0.0346 * cf
+cyr = -0.61 * cf
+ydbbph = -0.2979 * cf
+ydbrph = 0.6308 * cf
+ydrrph = -0.0854 * cf
+ydbbb = 2.6087 * cf
+ydbbr = -1.7091 * cf
+ydbrr = 1.1682 * cf
+ydrrr = -0.0461 * cf
+
+kdph = -0.0185 * cf
+kdb = -0.2586 * cf
+kdr = 0.0532 * cf
+kdbbph = 0.2229 * cf
+kdbrph = 0.5374 * cf
+kdrrph = -0.0928 * cf
+kdbbb = -0.7293 * cf
+kdbbr = 1.1474 * cf
+kdbrr = -0.3351 * cf
+kdrrr = -0.0132 * cf
+
+ndph = -0.0086 * cf
+ndb = 0.0966 * cf
+cnb = 0.22 * cf
+ndr = -0.0513 * cf
+cnr = -0.62 * cf
+ndbbph = -0.2510 * cf
+ndbrph = 0.0722 * cf
+ndrrph = -0.0172 * cf
+ndbbb = 0.4218 * cf
+ndbbr = -0.8629 * cf
+ndbrr = 0.1459 * cf
+ndrrr = -0.0439 * cf
+```
+
+**Inertia terms**
+```python
+rho = 1000.0
+g = 9.81
+m = 64.55
+mx = 3.662
+my = 62.7366
+i_x = 0.567
+i_z = 9.6038
+j_x = 0.6309
+j_z = 10.2347
+
+m11 = m + mx
+m22 = m + my
+m33 = i_x + j_x
+m44 = i_z + j_z
+```
+
+$$ m_{11}=m+m_x,\qquad m_{22}=m+m_y, \qquad m_{33}=I_x+J_x, \qquad m_{44}=I_z+J_z $$
+
+**Propeller model**
+```python
+n1_force = float(np.sign(n1) * max(abs(n1), MIN_ADVANCE_RATIO)) if abs(n1) >= MIN_ADVANCE_RATIO else 0.0
+n2_force = float(np.sign(n2) * max(abs(n2), MIN_ADVANCE_RATIO)) if abs(n2) >= MIN_ADVANCE_RATIO else 0.0
+
+if abs(n1_force) < MIN_ADVANCE_RATIO:
+    j_adv = 0.0
+    kt = 0.0
+    xd_p = 0.0
+    ud_r = RUDDER_INFLOW_SCALE * epsi * onew
+else:
+    j_adv = PROPELLER_ADVANCE_SCALE * onew * u / max(abs(n1_force) * d_prop, MIN_ADVANCE_RATIO)
+    a0, a1, a2 = 0.3267, -0.2297, -0.1607
+    kt = a0 + a1 * j_adv + a2 * j_adv * j_adv
+    xd_p = (
+        PROPELLER_THRUST_SCALE
+        * abs(n1_force)
+        * n1_force
+        * onet
+        * kt
+        * (d_prop**4)
+        / (0.5 * l_ship * draft * u_mag * u_mag)
+    )
+    j_sq = max(j_adv * j_adv, MIN_ADVANCE_RATIO * MIN_ADVANCE_RATIO)
+    prop_term = max(1.0 + 8.0 * kt / (math.pi * j_sq), 0.0)
+    ud_r = RUDDER_INFLOW_SCALE * epsi * onew * math.sqrt(
+        eta_r * ((1.0 + kappa * math.sqrt(prop_term) - 1.0) ** 2) + (1.0 - eta_r)
+    )
+```
+Advance-ratio $J$, thrust coefficient $K_T$, propeller surge force
+
+**Rudder model**
+```python
+vd_r = -g_r * (drift - ld_r * rd + (p * (z_r - z_g) / u_mag))
+ud_total_r = math.hypot(ud_r, vd_r)
+alpha_r = delta - math.atan2(-vd_r, ud_r)
+fd_n = -(area_r_over_ld) * (6.13 * lambda_r / (2.25 + lambda_r)) * (ud_total_r**2) * math.sin(alpha_r)
+
+xd_r = onet_r * fd_n * math.sin(delta) * math.cos(phi)
+yd_r = RUDDER_FORCE_SCALE * (1.0 + a_h) * fd_n * math.cos(delta) * math.cos(phi)
+kd_r = z_r * yd_r / l_ship
+nd_r = RUDDER_FORCE_SCALE * RUDDER_YAW_SCALE * (x_r + a_h * x_h) * fd_n * math.cos(delta) * math.cos(phi)
+```
+$$ \alpha_R,F_N,X_R,Y_R,K_R,N_R $$
+
+**Hull forces/moments**
+```python
+xd_h = (
+    xd0 * (1.0 + cx0 * abs(phi))
+    + xdrph * rd * phi
+    + xdbb * (1.0 + cxbb * abs(phi)) * drift * drift
+    + xdbrmdy * drift * rd
+    + xdrr * (1.0 + cxrr * abs(phi)) * rd * rd
+    + xdbbbb * drift**4
+)
+yd_h = (
+    ydph * phi
+    + ydb * (1.0 + cyb * abs(phi)) * drift
+    + ydrmdx * (1.0 + cyr * abs(phi)) * rd
+    + ydbbph * drift * drift * phi
+    + ydbrph * drift * rd * phi
+    + ydrrph * rd * rd * phi
+    + ydbbb * drift**3
+    + ydbbr * drift * drift * rd
+    + ydbrr * drift * rd * rd
+    + ydrrr * rd**3
+)
+kd_h = (
+    kdph * phi
+    + kdb * drift
+    + kdr * rd
+    + kdbbph * drift * drift * phi
+    + kdbrph * drift * rd * phi
+    + kdrrph * rd * rd * phi
+    + kdbbb * drift**3
+    + kdbbr * drift * drift * rd
+    + kdbrr * drift * rd * rd
+    + kdrrr * rd**3
+)
+nd_h = (
+    ndph * phi
+    + ndb * (1.0 + cnb * abs(phi)) * drift
+    + ndr * (1.0 + cnr * abs(phi)) * rd
+    + ndbbph * drift * drift * phi
+    + ndbrph * drift * rd * phi
+    + ndrrph * rd * rd * phi
+    + ndbbb * drift**3
+    + ndbbr * drift * drift * rd
+    + ndbrr * drift * rd * rd
+    + ndrrr * rd**3
+)
+```
+$$ X_{dH},Y_{dH},K_{dH},N_{dH} $$
+
+**Roll restoring/damping**
+```python
+c44 = g * m * gm
+damping_a = 0.5
+b44 = 2.0 * damping_a / math.pi * math.sqrt(max(g * m * gm * (i_x + j_x), 0.0))
+kd_h2 = z_g * yd_h - (z_r - z_g) * yd_r
+
+roll_damping_moment = -ROLL_DAMP_SCALE * b44 * p
+roll_restoring_moment = -ROLL_RESTORE_SCALE * c44 * phi
+pdot = (
+    kd * force_scale_k
+    + roll_damping_moment
+    + roll_restoring_moment
+    + (z_h - z_g) * (my * vdot + mx * u * r)) / m33
+```
+$$ C_{44}=g\,m\,GM $$
+
+**Bow thruster**
+```python
+x_b = 0.45
+z_b = -0.05
+k_bt = 0.026
+f_bt = (
+    BOW_THRUSTER_SCALE
+    * abs(n2_force)
+    * n2_force
+    * k_bt
+    / (0.5 * rho * l_ship * draft * u_mag * u_mag)
+)
+yd_b = f_bt
+kd_b = z_b * f_bt / l_ship
+nb_b = x_b * f_bt / l_ship
+```
+$$ Y_B,K_B,N_B $$
+
+**Total forces/moments**
+```python
+xd = xd_h + xd_p + RUDDER_X_DRAG_SCALE * xd_r
+yd = yd_h + yd_r + yd_b
+kd = kd_h + kd_h2 + kd_r + kd_b
+nd = nd_h + nd_r - x_g * yd + nb_b
+```
+$$ X,Y,K,N $$
+
+**Accelerations**
+```python
+vdot = (yd * force_scale_x - m11 * u * r) / m22
+surge_linear_force = -LINEAR_SURGE_DAMP * u
+yaw_linear_moment = -LINEAR_YAW_DAMP * r
+udot = (xd * force_scale_x + surge_linear_force + m22 * v * r) / m11
+roll_damping_moment = -ROLL_DAMP_SCALE * b44 * p
+roll_restoring_moment = -ROLL_RESTORE_SCALE * c44 * phi
+pdot = (
+    kd * force_scale_k
+    + roll_damping_moment
+    + roll_restoring_moment
+    + (z_h - z_g) * (my * vdot + mx * u * r)
+) / m33
+rdot = (nd * force_scale_n + yaw_linear_moment) / m44
+```
+$$ \dot{u},\dot{v},\dot{p},\dot{r} $$
+
+**Kinematics**
+```python
+xdot = math.cos(psi) * u - math.sin(psi) * v * math.cos(phi)
+ydot = math.sin(psi) * u + math.cos(psi) * v * math.cos(phi)
+phidot = p
+psidot = r * math.cos(phi)
+```
+Earth fixed $$ \dot{x},\dot{y},\dot{\phi},\dot{\psi} $$
+
+**Return derivative vector**
+```python
+return np.array(
+    [
+        udot,
+        vdot,
+        pdot,
+        rdot,
+        xdot,
+        ydot,
+        phidot,
+        psidot,
+        delta_dot,
+        n1_dot,
+        n2_dot,
+    ],
+    dtype=float,
+)
+```
+Full state derivative
+
+### 6.6 Why the 4-DOF model is useful even if v2 remains competitive
 
 The v2 model gave better straight-line matching in the latest calibration, while the faithful 4DOF model gave better turn geometry and speed retention in a turn. This is expected:
 
 - v2 is more empirically shaped for the two real tests;
-- 4DOF is more physically structured and closer to a conventional manoeuvring model.
+- 4-DOF is more physically structured and closer to a conventional manoeuvring model.
 
-Therefore, the 4DOF model is more attractive for long-term modelling, while v2 may remain the short-term RL training model if straight-line fidelity is more important.
+Therefore, the 4-DOF model is more attractive for long-term modelling, while v2 may remain the short-term RL training model if straight-line fidelity is more important.
 
 ## 7. Practical workflow for future modelling problems
 

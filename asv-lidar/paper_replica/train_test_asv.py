@@ -101,7 +101,9 @@ def eval_one_episode(model, env: ASVLidarEnv, deterministic: bool = True, max_st
     r_pf_list: List[float] = []
     r_oa_list: List[float] = []
     r_exist_list: List[float] = []
-    mean_sector_closeness_list: List[float] = []
+    min_sector_range_list: List[float] = []
+    p10_sector_range_list: List[float] = []
+    mean_sector_pen_list: List[float] = []
     collided_steps = 0
 
     d_start = float(np.hypot(env.goal_x - env.asv_x, env.goal_y - env.asv_y))
@@ -136,8 +138,12 @@ def eval_one_episode(model, env: ASVLidarEnv, deterministic: bool = True, max_st
                 r_oa_list.append(float(info["r_oa"]))
             if "r_exist" in info:
                 r_exist_list.append(float(info["r_exist"]))
-            if "mean_sector_closeness" in info:
-                mean_sector_closeness_list.append(float(info["mean_sector_closeness"]))
+            if "min_sector_range" in info:
+                min_sector_range_list.append(float(info["min_sector_range"]))
+            if "p10_sector_range" in info:
+                p10_sector_range_list.append(float(info["p10_sector_range"]))
+            if "mean_sector_pen" in info:
+                mean_sector_pen_list.append(float(info["mean_sector_pen"]))
             if bool(info.get("collided", False)):
                 collided_steps += 1
 
@@ -189,7 +195,9 @@ def eval_one_episode(model, env: ASVLidarEnv, deterministic: bool = True, max_st
         "mean_r_oa": safe_mean(r_oa_list),
         "mean_r_exist": safe_mean(r_exist_list),
         "mean_lambda": safe_mean(lam_list),
-        "mean_sector_closeness": safe_mean(mean_sector_closeness_list),
+        "min_sector_range": safe_min(min_sector_range_list),
+        "p10_sector_range": safe_min(p10_sector_range_list),
+        "mean_sector_pen": safe_mean(mean_sector_pen_list),
         "has_reward_info": int(bool(len(r_pf_list) or len(r_oa_list) or len(r_exist_list) or len(lam_list))),
         "reward_per_step": float(ep_reward / float(step_count)) if step_count > 0 else 0.0,
         "collision_steps": int(collided_steps),
