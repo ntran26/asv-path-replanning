@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import argparse
@@ -16,20 +15,16 @@ from stable_baselines3.common.vec_env import SubprocVecEnv, VecMonitor
 
 from rl_env import ASVLidarEnv, DEFAULT_EVAL_LAMBDA, RPM_MAX, RPM_MIN
 
-# IMPORTANT: test_run.py numbering is slightly counter-intuitive.
 # case 0 = centered no-obstacle path following, case 1 = centered single obstacle.
 DEFAULT_EVAL_CASES = [0, 1, 2, 3, 6, 7]
-
 
 def action_to_rpm(throttle_cmd: float) -> float:
     throttle_cmd = float(np.clip(throttle_cmd, -1.0, 1.0))
     return float(RPM_MIN + (throttle_cmd + 1.0) * 0.5 * (RPM_MAX - RPM_MIN))
 
-
 def action_to_rudder_deg(rudder_cmd: float) -> float:
     rudder_cmd = float(np.clip(rudder_cmd, -1.0, 1.0))
     return float(rudder_cmd * 40.0)
-
 
 def lidar_clearance_stats(env: ASVLidarEnv) -> Dict[str, float]:
     out = {"min_lidar_all": float("inf"), "p10_front": float("inf"), "p50_front": float("inf")}
@@ -49,7 +44,6 @@ def lidar_clearance_stats(env: ASVLidarEnv) -> Dict[str, float]:
         out["p10_front"] = float(np.percentile(front_finite, 10))
         out["p50_front"] = float(np.percentile(front_finite, 50))
     return out
-
 
 def termination_reason(env: ASVLidarEnv, done: bool, hit_max_steps: bool) -> str:
     if hit_max_steps:
@@ -80,7 +74,6 @@ def termination_reason(env: ASVLidarEnv, done: bool, hit_max_steps: bool) -> str
         return "goal"
     return "terminated" if done else "timeout"
 
-
 def eval_one_episode(model, env: ASVLidarEnv, deterministic: bool = True, max_steps: int = 5000) -> Dict[str, Any]:
     obs, _ = env.reset()
     done = False
@@ -108,11 +101,16 @@ def eval_one_episode(model, env: ASVLidarEnv, deterministic: bool = True, max_st
 
     d_start = float(np.hypot(env.goal_x - env.asv_x, env.goal_y - env.asv_y))
 
+    last_info = {}
+    last_truncated = False
+
     while step_count < max_steps:
         action, _ = model.predict(obs, deterministic=deterministic)
         action = np.array(action, dtype=np.float32).reshape(-1)
         obs, reward, terminated, truncated, info = env.step(action)
         done = bool(terminated or truncated)
+        last_info = info if isinstance(info, dict) else {}
+        last_truncated = bool(truncated)
         ep_reward += float(reward)
         step_count += 1
 
@@ -146,6 +144,8 @@ def eval_one_episode(model, env: ASVLidarEnv, deterministic: bool = True, max_st
                 mean_sector_pen_list.append(float(info["mean_sector_pen"]))
             if bool(info.get("collided", False)):
                 collided_steps += 1
+            if bool(info.get("timeout", False)):
+                reason = "timeout"
 
         if done:
             break
@@ -154,8 +154,17 @@ def eval_one_episode(model, env: ASVLidarEnv, deterministic: bool = True, max_st
     d_end = float(np.hypot(env.goal_x - env.asv_x, env.goal_y - env.asv_y))
     prog_total = d_start - d_end
     prog_per_step = prog_total / float(step_count) if step_count > 0 else 0.0
-    reason = termination_reason(env, done=done, hit_max_steps=hit_max_steps)
-    success = 1 if reason == "goal" else 0
+    reached_goal = bool(last_info.get("reached_goal", False))
+    env_timeout = bool(last_info.get("timeout", False)) or bool(last_truncated)
+
+    if reached_goal:
+        reason = "goal"
+    elif env_timeout or hit_max_steps:
+        reason = "timeout"
+    else:
+        reason = termination_reason(env, done=done, hit_max_steps=hit_max_steps)
+
+    success = 1 if reached_goal else 0
 
     def safe_mean(x: Sequence[float]) -> float:
         return float(np.mean(x)) if len(x) else 0.0
@@ -202,7 +211,6 @@ def eval_one_episode(model, env: ASVLidarEnv, deterministic: bool = True, max_st
         "reward_per_step": float(ep_reward / float(step_count)) if step_count > 0 else 0.0,
         "collision_steps": int(collided_steps),
     }
-
 
 class EvalMetricsCallback(BaseCallback):
     def __init__(
@@ -395,7 +403,6 @@ class EvalMetricsCallback(BaseCallback):
         self.logger.record("eval/selection_score", summary["selection_score"])
         return True
 
-
 def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", choices=["train", "test", "eval"], default="test")
@@ -419,7 +426,6 @@ def parse_args():
     ap.add_argument("--eval-path-mode", choices=["straight", "curve", "mixed"], default="straight")
     return ap.parse_args()
 
-
 def make_env(seed: int, rank: int, *, map_width: float, map_height: float, path_mode: str):
     def _init():
         env = ASVLidarEnv(
@@ -433,7 +439,6 @@ def make_env(seed: int, rank: int, *, map_width: float, map_height: float, path_
         env.reset(seed=seed + rank)
         return env
     return _init
-
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()

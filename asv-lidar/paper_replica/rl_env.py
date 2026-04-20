@@ -62,6 +62,10 @@ U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 MAX_IN = 1.0
 MIN_IN = -1.0
 
+# Timeout condition
+MAX_EPISODE_STEPS = 1000
+R_TIMEOUT = -1000.0
+
 
 class ASVLidarEnv(gym.Env):
     metadata = {"render_modes": ["human"]}
@@ -452,7 +456,7 @@ class ASVLidarEnv(gym.Env):
         super().reset(seed=seed)
         if seed is not None:
             np.random.seed(seed)
-
+        self.step_count = 0
         self.elapsed_time = 0.0
         self.asv_h = 0.0
         self.asv_w = 0.0
@@ -565,21 +569,32 @@ class ASVLidarEnv(gym.Env):
 
         r_oa = -float(np.sum(w * pen) / (np.sum(w) + 1e-6))
 
+        self.current_lambda = 0.7
+        
+        r_exist = -self.current_lambda * (2.0 * ALPHA_R + 1.0)
+
         if collided:
-            reward = float(R_COLLISION)
+            reward = R_COLLISION
         else:
-            reward = float(self.current_lambda * r_pf + (1.0 - self.current_lambda) * r_oa + R_EXIST)
+            reward = self.current_lambda * r_pf + (1.0 - self.current_lambda) * r_oa + r_exist
             if reached_goal:
                 reward += 50.0
 
         terminated = self.check_done()
+
+        self.step_count += 1
+        truncated = False
+
+        if self.step_count >= MAX_EPISODE_STEPS and not terminated:
+            truncated = True
+            reward += R_TIMEOUT
 
         info = {
             "lam": float(self.current_lambda),
             "log10_lambda": float(self.current_log10_lambda),
             "r_pf": float(r_pf),
             "r_oa": float(r_oa),
-            "r_exist": float(R_EXIST),
+            "r_exist": float(r_exist),
             "reward": float(reward),
             "ye": float(ye),
             "speed_mps": float(self.speed_mps),
@@ -599,11 +614,12 @@ class ASVLidarEnv(gym.Env):
             "collided": bool(collided),
             "reached_goal": bool(reached_goal),
             "path_mode": self.path_mode_used,
+            "timeout": bool(truncated),
         }
 
         if self.render_mode in self.metadata["render_modes"]:
             self.render()
-        return self._get_obs(), reward, terminated, False, info
+        return self._get_obs(), reward, terminated, truncated, info
 
     # ------------------------------------------------------------------
     # Rendering
