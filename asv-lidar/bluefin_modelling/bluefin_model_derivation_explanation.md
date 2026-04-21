@@ -61,85 +61,404 @@ The Bluefin MATLAB scripts do not necessarily write the equations in matrix form
 
 This is still the same modelling logic as Fossen's equation. The MATLAB model simply writes each DOF explicitly.
 
-## 3. `Blue02.m`: what it is and how it maps to theory
+## 3. `Blue02.m`: MATLAB code, equations, and theory mapping
 
-### 3.1 Model type
+`Blue02.m` is best understood as a compact **3-DOF horizontal manoeuvring model** in surge, sway, and yaw, with rudder and propeller effects added explicitly. It is not a fully consistent 9-state implementation, because the file comments list a larger state vector than the code actually uses. Nevertheless, the force construction follows the same marine-craft modelling idea described by Fossen: inertia and added mass are balanced against hydrodynamic damping and actuator forces.
 
-`Blue02.m` is best understood as a **3-DOF horizontal manoeuvring model**. Its intended dynamic states are surge $u$, sway $v$, yaw rate $r$, heading $\psi$, rudder angle $\delta$, and planar position $x,y$.
+### 3.1 Function, intended states, and inputs
 
-This matches Fossen's 3-DOF horizontal reduction:
+The MATLAB file starts with the function definition and the intended state/input comments:
+ 
+```matlab
+function xdot = Blue02(x,ui)
+% State vector:
+% x(1) = u [m]
+% x(2) = v [m]
+% x(3) = p [rad/s]
+% x(4) = r [rad/s]
+% x(5) = x [m]
+% x(6) = y [m]
+% x(7) = phi [rad]
+% x(8) = psi [rad]
+% x(9) = del [rad]
+% Input vector:
+% u(1) = rudder [rad]
+% u(2) = rpm of prop [rpm]
+% u(3) = rpm of thruster [rpm]
+```
 
-$$
-\nu = [u,\ v,\ r]^T,\qquad \eta = [x,\ y,\ \psi]^T
-$$
-
-Fossen explains this model class under "3-DOF Horizontal Model", where he states that horizontal ship motion is usually described by surge, sway, and yaw.
-
-### 3.2 Inertia and added mass
-
-The MATLAB file uses:
-
-$$
-m_{11}=m+m_x,\qquad m_{22}=m+m_y,\qquad m_{33}=I_z+J_z
-$$
-
-This follows Fossen's distinction between rigid-body mass/inertia and hydrodynamic added mass. In the book, the total inertia is written as $M=M_{RB}+M_A$, and added mass is described as the inertia of the surrounding fluid.
-
-### 3.3 Hull force and damping terms
-
-`Blue02.m` forms hull contributions such as
-
-$$
-X_H,\quad Y_H,\quad N_H
-$$
-
-from polynomial terms in $v$, $r$, $v^2$, $r^2$, and $vr$. These are empirical manoeuvring derivatives. They correspond to Fossen's $D(\nu)\nu$ and nonlinear hydrodynamic force terms.
-
-A simplified interpretation is:
+The intended 3-DOF horizontal theory is:
 
 $$
-X = X_H + X_P + X_R
-$$
-$$
-Y = Y_H + Y_R
-$$
-$$
-N = N_H + N_R
+\nu=[u,\ v,\ r]^T,
+\qquad
+\eta=[x,\ y,\ \psi]^T.
 $$
 
-Fossen explains that damping may include linear and nonlinear components, including skin friction, vortex shedding, and other velocity-dependent effects.
+This is the standard horizontal-plane vessel model described by Fossen under the 3-DOF reduction. Surge $u$, sway $v$, and yaw rate $r$ are body-fixed velocities, while $x$, $y$, and $\psi$ describe earth-fixed position and heading.
 
-### 3.4 Propeller model
+However, the implementation later unpacks the state differently:
 
-In `Blue02.m`, the propeller contributes a surge force $X_P$. This follows the same actuator idea as Fossen's actuator section: a main propeller produces a force in the longitudinal $x$-direction.
+```matlab
+U = sqrt(0.6^2+0.4^2);
+u = x(1)/U;
+v = x(2)/U;
+r = x(3)*L/U;
+psi = x(4);
+del = x(5);
+phi = x(6);
+del_c = ui(1);
+n1 = ui(2)/60;     % rps of prop
+n2 = ui(3)/60;     % rps of thruster
+```
 
-### 3.5 Rudder model
-
-`Blue02.m` computes an effective rudder inflow, then forms a normal force $F_N$. This force is resolved into surge, sway, and yaw contributions:
+This means the actual implemented state is closer to:
 
 $$
-X_R \sim F_N\sin\delta
-$$
-$$
-Y_R \sim F_N\cos\delta
-$$
-$$
-N_R \sim x_R F_N\cos\delta
+x \approx [u,\ v,\ r,\ \psi,\ \delta,\ \phi]^T
 $$
 
-This matches Fossen's actuator explanation: an aft rudder produces a lateral force as a function of rudder deflection, and that lateral force creates a yaw moment for steering. 
+with the returned derivative vector later containing seven derivatives. This mismatch is one reason why `Blue02.m` was treated as a useful reference rather than a direct final model.
 
-### 3.6 Why `Blue02.m` alone was not enough
+### 3.2 Physical constants and Bluefin vessel parameters
+
+The MATLAB model defines water density, rudder limits, vessel mass, added-mass terms, yaw inertia, length, draft, and wetted surface quantities:
+
+```matlab
+rho = 1000;
+rhoA= 0.1250;
+g   = 9.81;
+del_max  = 40*pi/180;
+deld_max = 20*pi/180;
+
+m    = 64.55;
+mx   = 3.662;
+my   = 62.7366;
+Iz   = 9.6038;
+Jz   = 0.6309;
+IzJz = 10.2347;
+L  = 1.725;
+d  = 0.193;
+Sw = 0.7614;
+```
+
+These values define the physical scale of the vessel. In Fossen's notation, the total inertia is interpreted as the sum of rigid-body inertia and hydrodynamic added inertia:
+
+$$
+M = M_{RB}+M_A.
+$$
+
+The file then constructs the simplified diagonal inertia terms:
+
+```matlab
+m11 = (m+mx);
+m22 = (m+my);
+m33 = IzJz;
+```
+
+which correspond to:
+
+$$
+m_{11}=m+m_x,
+\qquad
+m_{22}=m+m_y,
+\qquad
+m_{33}=I_z+J_z.
+$$
+
+Here $m_{11}$ is effective surge inertia, $m_{22}$ is effective sway inertia, and $m_{33}$ is effective yaw inertia. This follows the same physical interpretation as Fossen's added-mass discussion: the vessel must accelerate both its own mass and some surrounding water.
+
+### 3.3 Rudder saturation and actuator dynamics
+
+The MATLAB rudder command is first saturated to the maximum rudder angle:
+
+```matlab
+if abs(del_c) >= del_max,
+   del_c = sign(del_c)*del_max;
+end
+```
+
+This corresponds to:
+
+$$
+|\delta_c| \le \delta_{\max}.
+$$
+
+The rudder angle then follows the command through a rate-limited first-order actuator:
+
+```matlab
+del_dot = del_c - del;
+
+if abs(del_dot) >= deld_max,
+   del_dot = sign(del_dot)*deld_max;
+end
+```
+
+The corresponding equation is:
+
+$$
+\dot{\delta} = \operatorname{sat}_{\dot{\delta}_{\max}}(\delta_c-\delta).
+$$
+
+This matches the actuator modelling idea in Fossen's actuator chapters: the control system commands an actuator, but the vessel responds to the actual actuator state, not an ideal instantaneous command.
+
+### 3.4 Non-dimensional velocity variables
+
+The model computes the resultant speed, then forms non-dimensional sway and yaw variables:
+
+```matlab
+U = sqrt(u*u+v*v);
+vd = v/U;
+rd = r*L/U;
+```
+
+The corresponding definitions are:
+
+$$
+U = \sqrt{u^2+v^2},
+$$
+
+$$
+v_d = \frac{v}{U},
+\qquad
+r_d = \frac{rL}{U}.
+$$
+
+These non-dimensional variables are common in manoeuvring models because they express lateral velocity and yaw rate relative to the vessel speed and length.
+
+### 3.5 Hull surge, sway, and yaw contributions
+
+The MATLAB hull surge force is:
+
+```matlab
+XH = m*v*r-1/2*rho*U^2*L*d*Sw/(L*d)*0.4631/(log(4*10^7)^2.6)*u^2+...
+     Xvv*v^2+Xvr*v*r+Xrr*r^2;
+```
+
+This can be interpreted as:
+
+$$
+X_H = mvr + X_{resistance}(u,U) + X_{vv}v^2 + X_{vr}vr + X_{rr}r^2.
+$$
+
+The first term $mvr$ is a velocity-coupling term. The resistance term is a speed-dependent hull drag approximation. The remaining polynomial terms are empirical manoeuvring derivatives.
+
+The sway force is computed as:
+
+```matlab
+YH = 0.5*rho*L*d*U^2*(Yv*vd+Yvr*vd*abs(rd)+Yr*rd+...
+     Yvv*abs(vd)*vd+Yrr*rd*abs(rd));
+```
+
+which corresponds to:
+
+$$
+Y_H = \frac{1}{2} \rho L d U^2
+\left(
+\begin{aligned}
+Y_{vv\_d} + Y_{vr} v d |r_d| + Y_{rr\_d} + Y_{vv} v_d |v_d| + Y_{rr} r_d |r_d|
+\end{aligned}
+\right)
+$$
+
+The yaw moment is computed as:
+
+```matlab
+NH = 0.5*rho*(L^2)*d*U^2*(Nv*vd+Nvr*abs(vd)*rd+Nr*rd+Nvv*vd*abs(vd)...
+     +Nrr*rd*abs(rd));
+```
+
+which corresponds to:
+
+$$
+N_H = \frac{1}{2}\rho L^2 d U^2
+\left(
+\begin{aligned}
+N_vv_d + N_{vr}|v_d|r_d + N_rr_d + N_{vv}v_d|v_d| + N_{rr}r_d|r_d|
+\end{aligned}
+\right)
+$$
+
+These are component-wise versions of the hydrodynamic damping and manoeuvring-derivative terms in Fossen's general marine craft equation:
+
+$$
+M\dot{\nu}+C(\nu)\nu+D(\nu)\nu+g(\eta)=\tau
+$$
+
+In `Blue02.m`, the damping is not written as a matrix $D(\nu)$, but as explicit empirical force and moment expressions.
+
+### 3.6 Propeller surge force
+
+The propeller block is:
+
+```matlab
+KT = 0.25; J=0.072;
+XP = (1-tp)*rho*(n1^2)*Dp^4*KT*J;
+YP = 0;
+NP = 0;
+```
+
+This gives the propeller contribution:
+
+$$
+X_P = (1-t_P)\rho n_1^2D_P^4K_TJ
+$$
+
+The model assumes the propeller mainly contributes surge force:
+
+$$
+Y_P = 0,
+\qquad
+N_P = 0
+$$
+
+This is consistent with the actuator interpretation in Fossen: a main propeller is primarily a longitudinal actuator, producing thrust in the vessel's body-fixed surge direction.
+
+### 3.7 Rudder inflow and rudder normal force
+
+The MATLAB rudder inflow approximation is:
+
+```matlab
+uR = 0.856113*u*sqrt(1+6.3*(1-(0.856113*u)/(0.00717*1000))^1.5);
+```
+
+This defines an effective rudder inflow speed:
+
+$$
+u_R = 0.856113u
+\sqrt{1+6.3\left(1-\frac{0.856113u}{0.00717\cdot1000}\right)^{1.5}}
+$$
+
+The rudder normal force is then:
+
+```matlab
+FN = -1/2*10^3*0.0091*2.6927*u^2*sin(del+(0.603463/uR)*(v-1.5525*r));
+```
+
+which corresponds to:
+
+$$
+F_N = -\frac{1}{2}\rho A_R f_{\alpha}u^2
+\sin\left(
+\delta + \frac{0.603463}{u_R}(v-1.5525r)
+\right)
+$$
+
+The term inside the sine is an effective rudder angle of attack: it combines actual rudder deflection with lateral inflow due to sway and yaw.
+
+### 3.8 Rudder force resolution into surge, sway, and yaw
+
+The MATLAB code resolves the rudder normal force into body-force and yaw-moment components:
+
+```matlab
+XR = -(1-0.449821)*FN*sin(del);
+YR = -(1+0.443853)*FN*cos(del);
+NR = -(0.646875+0.443853*0.7569)*FN*cos(del);
+```
+
+These correspond to:
+
+$$
+X_R = -(1-t_R)F_N\sin\delta
+$$
+
+$$
+Y_R = -(1+a_H)F_N\cos\delta
+$$
+
+$$
+N_R = -(x_R+a_Hx_H)F_N\cos\delta
+$$
+
+This is exactly the actuator-moment-arm concept from Fossen's actuator discussion: a rudder generates a lateral force and the moment arm between that force and the centre of gravity generates a yaw moment.
+
+### 3.9 Total forces and moments
+
+The MATLAB code sums the force contributions:
+
+```matlab
+X = XH + XP + XR;
+Y = YH + YP + YR;
+N = NH + NP + NR;
+```
+
+which corresponds to:
+
+$$
+X = X_H+X_P+X_R
+$$
+
+$$
+Y = Y_H+Y_P+Y_R
+$$
+
+$$
+N = N_H+N_P+N_R
+$$
+
+This maps directly to the generalized force vector $\tau$ in Fossen's notation.
+
+### 3.10 Returned derivatives
+
+The MATLAB derivative vector is:
+
+```matlab
+xdot = [X*2/(m11*(rho*L*L*U*U))
+        Y*2/(m22*(rho*L*L*U*U))
+        1/(Iz+Jz)*(N)
+        r/L*U
+        del_dot
+        u*cos(psi)-v*cos(phi)*sin(psi)
+        u*sin(psi)-v*cos(phi)*cos(phi)];
+```
+
+The first three entries are surge, sway, and yaw acceleration-like terms:
+
+$$
+\dot{u} = \frac{2X}{m_{11}\rho L^2U^2}
+$$
+
+$$
+\dot{v} = \frac{2Y}{m_{22}\rho L^2U^2}
+$$
+
+$$
+\dot{r} = \frac{N}{I_z+J_z}
+$$
+
+The heading derivative is:
+
+$$
+\dot{\psi}=\frac{r}{L}U
+$$
+
+The rudder derivative is:
+
+$$
+\dot{\delta}=\operatorname{sat}_{\dot{\delta}_{\max}}(\delta_c-\delta)
+$$
+
+The planar kinematics are:
+
+$$
+\dot{x}=u\cos\psi-v\cos\phi\sin\psi
+$$
+
+$$
+\dot{y}=u\sin\psi-v\cos\phi\cos\phi
+$$
+
+The final $\dot{y}$ expression appears unusual because it contains $\cos(\phi)\cos(\phi)$. This is another sign that `Blue02.m` should be treated as an intermediate reference rather than the cleanest final source.
+
+### 3.11 Why `Blue02.m` alone was not enough
 
 `Blue02.m` was useful, but it had several limitations:
 
 1. The state comments and implementation are not fully consistent.
-2. Roll is mentioned but not actually included.
-3. It does not include a bow-thruster state.
+2. Roll is mentioned but not actually included as a proper dynamic state.
+3. It does not include a consistent bow-thruster state.
 4. It is less complete than `Bluefin4DOFModel02.m`.
 5. It does not provide enough independent tuning freedom to match both straight-line and turning performance.
-
-This is why the Python path first used a simplified 3DOF-inspired model (`ship_model_bluefin_v2.py`) and then moved to a 4DOF candidate.
 
 ## 4. `ship_model_bluefin_v2.py`: how it was constructed from the 3-DOF theory
 
@@ -315,139 +634,521 @@ $$
 
 instead of forcing all rudder effects to share one coefficient. This follows the physical idea that rudder forces create both lateral force and yaw moment, while also reducing forward speed. Fossen's actuator section supports this interpretation by describing rudders as lateral-force devices that generate steering yaw moments.
 
-## 5. `Bluefin4DOFModel02.m`: why it is the better MATLAB source
+## 5. `Bluefin4DOFModel02.m`: MATLAB code, equations, and theory mapping
 
-`Bluefin4DOFModel02.m` is more complete than `Blue02.m`.
+`Bluefin4DOFModel02.m` is a more complete model than `Blue02.m`. It is based on a Japanese-style 4DOF manoeuvring model that includes surge, sway, roll, and yaw. It also includes actuator states for rudder angle, main propeller speed, and bow-thruster speed.
 
-It uses the state vector:
+### 5.1 State vector and input vector
 
-$$
-x = [u,\ v,\ p,\ r,\ x,\ y,\ \phi,\ \psi,\ \delta,\ n_1,\ n_2]^T
-$$
+The MATLAB file documents the full state vector:
 
-The inputs are:
+```matlab
+% x(1)=u        = surge velocity          (m/s)
+% x(2)=v        = sway velocity           (m/s)
+% x(3)=p        = roll rate               (rad/s)
+% x(4)=r        = yaw velocity            (rad/s)
+% x(5)=x        = position in x-direction (m)
+% x(6)=y        = position in y-direction (m)
+% x(7)=phi      = roll angle              (rad)
+% x(8)=psi      = yaw angle               (rad)
+% x(9)=delta    = actual rudder angle     (rad)
+% x(10)=n1      = propeller               (rps)
+% x(11)=n2      = bow thruster            (rps)
+```
 
-$$
-u_c=[\delta_c,\ n_{1c},\ n_{2c}]^T
-$$
-
-This means the MATLAB file models:
-
-- surge $u$
-- sway $v$
-- roll rate $p$
-- yaw rate $r$
-- position $x,y$
-- roll angle $\phi$
-- heading $\psi$
-- actual rudder angle $\delta$
-- actual propeller state $n_1$
-- actual bow-thruster state $n_2$
-
-This matches the 4DOF idea in Fossen's actuator/allocation section, where 4DOF is listed as surge, sway, roll, and yaw.
-
-### 5.1 4DOF force and moment balance
-
-The MATLAB file constructs:
+The corresponding state vector is:
 
 $$
-X_d = X_{dH}+X_{dP}+X_{dR}
+x=[u,\ v,\ p,\ r,\ x,\ y,\ \phi,\ \psi,\ \delta,\ n_1,\ n_2]^T
+$$
+
+The input vector is documented as:
+
+```matlab
+% ui      = [ delta_c n1_c n2_c]'
+% delta_c = commanded rudder angle          (rad)
+% n1_c    = commanded shaft velocity vector (rpm)
+% n2_c    = commanded thruster velocity     (rpm)
+```
+
+The corresponding input vector is:
+
+$$u_c=[\delta_c,\ n_{1c},\ n_{2c}]^T
+$$
+
+The file verifies these dimensions explicitly:
+
+```matlab
+if (length(x) ~= 11),error('x-vector must have dimension 11 !');end
+if (length(ui) ~= 3),error('u-vector must have dimension  3 !');end
+```
+
+This structure is much closer to Fossen's general marine-craft formulation, because it keeps actuator states as part of the dynamic system rather than treating commands as instantaneous force inputs.
+
+### 5.2 Speed, drift angle, and non-dimensional states
+
+The MATLAB file computes vessel length, resultant speed, and drift angle:
+
+```matlab
+L = 1.725;                     % length of ship (m)
+U = sqrt(x(1)^2 + x(2)^2);     % service speed (m/s)
+
+b = -asin(x(2)/U);
+```
+
+This corresponds to:
+
+$$
+U=\sqrt{u^2+v^2}
 $$
 
 $$
-Y_d = Y_{dH}+Y_{dR}+Y_{dB}
+\beta=-\sin^{-1}\left(\frac{v}{U}\right)
 $$
 
-$$
-K_d = K_{dH}+K_{dH2}+K_{dR}+K_{dB}
-$$
+The code then forms dimensional and non-dimensional variables:
+
+```matlab
+ud   = x(1)/U;     u = x(1);
+vd   = x(2)/U;     v = x(2);
+pd   = x(3)*L/U;   p = x(3);
+rd   = x(4)*L/U;   r = x(4);
+phi = x(7);
+psi = x(8);
+delta = x(9);
+n1   = x(10);
+n2   = x(11);
+```
+
+The corresponding definitions are:
 
 $$
-N_d = N_{dH}+N_{dR}-x_GY_d+N_{dB}
+u_d=\frac{u}{U},\qquad v_d=\frac{v}{U},\qquad
+p_d=\frac{pL}{U},\qquad r_d=\frac{rL}{U}
 $$
 
-These are simply component-wise versions of the generalized force vector $\tau$ in Fossen's general equation.
+These non-dimensional quantities are used in the empirical hull, rudder, and roll terms.
 
-### 5.2 Surge and sway acceleration
+### 5.3 Inputs and actuator commands
 
-The MATLAB model uses:
+The MATLAB input conversion is:
 
-$$
-\dot{u} = \frac{X_d(0.5\rho LdU^2)+m_{22}vr}{m_{11}}
-$$
+```matlab
+delta_c = ui(1);
+n1_c    = ui(2)/60;  % n1_c in rps
+n2_c    = ui(3)/60;  % n2_c in rps
+```
 
-$$
-\dot{v} = \frac{Y_d(0.5\rho LdU^2)-m_{11}ur}{m_{22}}
-$$
-
-These equations come from expanding the inertia and Coriolis-like coupling terms in component form. They are analogous to Fossen's rigid-body component equations and the general matrix equation. 
-
-### 5.3 Roll equation
-
-The 4DOF model adds roll:
+This corresponds to:
 
 $$
-\dot{p} = \frac{K_d(0.5\rho Ld^2U^2)+(z_H-z_G)(m_y\dot{v}+m_xur)}{m_{33}}
+\delta_c=ui_1,
+\qquad
+n_{1c}=\frac{ui_2}{60},
+\qquad
+n_{2c}=\frac{ui_3}{60}
 $$
 
-The roll restoring term is based on:
+The conversion by 60 changes rpm into revolutions per second.
+
+### 5.4 Effective inertia terms
+
+The MATLAB file defines rigid-body mass, added-mass values, and moments of inertia:
+
+```matlab
+m = 64.55;
+mx = 3.662;
+my = 62.7366;
+Ix = 0.567;
+Iz = 9.6038;
+Jx = 0.6309;
+Jz = 10.2347;
+
+m11 = (m+mx);
+m22 = (m+my);
+m33 = (Ix+Jx);
+m44 = (Iz+Jz);
+```
+
+These correspond to:
 
 $$
-C_{44}=g\,m\,GM
+m_{11}=m+m_x,
+\qquad
+m_{22}=m+m_y,
+\qquad
+m_{33}=I_x+J_x,
+\qquad
+m_{44}=I_z+J_z
 $$
 
-This follows Fossen's discussion of restoring forces and moments from gravity and buoyancy. 
+This is the component-wise equivalent of Fossen's $M=M_{RB}+M_A$, extended from 3DOF to surge, sway, roll, and yaw.
 
-### 5.4 Yaw equation
+### 5.5 Rudder and shaft actuator dynamics
 
-The yaw equation is:
+The MATLAB file limits the commanded rudder angle:
+
+```matlab
+if abs(delta_c) >= delta_max*pi/180,
+   delta_c = sign(delta_c)*delta_max*pi/180;
+end
+```
+
+which corresponds to:
 
 $$
-\dot{r} = \frac{N_d(0.5\rho L^2dU^2)}{m_{44}}
+|\delta_c|\le \delta_{\max}
 $$
 
-This is the yaw component of the generalized moment equation.
+It then computes the rate-limited actual rudder derivative:
 
-### 5.5 Propeller advance-ratio model
+```matlab
+delta_dot = delta_c - delta;
 
-The 4DOF MATLAB file uses an advance-ratio style propeller law:
+if abs(delta_dot) >= Ddelta_max*pi/180,
+   delta_dot = sign(delta_dot)*Ddelta_max*pi/180;
+end
+```
+
+which corresponds to:
+
+$$
+\dot{\delta}=\operatorname{sat}_{\dot{\delta}_{\max}}(\delta_c-\delta)
+$$
+
+The shaft-speed dynamics are:
+
+```matlab
+n1_dot = n1s - n1;
+n2_dot = n2s - n2;
+
+if abs(n1_dot) >= Nc_max,
+   n1_dot = sign(n1_dot)*Nc_max;
+end
+if abs(n2_dot) >= Nc_max,
+   n2_dot = sign(n2_dot)*Nc_max;
+end
+```
+
+which correspond to:
+
+$$
+\dot{n}_1=\operatorname{sat}_{N_{c\max}}(n_{1c}-n_1),
+\qquad
+\dot{n}_2=\operatorname{sat}_{N_{c\max}}(n_{2c}-n_2).
+$$
+
+This actuator-state formulation is important because it gives the vessel a finite response time to commanded rudder and shaft-speed changes.
+
+### 5.6 Propeller advance-ratio model
+
+The propeller block is:
+
+```matlab
+J = onew*u/(n1s*DPs);
+a0 = 0.3267; a1 = -0.2297; a2 = -0.1607;
+KT = a0+a1*J+a2*J^2;
+XdP = abs(n1s)*n1s*onet*KT*(DPs^4)/(0.5*L*d*U^2);
+```
+
+The corresponding advance ratio is:
 
 $$
 J=\frac{(1-w)u}{n_1D_P}
 $$
 
-$$
-K_T=a_0+a_1J+a_2J^2
-$$
-
-Then $K_T$ is used in the propeller surge contribution $X_{dP}$. This is more physically structured than the simple $rpm^2$ law in the earliest Python model.
-
-Fossen's actuator section says the main propeller produces a longitudinal force for transit, while the exact propeller coefficient law comes from the MATLAB Bluefin file itself.
-
-### 5.6 Rudder inflow and normal force
-
-The 4DOF MATLAB file computes a local rudder inflow and a rudder normal force:
+The thrust coefficient is:
 
 $$
-U_{dR}=\sqrt{u_{dR}^2+v_{dR}^2},
+K_T=a_0+a_1J+a_2J^2.
+$$
+
+The non-dimensional propeller surge contribution is:
+
+$$
+X_{dP}=\frac{|n_1|n_1(1-t)K_TD_P^4}{0.5LdU^2}
+$$
+
+This is more physically structured than a simple $rpm^2$ thrust law because the propeller force depends on both shaft speed and the vessel's forward speed through $J$.
+
+### 5.7 Rudder inflow, angle of attack, and normal force
+
+The MATLAB rudder inflow block is:
+
+```matlab
+udR = epsi*(onew)*sqrt(eta*((1+kappa*sqrt(1+8*KT/(pi*J^2))-1)^2)+(1-eta));
+vdR = -gR*(b-ldR*rd+(p*(zR-zG)/U));
+UdR = sqrt(udR^2+vdR^2);
+alphaR  = delta-atan2(-vdR,udR);
+FdN = -(ARpLd)*(6.13*lambda/(2.25+lambda))*UdR^2*sin(alphaR);
+```
+
+The corresponding equations are:
+
+$$u_{dR}=\epsilon(1-w)
+\sqrt{\eta\left(1+\kappa\sqrt{1+\frac{8K_T}{\pi J^2}}-1\right)^2+(1-\eta)}
 $$
 
 $$
-\alpha_R=\delta-\arctan\left(\frac{-v_{dR}}{u_{dR}}\right)
+v_{dR}=-\gamma_R\left(\beta-l_{dR}r_d+\frac{p(z_R-z_G)}{U}\right)
 $$
 
 $$
-F_{dN}=-
-\left(\frac{A_R}{Ld}\right)
+U_{dR}=\sqrt{u_{dR}^2+v_{dR}^2}
+$$
+
+$$
+\alpha_R=\delta-\tan^{-1}\left(\frac{-v_{dR}}{u_{dR}}\right)
+$$
+
+$$
+F_{dN}=-\left(\frac{A_R}{Ld}\right)
 \left(\frac{6.13\lambda}{2.25+\lambda}\right)
 U_{dR}^2\sin\alpha_R
 $$
 
-The force is then resolved into surge, sway, roll, and yaw contributions. This is directly aligned with Fossen's explanation that actuator forces generate forces and moments through moment arms.
+This is the rudder-force equivalent of Fossen's actuator-force explanation. The rudder produces a hydrodynamic force based on inflow and deflection; that force is then resolved into forces and moments.
 
-### 5.7 Bow thruster
+### 5.8 Rudder force and moment resolution
 
-The MATLAB file adds a bow-thruster force $F_{BT}$, contributing to sway, roll, and yaw through its moment arms. This is consistent with Fossen's description of tunnel thrusters as transverse actuators producing $F_y$ for low-speed manoeuvring and dynamic positioning.
+The MATLAB code resolves the rudder normal force as:
+
+```matlab
+XdR = (onetR)*FdN*sin(delta)*cos(phi);
+YdR = (1+aH)*FdN*cos(delta)*cos(phi);
+KdR = zR*YdR/L;
+NdR = (xR+aH*xH)*FdN*cos(delta)*cos(phi);
+```
+
+The corresponding equations are:
+
+$$
+X_{dR}=(1-t_R)F_{dN}\sin\delta\cos\phi
+$$
+
+$$
+Y_{dR}=(1+a_H)F_{dN}\cos\delta\cos\phi
+$$
+
+$$
+K_{dR}=\frac{z_RY_{dR}}{L}
+$$
+
+$$
+N_{dR}=(x_R+a_Hx_H)F_{dN}\cos\delta\cos\phi
+$$
+
+The surge term represents rudder-induced drag/thrust effect, the sway term is lateral rudder force, the roll term is caused by vertical offset, and the yaw moment comes from the rudder moment arm.
+
+### 5.9 Hull hydrodynamic forces and moments
+
+The MATLAB hull force block is:
+
+```matlab
+XdH = Xd0*(1+cx0*abs(phi))+Xdrph*rd*phi+Xdbb*(1+cxbb*abs(phi))*b^2+...
+      Xdbrmdy*b*rd+Xdrr*(1+cxrr*abs(phi))*rd^2+Xdbbbb*b^4;
+YdH = Ydph*phi+Ydb*(1+cyb*abs(phi))*b+Ydrmdx*(1+cyr*abs(phi))*rd+...
+      Ydbbph*b^2*phi+Ydbrph*b*rd*phi+Ydrrph*rd^2*phi+Ydbbb*b^3+...
+      Ydbbr*b^2*rd+Ydbrr*b*rd^2+Ydrrr*rd^3;
+KdH = Kdph*phi+Kdb*b+Kdr*rd+Kdbbph*b^2*phi+Kdbrph*b*rd*phi+...
+      Kdrrph*rd^2*phi+Kdbbb*b^3+Kdbbr*b^2*rd+Kdbrr*b*rd^2+Kdrrr*rd^3;
+NdH = Ndph*phi+Ndb*(1+cnb*abs(phi))*b+Ndr*(1+cnr*abs(phi))*rd+...
+      Ndbbph*b^2*phi+Ndbrph*b*rd*phi+Ndrrph*rd^2*phi+Ndbbb*b^3+...
+      Ndbbr*b^2*rd+Ndbrr*b*rd^2+Ndrrr*rd^3;
+```
+
+This corresponds to nonlinear polynomial manoeuvring derivatives:
+
+$$
+X_{dH}=f_X(\beta,r_d,\phi)
+$$
+
+$$
+Y_{dH}=f_Y(\beta,r_d,\phi)
+$$
+
+$$
+K_{dH}=f_K(\beta,r_d,\phi)
+$$
+
+$$
+N_{dH}=f_N(\beta,r_d,\phi)
+$$
+
+In Fossen's compact notation, these terms belong to the hydrodynamic damping and restoring structure. In this MATLAB file they are expanded explicitly using empirical coefficients from the Japanese manoeuvring model.
+
+### 5.10 Roll restoring and roll damping
+
+The MATLAB roll restoring and damping block is:
+
+```matlab
+C44  = g*m*GM;
+a    = 0.5;
+B44  = 2*a/pi*sqrt(g*m*GM*(Ix+Jx));
+KdH2 = zG*YdH-B44*p-C44*phi-(zR-zG)*YdR;
+```
+
+The restoring coefficient is:
+
+$$
+C_{44}=g m GM
+$$
+
+The roll damping approximation is:
+
+$$
+B_{44}=\frac{2a}{\pi}\sqrt{gmGM(I_x+J_x)}
+$$
+
+The additional roll moment is:
+
+$$
+K_{dH2}=z_GY_{dH}-B_{44}p-C_{44}\phi-(z_R-z_G)Y_{dR}
+$$
+
+This follows Fossen's general restoring-force concept: gravity and buoyancy generate restoring moments that depend on displacement from equilibrium. Here the restoring effect is applied to roll.
+
+### 5.11 Bow-thruster force and moments
+
+The MATLAB bow-thruster block is:
+
+```matlab
+Dbt = 0.033;
+xB = 0.45;
+zB = -0.05;
+KBT = 0.026;
+FBT = abs(n2s)*n2s*KBT/(0.5*rho*L*d*U^2);
+YdB = FBT;
+KdB = zB*FBT/L;
+NbB = xB*FBT/L;
+```
+
+The corresponding bow-thruster force is:
+
+$$
+F_{BT}=\frac{|n_2|n_2K_{BT}}{0.5\rho LdU^2}
+$$
+
+It contributes to sway, roll, and yaw as:
+
+$$
+Y_{dB}=F_{BT}
+$$
+
+$$
+K_{dB}=\frac{z_BF_{BT}}{L}
+$$
+
+$$
+N_{dB}=\frac{x_BF_{BT}}{L}
+$$
+
+This corresponds to Fossen's actuator-allocation idea: a transverse thruster produces a lateral force, and that force creates roll and yaw moments through its moment arms.
+
+### 5.12 Total forces and moments
+
+The MATLAB model sums all components:
+
+```matlab
+Xd = XdH + XdP + XdR;
+Yd = YdH + YdR + YdB;
+Kd = KdH+KdH2+KdR+KdB;
+Nd = NdH + NdR -xG*Yd + NbB;
+```
+
+which correspond to:
+
+$$
+X_d=X_{dH}+X_{dP}+X_{dR}
+$$
+
+$$
+Y_d=Y_{dH}+Y_{dR}+Y_{dB}
+$$
+
+$$
+K_d=K_{dH}+K_{dH2}+K_{dR}+K_{dB}
+$$
+
+$$
+N_d=N_{dH}+N_{dR}-x_GY_d+N_{dB}
+$$
+
+This is the explicit component-wise version of the generalized force vector $\tau$ in Fossen's marine-craft equation.
+
+### 5.13 Surge, sway, roll, and yaw accelerations
+
+The MATLAB file first computes sway acceleration because it is reused in the roll equation:
+
+```matlab
+vdot = (Yd*(0.5*rho*L*d*U^2)-m11*u*r)/m22;
+```
+
+This corresponds to:
+
+$$
+\dot{v}=\frac{Y_d(0.5\rho LdU^2)-m_{11}ur}{m_{22}}
+$$
+
+The final derivative vector is:
+
+```matlab
+xdot = [(Xd*(0.5*rho*L*d*U^2)+m22*v*r)/m11
+        (Yd*(0.5*rho*L*d*U^2)-m11*u*r)/m22
+        (Kd*(0.5*rho*L*d^2*U^2)+(zH-zG)*(my*vdot+mx*u*r))/m33
+        Nd*(0.5*rho*L^2*d*U^2)/m44
+        cos(psi)*u-sin(psi)*v*cos(phi)
+        sin(psi)*u+cos(psi)*v*cos(phi)
+        p
+        r*cos(phi)
+        delta_dot
+        n1_dot
+        n2_dot];
+```
+
+The first four equations are:
+
+$$
+\dot{u}=\frac{X_d(0.5\rho LdU^2)+m_{22}vr}{m_{11}}
+$$
+
+$$
+\dot{v}=\frac{Y_d(0.5\rho LdU^2)-m_{11}ur}{m_{22}}
+$$
+
+$$
+\dot{p}=\frac{K_d(0.5\rho Ld^2U^2)+(z_H-z_G)(m_y\dot{v}+m_xur)}{m_{33}}
+$$
+
+$$
+\dot{r}=\frac{N_d(0.5\rho L^2dU^2)}{m_{44}}
+$$
+
+The earth-fixed kinematics are:
+
+$$
+\dot{x}=u\cos\psi-v\sin\psi\cos\phi
+$$
+
+$$
+\dot{y}=u\sin\psi+v\cos\psi\cos\phi
+$$
+
+$$
+\dot{\phi}=p
+$$
+
+$$
+\dot{\psi}=r\cos\phi
+$$
+
+The remaining actuator-state derivatives are:
+
+$$
+\dot{\delta},\qquad \dot{n}_1,\qquad \dot{n}_2
+$$
+
+This is the main reason `Bluefin4DOFModel02.m` is a stronger modelling source than `Blue02.m`: it is a complete dynamic system with surge, sway, roll, yaw, position, heading, rudder state, propeller state, and bow-thruster state.
 
 ## 6. `bluefin_4dof_final.py`: how the Python file maps to the 4-DOF theory
 
