@@ -84,11 +84,11 @@ class TestCase:
         if test_case == 1:      # middle/on-path
             self.obs.append(self._box(5, 12.5))
 
-        elif test_case == 2:    # left of path
-            self.obs.append(self._box(4, 12.5))
+        elif test_case == 2:    # far obstacle
+            self.obs.append(self._box(5, 15))
 
-        elif test_case == 3:    # right of path
-            self.obs.append(self._box(6, 12.5))
+        elif test_case == 3:    # near obstacle
+            self.obs.append(self._box(5, 10))
 
         elif test_case == 4:    # 3 scattered obstacles
             for x, y in [(5, 8), (8, 15), (3, 18)]:

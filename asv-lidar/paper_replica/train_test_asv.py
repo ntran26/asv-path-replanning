@@ -16,7 +16,7 @@ from stable_baselines3.common.vec_env import SubprocVecEnv, VecMonitor
 from rl_env import ASVLidarEnv, DEFAULT_EVAL_LAMBDA, RPM_MAX, RPM_MIN
 
 # case 0 = centered no-obstacle path following, case 1 = centered single obstacle.
-DEFAULT_EVAL_CASES = [0, 1, 2, 3, 6, 7]
+DEFAULT_EVAL_CASES = [0, 1, 2, 3, 4, 6, 7]
 
 def action_to_rpm(throttle_cmd: float) -> float:
     throttle_cmd = float(np.clip(throttle_cmd, -1.0, 1.0))
@@ -420,20 +420,29 @@ def parse_args():
     ap.add_argument("--test-lambda", type=float, default=DEFAULT_EVAL_LAMBDA)
     ap.add_argument("--train-map-width", type=float, default=25.0)
     ap.add_argument("--train-map-height", type=float, default=50.0)
+    ap.add_argument("--train-lambda", type=float, default=None)
     ap.add_argument("--eval-map-width", type=float, default=10.0)
     ap.add_argument("--eval-map-height", type=float, default=25.0)
     ap.add_argument("--train-path-mode", choices=["straight", "curve", "mixed"], default="mixed")
     ap.add_argument("--eval-path-mode", choices=["straight", "curve", "mixed"], default="straight")
     return ap.parse_args()
 
-def make_env(seed: int, rank: int, *, map_width: float, map_height: float, path_mode: str):
+def make_env(
+    seed: int,
+    rank: int,
+    *,
+    map_width: float,
+    map_height: float,
+    path_mode: str,
+    train_lambda: float | None = None,
+):
     def _init():
         env = ASVLidarEnv(
             render_mode=None,
             map_width=map_width,
             map_height=map_height,
             path_mode=path_mode,
-            lambda_override=None,
+            lambda_override=train_lambda,
             test_case=None,
         )
         env.reset(seed=seed + rank)
@@ -448,7 +457,14 @@ if __name__ == "__main__":
 
     if args.mode == "train":
         env_fns = [
-            make_env(args.seed, i, map_width=args.train_map_width, map_height=args.train_map_height, path_mode=args.train_path_mode)
+            make_env(
+                args.seed,
+                i,
+                map_width=args.train_map_width,
+                map_height=args.train_map_height,
+                path_mode=args.train_path_mode,
+                train_lambda=args.train_lambda,
+            )
             for i in range(args.num_envs)
         ]
         vec_env = VecMonitor(SubprocVecEnv(env_fns), filename="train_monitor.csv")

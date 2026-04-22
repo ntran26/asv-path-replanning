@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import math
@@ -35,6 +34,11 @@ RENDER_FPS = 10
 MAP_WIDTH = 25
 MAP_HEIGHT = 50
 MAX_OBS = 6
+OBSTACLE_MODE = "single_on_path"
+# OBSTACLE_MODE = "old_path_relative"
+OBSTACLE_SIZE = 1.0
+OBSTACLE_PATH_START_FRAC = 0.20
+OBSTACLE_PATH_END_FRAC = 0.80
 
 # Path generation
 PATH_MODE = "mixed"       # "straight", "curve", "mixed"
@@ -94,6 +98,8 @@ class ASVLidarEnv(gym.Env):
         self.lambda_override = lambda_override
         self.test_case = test_case
         self.record_video = bool(record_video)
+        self.obstacle_mode = OBSTACLE_MODE
+        self.obstacle_size = OBSTACLE_SIZE
 
         pygame.init()
         self.render_mode = render_mode
@@ -393,10 +399,78 @@ class ASVLidarEnv(gym.Env):
     # ------------------------------------------------------------------
     # Obstacles
     # ------------------------------------------------------------------
+    def _generate_single_on_path_obstacle(self) -> List[List[Tuple[float, float]]]:
+        """Generate exactly one rectangular obstacle with its centre on the path.
+
+        This is intended for the focused curriculum where the agent must learn
+        that a blocked reference path requires a temporary bypass. The obstacle
+        is sampled uniformly along the middle portion of the path so it is not
+        placed immediately at the start or goal.
+        """
+        if len(self.path) < 2:
+            return []
+
+        half = 0.5 * float(self.obstacle_size)
+        margin = half + 0.10
+
+        s_total = float(self.path_s[-1]) if len(self.path_s) > 0 else 0.0
+        if s_total <= 1e-6:
+            return []
+
+        s_min = OBSTACLE_PATH_START_FRAC * s_total
+        s_max = OBSTACLE_PATH_END_FRAC * s_total
+
+        # Build a list of feasible path indices where the whole obstacle stays
+        # inside the map and is not too close to the start/goal.
+        feasible_indices: List[int] = []
+        start = np.array([self.start_x, self.start_y], dtype=np.float32)
+        goal = np.array([self.goal_x, self.goal_y], dtype=np.float32)
+
+        for idx, (px, py) in enumerate(self.path):
+            if len(self.path_s) > idx:
+                s_val = float(self.path_s[idx])
+                if s_val < s_min or s_val > s_max:
+                    continue
+
+            cx = float(px)
+            cy = float(py)
+            if cx - half < margin or cx + half > self.map_width - margin:
+                continue
+            if cy - half < margin or cy + half > self.map_height - margin:
+                continue
+
+            c = np.array([cx, cy], dtype=np.float32)
+            if float(np.linalg.norm(c - start)) < 2.0:
+                continue
+            if float(np.linalg.norm(c - goal)) < 2.0:
+                continue
+
+            feasible_indices.append(idx)
+
+        if not feasible_indices:
+            # In normal 25x50 / 10x25 maps this should not happen. Returning
+            # empty is safer than silently moving the obstacle off the path.
+            return []
+
+        idx = int(np.random.choice(feasible_indices))
+        cx = float(self.path[idx, 0])
+        cy = float(self.path[idx, 1])
+
+        x0 = cx - half
+        x1 = cx + half
+        y0 = cy - half
+        y1 = cy + half
+        return [[(x0, y0), (x1, y0), (x1, y1), (x0, y1)]]
+
     def _generate_obstacles(self, num_obs: int, test_case: Optional[int] = None):
         if test_case is not None:
             raw = self.scenario.obstacles(test_case=test_case)
             return self._scale_case_obstacles(raw)
+        
+        # Switch self.obstacle_mode / OBSTACLE_MODE back to "old_path_relative"
+        # to restore the previous random path-relative obstacle generator.
+        if self.obstacle_mode == "single_on_path":
+            return self._generate_single_on_path_obstacle()
 
         obstacles: List[List[Tuple[float, float]]] = []
         if num_obs <= 0:
@@ -568,8 +642,6 @@ class ASVLidarEnv(gym.Env):
         pen = 1.0 / (GAMMA_X * (x ** 2))
 
         r_oa = -float(np.sum(w * pen) / (np.sum(w) + 1e-6))
-
-        self.current_lambda = 0.7
         
         r_exist = -self.current_lambda * (2.0 * ALPHA_R + 1.0)
 
