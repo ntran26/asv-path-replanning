@@ -77,14 +77,14 @@ OBSTACLE_LATERAL_OFFSET_MAX = 0.95
 
 # Local lidar-based bypass cue. This is not global planning: it uses only the
 # lidar sector ranges to choose the clearer side when the path ahead is blocked.
-BLOCK_D_SAFE = 6.0
+BLOCK_D_SAFE = 5.0
 BLOCK_D_CRIT = 2.0
 BLOCK_FRONT_DEG = 25.0
 SIDE_ARC_MIN_DEG = 15.0
 SIDE_ARC_MAX_DEG = 100.0
 SIDE_CLEAR_TIE = 0.25
-BYPASS_CTE = 1.35
-K_LOCAL_TARGET = 2.5
+BYPASS_CTE = 0.7
+K_LOCAL_TARGET = 1.5
 K_CENTER_BLOCK = 1.0
 K_BORDER = 1.5
 
@@ -466,18 +466,26 @@ class ASVLidarEnv(gym.Env):
         self.right_clearance = pctl(right_mask, 20.0)
         self.block_alpha = float(np.clip((BLOCK_D_SAFE - self.front_clearance) / (BLOCK_D_SAFE - BLOCK_D_CRIT), 0.0, 1.0))
 
-        if self.block_alpha <= 1e-6:
+        if self.block_alpha <= 1e-6 or self.front_clearance > BLOCK_D_SAFE:
             self.local_target_cte = 0.0
             return
 
-        # In this coordinate/sign convention, starboard/right of the path has negative CTE.
-        if abs(self.right_clearance - self.left_clearance) < SIDE_CLEAR_TIE:
-            side_cte_sign = -1.0  # default starboard/right to break symmetry
-        elif self.right_clearance > self.left_clearance:
+        clear_diff = self.right_clearance - self.left_clearance
+
+        # If both sides are nearly equal, only apply the default side bias when the path
+        # is clearly blocked. Otherwise, stay centered.
+        if abs(clear_diff) < SIDE_CLEAR_TIE:
+            if self.block_alpha < 0.5:
+                self.local_target_cte = 0.0
+                return
+            side_cte_sign = -1.0   # default starboard/right only when truly blocked
+        elif clear_diff > 0.0:
             side_cte_sign = -1.0
         else:
             side_cte_sign = +1.0
-        self.local_target_cte = float(side_cte_sign * BYPASS_CTE * self.block_alpha)
+
+        # make the requested bypass grow more gently
+        self.local_target_cte = float(side_cte_sign * BYPASS_CTE * (self.block_alpha ** 1.5))
 
     # ------------------------------------------------------------------
     # Reset / step
@@ -580,10 +588,17 @@ class ASVLidarEnv(gym.Env):
         # Local planner penalty: when front is blocked, staying on path is bad;
         # moving toward the lidar-selected bypass side is good.
         target_err = float(self.cross_track_error - self.local_target_cte)
-        r_local = -float(K_LOCAL_TARGET * self.block_alpha * min((target_err / max(BYPASS_CTE, 1e-6)) ** 2, 4.0))
-        r_center = -float(K_CENTER_BLOCK * self.block_alpha * math.exp(-ye / 0.5))
 
-        # Soft geofence penalty before hard border collision.
+        # softer local-target penalty so the agent does not overcommit to a wide bypass
+        r_local = -float(
+            K_LOCAL_TARGET * self.block_alpha * min((target_err / max(BYPASS_CTE, 1e-6)) ** 2, 2.5)
+        )
+
+        # only penalize being centered when really centered on a blocked path
+        r_center = -float(
+            K_CENTER_BLOCK * self.block_alpha * math.exp(-ye / 0.35)
+        )
+
         min_border = min(self.asv_x, self.map_width - self.asv_x, self.asv_y, self.map_height - self.asv_y)
         r_border = -float(K_BORDER * max(0.0, 1.0 - min_border / 1.5) ** 2)
 

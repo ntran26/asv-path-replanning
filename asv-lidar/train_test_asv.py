@@ -332,13 +332,21 @@ class EvalMetricsCallback(BaseCallback):
         collision_rate = border_rate + obstacle_rate
         mean_abs_cte = mean_of("mean_abs_cte")
         mean_abs_course_error = mean_of("mean_abs_course_error")
+        # selection_score = (
+        #     10.0 * success_rate
+        #     - 3.0 * obstacle_rate
+        #     - 3.0 * border_rate
+        #     - 2.0 * timeout_rate
+        #     - 0.25 * mean_abs_cte
+        #     - 0.02 * mean_abs_course_error
+        # )
         selection_score = (
-            10.0 * success_rate
+            8.0 * success_rate
             - 3.0 * obstacle_rate
             - 3.0 * border_rate
             - 2.0 * timeout_rate
-            - 0.25 * mean_abs_cte
-            - 0.02 * mean_abs_course_error
+            - 1.2 * mean_abs_cte
+            - 0.05 * mean_abs_course_error
         )
         summary = {
             "timesteps": int(self.num_timesteps),
@@ -463,14 +471,14 @@ if __name__ == "__main__":
                 vec_env,
                 verbose=1,
                 tensorboard_log=f"./{algo}_log/",
-                learning_rate=2e-4,
+                learning_rate=1e-4,
                 n_steps=1024,
                 batch_size=256,
                 n_epochs=10,
                 gamma=0.999,
                 gae_lambda=0.95,
                 clip_range=0.2,
-                ent_coef=0.01,
+                ent_coef=0.03,
                 vf_coef=0.5,
                 policy_kwargs=policy_kwargs,
             )
