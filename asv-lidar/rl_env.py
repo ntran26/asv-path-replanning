@@ -33,7 +33,7 @@ UPDATE_RATE = 0.1
 RENDER_FPS = 10
 MAP_WIDTH = 10
 MAP_HEIGHT = 25
-MAX_OBS = 1
+MAX_OBS = 6
 
 PATH_MODE = "straight"      # keep the nominal global/reference path straight
 CURVE_PROB = 0.0
@@ -74,6 +74,9 @@ OBSTACLE_PATH_END_FRAC = 0.70
 OBSTACLE_CENTER_PROB = 0.30
 OBSTACLE_LATERAL_OFFSET_MIN = 0.25
 OBSTACLE_LATERAL_OFFSET_MAX = 0.95
+
+OBSTACLE_MODE = "random_multi"
+# OBSTACLE_MODE = "single_near_path"
 
 # Local lidar-based bypass cue. This is not global planning: it uses only the
 # lidar sector ranges to choose the clearer side when the path ahead is blocked.
@@ -122,6 +125,7 @@ class ASVLidarEnv(gym.Env):
         self.render_scale = float(RENDER_SCALE)
         self.window_size = (int(round(self.map_width * self.render_scale)), int(round(self.map_height * self.render_scale)))
         self.world_size = (self.map_width, self.map_height)
+        self.obstacle_mode = OBSTACLE_MODE
 
         self.display = None
         self.surface = None
@@ -444,8 +448,68 @@ class ASVLidarEnv(gym.Env):
         if test_case is not None:
             raw = self.scenario.obstacles(test_case=test_case)
             return self._scale_case_obstacles(raw)
-        # Focused local-planner curriculum: exactly one lidar-visible obstacle near the path.
-        return self._generate_single_near_path_obstacle()
+
+        if self.obstacle_mode == "single_near_path":
+            return self._generate_single_near_path_obstacle()
+
+        # random multiple obstacles around the map / around the path like before
+        obstacles: List[List[Tuple[float, float]]] = []
+        if num_obs <= 0:
+            return obstacles
+
+        path_len = len(self.path)
+        start_margin = int(0.15 * path_len)
+        end_margin = int(0.85 * path_len)
+        min_center_dist = 1.6
+        max_tries = 200
+        tries = 0
+
+        while len(obstacles) < num_obs and tries < max_tries:
+            tries += 1
+
+            idx = int(np.random.randint(max(1, start_margin), max(2, end_margin)))
+            center = self.path[idx].astype(np.float32)
+
+            tangent = self._path_tangent(idx)
+            normal = np.array([-tangent[1], tangent[0]], dtype=np.float32)
+
+            lateral_sigma = 0.18 * self.map_width
+            lateral = float(np.random.normal(loc=0.0, scale=lateral_sigma))
+            center = center + lateral * normal
+
+            w = float(np.random.uniform(0.8, 1.2))
+            h = float(np.random.uniform(0.8, 1.2))
+
+            x0 = float(center[0] - 0.5 * w)
+            x1 = float(center[0] + 0.5 * w)
+            y0 = float(center[1] - 0.5 * h)
+            y1 = float(center[1] + 0.5 * h)
+
+            margin = 1.0
+            if x0 < margin or x1 > self.map_width - margin or y0 < margin or y1 > self.map_height - margin:
+                continue
+
+            c = np.array([(x0 + x1) * 0.5, (y0 + y1) * 0.5], dtype=np.float32)
+            start = np.array([self.start_x, self.start_y], dtype=np.float32)
+            goal = np.array([self.goal_x, self.goal_y], dtype=np.float32)
+
+            if float(np.linalg.norm(c - start)) < 2.0 or float(np.linalg.norm(c - goal)) < 2.0:
+                continue
+
+            too_close = False
+            for obs in obstacles:
+                oc = np.mean(np.array(obs, dtype=np.float32), axis=0)
+                if float(np.linalg.norm(c - oc)) < min_center_dist:
+                    too_close = True
+                    break
+            if too_close:
+                continue
+
+            obstacles.append([(x0, y0), (x1, y0), (x1, y1), (x0, y1)])
+
+        return obstacles
+    
+
 
     # ------------------------------------------------------------------
     # Local planner features from LiDAR only
@@ -523,7 +587,18 @@ class ASVLidarEnv(gym.Env):
         self.asv_x = float(self.start_x)
         self.asv_y = float(self.start_y)
         self.path = self._generate_path(self.start_x, self.start_y, self.goal_x, self.goal_y)
-        self.obstacles = self._generate_obstacles(1, self.test_case)
+
+        if self.test_case is None:
+            if self.obstacle_mode == "single_near_path":
+                num_obs = 1
+            else:
+                num_obs = int(np.random.randint(0, self.max_obs + 1))
+        else:
+            num_obs = 0
+
+        self.obstacles = self._generate_obstacles(num_obs, self.test_case)
+
+        # self.obstacles = self._generate_obstacles(1, self.test_case)
         self.asv_path = [(self.asv_x, self.asv_y)]
         self.distance_to_goal = float(np.linalg.norm([self.asv_x - self.goal_x, self.asv_y - self.goal_y]))
         self.lidar.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=self.obstacles, map_border=None)
