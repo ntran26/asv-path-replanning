@@ -17,7 +17,7 @@ from rl_env import ASVLidarEnv, DEFAULT_EVAL_LAMBDA, RPM_MAX, RPM_MIN
 
 # Focused local-planner eval set:
 # 0 = no obstacle path following, 1 = centered obstacle, 2/3 = offset obstacles.
-DEFAULT_EVAL_CASES = [0, 1, 2, 3]
+DEFAULT_EVAL_CASES = [0, 1, 2, 3, 4, 5]
 
 
 def action_to_rpm(throttle_cmd: float) -> float:
@@ -410,7 +410,7 @@ def parse_args():
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--eval-freq", type=int, default=50_000)
     ap.add_argument("--eval-max-steps", type=int, default=2_000)
-    ap.add_argument("--save-freq", type=int, default=500_000)
+    ap.add_argument("--save-freq", type=int, default=100_000)
     ap.add_argument("--model-path", type=str, default=None)
     ap.add_argument("--test-case", type=int, default=None)
     ap.add_argument("--eval-cases", type=int, nargs="+", default=DEFAULT_EVAL_CASES)
