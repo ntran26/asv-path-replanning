@@ -33,7 +33,7 @@ UPDATE_RATE = 0.1
 RENDER_FPS = 10
 MAP_WIDTH = 10
 MAP_HEIGHT = 25
-MAX_OBS = 6
+MAX_OBS = 1
 
 PATH_MODE = "straight"      # keep the nominal global/reference path straight
 CURVE_PROB = 0.0
@@ -42,24 +42,25 @@ LOOKAHEAD_FRACTION = 0.25
 # Fixed lambda for this practical local-planner run.
 LAMBDA_MIN = 1e-4
 LAMBDA_MAX = 1.0
-DEFAULT_EVAL_LAMBDA = 0.7
+DEFAULT_EVAL_LAMBDA = 0.6
 
 # Reward parameters
-GAMMA_E = 0.15
+GAMMA_E = 0.05
 GAMMA_THETA = 4.0
 GAMMA_X = 0.005
 EPSILON_X = 1.0
 R_COLLISION = -1000.0
 R_TIMEOUT = -1000.0
 R_GOAL = 50.0
-R_EXIST = -0.35
+R_EXIST = -0.20
+U_REWARD_REF = 0.8
 
 # Fixed-speed steering task. The action space remains 2D for compatibility,
 # but throttle is ignored while FIXED_RPM=True.
 RPM_MIN = 0
 RPM_MAX = 24
 CRUISE_RPM = 12.0
-FIXED_RPM = False
+FIXED_RPM = True
 U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 MAX_IN = 1.0
 MIN_IN = -1.0
@@ -75,21 +76,18 @@ OBSTACLE_CENTER_PROB = 0.30
 OBSTACLE_LATERAL_OFFSET_MIN = 0.25
 OBSTACLE_LATERAL_OFFSET_MAX = 0.95
 
-OBSTACLE_MODE = "random_multi"
-# OBSTACLE_MODE = "single_near_path"
-
 # Local lidar-based bypass cue. This is not global planning: it uses only the
 # lidar sector ranges to choose the clearer side when the path ahead is blocked.
-BLOCK_D_SAFE = 5.0
+BLOCK_D_SAFE = 6.0
 BLOCK_D_CRIT = 2.0
 BLOCK_FRONT_DEG = 25.0
 SIDE_ARC_MIN_DEG = 15.0
 SIDE_ARC_MAX_DEG = 100.0
 SIDE_CLEAR_TIE = 0.25
-BYPASS_CTE = 0.7
-K_LOCAL_TARGET = 1.5
-K_CENTER_BLOCK = 1.0
-K_BORDER = 1.5
+BYPASS_CTE = 1.35
+K_LOCAL_TARGET = 2.5
+K_CENTER_BLOCK = 0.0
+K_BORDER = 0.0
 
 
 class ASVLidarEnv(gym.Env):
@@ -125,7 +123,6 @@ class ASVLidarEnv(gym.Env):
         self.render_scale = float(RENDER_SCALE)
         self.window_size = (int(round(self.map_width * self.render_scale)), int(round(self.map_height * self.render_scale)))
         self.world_size = (self.map_width, self.map_height)
-        self.obstacle_mode = OBSTACLE_MODE
 
         self.display = None
         self.surface = None
@@ -448,68 +445,8 @@ class ASVLidarEnv(gym.Env):
         if test_case is not None:
             raw = self.scenario.obstacles(test_case=test_case)
             return self._scale_case_obstacles(raw)
-
-        if self.obstacle_mode == "single_near_path":
-            return self._generate_single_near_path_obstacle()
-
-        # random multiple obstacles around the map / around the path like before
-        obstacles: List[List[Tuple[float, float]]] = []
-        if num_obs <= 0:
-            return obstacles
-
-        path_len = len(self.path)
-        start_margin = int(0.15 * path_len)
-        end_margin = int(0.85 * path_len)
-        min_center_dist = 1.6
-        max_tries = 200
-        tries = 0
-
-        while len(obstacles) < num_obs and tries < max_tries:
-            tries += 1
-
-            idx = int(np.random.randint(max(1, start_margin), max(2, end_margin)))
-            center = self.path[idx].astype(np.float32)
-
-            tangent = self._path_tangent(idx)
-            normal = np.array([-tangent[1], tangent[0]], dtype=np.float32)
-
-            lateral_sigma = 0.18 * self.map_width
-            lateral = float(np.random.normal(loc=0.0, scale=lateral_sigma))
-            center = center + lateral * normal
-
-            w = float(np.random.uniform(0.8, 1.2))
-            h = float(np.random.uniform(0.8, 1.2))
-
-            x0 = float(center[0] - 0.5 * w)
-            x1 = float(center[0] + 0.5 * w)
-            y0 = float(center[1] - 0.5 * h)
-            y1 = float(center[1] + 0.5 * h)
-
-            margin = 1.0
-            if x0 < margin or x1 > self.map_width - margin or y0 < margin or y1 > self.map_height - margin:
-                continue
-
-            c = np.array([(x0 + x1) * 0.5, (y0 + y1) * 0.5], dtype=np.float32)
-            start = np.array([self.start_x, self.start_y], dtype=np.float32)
-            goal = np.array([self.goal_x, self.goal_y], dtype=np.float32)
-
-            if float(np.linalg.norm(c - start)) < 2.0 or float(np.linalg.norm(c - goal)) < 2.0:
-                continue
-
-            too_close = False
-            for obs in obstacles:
-                oc = np.mean(np.array(obs, dtype=np.float32), axis=0)
-                if float(np.linalg.norm(c - oc)) < min_center_dist:
-                    too_close = True
-                    break
-            if too_close:
-                continue
-
-            obstacles.append([(x0, y0), (x1, y0), (x1, y1), (x0, y1)])
-
-        return obstacles
-    
-
+        # Focused local-planner curriculum: exactly one lidar-visible obstacle near the path.
+        return self._generate_single_near_path_obstacle()
 
     # ------------------------------------------------------------------
     # Local planner features from LiDAR only
@@ -530,26 +467,18 @@ class ASVLidarEnv(gym.Env):
         self.right_clearance = pctl(right_mask, 20.0)
         self.block_alpha = float(np.clip((BLOCK_D_SAFE - self.front_clearance) / (BLOCK_D_SAFE - BLOCK_D_CRIT), 0.0, 1.0))
 
-        if self.block_alpha <= 1e-6 or self.front_clearance > BLOCK_D_SAFE:
+        if self.block_alpha <= 1e-6:
             self.local_target_cte = 0.0
             return
 
-        clear_diff = self.right_clearance - self.left_clearance
-
-        # If both sides are nearly equal, only apply the default side bias when the path
-        # is clearly blocked. Otherwise, stay centered.
-        if abs(clear_diff) < SIDE_CLEAR_TIE:
-            if self.block_alpha < 0.5:
-                self.local_target_cte = 0.0
-                return
-            side_cte_sign = -1.0   # default starboard/right only when truly blocked
-        elif clear_diff > 0.0:
+        # In this coordinate/sign convention, starboard/right of the path has negative CTE.
+        if abs(self.right_clearance - self.left_clearance) < SIDE_CLEAR_TIE:
+            side_cte_sign = -1.0  # default starboard/right to break symmetry
+        elif self.right_clearance > self.left_clearance:
             side_cte_sign = -1.0
         else:
             side_cte_sign = +1.0
-
-        # make the requested bypass grow more gently
-        self.local_target_cte = float(side_cte_sign * BYPASS_CTE * (self.block_alpha ** 1.5))
+        self.local_target_cte = float(side_cte_sign * BYPASS_CTE * self.block_alpha)
 
     # ------------------------------------------------------------------
     # Reset / step
@@ -587,18 +516,7 @@ class ASVLidarEnv(gym.Env):
         self.asv_x = float(self.start_x)
         self.asv_y = float(self.start_y)
         self.path = self._generate_path(self.start_x, self.start_y, self.goal_x, self.goal_y)
-
-        if self.test_case is None:
-            if self.obstacle_mode == "single_near_path":
-                num_obs = 1
-            else:
-                num_obs = int(np.random.randint(0, self.max_obs + 1))
-        else:
-            num_obs = 0
-
-        self.obstacles = self._generate_obstacles(num_obs, self.test_case)
-
-        # self.obstacles = self._generate_obstacles(1, self.test_case)
+        self.obstacles = self._generate_obstacles(1, self.test_case)
         self.asv_path = [(self.asv_x, self.asv_y)]
         self.distance_to_goal = float(np.linalg.norm([self.asv_x - self.goal_x, self.asv_y - self.goal_y]))
         self.lidar.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=self.obstacles, map_border=None)
@@ -646,42 +564,38 @@ class ASVLidarEnv(gym.Env):
 
         ye = abs(float(self.cross_track_error))
         U_norm = float(np.clip(self.speed_mps / U_MAX, 0.0, 1.5))
-        cos_chi = float(np.cos(np.radians(self.course_error)))
 
-        # Simple path-following term. It rewards staying close to path, aligned, and moving forward.
-        r_pf = float(1.2 * math.exp(-GAMMA_E * ye) + 0.4 * cos_chi + 0.3 * U_norm * cos_chi)
+        # Simple old-style path reward with heading alignment, but using the current richer observation.
+        # Use a speed gate so sitting still on the path is not profitable.
+        u_gate = float(np.clip(max(self.u_body, 0.0) / U_REWARD_REF, 0.0, 1.0))
+        r_pf = float(math.exp(-GAMMA_E * ye))
+        heading_err_deg = 0.7 * float(self.lookahead_course_error) + 0.3 * float(self.course_error)
+        r_heading = float(math.cos(math.radians(heading_err_deg)))
 
-        # Obstacle penalty from sector distances.
+        # Use raw beams for reward for a smoother obstacle gradient than sector penalties.
+        lidar_d = self.lidar.ranges.astype(np.float32)
+        lidar_angles_deg = self.lidar.angles.astype(np.float32)
+        w_raw = 1.0 / (1.0 + np.abs(lidar_angles_deg))
+        r_oa = -float(np.sum(w_raw / np.maximum(lidar_d, 1.0)) / max(len(lidar_d), 1))
+
+        # Keep local-planner shaping terms available for debug, but remove them from the reward for now.
+        r_local = 0.0
+        r_center = 0.0
+        r_border = 0.0
+
         sector_d = self.lidar.sector_ranges.astype(np.float32)
-        sector_angles_deg = self.lidar.sector_angles.astype(np.float32)
-        theta_rad = np.radians(sector_angles_deg)
-        w_sec = 1.0 / (1.0 + np.abs(GAMMA_THETA * theta_rad))
-        x = np.maximum(sector_d, EPSILON_X)
-        pen = 1.0 / (GAMMA_X * (x ** 2))
-        r_oa = -float(np.sum(w_sec * pen) / (np.sum(w_sec) + 1e-6))
-
-        # Local planner penalty: when front is blocked, staying on path is bad;
-        # moving toward the lidar-selected bypass side is good.
-        target_err = float(self.cross_track_error - self.local_target_cte)
-
-        # softer local-target penalty so the agent does not overcommit to a wide bypass
-        r_local = -float(
-            K_LOCAL_TARGET * self.block_alpha * min((target_err / max(BYPASS_CTE, 1e-6)) ** 2, 2.5)
-        )
-
-        # only penalize being centered when really centered on a blocked path
-        r_center = -float(
-            K_CENTER_BLOCK * self.block_alpha * math.exp(-ye / 0.35)
-        )
-
-        min_border = min(self.asv_x, self.map_width - self.asv_x, self.asv_y, self.map_height - self.asv_y)
-        r_border = -float(K_BORDER * max(0.0, 1.0 - min_border / 1.5) ** 2)
+        pen = 1.0 / (GAMMA_X * (np.maximum(sector_d, EPSILON_X) ** 2))
 
         r_exist = R_EXIST
         if collided:
             reward = float(R_COLLISION)
         else:
-            reward = float(self.current_lambda * r_pf + (1.0 - self.current_lambda) * r_oa + r_local + r_center + r_border + r_exist)
+            reward = float(
+                self.current_lambda * (u_gate * r_pf)
+                + (1.0 - self.current_lambda) * r_oa
+                + 0.35 * u_gate * r_heading
+                + r_exist
+            )
             if reached_goal:
                 reward += R_GOAL
 
@@ -696,6 +610,7 @@ class ASVLidarEnv(gym.Env):
             "lam": float(self.current_lambda),
             "log10_lambda": float(self.current_log10_lambda),
             "r_pf": float(r_pf),
+            "r_heading": float(r_heading),
             "r_oa": float(r_oa),
             "r_local": float(r_local),
             "r_center": float(r_center),
