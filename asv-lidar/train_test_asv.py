@@ -17,7 +17,7 @@ from rl_env import ASVLidarEnv, DEFAULT_EVAL_LAMBDA, RPM_MAX, RPM_MIN
 
 # Focused local-planner eval set:
 # 0 = no obstacle path following, 1 = centered obstacle, 2/3 = offset obstacles.
-DEFAULT_EVAL_CASES = [0, 1, 2, 3, 4, 5]
+DEFAULT_EVAL_CASES = [0, 1, 2, 3, 4, 5, 6, 7]
 
 
 def action_to_rpm(throttle_cmd: float) -> float:
@@ -332,14 +332,6 @@ class EvalMetricsCallback(BaseCallback):
         collision_rate = border_rate + obstacle_rate
         mean_abs_cte = mean_of("mean_abs_cte")
         mean_abs_course_error = mean_of("mean_abs_course_error")
-        # selection_score = (
-        #     10.0 * success_rate
-        #     - 3.0 * obstacle_rate
-        #     - 3.0 * border_rate
-        #     - 2.0 * timeout_rate
-        #     - 0.25 * mean_abs_cte
-        #     - 0.02 * mean_abs_course_error
-        # )
         selection_score = (
             8.0 * success_rate
             - 3.0 * obstacle_rate
@@ -501,7 +493,7 @@ if __name__ == "__main__":
             save_freq=max(int(args.save_freq // max(args.num_envs, 1)), 1),
             save_path="models",
             name_prefix=f"{algo}_model",
-            # save_replay_buffer=(algo == "sac"),
+            save_replay_buffer=(algo == "sac"),
             save_vecnormalize=False,
         )
         eval_cb = EvalMetricsCallback(
@@ -529,7 +521,7 @@ if __name__ == "__main__":
             test_case=args.test_case,
             record_video=True,
         )
-        obs, _ = env.reset(seed=args.seed + 123)
+        obs, _ = env.reset()
         done = False
         total_reward = 0.0
         while not done:
