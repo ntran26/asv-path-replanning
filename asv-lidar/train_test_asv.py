@@ -501,7 +501,7 @@ if __name__ == "__main__":
             save_freq=max(int(args.save_freq // max(args.num_envs, 1)), 1),
             save_path="models",
             name_prefix=f"{algo}_model",
-            save_replay_buffer=(algo == "sac"),
+            # save_replay_buffer=(algo == "sac"),
             save_vecnormalize=False,
         )
         eval_cb = EvalMetricsCallback(
