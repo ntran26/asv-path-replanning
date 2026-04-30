@@ -65,9 +65,9 @@ U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 MAX_IN = 1.0
 MIN_IN = -1.0
 
-MAX_EPISODE_STEPS = 800
+MAX_EPISODE_STEPS = 700
 
-# # first speed-control stage: 9-15 RPM
+# # first speed-control stage: 9-15 RPM (37.5% - 62.5%)
 # RPM_DELTA = 3.0      
 # RPM_FLOOR = 9.0
 # RPM_CEIL = 15.0
@@ -76,7 +76,7 @@ MAX_EPISODE_STEPS = 800
 # K_SLOW = 0.15
 # K_THRUST_DEV = 0.02
 
-# # second speed-control stage: 8-16 RPM
+# # second speed-control stage: 8-16 RPM (33% - 66%)
 # RPM_DELTA = 4.0
 # RPM_FLOOR = 8.0
 # RPM_CEIL = 16.0
@@ -85,23 +85,23 @@ MAX_EPISODE_STEPS = 800
 # K_SLOW = 0.10
 # K_THRUST_DEV = 0.015
 
-# third speed-control stage: 6-18 RPM
-RPM_DELTA = 6.0
-RPM_FLOOR = 6.0
-RPM_CEIL = 18.0
-U_MIN_REWARD = 0.35
-K_PROGRESS = 0.7
-K_SLOW = 0.12
-K_THRUST_DEV = 0.010
-
-# # forth speed-control stage: 3-21 RPM
-# RPM_DELTA = 9.0
-# RPM_FLOOR = 3.0
-# RPM_CEIL = 21.0
+# # third speed-control stage: 6-18 RPM (25% - 75%)
+# RPM_DELTA = 6.0
+# RPM_FLOOR = 6.0
+# RPM_CEIL = 18.0
 # U_MIN_REWARD = 0.35
-# K_PROGRESS = 0.8
-# K_SLOW = 0.15
-# K_THRUST_DEV = 0.005
+# K_PROGRESS = 0.7
+# K_SLOW = 0.12
+# K_THRUST_DEV = 0.010
+
+# full speed control
+RPM_DELTA = 12.0
+RPM_FLOOR = 0.0
+RPM_CEIL = 24.0
+U_MIN_REWARD = 0.55
+K_PROGRESS = 1.2
+K_SLOW = 0.35
+K_THRUST_DEV = 0.006
 
 # Observation LiDAR border-visibility mode.
 # - "none": no borders/walls in LiDAR

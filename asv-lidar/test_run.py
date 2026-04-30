@@ -44,6 +44,7 @@ Note:
 """
 
 ENV_DATA = "data/env_setup/survival_pool/env_0.json"
+EVAL_SUITE_DATA = "data/env_setup/eval_suite/asv_eval_suite_100_harder.json"
 
 OBS_LENGTH = 1.0
 
@@ -75,6 +76,11 @@ class TestCase:
         """Return obstacle polygons for a deterministic test case."""
         # IMPORTANT: always clear old obstacles. The same TestCase instance is reused.
         self.obs = []
+
+        if 1000 <= int(test_case) < 1100:
+            case = self._load_suite_case(test_case)
+            self.obs = case["obstacles"]
+            return self.obs
 
         # Existing no-obstacle cases
         if test_case in [0, 6, 7, 8, 9, 19, 20]:
@@ -158,6 +164,12 @@ class TestCase:
 
     def position(self, test_case):
         """Return start_x, start_y, goal_x, goal_y for a deterministic test case."""
+        if 1000 <= int(test_case) < 1100:
+            case = self._load_suite_case(test_case)
+            self.start_x, self.start_y = case["start"]
+            self.goal_x, self.goal_y = case["goal"]
+            return self.start_x, self.start_y, self.goal_x, self.goal_y
+
         # Existing centered straight-path cases and most paper-replica cases
         if test_case in [0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 15, 16, 17, 18]:
             self.start_x = 5
@@ -253,3 +265,14 @@ class TestCase:
     def paper_replica_cases(self):
         """Convenience list for paper-style evaluation."""
         return [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+    
+    def _load_suite_case(self, test_case):
+        suite_idx = int(test_case) - 1000
+        with open(EVAL_SUITE_DATA, "r") as f:
+            suite = json.load(f)
+
+        cases = suite["cases"]
+        if suite_idx < 0 or suite_idx >= len(cases):
+            raise ValueError(f"Invalid eval-suite test case: {test_case}")
+
+        return cases[suite_idx]

@@ -1,3 +1,15 @@
+"""
+Train
+    python train_test_asv.py --mode train --algo sac --timesteps 1000000
+    python train_test_asv.py --mode train --algo sac --timesteps 1000000 --resume --model-path best_model.zip
+
+Test
+    python train_test_asv.py --mode test --algo sac --model-path best_model.zip --test-case 4
+
+Evaluation
+    python train_test_asv.py --mode eval --eval-cases $(seq 1000 1099) --algo sac --model-path best_model.zip 
+"""
+
 from __future__ import annotations
 
 import argparse
