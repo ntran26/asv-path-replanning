@@ -17,7 +17,7 @@ from rl_env import ASVLidarEnv, DEFAULT_EVAL_LAMBDA, RPM_MAX, RPM_MIN
 
 # Focused local-planner eval set:
 # 0 = no obstacle path following, 1 = centered obstacle, 2/3 = offset obstacles.
-DEFAULT_EVAL_CASES = [0, 1, 2, 3, 4, 5, 6, 7]
+DEFAULT_EVAL_CASES = [0, 1, 2, 3, 4, 6, 7]
 
 
 def action_to_rpm(throttle_cmd: float) -> float:
@@ -415,8 +415,9 @@ def parse_args():
     ap.add_argument("--eval-map-height", type=float, default=25.0)
     ap.add_argument("--train-path-mode", choices=["straight", "curve", "mixed"], default="straight")
     ap.add_argument("--eval-path-mode", choices=["straight", "curve", "mixed"], default="straight")
+    ap.add_argument("--resume", action="store_true", help="Resume training from --model-path")
+    ap.add_argument("--replay-buffer-path", type=str, default=None, help="Replay buffer file for SAC resume")
     return ap.parse_args()
-
 
 def make_env(seed: int, rank: int, *, map_width: float, map_height: float, path_mode: str, train_lambda: float):
     def _init():
@@ -432,7 +433,6 @@ def make_env(seed: int, rank: int, *, map_width: float, map_height: float, path_
         env.reset(seed=seed + rank)
         return env
     return _init
-
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
@@ -456,38 +456,65 @@ if __name__ == "__main__":
         )
         eval_env.reset(seed=args.seed + 10_000)
 
-        if algo == "ppo":
-            policy_kwargs = dict(activation_fn=nn.Tanh, net_arch=dict(pi=[64, 64], vf=[64, 64]))
-            model = PPO(
-                "MultiInputPolicy",
-                vec_env,
-                verbose=1,
-                tensorboard_log=f"./{algo}_log/",
-                learning_rate=1e-4,
-                n_steps=1024,
-                batch_size=256,
-                n_epochs=10,
-                gamma=0.999,
-                gae_lambda=0.95,
-                clip_range=0.2,
-                ent_coef=0.03,
-                vf_coef=0.5,
-                policy_kwargs=policy_kwargs,
-            )
+        resume_training = bool(args.resume and args.model_path and os.path.exists(args.model_path))
+
+        if resume_training:
+            print(f"Resuming from {args.model_path}")
+
+            if algo == "ppo":
+                model = PPO.load(
+                    args.model_path,
+                    env=vec_env,
+                    tensorboard_log=f"./{algo}_log/",
+                    device="auto",
+                )
+            else:
+                model = SAC.load(
+                    args.model_path,
+                    env=vec_env,
+                    tensorboard_log=f"./{algo}_log/",
+                    device="auto",
+                )
+
+                if args.replay_buffer_path is not None and os.path.exists(args.replay_buffer_path):
+                    print(f"Loading replay buffer from {args.replay_buffer_path}")
+                    model.load_replay_buffer(args.replay_buffer_path)
+                else:
+                    print("No replay buffer loaded; SAC will resume with an empty buffer.")
+
         else:
-            model = SAC(
-                "MultiInputPolicy",
-                vec_env,
-                verbose=1,
-                tensorboard_log=f"./{algo}_log/",
-                learning_rate=1e-4,
-                batch_size=512,
-                gamma=0.99,
-                buffer_size=1_000_000,
-                train_freq=1,
-                gradient_steps=1,
-                ent_coef="auto",
-            )
+            if algo == "ppo":
+                policy_kwargs = dict(activation_fn=nn.Tanh, net_arch=dict(pi=[64, 64], vf=[64, 64]))
+                model = PPO(
+                    "MultiInputPolicy",
+                    vec_env,
+                    verbose=1,
+                    tensorboard_log=f"./{algo}_log/",
+                    learning_rate=1e-4,
+                    n_steps=1024,
+                    batch_size=256,
+                    n_epochs=10,
+                    gamma=0.999,
+                    gae_lambda=0.95,
+                    clip_range=0.2,
+                    ent_coef=0.03,
+                    vf_coef=0.5,
+                    policy_kwargs=policy_kwargs,
+                )
+            else:
+                model = SAC(
+                    "MultiInputPolicy",
+                    vec_env,
+                    verbose=1,
+                    tensorboard_log=f"./{algo}_log/",
+                    learning_rate=5e-5,
+                    batch_size=512,
+                    gamma=0.99,
+                    buffer_size=1_000_000,
+                    train_freq=1,
+                    gradient_steps=1,
+                    ent_coef="auto",
+                )
 
         checkpoint_cb = CheckpointCallback(
             save_freq=max(int(args.save_freq // max(args.num_envs, 1)), 1),
@@ -504,7 +531,14 @@ if __name__ == "__main__":
             verbose=1,
         )
         callbacks = CallbackList([checkpoint_cb, eval_cb])
-        model.learn(total_timesteps=int(args.timesteps), tb_log_name=f"asv_{algo}", callback=callbacks, progress_bar=True)
+        # model.learn(total_timesteps=int(args.timesteps), tb_log_name=f"asv_{algo}", callback=callbacks, progress_bar=True)
+        model.learn(
+            total_timesteps=int(args.timesteps),
+            tb_log_name=f"asv_{algo}",
+            callback=callbacks,
+            progress_bar=True,
+            reset_num_timesteps=not resume_training,
+        )
         model.save(model_path)
         print(f"Saved model -> {model_path}")
         vec_env.close()
