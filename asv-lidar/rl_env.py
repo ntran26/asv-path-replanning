@@ -65,17 +65,25 @@ U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 MAX_IN = 1.0
 MIN_IN = -1.0
 
-MAX_EPISODE_STEPS = 700
+MAX_EPISODE_STEPS = 800
 
-# first speed-control stage: narrow range
-RPM_DELTA = 3.0      
-RPM_FLOOR = 9.0
-RPM_CEIL = 15.0
+# # first speed-control stage: narrow range
+# RPM_DELTA = 3.0      
+# RPM_FLOOR = 9.0
+# RPM_CEIL = 15.0
+# U_MIN_REWARD = 0.35
+# K_PROGRESS = 0.5
+# K_SLOW = 0.15
+# K_THRUST_DEV = 0.02
 
-U_MIN_REWARD = 0.35
-K_PROGRESS = 0.5
-K_SLOW = 0.15
-K_THRUST_DEV = 0.02
+# second speed-control stage: wider range
+RPM_DELTA = 4.0
+RPM_FLOOR = 8.0
+RPM_CEIL = 16.0
+U_MIN_REWARD = 0.30
+K_PROGRESS = 0.6
+K_SLOW = 0.10
+K_THRUST_DEV = 0.015
 
 # Observation LiDAR border-visibility mode.
 # - "none": no borders/walls in LiDAR
