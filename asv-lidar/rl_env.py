@@ -67,7 +67,7 @@ MIN_IN = -1.0
 
 MAX_EPISODE_STEPS = 800
 
-# # first speed-control stage: narrow range
+# # first speed-control stage: 9-15 RPM
 # RPM_DELTA = 3.0      
 # RPM_FLOOR = 9.0
 # RPM_CEIL = 15.0
@@ -76,14 +76,32 @@ MAX_EPISODE_STEPS = 800
 # K_SLOW = 0.15
 # K_THRUST_DEV = 0.02
 
-# second speed-control stage: wider range
-RPM_DELTA = 4.0
-RPM_FLOOR = 8.0
-RPM_CEIL = 16.0
-U_MIN_REWARD = 0.30
-K_PROGRESS = 0.6
-K_SLOW = 0.10
-K_THRUST_DEV = 0.015
+# # second speed-control stage: 8-16 RPM
+# RPM_DELTA = 4.0
+# RPM_FLOOR = 8.0
+# RPM_CEIL = 16.0
+# U_MIN_REWARD = 0.30
+# K_PROGRESS = 0.6
+# K_SLOW = 0.10
+# K_THRUST_DEV = 0.015
+
+# third speed-control stage: 6-18 RPM
+RPM_DELTA = 6.0
+RPM_FLOOR = 6.0
+RPM_CEIL = 18.0
+U_MIN_REWARD = 0.35
+K_PROGRESS = 0.7
+K_SLOW = 0.12
+K_THRUST_DEV = 0.010
+
+# # forth speed-control stage: 3-21 RPM
+# RPM_DELTA = 9.0
+# RPM_FLOOR = 3.0
+# RPM_CEIL = 21.0
+# U_MIN_REWARD = 0.35
+# K_PROGRESS = 0.8
+# K_SLOW = 0.15
+# K_THRUST_DEV = 0.005
 
 # Observation LiDAR border-visibility mode.
 # - "none": no borders/walls in LiDAR
