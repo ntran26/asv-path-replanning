@@ -85,23 +85,23 @@ MAX_EPISODE_STEPS = 700
 # K_SLOW = 0.10
 # K_THRUST_DEV = 0.015
 
-# # third speed-control stage: 6-18 RPM (25% - 75%)
-# RPM_DELTA = 6.0
-# RPM_FLOOR = 6.0
-# RPM_CEIL = 18.0
-# U_MIN_REWARD = 0.35
-# K_PROGRESS = 0.7
-# K_SLOW = 0.12
-# K_THRUST_DEV = 0.010
+# third speed-control stage: 6-18 RPM (25% - 75%)
+RPM_DELTA = 6.0
+RPM_FLOOR = 6.0
+RPM_CEIL = 18.0
+U_MIN_REWARD = 0.35
+K_PROGRESS = 0.7
+K_SLOW = 0.12
+K_THRUST_DEV = 0.010
 
-# full speed control
-RPM_DELTA = 12.0
-RPM_FLOOR = 0.0
-RPM_CEIL = 24.0
-U_MIN_REWARD = 0.55
-K_PROGRESS = 1.2
-K_SLOW = 0.35
-K_THRUST_DEV = 0.006
+# # full speed control
+# RPM_DELTA = 12.0
+# RPM_FLOOR = 0.0
+# RPM_CEIL = 24.0
+# U_MIN_REWARD = 0.55
+# K_PROGRESS = 1.2
+# K_SLOW = 0.35
+# K_THRUST_DEV = 0.006
 
 # Observation LiDAR border-visibility mode.
 # - "none": no borders/walls in LiDAR
