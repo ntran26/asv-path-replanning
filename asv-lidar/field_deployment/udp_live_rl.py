@@ -16,6 +16,18 @@ from test_run import TestCase
 LIDAR_RANGE = 16
 LIDAR_SWATH = 270
 LIDAR_BEAMS = 90
+LIDAR_SECTORS = 25
+
+RPM_MIN = 0.0
+RPM_MAX = 24.0
+CRUISE_RPM = 12.0
+
+# 25% to 75%
+RPM_DELTA = 6.0
+RPM_FLOOR = 6.0
+RPM_CEIL = 18.0
+
+S2_MAX_CMD = 80.0  # adjust if your real command range differs
 
 MAP_WIDTH = 10
 MAP_HEIGHT = 25
@@ -23,26 +35,73 @@ OBS_LENGTH = 1
 
 SCALE = 1
 
-def generate_path(start_x, start_y, goal_x, goal_y):
-    path_length = max(2, int(np.hypot(abs(goal_x - start_x), abs(goal_y - start_y))))
+def wrap180(a: float) -> float:
+    return (float(a) + 180.0) % 360.0 - 180.0
 
-    # record path coordinates
-    path_x = np.round(np.linspace(start_x, goal_x, path_length)).astype(int)
-    path_y = np.round(np.linspace(start_y, goal_y, path_length)).astype(int)
+def generate_reference_path(start_x, start_y, goal_x, goal_y):
+    # Match current rl_env.py style better than the old rounded integer path
+    path_length = max(40, int(np.hypot(goal_x - start_x, goal_y - start_y) * 5.0))
+    path_x = np.linspace(start_x, goal_x, path_length, dtype=np.float32)
+    path_y = np.linspace(start_y, goal_y, path_length, dtype=np.float32)
+    path = np.column_stack((path_x, path_y)).astype(np.float32)
 
-    # store path coordinates
-    path = np.column_stack((path_x, path_y))
+    diffs = np.diff(path, axis=0)
+    seg_len = np.linalg.norm(diffs, axis=1)
+    path_s = np.concatenate(([0.0], np.cumsum(seg_len))).astype(np.float32)
+    return path, path_s
 
-    return path
+def path_tangent(path: np.ndarray, idx: int) -> np.ndarray:
+    idx = int(np.clip(idx, 0, len(path) - 1))
+    if len(path) < 2:
+        return np.array([0.0, 1.0], dtype=np.float32)
+    if idx == 0:
+        vec = path[1] - path[0]
+    elif idx == len(path) - 1:
+        vec = path[-1] - path[-2]
+    else:
+        vec = path[idx + 1] - path[idx - 1]
+    n = float(np.linalg.norm(vec))
+    if n < 1e-6:
+        return np.array([0.0, 1.0], dtype=np.float32)
+    return (vec / n).astype(np.float32)
 
-def calculate_angle(asv_x, asv_y, heading, goal_x, goal_y):
-    dx = goal_x - asv_x
-    dy = goal_y - asv_y
+def bearing_deg(from_xy: np.ndarray, to_xy: np.ndarray) -> float:
+    dx = float(to_xy[0] - from_xy[0])
+    dy = float(to_xy[1] - from_xy[1])
+    return float(np.degrees(np.arctan2(dx, dy)))
 
-    target_angle = np.degrees(np.arctan2(dx, dy))    
-    angle_diff = (target_angle - heading + 180) % 360 - 180    # normalize to [-180,180]
+def pool_lidar_to_sectors(full_lidar_m, *, lidar_index0_deg: float):
+    raw_angles = np.linspace(
+        -LIDAR_SWATH / 2.0,
+        LIDAR_SWATH / 2.0,
+        LIDAR_BEAMS,
+        dtype=np.float32,
+    )
 
-    return angle_diff
+    raw = log_viewer.pick_lidar_swath(
+        np.asarray(full_lidar_m, dtype=np.float32),
+        raw_angles,
+        index0_deg=lidar_index0_deg,
+    ).astype(np.float32)
+
+    raw = np.clip(raw, 0.0, LIDAR_RANGE)
+
+    sectors = np.array_split(raw, LIDAR_SECTORS)
+    sector_ranges = np.array(
+        [float(np.min(s)) if len(s) else LIDAR_RANGE for s in sectors],
+        dtype=np.float32,
+    )
+    sector_ranges = np.clip(sector_ranges, 0.0, LIDAR_RANGE)
+    sector_closeness = np.clip(1.0 - sector_ranges / LIDAR_RANGE, 0.0, 1.0).astype(np.float32)
+
+    sector_angles = np.linspace(
+        -LIDAR_SWATH / 2.0,
+        LIDAR_SWATH / 2.0,
+        LIDAR_SECTORS,
+        dtype=np.float32,
+    )
+
+    return raw, raw_angles, sector_ranges, sector_closeness, sector_angles
 
 def draw_static_ref(surface: pygame.Surface,
                     map_rect: pygame.Rect,
@@ -96,100 +155,152 @@ def draw_static_ref(surface: pygame.Surface,
 
 # RL observation adapter
 def frame_to_rl_obs(
-        frame: BluefinFrame,
-        *,
-        model_obs_space,
-        real_origin_xy: Optional[Tuple[float, float]],
-        start_xy: Tuple[float, float],
-        goal_xy: Tuple[float, float],
-        reference_path: np.ndarray,
-        pos_scale: float,
-        speed_scale: float,
-        lidar_index0_deg: float
-) -> Tuple[Dict[str, np.ndarray], Dict[str, float], Tuple[float, float], float, float]:
-    """
-    Convert a decoded telemetry frame into the exact observation format used by the updated y-up env.
-
-    Observation format to match:
-        {
-            "lidar": shape (LIDAR_BEAMS,), float32
-            "pos": shape (2,)
-            "hdg": shape (1,)
-            "dhdg": shape (1,)
-            "speed": shape (1,)
-            "tgt": shape (1,)
-            "target_heading": shape (1,)
-        }
-
-    Mapping strategy:
-    - Keep deployment processing in y-up.
-    - Use the first real telemetry position as an origin anchor.
-    - Place that origin at the scenario start point.
-    """
+    frame: BluefinFrame,
+    *,
+    model_obs_space,
+    real_origin_xy,
+    start_xy,
+    goal_xy,
+    reference_path,
+    reference_path_s,
+    lookahead_fraction: float,
+    lambda_value: float,
+    pos_scale: float,
+    lidar_index0_deg: float,
+):
     spaces = getattr(model_obs_space, "spaces", {})
-    
-    # position mapping: first telemetry sample maps to scenario start
+
+    # Map real position into RL map frame.
     if real_origin_xy is None:
         rx0, ry0 = float(frame.x_m), float(frame.y_m)
     else:
         rx0, ry0 = real_origin_xy
 
-    mx = start_xy[0] + (frame.x_m - rx0) * pos_scale
-    my = start_xy[1] + (frame.y_m - ry0) * pos_scale
+    mx = float(start_xy[0] + (frame.x_m - rx0) * pos_scale)
+    my = float(start_xy[1] + (frame.y_m - ry0) * pos_scale)
+    asv_pos = np.array([mx, my], dtype=np.float32)
 
-    # mx = frame.x_m * pos_scale
-    # my = frame.y_m * pos_scale
+    yaw_deg = float(frame.yaw_deg)
+    yaw_rate = float(frame.yaw_rate)
 
-    # heading and heading rate
-    yaw_deg = frame.yaw_deg
-    yaw_rate = frame.yaw_rate
-    
-    # speed
-    speed = frame.speed_mps * speed_scale
+    # Use decoded body velocities from log_parser.py.
+    u_body = float(frame.u_body_mps)
+    v_body = float(frame.v_body_mps)
 
-    # path features
-    pos_arr = np.array([mx, my], dtype=np.float32)
-    distance = np.linalg.norm(reference_path - pos_arr, axis=1)
-    tgt = np.min(distance)
-    target_heading = calculate_angle(mx, my, yaw_deg, goal_xy[0], goal_xy[1])
+    # Course from measured velocity if moving; otherwise fall back to yaw.
+    if frame.speed_mps > 1e-4:
+        course_deg = float(np.degrees(np.arctan2(frame.vx_mps, frame.vy_mps)))
+    else:
+        course_deg = yaw_deg
 
-    # lidar processing to env beam count / swath
-    lidar_angles = np.linspace(-LIDAR_SWATH/2, LIDAR_SWATH/2, LIDAR_BEAMS, dtype=np.float64)
-    lidar_proc = log_viewer.pick_lidar_swath(
-        np.asarray(frame.lidar_m, dtype=np.float32),
-        lidar_angles,
-        index0_deg=lidar_index0_deg,
-    ).astype(np.float32)
-    lidar_proc = np.clip(lidar_proc, 0, LIDAR_RANGE)
+    # Path-relative states.
+    d = np.linalg.norm(reference_path - asv_pos, axis=1)
+    closest_idx = int(np.argmin(d))
+    cte_abs = float(d[closest_idx])
+    closest_pt = reference_path[closest_idx]
+    tangent = path_tangent(reference_path, closest_idx)
+
+    rel = asv_pos - closest_pt
+    cross_z = float(tangent[0] * rel[1] - tangent[1] * rel[0])
+    sign = 1.0 if cross_z > 0.0 else (-1.0 if cross_z < 0.0 else 0.0)
+    cross_track_error = sign * cte_abs
+
+    path_course_deg = float(np.degrees(np.arctan2(float(tangent[0]), float(tangent[1]))))
+    course_error = wrap180(path_course_deg - course_deg)
+
+    # Lookahead course error.
+    total_len = float(reference_path_s[-1]) if len(reference_path_s) else 1.0
+    lookahead_distance = max(2.0, lookahead_fraction * total_len)
+    s_here = float(reference_path_s[closest_idx])
+    s_target = min(total_len, s_here + lookahead_distance)
+    lookahead_idx = int(np.searchsorted(reference_path_s, s_target, side="left"))
+    lookahead_idx = int(np.clip(lookahead_idx, 0, len(reference_path) - 1))
+    lookahead_pt = reference_path[lookahead_idx]
+    lookahead_course_error = wrap180(bearing_deg(asv_pos, lookahead_pt) - course_deg)
+
+    # LiDAR sector observation.
+    raw_lidar, raw_angles, sector_ranges, sector_closeness, sector_angles = pool_lidar_to_sectors(
+        frame.lidar_m,
+        lidar_index0_deg=lidar_index0_deg,
+    )
+
+    # Local planner LiDAR features.
+    BLOCK_D_SAFE = 6.0
+    BLOCK_D_CRIT = 2.0
+    BLOCK_FRONT_DEG = 25.0
+    SIDE_ARC_MIN_DEG = 15.0
+    SIDE_ARC_MAX_DEG = 100.0
+    SIDE_CLEAR_TIE = 0.25
+    BYPASS_CTE = 1.35
+
+    front_mask = np.abs(sector_angles) <= BLOCK_FRONT_DEG
+    left_mask = (sector_angles <= -SIDE_ARC_MIN_DEG) & (sector_angles >= -SIDE_ARC_MAX_DEG)
+    right_mask = (sector_angles >= SIDE_ARC_MIN_DEG) & (sector_angles <= SIDE_ARC_MAX_DEG)
+
+    def pctl(mask, p=20.0):
+        vals = sector_ranges[mask]
+        return float(np.percentile(vals, p)) if vals.size else float(LIDAR_RANGE)
+
+    front_clearance = pctl(front_mask, 10.0)
+    left_clearance = pctl(left_mask, 20.0)
+    right_clearance = pctl(right_mask, 20.0)
+
+    block_alpha = float(np.clip(
+        (BLOCK_D_SAFE - front_clearance) / (BLOCK_D_SAFE - BLOCK_D_CRIT),
+        0.0,
+        1.0,
+    ))
+
+    if block_alpha <= 1e-6:
+        local_target_cte = 0.0
+    else:
+        # Starboard/right has negative CTE in your sim convention.
+        if abs(right_clearance - left_clearance) < SIDE_CLEAR_TIE:
+            side_cte_sign = -1.0
+        elif right_clearance > left_clearance:
+            side_cte_sign = -1.0
+        else:
+            side_cte_sign = +1.0
+        local_target_cte = float(side_cte_sign * BYPASS_CTE * block_alpha)
 
     obs_values = {
-        "lidar": lidar_proc.astype(np.float32),
-        "pos": np.array([mx, my], dtype=np.float32),
-        "hdg": np.array([yaw_deg], dtype=np.float32),
-        "dhdg": np.array([yaw_rate], dtype=np.float32),
-        "speed": np.array([speed], dtype=np.float32),
-        "tgt": np.array([tgt], dtype=np.float32),
-        "target_heading": np.array([target_heading], dtype=np.float32),
+        "lidar": sector_closeness.astype(np.float32),
+        "u": np.array([u_body], dtype=np.float32),
+        "v": np.array([v_body], dtype=np.float32),
+        "yaw_rate": np.array([yaw_rate], dtype=np.float32),
+        "cross_track_error": np.array([cross_track_error], dtype=np.float32),
+        "course_error": np.array([course_error], dtype=np.float32),
+        "lookahead_course_error": np.array([lookahead_course_error], dtype=np.float32),
+        "front_clearance": np.array([front_clearance], dtype=np.float32),
+        "side_clearance_diff": np.array([right_clearance - left_clearance], dtype=np.float32),
+        "local_target_cte": np.array([local_target_cte], dtype=np.float32),
+        "log10_lambda": np.array([np.log10(lambda_value)], dtype=np.float32),
     }
 
-    # enforce exact keys/shapes expected by loaded model
-    obs: Dict[str, np.ndarray] = {}
+    # Enforce exact model keys/shapes.
+    obs = {}
     for key, sp in spaces.items():
-        if key in obs_values:
-            arr = np.asarray(obs_values[key], dtype=np.float32).reshape(sp.shape)
-            obs[key] = arr
-        else:
-            obs[key] = np.zeros(sp.shape, dtype=np.float32)
-    
+        if key not in obs_values:
+            raise KeyError(f"Observation key {key!r} required by model but not built by adapter.")
+        obs[key] = np.asarray(obs_values[key], dtype=np.float32).reshape(sp.shape)
+
     aux = {
         "x": mx,
         "y": my,
         "yaw_deg": yaw_deg,
         "yaw_rate": yaw_rate,
-        "speed": speed,
-        "tgt": tgt,
-        "target_heading": target_heading,
+        "u": u_body,
+        "v": v_body,
+        "speed": float(frame.speed_mps),
+        "cross_track_error": float(cross_track_error),
+        "course_error": float(course_error),
+        "lookahead_course_error": float(lookahead_course_error),
+        "front_clearance": float(front_clearance),
+        "left_clearance": float(left_clearance),
+        "right_clearance": float(right_clearance),
+        "local_target_cte": float(local_target_cte),
     }
+
     return obs, aux, (mx, my), yaw_deg, yaw_rate
 
 def main():
@@ -213,7 +324,7 @@ def main():
     args = ap.parse_args()
 
     # Load RL policy
-    model = PPO.load("ppo_asv_model.zip")
+    model = SAC.load("sac_best_model.zip")
     model_obs_space = model.observation_space
 
     # Load reference map elements from TestCase class
@@ -222,7 +333,7 @@ def main():
     start_xy = (sx, sy)
     goal_xy = (gx, gy)
     obstacles = test_scenario.obstacles(test_case=args.test_case)
-    reference_path = generate_path(sx, sy, gx, gy)
+    reference_path = generate_reference_path(sx, sy, gx, gy)
 
     # Socket setup
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -372,17 +483,23 @@ def main():
                         latest_action = np.asarray(action, dtype=np.float32).reshape(-1)
                         # latest_cmd = latest_action*100
 
+                        def action_to_rpm(a1: float) -> float:
+                            return float(np.clip(CRUISE_RPM + RPM_DELTA * float(a1), RPM_FLOOR, RPM_CEIL))
+
+                        def rpm_to_s2_cmd(rpm: float) -> float:
+                            # Assumption: S2 command is linear 0..S2_MAX_CMD for 0..RPM_MAX.
+                            return float(np.clip((rpm / RPM_MAX) * S2_MAX_CMD, 0.0, S2_MAX_CMD))
+
                         def rudder_to_cmd(a):
                             # return 80 * a - 20      # [-100, 60]
                             return a*100          # [-100, 100]
-                        def thrust_to_cmd(b):
-                            return np.clip(100*b, 0, 80)  # [0, 100]
+                        # def thrust_to_cmd(b):
+                        #     return np.clip(100*b, 25, 75)  # [25, 75]
 
                         rudder_cmd = -rudder_to_cmd(latest_action[0])
-                        thrust_cmd = thrust_to_cmd(latest_action[1])
-
-                        # rudder_cmd = rudder_to_cmd(1)
-                        # thrust_cmd = thrust_to_cmd(0)
+                        # thrust_cmd = thrust_to_cmd(latest_action[1])
+                        rpm_cmd = action_to_rpm(latest_action[1])
+                        thrust_cmd = rpm_to_s2_cmd(rpm_cmd)
 
                         command = f"$CMD,{rudder_cmd},{thrust_cmd}"
                         sock.sendto(command.encode(), (args.server_ip, args.server_port))

@@ -46,7 +46,6 @@ except Exception:
     HAVE_TENSORBOARD = False
     EventAccumulator = None  # type: ignore
 
-
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser()
     p.add_argument("--monitor", type=str, required=True, help="Path to train_monitor.csv")
@@ -64,12 +63,10 @@ def parse_args() -> argparse.Namespace:
     )
     return p.parse_args()
 
-
 def ensure_outdir(path: str | Path) -> Path:
     p = Path(path)
     p.mkdir(parents=True, exist_ok=True)
     return p
-
 
 def load_table(path: str | Path) -> pd.DataFrame:
     path = Path(path)
@@ -90,17 +87,14 @@ def load_table(path: str | Path) -> pd.DataFrame:
         return pd.read_csv(path)
     raise ValueError(f"Unsupported file type: {path}")
 
-
 def save_plot(fig: plt.Figure, outpath: Path) -> None:
     fig.tight_layout()
     fig.savefig(outpath, dpi=200, bbox_inches="tight")
     plt.close(fig)
 
-
 def rolling_mean(series: pd.Series, window: int) -> pd.Series:
     w = max(int(window), 1)
     return series.rolling(window=w, min_periods=1).mean()
-
 
 def add_cumulative_timesteps(df: pd.DataFrame) -> pd.DataFrame:
     out = df.copy()
@@ -109,20 +103,17 @@ def add_cumulative_timesteps(df: pd.DataFrame) -> pd.DataFrame:
     out["timesteps"] = out["l"].cumsum()
     return out
 
-
 def pick_cte_col(df: pd.DataFrame) -> Optional[str]:
     for col in ["mean_abs_cte", "mean_abs_tgt", "mean_abs_cross_track_error"]:
         if col in df.columns:
             return col
     return None
 
-
 def pick_course_col(df: pd.DataFrame) -> Optional[str]:
     for col in ["mean_abs_course_error", "mean_abs_angle_diff", "mean_abs_heading_error"]:
         if col in df.columns:
             return col
     return None
-
 
 def plot_training_reward(monitor_df: pd.DataFrame, window: int, outdir: Path) -> None:
     df = add_cumulative_timesteps(monitor_df)
@@ -136,7 +127,6 @@ def plot_training_reward(monitor_df: pd.DataFrame, window: int, outdir: Path) ->
     ax.grid(True, alpha=0.3)
     save_plot(fig, outdir / "01_training_reward_vs_timesteps.png")
 
-
 def plot_episode_length(monitor_df: pd.DataFrame, window: int, outdir: Path) -> None:
     df = add_cumulative_timesteps(monitor_df)
     fig, ax = plt.subplots(figsize=(8, 4.5))
@@ -148,7 +138,6 @@ def plot_episode_length(monitor_df: pd.DataFrame, window: int, outdir: Path) -> 
     ax.legend()
     ax.grid(True, alpha=0.3)
     save_plot(fig, outdir / "02_episode_length_vs_timesteps.png")
-
 
 def plot_eval_success(eval_summary: pd.DataFrame, outdir: Path) -> None:
     if "timesteps" not in eval_summary.columns or "success_rate" not in eval_summary.columns:
@@ -162,7 +151,6 @@ def plot_eval_success(eval_summary: pd.DataFrame, outdir: Path) -> None:
     ax.grid(True, alpha=0.3)
     save_plot(fig, outdir / "03_eval_success_rate_vs_timesteps.png")
 
-
 def plot_eval_cte(eval_summary: pd.DataFrame, outdir: Path) -> None:
     cte_col = pick_cte_col(eval_summary)
     if cte_col is None:
@@ -174,7 +162,6 @@ def plot_eval_cte(eval_summary: pd.DataFrame, outdir: Path) -> None:
     ax.set_title("Mean absolute cross-track error vs timesteps")
     ax.grid(True, alpha=0.3)
     save_plot(fig, outdir / "04_eval_mean_abs_cte_vs_timesteps.png")
-
 
 def plot_failure_modes(eval_summary: pd.DataFrame, outdir: Path) -> None:
     cols = [c for c in ["border_rate", "obstacle_rate", "timeout_rate", "collision_rate"] if c in eval_summary.columns]
@@ -190,7 +177,6 @@ def plot_failure_modes(eval_summary: pd.DataFrame, outdir: Path) -> None:
     ax.legend()
     ax.grid(True, alpha=0.3)
     save_plot(fig, outdir / "05_eval_failure_rates_vs_timesteps.png")
-
 
 def plot_heading_errors(eval_summary: pd.DataFrame, outdir: Path) -> None:
     cols = []
@@ -210,7 +196,6 @@ def plot_heading_errors(eval_summary: pd.DataFrame, outdir: Path) -> None:
     ax.legend()
     ax.grid(True, alpha=0.3)
     save_plot(fig, outdir / "06_eval_heading_errors_vs_timesteps.png")
-
 
 def plot_final_per_case(eval_metrics: pd.DataFrame, outdir: Path) -> None:
     if eval_metrics is None or eval_metrics.empty:
@@ -257,10 +242,8 @@ def plot_final_per_case(eval_metrics: pd.DataFrame, outdir: Path) -> None:
 
     save_plot(fig, outdir / "07_final_per_case_metrics.png")
 
-
 def find_event_files(tb_dir: Path) -> list[Path]:
     return sorted([p for p in tb_dir.rglob("events.out.tfevents.*") if p.is_file()])
-
 
 def default_tb_tags() -> list[str]:
     return [
@@ -285,13 +268,11 @@ def default_tb_tags() -> list[str]:
         "train/q_values",
     ]
 
-
 def sanitize_filename(tag: str) -> str:
     keep = []
     for ch in tag:
         keep.append(ch if ch.isalnum() else "_")
     return "".join(keep).strip("_")
-
 
 def collect_tb_scalars(tb_dir: Path, tags: Optional[Iterable[str]]) -> dict[str, pd.DataFrame]:
     if not HAVE_TENSORBOARD:
@@ -327,7 +308,6 @@ def collect_tb_scalars(tb_dir: Path, tags: Optional[Iterable[str]]) -> dict[str,
         })
     return out
 
-
 def plot_tb_scalars(tb_scalars: dict[str, pd.DataFrame], outdir: Path) -> None:
     if not tb_scalars:
         return
@@ -343,7 +323,6 @@ def plot_tb_scalars(tb_scalars: dict[str, pd.DataFrame], outdir: Path) -> None:
         ax.set_title(tag)
         ax.grid(True, alpha=0.3)
         save_plot(fig, tb_out / f"{sanitize_filename(tag)}.png")
-
 
 def main() -> None:
     args = parse_args()
@@ -371,7 +350,6 @@ def main() -> None:
         plot_tb_scalars(tb_scalars, outdir)
 
     print(f"Plots written to: {outdir}")
-
 
 if __name__ == "__main__":
     main()

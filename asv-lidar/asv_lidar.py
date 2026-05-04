@@ -10,7 +10,6 @@ LIDAR_BEAMS = 90
 # What the agent observes
 LIDAR_SECTORS = 25
 
-
 class Lidar:
     """Basic line-intersection LiDAR with sector pooling.
 
