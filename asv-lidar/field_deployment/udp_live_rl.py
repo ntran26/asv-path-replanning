@@ -27,7 +27,7 @@ RPM_DELTA = 6.0
 RPM_FLOOR = 6.0
 RPM_CEIL = 18.0
 
-S2_MAX_CMD = 80.0  # adjust if your real command range differs
+S2_MAX_CMD = 100    # adjust to limit the maximum speed (currently using 100%)
 
 MAP_WIDTH = 10
 MAP_HEIGHT = 25
