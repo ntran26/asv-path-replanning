@@ -28,10 +28,16 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pygame
+
+try:
+    import cv2
+except Exception:
+    cv2 = None
 from stable_baselines3 import SAC
 
 from log_parser import BluefinFrame, BluefinStreamDecoder
 import log_viewer
+import policy_render as pr
 from test_run import TestCase
 
 try:
@@ -144,7 +150,7 @@ def _feasibility_pool(sector_ranges: np.ndarray, vessel_width: float, sector_ang
     return float(np.max(sector_ranges))
 
 
-def pool_lidar_to_sectors(full_lidar_m: np.ndarray, *, lidar_index0_deg: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def pool_lidar_to_sectors(full_lidar_m: np.ndarray, *, lidar_index0_deg: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Return raw policy swath + 25 sector ranges/closeness."""
     raw_angles = np.linspace(-float(LIDAR_SWATH) / 2.0, float(LIDAR_SWATH) / 2.0, int(LIDAR_BEAMS), dtype=np.float32)
     raw = log_viewer.pick_lidar_swath(
@@ -182,7 +188,7 @@ def frame_to_rl_obs(
     lambda_value: float,
     pos_scale: float,
     lidar_index0_deg: float,
-) -> Tuple[Dict[str, np.ndarray], Dict[str, float], Tuple[float, float], float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> Tuple[Dict[str, np.ndarray], Dict[str, float], Tuple[float, float], float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     spaces = getattr(model_obs_space, "spaces", {})
 
     # Map first real telemetry sample to scenario start in RL map coordinates.
@@ -300,7 +306,7 @@ def frame_to_rl_obs(
         "local_target_cte": float(local_target_cte),
     }
 
-    return obs, aux, (mx, my), yaw_deg, yaw_rate, raw_lidar, raw_angles, sector_ranges, sector_closeness
+    return obs, aux, (mx, my), yaw_deg, yaw_rate, raw_lidar, raw_angles, sector_ranges, sector_closeness, sector_angles
 
 
 # ---------------------------------------------------------------------------
@@ -397,10 +403,13 @@ def main() -> None:
     ap.add_argument("--local-port", type=int, default=5000)
     ap.add_argument("--server-ip", default="127.0.0.1")
     ap.add_argument("--server-port", type=int, default=5050)
-    ap.add_argument("--record-log", default=None)
+    ap.add_argument("--record-log", default=None, help="Append received UDP lines and RL action lines to this log file")
+    ap.add_argument("--record-video", action="store_true", help="Record the live pygame display to MP4")
+    ap.add_argument("--out-video", default="udp_live_rl_record.mp4", help="Output MP4 file when --record-video is enabled")
+    ap.add_argument("--video-fps", type=float, default=10.0, help="Video recording FPS")
 
     ap.add_argument("--model-path", default="sac_best_model.zip")
-    ap.add_argument("--test-case", type=int, default=1)
+    ap.add_argument("--test-case", type=int, default=0)
     ap.add_argument("--lambda-value", type=float, default=DEFAULT_LAMBDA)
     ap.add_argument("--lookahead-fraction", type=float, default=LOOKAHEAD_FRACTION)
     ap.add_argument("--pos-scale", type=float, default=POS_SCALE)
@@ -462,6 +471,9 @@ def main() -> None:
     latest_aux: Optional[Dict[str, float]] = None
     latest_sector_ranges: Optional[np.ndarray] = None
     latest_sector_closeness: Optional[np.ndarray] = None
+    latest_sector_angles: Optional[np.ndarray] = None
+    latest_raw_lidar: Optional[np.ndarray] = None
+    latest_raw_angles: Optional[np.ndarray] = None
     rudder_cmd = 0.0
     rpm_cmd = args.cruise_rpm
     thrust_cmd = rpm_to_s2_cmd(rpm_cmd, rpm_max=args.rpm_max, s2_max_cmd=args.s2_max_cmd)
@@ -473,6 +485,27 @@ def main() -> None:
     map_w = win_w - text_w
     screen = pygame.display.set_mode((win_w, win_h))
     clock = pygame.time.Clock()
+
+    video_writer = None
+    cv2 = None
+    if args.record_video:
+        try:
+            import cv2 as _cv2  # imported lazily so normal use does not require OpenCV
+            cv2 = _cv2
+            fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+            video_writer = cv2.VideoWriter(
+                args.out_video,
+                fourcc,
+                float(args.video_fps),
+                (int(win_w), int(win_h)),
+            )
+            if not video_writer.isOpened():
+                raise RuntimeError("cv2.VideoWriter failed to open")
+            print(f"[VIDEO] Recording display to: {args.out_video} @ {args.video_fps:g} FPS")
+        except Exception as e:
+            print(f"[VIDEO] Could not start recording: {type(e).__name__}: {e}")
+            video_writer = None
+            cv2 = None
 
     font = pygame.font.SysFont("consolas", 17) or pygame.font.Font(None, 17)
     small = pygame.font.SysFont("consolas", 14) or pygame.font.Font(None, 14)
@@ -567,6 +600,7 @@ def main() -> None:
                             raw_lidar_angles,
                             latest_sector_ranges,
                             latest_sector_closeness,
+                            latest_sector_angles,
                         ) = frame_to_rl_obs(
                             frame,
                             model_obs_space=model_obs_space,
@@ -579,6 +613,8 @@ def main() -> None:
                             pos_scale=args.pos_scale,
                             lidar_index0_deg=args.lidar_index0_deg,
                         )
+                        latest_raw_lidar = raw_lidar
+                        latest_raw_angles = raw_lidar_angles
                     except Exception as e:
                         print(f"[OBS ERROR] {type(e).__name__}: {e}")
                         latest_obs = None
@@ -601,8 +637,22 @@ def main() -> None:
                         thrust_cmd = rpm_to_s2_cmd(rpm_cmd, rpm_max=args.rpm_max, s2_max_cmd=args.s2_max_cmd)
 
                         command = f"$CMD,{rudder_cmd:.2f},{thrust_cmd:.2f}"
+                        sent_command = False
                         if not args.shadow:
                             sock.sendto(command.encode(), (args.server_ip, args.server_port))
+                            sent_command = True
+
+                        # If recording the raw UDP log, also record the action/command
+                        # associated with each decoded LiDAR frame. Lines beginning
+                        # with '#ACTION' are ignored by log_parser.py, but preserve
+                        # enough information to replay/debug the control decision.
+                        if log is not None:
+                            log.write(
+                                f"#ACTION,t={frame.t_sec:.6f},ts={frame.ts_str},seq={frame.seq},"
+                                f"a0={float(latest_action[0]):+.6f},a1={float(latest_action[1]):+.6f},"
+                                f"rudder={rudder_cmd:+.3f},rpm={rpm_cmd:.3f},S2={thrust_cmd:.3f},"
+                                f"shadow={int(args.shadow)},sent={int(sent_command)}\n"
+                            )
 
                         path_world.append(mapped_xy)
                         if len(path_world) > args.max_path:
@@ -620,7 +670,7 @@ def main() -> None:
         line_h = 21
         header_lines = [
             f"UDP local={args.bind_ip}:{args.local_port}  server={args.server_ip}:{args.server_port}  shadow={args.shadow}",
-            f"RX lines={rx_lines} frames={rx_frames} {'PAUSED' if paused else 'RUNNING'}  full_lidar={'ON' if show_full_lidar else 'OFF'}(F)",
+            f"RX lines={rx_lines} frames={rx_frames} {'PAUSED' if paused else 'RUNNING'}  lidar_list={'225 beams' if show_full_lidar else '25 sectors'}(F)",
             f"Map={'ON' if show_map else 'OFF'}(M) follow={'ON' if follow_mode else 'OFF'}(G) zoom={px_per_m:.1f}px/m",
         ]
         if frame is None:
@@ -650,17 +700,16 @@ def main() -> None:
 
         if frame is not None:
             if show_full_lidar:
-                lidar_src = frame.lidar_m
-                title = "LiDAR full 360 list (F)"
-                cached_key = (rx_frames, show_full_lidar, "full")
+                title = "Policy raw LiDAR swath: 225 beam distances (F)"
+                cached_key = (rx_frames, show_full_lidar, "raw225")
                 if cached_key != cached_lidar_key:
-                    cached_lidar_lines = log_viewer.format_lidar_lines(lidar_src, per_line=15, precision=1)
+                    cached_lidar_lines = pr.format_range_lines(latest_raw_lidar, per_line=10, precision=1)
                     cached_lidar_key = cached_key
             else:
-                title = "Policy 25-sector LiDAR: closeness/range (F)"
+                title = "Policy 25-sector LiDAR: sector distances (F)"
                 cached_key = (rx_frames, show_full_lidar, "sector")
                 if cached_key != cached_lidar_key:
-                    cached_lidar_lines = format_sector_lines(latest_sector_closeness, latest_sector_ranges, per_line=5)
+                    cached_lidar_lines = pr.format_sector_lines(latest_sector_closeness, latest_sector_ranges, per_line=5)
                     cached_lidar_key = cached_key
 
             max_lines = max(1, (win_h - y - 20) // 18)
@@ -686,22 +735,9 @@ def main() -> None:
                     index0_deg=args.lidar_index0_deg,
                 )
 
-            log_viewer.draw_map_panel(
-                screen,
-                map_rect,
-                path_world=path_world,
-                current_world=current_world,
-                yaw_deg=yaw_for_draw,
-                view_center_world=view_center_world,
-                px_per_m=px_per_m,
-                lidar_angles_deg=lidar_draw_angles if lidar_ranges_draw is not None else None,
-                lidar_ranges_m=lidar_ranges_draw,
-                lidar_index0_deg=args.lidar_index0_deg,
-                lidar_index0_range_m=float(frame.lidar_m[0]) if frame is not None and frame.lidar_m.size > 0 else None,
-                mark_index0=True,
-            )
-
-            draw_static_ref(
+            # Right panel intentionally has no text overlay.  All policy/command
+            # information is shown in the left panel.
+            pr.draw_policy_map(
                 screen,
                 map_rect,
                 map_width=MAP_WIDTH,
@@ -710,13 +746,45 @@ def main() -> None:
                 obstacles=obstacles,
                 start_xy=start_xy,
                 goal_xy=goal_xy,
+                trajectory=path_world,
+                current_xy=current_world,
+                heading_deg=yaw_for_draw,
+                raw_lidar_ranges=latest_raw_lidar if current_world is not None else None,
+                raw_lidar_angles=latest_raw_angles if current_world is not None else None,
+                sector_ranges=latest_sector_ranges if current_world is not None else None,
+                sector_closeness=latest_sector_closeness if current_world is not None else None,
+                sector_angles=latest_sector_angles if current_world is not None else None,
                 view_center_world=view_center_world,
                 px_per_m=px_per_m,
+                # F toggles the visual LiDAR mode too: sector view by default,
+                # raw 225-beam swath only when requested. This makes the sector
+                # representation much easier to see during field testing.
+                show_raw_lidar=show_full_lidar,
+                show_sector_lidar=not show_full_lidar,
+                show_icon=True,
+                show_hull=True,
+                status_lines=None,
+                font=None,
             )
 
         pygame.display.flip()
+
+        if video_writer is not None and cv2 is not None:
+            try:
+                frame_rgb = pygame.surfarray.array3d(screen)
+                frame_rgb = np.transpose(frame_rgb, (1, 0, 2))
+                frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
+                video_writer.write(frame_bgr)
+            except Exception as e:
+                print(f"[VIDEO] Write failed: {type(e).__name__}: {e}")
+                video_writer.release()
+                video_writer = None
+
         clock.tick(args.fps)
 
+    if video_writer is not None:
+        video_writer.release()
+        print(f"[VIDEO] Saved {args.out_video}")
     if log is not None:
         log.close()
     sock.close()
