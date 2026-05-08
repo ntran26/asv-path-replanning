@@ -6,7 +6,7 @@ shadow test with fake replay:
   python udp_live_rl.py --model-path sac_best_model.zip --test-case 1 --shadow
   
 live control:
-  python udp_live_rl.py --server-ip 10.201.219.170 --record-video --record-log 2026-05-08/trial.log --test-case 1
+  python udp_live_rl.py --server-ip 10.201.220.121 --record-video --record-log 2026-05-08/trial.log --test-case 6
 
 Notes:
 - SAC is hardcoded. PPO support was removed intentionally.
@@ -116,12 +116,10 @@ def path_tangent(path: np.ndarray, idx: int) -> np.ndarray:
         return np.array([0.0, 1.0], dtype=np.float32)
     return (vec / n).astype(np.float32)
 
-
 def bearing_deg(from_xy: np.ndarray, to_xy: np.ndarray) -> float:
     dx = float(to_xy[0] - from_xy[0])
     dy = float(to_xy[1] - from_xy[1])
     return float(np.degrees(np.arctan2(dx, dy)))
-
 
 # ---------------------------------------------------------------------------
 # LiDAR pooling helpers
@@ -634,7 +632,11 @@ def main() -> None:
                         )
                         thrust_cmd = rpm_to_s2_cmd(rpm_cmd, rpm_max=args.rpm_max, s2_max_cmd=args.s2_max_cmd)
 
+                        # rudder_cmd = -100
+                        # thrust_cmd = 0
+
                         command = f"$CMD,{rudder_cmd:.2f},{thrust_cmd:.2f}"
+                        
                         sent_command = False
                         if not args.shadow:
                             sock.sendto(command.encode(), (args.server_ip, args.server_port))
