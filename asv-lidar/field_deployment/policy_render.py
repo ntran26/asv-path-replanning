@@ -45,7 +45,6 @@ except Exception:
 Color = Tuple[int, int, int]
 Point = Tuple[float, float]
 
-
 def world_to_screen(
     xy_world: Point,
     *,
@@ -64,7 +63,6 @@ def world_to_screen(
     sy = cy_px - (float(y) - cy_w) * px_per_m
     return int(round(sx)), int(round(sy))
 
-
 def _w2s_factory(map_rect: pygame.Rect, view_center_world: Point, px_per_m: float):
     vc_px = map_rect.center
 
@@ -73,7 +71,6 @@ def _w2s_factory(map_rect: pygame.Rect, view_center_world: Point, px_per_m: floa
 
     return w2s
 
-
 def _as_path_array(path: Optional[Sequence[Sequence[float]]]) -> Optional[np.ndarray]:
     if path is None:
         return None
@@ -81,7 +78,6 @@ def _as_path_array(path: Optional[Sequence[Sequence[float]]]) -> Optional[np.nda
     if arr.ndim != 2 or arr.shape[1] < 2 or arr.shape[0] < 2:
         return None
     return arr[:, :2]
-
 
 def draw_reference_scene(
     surface: pygame.Surface,
@@ -142,7 +138,6 @@ def draw_reference_scene(
             pygame.draw.circle(surface, (0, 0, 0), p, 6, 1)
     finally:
         surface.set_clip(prev_clip)
-
 
 def draw_trajectory(
     surface: pygame.Surface,
@@ -304,7 +299,6 @@ def draw_raw_lidar(
     finally:
         surface.set_clip(prev_clip)
 
-
 def closeness_color(c: float) -> Color:
     c = float(np.clip(c, 0.0, 1.0))
     if c < 0.35:
@@ -312,7 +306,6 @@ def closeness_color(c: float) -> Color:
     if c < 0.70:
         return (240, 210, 60)
     return (255, 80, 60)
-
 
 def draw_lidar_sectors(
     surface: pygame.Surface,
@@ -458,7 +451,6 @@ def draw_policy_scene(
             draw_hull=show_hull,
         )
 
-
 def format_sector_lines(sector_closeness: Optional[np.ndarray], sector_ranges: Optional[np.ndarray], *, per_line: int = 5) -> List[str]:
     """Format the 25 policy sectors as distances only.
 
@@ -476,7 +468,6 @@ def format_sector_lines(sector_closeness: Optional[np.ndarray], sector_ranges: O
             parts.append(f"{j:02d}:{float(r[j]):4.1f}m")
         lines.append("  ".join(parts))
     return lines
-
 
 def format_raw_lidar_lines(raw_ranges: Optional[np.ndarray], raw_angles: Optional[np.ndarray] = None, *, per_line: int = 9) -> List[str]:
     """Format the raw policy LiDAR swath as 225 beam distances."""
@@ -496,8 +487,6 @@ def format_raw_lidar_lines(raw_ranges: Optional[np.ndarray], raw_angles: Optiona
         lines.append("  ".join(parts))
     return lines
 
-
-
 def format_range_lines(raw_ranges: Optional[np.ndarray], *, per_line: int = 9, precision: int = 1) -> List[str]:
     """Compatibility wrapper: format raw LiDAR swath distances."""
     return format_raw_lidar_lines(raw_ranges, raw_angles=None, per_line=per_line)
@@ -513,8 +502,6 @@ def pool_raw_lidar_to_sectors(raw_ranges: Sequence[float], *, n_sectors: int = L
     closeness = np.clip(1.0 - ranges / float(max_range), 0.0, 1.0).astype(np.float32)
     angles = np.linspace(-float(LIDAR_SWATH) / 2.0, float(LIDAR_SWATH) / 2.0, int(n_sectors), dtype=np.float32)
     return ranges, closeness, angles
-
-
 
 def draw_policy_info_overlay(
     surface: pygame.Surface,
@@ -532,7 +519,6 @@ def draw_policy_info_overlay(
         surface.blit(bg, (x - 3, y - 1))
         surface.blit(txt, (x, y))
         y += txt.get_height() + 3
-
 
 def draw_policy_map(
     surface: pygame.Surface,

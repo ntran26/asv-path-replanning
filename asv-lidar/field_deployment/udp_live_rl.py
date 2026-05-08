@@ -1,12 +1,12 @@
 """
 Live UDP bridge between Bluefin telemetry and the current SAC ASV local-planner policy.
 
-Typical shadow test with fake replay:
+shadow test with fake replay:
   python fake_vessel_replay.py --log trial.log --loop
   python udp_live_rl.py --model-path sac_best_model.zip --test-case 1 --shadow
-
-Typical live control:
-  python udp_live_rl.py --server-ip 10.201.219.170 --model-path sac_best_model.zip --test-case 1
+  
+live control:
+  python udp_live_rl.py --server-ip 10.201.219.170 --record-video --record-log 2026-05-08/trial.log --test-case 1
 
 Notes:
 - SAC is hardcoded. PPO support was removed intentionally.
@@ -54,17 +54,17 @@ except Exception:
     VESSEL_WIDTH = 0.50
 
 # ---------------------------------------------------------------------------
-# Deployment defaults: stage 7C speed-control policy
+# Deployment defaults: stage 3 speed-control policy
 # ---------------------------------------------------------------------------
 MAP_WIDTH = 10.0
 MAP_HEIGHT = 25.0
 POS_SCALE = 1.0
 LOOKAHEAD_FRACTION = 0.25
-DEFAULT_LAMBDA = 0.6
+DEFAULT_LAMBDA = 0.5
 
 RPM_MAX = 24.0
 CRUISE_RPM = 12.0
-RPM_DELTA = 6.0       # stage 7C: 6-18 RPM
+RPM_DELTA = 6.0       # stage 3: 6-18 RPM
 RPM_FLOOR = 6.0
 RPM_CEIL = 18.0
 S2_MAX_CMD = 100.0    # vessel command S2 range: 0-100
@@ -72,13 +72,13 @@ S2_MAX_CMD = 100.0    # vessel command S2 range: 0-100
 RUDDER_SCALE = 100.0
 RUDDER_SIGN = -1.0    # real vessel sign is reversed vs sim
 
-BLOCK_D_SAFE = 6.0
+BLOCK_D_SAFE = 4.5
 BLOCK_D_CRIT = 2.0
 BLOCK_FRONT_DEG = 25.0
 SIDE_ARC_MIN_DEG = 15.0
 SIDE_ARC_MAX_DEG = 100.0
 SIDE_CLEAR_TIE = 0.25
-BYPASS_CTE = 1.35
+BYPASS_CTE = 0.8
 
 # ---------------------------------------------------------------------------
 # Geometry/path helpers
@@ -149,7 +149,6 @@ def _feasibility_pool(sector_ranges: np.ndarray, vessel_width: float, sector_ang
             return float(xi)
     return float(np.max(sector_ranges))
 
-
 def pool_lidar_to_sectors(full_lidar_m: np.ndarray, *, lidar_index0_deg: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Return raw policy swath + 25 sector ranges/closeness."""
     raw_angles = np.linspace(-float(LIDAR_SWATH) / 2.0, float(LIDAR_SWATH) / 2.0, int(LIDAR_BEAMS), dtype=np.float32)
@@ -170,7 +169,6 @@ def pool_lidar_to_sectors(full_lidar_m: np.ndarray, *, lidar_index0_deg: float) 
     sector_closeness = np.clip(1.0 - sector_ranges / float(LIDAR_RANGE), 0.0, 1.0).astype(np.float32)
     sector_angles = np.linspace(-float(LIDAR_SWATH) / 2.0, float(LIDAR_SWATH) / 2.0, int(LIDAR_SECTORS), dtype=np.float32)
     return raw, raw_angles, sector_ranges, sector_closeness, sector_angles
-
 
 # ---------------------------------------------------------------------------
 # RL observation adapter
@@ -308,7 +306,6 @@ def frame_to_rl_obs(
 
     return obs, aux, (mx, my), yaw_deg, yaw_rate, raw_lidar, raw_angles, sector_ranges, sector_closeness, sector_angles
 
-
 # ---------------------------------------------------------------------------
 # Command mapping
 # ---------------------------------------------------------------------------
@@ -318,14 +315,11 @@ def action_to_rpm(a1: float, *, fixed_rpm: bool, cruise_rpm: float, rpm_delta: f
         return float(cruise_rpm)
     return float(np.clip(cruise_rpm + rpm_delta * float(np.clip(a1, -1.0, 1.0)), rpm_floor, rpm_ceil))
 
-
 def rpm_to_s2_cmd(rpm: float, *, rpm_max: float, s2_max_cmd: float) -> float:
-    return float(np.clip((float(rpm) / max(float(rpm_max), 1e-6)) * float(s2_max_cmd), 0.0, float(s2_max_cmd)))
-
+    return np.clip((float(rpm) / max(float(rpm_max), 1e-6)) * float(s2_max_cmd), 0.0, float(s2_max_cmd))
 
 def rudder_to_cmd(a0: float, *, sign: float, scale: float) -> float:
     return float(sign * scale * float(np.clip(a0, -1.0, 1.0)))
-
 
 # ---------------------------------------------------------------------------
 # Drawing helpers
@@ -621,6 +615,10 @@ def main() -> None:
                         latest_aux = None
                         mapped_xy = (0.0, 0.0)
 
+# ---------------------------------------------------------------------------------------------------
+#                               ACTION
+# ---------------------------------------------------------------------------------------------------
+
                     if latest_obs is not None:
                         action, _ = model.predict(latest_obs, deterministic=True)
                         latest_action = np.asarray(action, dtype=np.float32).reshape(-1)
@@ -678,11 +676,15 @@ def main() -> None:
         else:
             header_lines += [
                 f"ts={frame.ts_str} t={frame.t_sec:.3f}s seq={frame.seq} hdg_ref={frame.hdg_ref_deg}",
-                f"Real: x={frame.x_m:+.3f} y={frame.y_m:+.3f} hdg={frame.yaw_deg:+.2f} yaw_rate={frame.yaw_rate:+.2f} speed={frame.speed_mps:.3f}",
+                f" ",
+                f"Real:",
+                f"x={frame.x_m:+.3f} y={frame.y_m:+.3f} hdg={frame.yaw_deg:+.2f} yaw_rate={frame.yaw_rate:+.2f} speed={frame.speed_mps:.3f}",
+                f" ",
             ]
             if latest_aux is not None:
                 header_lines += [
-                    f"RL map: x={latest_aux['x']:+.3f} y={latest_aux['y']:+.3f} hdg={latest_aux['yaw_deg']:+.2f}",
+                    f"RL map:",
+                    f"x={latest_aux['x']:+.3f} y={latest_aux['y']:+.3f} hdg={latest_aux['yaw_deg']:+.2f}",
                     f"Obs: u={latest_aux['u']:+.3f} v={latest_aux['v']:+.3f} cte={latest_aux['cross_track_error']:+.3f}",
                     f"Obs: course={latest_aux['course_error']:+.2f} lookahead={latest_aux['lookahead_course_error']:+.2f}",
                     f"Obs: front={latest_aux['front_clearance']:.2f} L={latest_aux['left_clearance']:.2f} R={latest_aux['right_clearance']:.2f} local_cte={latest_aux['local_target_cte']:+.3f}",
@@ -690,7 +692,7 @@ def main() -> None:
         if latest_action is not None:
             header_lines += [
                 f"Action: rud={float(latest_action[0]):+.3f} thr={float(latest_action[1]):+.3f}",
-                f"Command: rudder={rudder_cmd:+.1f}  rpm={rpm_cmd:.2f}  S2={thrust_cmd:.1f}  sign={args.rudder_sign:+.1f}",
+                f"Command: rudder={rudder_cmd:+.1f}   throttle={thrust_cmd:.1f}(rpm={rpm_cmd:.2f})",
             ]
 
         for s in header_lines:
