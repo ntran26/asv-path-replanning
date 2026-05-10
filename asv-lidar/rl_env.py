@@ -208,6 +208,9 @@ class ASVLidarEnv(gym.Env):
         self.u_body = 0.0
         self.v_body = 0.0
 
+        self.rudder = None
+        self.rpm = None
+
         self.start_x = 0.0
         self.start_y = 0.0
         self.goal_x = 0.0
@@ -674,6 +677,9 @@ class ASVLidarEnv(gym.Env):
         self._sample_lambda()
         self._sample_obs_border_mode()
 
+        self.rudder = 0
+        self.rpm = 0
+
         if self.test_case is None:
             self.start_x, self.start_y, self.goal_x, self.goal_y = self._start_goal_random()
         else:
@@ -720,7 +726,9 @@ class ASVLidarEnv(gym.Env):
             rpm = CRUISE_RPM
         else:
             rpm = float(np.clip(CRUISE_RPM + RPM_DELTA * throttle_cmd, RPM_FLOOR, RPM_CEIL))
-        # rpm = CRUISE_RPM if FIXED_RPM else (throttle_cmd - MIN_IN) * ((RPM_MAX - RPM_MIN) / (MAX_IN - MIN_IN)) + RPM_MIN
+        
+        self.rudder = rudder
+        self.rpm = rpm
 
         d_prev = float(self.distance_to_goal)
         x_prev = float(self.asv_x)
@@ -922,8 +930,13 @@ class ASVLidarEnv(gym.Env):
                 f"cte:{self.cross_track_error:+0.2f} tgt:{self.local_target_cte:+0.2f} front:{self.front_clearance:0.1f} L/R:{self.left_clearance:0.1f}/{self.right_clearance:0.1f} bc:{self.true_border_clearance:0.2f}",
                 (255, 255, 255), (0, 0, 0),
             )
+            status_line_3, _ = self.status.render(
+                f"rud:{self.rudder:+0.2f}   thr:{self.rpm:+0.2f}",
+                (255, 255, 255), (0, 0, 0)
+            )
             self.surface.blit(status_line_1, (10, self.window_size[1] - 28))
             self.surface.blit(status_line_2, (10, self.window_size[1] - 14))
+            self.surface.blit(status_line_3, (10, self.window_size[1] - 600))
         self.display.blit(self.surface, (0, 0))
         pygame.display.update()
         self.fps_clock.tick(RENDER_FPS)
