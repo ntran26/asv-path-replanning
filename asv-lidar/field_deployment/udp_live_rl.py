@@ -44,8 +44,8 @@ try:
     from asv_lidar import LIDAR_RANGE, LIDAR_SWATH, LIDAR_BEAMS, LIDAR_SECTORS
 except Exception:
     LIDAR_RANGE = 16.0
-    LIDAR_SWATH = 240.0
-    LIDAR_BEAMS = 225
+    LIDAR_SWATH = 270.0
+    LIDAR_BEAMS = 90
     LIDAR_SECTORS = 25
 
 try:
