@@ -1,4 +1,5 @@
-﻿# Bluefin vessel model derivation and Python implementation notes
+﻿
+# Bluefin Vessel Model Derivation
 
 **Purpose.** This note documents the workflow:
 
