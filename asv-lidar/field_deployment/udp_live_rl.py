@@ -743,9 +743,9 @@ def main() -> None:
             header_lines += [
                 f"Action: rud={float(latest_action[0]):+.3f}    thr={float(latest_action[1]):+.3f}",
                 f"Command: rudder={rudder_cmd:+.1f}   throttle={thrust_cmd:.1f}(rpm={rpm_cmd:.2f})",
-                f"a0={float(latest_action[0]):+.6f}    a1={float(latest_action[1]):+.6f},"
-                f"raw_rudder={raw_rudder_cmd:+.3f}    rudder={rudder_cmd:+.3f},"
-                f"rpm={rpm_cmd:.3f}    S2={thrust_cmd:.3f},"
+                f"a0={float(latest_action[0]):+.6f}    a1={float(latest_action[1]):+.6f}",
+                f"raw_rudder={raw_rudder_cmd:+.3f}    rudder={rudder_cmd:+.3f}",
+                f"rpm={rpm_cmd:.3f}    S2={thrust_cmd:.3f}",
             ]
 
         for s in header_lines:
