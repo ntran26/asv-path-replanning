@@ -44,8 +44,8 @@ try:
     from asv_lidar import LIDAR_RANGE, LIDAR_SWATH, LIDAR_BEAMS, LIDAR_SECTORS
 except Exception:
     LIDAR_RANGE = 16.0
-    LIDAR_SWATH = 240.0
-    LIDAR_BEAMS = 225
+    LIDAR_SWATH = 270.0
+    LIDAR_BEAMS = 90
     LIDAR_SECTORS = 25
 
 try:
@@ -79,6 +79,11 @@ SIDE_ARC_MIN_DEG = 15.0
 SIDE_ARC_MAX_DEG = 100.0
 SIDE_CLEAR_TIE = 0.25
 BYPASS_CTE = 0.8
+
+MAX_RUDDER_DEG_FOR_RATE = 40.0
+MAX_RUDDER_RATE_DPS = 20.0
+MAX_CMD_DT = 0.5
+MIN_CMD_DT = 1e-3
 
 # ---------------------------------------------------------------------------
 # Geometry/path helpers
@@ -467,6 +472,9 @@ def main() -> None:
     latest_raw_lidar: Optional[np.ndarray] = None
     latest_raw_angles: Optional[np.ndarray] = None
     rudder_cmd = 0.0
+    raw_rudder_cmd = 0.0
+    prev_rudder_cmd = 0.0
+    prev_rudder_t = None
     rpm_cmd = args.cruise_rpm
     thrust_cmd = rpm_to_s2_cmd(rpm_cmd, rpm_max=args.rpm_max, s2_max_cmd=args.s2_max_cmd)
 
@@ -621,7 +629,47 @@ def main() -> None:
                         action, _ = model.predict(latest_obs, deterministic=True)
                         latest_action = np.asarray(action, dtype=np.float32).reshape(-1)
 
-                        rudder_cmd = rudder_to_cmd(latest_action[0], sign=args.rudder_sign, scale=args.rudder_scale)
+                        raw_rudder_cmd = rudder_to_cmd(
+                            latest_action[0],
+                            sign=args.rudder_sign,
+                            scale=args.rudder_scale,
+                        )
+
+                        # Use telemetry frame time, not pygame FPS.
+                        t_now = float(frame.t_sec)
+                        if prev_rudder_t is None:
+                            dt_cmd = 0.1
+                        else:
+                            dt_cmd = float(np.clip(t_now - prev_rudder_t, MIN_CMD_DT, MAX_CMD_DT))
+
+                        # Simulation mapping:
+                        # ±100 command percent corresponds approximately to ±40 deg rudder.
+                        # 20 deg/s therefore corresponds to 50 command-percent/s.
+                        max_cmd_rate_per_s = (
+                            abs(float(args.rudder_scale))
+                            * MAX_RUDDER_RATE_DPS
+                            / MAX_RUDDER_DEG_FOR_RATE
+                        )
+
+                        # This matches the ship_model.py style:
+                        # delta_dot = clip(delta_cmd - delta, ±max_rate)
+                        rudder_error = raw_rudder_cmd - prev_rudder_cmd
+                        rudder_cmd_dot = float(np.clip(
+                            rudder_error,
+                            -max_cmd_rate_per_s,
+                            +max_cmd_rate_per_s,
+                        ))
+
+                        rudder_cmd = float(prev_rudder_cmd + rudder_cmd_dot * dt_cmd)
+                        rudder_cmd = float(np.clip(
+                            rudder_cmd,
+                            -abs(float(args.rudder_scale)),
+                            +abs(float(args.rudder_scale)),
+                        ))
+
+                        prev_rudder_cmd = rudder_cmd
+                        prev_rudder_t = t_now
+
                         rpm_cmd = action_to_rpm(
                             latest_action[1],
                             fixed_rpm=bool(args.fixed_rpm),
@@ -693,8 +741,11 @@ def main() -> None:
                 ]
         if latest_action is not None:
             header_lines += [
-                f"Action: rud={float(latest_action[0]):+.3f} thr={float(latest_action[1]):+.3f}",
+                f"Action: rud={float(latest_action[0]):+.3f}    thr={float(latest_action[1]):+.3f}",
                 f"Command: rudder={rudder_cmd:+.1f}   throttle={thrust_cmd:.1f}(rpm={rpm_cmd:.2f})",
+                f"a0={float(latest_action[0]):+.6f}    a1={float(latest_action[1]):+.6f},"
+                f"raw_rudder={raw_rudder_cmd:+.3f}    rudder={rudder_cmd:+.3f},"
+                f"rpm={rpm_cmd:.3f}    S2={thrust_cmd:.3f},"
             ]
 
         for s in header_lines:

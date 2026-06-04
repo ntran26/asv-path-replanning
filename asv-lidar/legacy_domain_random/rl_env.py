@@ -67,6 +67,42 @@ MIN_IN = -1.0
 
 MAX_EPISODE_STEPS = 700
 
+# # first speed-control stage: 9-15 RPM (37.5% - 62.5%)
+# RPM_DELTA = 3.0      
+# RPM_FLOOR = 9.0
+# RPM_CEIL = 15.0
+# U_MIN_REWARD = 0.35
+# K_PROGRESS = 0.5
+# K_SLOW = 0.15
+# K_THRUST_DEV = 0.02
+
+# # second speed-control stage: 8-16 RPM (33% - 66%)
+# RPM_DELTA = 4.0
+# RPM_FLOOR = 8.0
+# RPM_CEIL = 16.0
+# U_MIN_REWARD = 0.30
+# K_PROGRESS = 0.6
+# K_SLOW = 0.10
+# K_THRUST_DEV = 0.015
+
+# third speed-control stage: 6-18 RPM (25% - 75%)
+RPM_DELTA = 6.0
+RPM_FLOOR = 6.0
+RPM_CEIL = 18.0
+U_MIN_REWARD = 0.35
+K_PROGRESS = 0.7
+K_SLOW = 0.12
+K_THRUST_DEV = 0.010
+
+# # full speed control
+# RPM_DELTA = 12.0
+# RPM_FLOOR = 0.0
+# RPM_CEIL = 24.0
+# U_MIN_REWARD = 0.55
+# K_PROGRESS = 1.2
+# K_SLOW = 0.35
+# K_THRUST_DEV = 0.006
+
 # Observation LiDAR border-visibility mode.
 # - "none": no borders/walls in LiDAR
 # - "asymmetric": left pool edge visible, right pool edge invisible, far right wall visible
@@ -171,6 +207,9 @@ class ASVLidarEnv(gym.Env):
         self.speed_mps = 0.0
         self.u_body = 0.0
         self.v_body = 0.0
+
+        self.rudder = None
+        self.rpm = None
 
         self.start_x = 0.0
         self.start_y = 0.0
@@ -380,7 +419,7 @@ class ASVLidarEnv(gym.Env):
         margin_x = max(2.0, 0.25 * self.map_width)
 
         # 70%: vertical path
-        if np.random.rand() < 0.7:
+        if np.random.rand() < 0.1:
             x = float(np.random.uniform(margin_x, self.map_width - margin_x))
             return x, 2.0, x, self.map_height - 3.0
 
@@ -638,6 +677,9 @@ class ASVLidarEnv(gym.Env):
         self._sample_lambda()
         self._sample_obs_border_mode()
 
+        self.rudder = 0
+        self.rpm = 0
+
         if self.test_case is None:
             self.start_x, self.start_y, self.goal_x, self.goal_y = self._start_goal_random()
         else:
@@ -679,15 +721,26 @@ class ASVLidarEnv(gym.Env):
         rudder_cmd = float(np.clip(action[0], MIN_IN, MAX_IN))
         throttle_cmd = float(np.clip(action[1], MIN_IN, MAX_IN))
         rudder = rudder_cmd * 100.0
-        rpm = CRUISE_RPM if FIXED_RPM else (throttle_cmd - MIN_IN) * ((RPM_MAX - RPM_MIN) / (MAX_IN - MIN_IN)) + RPM_MIN
 
+        if FIXED_RPM:
+            rpm = CRUISE_RPM
+        else:
+            rpm = float(np.clip(CRUISE_RPM + RPM_DELTA * throttle_cmd, RPM_FLOOR, RPM_CEIL))
+        
+        self.rudder = rudder
+        self.rpm = rpm
+
+        d_prev = float(self.distance_to_goal)
         x_prev = float(self.asv_x)
         y_prev = float(self.asv_y)
+
+        # dynamic update
         dx, dy, h, w = self.model.update(rpm, rudder, UPDATE_RATE)
         self.asv_x += dx
         self.asv_y += dy
         self.asv_h = float(h)
         self.asv_w = float(w)
+
         dx_pos = float(self.asv_x) - x_prev
         dy_pos = float(self.asv_y) - y_prev
         self.speed_mps = float(math.hypot(dx_pos, dy_pos) / UPDATE_RATE)
@@ -702,6 +755,8 @@ class ASVLidarEnv(gym.Env):
         self._update_local_planner_features()
         self.asv_path.append((self.asv_x, self.asv_y))
         self.distance_to_goal = float(np.linalg.norm([self.asv_x - self.goal_x, self.asv_y - self.goal_y]))
+
+        # collision/goal flag
         collided = bool(self._check_collision_geom())
         reached_goal = bool(self.distance_to_goal <= (VESSEL_LENGTH * 0.5))
 
@@ -732,7 +787,18 @@ class ASVLidarEnv(gym.Env):
         self.true_border_clearance = self._border_clearance_true()
         r_border = -float(K_BORDER_SOFT * max(0.0, 1.0 - self.true_border_clearance / SOFT_BORDER_SAFE_DIST) ** 2)
 
+        # step penalty
         r_exist = R_EXIST
+
+        # progress reward - keep moving forward
+        r_progress = K_PROGRESS * (d_prev - self.distance_to_goal)
+
+        # low-speed penalty
+        r_slow = -(K_SLOW * max(0.0, U_MIN_REWARD - max(self.u_body, 0.0)))
+
+        # stay near cruise RPM
+        r_thrust = -float(K_THRUST_DEV * abs(rpm - CRUISE_RPM) / max(RPM_DELTA, 1e-6))
+
         if collided:
             reward = float(R_COLLISION)
         else:
@@ -742,6 +808,9 @@ class ASVLidarEnv(gym.Env):
                 + 0.35 * u_gate * r_heading
                 + r_exist
                 + r_border
+                + r_progress
+                + r_slow
+                + r_thrust
             )
             if reached_goal:
                 reward += R_GOAL
@@ -791,6 +860,10 @@ class ASVLidarEnv(gym.Env):
             "path_mode": self.path_mode_used,
             "obs_border_mode": self.obs_border_mode_used,
             "true_border_clearance": float(self.true_border_clearance),
+            "rpm": float(rpm),
+            "r_progress": float(r_progress),
+            "r_slow": float(r_slow),
+            "r_thrust": float(r_thrust),
         }
 
         if self.render_mode in self.metadata["render_modes"]:
@@ -857,8 +930,13 @@ class ASVLidarEnv(gym.Env):
                 f"cte:{self.cross_track_error:+0.2f} tgt:{self.local_target_cte:+0.2f} front:{self.front_clearance:0.1f} L/R:{self.left_clearance:0.1f}/{self.right_clearance:0.1f} bc:{self.true_border_clearance:0.2f}",
                 (255, 255, 255), (0, 0, 0),
             )
+            status_line_3, _ = self.status.render(
+                f"rud:{self.rudder:+0.2f}   thr:{self.rpm:+0.2f}",
+                (255, 255, 255), (0, 0, 0)
+            )
             self.surface.blit(status_line_1, (10, self.window_size[1] - 28))
             self.surface.blit(status_line_2, (10, self.window_size[1] - 14))
+            self.surface.blit(status_line_3, (10, self.window_size[1] - 600))
         self.display.blit(self.surface, (0, 0))
         pygame.display.update()
         self.fps_clock.tick(RENDER_FPS)
