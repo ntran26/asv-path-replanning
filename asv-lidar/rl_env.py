@@ -20,8 +20,6 @@ from ship_model import (
     VESSEL_LENGTH,
     VESSEL_WIDTH,
     ShipModel,
-    MAX_RUD_ANGLE,
-    MAX_RUD_RATE_DPS
 )
 from test_run import TestCase
 
@@ -56,21 +54,6 @@ R_TIMEOUT = -1000.0
 R_GOAL = 50.0
 R_EXIST = -0.5
 U_REWARD_REF = 0.8
-
-# Smooth-control shaping
-USE_COMMAND_RATE_LIMIT_IN_TRAINING = False
-RUDDER_RATE_NORM_PER_S = MAX_RUD_RATE_DPS / MAX_RUD_ANGLE
-THROTTLE_RATE_NORM_PER_S = 1.0
-
-K_RUDDER_MAG = 0.015
-K_RUDDER_SLEW = 0.18
-K_RUDDER_FLIP = 0.05
-K_THROTTLE_SLEW = 0.03
-K_YAW_RATE = 0.015
-K_YAW_ACCEL = 0.010
-
-RUDDER_FLIP_DEADBAND = 0.10
-YAW_RATE_REF_DPS = 30.0
 
 # Fixed-speed steering task. The action space remains 2D for compatibility,
 # but throttle is ignored while FIXED_RPM=True.
@@ -142,8 +125,8 @@ OBSTACLE_CENTER_PROB = 0.30
 OBSTACLE_LATERAL_OFFSET_MIN = 0.25
 OBSTACLE_LATERAL_OFFSET_MAX = 0.95
 
-# Local lidar-based bypass cue
-# choose the clearer side when the path ahead is blocked.
+# Local lidar-based bypass cue. This is not global planning: it uses only the
+# lidar sector ranges to choose the clearer side when the path ahead is blocked.
 BLOCK_D_SAFE = 4.5
 BLOCK_D_CRIT = 2.0
 BLOCK_FRONT_DEG = 25.0
@@ -255,13 +238,6 @@ class ASVLidarEnv(gym.Env):
         self.block_alpha = 0.0
         self.local_target_cte = 0.0
 
-        # Action/command memory for smooth-control training.
-        self.prev_raw_rudder_cmd = 0.0
-        self.prev_raw_throttle_cmd = 0.0
-        self.prev_rudder_cmd = 0.0
-        self.prev_throttle_cmd = 0.0
-        self.prev_yaw_rate_dps = 0.0
-
         self.asv_path: List[Tuple[float, float]] = []
         self.obstacles: List[List[Tuple[float, float]]] = []
         self.current_lambda = DEFAULT_EVAL_LAMBDA
@@ -274,8 +250,6 @@ class ASVLidarEnv(gym.Env):
             "u": Box(low=0.0, high=5.0, shape=(1,), dtype=np.float32),
             "v": Box(low=-3.0, high=3.0, shape=(1,), dtype=np.float32),
             "yaw_rate": Box(low=-180.0, high=180.0, shape=(1,), dtype=np.float32),
-            "prev_rudder_cmd": Box(low=-1.0, high=1.0, shape=(1,), dtype=np.float32),
-            "prev_throttle_cmd": Box(low=-1.0, high=1.0, shape=(1,), dtype=np.float32),
             "cross_track_error": Box(low=-max(self.map_width, self.map_height), high=max(self.map_width, self.map_height), shape=(1,), dtype=np.float32),
             "course_error": Box(low=-180.0, high=180.0, shape=(1,), dtype=np.float32),
             "lookahead_course_error": Box(low=-180.0, high=180.0, shape=(1,), dtype=np.float32),
@@ -366,8 +340,6 @@ class ASVLidarEnv(gym.Env):
             "u": np.array([self.u_body], dtype=np.float32),
             "v": np.array([self.v_body], dtype=np.float32),
             "yaw_rate": np.array([self.asv_w], dtype=np.float32),
-            "prev_rudder_cmd": np.array([self.prev_rudder_cmd], dtype=np.float32),
-            "prev_throttle_cmd": np.array([self.prev_throttle_cmd], dtype=np.float32),
             "cross_track_error": np.array([self.cross_track_error], dtype=np.float32),
             "course_error": np.array([self.course_error], dtype=np.float32),
             "lookahead_course_error": np.array([self.lookahead_course_error], dtype=np.float32),
@@ -676,10 +648,6 @@ class ASVLidarEnv(gym.Env):
             side_cte_sign = +1.0
         self.local_target_cte = float(side_cte_sign * BYPASS_CTE * self.block_alpha)
 
-    def _rate_limit_norm(self, target: float, previous: float, max_rate_per_s: float) -> float:
-        max_step = max(0.0, float(max_rate_per_s)) * UPDATE_RATE
-        return float(previous + np.clip(float(target) - float(previous), -max_step, +max_step))
-
     # ------------------------------------------------------------------
     # Reset / step
     # ------------------------------------------------------------------
@@ -702,12 +670,6 @@ class ASVLidarEnv(gym.Env):
         self.right_clearance = LIDAR_RANGE
         self.block_alpha = 0.0
         self.local_target_cte = 0.0
-        self.prev_raw_rudder_cmd = 0.0
-        self.prev_raw_throttle_cmd = 0.0
-        self.prev_rudder_cmd = 0.0
-        self.prev_throttle_cmd = 0.0
-        self.prev_yaw_rate_dps = 0.0
-
         self.model = ShipModel()
         self.lidar_obs.reset()
         self.lidar_reward.reset()
@@ -756,40 +718,8 @@ class ASVLidarEnv(gym.Env):
 
     def step(self, action):
         self.elapsed_time += UPDATE_RATE
-
-        action = np.asarray(action, dtype=np.float32).reshape(-1)
-
-        # Raw policy outputs. These are what we penalise for chattering.
-        raw_rudder_cmd = float(np.clip(action[0], MIN_IN, MAX_IN))
-        raw_throttle_cmd = float(np.clip(action[1], MIN_IN, MAX_IN))
-
-        # Action changes relative to previous raw policy output.
-        d_rudder_cmd = raw_rudder_cmd - self.prev_raw_rudder_cmd
-        d_throttle_cmd = raw_throttle_cmd - self.prev_raw_throttle_cmd
-
-        # Explicit sign-flip detector. This targets +1, -1, +1, -1 rudder behaviour.
-        rudder_sign_flip = float(
-            abs(raw_rudder_cmd) > RUDDER_FLIP_DEADBAND
-            and abs(self.prev_raw_rudder_cmd) > RUDDER_FLIP_DEADBAND
-            and raw_rudder_cmd * self.prev_raw_rudder_cmd < 0.0
-        )
-
-        # Optional command dynamics
-        if USE_COMMAND_RATE_LIMIT_IN_TRAINING:
-            rudder_cmd = self._rate_limit_norm(
-                raw_rudder_cmd,
-                self.prev_rudder_cmd,
-                RUDDER_RATE_NORM_PER_S,
-            )
-            throttle_cmd = self._rate_limit_norm(
-                raw_throttle_cmd,
-                self.prev_throttle_cmd,
-                THROTTLE_RATE_NORM_PER_S,
-            )
-        else:
-            rudder_cmd = raw_rudder_cmd
-            throttle_cmd = raw_throttle_cmd
-
+        rudder_cmd = float(np.clip(action[0], MIN_IN, MAX_IN))
+        throttle_cmd = float(np.clip(action[1], MIN_IN, MAX_IN))
         rudder = rudder_cmd * 100.0
 
         if FIXED_RPM:
@@ -869,28 +799,6 @@ class ASVLidarEnv(gym.Env):
         # stay near cruise RPM
         r_thrust = -float(K_THRUST_DEV * abs(rpm - CRUISE_RPM) / max(RPM_DELTA, 1e-6))
 
-        # Smooth-control penalties.
-        # Penalise raw policy output changes, not just the limited command.
-        # This encourages the learned policy itself to become smoother.
-        yaw_rate_norm = abs(float(self.asv_w)) / max(YAW_RATE_REF_DPS, 1e-6)
-        yaw_accel_norm = abs(float(self.asv_w) - float(self.prev_yaw_rate_dps)) / max(YAW_RATE_REF_DPS, 1e-6)
-
-        r_rudder_mag = -K_RUDDER_MAG * abs(raw_rudder_cmd)
-        r_rudder_slew = -K_RUDDER_SLEW * abs(d_rudder_cmd)
-        r_rudder_flip = -K_RUDDER_FLIP * rudder_sign_flip
-        r_throttle_slew = -K_THROTTLE_SLEW * abs(d_throttle_cmd)
-        r_yaw_rate = -K_YAW_RATE * (yaw_rate_norm ** 2)
-        r_yaw_accel = -K_YAW_ACCEL * (yaw_accel_norm ** 2)
-
-        r_smooth = float(
-            r_rudder_mag
-            + r_rudder_slew
-            + r_rudder_flip
-            + r_throttle_slew
-            + r_yaw_rate
-            + r_yaw_accel
-        )
-
         if collided:
             reward = float(R_COLLISION)
         else:
@@ -903,7 +811,6 @@ class ASVLidarEnv(gym.Env):
                 + r_progress
                 + r_slow
                 + r_thrust
-                + r_smooth
             )
             if reached_goal:
                 reward += R_GOAL
@@ -945,8 +852,7 @@ class ASVLidarEnv(gym.Env):
             "p10_sector_range": float(np.percentile(sector_d, 10)),
             "mean_sector_pen": float(np.mean(pen)),
             "rpm": float(rpm),
-            "rudder_deg": float(rudder_cmd * MAX_RUD_ANGLE),
-            "raw_rudder_deg": float(raw_rudder_cmd * MAX_RUD_ANGLE),
+            "rudder_deg": float(rudder_cmd * 40.0),
             "distance_to_goal": float(self.distance_to_goal),
             "collided": bool(collided),
             "reached_goal": bool(reached_goal),
@@ -958,29 +864,7 @@ class ASVLidarEnv(gym.Env):
             "r_progress": float(r_progress),
             "r_slow": float(r_slow),
             "r_thrust": float(r_thrust),
-            "raw_rudder_cmd": float(raw_rudder_cmd),
-            "raw_throttle_cmd": float(raw_throttle_cmd),
-            "rudder_cmd": float(rudder_cmd),
-            "throttle_cmd": float(throttle_cmd),
-            "d_rudder_cmd": float(d_rudder_cmd),
-            "d_throttle_cmd": float(d_throttle_cmd),
-            "rudder_sign_flip": float(rudder_sign_flip),
-            "r_smooth": float(r_smooth),
-            "r_rudder_mag": float(r_rudder_mag),
-            "r_rudder_slew": float(r_rudder_slew),
-            "r_rudder_flip": float(r_rudder_flip),
-            "r_throttle_slew": float(r_throttle_slew),
-            "r_yaw_rate": float(r_yaw_rate),
-            "r_yaw_accel": float(r_yaw_accel),
-            "actual_rudder_deg": float(math.degrees(getattr(self.model, "_delta", 0.0))),
         }
-        
-        # Store current commands for the next observation and next smoothness calculation.
-        self.prev_raw_rudder_cmd = raw_rudder_cmd
-        self.prev_raw_throttle_cmd = raw_throttle_cmd
-        self.prev_rudder_cmd = rudder_cmd
-        self.prev_throttle_cmd = throttle_cmd
-        self.prev_yaw_rate_dps = float(self.asv_w)
 
         if self.render_mode in self.metadata["render_modes"]:
             self.render()

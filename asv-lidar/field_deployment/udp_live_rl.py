@@ -456,6 +456,25 @@ def main() -> None:
     log = None
     if args.record_log:
         log = open(args.record_log, "a", encoding="utf-8", buffering=1)
+        log.write(
+            f"#CONFIG,"
+            f"model_path={args.model_path},"
+            f"test_case={args.test_case},"
+            f"fixed_rpm={int(args.fixed_rpm)},"
+            f"cruise_rpm={args.cruise_rpm},"
+            f"rudder_sign={args.rudder_sign},"
+            f"rudder_scale={args.rudder_scale},"
+            f"max_rudder_rate_dps={MAX_RUDDER_RATE_DPS},"
+            f"max_rudder_deg={MAX_RUDDER_DEG_FOR_RATE},"
+            f"lidar_index0_deg={args.lidar_index0_deg},"
+            f"lambda={args.lambda_value},"
+            f"lookahead_fraction={args.lookahead_fraction},"
+            f"pos_scale={args.pos_scale},"
+            f"BLOCK_D_SAFE={BLOCK_D_SAFE},"
+            f"BLOCK_D_CRIT={BLOCK_D_CRIT},"
+            f"SIDE_CLEAR_TIE={SIDE_CLEAR_TIE},"
+            f"BYPASS_CTE={BYPASS_CTE}\n"
+        )
         print(f"[UDP] Recording received lines to: {args.record_log}")
 
     decoder = BluefinStreamDecoder(lidar_out_beams=720)
@@ -635,6 +654,9 @@ def main() -> None:
                             scale=args.rudder_scale,
                         )
 
+                        # Store previous limited command for logging and rate calculation.
+                        prev_rudder_cmd_for_log = prev_rudder_cmd
+
                         # Use telemetry frame time, not pygame FPS.
                         t_now = float(frame.t_sec)
                         if prev_rudder_t is None:
@@ -653,19 +675,27 @@ def main() -> None:
 
                         # This matches the ship_model.py style:
                         # delta_dot = clip(delta_cmd - delta, ±max_rate)
-                        rudder_error = raw_rudder_cmd - prev_rudder_cmd
+                        rudder_error = raw_rudder_cmd - prev_rudder_cmd_for_log
+
                         rudder_cmd_dot = float(np.clip(
                             rudder_error,
                             -max_cmd_rate_per_s,
                             +max_cmd_rate_per_s,
                         ))
 
-                        rudder_cmd = float(prev_rudder_cmd + rudder_cmd_dot * dt_cmd)
+                        rudder_cmd = float(prev_rudder_cmd_for_log + rudder_cmd_dot * dt_cmd)
+
                         rudder_cmd = float(np.clip(
                             rudder_cmd,
                             -abs(float(args.rudder_scale)),
                             +abs(float(args.rudder_scale)),
                         ))
+
+                        # Actual realised rate of the limited command that will be sent.
+                        # Units: command-percent per second.
+                        rudder_rate_cmd_per_s = float(
+                            (rudder_cmd - prev_rudder_cmd_for_log) / max(dt_cmd, 1e-6)
+                        )
 
                         prev_rudder_cmd = rudder_cmd
                         prev_rudder_t = t_now
@@ -694,12 +724,44 @@ def main() -> None:
                         # associated with each decoded LiDAR frame. Lines beginning
                         # with '#ACTION' are ignored by log_parser.py, but preserve
                         # enough information to replay/debug the control decision.
+
+                        # if log is not None:
+                        #     log.write(
+                        #         f"#ACTION,t={frame.t_sec:.6f},ts={frame.ts_str},seq={frame.seq},"
+                        #         f"a0={float(latest_action[0]):+.6f},a1={float(latest_action[1]):+.6f},"
+                        #         f"rudder={rudder_cmd:+.3f},rpm={rpm_cmd:.3f},S2={thrust_cmd:.3f},"
+                        #         f"shadow={int(args.shadow)},sent={int(sent_command)}\n"
+                        #     )
+
                         if log is not None:
                             log.write(
-                                f"#ACTION,t={frame.t_sec:.6f},ts={frame.ts_str},seq={frame.seq},"
-                                f"a0={float(latest_action[0]):+.6f},a1={float(latest_action[1]):+.6f},"
-                                f"rudder={rudder_cmd:+.3f},rpm={rpm_cmd:.3f},S2={thrust_cmd:.3f},"
-                                f"shadow={int(args.shadow)},sent={int(sent_command)}\n"
+                                f"#ACTION,"
+                                f"t_frame={frame.t_sec:.6f},"
+                                f"t_wall={time.monotonic():.6f},"
+                                f"ts={frame.ts_str},seq={frame.seq},"
+                                f"test_case={args.test_case},"
+                                f"shadow={int(args.shadow)},sent={int(sent_command)},"
+                                f"a0={float(latest_action[0]):+.6f},"
+                                f"a1={float(latest_action[1]):+.6f},"
+                                f"raw_rudder={raw_rudder_cmd:+.3f},"
+                                f"limited_rudder={rudder_cmd:+.3f},"
+                                f"dt_cmd={dt_cmd:.4f},"
+                                f"rudder_rate={rudder_rate_cmd_per_s:+.3f},"
+                                f"max_rudder_rate={max_cmd_rate_per_s:.3f},"
+                                f"rpm={rpm_cmd:.3f},"
+                                f"S2={thrust_cmd:.3f},"
+                                f"S1_telem={frame.s1},S2_telem={frame.s2},"
+                                f"x_real={frame.x_m:+.3f},y_real={frame.y_m:+.3f},yaw_real={frame.yaw_deg:+.2f},"
+                                f"speed={frame.speed_mps:.3f},u={frame.u_body_mps:+.3f},v={frame.v_body_mps:+.3f},yaw_rate={frame.yaw_rate:+.3f},"
+                                f"x_rl={latest_aux['x']:+.3f},y_rl={latest_aux['y']:+.3f},"
+                                f"cte={latest_aux['cross_track_error']:+.3f},"
+                                f"course={latest_aux['course_error']:+.2f},"
+                                f"lookahead={latest_aux['lookahead_course_error']:+.2f},"
+                                f"front={latest_aux['front_clearance']:.3f},"
+                                f"left={latest_aux['left_clearance']:.3f},"
+                                f"right={latest_aux['right_clearance']:.3f},"
+                                f"local_cte={latest_aux['local_target_cte']:+.3f},"
+                                f"cmd='{command}'\n"
                             )
 
                         path_world.append(mapped_xy)
