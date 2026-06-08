@@ -42,7 +42,7 @@ LOOKAHEAD_FRACTION = 0.25
 # Fixed lambda for this practical local-planner run.
 LAMBDA_MIN = 1e-4
 LAMBDA_MAX = 1.0
-DEFAULT_EVAL_LAMBDA = 0.6
+DEFAULT_EVAL_LAMBDA = 0.5
 
 # Reward parameters
 GAMMA_E = 0.05
@@ -60,7 +60,7 @@ U_REWARD_REF = 0.8
 RPM_MIN = 0
 RPM_MAX = 24
 CRUISE_RPM = 12.0
-FIXED_RPM = False
+FIXED_RPM = True
 U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 MAX_IN = 1.0
 MIN_IN = -1.0
@@ -108,7 +108,7 @@ K_THRUST_DEV = 0.006
 # - "asymmetric": left pool edge visible, right pool edge invisible, far right wall visible
 # - "both": both true pool borders visible
 # - "mixed": randomize across the three cases above
-OBS_BORDER_MODE = "both"
+OBS_BORDER_MODE = "mixed"
 OBS_BORDER_P_NONE = 0.25
 OBS_BORDER_P_ASYMMETRIC = 0.50
 OBS_BORDER_P_BOTH = 0.25
