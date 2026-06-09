@@ -60,21 +60,21 @@ U_REWARD_REF = 0.8
 RPM_MIN = 0
 RPM_MAX = 24
 CRUISE_RPM = 12.0
-FIXED_RPM = True
+FIXED_RPM = False
 U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 MAX_IN = 1.0
 MIN_IN = -1.0
 
 MAX_EPISODE_STEPS = 700
 
-# # first speed-control stage: 9-15 RPM (37.5% - 62.5%)
-# RPM_DELTA = 3.0      
-# RPM_FLOOR = 9.0
-# RPM_CEIL = 15.0
-# U_MIN_REWARD = 0.35
-# K_PROGRESS = 0.5
-# K_SLOW = 0.15
-# K_THRUST_DEV = 0.02
+# first speed-control stage: 9-15 RPM (37.5% - 62.5%)
+RPM_DELTA = 3.0      
+RPM_FLOOR = 9.0
+RPM_CEIL = 15.0
+U_MIN_REWARD = 0.30
+K_PROGRESS = 0.6
+K_SLOW = 0.10
+K_THRUST_DEV = 0.015
 
 # # second speed-control stage: 8-16 RPM (33% - 66%)
 # RPM_DELTA = 4.0
@@ -94,14 +94,14 @@ MAX_EPISODE_STEPS = 700
 # K_SLOW = 0.12
 # K_THRUST_DEV = 0.010
 
-# full speed control
-RPM_DELTA = 12.0
-RPM_FLOOR = 0.0
-RPM_CEIL = 24.0
-U_MIN_REWARD = 0.55
-K_PROGRESS = 1.2
-K_SLOW = 0.35
-K_THRUST_DEV = 0.006
+# # full speed control
+# RPM_DELTA = 12.0
+# RPM_FLOOR = 0.0
+# RPM_CEIL = 24.0
+# U_MIN_REWARD = 0.55
+# K_PROGRESS = 1.2
+# K_SLOW = 0.35
+# K_THRUST_DEV = 0.006
 
 # Observation LiDAR border-visibility mode.
 # - "none": no borders/walls in LiDAR
@@ -244,6 +244,8 @@ class ASVLidarEnv(gym.Env):
         self.current_log10_lambda = float(np.log10(DEFAULT_EVAL_LAMBDA))
         self.obs_border_mode_used = "none"
         self.true_border_clearance = min(self.map_width, self.map_height)
+
+        self.forced_num_obs = None
 
         self.observation_space = DictSpace({
             "lidar": Box(low=0.0, high=1.0, shape=(LIDAR_SECTORS,), dtype=np.float32),
@@ -419,7 +421,7 @@ class ASVLidarEnv(gym.Env):
         margin_x = max(2.0, 0.25 * self.map_width)
 
         # 70%: vertical path
-        if np.random.rand() < 0.1:
+        if np.random.rand() < 0.7:
             x = float(np.random.uniform(margin_x, self.map_width - margin_x))
             return x, 2.0, x, self.map_height - 3.0
 
@@ -549,72 +551,49 @@ class ASVLidarEnv(gym.Env):
                 if np.hypot(cx - self.start_x, cy - self.start_y) > 3.0 and np.hypot(cx - self.goal_x, cy - self.goal_y) > 3.0:
                     return [self._make_box(cx, cy, OBSTACLE_SIZE)]
         return []
-
-    # def _generate_obstacles(self, num_obs: int, test_case: Optional[int] = None):
-    #     if test_case is not None:
-    #         raw = self.scenario.obstacles(test_case=test_case)
-    #         return self._scale_case_obstacles(raw)
-    #     # Focused local-planner curriculum: exactly one lidar-visible obstacle near the path.
-    #     return self._generate_single_near_path_obstacle()
     
     def _generate_obstacles(self, num_obs: int, test_case: Optional[int] = None):
         if test_case is not None:
             raw = self.scenario.obstacles(test_case=test_case)
             return self._scale_case_obstacles(raw)
 
-        if self.obstacle_mode == "single_near_path":
-            return self._generate_single_near_path_obstacle()
+        num_obs = int(max(0, num_obs))
+        if num_obs <= 0:
+            return []
 
         obstacles: List[List[Tuple[float, float]]] = []
-        if num_obs <= 0:
-            return obstacles
-
-        path_len = len(self.path)
-        start_margin = int(0.25 * path_len)
-        end_margin = int(0.75 * path_len)
-        min_center_dist = 1.6
-        max_tries = 200
+        max_tries = 300
         tries = 0
 
         while len(obstacles) < num_obs and tries < max_tries:
             tries += 1
-            idx = int(np.random.randint(max(1, start_margin), max(2, end_margin)))
-            center = self.path[idx].astype(np.float32)
-            tangent = self._path_tangent(idx)
-            normal = np.array([-tangent[1], tangent[0]], dtype=np.float32)
-            lateral_sigma = 0.18 * self.map_width
-            lateral = float(np.random.normal(loc=0.0, scale=lateral_sigma))
-            center = center + lateral * normal
-            w = float(np.random.uniform(0.8, 1.2))
-            h = float(np.random.uniform(0.8, 1.2))
 
-            x0 = float(center[0] - 0.5 * w)
-            x1 = float(center[0] + 0.5 * w)
-            y0 = float(center[1] - 0.5 * h)
-            y1 = float(center[1] + 0.5 * h)
-
-            margin = 1.0
-            if x0 < margin or x1 > self.map_width - margin or y0 < margin or y1 > self.map_height - margin:
+            candidate = self._generate_single_near_path_obstacle()
+            if not candidate:
                 continue
 
-            c = np.array([(x0 + x1) * 0.5, (y0 + y1) * 0.5], dtype=np.float32)
-            start = np.array([self.start_x, self.start_y], dtype=np.float32)
-            goal = np.array([self.goal_x, self.goal_y], dtype=np.float32)
-            if float(np.linalg.norm(c - start)) < 2.0 or float(np.linalg.norm(c - goal)) < 2.0:
+            obs = candidate[0]
+
+            # Reject if overlapping or too close to existing obstacles.
+            if any(self._boxes_overlap(obs, existing, pad=0.25) for existing in obstacles):
                 continue
 
-            too_close = False
-            for obs in obstacles:
-                oc = np.mean(np.array(obs, dtype=np.float32), axis=0)
-                if float(np.linalg.norm(c - oc)) < min_center_dist:
-                    too_close = True
-                    break
-            if too_close:
-                continue
-
-            obstacles.append([(x0, y0), (x1, y0), (x1, y1), (x0, y1)])
+            obstacles.append(obs)
 
         return obstacles
+    
+    def _boxes_overlap(self, a, b, pad: float = 0.15) -> bool:
+        ax = [p[0] for p in a]
+        ay = [p[1] for p in a]
+        bx = [p[0] for p in b]
+        by = [p[1] for p in b]
+
+        return not (
+            max(ax) + pad < min(bx) or
+            max(bx) + pad < min(ax) or
+            max(ay) + pad < min(by) or
+            max(by) + pad < min(ay)
+        )
 
     # ------------------------------------------------------------------
     # Local planner features from LiDAR only
@@ -697,7 +676,18 @@ class ASVLidarEnv(gym.Env):
                 num_obs = int(np.random.randint(0, self.max_obs + 1))
         else:
             num_obs = int(np.random.randint(0, self.max_obs + 1))
+        # self.obstacles = self._generate_obstacles(num_obs, self.test_case)
+        if self.test_case is None:
+            if self.forced_num_obs is not None:
+                num_obs = int(self.forced_num_obs)
+            else:
+                num_obs = int(np.random.randint(0, self.max_obs + 1))
+        else:
+            num_obs = 0
+
+        self.num_obs = int(num_obs)
         self.obstacles = self._generate_obstacles(num_obs, self.test_case)
+
         self.asv_path = [(self.asv_x, self.asv_y)]
         self.distance_to_goal = float(np.linalg.norm([self.asv_x - self.goal_x, self.asv_y - self.goal_y]))
         self.lidar_obs.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=self.obstacles, map_border=self._get_obs_lidar_border())

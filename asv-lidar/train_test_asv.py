@@ -17,7 +17,7 @@ import csv
 import json
 import multiprocessing
 import os
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, List, Sequence, Optional
 
 import numpy as np
 import torch.nn as nn
@@ -31,6 +31,10 @@ from rl_env import ASVLidarEnv, DEFAULT_EVAL_LAMBDA, RPM_MAX, RPM_MIN
 # 0 = no obstacle path following, 1 = centered obstacle, 2/3 = offset obstacles.
 DEFAULT_EVAL_CASES = [0, 1, 2, 3, 4, 6, 7]
 
+# 6 obstacle-count groups × 5 episodes = 30 eval episodes per checkpoint
+EVAL_OBS_COUNTS = [0, 1, 2, 3, 4, 5]
+EVAL_EPISODES_PER_OBS_COUNT = 5
+EVAL_BASE_SEED = 675973
 
 def action_to_rpm(throttle_cmd: float) -> float:
     throttle_cmd = float(np.clip(throttle_cmd, -1.0, 1.0))
@@ -76,8 +80,9 @@ def termination_reason_from_env(env: ASVLidarEnv, info: Dict[str, Any], truncate
     return "terminated"
 
 
-def eval_one_episode(model, env: ASVLidarEnv, deterministic: bool = True, max_steps: int = 2000) -> Dict[str, Any]:
-    obs, _ = env.reset()
+def eval_one_episode(model, env: ASVLidarEnv, deterministic: bool = True, max_steps: int = 2000, seed: Optional[int] = None,
+    ) -> Dict[str, Any]:
+    obs, _ = env.reset(seed=seed)
     done = False
     ep_reward = 0.0
     step_count = 0
@@ -191,6 +196,7 @@ def eval_one_episode(model, env: ASVLidarEnv, deterministic: bool = True, max_st
         "ep_len": int(step_count),
         "success": int(success),
         "term_reason": str(reason),
+        "num_obs": int(len(getattr(env, "obstacles", []))),
         "d_start": float(d_start),
         "d_end": float(d_end),
         "progress_total": float(progress_total),
@@ -257,7 +263,7 @@ class EvalMetricsCallback(BaseCallback):
         self.summary_rows: List[Dict[str, Any]] = []
         self.best_score = -np.inf
         self.header = [
-            "timesteps", "test_case", "ep_reward", "ep_len", "success", "term_reason",
+            "timesteps", "eval_group", "eval_episode", "num_obs", "ep_reward", "ep_len", "success", "term_reason",
             "d_start", "d_end", "progress_total", "progress_per_step",
             "mean_speed", "mean_u", "mean_v", "mean_rpm", "min_rpm", "max_rpm",
             "mean_abs_rudder", "std_rudder", "mean_abs_cte", "max_abs_cte",
@@ -312,21 +318,56 @@ class EvalMetricsCallback(BaseCallback):
             return True
         ep_metrics: List[Dict[str, Any]] = []
         prev_case = getattr(self.eval_env, "test_case", None)
-        for case_id in self.eval_cases:
-            self.eval_env.test_case = int(case_id)
-            m = eval_one_episode(self.model, self.eval_env, deterministic=True, max_steps=self.max_steps)
-            m["test_case"] = int(case_id)
-            ep_metrics.append(m)
-            row = [self.num_timesteps, int(case_id)] + [m.get(k) for k in self.header[2:]]
-            self._append_row(row)
-            self.rows.append({"timesteps": int(self.num_timesteps), **m})
-            if self.verbose:
-                print(
-                    f"[EVAL @{self.num_timesteps}] case={case_id} succ={m['success']} reason={m['term_reason']} "
-                    f"cte={m['mean_abs_cte']:.2f} front={m['min_front_clearance']:.2f} "
-                    f"r=({m['mean_r_pf']:.2f},{m['mean_r_oa']:.2f},{m['mean_r_local']:.2f})"
+        prev_forced_num_obs = getattr(self.eval_env, "forced_num_obs", None)
+
+        self.eval_env.test_case = None
+
+        for obs_count in EVAL_OBS_COUNTS:
+            for ep_i in range(EVAL_EPISODES_PER_OBS_COUNT):
+                self.eval_env.forced_num_obs = int(obs_count)
+
+                # Fixed seed per obstacle count and episode index.
+                # This makes the callback comparable across checkpoints.
+                eval_seed = int(EVAL_BASE_SEED + 1000 * obs_count + ep_i)
+
+                m = eval_one_episode(
+                    self.model,
+                    self.eval_env,
+                    deterministic=True,
+                    max_steps=self.max_steps,
+                    seed=eval_seed,
                 )
+
+                m["eval_group"] = f"obs_{obs_count}"
+                m["eval_episode"] = int(ep_i)
+                m["requested_num_obs"] = int(obs_count)
+
+                ep_metrics.append(m)
+
+                row = [
+                    self.num_timesteps,
+                    f"obs_{obs_count}",
+                    int(ep_i),
+                    int(m.get("num_obs", obs_count)),
+                ] + [m.get(k) for k in self.header[4:]]
+
+                self._append_row(row)
+
+                self.rows.append({
+                    "timesteps": int(self.num_timesteps),
+                    **m,
+                })
+
+                if self.verbose:
+                    print(
+                        f"[EVAL @{self.num_timesteps}] obs={obs_count} ep={ep_i} "
+                        f"succ={m['success']} reason={m['term_reason']} "
+                        f"cte={m['mean_abs_cte']:.2f} front={m['min_front_clearance']:.2f} "
+                        f"R={m['ep_reward']:.1f}"
+                    )
+
         self.eval_env.test_case = prev_case
+        self.eval_env.forced_num_obs = prev_forced_num_obs
 
         def mean_of(key: str) -> float:
             vals = [float(x.get(key, 0.0)) for x in ep_metrics]
@@ -344,14 +385,38 @@ class EvalMetricsCallback(BaseCallback):
         collision_rate = border_rate + obstacle_rate
         mean_abs_cte = mean_of("mean_abs_cte")
         mean_abs_course_error = mean_of("mean_abs_course_error")
+
+        group_summaries = {}
+        for obs_count in EVAL_OBS_COUNTS:
+            group = [m for m in ep_metrics if int(m.get("requested_num_obs", -1)) == int(obs_count)]
+            if not group:
+                continue
+
+            reasons = [str(x.get("term_reason", "")) for x in group]
+            group_summaries[f"obs_{obs_count}_success_rate"] = float(np.mean([int(x.get("success", 0)) for x in group]))
+            group_summaries[f"obs_{obs_count}_obstacle_rate"] = float(np.mean([1 if r == "obstacle" else 0 for r in reasons]))
+            group_summaries[f"obs_{obs_count}_border_rate"] = float(np.mean([1 if r == "border" else 0 for r in reasons]))
+            group_summaries[f"obs_{obs_count}_timeout_rate"] = float(np.mean([1 if r == "timeout" else 0 for r in reasons]))
+            group_summaries[f"obs_{obs_count}_mean_abs_cte"] = float(np.mean([float(x.get("mean_abs_cte", 0.0)) for x in group]))
+        
+        weighted_success = (
+            1.0 * group_summaries.get("obs_0_success_rate", 0.0)
+            + 1.2 * group_summaries.get("obs_1_success_rate", 0.0)
+            + 1.5 * group_summaries.get("obs_2_success_rate", 0.0)
+            + 2.0 * group_summaries.get("obs_3_success_rate", 0.0)
+            + 2.5 * group_summaries.get("obs_4_success_rate", 0.0)
+            + 3.0 * group_summaries.get("obs_5_success_rate", 0.0)
+        ) / (1.0 + 1.2 + 1.5 + 2.0 + 2.5 + 3.0)
+
         selection_score = (
-            8.0 * success_rate
-            - 3.0 * obstacle_rate
+            10.0 * weighted_success
+            - 4.0 * obstacle_rate
             - 3.0 * border_rate
             - 2.0 * timeout_rate
-            - 1.2 * mean_abs_cte
-            - 0.05 * mean_abs_course_error
+            - 0.8 * mean_abs_cte
+            - 0.03 * mean_abs_course_error
         )
+
         summary = {
             "timesteps": int(self.num_timesteps),
             "mean_ep_reward": mean_of("ep_reward"),
@@ -385,6 +450,8 @@ class EvalMetricsCallback(BaseCallback):
             "selection_score": float(selection_score),
             "reward_info_rate": mean_of("has_reward_info"),
         }
+        summary.update(group_summaries)
+        
         self.summary_rows.append(summary)
         self._append_summary_row([summary.get(k) for k in self.summary_header])
         with open(self.json_path, "w") as f:
@@ -408,7 +475,7 @@ class EvalMetricsCallback(BaseCallback):
 def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", choices=["train", "test", "eval"], default="test")
-    ap.add_argument("--algo", choices=["ppo", "sac"], default="ppo")
+    ap.add_argument("--algo", choices=["ppo", "sac"], default="sac")
     ap.add_argument("--timesteps", type=int, default=1_000_000)
     ap.add_argument("--num-envs", type=int, default=8)
     ap.add_argument("--seed", type=int, default=0)
