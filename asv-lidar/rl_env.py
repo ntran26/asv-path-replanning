@@ -74,7 +74,7 @@ RPM_CEIL = 15.0
 U_MIN_REWARD = 0.30
 K_PROGRESS = 0.6
 K_SLOW = 0.10
-K_THRUST_DEV = 0.015
+K_THRUST_DEV = 0.025
 
 # # second speed-control stage: 8-16 RPM (33% - 66%)
 # RPM_DELTA = 4.0

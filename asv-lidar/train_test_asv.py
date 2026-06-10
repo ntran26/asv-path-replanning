@@ -25,7 +25,7 @@ from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.callbacks import BaseCallback, CallbackList, CheckpointCallback
 from stable_baselines3.common.vec_env import SubprocVecEnv, VecMonitor
 
-from rl_env import ASVLidarEnv, DEFAULT_EVAL_LAMBDA, RPM_MAX, RPM_MIN
+from rl_env import ASVLidarEnv, DEFAULT_EVAL_LAMBDA, RPM_MAX, RPM_MIN, CRUISE_RPM, FIXED_RPM, RPM_CEIL, RPM_FLOOR, RPM_DELTA
 
 # Focused local-planner eval set:
 # 0 = no obstacle path following, 1 = centered obstacle, 2/3 = offset obstacles.
@@ -37,9 +37,16 @@ EVAL_EPISODES_PER_OBS_COUNT = 5
 EVAL_BASE_SEED = 675973
 
 def action_to_rpm(throttle_cmd: float) -> float:
-    throttle_cmd = float(np.clip(throttle_cmd, -1.0, 1.0))
-    return float(RPM_MIN + (throttle_cmd + 1.0) * 0.5 * (RPM_MAX - RPM_MIN))
+    """Fallback RPM mapping for logging if env.step() does not return info['rpm']."""
+    if FIXED_RPM:
+        return float(CRUISE_RPM)
 
+    throttle_cmd = float(np.clip(throttle_cmd, -1.0, 1.0))
+    return float(np.clip(
+        CRUISE_RPM + RPM_DELTA * throttle_cmd,
+        RPM_FLOOR,
+        RPM_CEIL,
+    ))
 
 def action_to_rudder_deg(rudder_cmd: float) -> float:
     rudder_cmd = float(np.clip(rudder_cmd, -1.0, 1.0))
@@ -276,9 +283,14 @@ class EvalMetricsCallback(BaseCallback):
             "timesteps", "mean_ep_reward", "std_ep_reward", "mean_ep_len",
             "success_rate", "collision_rate", "border_rate", "obstacle_rate", "timeout_rate",
             "mean_progress_per_step", "mean_d_end", "mean_speed",
+            "mean_rpm", "min_rpm", "max_rpm",
             "mean_abs_cte", "mean_abs_course_error", "mean_abs_lookahead_error",
-            "min_min_lidar_all", "min_p10_front", "mean_r_pf", "mean_r_oa", "mean_r_local", "mean_r_center", "mean_r_border", "mean_r_exist", "mean_lambda",
-            "min_sector_range", "p10_sector_range", "mean_sector_pen", "min_front_clearance", "max_block_alpha", "selection_score", "reward_info_rate",
+            "min_min_lidar_all", "min_p10_front",
+            "mean_r_pf", "mean_r_oa", "mean_r_local", "mean_r_center",
+            "mean_r_border", "mean_r_exist", "mean_lambda",
+            "min_sector_range", "p10_sector_range", "mean_sector_pen",
+            "min_front_clearance", "max_block_alpha",
+            "selection_score", "reward_info_rate",
         ]
         self._csv_inited = False
         self._summary_csv_inited = False
@@ -430,6 +442,10 @@ class EvalMetricsCallback(BaseCallback):
             "mean_progress_per_step": mean_of("progress_per_step"),
             "mean_d_end": mean_of("d_end"),
             "mean_speed": mean_of("mean_speed"),
+            "mean_rpm": mean_of("mean_rpm"),
+            "min_rpm": float(np.min([float(x.get("min_rpm", float("inf"))) for x in ep_metrics])) if ep_metrics else float("inf"),
+            "max_rpm": float(np.max([float(x.get("max_rpm", 0.0)) for x in ep_metrics])) if ep_metrics else 0.0,
+            "mean_abs_cte": mean_abs_cte,
             "mean_abs_cte": mean_abs_cte,
             "mean_abs_course_error": mean_abs_course_error,
             "mean_abs_lookahead_error": mean_of("mean_abs_lookahead_error"),
@@ -450,8 +466,9 @@ class EvalMetricsCallback(BaseCallback):
             "selection_score": float(selection_score),
             "reward_info_rate": mean_of("has_reward_info"),
         }
-        summary.update(group_summaries)
         
+        summary.update(group_summaries)
+
         self.summary_rows.append(summary)
         self._append_summary_row([summary.get(k) for k in self.summary_header])
         with open(self.json_path, "w") as f:

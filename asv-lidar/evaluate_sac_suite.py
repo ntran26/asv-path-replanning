@@ -18,7 +18,7 @@ from rl_env import ASVLidarEnv, DEFAULT_EVAL_LAMBDA
 # -----------------------------
 # User settings
 # -----------------------------
-MODEL_PATH = "sac_best_1M.zip"
+MODEL_PATH = "best_model_900000.zip"
 SUITE_JSON = "data/env_setup/eval_suite/asv_eval_suite.json"
 SUITE_JSON = "data/env_setup/eval_suite_success_filtered/asv_success_suite.json"
 OUT_DIR = "eval_results/eval_suite"
