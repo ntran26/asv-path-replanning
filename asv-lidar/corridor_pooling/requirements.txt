@@ -1,0 +1,8 @@
+numpy
+pygame
+gymnasium
+stable-baselines3[extra]
+torch
+opencv-python
+rich
+tqdm

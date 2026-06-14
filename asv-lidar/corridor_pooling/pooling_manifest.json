@@ -1,0 +1,14 @@
+{
+  "pooling_mode": "corridor",
+  "observation_removed": [
+    "log10_lambda"
+  ],
+  "fixed_lambda": 0.5,
+  "lidar_range_m": 16.0,
+  "lidar_swath_deg": 270.0,
+  "lidar_beams": 90,
+  "lidar_sectors": 25,
+  "feasibility_safe_width_formula": "VESSEL_WIDTH + 2 * HULL_MARGIN",
+  "start_goal_vertical_probability": 0.7,
+  "notes": "All other environment/reward/training parameters are intended to match the uploaded base files."
+}
