@@ -92,18 +92,18 @@ MAX_EPISODE_STEPS = 700
 # Fixed-RPM training still uses the progress/slow-speed reward constants below.
 # Keep this block narrow-speed compatible so the fixed-RPM branch does not inherit
 # the aggressive full-speed-control progress shaping.
-RPM_DELTA = 4.0
-RPM_FLOOR = 8.0
-RPM_CEIL = 16.0
+RPM_DELTA = 3.0
+RPM_FLOOR = 9.0
+RPM_CEIL = 15.0
 U_MIN_REWARD = 0.30
 K_PROGRESS = 0.6
 K_SLOW = 0.10
 K_THRUST_DEV = 0.025
 
 # Later speed-control stages, if needed:
+# stage 1: RPM_DELTA=3.0, RPM_FLOOR=9.0, RPM_CEIL=15.0
 # stage 2: RPM_DELTA=4.0, RPM_FLOOR=8.0, RPM_CEIL=16.0
 # stage 3: RPM_DELTA=6.0, RPM_FLOOR=6.0, RPM_CEIL=18.0
-# full range 0-24 RPM is intentionally disabled for this fixed-RPM run.
 
 # Observation LiDAR border-visibility mode.
 # - "none": no borders/walls in LiDAR
