@@ -71,9 +71,8 @@ U_REWARD_REF = 0.8
 GAMMA_E_CLEAR = 0.20
 GAMMA_E_BLOCKED = 0.05
 
-# Explicit goal-region definition. This is intentionally larger than the old
-# point-goal threshold so visually valid finishes near the end region count.
-GOAL_RADIUS = 1.20
+# Explicit goal-region definition
+GOAL_RADIUS = 0.5
 GOAL_ALONG_DIST = 1.25
 GOAL_CTE_RADIUS = 1.60
 
