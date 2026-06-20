@@ -67,10 +67,10 @@ def _normalised(vx: float, vy: float) -> Point:
 # Mostly slanted start/goal templates. The last local case in each block is
 # curved through the control point specified separately.
 _PATH_TEMPLATES: Dict[int, Dict[str, Point]] = {
-    # Easy / slight slant
-    0: {"start": (4.8, START_Y), "goal": (5.2, GOAL_Y)},
-    1: {"start": (4.3, START_Y), "goal": (5.7, GOAL_Y)},
-    2: {"start": (5.7, START_Y), "goal": (4.3, GOAL_Y)},
+    # straight and diagonal paths
+    0: {"start": (5.0, START_Y), "goal": (5.0, GOAL_Y)},
+    1: {"start": (2.0, START_Y), "goal": (8.0, GOAL_Y)},
+    2: {"start": (8.0, START_Y), "goal": (2.0, GOAL_Y)},
     # Medium slant
     3: {"start": (3.9, START_Y), "goal": (6.1, GOAL_Y)},
     4: {"start": (6.1, START_Y), "goal": (3.9, GOAL_Y)},

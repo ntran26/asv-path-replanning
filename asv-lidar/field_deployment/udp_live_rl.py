@@ -47,7 +47,7 @@ try:
 except Exception:
     LIDAR_RANGE = 16.0
     LIDAR_SWATH = 270.0
-    LIDAR_BEAMS = 90
+    LIDAR_BEAMS = 225
     LIDAR_SECTORS = 25
 
 try:

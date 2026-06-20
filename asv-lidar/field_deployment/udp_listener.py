@@ -8,7 +8,7 @@ import pygame
 import numpy as np
 from typing import Optional, List, Tuple
 from log_parser import BluefinFrame, BluefinStreamDecoder
-import log_viewer_update as log_viewer
+import log_viewer as log_viewer
 
 def main():
     ap = argparse.ArgumentParser()
