@@ -13,7 +13,7 @@ Notes:
 - The observation adapter builds the same dict-style observation as the current rl_env.py:
     lidar, u, v, yaw_rate, cross_track_error, course_error,
     lookahead_course_error, front_clearance, side_clearance_diff,
-    local_target_cte, log10_lambda.
+    local_target_cte.
 - Rudder sign is reversed by default because the real vessel rudder command uses
   the opposite sign to the simulation convention.
 """
@@ -21,6 +21,7 @@ Notes:
 from __future__ import annotations
 
 import argparse
+import os
 import math
 import socket
 import time
@@ -39,6 +40,7 @@ from log_parser import BluefinFrame, BluefinStreamDecoder
 import log_viewer
 import policy_render as pr
 from test_run import TestCase
+from lidar_pooling import pool_lidar_to_sectors_shared, normalise_pooling_mode
 
 try:
     from asv_lidar import LIDAR_RANGE, LIDAR_SWATH, LIDAR_BEAMS, LIDAR_SECTORS
@@ -49,9 +51,16 @@ except Exception:
     LIDAR_SECTORS = 25
 
 try:
-    from ship_model import VESSEL_WIDTH
+    from ship_model import VESSEL_WIDTH, HULL_MARGIN
 except Exception:
     VESSEL_WIDTH = 0.50
+    HULL_MARGIN = 0.15
+
+# ---------------------------------------------------------------------------
+# LiDAR pooling mode. Keep this matched to training.
+# ---------------------------------------------------------------------------
+LIDAR_POOLING_MODE = normalise_pooling_mode("paper")
+FEASIBILITY_SAFE_WIDTH = float(VESSEL_WIDTH + 2.0 * HULL_MARGIN)
 
 # ---------------------------------------------------------------------------
 # Deployment defaults: stage 3 speed-control policy
@@ -130,31 +139,22 @@ def bearing_deg(from_xy: np.ndarray, to_xy: np.ndarray) -> float:
 # LiDAR pooling helpers
 # ---------------------------------------------------------------------------
 
-def _feasibility_pool(sector_ranges: np.ndarray, vessel_width: float, sector_angle_span_rad: float) -> float:
-    """Approximate the sector feasibility pooling used by asv_lidar.py."""
-    n = int(len(sector_ranges))
-    if n == 0:
-        return float(LIDAR_RANGE)
-    if n == 1:
-        return float(sector_ranges[0])
+def pool_lidar_to_sectors(
+    full_lidar_m: np.ndarray,
+    *,
+    lidar_index0_deg: float,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Return raw policy swath + 25 sector ranges/closeness.
 
-    beam_spacing = sector_angle_span_rad / float(n - 1)
-    order = np.argsort(sector_ranges)
-    for idx in order:
-        xi = float(sector_ranges[idx])
-        if xi <= 0.0:
-            continue
-        required_half_width_rad = math.atan2(0.5 * vessel_width, max(xi, 1e-6))
-        required_beams = max(1, int(math.ceil(required_half_width_rad / max(beam_spacing, 1e-6))))
-        lo = max(0, idx - required_beams)
-        hi = min(n, idx + required_beams + 1)
-        if np.all(sector_ranges[lo:hi] >= xi):
-            return float(xi)
-    return float(np.max(sector_ranges))
-
-def pool_lidar_to_sectors(full_lidar_m: np.ndarray, *, lidar_index0_deg: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Return raw policy swath + 25 sector ranges/closeness."""
-    raw_angles = np.linspace(-float(LIDAR_SWATH) / 2.0, float(LIDAR_SWATH) / 2.0, int(LIDAR_BEAMS), dtype=np.float32)
+    This uses the same shared pooling helper as the simulator. The pooling
+    mode is hardcoded for this branch so it matches the trained policy.
+    """
+    raw_angles = np.linspace(
+        -float(LIDAR_SWATH) / 2.0,
+        float(LIDAR_SWATH) / 2.0,
+        int(LIDAR_BEAMS),
+        dtype=np.float32,
+    )
     raw = log_viewer.pick_lidar_swath(
         np.asarray(full_lidar_m, dtype=np.float32),
         raw_angles,
@@ -162,15 +162,15 @@ def pool_lidar_to_sectors(full_lidar_m: np.ndarray, *, lidar_index0_deg: float) 
     ).astype(np.float32)
     raw = np.clip(raw, 0.0, float(LIDAR_RANGE))
 
-    sectors = np.array_split(raw, int(LIDAR_SECTORS))
-    sector_angle_span = math.radians(float(LIDAR_SWATH) / float(LIDAR_SECTORS))
-    sector_ranges = np.array(
-        [_feasibility_pool(s, float(VESSEL_WIDTH), sector_angle_span) if len(s) else float(LIDAR_RANGE) for s in sectors],
-        dtype=np.float32,
+    sector_ranges, sector_closeness, sector_angles = pool_lidar_to_sectors_shared(
+        raw,
+        raw_angles_deg=raw_angles,
+        lidar_range=float(LIDAR_RANGE),
+        lidar_swath_deg=float(LIDAR_SWATH),
+        n_sectors=int(LIDAR_SECTORS),
+        safe_width_m=float(FEASIBILITY_SAFE_WIDTH),
+        mode=str(LIDAR_POOLING_MODE),
     )
-    sector_ranges = np.clip(sector_ranges, 0.0, float(LIDAR_RANGE))
-    sector_closeness = np.clip(1.0 - sector_ranges / float(LIDAR_RANGE), 0.0, 1.0).astype(np.float32)
-    sector_angles = np.linspace(-float(LIDAR_SWATH) / 2.0, float(LIDAR_SWATH) / 2.0, int(LIDAR_SECTORS), dtype=np.float32)
     return raw, raw_angles, sector_ranges, sector_closeness, sector_angles
 
 # ---------------------------------------------------------------------------
@@ -186,7 +186,6 @@ def frame_to_rl_obs(
     reference_path: np.ndarray,
     reference_path_s: np.ndarray,
     lookahead_fraction: float,
-    lambda_value: float,
     pos_scale: float,
     lidar_index0_deg: float,
 ) -> Tuple[Dict[str, np.ndarray], Dict[str, float], Tuple[float, float], float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -278,7 +277,6 @@ def frame_to_rl_obs(
         "front_clearance": np.array([front_clearance], dtype=np.float32),
         "side_clearance_diff": np.array([right_clearance - left_clearance], dtype=np.float32),
         "local_target_cte": np.array([local_target_cte], dtype=np.float32),
-        "log10_lambda": np.array([np.log10(float(lambda_value))], dtype=np.float32),
     }
 
     obs: Dict[str, np.ndarray] = {}
@@ -395,6 +393,7 @@ def format_sector_lines(sector_closeness: Optional[np.ndarray], sector_ranges: O
 # ---------------------------------------------------------------------------
 
 def main() -> None:
+    global LIDAR_POOLING_MODE, FEASIBILITY_SAFE_WIDTH
     ap = argparse.ArgumentParser()
     ap.add_argument("--bind-ip", default="0.0.0.0")
     ap.add_argument("--local-port", type=int, default=5000)
@@ -407,10 +406,15 @@ def main() -> None:
 
     ap.add_argument("--model-path", default="sac_best_model.zip")
     ap.add_argument("--test-case", type=int, default=0)
-    ap.add_argument("--lambda-value", type=float, default=DEFAULT_LAMBDA)
     ap.add_argument("--lookahead-fraction", type=float, default=LOOKAHEAD_FRACTION)
     ap.add_argument("--pos-scale", type=float, default=POS_SCALE)
     ap.add_argument("--lidar-index0-deg", type=float, default=getattr(log_viewer, "LIDAR_INDEX_DEG", 0.0))
+    ap.add_argument(
+        "--feasibility-safe-width",
+        type=float,
+        default=FEASIBILITY_SAFE_WIDTH,
+        help="Safety-adjusted vessel width used by feasibility pooling.",
+    )
 
     ap.add_argument("--fixed-rpm", action="store_true")
     ap.add_argument("--cruise-rpm", type=float, default=CRUISE_RPM)
@@ -429,11 +433,13 @@ def main() -> None:
     ap.add_argument("--zoom", type=float, default=30.0)
     ap.add_argument("--max-path", type=int, default=20000)
     args = ap.parse_args()
+    FEASIBILITY_SAFE_WIDTH = float(args.feasibility_safe_width)
 
     model = SAC.load(args.model_path)
     model_obs_space = model.observation_space
     print(f"[RL] Loaded SAC model: {args.model_path}")
     print(f"[RL] Observation space: {model_obs_space}")
+    print(f"[LiDAR] pooling={LIDAR_POOLING_MODE} safe_width={FEASIBILITY_SAFE_WIDTH:.3f} m")
 
     scenario = TestCase()
     sx, sy, gx, gy = scenario.position(test_case=args.test_case)
@@ -467,7 +473,8 @@ def main() -> None:
             f"max_rudder_rate_dps={MAX_RUDDER_RATE_DPS},"
             f"max_rudder_deg={MAX_RUDDER_DEG_FOR_RATE},"
             f"lidar_index0_deg={args.lidar_index0_deg},"
-            f"lambda={args.lambda_value},"
+            f"lidar_pooling={LIDAR_POOLING_MODE},"
+            f"feasibility_safe_width={FEASIBILITY_SAFE_WIDTH},"
             f"lookahead_fraction={args.lookahead_fraction},"
             f"pos_scale={args.pos_scale},"
             f"BLOCK_D_SAFE={BLOCK_D_SAFE},"
@@ -498,7 +505,7 @@ def main() -> None:
     thrust_cmd = rpm_to_s2_cmd(rpm_cmd, rpm_max=args.rpm_max, s2_max_cmd=args.s2_max_cmd)
 
     pygame.init()
-    pygame.display.set_caption("Bluefin UDP SAC live RL bridge")
+    pygame.display.set_caption(f"Bluefin UDP SAC live RL bridge [{LIDAR_POOLING_MODE} pooling]")
     win_w, win_h = 1280, 720
     text_w = 840
     map_w = win_w - text_w
@@ -628,7 +635,6 @@ def main() -> None:
                             reference_path=reference_path,
                             reference_path_s=reference_path_s,
                             lookahead_fraction=args.lookahead_fraction,
-                            lambda_value=args.lambda_value,
                             pos_scale=args.pos_scale,
                             lidar_index0_deg=args.lidar_index0_deg,
                         )

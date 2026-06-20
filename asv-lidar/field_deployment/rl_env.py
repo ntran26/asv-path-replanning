@@ -20,10 +20,18 @@ from ship_model import (
     VESSEL_LENGTH,
     VESSEL_WIDTH,
     ShipModel,
-    MAX_RUD_ANGLE,
-    MAX_RUD_RATE_DPS
 )
 from test_run import TestCase
+
+try:
+    from asv_lidar import LIDAR_POOLING_MODE
+except Exception:
+    LIDAR_POOLING_MODE = "unknown"
+
+try:
+    from asv_lidar import FEASIBILITY_SAFE_WIDTH
+except Exception:
+    FEASIBILITY_SAFE_WIDTH = VESSEL_WIDTH + 2.0 * HULL_MARGIN
 
 RENDER_SCALE = 25
 TEST_CASE = None
@@ -44,7 +52,7 @@ LOOKAHEAD_FRACTION = 0.25
 # Fixed lambda for this practical local-planner run.
 LAMBDA_MIN = 1e-4
 LAMBDA_MAX = 1.0
-DEFAULT_EVAL_LAMBDA = 0.6
+DEFAULT_EVAL_LAMBDA = 0.5
 
 # Reward parameters
 GAMMA_E = 0.05
@@ -57,68 +65,44 @@ R_GOAL = 50.0
 R_EXIST = -0.5
 U_REWARD_REF = 0.8
 
-# Smooth-control shaping
-USE_COMMAND_RATE_LIMIT_IN_TRAINING = False
-RUDDER_RATE_NORM_PER_S = MAX_RUD_RATE_DPS / MAX_RUD_ANGLE
-THROTTLE_RATE_NORM_PER_S = 1.0
+# Adaptive path-tracking sensitivity:
+# - clear path: stricter tracking to avoid no-obstacle detours
+# - blocked path: more tolerant CTE while bypassing obstacles
+GAMMA_E_CLEAR = 0.20
+GAMMA_E_BLOCKED = 0.05
 
-K_RUDDER_MAG = 0.015
-K_RUDDER_SLEW = 0.18
-K_RUDDER_FLIP = 0.05
-K_THROTTLE_SLEW = 0.03
-K_YAW_RATE = 0.015
-K_YAW_ACCEL = 0.010
-
-RUDDER_FLIP_DEADBAND = 0.10
-YAW_RATE_REF_DPS = 30.0
+# Explicit goal-region definition
+GOAL_RADIUS = 0.5
+GOAL_ALONG_DIST = 1.25
+GOAL_CTE_RADIUS = 1.60
 
 # Fixed-speed steering task. The action space remains 2D for compatibility,
 # but throttle is ignored while FIXED_RPM=True.
 RPM_MIN = 0
 RPM_MAX = 24
 CRUISE_RPM = 12.0
-FIXED_RPM = True
+FIXED_RPM = False
 U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 MAX_IN = 1.0
 MIN_IN = -1.0
 
 MAX_EPISODE_STEPS = 700
 
-# # first speed-control stage: 9-15 RPM (37.5% - 62.5%)
-# RPM_DELTA = 3.0      
-# RPM_FLOOR = 9.0
-# RPM_CEIL = 15.0
-# U_MIN_REWARD = 0.35
-# K_PROGRESS = 0.5
-# K_SLOW = 0.15
-# K_THRUST_DEV = 0.02
+# Fixed-RPM training still uses the progress/slow-speed reward constants below.
+# Keep this block narrow-speed compatible so the fixed-RPM branch does not inherit
+# the aggressive full-speed-control progress shaping.
+RPM_DELTA = 3.0
+RPM_FLOOR = 9.0
+RPM_CEIL = 15.0
+U_MIN_REWARD = 0.30
+K_PROGRESS = 0.6
+K_SLOW = 0.10
+K_THRUST_DEV = 0.025
 
-# # second speed-control stage: 8-16 RPM (33% - 66%)
-# RPM_DELTA = 4.0
-# RPM_FLOOR = 8.0
-# RPM_CEIL = 16.0
-# U_MIN_REWARD = 0.30
-# K_PROGRESS = 0.6
-# K_SLOW = 0.10
-# K_THRUST_DEV = 0.015
-
-# third speed-control stage: 6-18 RPM (25% - 75%)
-RPM_DELTA = 6.0
-RPM_FLOOR = 6.0
-RPM_CEIL = 18.0
-U_MIN_REWARD = 0.35
-K_PROGRESS = 0.7
-K_SLOW = 0.12
-K_THRUST_DEV = 0.010
-
-# # full speed control
-# RPM_DELTA = 12.0
-# RPM_FLOOR = 0.0
-# RPM_CEIL = 24.0
-# U_MIN_REWARD = 0.55
-# K_PROGRESS = 1.2
-# K_SLOW = 0.35
-# K_THRUST_DEV = 0.006
+# Later speed-control stages, if needed:
+# stage 1: RPM_DELTA=3.0, RPM_FLOOR=9.0, RPM_CEIL=15.0
+# stage 2: RPM_DELTA=4.0, RPM_FLOOR=8.0, RPM_CEIL=16.0
+# stage 3: RPM_DELTA=6.0, RPM_FLOOR=6.0, RPM_CEIL=18.0
 
 # Observation LiDAR border-visibility mode.
 # - "none": no borders/walls in LiDAR
@@ -126,12 +110,12 @@ K_THRUST_DEV = 0.010
 # - "both": both true pool borders visible
 # - "mixed": randomize across the three cases above
 OBS_BORDER_MODE = "mixed"
-OBS_BORDER_P_NONE = 0.25
-OBS_BORDER_P_ASYMMETRIC = 0.50
-OBS_BORDER_P_BOTH = 0.25
+OBS_BORDER_P_NONE = 0.10
+OBS_BORDER_P_ASYMMETRIC = 0.60
+OBS_BORDER_P_BOTH = 0.30
 RIGHT_WALL_OFFSET = 1.0
-SOFT_BORDER_SAFE_DIST = 0.7
-K_BORDER_SOFT = 0.25
+SOFT_BORDER_SAFE_DIST = 1.0
+K_BORDER_SOFT = 0.40
 
 # Obstacle curriculum: one obstacle near the path. Most episodes are slightly
 # offset left/right so the policy learns a pass; some are exactly centered.
@@ -142,8 +126,13 @@ OBSTACLE_CENTER_PROB = 0.30
 OBSTACLE_LATERAL_OFFSET_MIN = 0.25
 OBSTACLE_LATERAL_OFFSET_MAX = 0.95
 
-# Local lidar-based bypass cue
-# choose the clearer side when the path ahead is blocked.
+# Phase-1 training distribution: protect path/border behaviour first, then
+# increase obstacle density in later phases. forced_num_obs overrides this.
+TRAIN_OBS_COUNTS = [0, 1, 2, 3, 4]
+TRAIN_OBS_PROBS = [0.40, 0.25, 0.20, 0.10, 0.05]
+
+# Local lidar-based bypass cue. This is not global planning: it uses only the
+# lidar sector ranges to choose the clearer side when the path ahead is blocked.
 BLOCK_D_SAFE = 4.5
 BLOCK_D_CRIT = 2.0
 BLOCK_FRONT_DEG = 25.0
@@ -208,9 +197,13 @@ class ASVLidarEnv(gym.Env):
         self.video_fps = RENDER_FPS
 
         self.model = ShipModel()
+        # Policy observation LiDAR: obstacles + currently visible borders/walls.
         self.lidar_obs = Lidar()
+        # Obstacle-only LiDAR: used for obstacle reward and front blockage.
         self.lidar_reward = Lidar()
-        # Keep self.lidar pointing at the observation lidar so existing eval code still works.
+        # Border-only LiDAR: used to keep local bypass side-choice boundary-aware.
+        self.lidar_border_guard = Lidar()
+        # Keep self.lidar pointing at the observation lidar so existing eval/render code still works.
         self.lidar = self.lidar_obs
         self.scenario = TestCase()
         self.obstacle_mode = OBSTACLE_MODE
@@ -252,15 +245,9 @@ class ASVLidarEnv(gym.Env):
         self.front_clearance = LIDAR_RANGE
         self.left_clearance = LIDAR_RANGE
         self.right_clearance = LIDAR_RANGE
+        self.side_clearance_diff = 0.0
         self.block_alpha = 0.0
         self.local_target_cte = 0.0
-
-        # Action/command memory for smooth-control training.
-        self.prev_raw_rudder_cmd = 0.0
-        self.prev_raw_throttle_cmd = 0.0
-        self.prev_rudder_cmd = 0.0
-        self.prev_throttle_cmd = 0.0
-        self.prev_yaw_rate_dps = 0.0
 
         self.asv_path: List[Tuple[float, float]] = []
         self.obstacles: List[List[Tuple[float, float]]] = []
@@ -269,20 +256,19 @@ class ASVLidarEnv(gym.Env):
         self.obs_border_mode_used = "none"
         self.true_border_clearance = min(self.map_width, self.map_height)
 
+        self.forced_num_obs = None
+
         self.observation_space = DictSpace({
             "lidar": Box(low=0.0, high=1.0, shape=(LIDAR_SECTORS,), dtype=np.float32),
             "u": Box(low=0.0, high=5.0, shape=(1,), dtype=np.float32),
             "v": Box(low=-3.0, high=3.0, shape=(1,), dtype=np.float32),
             "yaw_rate": Box(low=-180.0, high=180.0, shape=(1,), dtype=np.float32),
-            "prev_rudder_cmd": Box(low=-1.0, high=1.0, shape=(1,), dtype=np.float32),
-            "prev_throttle_cmd": Box(low=-1.0, high=1.0, shape=(1,), dtype=np.float32),
             "cross_track_error": Box(low=-max(self.map_width, self.map_height), high=max(self.map_width, self.map_height), shape=(1,), dtype=np.float32),
             "course_error": Box(low=-180.0, high=180.0, shape=(1,), dtype=np.float32),
             "lookahead_course_error": Box(low=-180.0, high=180.0, shape=(1,), dtype=np.float32),
             "front_clearance": Box(low=0.0, high=LIDAR_RANGE, shape=(1,), dtype=np.float32),
             "side_clearance_diff": Box(low=-LIDAR_RANGE, high=LIDAR_RANGE, shape=(1,), dtype=np.float32),
             "local_target_cte": Box(low=-max(self.map_width, self.map_height), high=max(self.map_width, self.map_height), shape=(1,), dtype=np.float32),
-            "log10_lambda": Box(low=-4.0, high=0.0, shape=(1,), dtype=np.float32),
         })
 
         self.action_space = Box(
@@ -314,8 +300,9 @@ class ASVLidarEnv(gym.Env):
         return [[(float(px) * sx, float(py) * sy) for px, py in obs] for obs in obstacles]
 
     def _sample_lambda(self) -> None:
-        lam = DEFAULT_EVAL_LAMBDA if self.lambda_override is None else float(self.lambda_override)
-        self.current_lambda = float(np.clip(lam, LAMBDA_MIN, LAMBDA_MAX))
+        # Fixed path-vs-obstacle reward balance for this practical local planner.
+        # lambda_override is kept for API compatibility but intentionally ignored.
+        self.current_lambda = float(DEFAULT_EVAL_LAMBDA)
         self.current_log10_lambda = float(np.log10(self.current_lambda))
 
 
@@ -366,15 +353,12 @@ class ASVLidarEnv(gym.Env):
             "u": np.array([self.u_body], dtype=np.float32),
             "v": np.array([self.v_body], dtype=np.float32),
             "yaw_rate": np.array([self.asv_w], dtype=np.float32),
-            "prev_rudder_cmd": np.array([self.prev_rudder_cmd], dtype=np.float32),
-            "prev_throttle_cmd": np.array([self.prev_throttle_cmd], dtype=np.float32),
             "cross_track_error": np.array([self.cross_track_error], dtype=np.float32),
             "course_error": np.array([self.course_error], dtype=np.float32),
             "lookahead_course_error": np.array([self.lookahead_course_error], dtype=np.float32),
             "front_clearance": np.array([self.front_clearance], dtype=np.float32),
-            "side_clearance_diff": np.array([self.right_clearance - self.left_clearance], dtype=np.float32),
+            "side_clearance_diff": np.array([self.side_clearance_diff], dtype=np.float32),
             "local_target_cte": np.array([self.local_target_cte], dtype=np.float32),
-            "log10_lambda": np.array([self.current_log10_lambda], dtype=np.float32),
         }
 
     def _hull_polygon_world(self):
@@ -447,7 +431,7 @@ class ASVLidarEnv(gym.Env):
         margin_x = max(2.0, 0.25 * self.map_width)
 
         # 70%: vertical path
-        if np.random.rand() < 0.1:
+        if np.random.rand() < 0.7:
             x = float(np.random.uniform(margin_x, self.map_width - margin_x))
             return x, 2.0, x, self.map_height - 3.0
 
@@ -577,91 +561,82 @@ class ASVLidarEnv(gym.Env):
                 if np.hypot(cx - self.start_x, cy - self.start_y) > 3.0 and np.hypot(cx - self.goal_x, cy - self.goal_y) > 3.0:
                     return [self._make_box(cx, cy, OBSTACLE_SIZE)]
         return []
-
-    # def _generate_obstacles(self, num_obs: int, test_case: Optional[int] = None):
-    #     if test_case is not None:
-    #         raw = self.scenario.obstacles(test_case=test_case)
-    #         return self._scale_case_obstacles(raw)
-    #     # Focused local-planner curriculum: exactly one lidar-visible obstacle near the path.
-    #     return self._generate_single_near_path_obstacle()
     
     def _generate_obstacles(self, num_obs: int, test_case: Optional[int] = None):
         if test_case is not None:
             raw = self.scenario.obstacles(test_case=test_case)
             return self._scale_case_obstacles(raw)
 
-        if self.obstacle_mode == "single_near_path":
-            return self._generate_single_near_path_obstacle()
+        num_obs = int(max(0, num_obs))
+        if num_obs <= 0:
+            return []
 
         obstacles: List[List[Tuple[float, float]]] = []
-        if num_obs <= 0:
-            return obstacles
-
-        path_len = len(self.path)
-        start_margin = int(0.25 * path_len)
-        end_margin = int(0.75 * path_len)
-        min_center_dist = 1.6
-        max_tries = 200
+        max_tries = 300
         tries = 0
 
         while len(obstacles) < num_obs and tries < max_tries:
             tries += 1
-            idx = int(np.random.randint(max(1, start_margin), max(2, end_margin)))
-            center = self.path[idx].astype(np.float32)
-            tangent = self._path_tangent(idx)
-            normal = np.array([-tangent[1], tangent[0]], dtype=np.float32)
-            lateral_sigma = 0.18 * self.map_width
-            lateral = float(np.random.normal(loc=0.0, scale=lateral_sigma))
-            center = center + lateral * normal
-            w = float(np.random.uniform(0.8, 1.2))
-            h = float(np.random.uniform(0.8, 1.2))
 
-            x0 = float(center[0] - 0.5 * w)
-            x1 = float(center[0] + 0.5 * w)
-            y0 = float(center[1] - 0.5 * h)
-            y1 = float(center[1] + 0.5 * h)
-
-            margin = 1.0
-            if x0 < margin or x1 > self.map_width - margin or y0 < margin or y1 > self.map_height - margin:
+            candidate = self._generate_single_near_path_obstacle()
+            if not candidate:
                 continue
 
-            c = np.array([(x0 + x1) * 0.5, (y0 + y1) * 0.5], dtype=np.float32)
-            start = np.array([self.start_x, self.start_y], dtype=np.float32)
-            goal = np.array([self.goal_x, self.goal_y], dtype=np.float32)
-            if float(np.linalg.norm(c - start)) < 2.0 or float(np.linalg.norm(c - goal)) < 2.0:
+            obs = candidate[0]
+
+            # Reject if overlapping or too close to existing obstacles.
+            if any(self._boxes_overlap(obs, existing, pad=0.25) for existing in obstacles):
                 continue
 
-            too_close = False
-            for obs in obstacles:
-                oc = np.mean(np.array(obs, dtype=np.float32), axis=0)
-                if float(np.linalg.norm(c - oc)) < min_center_dist:
-                    too_close = True
-                    break
-            if too_close:
-                continue
-
-            obstacles.append([(x0, y0), (x1, y0), (x1, y1), (x0, y1)])
+            obstacles.append(obs)
 
         return obstacles
+    
+    def _boxes_overlap(self, a, b, pad: float = 0.15) -> bool:
+        ax = [p[0] for p in a]
+        ay = [p[1] for p in a]
+        bx = [p[0] for p in b]
+        by = [p[1] for p in b]
+
+        return not (
+            max(ax) + pad < min(bx) or
+            max(bx) + pad < min(ax) or
+            max(ay) + pad < min(by) or
+            max(by) + pad < min(ay)
+        )
 
     # ------------------------------------------------------------------
     # Local planner features from LiDAR only
     # ------------------------------------------------------------------
     def _update_local_planner_features(self) -> None:
-        sector_d = self.lidar_obs.sector_ranges.astype(np.float32)
-        sector_angles = self.lidar_obs.sector_angles.astype(np.float32)
+        # Front blockage must be obstacle-only. This prevents visible walls/borders
+        # from creating false "obstacle ahead" cues in no-obstacle episodes.
+        obs_d = self.lidar_reward.sector_ranges.astype(np.float32)
+
+        # Side choice should still be aware of true borders/geofence.
+        # This prevents selecting a bypass side that has obstacle clearance but no wall clearance.
+        border_d = self.lidar_border_guard.sector_ranges.astype(np.float32)
+        side_d = np.minimum(obs_d, border_d)
+
+        sector_angles = self.lidar_reward.sector_angles.astype(np.float32)
         front_mask = np.abs(sector_angles) <= BLOCK_FRONT_DEG
         left_mask = (sector_angles <= -SIDE_ARC_MIN_DEG) & (sector_angles >= -SIDE_ARC_MAX_DEG)
         right_mask = (sector_angles >= SIDE_ARC_MIN_DEG) & (sector_angles <= SIDE_ARC_MAX_DEG)
 
-        def pctl(mask, p=20.0):
-            vals = sector_d[mask]
+        def pctl(values: np.ndarray, mask: np.ndarray, p: float = 20.0) -> float:
+            vals = values[mask]
             return float(np.percentile(vals, p)) if vals.size else float(LIDAR_RANGE)
 
-        self.front_clearance = pctl(front_mask, 10.0)
-        self.left_clearance = pctl(left_mask, 20.0)
-        self.right_clearance = pctl(right_mask, 20.0)
-        self.block_alpha = float(np.clip((BLOCK_D_SAFE - self.front_clearance) / (BLOCK_D_SAFE - BLOCK_D_CRIT), 0.0, 1.0))
+        self.front_clearance = pctl(obs_d, front_mask, 10.0)
+        self.left_clearance = pctl(side_d, left_mask, 20.0)
+        self.right_clearance = pctl(side_d, right_mask, 20.0)
+        self.side_clearance_diff = float(self.right_clearance - self.left_clearance)
+
+        self.block_alpha = float(np.clip(
+            (BLOCK_D_SAFE - self.front_clearance) / (BLOCK_D_SAFE - BLOCK_D_CRIT),
+            0.0,
+            1.0,
+        ))
 
         if self.block_alpha <= 1e-6:
             self.local_target_cte = 0.0
@@ -669,16 +644,13 @@ class ASVLidarEnv(gym.Env):
 
         # In this coordinate/sign convention, starboard/right of the path has negative CTE.
         if abs(self.right_clearance - self.left_clearance) < SIDE_CLEAR_TIE:
-            side_cte_sign = -1.0  # default starboard/right to break symmetry
+            side_cte_sign = -1.0
         elif self.right_clearance > self.left_clearance:
             side_cte_sign = -1.0
         else:
             side_cte_sign = +1.0
-        self.local_target_cte = float(side_cte_sign * BYPASS_CTE * self.block_alpha)
 
-    def _rate_limit_norm(self, target: float, previous: float, max_rate_per_s: float) -> float:
-        max_step = max(0.0, float(max_rate_per_s)) * UPDATE_RATE
-        return float(previous + np.clip(float(target) - float(previous), -max_step, +max_step))
+        self.local_target_cte = float(side_cte_sign * BYPASS_CTE * self.block_alpha)
 
     # ------------------------------------------------------------------
     # Reset / step
@@ -687,6 +659,7 @@ class ASVLidarEnv(gym.Env):
         super().reset(seed=seed)
         if seed is not None:
             np.random.seed(seed)
+
         self.step_count = 0
         self.elapsed_time = 0.0
         self.asv_h = 0.0
@@ -700,18 +673,16 @@ class ASVLidarEnv(gym.Env):
         self.front_clearance = LIDAR_RANGE
         self.left_clearance = LIDAR_RANGE
         self.right_clearance = LIDAR_RANGE
+        self.side_clearance_diff = 0.0
         self.block_alpha = 0.0
         self.local_target_cte = 0.0
-        self.prev_raw_rudder_cmd = 0.0
-        self.prev_raw_throttle_cmd = 0.0
-        self.prev_rudder_cmd = 0.0
-        self.prev_throttle_cmd = 0.0
-        self.prev_yaw_rate_dps = 0.0
 
         self.model = ShipModel()
         self.lidar_obs.reset()
         self.lidar_reward.reset()
+        self.lidar_border_guard.reset()
         self.lidar = self.lidar_obs
+
         self._sample_lambda()
         self._sample_obs_border_mode()
 
@@ -728,68 +699,80 @@ class ASVLidarEnv(gym.Env):
         self.asv_x = float(self.start_x)
         self.asv_y = float(self.start_y)
         self.path = self._generate_path(self.start_x, self.start_y, self.goal_x, self.goal_y)
+
         if self.test_case is None:
-            if self.obstacle_mode == "single_near_path":
-                num_obs = 1
-            elif self.obstacle_mode == "multi_obs":
-                num_obs = int(np.random.randint(0, self.max_obs + 1))
+            if self.forced_num_obs is not None:
+                num_obs = int(self.forced_num_obs)
+            else:
+                probs = np.asarray(TRAIN_OBS_PROBS, dtype=np.float64)
+                probs = probs / np.sum(probs)
+                num_obs = int(np.random.choice(TRAIN_OBS_COUNTS, p=probs))
         else:
-            num_obs = int(np.random.randint(0, self.max_obs + 1))
+            num_obs = 0
+
+        self.num_obs = int(num_obs)
         self.obstacles = self._generate_obstacles(num_obs, self.test_case)
+
         self.asv_path = [(self.asv_x, self.asv_y)]
         self.distance_to_goal = float(np.linalg.norm([self.asv_x - self.goal_x, self.asv_y - self.goal_y]))
-        self.lidar_obs.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=self.obstacles, map_border=self._get_obs_lidar_border())
-        self.lidar_reward.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=self.obstacles, map_border=None)
+
+        self.lidar_obs.scan(
+            (self.asv_x, self.asv_y),
+            self.asv_h,
+            obstacles=self.obstacles,
+            map_border=self._get_obs_lidar_border(),
+        )
+        self.lidar_reward.scan(
+            (self.asv_x, self.asv_y),
+            self.asv_h,
+            obstacles=self.obstacles,
+            map_border=None,
+        )
+        self.lidar_border_guard.scan(
+            (self.asv_x, self.asv_y),
+            self.asv_h,
+            obstacles=None,
+            map_border=self.map_border,
+        )
+        self.lidar = self.lidar_obs
+
         self.true_border_clearance = self._border_clearance_true()
         self._update_path_relative_states(course_deg=self.asv_h)
         self._update_local_planner_features()
+
         if self.render_mode in self.metadata["render_modes"]:
             self.render()
         return self._get_obs(), {}
 
+    def _reached_goal_region(self) -> bool:
+        # Circular goal acceptance region.
+        if self.distance_to_goal <= GOAL_RADIUS:
+            return True
+
+        # Finish-capsule acceptance near the end of the path. This catches cases
+        # where the ASV has reached the goal region after avoidance but does not
+        # pass exactly through the point goal.
+        if len(self.path_s) > 0:
+            s_here = float(self.path_s[self.closest_idx])
+            s_end = float(self.path_s[-1])
+            near_end_along_path = (s_end - s_here) <= GOAL_ALONG_DIST
+            near_end_lateral = abs(float(self.cross_track_error)) <= GOAL_CTE_RADIUS
+            if near_end_along_path and near_end_lateral:
+                return True
+
+        return False
+
     def check_done(self) -> bool:
         if self._check_collision_geom():
             return True
-        if self.distance_to_goal <= (VESSEL_LENGTH * 0.5):
+        if self._reached_goal_region():
             return True
         return False
 
     def step(self, action):
         self.elapsed_time += UPDATE_RATE
-
-        action = np.asarray(action, dtype=np.float32).reshape(-1)
-
-        # Raw policy outputs. These are what we penalise for chattering.
-        raw_rudder_cmd = float(np.clip(action[0], MIN_IN, MAX_IN))
-        raw_throttle_cmd = float(np.clip(action[1], MIN_IN, MAX_IN))
-
-        # Action changes relative to previous raw policy output.
-        d_rudder_cmd = raw_rudder_cmd - self.prev_raw_rudder_cmd
-        d_throttle_cmd = raw_throttle_cmd - self.prev_raw_throttle_cmd
-
-        # Explicit sign-flip detector. This targets +1, -1, +1, -1 rudder behaviour.
-        rudder_sign_flip = float(
-            abs(raw_rudder_cmd) > RUDDER_FLIP_DEADBAND
-            and abs(self.prev_raw_rudder_cmd) > RUDDER_FLIP_DEADBAND
-            and raw_rudder_cmd * self.prev_raw_rudder_cmd < 0.0
-        )
-
-        # Optional command dynamics
-        if USE_COMMAND_RATE_LIMIT_IN_TRAINING:
-            rudder_cmd = self._rate_limit_norm(
-                raw_rudder_cmd,
-                self.prev_rudder_cmd,
-                RUDDER_RATE_NORM_PER_S,
-            )
-            throttle_cmd = self._rate_limit_norm(
-                raw_throttle_cmd,
-                self.prev_throttle_cmd,
-                THROTTLE_RATE_NORM_PER_S,
-            )
-        else:
-            rudder_cmd = raw_rudder_cmd
-            throttle_cmd = raw_throttle_cmd
-
+        rudder_cmd = float(np.clip(action[0], MIN_IN, MAX_IN))
+        throttle_cmd = float(np.clip(action[1], MIN_IN, MAX_IN))
         rudder = rudder_cmd * 100.0
 
         if FIXED_RPM:
@@ -818,8 +801,24 @@ class ASVLidarEnv(gym.Env):
         self.v_body = float(getattr(self.model, "_v_sway", 0.0))
         course_deg = float(math.degrees(math.atan2(dx_pos, dy_pos))) if self.speed_mps > 1e-6 else float(self.asv_h)
 
-        self.lidar_obs.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=self.obstacles, map_border=self._get_obs_lidar_border())
-        self.lidar_reward.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=self.obstacles, map_border=None)
+        self.lidar_obs.scan(
+            (self.asv_x, self.asv_y),
+            self.asv_h,
+            obstacles=self.obstacles,
+            map_border=self._get_obs_lidar_border(),
+        )
+        self.lidar_reward.scan(
+            (self.asv_x, self.asv_y),
+            self.asv_h,
+            obstacles=self.obstacles,
+            map_border=None,
+        )
+        self.lidar_border_guard.scan(
+            (self.asv_x, self.asv_y),
+            self.asv_h,
+            obstacles=None,
+            map_border=self.map_border,
+        )
         self.lidar = self.lidar_obs
         self._update_path_relative_states(course_deg=course_deg)
         self._update_local_planner_features()
@@ -828,7 +827,7 @@ class ASVLidarEnv(gym.Env):
 
         # collision/goal flag
         collided = bool(self._check_collision_geom())
-        reached_goal = bool(self.distance_to_goal <= (VESSEL_LENGTH * 0.5))
+        reached_goal = bool(self._reached_goal_region())
 
         ye = abs(float(self.cross_track_error))
         U_norm = float(np.clip(self.speed_mps / U_MAX, 0.0, 1.5))
@@ -836,7 +835,11 @@ class ASVLidarEnv(gym.Env):
         # Simple old-style path reward with heading alignment, but using the current richer observation.
         # Use a speed gate so sitting still on the path is not profitable.
         u_gate = float(np.clip(max(self.u_body, 0.0) / U_REWARD_REF, 0.0, 1.0))
-        r_pf = float(math.exp(-GAMMA_E * ye))
+        gamma_e_eff = (
+            (1.0 - float(self.block_alpha)) * GAMMA_E_CLEAR
+            + float(self.block_alpha) * GAMMA_E_BLOCKED
+        )
+        r_pf = float(math.exp(-gamma_e_eff * ye))
         heading_err_deg = 0.7 * float(self.lookahead_course_error) + 0.3 * float(self.course_error)
         r_heading = float(math.cos(math.radians(heading_err_deg)))
 
@@ -869,28 +872,6 @@ class ASVLidarEnv(gym.Env):
         # stay near cruise RPM
         r_thrust = -float(K_THRUST_DEV * abs(rpm - CRUISE_RPM) / max(RPM_DELTA, 1e-6))
 
-        # Smooth-control penalties.
-        # Penalise raw policy output changes, not just the limited command.
-        # This encourages the learned policy itself to become smoother.
-        yaw_rate_norm = abs(float(self.asv_w)) / max(YAW_RATE_REF_DPS, 1e-6)
-        yaw_accel_norm = abs(float(self.asv_w) - float(self.prev_yaw_rate_dps)) / max(YAW_RATE_REF_DPS, 1e-6)
-
-        r_rudder_mag = -K_RUDDER_MAG * abs(raw_rudder_cmd)
-        r_rudder_slew = -K_RUDDER_SLEW * abs(d_rudder_cmd)
-        r_rudder_flip = -K_RUDDER_FLIP * rudder_sign_flip
-        r_throttle_slew = -K_THROTTLE_SLEW * abs(d_throttle_cmd)
-        r_yaw_rate = -K_YAW_RATE * (yaw_rate_norm ** 2)
-        r_yaw_accel = -K_YAW_ACCEL * (yaw_accel_norm ** 2)
-
-        r_smooth = float(
-            r_rudder_mag
-            + r_rudder_slew
-            + r_rudder_flip
-            + r_throttle_slew
-            + r_yaw_rate
-            + r_yaw_accel
-        )
-
         if collided:
             reward = float(R_COLLISION)
         else:
@@ -903,7 +884,6 @@ class ASVLidarEnv(gym.Env):
                 + r_progress
                 + r_slow
                 + r_thrust
-                + r_smooth
             )
             if reached_goal:
                 reward += R_GOAL
@@ -917,7 +897,6 @@ class ASVLidarEnv(gym.Env):
 
         info = {
             "lam": float(self.current_lambda),
-            "log10_lambda": float(self.current_log10_lambda),
             "r_pf": float(r_pf),
             "r_heading": float(r_heading),
             "r_oa": float(r_oa),
@@ -938,6 +917,7 @@ class ASVLidarEnv(gym.Env):
             "right_clearance": float(self.right_clearance),
             "block_alpha": float(self.block_alpha),
             "local_target_cte": float(self.local_target_cte),
+            "side_clearance_diff": float(self.side_clearance_diff),
             "min_lidar": float(np.min(self.lidar_obs.ranges)) if len(self.lidar_obs.ranges) > 0 else float("inf"),
             "min_lidar_reward": float(np.min(self.lidar_reward.ranges)) if len(self.lidar_reward.ranges) > 0 else float("inf"),
             "min_sector_range": float(np.min(self.lidar_obs.sector_ranges.astype(np.float32))),
@@ -945,42 +925,24 @@ class ASVLidarEnv(gym.Env):
             "p10_sector_range": float(np.percentile(sector_d, 10)),
             "mean_sector_pen": float(np.mean(pen)),
             "rpm": float(rpm),
-            "rudder_deg": float(rudder_cmd * MAX_RUD_ANGLE),
-            "raw_rudder_deg": float(raw_rudder_cmd * MAX_RUD_ANGLE),
+            "rudder_deg": float(rudder_cmd * 40.0),
             "distance_to_goal": float(self.distance_to_goal),
             "collided": bool(collided),
             "reached_goal": bool(reached_goal),
             "timeout": bool(truncated),
             "path_mode": self.path_mode_used,
             "obs_border_mode": self.obs_border_mode_used,
+            "lidar_pooling_mode": str(LIDAR_POOLING_MODE),
+            "feasibility_safe_width": float(FEASIBILITY_SAFE_WIDTH),
             "true_border_clearance": float(self.true_border_clearance),
-            "rpm": float(rpm),
+            "goal_radius": float(GOAL_RADIUS),
+            "goal_along_dist": float(GOAL_ALONG_DIST),
+            "goal_cte_radius": float(GOAL_CTE_RADIUS),
+            "gamma_e_eff": float(gamma_e_eff),
             "r_progress": float(r_progress),
             "r_slow": float(r_slow),
             "r_thrust": float(r_thrust),
-            "raw_rudder_cmd": float(raw_rudder_cmd),
-            "raw_throttle_cmd": float(raw_throttle_cmd),
-            "rudder_cmd": float(rudder_cmd),
-            "throttle_cmd": float(throttle_cmd),
-            "d_rudder_cmd": float(d_rudder_cmd),
-            "d_throttle_cmd": float(d_throttle_cmd),
-            "rudder_sign_flip": float(rudder_sign_flip),
-            "r_smooth": float(r_smooth),
-            "r_rudder_mag": float(r_rudder_mag),
-            "r_rudder_slew": float(r_rudder_slew),
-            "r_rudder_flip": float(r_rudder_flip),
-            "r_throttle_slew": float(r_throttle_slew),
-            "r_yaw_rate": float(r_yaw_rate),
-            "r_yaw_accel": float(r_yaw_accel),
-            "actual_rudder_deg": float(math.degrees(getattr(self.model, "_delta", 0.0))),
         }
-        
-        # Store current commands for the next observation and next smoothness calculation.
-        self.prev_raw_rudder_cmd = raw_rudder_cmd
-        self.prev_raw_throttle_cmd = raw_throttle_cmd
-        self.prev_rudder_cmd = rudder_cmd
-        self.prev_throttle_cmd = throttle_cmd
-        self.prev_yaw_rate_dps = float(self.asv_w)
 
         if self.render_mode in self.metadata["render_modes"]:
             self.render()
