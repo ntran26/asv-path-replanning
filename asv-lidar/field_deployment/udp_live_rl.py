@@ -3,10 +3,10 @@ Live UDP bridge between Bluefin telemetry and the current SAC ASV local-planner 
 
 shadow test with fake replay:
   python fake_vessel_replay.py --log trial.log --loop
-  python udp_live_rl.py --model-path sac_best_model.zip --test-case 1 --shadow
+  python udp_live_rl.py --test-case 1 --shadow
   
 live control:
-  python udp_live_rl.py --server-ip 10.201.220.121 --record-video --record-log 2026-05-08/trial.log --test-case 6
+  python udp_live_rl.py --server-ip 10.201.220.121 --record-video --record-log trial.log --test-case 1 --fixed-rpm
 
 Notes:
 - SAC is hardcoded. PPO support was removed intentionally.
@@ -57,7 +57,7 @@ except Exception:
     HULL_MARGIN = 0.15
 
 # ---------------------------------------------------------------------------
-# LiDAR pooling mode. Keep this matched to training.
+# LiDAR pooling mode
 # ---------------------------------------------------------------------------
 LIDAR_POOLING_MODE = normalise_pooling_mode("paper")
 FEASIBILITY_SAFE_WIDTH = float(VESSEL_WIDTH + 2.0 * HULL_MARGIN)
@@ -71,13 +71,24 @@ POS_SCALE = 1.0
 LOOKAHEAD_FRACTION = 0.25
 DEFAULT_LAMBDA = 0.5
 
+RPM_STAGE = 1
+
+if RPM_STAGE == 1:
+    RPM_DELTA = 3.0       
+    RPM_FLOOR = 9.0
+    RPM_CEIL = 15.0
+elif RPM_STAGE == 2:
+    RPM_DELTA = 4.0       
+    RPM_FLOOR = 8.0
+    RPM_CEIL = 16.0
+elif RPM_STAGE == 3:
+    RPM_DELTA = 6.0      
+    RPM_FLOOR = 6.0
+    RPM_CEIL = 18.0
+
 RPM_MAX = 24.0
 CRUISE_RPM = 12.0
-RPM_DELTA = 6.0       # stage 3: 6-18 RPM
-RPM_FLOOR = 6.0
-RPM_CEIL = 18.0
 S2_MAX_CMD = 100.0    # vessel command S2 range: 0-100
-
 RUDDER_SCALE = 100.0
 RUDDER_SIGN = -1.0    # real vessel sign is reversed vs sim
 
@@ -86,7 +97,7 @@ BLOCK_D_CRIT = 2.0
 BLOCK_FRONT_DEG = 25.0
 SIDE_ARC_MIN_DEG = 15.0
 SIDE_ARC_MAX_DEG = 100.0
-SIDE_CLEAR_TIE = 0.25
+SIDE_CLEAR_TIE = 0.15
 BYPASS_CTE = 0.8
 
 MAX_RUDDER_DEG_FOR_RATE = 40.0
@@ -404,7 +415,7 @@ def main() -> None:
     ap.add_argument("--out-video", default="udp_live_rl_record.mp4", help="Output MP4 file when --record-video is enabled")
     ap.add_argument("--video-fps", type=float, default=10.0, help="Video recording FPS")
 
-    ap.add_argument("--model-path", default="sac_best_model.zip")
+    ap.add_argument("--model-path", default="best_model.zip")
     ap.add_argument("--test-case", type=int, default=0)
     ap.add_argument("--lookahead-fraction", type=float, default=LOOKAHEAD_FRACTION)
     ap.add_argument("--pos-scale", type=float, default=POS_SCALE)
@@ -468,6 +479,9 @@ def main() -> None:
             f"test_case={args.test_case},"
             f"fixed_rpm={int(args.fixed_rpm)},"
             f"cruise_rpm={args.cruise_rpm},"
+            f"rpm_delta={args.rpm_delta},"
+            f"rpm_floor={args.rpm_floor},"
+            f"rpm_ceil={args.rpm_ceil},"
             f"rudder_sign={args.rudder_sign},"
             f"rudder_scale={args.rudder_scale},"
             f"max_rudder_rate_dps={MAX_RUDDER_RATE_DPS},"
@@ -716,8 +730,12 @@ def main() -> None:
                         )
                         thrust_cmd = rpm_to_s2_cmd(rpm_cmd, rpm_max=args.rpm_max, s2_max_cmd=args.s2_max_cmd)
 
+                        # # manual rudder/throttle test
                         # rudder_cmd = -100
                         # thrust_cmd = 0
+
+                        # # turn rate limiter off
+                        # rudder_cmd = float(raw_rudder_cmd)
 
                         command = f"$CMD,{rudder_cmd:.2f},{thrust_cmd:.2f}"
                         
