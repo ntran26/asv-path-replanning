@@ -1,0 +1,22 @@
+{
+  "suite_json": "eval_suite/asv_eval_suite.json",
+  "out_dir": "eval_results/los_apf_baseline",
+  "limit_scenarios": null,
+  "max_steps": 2000,
+  "map_width": 10.0,
+  "map_height": 25.0,
+  "path_mode": "straight",
+  "method": "los_apf",
+  "lidar_source": "obs",
+  "k_att": 1.0,
+  "k_cte": 0.15,
+  "k_rep": 1.15,
+  "repulse_range": 5.0,
+  "repulse_power": 2.0,
+  "front_gain": 1.5,
+  "kp_heading": 1.0,
+  "kd_yaw": 0.015,
+  "max_error_for_full_rudder_deg": 55.0,
+  "rudder_sign": 1.0,
+  "throttle_action": 0.0
+}
