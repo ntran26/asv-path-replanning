@@ -81,19 +81,32 @@ GOAL_CTE_RADIUS = 1.60
 RPM_MIN = 0
 RPM_MAX = 24
 CRUISE_RPM = 12.0
-FIXED_RPM = False
+FIXED_RPM = True
 U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 MAX_IN = 1.0
 MIN_IN = -1.0
 
 MAX_EPISODE_STEPS = 700
 
-# Fixed-RPM training still uses the progress/slow-speed reward constants below.
-# Keep this block narrow-speed compatible so the fixed-RPM branch does not inherit
-# the aggressive full-speed-control progress shaping.
-RPM_DELTA = 3.0
-RPM_FLOOR = 9.0
-RPM_CEIL = 15.0
+RPM_STAGE = 4
+
+if RPM_STAGE == 1:
+    RPM_DELTA = 3.0       
+    RPM_FLOOR = 9.0
+    RPM_CEIL = 15.0
+elif RPM_STAGE == 2:
+    RPM_DELTA = 4.0       
+    RPM_FLOOR = 8.0
+    RPM_CEIL = 16.0
+elif RPM_STAGE == 3:
+    RPM_DELTA = 6.0      
+    RPM_FLOOR = 6.0
+    RPM_CEIL = 18.0
+elif RPM_STAGE == 4:
+    RPM_DELTA = 12.0      
+    RPM_FLOOR = 0.0
+    RPM_CEIL = 24.0
+
 U_MIN_REWARD = 0.30
 K_PROGRESS = 0.6
 K_SLOW = 0.10
@@ -103,6 +116,7 @@ K_THRUST_DEV = 0.025
 # stage 1: RPM_DELTA=3.0, RPM_FLOOR=9.0, RPM_CEIL=15.0
 # stage 2: RPM_DELTA=4.0, RPM_FLOOR=8.0, RPM_CEIL=16.0
 # stage 3: RPM_DELTA=6.0, RPM_FLOOR=6.0, RPM_CEIL=18.0
+# stage 4: RPM_DELTA=12.0, RPM_FLOOR=0.0, RPM_CEIL=24.0
 
 # Observation LiDAR border-visibility mode.
 # - "none": no borders/walls in LiDAR

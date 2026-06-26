@@ -85,6 +85,10 @@ elif RPM_STAGE == 3:
     RPM_DELTA = 6.0      
     RPM_FLOOR = 6.0
     RPM_CEIL = 18.0
+elif RPM_STAGE == 4:
+    RPM_DELTA = 12.0      
+    RPM_FLOOR = 0.0
+    RPM_CEIL = 24.0
 
 RPM_MAX = 24.0
 CRUISE_RPM = 12.0
