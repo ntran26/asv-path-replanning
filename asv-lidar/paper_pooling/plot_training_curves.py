@@ -81,6 +81,79 @@ def save_figure(fig: plt.Figure, out_dir: Path, stem: str) -> None:
     print(f"Saved: {out_dir / (stem + '.svg')}")
 
 
+def _steps_to_x(steps: float, x_units: str) -> float:
+    if x_units == "steps":
+        return steps
+    if x_units == "k":
+        return steps / 1_000.0
+    if x_units == "m":
+        return steps / 1_000_000.0
+    raise ValueError(f"Unknown x_units: {x_units}")
+
+
+def add_training_stage_markers(ax: plt.Axes, x_units: str) -> None:
+    """
+    Add dashed vertical lines and labels for the training curriculum:
+      - cruise (fixed-speed): 0 to 700k
+      - stage 1: 700k to 800k
+      - stage 2: 800k to 900k
+      - stage 3: 900k to 1.0M
+    """
+    # boundaries between phases
+    boundaries = [700_000, 800_000, 900_000]
+
+    # label centers for each phase
+    label_centers = [350_000, 750_000, 850_000, 950_000]
+    label_texts = ["cruise", "stage 1", "stage 2", "stage 3"]
+
+    # dashed boundaries
+    for s in boundaries:
+        ax.axvline(
+            _steps_to_x(s, x_units),
+            color="gray",
+            linestyle="--",
+            linewidth=1.2,
+            alpha=0.9,
+            zorder=0,
+        )
+
+    # labels at the top of the axes
+    for s, txt in zip(label_centers, label_texts):
+        ax.text(
+            _steps_to_x(s, x_units),
+            0.98,
+            txt,
+            transform=ax.get_xaxis_transform(),
+            ha="center",
+            va="top",
+            fontsize=10,
+            bbox=dict(facecolor="white", edgecolor="none", alpha=0.75, pad=1.5),
+        )
+
+
+# def plot_eval_reward_only(rows: List[Dict[str, Any]], out_dir: Path, title: str, x_units: str) -> None:
+#     """Plot only the mean evaluation reward curve, with optional ±1 std. band."""
+#     x, xlabel = x_values(rows, x_units)
+#     mean_reward = arr(rows, "mean_ep_reward")
+#     std_reward = arr(rows, "std_ep_reward")
+
+#     fig, ax = plt.subplots(figsize=(7.2, 4.4))
+#     ax.plot(x, mean_reward, marker="o", linewidth=1.8, label="Mean eval reward")
+#     if finite_any(std_reward):
+#         lower = mean_reward - std_reward
+#         upper = mean_reward + std_reward
+#         ax.fill_between(x, lower, upper, alpha=0.18, label="±1 std. reward")
+#     ax.set_xlabel(xlabel)
+#     ax.set_ylabel("Mean episode reward")
+#     ax.grid(True, alpha=0.3)
+#     ax.legend(loc="lower right", frameon=True)
+#     if title:
+#         ax.set_title(title)
+#     fig.tight_layout()
+#     save_figure(fig, out_dir, "eval_mean_reward")
+#     plt.close(fig)
+
+
 def plot_eval_reward_only(rows: List[Dict[str, Any]], out_dir: Path, title: str, x_units: str) -> None:
     """Plot only the mean evaluation reward curve, with optional ±1 std. band."""
     x, xlabel = x_values(rows, x_units)
@@ -93,6 +166,9 @@ def plot_eval_reward_only(rows: List[Dict[str, Any]], out_dir: Path, title: str,
         lower = mean_reward - std_reward
         upper = mean_reward + std_reward
         ax.fill_between(x, lower, upper, alpha=0.18, label="±1 std. reward")
+
+    add_training_stage_markers(ax, x_units)
+
     ax.set_xlabel(xlabel)
     ax.set_ylabel("Mean episode reward")
     ax.grid(True, alpha=0.3)
