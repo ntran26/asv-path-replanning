@@ -17,7 +17,6 @@ python plot_trajectory.py \
   --titles "Straight path" "Slanted path L-R" "Slanted path R-L" \
   --out sim_field_trajectory_comparison.png \
   --out-svg sim_field_trajectory_comparison.svg \
-  --out-pdf sim_field_trajectory_comparison.pdf
 
 Notes:
   - If the field log comes from udp_live_rl.py, the script will automatically
@@ -47,10 +46,29 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon as MplPolygon
 from matplotlib.patches import Rectangle
 from matplotlib.lines import Line2D
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 Point = Tuple[float, float]
 Polygon = List[Point]
 
+
+# ---------------------------------------------------------------------------
+# Default data and configuration
+# ---------------------------------------------------------------------------
+DEFAULT_CASES = [1, 2, 3]
+DEFAULT_SIM = ["sim_1.json", "sim_2.json", "sim_3.json"]
+DEFAULT_FIELD = ["field_1.log", "field_2.log", "field_3.log"]
+DEFAULT_TITLES = ["Straight path",
+                  "Slanted path L-R",
+                  "Slanted path R-L"]
+DEFAULT_TEST_RUN = None
+DEFAULT_FIELD_SOURCE = "action"
+DEFAULT_OUT_PNG = "sim_field_trajectory_comparison.png"
+DEFAULT_OUT_SVG = "sim_field_trajectory_comparison.svg"
+
+DEFAULT_SHOW_SHIP_ICON = True
+DEFAULT_SHIP_ICON_TARGET = "both"  # "field", "simulation", or "both"
+DEFAULT_SHIP_ICON_ZOOM = 2
 
 # ---------------------------------------------------------------------------
 # General helpers
@@ -108,6 +126,77 @@ def _smooth_xy(path: np.ndarray, window: int) -> np.ndarray:
         padded = np.pad(path[:, col], (pad, pad), mode="edge")
         out[:, col] = np.convolve(padded, kernel, mode="valid")
     return out
+
+def _add_ship_marker(
+    ax,
+    path: np.ndarray,
+    *,
+    length: float = 0.85,
+    width: float = 0.32,
+    zoom: float = 1.0,
+    facecolor: str = "white",
+    edgecolor: str = "0.15",
+    zorder: int = 10,
+) -> None:
+    """Draw a simple top-down ASV hull at the final point of a trajectory."""
+    if path is None or len(path) < 2:
+        return
+
+    p_end = path[-1, :2]
+
+    # Find last non-zero direction.
+    direction = None
+    for i in range(len(path) - 2, -1, -1):
+        d = p_end - path[i, :2]
+        n = float(np.linalg.norm(d))
+        if n > 1e-6:
+            direction = d / n
+            break
+
+    if direction is None:
+        direction = np.array([0.0, 1.0], dtype=float)
+
+    # Forward and left vectors in world coordinates.
+    fwd = direction
+    left = np.array([-fwd[1], fwd[0]], dtype=float)
+
+    L = float(length) * zoom
+    W = float(width) * zoom
+
+    # Simple boat shape: pointed bow, rectangular stern.
+    local = [
+        (+0.55 * L,  0.0),       # bow
+        (+0.10 * L, +0.50 * W),
+        (-0.45 * L, +0.50 * W),
+        (-0.45 * L, -0.50 * W),
+        (+0.10 * L, -0.50 * W),
+    ]
+
+    pts = []
+    for xf, yl in local:
+        p = p_end + xf * fwd + yl * left
+        pts.append((float(p[0]), float(p[1])))
+
+    hull = MplPolygon(
+        pts,
+        closed=True,
+        facecolor=facecolor,
+        edgecolor=edgecolor,
+        linewidth=1.0,
+        zorder=zorder,
+    )
+    ax.add_patch(hull)
+
+    # Small centre line to make it visually read as a vessel.
+    stern = p_end - 0.30 * L * fwd
+    bow = p_end + 0.35 * L * fwd
+    ax.plot(
+        [stern[0], bow[0]],
+        [stern[1], bow[1]],
+        color=edgecolor,
+        linewidth=0.8,
+        zorder=zorder + 1,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -380,20 +469,20 @@ def _draw_layout(
     map_height: float,
     show_grid: bool,
 ) -> None:
-    # Workspace boundary.
+    # Workspace boundary
     ax.add_patch(Rectangle((0, 0), map_width, map_height, fill=False, edgecolor="0.15", linewidth=1.2))
 
-    # Obstacles.
+    # Obstacles
     for obs in layout.obstacles:
         if len(obs) >= 3:
             patch = MplPolygon(obs, closed=True, facecolor="0.82", edgecolor="0.25", linewidth=1.0, zorder=2)
             ax.add_patch(patch)
 
-    # Reference path.
+    # Reference path
     if layout.path is not None and len(layout.path) >= 2:
         ax.plot(layout.path[:, 0], layout.path[:, 1], linestyle="--", color="0.05", linewidth=1.6, label="Reference path", zorder=3)
 
-    # Start and goal markers.
+    # Start and goal markers
     ax.scatter([layout.start[0]], [layout.start[1]], s=42, marker="o", facecolor="white", edgecolor="0.05", linewidth=1.0, zorder=6)
     ax.scatter([layout.goal[0]], [layout.goal[1]], s=64, marker="*", facecolor="0.05", edgecolor="0.05", linewidth=0.8, zorder=6)
     ax.text(layout.start[0], layout.start[1] - 0.55, "Start", ha="center", va="top", fontsize=8)
@@ -419,17 +508,18 @@ def plot_comparison(
     map_height: float,
     out_png: str,
     out_svg: Optional[str] = None,
-    out_pdf: Optional[str] = None,
     dpi: int = 300,
     show_grid: bool = False,
     figure_title: Optional[str] = None,
+    show_ship_icon: bool = DEFAULT_SHOW_SHIP_ICON,
+    ship_icon_target: str = DEFAULT_SHIP_ICON_TARGET,
+    ship_icon_zoom: float = DEFAULT_SHIP_ICON_ZOOM,
 ) -> None:
     n = len(layouts)
     if n != 3:
-        # The script can technically handle other counts, but your paper figure is three panels.
         print(f"[WARN] Expected 3 scenarios for the paper figure, got {n}.")
 
-    fig_w = 10.8 if n == 3 else max(3.6 * n, 4.0)
+    fig_w = 8.0 if n == 3 else max(3.6 * n, 4.0)
     fig_h = 4.7
     fig, axes = plt.subplots(1, n, figsize=(fig_w, fig_h), constrained_layout=False)
     if n == 1:
@@ -442,11 +532,15 @@ def plot_comparison(
             ax.plot(sim[:, 0], sim[:, 1], color="#1f77b4", linewidth=2.0, label="Simulation", zorder=4)
             ax.scatter([sim[0, 0]], [sim[0, 1]], s=18, color="#1f77b4", zorder=5)
             ax.scatter([sim[-1, 0]], [sim[-1, 1]], s=24, color="#1f77b4", marker="s", zorder=5)
+            if show_ship_icon and ship_icon_target in {"simulation", "both"}:
+                _add_ship_marker(ax, sim, zoom=ship_icon_zoom, facecolor="white", edgecolor="#1f77b4", zorder=9)
 
         if field is not None and len(field) >= 2:
             ax.plot(field[:, 0], field[:, 1], color="#d62728", linewidth=2.0, label="Field", zorder=5)
             ax.scatter([field[0, 0]], [field[0, 1]], s=18, color="#d62728", zorder=6)
             ax.scatter([field[-1, 0]], [field[-1, 1]], s=24, color="#d62728", marker="s", zorder=6)
+            if show_ship_icon and ship_icon_target in {"field", "both"}:
+                _add_ship_marker(ax, field, zoom=ship_icon_zoom, facecolor="white", edgecolor="#d62728", zorder=10)
 
         title = titles[i] if i < len(titles) and titles[i] else f"Case {layout.case_id}"
         ax.set_title(title, fontsize=10, fontweight="bold", pad=8)
@@ -491,9 +585,7 @@ def plot_comparison(
     if out_svg:
         fig.savefig(out_svg, bbox_inches="tight")
         print(f"[SAVED] {out_svg}")
-    if out_pdf:
-        fig.savefig(out_pdf, bbox_inches="tight")
-        print(f"[SAVED] {out_pdf}")
+
     plt.close(fig)
 
 
@@ -509,9 +601,9 @@ def _validate_three(name: str, values: Sequence[Any], expected: int) -> List[Any
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="Plot ASV simulation vs field trajectories for three paper scenarios.")
-    ap.add_argument("--cases", type=int, nargs="+", required=True, help="Test-case IDs from test_run.py. Usually three values, e.g. 1 2 3.")
-    ap.add_argument("--sim-jsons", nargs="+", required=True, help="Simulation asv_data.json files. Use 'none' to skip a scenario.")
-    ap.add_argument("--field-logs", nargs="+", required=True, help="Field logs. Use 'none' to skip a scenario.")
+    ap.add_argument("--cases", type=int, nargs="+", default=DEFAULT_CASES, help="Test-case IDs from test_run.py. Usually three values, e.g. 1 2 3.")
+    ap.add_argument("--sim-jsons", nargs="+", default=DEFAULT_SIM, help="Simulation asv_data.json files. Use 'none' to skip a scenario.")
+    ap.add_argument("--field-logs", nargs="+", default=DEFAULT_FIELD, help="Field logs. Use 'none' to skip a scenario.")
     ap.add_argument("--titles", nargs="*", default=None, help="Panel titles. Defaults to Case N.")
     ap.add_argument("--test-run", default=None, help="Path to test_run.py. Defaults to importing test_run from current directory.")
 
@@ -530,7 +622,6 @@ def main() -> None:
     ap.add_argument("--figure-title", default=None)
     ap.add_argument("--out", default="sim_field_trajectory_comparison.png", help="Output PNG path.")
     ap.add_argument("--out-svg", default=None, help="Optional SVG output path.")
-    ap.add_argument("--out-pdf", default=None, help="Optional PDF output path.")
     ap.add_argument("--dpi", type=int, default=300)
 
     args = ap.parse_args()
@@ -557,7 +648,7 @@ def main() -> None:
 
         field_path, field_meta = load_field_trajectory(
             field_log,
-            case_id=case_id,
+            case_id=None,
             start_xy=layout.start,
             source=args.field_source,
             pos_scale=args.field_scale,
@@ -585,7 +676,6 @@ def main() -> None:
         map_height=float(args.map_height),
         out_png=args.out,
         out_svg=args.out_svg,
-        out_pdf=args.out_pdf,
         dpi=int(args.dpi),
         show_grid=bool(args.grid),
         figure_title=args.figure_title,
