@@ -55,12 +55,12 @@ Polygon = List[Point]
 # ---------------------------------------------------------------------------
 # Default data and configuration
 # ---------------------------------------------------------------------------
-DEFAULT_CASES = [1, 2, 3]
+DEFAULT_CASES = [1, 22, 3]
 DEFAULT_SIM = ["sim_1.json", "sim_2.json", "sim_3.json"]
 DEFAULT_FIELD = ["field_1.log", "field_2.log", "field_3.log"]
-DEFAULT_TITLES = ["Straight path",
-                  "Slanted path L-R",
-                  "Slanted path R-L"]
+DEFAULT_TITLES = ["Scenario 1",
+                  "Scenario 2",
+                  "Scenario 3"]
 DEFAULT_TEST_RUN = None
 DEFAULT_FIELD_SOURCE = "action"
 DEFAULT_OUT_PNG = "sim_field_trajectory_comparison.png"
@@ -589,22 +589,8 @@ def plot_comparison(
     plt.close(fig)
 
 
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
-
-def _validate_three(name: str, values: Sequence[Any], expected: int) -> List[Any]:
-    if len(values) != expected:
-        raise ValueError(f"{name} must have {expected} values, got {len(values)}: {values}")
-    return list(values)
-
-
 def main() -> None:
     ap = argparse.ArgumentParser(description="Plot ASV simulation vs field trajectories for three paper scenarios.")
-    ap.add_argument("--cases", type=int, nargs="+", default=DEFAULT_CASES, help="Test-case IDs from test_run.py. Usually three values, e.g. 1 2 3.")
-    ap.add_argument("--sim-jsons", nargs="+", default=DEFAULT_SIM, help="Simulation asv_data.json files. Use 'none' to skip a scenario.")
-    ap.add_argument("--field-logs", nargs="+", default=DEFAULT_FIELD, help="Field logs. Use 'none' to skip a scenario.")
-    ap.add_argument("--titles", nargs="*", default=None, help="Panel titles. Defaults to Case N.")
     ap.add_argument("--test-run", default=None, help="Path to test_run.py. Defaults to importing test_run from current directory.")
 
     ap.add_argument("--field-source", choices=["auto", "action", "raw"], default="auto", help="Field log source. auto prefers #ACTION x_rl/y_rl, then raw telemetry.")
@@ -626,19 +612,17 @@ def main() -> None:
 
     args = ap.parse_args()
 
-    n = len(args.cases)
-    sim_jsons = _validate_three("--sim-jsons", args.sim_jsons, n)
-    field_logs = _validate_three("--field-logs", args.field_logs, n)
-    if args.titles is None or len(args.titles) == 0:
-        titles = [f"Case {c}" for c in args.cases]
-    else:
-        titles = _validate_three("--titles", args.titles, n)
+    cases = DEFAULT_CASES
+    sim_jsons = DEFAULT_SIM
+    field_logs = DEFAULT_FIELD
+    titles = DEFAULT_TITLES
+    n = len(cases)
 
     layouts: List[ScenarioLayout] = []
     sim_paths: List[np.ndarray] = []
     field_paths: List[np.ndarray] = []
 
-    for case_id, sim_json, field_log in zip(args.cases, sim_jsons, field_logs):
+    for case_id, sim_json, field_log in zip(cases, sim_jsons, field_logs):
         layout = load_scenario_from_test_run(case_id, test_run_path=args.test_run)
         layouts.append(layout)
 
