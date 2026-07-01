@@ -1,293 +1,280 @@
-"""Built-in deterministic scenario set for quick ASV policy tests.
+import json
 
-Scenario layout
----------------
-The cases are grouped by obstacle count:
-
-    00-09 : 0 obstacles, pure path tracking
-    10-19 : 1 obstacle
-    20-29 : 2 obstacles
-    30-39 : 3 obstacles
-    40-49 : 4 obstacles
-    50-59 : 5 obstacles
-
-Within each 10-case block, cases are arranged from easier to harder. Cases
-ending in 9 use a deterministic curved reference path; all other cases use a
-straight mostly-slanted path. Coordinates are defined for the canonical
-10 m x 25 m map used by rl_env.py and are scaled by rl_env.py when a different
-map size is requested.
-
-This file is intentionally small and dependency-light because it is imported by
-both the simulator environment and the UDP deployment/visualisation tools.
 """
-from __future__ import annotations
+Deterministic test cases for ASV path-following and obstacle-avoidance evaluation.
 
-from typing import Dict, List, Optional, Tuple
+Coordinate convention:
+- These cases are authored in the original 10 x 25 local task frame.
+- Existing cases 0-7 are kept for backward compatibility.
 
-Point = Tuple[float, float]
-Polygon = List[Point]
+Existing cases:
+Test case None: random start & goal points, random obstacles
+Test case 0: centered straight path, no obstacles
+Test case 1: field Scenario A, narrow gate + recovery (3 obstacles)
+Test case 2: field Scenario B, three-obstacle slalom (3 obstacles)
+Test case 3: field Scenario C, boundary-constrained bypass (3 obstacles)
+Test case 4: centered straight path, 3 scattered obstacles
+Test case 5: diagonal path, horizontal blockage
+Test case 6: no obstacles, goal to left
+Test case 7: no obstacles, goal to right
 
-MAP_WIDTH = 10.0
-MAP_HEIGHT = 25.0
-START_Y = 2.0
-GOAL_Y = 22.0
+Test case 99: load setup from recorded random scenario file
 
-# Cases are in blocks of 10. 0..5 obstacles => 60 cases total.
-MIN_CASE_ID = 0
-MAX_CASE_ID = 59
-CASES_PER_GROUP = 10
-MAX_OBSTACLES = 5
+Note:
+- Cases 8, 9, and 13 include optional curved-path waypoints through path_waypoints().
+  Your environment must call TestCase.path_waypoints(test_case) to actually use the curved path.
+  If the environment only calls position(), those cases will still run, but with a straight
+  start-to-goal reference path.
+"""
 
+ENV_DATA = "data/env_setup/survival_pool/env_0.json"
+EVAL_SUITE_DATA = "data/env_setup/eval_suite/asv_eval_suite_100_harder.json"
 
-def _box(cx: float, cy: float, size: float = 1.0) -> Polygon:
-    h = 0.5 * float(size)
-    return [
-        (float(cx - h), float(cy - h)),
-        (float(cx + h), float(cy - h)),
-        (float(cx + h), float(cy + h)),
-        (float(cx - h), float(cy + h)),
-    ]
-
-
-def _clip(x: float, lo: float, hi: float) -> float:
-    return float(max(lo, min(hi, x)))
-
-
-def _lerp(a: float, b: float, t: float) -> float:
-    return float((1.0 - t) * a + t * b)
-
-
-def _normalised(vx: float, vy: float) -> Point:
-    n = (vx * vx + vy * vy) ** 0.5
-    if n <= 1e-9:
-        return (0.0, 1.0)
-    return (float(vx / n), float(vy / n))
-
-
-# Mostly slanted start/goal templates. The last local case in each block is
-# curved through the control point specified separately.
-_PATH_TEMPLATES: Dict[int, Dict[str, Point]] = {
-    # straight and diagonal paths
-    0: {"start": (5.0, START_Y), "goal": (5.0, GOAL_Y)},
-    1: {"start": (2.0, START_Y), "goal": (8.0, GOAL_Y)},
-    2: {"start": (8.0, START_Y), "goal": (2.0, GOAL_Y)},
-    # Medium slant
-    3: {"start": (3.9, START_Y), "goal": (6.1, GOAL_Y)},
-    4: {"start": (6.1, START_Y), "goal": (3.9, GOAL_Y)},
-    5: {"start": (3.6, START_Y), "goal": (6.4, GOAL_Y)},
-    6: {"start": (6.4, START_Y), "goal": (3.6, GOAL_Y)},
-    # Harder slants, closer to pool sides while still feasible
-    7: {"start": (3.2, START_Y), "goal": (6.8, GOAL_Y)},
-    8: {"start": (6.8, START_Y), "goal": (3.2, GOAL_Y)},
-    # Curved path case at the end of each block
-    9: {"start": (3.8, START_Y), "goal": (6.2, GOAL_Y), "control": (7.0, 12.0)},
-}
-
-
-_OBS_FRACTIONS: Dict[int, Tuple[float, ...]] = {
-    0: (),
-    1: (0.50,),
-    2: (0.38, 0.62),
-    3: (0.28, 0.50, 0.72),
-    4: (0.22, 0.40, 0.60, 0.78),
-    5: (0.18, 0.34, 0.50, 0.66, 0.82),
-}
-
-
-def _offset_pattern(local_id: int, obstacle_count: int) -> Tuple[float, ...]:
-    """Lateral obstacle offsets from the reference path, easy -> hard.
-
-    Positive offset means one side of the path; negative offset means the other
-    side. Zero means the obstacle is centred on/very near the path.
-    """
-    if obstacle_count <= 0:
-        return ()
-
-    # Base side alternation, varied by local case so the policy is tested on
-    # both port/starboard bypasses.
-    side = 1.0 if local_id % 2 == 0 else -1.0
-
-    if local_id <= 2:
-        # Easy: obstacles are clearly offset from the path.
-        amp = (1.30, 1.15, 1.00)[local_id]
-        pattern = [side * amp * ((-1.0) ** i) for i in range(obstacle_count)]
-    elif local_id <= 5:
-        # Medium: closer to the path, still with obvious bypass side.
-        amp = (0.85, 0.70, 0.55)[local_id - 3]
-        pattern = [side * amp * ((-1.0) ** i) for i in range(obstacle_count)]
-    elif local_id == 6:
-        # Medium-hard: include one centred obstacle.
-        base = [0.0, side * 0.85, -side * 0.85, side * 0.55, -side * 0.55]
-        pattern = base[:obstacle_count]
-    elif local_id == 7:
-        # Hard: near-centre obstacles plus alternating bypass requirements.
-        base = [side * 0.35, -side * 0.70, side * 0.70, -side * 0.35, 0.0]
-        pattern = base[:obstacle_count]
-    elif local_id == 8:
-        # Hardest straight case: several path-blocking or near-blocking obstacles.
-        base = [0.0, side * 0.45, -side * 0.45, 0.0, -side * 0.65]
-        pattern = base[:obstacle_count]
-    else:
-        # Curved case: still challenging, but not impossible; obstacles are
-        # placed around the curve and alternate sides.
-        base = [side * 0.75, -side * 0.75, 0.0, side * 0.60, -side * 0.60]
-        pattern = base[:obstacle_count]
-
-    return tuple(float(x) for x in pattern)
-
-
-def _case_ids(test_case: int) -> Tuple[int, int, int]:
-    """Return (case_id, obstacle_count, local_id)."""
-    tc = int(test_case)
-    if MIN_CASE_ID <= tc <= MAX_CASE_ID:
-        obstacle_count = tc // CASES_PER_GROUP
-        local_id = tc % CASES_PER_GROUP
-        return tc, obstacle_count, local_id
-
-    # Keep case 99 as a simple legacy empty-path test.
-    if tc == 99:
-        return 99, 0, 0
-
-    # Safe fallback.
-    return 0, 0, 0
-
-
-def _path_spec(local_id: int) -> Dict[str, Point]:
-    return _PATH_TEMPLATES.get(int(local_id), _PATH_TEMPLATES[0])
-
-
-def _point_on_path(local_id: int, t: float) -> Point:
-    spec = _path_spec(local_id)
-    sx, sy = spec["start"]
-    gx, gy = spec["goal"]
-    t = _clip(float(t), 0.0, 1.0)
-
-    if local_id == 9 and "control" in spec:
-        cx, cy = spec["control"]
-        omt = 1.0 - t
-        x = omt * omt * sx + 2.0 * omt * t * cx + t * t * gx
-        y = omt * omt * sy + 2.0 * omt * t * cy + t * t * gy
-        return (float(x), float(y))
-
-    return (_lerp(sx, gx, t), _lerp(sy, gy, t))
-
-
-def _path_tangent(local_id: int, t: float) -> Point:
-    spec = _path_spec(local_id)
-    sx, sy = spec["start"]
-    gx, gy = spec["goal"]
-    t = _clip(float(t), 0.0, 1.0)
-
-    if local_id == 9 and "control" in spec:
-        cx, cy = spec["control"]
-        # Derivative of quadratic Bezier curve.
-        dx = 2.0 * (1.0 - t) * (cx - sx) + 2.0 * t * (gx - cx)
-        dy = 2.0 * (1.0 - t) * (cy - sy) + 2.0 * t * (gy - cy)
-        return _normalised(dx, dy)
-
-    return _normalised(gx - sx, gy - sy)
-
-
-def _normal_left(local_id: int, t: float) -> Point:
-    tx, ty = _path_tangent(local_id, t)
-    return (-ty, tx)
-
-
-def _sample_path(local_id: int, n: int = 100) -> List[Point]:
-    n = max(2, int(n))
-    return [_point_on_path(local_id, i / float(n - 1)) for i in range(n)]
-
-
-def _scenario_obstacles(obstacle_count: int, local_id: int) -> List[Polygon]:
-    obstacle_count = int(max(0, min(MAX_OBSTACLES, obstacle_count)))
-    if obstacle_count <= 0:
-        return []
-
-    fracs = _OBS_FRACTIONS[obstacle_count]
-    offsets = _offset_pattern(local_id, obstacle_count)
-
-    obstacles: List[Polygon] = []
-    for frac, offset in zip(fracs, offsets):
-        px, py = _point_on_path(local_id, frac)
-        nx, ny = _normal_left(local_id, frac)
-
-        # Lateral offset from path, with clipping to keep boxes inside the map.
-        cx = _clip(px + float(offset) * nx, 1.0, MAP_WIDTH - 1.0)
-        cy = _clip(py + float(offset) * ny, 4.0, MAP_HEIGHT - 4.0)
-        obstacles.append(_box(cx, cy, 1.0))
-
-    return obstacles
+OBS_LENGTH = 1.0
 
 
 class TestCase:
-    """Preset scenarios for quick deterministic visual policy tests."""
+    def __init__(self):
+        self.obs = []
+        self.start_x = None
+        self.start_y = None
+        self.goal_x = None
+        self.goal_y = None
+        self.obs_size = OBS_LENGTH / 2.0
+        self.env_data = ENV_DATA
 
-    def count(self) -> int:
-        return (MAX_OBSTACLES + 1) * CASES_PER_GROUP
+    # -------------------------------
+    # Small geometry helpers
+    # -------------------------------
+    def _box(self, x, y, half_size=None):
+        """Axis-aligned square obstacle centered at (x, y)."""
+        hs = self.obs_size if half_size is None else float(half_size)
+        return [(x - hs, y - hs), (x + hs, y - hs), (x + hs, y + hs), (x - hs, y + hs)]
 
-    def obstacle_count(self, test_case: int = 0) -> int:
-        _, obstacle_count, _ = _case_ids(test_case)
-        return int(obstacle_count)
+    def _rect(self, x, y, half_x, half_y):
+        """Axis-aligned rectangular obstacle centered at (x, y)."""
+        return [(x - half_x, y - half_y), (x + half_x, y - half_y),
+                (x + half_x, y + half_y), (x - half_x, y + half_y)]
 
-    def path_mode(self, test_case: int = 0) -> str:
-        _, _, local_id = _case_ids(test_case)
-        return "curve" if local_id == 9 else "straight"
+    def obstacles(self, test_case):
+        """Return obstacle polygons for a deterministic test case."""
+        # IMPORTANT: always clear old obstacles. The same TestCase instance is reused.
+        self.obs = []
 
-    def difficulty(self, test_case: int = 0) -> str:
-        _, _, local_id = _case_ids(test_case)
-        if local_id <= 2:
-            return "easy"
-        if local_id <= 5:
-            return "medium"
-        if local_id <= 7:
-            return "hard"
-        return "very_hard" if local_id == 8 else "curved"
+        if 1000 <= int(test_case) < 1100:
+            case = self._load_suite_case(test_case)
+            self.obs = case["obstacles"]
+            return self.obs
 
-    def description(self, test_case: int = 0) -> str:
-        case_id, obstacle_count, local_id = _case_ids(test_case)
-        return (
-            f"case {case_id}: obs_{obstacle_count}, "
-            f"{self.path_mode(test_case)} path, {self.difficulty(test_case)}"
-        )
+        # Existing no-obstacle cases
+        if test_case in [0, 6, 7, 8, 9, 19, 20]:
+            return self.obs
 
-    def position(self, test_case: int = 0) -> Tuple[float, float, float, float]:
-        # Coordinates are in the canonical 10 m x 25 m map. rl_env.py scales
-        # them if a different map size is requested.
-        case_id, _, local_id = _case_ids(test_case)
-        if case_id == 99:
-            return (5.0, START_Y, 5.0, GOAL_Y)
-        spec = _path_spec(local_id)
-        sx, sy = spec["start"]
-        gx, gy = spec["goal"]
-        return (float(sx), float(sy), float(gx), float(gy))
+        # Existing cases 1-5, kept compatible with your previous evaluations
+        if test_case == 1:      # Scenario A: narrow gate + recovery
+            # Two obstacles form a gate; the third obstacle forces path recovery and a second correction.
+            for x, y in [(2.0, 11.0), (7.0, 11.0), (4.35, 16.5)]:
+                self.obs.append(self._box(x, y))
 
-    def path(self, test_case: int = 0, n: Optional[int] = None) -> List[Point]:
-        """Return the deterministic reference path for this case.
+        elif test_case == 2:    # Scenario B: three-obstacle slalom
+            # Alternating offsets test sequential avoidance without excessive oscillation.
+            for x, y in [(4.1, 8.0), (5.9, 13.0), (2.0, 18.0)]:
+                self.obs.append(self._box(x, y))
 
-        Current rl_env.py versions may only call position(); if you want the
-        curved cases to be truly curved, update rl_env.py to use this method
-        when test_case is not None.
+        elif test_case == 3:    # Scenario C: boundary-constrained bypass
+            # Side obstacles and a centerline obstacle test obstacle/boundary trade-offs.
+            for x, y in [(1.5, 9.0), (8.5, 14.0), (5.0, 17.5)]:
+                self.obs.append(self._box(x, y))
+
+        elif test_case == 4:    # 3 scattered obstacles
+            for x, y in [(5, 8), (8, 15), (3, 18)]:
+                self.obs.append(self._box(x, y))
+
+        elif test_case == 5:    # horizontal blockage on diagonal path
+            self.obs.append(self._rect(3.5, 15, half_x=3.0, half_y=self.obs_size))
+            self.obs.append(self._box(9, 15))
+
+        # -------------------------------
+        # Paper-replica cases 8+
+        # -------------------------------
+        elif test_case == 10:
+            # Scenario C style: two obstacles close to/on the center path.
+            # The gap between them encourages a close-but-controlled pass.
+            self.obs.append(self._box(4.45, 11.0))
+            self.obs.append(self._box(5.55, 14.0))
+
+        elif test_case == 11:
+            # Scenario C style: obstacles near, but not exactly on, the path.
+            # A path-adherent policy should make only a small lateral correction.
+            self.obs.append(self._box(3.8, 10.5))
+            self.obs.append(self._box(6.2, 14.5))
+            self.obs.append(self._box(4.1, 18.0))
+
+        elif test_case == 12:
+            # Narrow centered gate. The vessel should pass between the obstacles.
+            # Gap center is x=5, with a moderate gap for a 0.5 m beam vessel.
+            self.obs.append(self._box(3.7, 12.5))
+            self.obs.append(self._box(6.3, 12.5))
+
+        elif test_case == 13:
+            # Curved/S-bend path with one obstacle near the bend.
+            # Requires both path following and a local correction around the obstacle.
+            self.obs.append(self._box(5.8, 13.0))
+
+        elif test_case == 14:
+            # Single obstacle early on the center path.
+            self.obs.append(self._box(5.0, 7.5))
+
+        elif test_case == 15:
+            # Single obstacle late on the center path.
+            self.obs.append(self._box(5.0, 17.5))
+
+        elif test_case == 16:
+            # Controlled slalom: alternating obstacles along the center path.
+            for x, y in [(4.0, 8.0), (6.0, 13.0), (4.0, 18.0)]:
+                self.obs.append(self._box(x, y))
+
+        elif test_case == 17:
+            # Off-path left obstacle. This should not trigger a very wide detour.
+            self.obs.append(self._box(2.7, 12.5))
+
+        elif test_case == 18:
+            # Off-path right obstacle. This should not trigger a very wide detour.
+            self.obs.append(self._box(7.3, 12.5))
+
+        elif test_case == 99:
+            with open(self.env_data, "r") as f:
+                data = json.load(f)
+            self.obs = data["obstacles"]
+
+        else:
+            raise ValueError(f"Invalid test case: {test_case}")
+
+        return self.obs
+
+    def position(self, test_case):
+        """Return start_x, start_y, goal_x, goal_y for a deterministic test case."""
+        if 1000 <= int(test_case) < 1100:
+            case = self._load_suite_case(test_case)
+            self.start_x, self.start_y = case["start"]
+            self.goal_x, self.goal_y = case["goal"]
+            return self.start_x, self.start_y, self.goal_x, self.goal_y
+
+        # Existing centered straight-path cases and most paper-replica cases
+        if test_case in [0, 1, 4, 10, 11, 12, 13, 14, 15, 16, 17, 18]:
+            self.start_x = 5
+            self.start_y = 2
+            self.goal_x = 5
+            self.goal_y = 22
+        
+        elif test_case == 2:
+            self.start_x = 3
+            self.start_y = 2
+            self.goal_x = 7
+            self.goal_y = 22
+
+        elif test_case == 3:
+            self.start_x = 7
+            self.start_y = 2
+            self.goal_x = 3
+            self.goal_y = 22
+
+        elif test_case == 5:
+            self.start_x = 2
+            self.start_y = 2
+            self.goal_x = 7
+            self.goal_y = 22
+
+        elif test_case == 6:
+            self.start_x = 5
+            self.start_y = 2
+            self.goal_x = 3
+            self.goal_y = 22
+
+        elif test_case == 7:
+            self.start_x = 5
+            self.start_y = 2
+            self.goal_x = 7
+            self.goal_y = 22
+
+        elif test_case == 8:
+            # S-bend path-following case. Start/goal stay centered; actual curve is in path_waypoints().
+            self.start_x = 5
+            self.start_y = 2
+            self.goal_x = 5
+            self.goal_y = 22
+
+        elif test_case == 9:
+            # Smooth right bend. Start/goal stay centered; actual curve is in path_waypoints().
+            self.start_x = 5
+            self.start_y = 2
+            self.goal_x = 5
+            self.goal_y = 22
+
+        elif test_case == 19:
+            self.start_x = 3
+            self.start_y = 2
+            self.goal_x = 7
+            self.goal_y = 22
+
+        elif test_case == 20:
+            self.start_x = 7
+            self.start_y = 2
+            self.goal_x = 3
+            self.goal_y = 22
+
+        elif test_case == 99:
+            with open(self.env_data, "r") as f:
+                data = json.load(f)
+            self.start_x = data["start"][0]
+            self.start_y = data["start"][1]
+            self.goal_x = data["goal"][0]
+            self.goal_y = data["goal"][1]
+
+        else:
+            raise ValueError(f"Invalid test case: {test_case}")
+
+        return self.start_x, self.start_y, self.goal_x, self.goal_y
+
+    def path_waypoints(self, test_case):
         """
-        case_id, _, local_id = _case_ids(test_case)
-        if case_id == 99:
-            local_id = 0
-        if n is None:
-            # Use denser samples for the curved path so the closest-point logic
-            # remains smooth.
-            n = 120 if local_id == 9 else 80
-        return _sample_path(local_id, int(n))
+        Optional reference path waypoints for curved paper-replica cases.
 
-    def obstacles(self, test_case: int = 0) -> List[Polygon]:
-        case_id, obstacle_count, local_id = _case_ids(test_case)
-        if case_id == 99:
-            return []
-        return _scenario_obstacles(obstacle_count, local_id)
+        Return:
+            None for normal straight-line path generation, or a list of (x, y) waypoints.
 
+        Environment integration idea:
+            wpts = self.scenario.path_waypoints(test_case)
+            if wpts is None:
+                path = self._generate_path(start_x, start_y, goal_x, goal_y)
+            else:
+                path = self._generate_path_from_waypoints(wpts)
+        """
+        if test_case == 8:
+            # Scenario B analogue: S-bend, no obstacles.
+            return [(5.0, 2.0), (3.4, 7.5), (6.6, 15.5), (5.0, 22.0)]
 
-if __name__ == "__main__":
-    tc = TestCase()
-    for group in range(MAX_OBSTACLES + 1):
-        ids = range(group * CASES_PER_GROUP, group * CASES_PER_GROUP + CASES_PER_GROUP)
-        print(f"obs_{group}:")
-        for case_id in ids:
-            print(f"  {tc.description(case_id)} start/goal={tc.position(case_id)} obstacles={len(tc.obstacles(case_id))}")
+        if test_case == 9:
+            # Scenario B analogue: one-sided smooth bend, no obstacles.
+            return [(5.0, 2.0), (7.0, 8.0), (7.2, 15.0), (5.0, 22.0)]
+
+        if test_case == 13:
+            # Scenario C/D analogue: S-bend with nearby obstacle.
+            return [(5.0, 2.0), (3.6, 8.0), (6.4, 15.0), (5.0, 22.0)]
+
+        return None
+
+    def paper_replica_cases(self):
+        """Convenience list for paper-style evaluation."""
+        return [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+    
+    def _load_suite_case(self, test_case):
+        suite_idx = int(test_case) - 1000
+        with open(EVAL_SUITE_DATA, "r") as f:
+            suite = json.load(f)
+
+        cases = suite["cases"]
+        if suite_idx < 0 or suite_idx >= len(cases):
+            raise ValueError(f"Invalid eval-suite test case: {test_case}")
+
+        return cases[suite_idx]

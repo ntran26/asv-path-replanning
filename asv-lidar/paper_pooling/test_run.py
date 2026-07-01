@@ -6,7 +6,6 @@ Deterministic test cases for ASV path-following and obstacle-avoidance evaluatio
 Coordinate convention:
 - These cases are authored in the original 10 x 25 local task frame.
 - Existing cases 0-7 are kept for backward compatibility.
-- New cases 8+ are paper-replica style cases for path-following + close obstacle avoidance.
 
 Existing cases:
 Test case None: random start & goal points, random obstacles
