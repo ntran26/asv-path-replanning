@@ -73,7 +73,7 @@ class TestCase:
         # Existing cases 1-5, kept compatible with your previous evaluations
         if test_case == 1:      # Scenario A: narrow gate + recovery
             # Two obstacles form a gate; the third obstacle forces path recovery and a second correction.
-            for x, y in [(2.0, 11.0), (7.0, 11.0), (4.35, 16.5)]:
+            for x, y in [(2.0, 16.5), (5.0, 8.0), (7.2, 15.7)]:
                 self.obs.append(self._box(x, y))
 
         elif test_case == 2:    # Scenario B: three-obstacle slalom

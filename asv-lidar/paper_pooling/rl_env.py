@@ -81,7 +81,7 @@ GOAL_CTE_RADIUS = 1.60
 RPM_MIN = 0
 RPM_MAX = 24
 CRUISE_RPM = 12.0
-FIXED_RPM = True
+FIXED_RPM = False
 U_MAX = float(np.sqrt(THRUST_COEF / DRAG_COEF) * RPM_MAX)
 MAX_IN = 1.0
 MIN_IN = -1.0
@@ -123,7 +123,7 @@ K_THRUST_DEV = 0.025
 # - "asymmetric": left pool edge visible, right pool edge invisible, far right wall visible
 # - "both": both true pool borders visible
 # - "mixed": randomize across the three cases above
-OBS_BORDER_MODE = "mixed"
+OBS_BORDER_MODE = "none"
 OBS_BORDER_P_NONE = 0.10
 OBS_BORDER_P_ASYMMETRIC = 0.60
 OBS_BORDER_P_BOTH = 0.30
@@ -149,11 +149,11 @@ TRAIN_OBS_PROBS = [0.40, 0.25, 0.20, 0.10, 0.05]
 # lidar sector ranges to choose the clearer side when the path ahead is blocked.
 BLOCK_D_SAFE = 4.5
 BLOCK_D_CRIT = 2.0
-BLOCK_FRONT_DEG = 25.0
+BLOCK_FRONT_DEG = 15.0
 SIDE_ARC_MIN_DEG = 15.0
 SIDE_ARC_MAX_DEG = 100.0
 SIDE_CLEAR_TIE = 0.15
-BYPASS_CTE = 0.8
+BYPASS_CTE = 0.6
 K_LOCAL_TARGET = 1.0
 K_CENTER_BLOCK = 0.0
 K_BORDER = 0.0
