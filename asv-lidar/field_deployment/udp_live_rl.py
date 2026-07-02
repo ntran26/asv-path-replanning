@@ -742,7 +742,7 @@ def main() -> None:
                         # rudder_cmd = float(raw_rudder_cmd)
 
                         command = f"$CMD,{rudder_cmd:.2f},{thrust_cmd:.2f}"
-                        command = f"$CMD,{0.0},{0.0}"
+                        # command = f"$CMD,{0.0},{0.0}"
                         
                         sent_command = False
                         if not args.shadow:

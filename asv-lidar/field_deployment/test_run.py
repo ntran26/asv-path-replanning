@@ -176,7 +176,7 @@ class TestCase:
         elif test_case == 3:
             self.start_x = 7
             self.start_y = 2
-            self.goal_x = 3
+            self.goal_x = 5
             self.goal_y = 22
 
         elif test_case == 5:
