@@ -47,7 +47,7 @@ MAX_OBS = 5
 
 PATH_MODE = "straight"      # keep the nominal global/reference path straight
 CURVE_PROB = 0.0
-LOOKAHEAD_FRACTION = 0.25
+LOOKAHEAD_FRACTION = 0.15
 
 # Fixed lambda for this practical local-planner run.
 LAMBDA_MIN = 1e-4

@@ -6,7 +6,7 @@ shadow test with fake replay:
   python udp_live_rl.py --test-case 1 --shadow
   
 live control:
-  python udp_live_rl.py --server-ip 10.201.205.110 --record-video --record-log 2026-07-02/trial.log --test-case 1 --fixed-rpm
+  python udp_live_rl.py --server-ip 10.201.205.110 --record-video --record-log 2026-07-03/trial.log --test-case 1 --fixed-rpm
 
 Notes:
 - SAC is hardcoded. PPO support was removed intentionally.
@@ -734,15 +734,12 @@ def main() -> None:
                         )
                         thrust_cmd = rpm_to_s2_cmd(rpm_cmd, rpm_max=args.rpm_max, s2_max_cmd=args.s2_max_cmd)
 
-                        # # manual rudder/throttle test
-                        # rudder_cmd = -100
-                        # thrust_cmd = 0
 
                         # # turn rate limiter off
-                        # rudder_cmd = float(raw_rudder_cmd)
+                        rudder_cmd = float(raw_rudder_cmd)
 
                         command = f"$CMD,{rudder_cmd:.2f},{thrust_cmd:.2f}"
-                        # command = f"$CMD,{0.0},{0.0}"
+                        # command = f"$CMD,{100.0},{0.0}"
                         
                         sent_command = False
                         if not args.shadow:
