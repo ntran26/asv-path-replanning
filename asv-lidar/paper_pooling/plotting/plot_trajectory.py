@@ -55,9 +55,9 @@ Polygon = List[Point]
 # ---------------------------------------------------------------------------
 # Default data and configuration
 # ---------------------------------------------------------------------------
-DEFAULT_CASES = [2, 2, 2]
-DEFAULT_SIM = ["data/sim_1.json", "data/sim_1.json", "data/sim_1.json"]
-DEFAULT_FIELD = ["data/4.log", "data/5.log", "data/6.log"]
+DEFAULT_CASES = [1, 2, 3]
+DEFAULT_SIM = ["data/sim_1.json", "data/sim_2_2.json", "data/sim_3.json"]
+DEFAULT_FIELD = ["data/field_1.log", "data/field_2.log", "data/field_3.log"]
 DEFAULT_TITLES = ["Scenario 1",
                   "Scenario 2",
                   "Scenario 3"]

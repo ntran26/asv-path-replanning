@@ -1,7 +1,7 @@
 """
 Train
     python train_test_asv.py --mode train --algo sac --timesteps 1000000
-    python train_test_asv.py --mode train --algo sac --timesteps 1000000 --resume --model-path best_model.zip
+    python train_test_asv.py --mode train --algo sac --timesteps 200000 --resume --model-path sac_model_1M.zip
 
 Test
     python train_test_asv.py --mode test --algo sac --model-path best_model.zip --test-case 4
@@ -649,6 +649,60 @@ if __name__ == "__main__":
         total_reward = 0.0
         while not done:
             action, _ = model.predict(obs, deterministic=True)
+
+            action = np.asarray(action, dtype=np.float32).reshape(-1)
+
+            # ------------------------------------------------------------
+            # Side/path consistency guard.
+            # Prevents the policy from steering into the worse side when
+            # the opposite side is clearly open and also closer to the path.
+            # ------------------------------------------------------------
+
+            USE_SIDE_PATH_GUARD = True
+
+            if USE_SIDE_PATH_GUARD:
+                cte = float(obs["cross_track_error"][0])
+                front = float(obs["front_clearance"][0])
+                local_target = float(obs["local_target_cte"][0])
+
+                # side_clearance_diff = right_clearance - left_clearance
+                side_diff = float(obs["side_clearance_diff"][0])
+
+                # Tune these.
+                CTE_GUARD_MIN = 0.25
+                SIDE_DIFF_GUARD_MIN = 1.0
+                FRONT_MIN = 1.5
+                MIN_CORRECTIVE_ACTION = 0.10
+
+                # In your current convention:
+                # positive CTE means ASV is left of the path, so it should recover right.
+                path_to_right = cte > CTE_GUARD_MIN
+                path_to_left = cte < -CTE_GUARD_MIN
+
+                right_much_clearer = side_diff > SIDE_DIFF_GUARD_MIN
+                left_much_clearer = side_diff < -SIDE_DIFF_GUARD_MIN
+
+                # From your video, negative rudder action sends the vessel left,
+                # positive rudder action sends it right.
+                if front > FRONT_MIN:
+                    if path_to_right and right_much_clearer:
+                        # Do not allow a left turn.
+                        action[0] = max(float(action[0]), MIN_CORRECTIVE_ACTION)
+
+                    elif path_to_left and left_much_clearer:
+                        # Do not allow a right turn.
+                        action[0] = min(float(action[0]), -MIN_CORRECTIVE_ACTION)
+
+                # Extra guard using local target:
+                # local_target < 0 means right-side bypass target,
+                # local_target > 0 means left-side bypass target.
+                if front > FRONT_MIN:
+                    if local_target < -0.10 and right_much_clearer:
+                        action[0] = max(float(action[0]), MIN_CORRECTIVE_ACTION)
+
+                    elif local_target > 0.10 and left_much_clearer:
+                        action[0] = min(float(action[0]), -MIN_CORRECTIVE_ACTION)
+
             obs, reward, terminated, truncated, info = env.step(action)
             done = bool(terminated or truncated)
             total_reward += float(reward)

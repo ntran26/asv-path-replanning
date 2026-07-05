@@ -78,12 +78,13 @@ class TestCase:
 
         elif test_case == 2:    # Scenario B: three-obstacle slalom
             # Alternating offsets test sequential avoidance without excessive oscillation.
-            for x, y in [(2.0, 8.5), (6.0, 17.0), (7.2, 9.3)]:
+            for x, y in [(1.5, 8.5), (6.0, 17.0), (7.2, 9.3)]:
                 self.obs.append(self._box(x, y))
+            # return self.obs
 
         elif test_case == 3:    # Scenario C: boundary-constrained bypass
             # Side obstacles and a centerline obstacle test obstacle/boundary trade-offs.
-            for x, y in [(1.5, 9.0), (8.5, 14.0), (5.0, 17.5)]:
+            for x, y in [(1.5, 8.5), (5.5, 17.0), (6.0, 9.3)]:
                 self.obs.append(self._box(x, y))
 
         elif test_case == 4:    # 3 scattered obstacles
@@ -168,7 +169,7 @@ class TestCase:
             self.goal_y = 22
         
         elif test_case == 2:
-            self.start_x = 2
+            self.start_x = 3
             self.start_y = 2
             self.goal_x = 8
             self.goal_y = 22
@@ -176,7 +177,7 @@ class TestCase:
         elif test_case == 3:
             self.start_x = 7
             self.start_y = 2
-            self.goal_x = 3
+            self.goal_x = 2
             self.goal_y = 22
 
         elif test_case == 5:
