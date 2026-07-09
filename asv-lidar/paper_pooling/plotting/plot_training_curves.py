@@ -12,14 +12,14 @@ Example:
     python plot_training_curves.py \
         --eval-summary eval_summary.json \
         --monitor train_monitor.csv \
-        --out-dir paper_plots \
-        --title "Feasible pooling SAC with Stage-1 speed control"
+        --out-dir training_plots \
+        --title "Average Reward over Timesteps"
 
 Outputs:
-    paper_plots/eval_reward_success_rpm.png/.svg        # default full figure
-    paper_plots/eval_mean_reward.png/.svg               # with --only-reward
-    paper_plots/group_success_by_obstacle.png/.svg       # default full figure
-    paper_plots/train_monitor_reward.png/.svg            # only if --monitor is given
+    training_plots/eval_reward_success_rpm.png/.svg        # default full figure
+    training_plots/eval_mean_reward.png/.svg               # with --only-reward
+    training_plots/group_success_by_obstacle.png/.svg       # default full figure
+    training_plots/train_monitor_reward.png/.svg            # only if --monitor is given
 """
 
 from __future__ import annotations
@@ -365,7 +365,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Plot ASV SAC training/evaluation curves for paper figures.")
     parser.add_argument("--eval-summary", type=Path, required=True, help="Path to eval_summary.json from train_test_asv.py.")
     parser.add_argument("--monitor", type=Path, default=None, help="Optional SB3 train_monitor.csv / monitor.csv.")
-    parser.add_argument("--out-dir", type=Path, default=Path("paper_plots"), help="Output directory for PNG/SVG figures.")
+    parser.add_argument("--out-dir", type=Path, default=Path("training_plots"), help="Output directory for PNG/SVG figures.")
     parser.add_argument("--title", default="", help="Optional figure title.")
     parser.add_argument("--x-units", choices=["steps", "k", "m"], default="m", help="X-axis units.")
     parser.add_argument("--rolling-window", type=int, default=50, help="Rolling window for monitor reward plot.")
