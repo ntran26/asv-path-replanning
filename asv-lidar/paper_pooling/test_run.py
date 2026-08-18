@@ -11,7 +11,11 @@ Existing cases:
 Test case None: random start & goal points, random obstacles
 Test case 0: centered straight path, no obstacles
 Test case 1: field Scenario A, narrow gate + recovery (3 obstacles)
-Test case 2: field Scenario B, three-obstacle slalom (3 obstacles)
+Test case 2: field Scenario B, three-obstacle slalom (3 obstacles).
+             Also the asv_lidar.mp4 regression layout: the near-goal obstacle at
+             (6.0, 17.0) sits on the reference path. The 1M policy drifts LEFT
+             into it instead of the cheap ~0.5 m pass on the starboard/path side
+             (obstacle/border-gate collapse discussed in the reward analysis).
 Test case 3: field Scenario C, boundary-constrained bypass (3 obstacles)
 Test case 4: centered straight path, 3 scattered obstacles
 Test case 5: diagonal path, horizontal blockage
@@ -78,6 +82,12 @@ class TestCase:
 
         elif test_case == 2:    # Scenario B: three-obstacle slalom
             # Alternating offsets test sequential avoidance without excessive oscillation.
+            # REGRESSION: this is the exact layout recorded in asv_lidar.mp4 /
+            # asv_data.json (start (3,2), goal (8,22)). Obstacle (6.0, 17.0) sits
+            # on the reference path near the goal; the policy should pass it on
+            # the starboard/path side (~0.5 m correction) rather than committing
+            # to a wide left detour. Test cases reset asv_h=0 with a fresh
+            # ShipModel, so under deterministic eval this reproduces the failure.
             for x, y in [(1.5, 8.5), (6.0, 17.0), (7.2, 9.3)]:
                 self.obs.append(self._box(x, y))
             # return self.obs
