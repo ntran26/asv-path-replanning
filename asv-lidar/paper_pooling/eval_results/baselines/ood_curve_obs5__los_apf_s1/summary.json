@@ -1,0 +1,143 @@
+{
+  "method": "ood_curve_obs5__los_apf_s1",
+  "n_episodes": 100,
+  "deterministic": true,
+  "bootstrap_resamples": 10000,
+  "bootstrap_stratified_by": "obstacle_count",
+  "metrics": {
+    "success": {
+      "n_finite": 100,
+      "mean": 0.67,
+      "median": 1.0,
+      "iqm": 0.67,
+      "std": 0.4702127178203499
+    },
+    "obstacle_collision": {
+      "n_finite": 100,
+      "mean": 0.26,
+      "median": 0.0,
+      "iqm": 0.26,
+      "std": 0.4386342439892262
+    },
+    "border_collision": {
+      "n_finite": 100,
+      "mean": 0.07,
+      "median": 0.0,
+      "iqm": 0.0,
+      "std": 0.25514701644346144
+    },
+    "timeout": {
+      "n_finite": 100,
+      "mean": 0.0,
+      "median": 0.0,
+      "iqm": 0.0,
+      "std": 0.0
+    },
+    "rms_cte": {
+      "n_finite": 100,
+      "mean": 1.7910410026166455,
+      "median": 1.7555501887578973,
+      "iqm": 1.7855159069535602,
+      "std": 0.5883333935931269
+    },
+    "mean_cte": {
+      "n_finite": 100,
+      "mean": 1.4207863380493932,
+      "median": 1.3925203889818976,
+      "iqm": 1.4224882822842932,
+      "std": 0.5037292598302733
+    },
+    "max_cte": {
+      "n_finite": 100,
+      "mean": 3.0681558513641356,
+      "median": 2.9457863569259644,
+      "iqm": 3.0094913387298585,
+      "std": 0.8131870923995049
+    },
+    "min_obstacle_clearance": {
+      "n_finite": 100,
+      "mean": 0.3165267687377315,
+      "median": 0.3040256384377019,
+      "iqm": 0.19748953427352853,
+      "std": 0.2680439791608087
+    },
+    "min_border_clearance": {
+      "n_finite": 100,
+      "mean": 0.8942210477912268,
+      "median": 0.9884765712332251,
+      "iqm": 0.988481308014541,
+      "std": 0.2700004216128167
+    },
+    "min_lateral_border_clearance": {
+      "n_finite": 100,
+      "mean": 1.9564120604893553,
+      "median": 2.1665689255930887,
+      "iqm": 2.151063614113889,
+      "std": 0.837992649368396
+    },
+    "path_completion_steps": {
+      "n_finite": 100,
+      "mean": 260.23,
+      "median": 277.5,
+      "iqm": 275.9423076923077,
+      "std": 66.42512401192789
+    },
+    "path_completion_time_s": {
+      "n_finite": 100,
+      "mean": 26.023000000000003,
+      "median": 27.75,
+      "iqm": 27.59423076923077,
+      "std": 6.642512401192789
+    },
+    "mean_speed": {
+      "n_finite": 100,
+      "mean": 0.6505766795646233,
+      "median": 0.6679685911372981,
+      "iqm": 0.664726191748388,
+      "std": 0.09490579170071282
+    },
+    "control_effort": {
+      "n_finite": 100,
+      "mean": 12.292512017568779,
+      "median": 11.449367236107307,
+      "iqm": 11.505229196453422,
+      "std": 5.645468260212066
+    },
+    "mean_abs_rudder_rate": {
+      "n_finite": 100,
+      "mean": 10.892829470788705,
+      "median": 10.871691955129778,
+      "iqm": 10.897636172775869,
+      "std": 3.1625441121218936
+    },
+    "rudder_saturation_fraction": {
+      "n_finite": 100,
+      "mean": 0.2972221570956076,
+      "median": 0.27457699721567785,
+      "iqm": 0.2730309289109746,
+      "std": 0.19480901166092968
+    },
+    "path_efficiency": {
+      "n_finite": 100,
+      "mean": 0.8510191730660951,
+      "median": 0.9767002679412018,
+      "iqm": 0.9525457656028189,
+      "std": 0.24286644522378378
+    }
+  },
+  "by_obstacle_count": {
+    "obs_5": {
+      "n": 100,
+      "success_rate": 0.67,
+      "obstacle_collision_rate": 0.26,
+      "border_collision_rate": 0.07,
+      "timeout_rate": 0.0,
+      "mean_rms_cte": 1.7910410026166455
+    }
+  },
+  "wall_clock_seconds": 66.54625678062439,
+  "controller": "los_apf:eval_results/baselines/los_apf_best.json",
+  "layouts": "eval_layouts/ood_curve_obs5.json",
+  "n_workers": 6,
+  "predict_deterministic": true
+}

@@ -1,0 +1,630 @@
+Evaluating sb3:sac:models/sac_model_1M.zip over 100 layouts (6 workers) ...
+    25/100  success=0.400  1.46 ep/s  eta 0.9 min
+    50/100  success=0.440  2.21 ep/s  eta 0.4 min
+    75/100  success=0.467  2.74 ep/s  eta 0.2 min
+   100/100  success=0.490  3.10 ep/s  eta 0.0 min
+
+ood_obs5__sac_published: 100 episodes
+  success           0.490
+  obstacle coll.    0.350
+  border coll.      0.160
+  timeout           0.000
+  rms cte           1.263 m
+  min obst clear    0.132 m
+  min border clear  0.743 m
+  min lat.  clear   1.649 m
+  control effort    11.095
+  rudder sat frac   0.210
+
+  wall clock 0.5 min
+  wrote eval_results\baselines\ood_obs5__sac_published\episodes.csv
+  wrote eval_results\baselines\ood_obs5__sac_published\summary.json
+Evaluating sb3:sac:models/sac_seed0/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=0.480  1.42 ep/s  eta 0.9 min
+    50/100  success=0.520  2.12 ep/s  eta 0.4 min
+    75/100  success=0.600  2.47 ep/s  eta 0.2 min
+   100/100  success=0.580  3.00 ep/s  eta 0.0 min
+
+ood_obs5__sac_seed0_best: 100 episodes
+  success           0.580
+  obstacle coll.    0.090
+  border coll.      0.330
+  timeout           0.000
+  rms cte           1.677 m
+  min obst clear    0.433 m
+  min border clear  0.572 m
+  min lat.  clear   1.042 m
+  control effort    9.555
+  rudder sat frac   0.031
+
+  wall clock 0.6 min
+  wrote eval_results\baselines\ood_obs5__sac_seed0_best\episodes.csv
+  wrote eval_results\baselines\ood_obs5__sac_seed0_best\summary.json
+Evaluating sb3:ppo:models/ppo_seed0/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=0.440  0.55 ep/s  eta 2.3 min
+    50/100  success=0.580  0.79 ep/s  eta 1.1 min
+    75/100  success=0.640  1.01 ep/s  eta 0.4 min
+   100/100  success=0.640  1.27 ep/s  eta 0.0 min
+
+ood_obs5__ppo_seed0_best: 100 episodes
+  success           0.640
+  obstacle coll.    0.260
+  border coll.      0.100
+  timeout           0.000
+  rms cte           1.712 m
+  min obst clear    0.295 m
+  min border clear  0.823 m
+  min lat.  clear   1.967 m
+  control effort    7.621
+  rudder sat frac   0.156
+
+  wall clock 1.3 min
+  wrote eval_results\baselines\ood_obs5__ppo_seed0_best\episodes.csv
+  wrote eval_results\baselines\ood_obs5__ppo_seed0_best\summary.json
+Evaluating sb3:sac:models/sac_seed1/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=0.320  1.16 ep/s  eta 1.1 min
+    50/100  success=0.340  1.82 ep/s  eta 0.5 min
+    75/100  success=0.333  2.22 ep/s  eta 0.2 min
+   100/100  success=0.320  2.71 ep/s  eta 0.0 min
+
+ood_obs5__sac_seed1_best: 100 episodes
+  success           0.320
+  obstacle coll.    0.450
+  border coll.      0.230
+  timeout           0.000
+  rms cte           1.238 m
+  min obst clear    0.175 m
+  min border clear  0.687 m
+  min lat.  clear   1.482 m
+  control effort    8.162
+  rudder sat frac   0.006
+
+  wall clock 0.6 min
+  wrote eval_results\baselines\ood_obs5__sac_seed1_best\episodes.csv
+  wrote eval_results\baselines\ood_obs5__sac_seed1_best\summary.json
+Evaluating sb3:ppo:models/ppo_seed1/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=0.840  0.46 ep/s  eta 2.7 min
+    50/100  success=0.720  0.82 ep/s  eta 1.0 min
+    75/100  success=0.720  1.04 ep/s  eta 0.4 min
+   100/100  success=0.720  1.24 ep/s  eta 0.0 min
+
+ood_obs5__ppo_seed1_best: 100 episodes
+  success           0.720
+  obstacle coll.    0.230
+  border coll.      0.050
+  timeout           0.000
+  rms cte           1.960 m
+  min obst clear    0.335 m
+  min border clear  0.896 m
+  min lat.  clear   1.946 m
+  control effort    9.939
+  rudder sat frac   0.210
+
+  wall clock 1.3 min
+  wrote eval_results\baselines\ood_obs5__ppo_seed1_best\episodes.csv
+  wrote eval_results\baselines\ood_obs5__ppo_seed1_best\summary.json
+Evaluating sb3:sac:models/sac_seed2/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=0.520  1.34 ep/s  eta 0.9 min
+    50/100  success=0.560  2.00 ep/s  eta 0.4 min
+    75/100  success=0.573  2.47 ep/s  eta 0.2 min
+   100/100  success=0.620  2.79 ep/s  eta 0.0 min
+
+ood_obs5__sac_seed2_best: 100 episodes
+  success           0.620
+  obstacle coll.    0.320
+  border coll.      0.060
+  timeout           0.000
+  rms cte           1.301 m
+  min obst clear    0.165 m
+  min border clear  0.817 m
+  min lat.  clear   1.751 m
+  control effort    9.539
+  rudder sat frac   0.057
+
+  wall clock 0.6 min
+  wrote eval_results\baselines\ood_obs5__sac_seed2_best\episodes.csv
+  wrote eval_results\baselines\ood_obs5__sac_seed2_best\summary.json
+Evaluating sb3:ppo:models/ppo_seed2/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=0.440  1.30 ep/s  eta 1.0 min
+    50/100  success=0.540  1.44 ep/s  eta 0.6 min
+    75/100  success=0.573  1.56 ep/s  eta 0.3 min
+   100/100  success=0.610  1.80 ep/s  eta 0.0 min
+
+ood_obs5__ppo_seed2_best: 100 episodes
+  success           0.610
+  obstacle coll.    0.300
+  border coll.      0.090
+  timeout           0.000
+  rms cte           1.283 m
+  min obst clear    0.154 m
+  min border clear  0.799 m
+  min lat.  clear   1.822 m
+  control effort    3.866
+  rudder sat frac   0.023
+
+  wall clock 0.9 min
+  wrote eval_results\baselines\ood_obs5__ppo_seed2_best\episodes.csv
+  wrote eval_results\baselines\ood_obs5__ppo_seed2_best\summary.json
+Evaluating los_apf:eval_results/baselines/los_apf_best.json over 100 layouts (6 workers) ...
+    25/100  success=0.760  0.91 ep/s  eta 1.4 min
+    50/100  success=0.760  1.38 ep/s  eta 0.6 min
+    75/100  success=0.787  1.74 ep/s  eta 0.2 min
+   100/100  success=0.780  2.07 ep/s  eta 0.0 min
+
+ood_obs5__los_apf_s1: 100 episodes
+  success           0.780
+  obstacle coll.    0.190
+  border coll.      0.030
+  timeout           0.000
+  rms cte           1.887 m
+  min obst clear    0.317 m
+  min border clear  0.917 m
+  min lat.  clear   1.966 m
+  control effort    12.620
+  rudder sat frac   0.269
+
+  wall clock 0.8 min
+  wrote eval_results\baselines\ood_obs5__los_apf_s1\episodes.csv
+  wrote eval_results\baselines\ood_obs5__los_apf_s1\summary.json
+Evaluating los_apf:eval_results/baselines/los_apf_best_s2.json over 100 layouts (6 workers) ...
+    25/100  success=0.720  1.97 ep/s  eta 0.6 min
+    50/100  success=0.780  2.60 ep/s  eta 0.3 min
+    75/100  success=0.747  2.79 ep/s  eta 0.1 min
+   100/100  success=0.760  2.99 ep/s  eta 0.0 min
+
+ood_obs5__los_apf_s2: 100 episodes
+  success           0.760
+  obstacle coll.    0.190
+  border coll.      0.050
+  timeout           0.000
+  rms cte           1.649 m
+  min obst clear    0.415 m
+  min border clear  0.905 m
+  min lat.  clear   2.053 m
+  control effort    7.791
+  rudder sat frac   0.112
+
+  wall clock 0.6 min
+  wrote eval_results\baselines\ood_obs5__los_apf_s2\episodes.csv
+  wrote eval_results\baselines\ood_obs5__los_apf_s2\summary.json
+Evaluating los_apf:eval_results/baselines/los_apf_best_s3.json over 100 layouts (6 workers) ...
+    25/100  success=0.760  1.57 ep/s  eta 0.8 min
+    50/100  success=0.640  1.95 ep/s  eta 0.4 min
+    75/100  success=0.627  1.90 ep/s  eta 0.2 min
+   100/100  success=0.610  2.14 ep/s  eta 0.0 min
+
+ood_obs5__los_apf_s3: 100 episodes
+  success           0.610
+  obstacle coll.    0.320
+  border coll.      0.070
+  timeout           0.000
+  rms cte           2.145 m
+  min obst clear    0.495 m
+  min border clear  0.860 m
+  min lat.  clear   1.747 m
+  control effort    13.844
+  rudder sat frac   0.325
+
+  wall clock 0.8 min
+  wrote eval_results\baselines\ood_obs5__los_apf_s3\episodes.csv
+  wrote eval_results\baselines\ood_obs5__los_apf_s3\summary.json
+Evaluating sb3:sac:models/sac_model_1M.zip over 100 layouts (6 workers) ...
+    25/100  success=1.000  0.71 ep/s  eta 1.7 min
+    50/100  success=0.940  1.16 ep/s  eta 0.7 min
+    75/100  success=0.827  1.45 ep/s  eta 0.3 min
+   100/100  success=0.790  1.75 ep/s  eta 0.0 min
+
+ood_curve__sac_published: 100 episodes
+  success           0.790
+  obstacle coll.    0.170
+  border coll.      0.040
+  timeout           0.000
+  rms cte           0.792 m
+  min obst clear    0.262 m
+  min border clear  0.920 m
+  min lat.  clear   2.344 m
+  control effort    8.968
+  rudder sat frac   0.094
+
+  wall clock 1.0 min
+  wrote eval_results\baselines\ood_curve__sac_published\episodes.csv
+  wrote eval_results\baselines\ood_curve__sac_published\summary.json
+Evaluating sb3:sac:models/sac_seed0/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=0.920  1.28 ep/s  eta 1.0 min
+    50/100  success=0.920  1.98 ep/s  eta 0.4 min
+    75/100  success=0.840  2.52 ep/s  eta 0.2 min
+   100/100  success=0.790  2.88 ep/s  eta 0.0 min
+
+ood_curve__sac_seed0_best: 100 episodes
+  success           0.790
+  obstacle coll.    0.080
+  border coll.      0.130
+  timeout           0.000
+  rms cte           1.105 m
+  min obst clear    0.476 m
+  min border clear  0.793 m
+  min lat.  clear   1.864 m
+  control effort    7.262
+  rudder sat frac   0.010
+
+  wall clock 0.6 min
+  wrote eval_results\baselines\ood_curve__sac_seed0_best\episodes.csv
+  wrote eval_results\baselines\ood_curve__sac_seed0_best\summary.json
+Evaluating sb3:ppo:models/ppo_seed0/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=1.000  1.35 ep/s  eta 0.9 min
+    50/100  success=0.960  2.03 ep/s  eta 0.4 min
+    75/100  success=0.933  2.36 ep/s  eta 0.2 min
+   100/100  success=0.890  2.88 ep/s  eta 0.0 min
+
+ood_curve__ppo_seed0_best: 100 episodes
+  success           0.890
+  obstacle coll.    0.110
+  border coll.      0.000
+  timeout           0.000
+  rms cte           1.230 m
+  min obst clear    0.541 m
+  min border clear  0.973 m
+  min lat.  clear   2.583 m
+  control effort    5.940
+  rudder sat frac   0.107
+
+  wall clock 0.6 min
+  wrote eval_results\baselines\ood_curve__ppo_seed0_best\episodes.csv
+  wrote eval_results\baselines\ood_curve__ppo_seed0_best\summary.json
+Evaluating sb3:sac:models/sac_seed1/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=1.000  1.10 ep/s  eta 1.1 min
+    50/100  success=0.860  1.63 ep/s  eta 0.5 min
+    75/100  success=0.787  1.72 ep/s  eta 0.2 min
+   100/100  success=0.760  1.86 ep/s  eta 0.0 min
+
+ood_curve__sac_seed1_best: 100 episodes
+  success           0.760
+  obstacle coll.    0.160
+  border coll.      0.080
+  timeout           0.000
+  rms cte           0.818 m
+  min obst clear    0.266 m
+  min border clear  0.851 m
+  min lat.  clear   2.174 m
+  control effort    6.007
+  rudder sat frac   0.004
+
+  wall clock 0.9 min
+  wrote eval_results\baselines\ood_curve__sac_seed1_best\episodes.csv
+  wrote eval_results\baselines\ood_curve__sac_seed1_best\summary.json
+Evaluating sb3:ppo:models/ppo_seed1/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=0.920  0.74 ep/s  eta 1.7 min
+    50/100  success=0.860  1.30 ep/s  eta 0.6 min
+    75/100  success=0.813  1.61 ep/s  eta 0.3 min
+   100/100  success=0.800  1.94 ep/s  eta 0.0 min
+
+ood_curve__ppo_seed1_best: 100 episodes
+  success           0.800
+  obstacle coll.    0.190
+  border coll.      0.010
+  timeout           0.000
+  rms cte           1.583 m
+  min obst clear    0.558 m
+  min border clear  0.963 m
+  min lat.  clear   2.280 m
+  control effort    8.922
+  rudder sat frac   0.180
+
+  wall clock 0.9 min
+  wrote eval_results\baselines\ood_curve__ppo_seed1_best\episodes.csv
+  wrote eval_results\baselines\ood_curve__ppo_seed1_best\summary.json
+Evaluating sb3:sac:models/sac_seed2/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=1.000  1.28 ep/s  eta 1.0 min
+    50/100  success=0.960  1.99 ep/s  eta 0.4 min
+    75/100  success=0.907  2.41 ep/s  eta 0.2 min
+   100/100  success=0.840  2.78 ep/s  eta 0.0 min
+
+ood_curve__sac_seed2_best: 100 episodes
+  success           0.840
+  obstacle coll.    0.130
+  border coll.      0.030
+  timeout           0.000
+  rms cte           0.944 m
+  min obst clear    0.285 m
+  min border clear  0.927 m
+  min lat.  clear   2.386 m
+  control effort    7.319
+  rudder sat frac   0.024
+
+  wall clock 0.6 min
+  wrote eval_results\baselines\ood_curve__sac_seed2_best\episodes.csv
+  wrote eval_results\baselines\ood_curve__sac_seed2_best\summary.json
+Evaluating sb3:ppo:models/ppo_seed2/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=1.000  1.40 ep/s  eta 0.9 min
+    50/100  success=0.960  2.15 ep/s  eta 0.4 min
+    75/100  success=0.893  2.46 ep/s  eta 0.2 min
+   100/100  success=0.840  2.88 ep/s  eta 0.0 min
+
+ood_curve__ppo_seed2_best: 100 episodes
+  success           0.840
+  obstacle coll.    0.090
+  border coll.      0.070
+  timeout           0.000
+  rms cte           1.195 m
+  min obst clear    0.388 m
+  min border clear  0.891 m
+  min lat.  clear   2.169 m
+  control effort    3.000
+  rudder sat frac   0.037
+
+  wall clock 0.6 min
+  wrote eval_results\baselines\ood_curve__ppo_seed2_best\episodes.csv
+  wrote eval_results\baselines\ood_curve__ppo_seed2_best\summary.json
+Evaluating los_apf:eval_results/baselines/los_apf_best.json over 100 layouts (6 workers) ...
+    25/100  success=1.000  1.57 ep/s  eta 0.8 min
+    50/100  success=0.980  1.80 ep/s  eta 0.5 min
+    75/100  success=0.973  1.90 ep/s  eta 0.2 min
+   100/100  success=0.940  2.20 ep/s  eta 0.0 min
+
+ood_curve__los_apf_s1: 100 episodes
+  success           0.940
+  obstacle coll.    0.060
+  border coll.      0.000
+  timeout           0.000
+  rms cte           1.162 m
+  min obst clear    0.546 m
+  min border clear  0.976 m
+  min lat.  clear   2.445 m
+  control effort    7.209
+  rudder sat frac   0.117
+
+  wall clock 0.8 min
+  wrote eval_results\baselines\ood_curve__los_apf_s1\episodes.csv
+  wrote eval_results\baselines\ood_curve__los_apf_s1\summary.json
+Evaluating los_apf:eval_results/baselines/los_apf_best_s2.json over 100 layouts (6 workers) ...
+    25/100  success=1.000  1.73 ep/s  eta 0.7 min
+    50/100  success=0.940  2.28 ep/s  eta 0.4 min
+    75/100  success=0.920  2.68 ep/s  eta 0.2 min
+   100/100  success=0.880  3.11 ep/s  eta 0.0 min
+
+ood_curve__los_apf_s2: 100 episodes
+  success           0.880
+  obstacle coll.    0.120
+  border coll.      0.000
+  timeout           0.000
+  rms cte           1.095 m
+  min obst clear    0.526 m
+  min border clear  0.965 m
+  min lat.  clear   2.490 m
+  control effort    5.084
+  rudder sat frac   0.054
+
+  wall clock 0.5 min
+  wrote eval_results\baselines\ood_curve__los_apf_s2\episodes.csv
+  wrote eval_results\baselines\ood_curve__los_apf_s2\summary.json
+Evaluating los_apf:eval_results/baselines/los_apf_best_s3.json over 100 layouts (6 workers) ...
+    25/100  success=1.000  2.95 ep/s  eta 0.4 min
+    50/100  success=0.960  3.47 ep/s  eta 0.2 min
+    75/100  success=0.947  3.46 ep/s  eta 0.1 min
+   100/100  success=0.950  3.65 ep/s  eta 0.0 min
+
+ood_curve__los_apf_s3: 100 episodes
+  success           0.950
+  obstacle coll.    0.040
+  border coll.      0.010
+  timeout           0.000
+  rms cte           1.429 m
+  min obst clear    0.825 m
+  min border clear  0.945 m
+  min lat.  clear   2.311 m
+  control effort    7.750
+  rudder sat frac   0.130
+
+  wall clock 0.5 min
+  wrote eval_results\baselines\ood_curve__los_apf_s3\episodes.csv
+  wrote eval_results\baselines\ood_curve__los_apf_s3\summary.json
+Evaluating sb3:sac:models/sac_model_1M.zip over 100 layouts (6 workers) ...
+    25/100  success=0.440  1.05 ep/s  eta 1.2 min
+    50/100  success=0.480  1.83 ep/s  eta 0.5 min
+    75/100  success=0.440  2.05 ep/s  eta 0.2 min
+   100/100  success=0.430  2.54 ep/s  eta 0.0 min
+
+ood_curve_obs5__sac_published: 100 episodes
+  success           0.430
+  obstacle coll.    0.520
+  border coll.      0.050
+  timeout           0.000
+  rms cte           1.158 m
+  min obst clear    0.113 m
+  min border clear  0.836 m
+  min lat.  clear   1.788 m
+  control effort    10.601
+  rudder sat frac   0.213
+
+  wall clock 0.7 min
+  wrote eval_results\baselines\ood_curve_obs5__sac_published\episodes.csv
+  wrote eval_results\baselines\ood_curve_obs5__sac_published\summary.json
+Evaluating sb3:sac:models/sac_seed0/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=0.560  0.70 ep/s  eta 1.8 min
+    50/100  success=0.580  0.98 ep/s  eta 0.8 min
+    75/100  success=0.560  1.15 ep/s  eta 0.4 min
+   100/100  success=0.570  1.39 ep/s  eta 0.0 min
+
+ood_curve_obs5__sac_seed0_best: 100 episodes
+  success           0.570
+  obstacle coll.    0.100
+  border coll.      0.330
+  timeout           0.000
+  rms cte           1.667 m
+  min obst clear    0.502 m
+  min border clear  0.583 m
+  min lat.  clear   1.039 m
+  control effort    9.620
+  rudder sat frac   0.023
+
+  wall clock 1.2 min
+  wrote eval_results\baselines\ood_curve_obs5__sac_seed0_best\episodes.csv
+  wrote eval_results\baselines\ood_curve_obs5__sac_seed0_best\summary.json
+Evaluating sb3:ppo:models/ppo_seed0/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=0.640  0.89 ep/s  eta 1.4 min
+    50/100  success=0.740  1.36 ep/s  eta 0.6 min
+    75/100  success=0.693  1.77 ep/s  eta 0.2 min
+   100/100  success=0.690  2.13 ep/s  eta 0.0 min
+
+ood_curve_obs5__ppo_seed0_best: 100 episodes
+  success           0.690
+  obstacle coll.    0.190
+  border coll.      0.120
+  timeout           0.000
+  rms cte           1.807 m
+  min obst clear    0.355 m
+  min border clear  0.817 m
+  min lat.  clear   1.871 m
+  control effort    7.779
+  rudder sat frac   0.140
+
+  wall clock 0.8 min
+  wrote eval_results\baselines\ood_curve_obs5__ppo_seed0_best\episodes.csv
+  wrote eval_results\baselines\ood_curve_obs5__ppo_seed0_best\summary.json
+Evaluating sb3:sac:models/sac_seed1/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=0.440  1.05 ep/s  eta 1.2 min
+    50/100  success=0.340  1.68 ep/s  eta 0.5 min
+    75/100  success=0.373  2.03 ep/s  eta 0.2 min
+   100/100  success=0.340  2.35 ep/s  eta 0.0 min
+
+ood_curve_obs5__sac_seed1_best: 100 episodes
+  success           0.340
+  obstacle coll.    0.500
+  border coll.      0.160
+  timeout           0.000
+  rms cte           1.269 m
+  min obst clear    0.105 m
+  min border clear  0.687 m
+  min lat.  clear   1.478 m
+  control effort    8.244
+  rudder sat frac   0.012
+
+  wall clock 0.7 min
+  wrote eval_results\baselines\ood_curve_obs5__sac_seed1_best\episodes.csv
+  wrote eval_results\baselines\ood_curve_obs5__sac_seed1_best\summary.json
+Evaluating sb3:ppo:models/ppo_seed1/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=0.640  0.56 ep/s  eta 2.2 min
+    50/100  success=0.640  0.88 ep/s  eta 0.9 min
+    75/100  success=0.627  1.07 ep/s  eta 0.4 min
+   100/100  success=0.650  1.31 ep/s  eta 0.0 min
+
+ood_curve_obs5__ppo_seed1_best: 100 episodes
+  success           0.650
+  obstacle coll.    0.250
+  border coll.      0.100
+  timeout           0.000
+  rms cte           1.869 m
+  min obst clear    0.351 m
+  min border clear  0.830 m
+  min lat.  clear   1.894 m
+  control effort    9.220
+  rudder sat frac   0.187
+
+  wall clock 1.3 min
+  wrote eval_results\baselines\ood_curve_obs5__ppo_seed1_best\episodes.csv
+  wrote eval_results\baselines\ood_curve_obs5__ppo_seed1_best\summary.json
+Evaluating sb3:sac:models/sac_seed2/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=0.560  1.11 ep/s  eta 1.1 min
+    50/100  success=0.560  1.62 ep/s  eta 0.5 min
+    75/100  success=0.520  1.95 ep/s  eta 0.2 min
+   100/100  success=0.550  2.35 ep/s  eta 0.0 min
+
+ood_curve_obs5__sac_seed2_best: 100 episodes
+  success           0.550
+  obstacle coll.    0.340
+  border coll.      0.110
+  timeout           0.000
+  rms cte           1.231 m
+  min obst clear    0.202 m
+  min border clear  0.823 m
+  min lat.  clear   1.875 m
+  control effort    8.592
+  rudder sat frac   0.038
+
+  wall clock 0.7 min
+  wrote eval_results\baselines\ood_curve_obs5__sac_seed2_best\episodes.csv
+  wrote eval_results\baselines\ood_curve_obs5__sac_seed2_best\summary.json
+Evaluating sb3:ppo:models/ppo_seed2/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=0.600  1.24 ep/s  eta 1.0 min
+    50/100  success=0.520  1.79 ep/s  eta 0.5 min
+    75/100  success=0.520  2.17 ep/s  eta 0.2 min
+   100/100  success=0.550  2.37 ep/s  eta 0.0 min
+
+ood_curve_obs5__ppo_seed2_best: 100 episodes
+  success           0.550
+  obstacle coll.    0.280
+  border coll.      0.170
+  timeout           0.000
+  rms cte           1.334 m
+  min obst clear    0.182 m
+  min border clear  0.767 m
+  min lat.  clear   1.664 m
+  control effort    4.074
+  rudder sat frac   0.036
+
+  wall clock 0.7 min
+  wrote eval_results\baselines\ood_curve_obs5__ppo_seed2_best\episodes.csv
+  wrote eval_results\baselines\ood_curve_obs5__ppo_seed2_best\summary.json
+Evaluating los_apf:eval_results/baselines/los_apf_best.json over 100 layouts (6 workers) ...
+    25/100  success=0.760  0.81 ep/s  eta 1.5 min
+    50/100  success=0.720  1.08 ep/s  eta 0.8 min
+    75/100  success=0.680  1.24 ep/s  eta 0.3 min
+   100/100  success=0.670  1.50 ep/s  eta 0.0 min
+
+ood_curve_obs5__los_apf_s1: 100 episodes
+  success           0.670
+  obstacle coll.    0.260
+  border coll.      0.070
+  timeout           0.000
+  rms cte           1.791 m
+  min obst clear    0.317 m
+  min border clear  0.894 m
+  min lat.  clear   1.956 m
+  control effort    12.293
+  rudder sat frac   0.297
+
+  wall clock 1.1 min
+  wrote eval_results\baselines\ood_curve_obs5__los_apf_s1\episodes.csv
+  wrote eval_results\baselines\ood_curve_obs5__los_apf_s1\summary.json
+Evaluating los_apf:eval_results/baselines/los_apf_best_s2.json over 100 layouts (6 workers) ...
+    25/100  success=0.840  1.39 ep/s  eta 0.9 min
+    50/100  success=0.720  1.90 ep/s  eta 0.4 min
+    75/100  success=0.693  2.11 ep/s  eta 0.2 min
+   100/100  success=0.720  2.60 ep/s  eta 0.0 min
+
+ood_curve_obs5__los_apf_s2: 100 episodes
+  success           0.720
+  obstacle coll.    0.250
+  border coll.      0.030
+  timeout           0.000
+  rms cte           1.540 m
+  min obst clear    0.412 m
+  min border clear  0.894 m
+  min lat.  clear   2.042 m
+  control effort    7.115
+  rudder sat frac   0.108
+
+  wall clock 0.6 min
+  wrote eval_results\baselines\ood_curve_obs5__los_apf_s2\episodes.csv
+  wrote eval_results\baselines\ood_curve_obs5__los_apf_s2\summary.json
+Evaluating los_apf:eval_results/baselines/los_apf_best_s3.json over 100 layouts (6 workers) ...
+    25/100  success=0.680  1.26 ep/s  eta 1.0 min
+    50/100  success=0.720  1.61 ep/s  eta 0.5 min
+    75/100  success=0.667  1.87 ep/s  eta 0.2 min
+   100/100  success=0.680  2.14 ep/s  eta 0.0 min
+
+ood_curve_obs5__los_apf_s3: 100 episodes
+  success           0.680
+  obstacle coll.    0.250
+  border coll.      0.070
+  timeout           0.000
+  rms cte           2.100 m
+  min obst clear    0.526 m
+  min border clear  0.881 m
+  min lat.  clear   1.818 m
+  control effort    13.305
+  rudder sat frac   0.312
+
+  wall clock 0.8 min
+  wrote eval_results\baselines\ood_curve_obs5__los_apf_s3\episodes.csv
+  wrote eval_results\baselines\ood_curve_obs5__los_apf_s3\summary.json

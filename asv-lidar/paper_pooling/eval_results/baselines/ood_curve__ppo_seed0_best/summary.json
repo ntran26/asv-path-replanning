@@ -1,0 +1,175 @@
+{
+  "method": "ood_curve__ppo_seed0_best",
+  "n_episodes": 100,
+  "deterministic": true,
+  "bootstrap_resamples": 10000,
+  "bootstrap_stratified_by": "obstacle_count",
+  "metrics": {
+    "success": {
+      "n_finite": 100,
+      "mean": 0.89,
+      "median": 1.0,
+      "iqm": 1.0,
+      "std": 0.31288975694324034
+    },
+    "obstacle_collision": {
+      "n_finite": 100,
+      "mean": 0.11,
+      "median": 0.0,
+      "iqm": 0.0,
+      "std": 0.31288975694324034
+    },
+    "border_collision": {
+      "n_finite": 100,
+      "mean": 0.0,
+      "median": 0.0,
+      "iqm": 0.0,
+      "std": 0.0
+    },
+    "timeout": {
+      "n_finite": 100,
+      "mean": 0.0,
+      "median": 0.0,
+      "iqm": 0.0,
+      "std": 0.0
+    },
+    "rms_cte": {
+      "n_finite": 100,
+      "mean": 1.2303587830609042,
+      "median": 1.1513010492193005,
+      "iqm": 1.131421375851608,
+      "std": 0.6798587674817242
+    },
+    "mean_cte": {
+      "n_finite": 100,
+      "mean": 1.0014489971244733,
+      "median": 0.9189770608043759,
+      "iqm": 0.9226281280890131,
+      "std": 0.5631930019581439
+    },
+    "max_cte": {
+      "n_finite": 100,
+      "mean": 2.0548920805752275,
+      "median": 1.817971408367157,
+      "iqm": 1.8654105067253113,
+      "std": 1.0613900999081507
+    },
+    "min_obstacle_clearance": {
+      "n_finite": 80,
+      "mean": 0.5409011453601742,
+      "median": 0.43255844900730234,
+      "iqm": 0.44356439454757374,
+      "std": 0.5023169943862396
+    },
+    "min_border_clearance": {
+      "n_finite": 100,
+      "mean": 0.9733008413949557,
+      "median": 0.9888681035262143,
+      "iqm": 0.9888662749549932,
+      "std": 0.08818279070305901
+    },
+    "min_lateral_border_clearance": {
+      "n_finite": 100,
+      "mean": 2.583056586212134,
+      "median": 2.609242293186131,
+      "iqm": 2.591557397846232,
+      "std": 0.789018621391385
+    },
+    "path_completion_steps": {
+      "n_finite": 100,
+      "mean": 211.78,
+      "median": 219.5,
+      "iqm": 218.57692307692307,
+      "std": 50.399718253180744
+    },
+    "path_completion_time_s": {
+      "n_finite": 100,
+      "mean": 21.178,
+      "median": 21.950000000000003,
+      "iqm": 21.85769230769231,
+      "std": 5.039971825318075
+    },
+    "mean_speed": {
+      "n_finite": 100,
+      "mean": 0.8555653278228482,
+      "median": 0.8475524427664511,
+      "iqm": 0.8561637120057958,
+      "std": 0.11906398187598081
+    },
+    "control_effort": {
+      "n_finite": 100,
+      "mean": 5.939567935751512,
+      "median": 5.763204769336019,
+      "iqm": 5.668926961537976,
+      "std": 3.530048987850371
+    },
+    "mean_abs_rudder_rate": {
+      "n_finite": 100,
+      "mean": 12.74764596967177,
+      "median": 11.975523173695093,
+      "iqm": 12.31896414387974,
+      "std": 3.9894744184949253
+    },
+    "rudder_saturation_fraction": {
+      "n_finite": 100,
+      "mean": 0.10672441724587495,
+      "median": 0.09849756769555297,
+      "iqm": 0.09388554974289023,
+      "std": 0.09719553173866313
+    },
+    "path_efficiency": {
+      "n_finite": 100,
+      "mean": 0.9051123332902972,
+      "median": 0.9578911614485841,
+      "iqm": 0.9616885664196693,
+      "std": 0.20541379393797074
+    }
+  },
+  "by_obstacle_count": {
+    "obs_0": {
+      "n": 20,
+      "success_rate": 1.0,
+      "obstacle_collision_rate": 0.0,
+      "border_collision_rate": 0.0,
+      "timeout_rate": 0.0,
+      "mean_rms_cte": 0.7189246130078237
+    },
+    "obs_1": {
+      "n": 20,
+      "success_rate": 0.95,
+      "obstacle_collision_rate": 0.05,
+      "border_collision_rate": 0.0,
+      "timeout_rate": 0.0,
+      "mean_rms_cte": 0.984290802324167
+    },
+    "obs_2": {
+      "n": 20,
+      "success_rate": 0.95,
+      "obstacle_collision_rate": 0.05,
+      "border_collision_rate": 0.0,
+      "timeout_rate": 0.0,
+      "mean_rms_cte": 1.5143872578569277
+    },
+    "obs_3": {
+      "n": 20,
+      "success_rate": 0.8,
+      "obstacle_collision_rate": 0.2,
+      "border_collision_rate": 0.0,
+      "timeout_rate": 0.0,
+      "mean_rms_cte": 1.4628171961307836
+    },
+    "obs_4": {
+      "n": 20,
+      "success_rate": 0.75,
+      "obstacle_collision_rate": 0.25,
+      "border_collision_rate": 0.0,
+      "timeout_rate": 0.0,
+      "mean_rms_cte": 1.471374045984819
+    }
+  },
+  "wall_clock_seconds": 34.779764890670776,
+  "controller": "sb3:ppo:models/ppo_seed0/best_model.zip",
+  "layouts": "eval_layouts/ood_curve.json",
+  "n_workers": 6,
+  "predict_deterministic": true
+}

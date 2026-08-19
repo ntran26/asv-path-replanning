@@ -1,0 +1,74 @@
+Evaluating sb3:ppo:models/ppo_seed1/final_model.zip over 500 layouts (3 workers) ...
+    25/500  success=0.000  1.22 ep/s  eta 6.5 min
+    50/500  success=0.000  1.64 ep/s  eta 4.6 min
+    75/500  success=0.000  1.79 ep/s  eta 4.0 min
+   100/500  success=0.000  1.96 ep/s  eta 3.4 min
+   125/500  success=0.000  1.90 ep/s  eta 3.3 min
+   150/500  success=0.000  1.73 ep/s  eta 3.4 min
+   175/500  success=0.000  1.69 ep/s  eta 3.2 min
+   200/500  success=0.000  1.69 ep/s  eta 3.0 min
+   225/500  success=0.000  1.74 ep/s  eta 2.6 min
+   250/500  success=0.000  1.78 ep/s  eta 2.3 min
+   275/500  success=0.000  1.84 ep/s  eta 2.0 min
+   300/500  success=0.000  1.85 ep/s  eta 1.8 min
+   325/500  success=0.000  1.83 ep/s  eta 1.6 min
+   350/500  success=0.000  1.85 ep/s  eta 1.4 min
+   375/500  success=0.000  1.88 ep/s  eta 1.1 min
+   400/500  success=0.000  1.86 ep/s  eta 0.9 min
+   425/500  success=0.000  1.80 ep/s  eta 0.7 min
+   450/500  success=0.000  1.74 ep/s  eta 0.5 min
+   475/500  success=0.000  1.70 ep/s  eta 0.2 min
+   500/500  success=0.000  1.69 ep/s  eta 0.0 min
+
+ppo_seed1_final: 500 episodes
+  success           0.000
+  obstacle coll.    0.242
+  border coll.      0.704
+  timeout           0.054
+  rms cte           2.325 m
+  min obst clear    1.881 m
+  min border clear  0.242 m
+  min lat.  clear   0.453 m
+  control effort    22.482
+  rudder sat frac   0.811
+
+  wall clock 4.9 min
+  wrote eval_results\baselines\ppo_seed1_final\episodes.csv
+  wrote eval_results\baselines\ppo_seed1_final\summary.json
+Evaluating sb3:ppo:models/ppo_seed1/best_model.zip over 500 layouts (3 workers) ...
+    25/500  success=0.960  0.95 ep/s  eta 8.4 min
+    50/500  success=0.980  1.29 ep/s  eta 5.8 min
+    75/500  success=0.973  1.49 ep/s  eta 4.8 min
+   100/500  success=0.980  1.70 ep/s  eta 3.9 min
+   125/500  success=0.960  1.81 ep/s  eta 3.5 min
+   150/500  success=0.933  1.88 ep/s  eta 3.1 min
+   175/500  success=0.909  1.87 ep/s  eta 2.9 min
+   200/500  success=0.910  1.86 ep/s  eta 2.7 min
+   225/500  success=0.920  1.65 ep/s  eta 2.8 min
+   250/500  success=0.924  1.59 ep/s  eta 2.6 min
+   275/500  success=0.931  1.63 ep/s  eta 2.3 min
+   300/500  success=0.917  1.67 ep/s  eta 2.0 min
+   325/500  success=0.914  1.69 ep/s  eta 1.7 min
+   350/500  success=0.914  1.71 ep/s  eta 1.5 min
+   375/500  success=0.915  1.69 ep/s  eta 1.2 min
+   400/500  success=0.917  1.69 ep/s  eta 1.0 min
+   425/500  success=0.913  1.68 ep/s  eta 0.7 min
+   450/500  success=0.913  1.65 ep/s  eta 0.5 min
+   475/500  success=0.907  1.63 ep/s  eta 0.3 min
+   500/500  success=0.906  1.59 ep/s  eta 0.0 min
+
+ppo_seed1_best: 500 episodes
+  success           0.906
+  obstacle coll.    0.082
+  border coll.      0.012
+  timeout           0.000
+  rms cte           1.724 m
+  min obst clear    0.817 m
+  min border clear  0.950 m
+  min lat.  clear   2.168 m
+  control effort    10.463
+  rudder sat frac   0.216
+
+  wall clock 5.2 min
+  wrote eval_results\baselines\ppo_seed1_best\episodes.csv
+  wrote eval_results\baselines\ppo_seed1_best\summary.json

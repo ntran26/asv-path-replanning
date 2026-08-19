@@ -1,0 +1,37 @@
+Evaluating sb3:sac:models/sac_model_1M.zip over 500 layouts (1 worker) ...
+    25/500  success=1.000  0.25 ep/s  eta 31.3 min
+    50/500  success=1.000  0.32 ep/s  eta 23.2 min
+    75/500  success=1.000  0.40 ep/s  eta 17.7 min
+   100/500  success=1.000  0.43 ep/s  eta 15.5 min
+   125/500  success=0.992  0.35 ep/s  eta 17.6 min
+   150/500  success=0.993  0.36 ep/s  eta 16.3 min
+   175/500  success=0.989  0.38 ep/s  eta 14.4 min
+   200/500  success=0.980  0.36 ep/s  eta 13.9 min
+   225/500  success=0.982  0.37 ep/s  eta 12.5 min
+   250/500  success=0.976  0.38 ep/s  eta 11.1 min
+   275/500  success=0.975  0.38 ep/s  eta 9.8 min
+   300/500  success=0.970  0.39 ep/s  eta 8.5 min
+   325/500  success=0.966  0.40 ep/s  eta 7.4 min
+   350/500  success=0.963  0.38 ep/s  eta 6.6 min
+   375/500  success=0.965  0.36 ep/s  eta 5.8 min
+   400/500  success=0.965  0.34 ep/s  eta 5.0 min
+   425/500  success=0.962  0.32 ep/s  eta 3.9 min
+   450/500  success=0.960  0.32 ep/s  eta 2.6 min
+   475/500  success=0.949  0.32 ep/s  eta 1.3 min
+   500/500  success=0.950  0.31 ep/s  eta 0.0 min
+
+sac_1M: 500 episodes
+  success           0.950
+  obstacle coll.    0.038
+  border coll.      0.012
+  timeout           0.000
+  rms cte           0.831 m
+  min obst clear    0.241 m
+  min border clear  0.947 m
+  min lat.  clear   2.418 m
+  control effort    9.496
+  rudder sat frac   0.098
+
+  wall clock 27.2 min
+  wrote eval_results\baselines\sac_1M\episodes.csv
+  wrote eval_results\baselines\sac_1M\summary.json

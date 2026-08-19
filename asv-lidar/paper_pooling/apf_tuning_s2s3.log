@@ -1,0 +1,150 @@
+Random search: 250 configurations x 100 layouts = 25,000 episodes
+  layouts : eval_layouts\tune_layouts_v1.json
+  workers : 3
+  seed    : 20240819
+  config 0 is the hand-chosen default
+
+     500/25000 episodes |   4 configs done | best success 0.750 | 3.2 ep/s | eta 128 min
+    1000/25000 episodes |  10 configs done | best success 0.750 | 3.7 ep/s | eta 108 min
+    1500/25000 episodes |  15 configs done | best success 0.750 | 3.8 ep/s | eta 104 min
+    2000/25000 episodes |  19 configs done | best success 0.750 | 3.9 ep/s | eta 99 min
+    2500/25000 episodes |  24 configs done | best success 0.850 | 3.8 ep/s | eta 98 min
+    3000/25000 episodes |  29 configs done | best success 0.850 | 3.9 ep/s | eta 94 min
+    3500/25000 episodes |  34 configs done | best success 0.850 | 3.9 ep/s | eta 91 min
+    4000/25000 episodes |  40 configs done | best success 0.850 | 3.9 ep/s | eta 89 min
+    4500/25000 episodes |  44 configs done | best success 0.850 | 3.9 ep/s | eta 87 min
+    5000/25000 episodes |  49 configs done | best success 0.850 | 3.9 ep/s | eta 85 min
+    5500/25000 episodes |  54 configs done | best success 0.860 | 3.8 ep/s | eta 85 min
+    6000/25000 episodes |  59 configs done | best success 0.860 | 3.9 ep/s | eta 82 min
+    6500/25000 episodes |  65 configs done | best success 0.860 | 3.8 ep/s | eta 81 min
+    7000/25000 episodes |  70 configs done | best success 0.910 | 3.8 ep/s | eta 79 min
+    7500/25000 episodes |  74 configs done | best success 0.910 | 3.8 ep/s | eta 78 min
+    8000/25000 episodes |  80 configs done | best success 0.910 | 3.8 ep/s | eta 75 min
+    8500/25000 episodes |  84 configs done | best success 0.910 | 3.8 ep/s | eta 73 min
+    9000/25000 episodes |  89 configs done | best success 0.910 | 3.8 ep/s | eta 70 min
+    9500/25000 episodes |  94 configs done | best success 0.910 | 3.8 ep/s | eta 68 min
+   10000/25000 episodes |  99 configs done | best success 0.910 | 3.8 ep/s | eta 66 min
+   10500/25000 episodes | 104 configs done | best success 0.910 | 3.8 ep/s | eta 64 min
+   11000/25000 episodes | 110 configs done | best success 0.910 | 3.8 ep/s | eta 61 min
+   11500/25000 episodes | 114 configs done | best success 0.910 | 3.8 ep/s | eta 60 min
+   12000/25000 episodes | 119 configs done | best success 0.910 | 3.8 ep/s | eta 58 min
+   12500/25000 episodes | 124 configs done | best success 0.910 | 3.8 ep/s | eta 55 min
+   13000/25000 episodes | 129 configs done | best success 0.910 | 3.8 ep/s | eta 53 min
+   13500/25000 episodes | 134 configs done | best success 0.910 | 3.8 ep/s | eta 51 min
+   14000/25000 episodes | 140 configs done | best success 0.910 | 3.8 ep/s | eta 48 min
+   14500/25000 episodes | 145 configs done | best success 0.910 | 3.8 ep/s | eta 46 min
+   15000/25000 episodes | 150 configs done | best success 0.910 | 3.8 ep/s | eta 44 min
+   15500/25000 episodes | 155 configs done | best success 0.910 | 3.8 ep/s | eta 42 min
+   16000/25000 episodes | 159 configs done | best success 0.980 | 3.8 ep/s | eta 40 min
+   16500/25000 episodes | 165 configs done | best success 0.980 | 3.8 ep/s | eta 38 min
+   17000/25000 episodes | 170 configs done | best success 0.980 | 3.7 ep/s | eta 36 min
+   17500/25000 episodes | 174 configs done | best success 0.980 | 3.8 ep/s | eta 33 min
+   18000/25000 episodes | 179 configs done | best success 0.980 | 3.7 ep/s | eta 32 min
+   18500/25000 episodes | 184 configs done | best success 0.980 | 3.5 ep/s | eta 31 min
+   19000/25000 episodes | 190 configs done | best success 0.980 | 3.3 ep/s | eta 30 min
+   19500/25000 episodes | 195 configs done | best success 0.980 | 3.1 ep/s | eta 30 min
+   20000/25000 episodes | 199 configs done | best success 0.980 | 3.0 ep/s | eta 28 min
+   20500/25000 episodes | 204 configs done | best success 0.980 | 3.0 ep/s | eta 25 min
+   21000/25000 episodes | 209 configs done | best success 0.980 | 2.9 ep/s | eta 23 min
+   21500/25000 episodes | 214 configs done | best success 0.980 | 2.9 ep/s | eta 20 min
+   22000/25000 episodes | 220 configs done | best success 0.980 | 2.9 ep/s | eta 17 min
+   22500/25000 episodes | 224 configs done | best success 0.980 | 2.9 ep/s | eta 14 min
+   23000/25000 episodes | 229 configs done | best success 0.980 | 2.9 ep/s | eta 11 min
+   23500/25000 episodes | 235 configs done | best success 0.980 | 2.9 ep/s | eta 9 min
+   24000/25000 episodes | 239 configs done | best success 0.980 | 2.9 ep/s | eta 6 min
+   24500/25000 episodes | 244 configs done | best success 0.980 | 2.9 ep/s | eta 3 min
+   25000/25000 episodes | 250 configs done | best success 0.980 | 2.9 ep/s | eta 0 min
+
+Top 10 configurations by success rate:
+    id   succ  rmsCTE  rmsSucc   obst   bord    tmo  effort
+   158  0.980   1.216    1.209  0.000  0.020  0.000   5.093
+    68  0.910   1.545    1.542  0.030  0.060  0.000   8.746
+   113  0.900   1.083    1.103  0.100  0.000  0.000   4.601
+   205  0.880   1.222    1.230  0.090  0.030  0.000  10.385
+   114  0.880   1.339    1.278  0.100  0.020  0.000   8.963
+   146  0.870   1.617    1.649  0.050  0.080  0.000   5.359
+   179  0.860   1.180    1.203  0.120  0.020  0.000   4.891
+    51  0.860   1.580    1.649  0.120  0.020  0.000   6.783
+    21  0.850   1.333    1.160  0.030  0.120  0.000   8.031
+    32  0.850   1.343    1.451  0.140  0.010  0.000   3.627
+
+  default config : success 0.750, rms cte 0.944
+  selected config: id 158, success 0.980, rms cte 1.216
+
+  wrote eval_results/baselines/apf_tuning_results_s2.csv
+  wrote eval_results/baselines/los_apf_best_s2.json
+Random search: 250 configurations x 100 layouts = 25,000 episodes
+  layouts : eval_layouts\tune_layouts_v1.json
+  workers : 3
+  seed    : 20240820
+  config 0 is the hand-chosen default
+
+     500/25000 episodes |   4 configs done | best success 0.930 | 2.3 ep/s | eta 174 min
+    1000/25000 episodes |   9 configs done | best success 0.930 | 2.4 ep/s | eta 164 min
+    1500/25000 episodes |  14 configs done | best success 0.930 | 2.4 ep/s | eta 162 min
+    2000/25000 episodes |  20 configs done | best success 0.930 | 2.5 ep/s | eta 151 min
+    2500/25000 episodes |  25 configs done | best success 0.930 | 2.6 ep/s | eta 143 min
+    3000/25000 episodes |  29 configs done | best success 0.930 | 2.7 ep/s | eta 137 min
+    3500/25000 episodes |  34 configs done | best success 0.930 | 2.7 ep/s | eta 133 min
+    4000/25000 episodes |  39 configs done | best success 0.930 | 2.6 ep/s | eta 133 min
+    4500/25000 episodes |  45 configs done | best success 0.930 | 2.7 ep/s | eta 127 min
+    5000/25000 episodes |  50 configs done | best success 0.930 | 2.6 ep/s | eta 128 min
+    5500/25000 episodes |  55 configs done | best success 0.930 | 2.7 ep/s | eta 122 min
+    6000/25000 episodes |  60 configs done | best success 0.930 | 2.7 ep/s | eta 119 min
+    6500/25000 episodes |  64 configs done | best success 0.930 | 2.7 ep/s | eta 116 min
+    7000/25000 episodes |  69 configs done | best success 0.930 | 2.7 ep/s | eta 112 min
+    7500/25000 episodes |  75 configs done | best success 0.930 | 2.7 ep/s | eta 110 min
+    8000/25000 episodes |  80 configs done | best success 0.930 | 2.7 ep/s | eta 105 min
+    8500/25000 episodes |  85 configs done | best success 0.930 | 2.7 ep/s | eta 103 min
+    9000/25000 episodes |  90 configs done | best success 0.930 | 2.7 ep/s | eta 100 min
+    9500/25000 episodes |  95 configs done | best success 0.930 | 2.7 ep/s | eta 97 min
+   10000/25000 episodes |  99 configs done | best success 0.930 | 2.6 ep/s | eta 95 min
+   10500/25000 episodes | 104 configs done | best success 0.930 | 2.6 ep/s | eta 92 min
+   11000/25000 episodes | 109 configs done | best success 0.930 | 2.6 ep/s | eta 88 min
+   11500/25000 episodes | 114 configs done | best success 0.930 | 2.7 ep/s | eta 84 min
+   12000/25000 episodes | 119 configs done | best success 0.930 | 2.7 ep/s | eta 81 min
+   12500/25000 episodes | 124 configs done | best success 0.930 | 2.7 ep/s | eta 78 min
+   13000/25000 episodes | 129 configs done | best success 0.930 | 2.7 ep/s | eta 75 min
+   13500/25000 episodes | 134 configs done | best success 0.930 | 2.7 ep/s | eta 72 min
+   14000/25000 episodes | 139 configs done | best success 0.930 | 2.7 ep/s | eta 69 min
+   14500/25000 episodes | 144 configs done | best success 0.930 | 2.7 ep/s | eta 66 min
+   15000/25000 episodes | 149 configs done | best success 0.930 | 2.7 ep/s | eta 63 min
+   15500/25000 episodes | 155 configs done | best success 0.930 | 2.7 ep/s | eta 60 min
+   16000/25000 episodes | 160 configs done | best success 0.930 | 2.7 ep/s | eta 56 min
+   16500/25000 episodes | 165 configs done | best success 0.930 | 2.7 ep/s | eta 53 min
+   17000/25000 episodes | 169 configs done | best success 0.930 | 2.7 ep/s | eta 50 min
+   17500/25000 episodes | 174 configs done | best success 0.930 | 2.6 ep/s | eta 47 min
+   18000/25000 episodes | 179 configs done | best success 0.930 | 2.6 ep/s | eta 45 min
+   18500/25000 episodes | 184 configs done | best success 0.930 | 2.6 ep/s | eta 42 min
+   19000/25000 episodes | 189 configs done | best success 0.930 | 2.6 ep/s | eta 38 min
+   19500/25000 episodes | 194 configs done | best success 0.930 | 2.6 ep/s | eta 35 min
+   20000/25000 episodes | 200 configs done | best success 0.930 | 2.6 ep/s | eta 32 min
+   20500/25000 episodes | 205 configs done | best success 0.930 | 2.6 ep/s | eta 29 min
+   21000/25000 episodes | 210 configs done | best success 0.930 | 2.6 ep/s | eta 26 min
+   21500/25000 episodes | 215 configs done | best success 0.930 | 2.6 ep/s | eta 22 min
+   22000/25000 episodes | 220 configs done | best success 0.930 | 2.6 ep/s | eta 19 min
+   22500/25000 episodes | 224 configs done | best success 0.930 | 2.6 ep/s | eta 16 min
+   23000/25000 episodes | 230 configs done | best success 0.930 | 2.6 ep/s | eta 13 min
+   23500/25000 episodes | 235 configs done | best success 0.930 | 2.6 ep/s | eta 10 min
+   24000/25000 episodes | 239 configs done | best success 0.930 | 2.6 ep/s | eta 6 min
+   24500/25000 episodes | 245 configs done | best success 0.930 | 2.6 ep/s | eta 3 min
+   25000/25000 episodes | 250 configs done | best success 0.930 | 2.6 ep/s | eta 0 min
+
+Top 10 configurations by success rate:
+    id   succ  rmsCTE  rmsSucc   obst   bord    tmo  effort
+     2  0.930   1.376    1.352  0.060  0.010  0.000   7.161
+   179  0.900   1.359    1.281  0.070  0.030  0.000  12.388
+   173  0.890   1.222    1.235  0.100  0.010  0.000   3.847
+   224  0.890   1.395    1.442  0.100  0.010  0.000   6.039
+    72  0.880   1.461    1.510  0.080  0.040  0.000   4.375
+   149  0.830   1.529    1.460  0.030  0.140  0.000   2.530
+    82  0.810   0.965    0.920  0.180  0.010  0.000  10.035
+   221  0.810   1.640    1.524  0.110  0.080  0.000   6.193
+   176  0.800   0.890    0.878  0.190  0.010  0.000   3.819
+   236  0.800   0.919    0.944  0.180  0.020  0.000   2.678
+
+  default config : success 0.750, rms cte 0.944
+  selected config: id 2, success 0.930, rms cte 1.376
+
+  wrote eval_results/baselines/apf_tuning_results_s3.csv
+  wrote eval_results/baselines/los_apf_best_s3.json
