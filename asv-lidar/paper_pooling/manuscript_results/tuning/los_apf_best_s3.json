@@ -1,0 +1,147 @@
+{
+  "params": {
+    "delta_lookahead": 4.765258980510277,
+    "w_lookahead": 0.5574387227836004,
+    "max_los_deg": 82.55541269829061,
+    "k_rep": 30.419975422289,
+    "c_threshold": 0.5113596586570335,
+    "rep_power": 1.5158547312865251,
+    "rep_sigma_deg": 69.62520504454642,
+    "max_rep_deg": 74.78825147767992,
+    "k_headon": 76.77855197797653,
+    "headon_deg": 28.107976464270877,
+    "side_tie": 0.7735612287655091,
+    "default_side": -1.0,
+    "kp": 0.032692948981493594,
+    "ki": 3.431986496891304e-05,
+    "kd": 0.01805864180150899,
+    "integral_limit": 292.89583689804635,
+    "throttle_base": 0.36691308584421545,
+    "k_speed_obs": 2.273234865272543,
+    "k_speed_head": 0.32189186831856365,
+    "bearing_mode": "actual"
+  },
+  "selection": {
+    "config_id": 2,
+    "success_rate": 0.93,
+    "mean_rms_cte": 1.376490919932283,
+    "mean_rms_cte_success": 1.3520140704379406,
+    "rule": "highest success rate; ties within 0.02 broken by mean RMS CTE on successful episodes"
+  },
+  "search": {
+    "n_configs": 250,
+    "n_layouts": 100,
+    "layouts": "eval_layouts\\tune_layouts_v1.json",
+    "total_episodes": 25000,
+    "seed": 20240820,
+    "tie_margin": 0.02,
+    "wall_clock_seconds": 9665.357605695724,
+    "space": {
+      "delta_lookahead": [
+        "uniform",
+        2.0,
+        14.0
+      ],
+      "w_lookahead": [
+        "uniform",
+        0.0,
+        0.6
+      ],
+      "max_los_deg": [
+        "uniform",
+        45.0,
+        90.0
+      ],
+      "k_rep": [
+        "loguniform",
+        4.0,
+        70.0
+      ],
+      "c_threshold": [
+        "uniform",
+        0.3,
+        0.8
+      ],
+      "rep_power": [
+        "uniform",
+        1.0,
+        4.0
+      ],
+      "rep_sigma_deg": [
+        "uniform",
+        20.0,
+        90.0
+      ],
+      "max_rep_deg": [
+        "uniform",
+        35.0,
+        90.0
+      ],
+      "k_headon": [
+        "loguniform",
+        8.0,
+        100.0
+      ],
+      "headon_deg": [
+        "uniform",
+        8.0,
+        40.0
+      ],
+      "side_tie": [
+        "uniform",
+        0.02,
+        0.8
+      ],
+      "default_side": [
+        "choice",
+        [
+          1.0,
+          -1.0
+        ]
+      ],
+      "kp": [
+        "loguniform",
+        0.004,
+        0.06
+      ],
+      "ki": [
+        "uniform",
+        0.0,
+        0.003
+      ],
+      "kd": [
+        "uniform",
+        0.0,
+        0.04
+      ],
+      "integral_limit": [
+        "uniform",
+        40.0,
+        400.0
+      ],
+      "throttle_base": [
+        "uniform",
+        0.1,
+        1.0
+      ],
+      "k_speed_obs": [
+        "uniform",
+        0.0,
+        2.5
+      ],
+      "k_speed_head": [
+        "uniform",
+        0.0,
+        2.0
+      ],
+      "bearing_mode": [
+        "choice",
+        [
+          "nominal",
+          "actual"
+        ]
+      ]
+    },
+    "results_csv": "eval_results/baselines/apf_tuning_results_s3.csv"
+  }
+}

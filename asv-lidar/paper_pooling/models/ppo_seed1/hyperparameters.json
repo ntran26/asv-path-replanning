@@ -39,18 +39,6 @@
       {
         "from_timestep": 0,
         "stage": 0
-      },
-      {
-        "from_timestep": 700000,
-        "stage": 1
-      },
-      {
-        "from_timestep": 800000,
-        "stage": 2
-      },
-      {
-        "from_timestep": 900000,
-        "stage": 3
       }
     ],
     "counter": "model.num_timesteps (total environment interactions)",
@@ -124,7 +112,7 @@
     "numpy": "1.26.4",
     "stable_baselines3": "2.3.2"
   },
-  "wall_clock_seconds": 4101.400249242783,
+  "wall_clock_seconds": 4629.17501616478,
   "completed": true,
   "smoke_test": false
 }

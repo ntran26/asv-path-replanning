@@ -58,10 +58,7 @@ FIG_DIR = os.path.join(BASE, "figures")
 # tuning-procedure variance, which is the correct analogue of a training seed.
 METHOD_SPECS: List[Tuple[str, str, bool]] = [
     ("SAC (published)", os.path.join(BASE, "sac_1M", "episodes.csv"), False),
-    ("SAC (retrained, final)", os.path.join(BASE, "sac_seed*_final", "episodes.csv"), False),
-    ("SAC (retrained, best)", os.path.join(BASE, "sac_seed*_best", "episodes.csv"), False),
-    ("PPO (final @1M)", os.path.join(BASE, "ppo_seed*_final", "episodes.csv"), False),
-    ("PPO (best ckpt)", os.path.join(BASE, "ppo_seed*_best", "episodes.csv"), False),
+    ("PPO (final @1M)", os.path.join(BASE, "ppo_fx_seed*_final", "episodes.csv"), False),
     ("LOS+APF (tuned)", os.path.join(BASE, "los_apf_s*", "episodes.csv"), False),
 ]
 
@@ -245,14 +242,12 @@ def build_paired_table() -> None:
 
     # Everything is paired against the published SAC checkpoint, which is the
     # manuscript's baseline and the one a reviewer will have in front of them.
+    # Everything is paired against the published SAC checkpoint, which is the
+    # manuscript's baseline and the one a reviewer will have in front of them.
     pairs = []
-    for algo in ("sac", "ppo"):
-        for kind in ("best", "final"):
-            pattern = os.path.join(BASE, f"{algo}_seed*_{kind}", "episodes.csv")
-            for run in sorted(glob.glob(pattern)):
-                seed = os.path.basename(os.path.dirname(run)).replace(f"_{kind}", "")
-                label = f"{algo.upper()} retrained {kind} ({seed})"
-                pairs.append(("SAC published", sac, label, run))
+    for run in sorted(glob.glob(os.path.join(BASE, "ppo_fx_seed*_final", "episodes.csv"))):
+        seed = os.path.basename(os.path.dirname(run)).replace("ppo_fx_", "").replace("_final", "")
+        pairs.append(("SAC published", sac, f"PPO final ({seed})", run))
     for los in sorted(glob.glob(os.path.join(BASE, "los_apf_s*", "episodes.csv"))):
         tag = os.path.basename(os.path.dirname(los))
         pairs.append(("SAC published", sac, f"LOS+APF ({tag})", los))
@@ -379,7 +374,6 @@ def plot_learning_curves() -> None:
     sac = read_sac_curve()
     families = [
         ("PPO", read_run_curves("ppo"), "tab:blue", "--", "s"),
-        ("SAC (retrained)", read_run_curves("sac"), "tab:green", "-.", "^"),
     ]
     families = [f for f in families if f[1]]
     if sac is None and not families:
@@ -408,15 +402,12 @@ def plot_learning_curves() -> None:
                     linestyle=[":", (0, (1, 1)), (0, (3, 1, 1, 1))][i % 3],
                     linewidth=0.9, zorder=2)
 
-    # Curriculum phase boundaries, matching the SAC run.
-    for boundary in (700, 800, 900):
-        ax.axvline(boundary, color="gray", linestyle="--", linewidth=1.0,
-                   alpha=0.7, zorder=0)
-    ylim = ax.get_ylim()
-    for centre, text in ((350, "cruise"), (750, "stage 1"),
-                         (850, "stage 2"), (950, "stage 3")):
-        ax.text(centre, ylim[1], text, ha="center", va="bottom",
-                fontsize=8, color="gray")
+    # No curriculum markers are drawn.  The published SAC run and every
+    # reported PPO run used fixed RPM for the entire 1M steps -- verified from
+    # the published run's own log, where eval/min_rpm == eval/max_rpm == 12.000
+    # at all 19 evaluations.  An earlier version of this figure drew stage
+    # boundaries at 700k/800k/900k taken from plot_training_curves.py; those
+    # describe the post-1M resumed runs, not these.  See BASELINES_RESULTS.md section 4.
 
     ax.set_xlabel("Environment steps (thousands)")
     ax.set_ylabel("Mean evaluation episode return")

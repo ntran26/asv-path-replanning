@@ -37,15 +37,52 @@ from stable_baselines3.common.callbacks import BaseCallback
 import config as cfg
 from env import ASVLidarEnv
 
-# Phase boundaries in *total environment steps*, from
-# plotting/plot_training_curves.py:96 -- cruise 0-700k, stage 1 700-800k,
-# stage 2 800-900k, stage 3 900k-1.0M.
-CURRICULUM_SCHEDULE: Tuple[Tuple[int, int], ...] = (
+# ---------------------------------------------------------------------------
+# CORRECTED 2026-08-19.  Read this before using STAGED_SCHEDULE.
+#
+# `PUBLISHED_SCHEDULE` is what actually produced `models/sac_model_1M.zip`:
+# fixed RPM for the whole 1M-step run, no propulsion curriculum at all.
+#
+# Evidence, from the published run's own TensorBoard log
+# (`sac_log/asv_sac_2/events.out.tfevents.1781347673.*`): at every one of the 19
+# evaluations from 50k to 950k, `eval/min_rpm == eval/mean_rpm ==
+# eval/max_rpm == 12.000`.  Throttle was never active.  Had any stage fired at
+# 700k/800k/900k, min and max would have separated immediately.
+#
+# The staged schedule appears only in the *resumed* runs after 1M steps
+# (1.00M-1.40M, 1.05M-1.45M, ...), where throttle is active and eval RPM does
+# vary.  Those resumed runs reached 0.617-0.750 eval-grid success, i.e. worse
+# than the 1M checkpoint they continued from.
+#
+# The stage markers in `plotting/plot_training_curves.py:96` therefore do not
+# describe the run that produced the published policy.  An earlier version of
+# this file took them at face value and scheduled stages inside the 1M budget;
+# that was wrong, and it handicapped both retrained SAC and PPO relative to the
+# published setup.  See BASELINES_RESULTS.md.
+#
+# Note the train/eval asymmetry this implies, which is a property of the
+# original work and is replicated deliberately rather than corrected: the
+# published policy was TRAINED with throttle inert (RPM pinned at CRUISE_RPM)
+# but is EVALUATED at RPM_STAGE = 1 with throttle live.
+# ---------------------------------------------------------------------------
+
+# Fixed RPM for the entire run.  This is the published SAC setup.
+PUBLISHED_SCHEDULE: Tuple[Tuple[int, int], ...] = (
+    (0, 0),
+)
+
+# The staged schedule as read from plot_training_curves.py.  Retained because
+# the post-1M resumed runs did use something like it, but it is NOT the setup
+# behind the published checkpoint and must not be used to replicate it.
+STAGED_SCHEDULE: Tuple[Tuple[int, int], ...] = (
     (0,       0),   # "cruise": FIXED_RPM, throttle ignored, RPM held at CRUISE_RPM
     (700_000, 1),
     (800_000, 2),
     (900_000, 3),
 )
+
+# Default for every training script in this study.
+CURRICULUM_SCHEDULE: Tuple[Tuple[int, int], ...] = PUBLISHED_SCHEDULE
 
 # Stage 0 is not in cfg.RPM_STAGES -- it is the fixed-speed phase.  The delta is
 # carried over from stage 1 purely so that the r_thrust term's division by
