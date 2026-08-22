@@ -1,0 +1,37 @@
+Evaluating sb3:sac:models/sac_seed1/final_model.zip over 500 layouts (3 workers) ...
+    25/500  success=1.000  1.24 ep/s  eta 6.4 min
+    50/500  success=1.000  1.74 ep/s  eta 4.3 min
+    75/500  success=1.000  1.86 ep/s  eta 3.8 min
+   100/500  success=1.000  1.92 ep/s  eta 3.5 min
+   125/500  success=0.928  1.92 ep/s  eta 3.3 min
+   150/500  success=0.893  1.91 ep/s  eta 3.1 min
+   175/500  success=0.857  1.93 ep/s  eta 2.8 min
+   200/500  success=0.840  1.98 ep/s  eta 2.5 min
+   225/500  success=0.822  1.88 ep/s  eta 2.4 min
+   250/500  success=0.792  1.88 ep/s  eta 2.2 min
+   275/500  success=0.775  1.92 ep/s  eta 2.0 min
+   300/500  success=0.777  1.94 ep/s  eta 1.7 min
+   325/500  success=0.769  1.95 ep/s  eta 1.5 min
+   350/500  success=0.766  1.96 ep/s  eta 1.3 min
+   375/500  success=0.773  1.97 ep/s  eta 1.1 min
+   400/500  success=0.777  1.98 ep/s  eta 0.8 min
+   425/500  success=0.776  1.91 ep/s  eta 0.7 min
+   450/500  success=0.773  1.86 ep/s  eta 0.4 min
+   475/500  success=0.775  1.82 ep/s  eta 0.2 min
+   500/500  success=0.780  1.80 ep/s  eta 0.0 min
+
+sac_fx_seed1_final: 500 episodes
+  success           0.780
+  obstacle coll.    0.198
+  border coll.      0.022
+  timeout           0.000
+  rms cte           0.814 m
+  min obst clear    0.190 m
+  min border clear  0.927 m
+  min lat.  clear   2.363 m
+  control effort    7.997
+  rudder sat frac   0.033
+
+  wall clock 4.6 min
+  wrote eval_results\baselines\sac_fx_seed1_final\episodes.csv
+  wrote eval_results\baselines\sac_fx_seed1_final\summary.json

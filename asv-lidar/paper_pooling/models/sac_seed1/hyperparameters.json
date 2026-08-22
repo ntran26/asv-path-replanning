@@ -1,0 +1,82 @@
+{
+  "algorithm": "SAC",
+  "sb3_policy": "MultiInputPolicy",
+  "seed": 1,
+  "total_timesteps": 1000000,
+  "num_envs": 8,
+  "vec_env": "SubprocVecEnv",
+  "eval_freq": 50000,
+  "save_freq": 100000,
+  "device": "cpu",
+  "hyperparameters": {
+    "learning_rate": 5e-05,
+    "batch_size": 512,
+    "gamma": 0.99,
+    "buffer_size": 1000000,
+    "train_freq": 1,
+    "gradient_steps": 1,
+    "ent_coef": "auto"
+  },
+  "policy_kwargs": {
+    "net_arch": [
+      256,
+      256
+    ],
+    "activation_fn": "ReLU",
+    "note": "SB3 SAC default; train.build_model does not set policy_kwargs"
+  },
+  "curriculum": {
+    "schedule_total_env_steps": [
+      {
+        "from_timestep": 0,
+        "stage": 0
+      }
+    ],
+    "counter": "model.num_timesteps (total environment interactions)",
+    "source": "plotting/plot_training_curves.py:96",
+    "note": "Same replicated schedule as the PPO baseline, so the two are directly comparable. See BASELINES_NOTES.md section 6."
+  },
+  "environment": {
+    "class": "CurriculumASVLidarEnv (subclass of ASVLidarEnv, adds only a stage setter)",
+    "map_width": 10.0,
+    "map_height": 25.0,
+    "path_mode": "straight",
+    "max_episode_steps": 700,
+    "update_rate_s": 0.1,
+    "lambda": 0.5,
+    "obs_border_mode": "none",
+    "cruise_rpm": 12.0,
+    "rpm_stages": {
+      "1": [
+        3.0,
+        9.0,
+        15.0
+      ],
+      "2": [
+        4.0,
+        8.0,
+        16.0
+      ],
+      "3": [
+        6.0,
+        6.0,
+        18.0
+      ],
+      "4": [
+        12.0,
+        0.0,
+        24.0
+      ]
+    }
+  },
+  "relationship_to_published_model": "Independent retrain. Does not replace models/sac_model_1M.zip, which remains the manuscript's artifact.",
+  "versions": {
+    "python": "3.10.11",
+    "torch": "2.2.1+cpu",
+    "numpy": "1.26.4",
+    "stable_baselines3": "2.3.2"
+  },
+  "wall_clock_seconds": 8512.147197961807,
+  "completed": true,
+  "smoke_test": false
+}

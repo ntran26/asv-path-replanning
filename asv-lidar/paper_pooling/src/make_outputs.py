@@ -57,9 +57,10 @@ FIG_DIR = os.path.join(BASE, "figures")
 # random searches under different search seeds, so its interval reflects
 # tuning-procedure variance, which is the correct analogue of a training seed.
 METHOD_SPECS: List[Tuple[str, str, bool]] = [
-    ("SAC (published)", os.path.join(BASE, "sac_1M", "episodes.csv"), False),
-    ("PPO (final @1M)", os.path.join(BASE, "ppo_fx_seed*_final", "episodes.csv"), False),
-    ("LOS+APF (tuned)", os.path.join(BASE, "los_apf_s*", "episodes.csv"), False),
+    ("SAC (deployed)", os.path.join(BASE, "sac_1M", "episodes.csv"), False),
+    ("SAC (retrained, 3 seeds)", os.path.join(BASE, "sac_fx_seed*_final", "episodes.csv"), False),
+    ("PPO (3 seeds)", os.path.join(BASE, "ppo_fx_seed*_final", "episodes.csv"), False),
+    ("LOS+APF (3 searches)", os.path.join(BASE, "los_apf_s*", "episodes.csv"), False),
 ]
 
 # (key, label, format, statistic)
@@ -244,13 +245,25 @@ def build_paired_table() -> None:
     # manuscript's baseline and the one a reviewer will have in front of them.
     # Everything is paired against the published SAC checkpoint, which is the
     # manuscript's baseline and the one a reviewer will have in front of them.
+    # Two families of comparison:
+    #   (a) everything against the deployed SAC checkpoint -- the manuscript's baseline
+    #   (b) retrained SAC against PPO seed-for-seed -- the matched from-scratch
+    #       comparison, which is the one that isolates the algorithm
     pairs = []
+    for run in sorted(glob.glob(os.path.join(BASE, "sac_fx_seed*_final", "episodes.csv"))):
+        seed = os.path.basename(os.path.dirname(run)).replace("sac_fx_", "").replace("_final", "")
+        pairs.append(("SAC deployed", sac, f"SAC retrained ({seed})", run))
     for run in sorted(glob.glob(os.path.join(BASE, "ppo_fx_seed*_final", "episodes.csv"))):
         seed = os.path.basename(os.path.dirname(run)).replace("ppo_fx_", "").replace("_final", "")
-        pairs.append(("SAC published", sac, f"PPO final ({seed})", run))
+        pairs.append(("SAC deployed", sac, f"PPO ({seed})", run))
     for los in sorted(glob.glob(os.path.join(BASE, "los_apf_s*", "episodes.csv"))):
         tag = os.path.basename(os.path.dirname(los))
-        pairs.append(("SAC published", sac, f"LOS+APF ({tag})", los))
+        pairs.append(("SAC deployed", sac, f"LOS+APF ({tag})", los))
+    for i in (0, 1, 2):
+        sa = os.path.join(BASE, f"sac_fx_seed{i}_final", "episodes.csv")
+        pp = os.path.join(BASE, f"ppo_fx_seed{i}_final", "episodes.csv")
+        if os.path.exists(sa) and os.path.exists(pp):
+            pairs.append((f"SAC retrained seed{i}", sa, f"PPO seed{i}", pp))
 
     rows: List[Dict[str, Any]] = []
     full: Dict[str, Any] = {}
