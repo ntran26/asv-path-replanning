@@ -138,11 +138,26 @@ def hyperparameter_record(seed: int, timesteps: int, num_envs: int,
 
 
 def train_one_seed(seed: int, timesteps: int, num_envs: int, eval_freq: int,
-                   smoke: bool = False, schedule=CURRICULUM_SCHEDULE) -> Dict[str, Any]:
-    run_dir = os.path.join("models", f"sac_seed{seed}")
+                   smoke: bool = False, schedule=CURRICULUM_SCHEDULE,
+                   gradient_steps: int = 1) -> Dict[str, Any]:
+    # A non-default gradient_steps gets its own run directory so a pilot can
+    # never overwrite the completed gradient_steps=1 seeds.
+    run_dir = (os.path.join("models", f"sac_seed{seed}") if gradient_steps == 1
+               else os.path.join("models", f"sac_gs{gradient_steps}_seed{seed}"))
     os.makedirs(run_dir, exist_ok=True)
 
     record = hyperparameter_record(seed, timesteps, num_envs, schedule)
+    record["hyperparameters"]["gradient_steps"] = int(gradient_steps)
+    if gradient_steps != 1:
+        record["deviation_from_published_config"] = (
+            f"gradient_steps={gradient_steps} instead of 1. With {num_envs} workers "
+            f"this gives ~{gradient_steps}/{num_envs} gradient updates per environment "
+            "transition, against 1/8 in the published config. Standard SAC practice is "
+            "one update per transition. This is a HYPERPARAMETER change only -- the "
+            "environment, reward and observation are untouched. Testing whether the "
+            "gap between from-scratch retrains (0.78-0.84) and the deployed policy "
+            "(0.950) is an under-training artifact. See BASELINES_RESULTS.md section 4a."
+        )
     with open(os.path.join(run_dir, "hyperparameters.json"), "w") as f:
         json.dump(record, f, indent=2)
 
@@ -155,11 +170,13 @@ def train_one_seed(seed: int, timesteps: int, num_envs: int, eval_freq: int,
                                      path_mode="straight")
     eval_env.reset(seed=env_seed + 10_000)
 
+    sac_kwargs = dict(SAC_HYPERPARAMS)
+    sac_kwargs["gradient_steps"] = int(gradient_steps)
     model = SAC(
         "MultiInputPolicy", vec_env, verbose=1,
         tensorboard_log="./sac_baseline_log/",
         seed=env_seed, device="cpu",
-        **SAC_HYPERPARAMS,
+        **sac_kwargs,
     )
 
     callbacks = [
@@ -210,6 +227,11 @@ def parse_args():
     ap.add_argument("--eval-freq", type=int, default=EVAL_FREQ)
     ap.add_argument("--smoke", action="store_true",
                     help="short run for wiring/throughput checks")
+    ap.add_argument("--gradient-steps", type=int, default=1,
+                    help="SAC gradient updates per rollout collection. The published "
+                         "config uses 1, which with 8 workers is one update per 8 "
+                         "transitions; standard SAC practice is one per transition. "
+                         "Non-default values write to models/sac_gs{N}_seed{S}/.")
     return ap.parse_args()
 
 
@@ -223,7 +245,7 @@ def main() -> None:
         print(f"SMOKE: curriculum scaled to {schedule}")
 
     print(f"SAC baseline: seeds={args.seeds} timesteps={args.timesteps:,} "
-          f"num_envs={args.num_envs}")
+          f"num_envs={args.num_envs} gradient_steps={args.gradient_steps}")
     print(f"Curriculum boundaries (total env steps): {[b for b, _ in schedule]}")
     print(f"Stage at t=0: {stage_for_timestep(0, schedule)}, "
           f"at t={args.timesteps:,}: {stage_for_timestep(args.timesteps, schedule)}")
@@ -233,7 +255,8 @@ def main() -> None:
         print(f"\n{'=' * 70}\nSEED {seed}\n{'=' * 70}")
         records.append(train_one_seed(seed, args.timesteps, args.num_envs,
                                       args.eval_freq, smoke=args.smoke,
-                                      schedule=schedule))
+                                      schedule=schedule,
+                                      gradient_steps=args.gradient_steps))
 
     total = sum(r["wall_clock_seconds"] for r in records)
     print(f"\nAll seeds complete. Total wall clock: {total / 3600:.2f} h")

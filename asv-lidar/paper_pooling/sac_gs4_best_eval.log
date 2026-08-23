@@ -1,0 +1,74 @@
+Evaluating sb3:sac:models/sac_gs4_seed1/best_model.zip over 500 layouts (3 workers) ...
+    25/500  success=1.000  0.81 ep/s  eta 9.8 min
+    50/500  success=1.000  1.34 ep/s  eta 5.6 min
+    75/500  success=1.000  1.71 ep/s  eta 4.1 min
+   100/500  success=1.000  2.01 ep/s  eta 3.3 min
+   125/500  success=1.000  2.06 ep/s  eta 3.0 min
+   150/500  success=0.987  2.13 ep/s  eta 2.7 min
+   175/500  success=0.983  2.11 ep/s  eta 2.6 min
+   200/500  success=0.985  2.07 ep/s  eta 2.4 min
+   225/500  success=0.973  2.02 ep/s  eta 2.3 min
+   250/500  success=0.964  2.00 ep/s  eta 2.1 min
+   275/500  success=0.953  1.96 ep/s  eta 1.9 min
+   300/500  success=0.953  1.94 ep/s  eta 1.7 min
+   325/500  success=0.942  1.89 ep/s  eta 1.5 min
+   350/500  success=0.934  1.85 ep/s  eta 1.3 min
+   375/500  success=0.931  1.85 ep/s  eta 1.1 min
+   400/500  success=0.932  1.81 ep/s  eta 0.9 min
+   425/500  success=0.925  1.79 ep/s  eta 0.7 min
+   450/500  success=0.918  1.77 ep/s  eta 0.5 min
+   475/500  success=0.903  1.78 ep/s  eta 0.2 min
+   500/500  success=0.900  1.78 ep/s  eta 0.0 min
+
+sac_gs4_seed1_best: 500 episodes
+  success           0.900
+  obstacle coll.    0.086
+  border coll.      0.014
+  timeout           0.000
+  rms cte           0.935 m
+  min obst clear    0.426 m
+  min border clear  0.920 m
+  min lat.  clear   2.393 m
+  control effort    8.769
+  rudder sat frac   0.048
+
+  wall clock 4.7 min
+  wrote eval_results\baselines\sac_gs4_seed1_best\episodes.csv
+  wrote eval_results\baselines\sac_gs4_seed1_best\summary.json
+Evaluating sb3:sac:models/sac_gs4_seed0/best_model.zip over 500 layouts (3 workers) ...
+    25/500  success=1.000  1.21 ep/s  eta 6.6 min
+    50/500  success=1.000  1.76 ep/s  eta 4.3 min
+    75/500  success=1.000  2.08 ep/s  eta 3.4 min
+   100/500  success=1.000  2.19 ep/s  eta 3.0 min
+   125/500  success=1.000  2.01 ep/s  eta 3.1 min
+   150/500  success=0.987  2.01 ep/s  eta 2.9 min
+   175/500  success=0.977  2.01 ep/s  eta 2.7 min
+   200/500  success=0.975  2.02 ep/s  eta 2.5 min
+   225/500  success=0.978  1.95 ep/s  eta 2.4 min
+   250/500  success=0.972  1.91 ep/s  eta 2.2 min
+   275/500  success=0.971  1.89 ep/s  eta 2.0 min
+   300/500  success=0.967  1.90 ep/s  eta 1.7 min
+   325/500  success=0.966  1.82 ep/s  eta 1.6 min
+   350/500  success=0.957  1.81 ep/s  eta 1.4 min
+   375/500  success=0.955  1.83 ep/s  eta 1.1 min
+   400/500  success=0.955  1.84 ep/s  eta 0.9 min
+   425/500  success=0.948  1.82 ep/s  eta 0.7 min
+   450/500  success=0.949  1.80 ep/s  eta 0.5 min
+   475/500  success=0.939  1.78 ep/s  eta 0.2 min
+   500/500  success=0.940  1.77 ep/s  eta 0.0 min
+
+sac_gs4_seed0_best: 500 episodes
+  success           0.940
+  obstacle coll.    0.016
+  border coll.      0.044
+  timeout           0.000
+  rms cte           1.135 m
+  min obst clear    0.540 m
+  min border clear  0.874 m
+  min lat.  clear   2.187 m
+  control effort    8.241
+  rudder sat frac   0.024
+
+  wall clock 4.7 min
+  wrote eval_results\baselines\sac_gs4_seed0_best\episodes.csv
+  wrote eval_results\baselines\sac_gs4_seed0_best\summary.json
