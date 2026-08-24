@@ -1,0 +1,34 @@
+Evaluating sb3:sac:models/sac_model_1M.zip over 100 layouts (6 workers) ...
+    25/100  success=0.520  0.25 ep/s  eta 5.1 min
+    50/100  success=0.400  0.44 ep/s  eta 1.9 min
+    75/100  success=0.427  0.57 ep/s  eta 0.7 min
+   100/100  success=0.490  0.64 ep/s  eta 0.0 min
+
+hard_obs5__sac_deployed: 100 episodes
+  success           0.490
+  obstacle coll.    0.430
+  border coll.      0.080
+  timeout           0.000
+  rms cte           1.207 m
+  min obst clear    0.114 m
+  min border clear  0.837 m
+  min lat.  clear   1.718 m
+  control effort    10.917
+  rudder sat frac   0.239
+
+  wall clock 2.6 min
+  wrote eval_results/hard_eval\hard_obs5__sac_deployed\episodes.csv
+  wrote eval_results/hard_eval\hard_obs5__sac_deployed\summary.json
+Evaluating sb3:sac:models/sac_gs4_seed0/best_model.zip over 100 layouts (6 workers) ...
+    25/100  success=0.840  0.34 ep/s  eta 3.7 min
+    50/100  success=0.800  0.56 ep/s  eta 1.5 min
+    75/100  success=0.733  0.72 ep/s  eta 0.6 min
+   100/100  success=0.730  0.78 ep/s  eta 0.0 min
+Traceback (most recent call last):
+  File "C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\paper_pooling\src\evaluate.py", line 307, in <module>
+    main()
+  File "C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\paper_pooling\src\evaluate.py", line 284, in main
+    write_rows(csv_path, rows)
+  File "C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\paper_pooling\src\evaluate.py", line 199, in write_rows
+    with open(path, "w", newline="") as f:
+FileNotFoundError: [Errno 2] No such file or directory: 'eval_results/hard_eval\\hard_obs5__sac_seed0\\episodes.csv'

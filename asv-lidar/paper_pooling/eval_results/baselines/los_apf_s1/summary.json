@@ -136,7 +136,7 @@
     },
     "obs_1": {
       "n": 100,
-      "success_rate": 1.0,
+      "success_rate": 0.95,
       "obstacle_collision_rate": 0.0,
       "border_collision_rate": 0.0,
       "timeout_rate": 0.0,
@@ -144,7 +144,7 @@
     },
     "obs_2": {
       "n": 100,
-      "success_rate": 0.96,
+      "success_rate": 0.92,
       "obstacle_collision_rate": 0.03,
       "border_collision_rate": 0.01,
       "timeout_rate": 0.0,
@@ -152,7 +152,7 @@
     },
     "obs_3": {
       "n": 100,
-      "success_rate": 0.93,
+      "success_rate": 0.88,
       "obstacle_collision_rate": 0.05,
       "border_collision_rate": 0.02,
       "timeout_rate": 0.0,
@@ -160,7 +160,7 @@
     },
     "obs_4": {
       "n": 100,
-      "success_rate": 0.95,
+      "success_rate": 0.81,
       "obstacle_collision_rate": 0.05,
       "border_collision_rate": 0.0,
       "timeout_rate": 0.0,

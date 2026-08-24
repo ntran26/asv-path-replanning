@@ -76,5 +76,8 @@
     "numpy": "1.26.4",
     "stable_baselines3": "2.3.2"
   },
-  "deviation_from_published_config": "gradient_steps=4 instead of 1. With 8 workers this gives ~4/8 gradient updates per environment transition, against 1/8 in the published config. Standard SAC practice is one update per transition. This is a HYPERPARAMETER change only -- the environment, reward and observation are untouched. Testing whether the gap between from-scratch retrains (0.78-0.84) and the deployed policy (0.950) is an under-training artifact. See BASELINES_RESULTS.md section 4a."
+  "deviation_from_published_config": "gradient_steps=4 instead of 1. With 8 workers this gives ~4/8 gradient updates per environment transition, against 1/8 in the published config. Standard SAC practice is one update per transition. This is a HYPERPARAMETER change only -- the environment, reward and observation are untouched. Testing whether the gap between from-scratch retrains (0.78-0.84) and the deployed policy (0.950) is an under-training artifact. See BASELINES_RESULTS.md section 4a.",
+  "wall_clock_seconds": 27589.4477558136,
+  "completed": true,
+  "smoke_test": false
 }

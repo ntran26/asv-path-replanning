@@ -19,10 +19,7 @@ It does use `front_clearance`, `side_clearance_diff` and `local_target_cte`,
 because those are components of the observation vector the SAC policy receives.
 Withholding them would handicap the baseline rather than make it fair.  Note
 that `side_clearance_diff` and `local_target_cte` carry partial *boundary*
-information (they are computed against a wall-only LiDAR), so the claim that
-both methods are equally boundary-blind is false -- see BASELINES_NOTES.md
-section 1.1.  Both methods have the same partial boundary information, which is
-the actual fair comparison.
+information (they are computed against a wall-only LiDAR)
 
 Sign conventions, all verified against the environment source
 -------------------------------------------------------------

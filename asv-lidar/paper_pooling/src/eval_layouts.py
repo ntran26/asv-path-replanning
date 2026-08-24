@@ -69,6 +69,29 @@ OOD_BASE_SEED = 7_000_000
 OOD_CASE_ID_OFFSET = 2_000_000
 OOD_N_PER_COUNT = 100
 
+# --- Hard evaluation ladder -------------------------------------------------
+# Obstacle densities above the training range (config.TRAIN_OBS_COUNTS = 0..4)
+# and above the frozen evaluation set (0..4).  Straight reference paths
+# throughout, so obstacle density is the ONLY variable that changes -- the point
+# is a clean degradation curve, not a mixed shift.
+#
+# Equally out-of-distribution for every method: the learned policies never
+# trained above 4 obstacles, and the LOS+APF parameters were selected on
+# 0-4 obstacle layouts.  No method is re-tuned for these sets.
+#
+# Seed base and case-id block are disjoint from the evaluation set
+# (675_974..1_076_073), the tuning set (5_000_000+) and the OOD sets
+# (7_000_000+ / case ids 2_000_000+).
+HARD_BASE_SEED = 8_000_000
+HARD_CASE_ID_OFFSET = 3_000_000
+HARD_N_PER_COUNT = 100
+
+HARD_SETS: Dict[str, Any] = {
+    "hard_obs5": {"counts": [5], "path_mode": "straight", "n": HARD_N_PER_COUNT, "block": 0},
+    "hard_obs6": {"counts": [6], "path_mode": "straight", "n": HARD_N_PER_COUNT, "block": 1},
+    "hard_obs7": {"counts": [7], "path_mode": "straight", "n": HARD_N_PER_COUNT, "block": 2},
+}
+
 # name -> (obstacle counts, path mode, n per count, case-id block)
 OOD_SETS: Dict[str, Any] = {
     "ood_obs5":       {"counts": [5],             "path_mode": "straight", "n": 100, "block": 0},
@@ -211,7 +234,27 @@ def build_tuning_set(verbose: bool = True) -> Dict[str, Any]:
     }
 
 
-def build_ood_set(name: str, verbose: bool = True) -> Dict[str, Any]:
+def build_hard_sets(verbose: bool = True) -> None:
+    """Generate the hard obstacle-density ladder (5, 6, 7 obstacles)."""
+    os.makedirs(OUT_DIR, exist_ok=True)
+    for name in HARD_SETS:
+        if verbose:
+            print(f"Generating {name} ...")
+        payload = build_ood_set(name, verbose=verbose, spec=HARD_SETS[name],
+                                base_seed=HARD_BASE_SEED,
+                                case_offset=HARD_CASE_ID_OFFSET,
+                                role="hard_evaluation")
+        path = os.path.join(OUT_DIR, f"{name}.json")
+        with open(path, "w") as f:
+            json.dump(payload, f, indent=2)
+        if verbose:
+            print(f"  wrote {path} ({payload['metadata']['n_scenarios']} scenarios)")
+
+
+def build_ood_set(name: str, verbose: bool = True, spec=None,
+                  base_seed: Optional[int] = None,
+                  case_offset: Optional[int] = None,
+                  role: str = "out_of_distribution_evaluation") -> Dict[str, Any]:
     """Generate one out-of-distribution layout set.
 
     Uses the same `generate_suite.build_scenario` and the same A* feasibility
@@ -227,7 +270,9 @@ def build_ood_set(name: str, verbose: bool = True) -> Dict[str, Any]:
     """
     import generate_suite as gs
 
-    spec = OOD_SETS[name]
+    spec = OOD_SETS[name] if spec is None else spec
+    base_seed = OOD_BASE_SEED if base_seed is None else base_seed
+    case_offset = OOD_CASE_ID_OFFSET if case_offset is None else case_offset
     counts = spec["counts"]
     path_mode = spec["path_mode"]
     n_each = spec["n"]
@@ -235,7 +280,7 @@ def build_ood_set(name: str, verbose: bool = True) -> Dict[str, Any]:
 
     env = ASVLidarEnv(map_width=gs.MAP_WIDTH, map_height=gs.MAP_HEIGHT,
                       max_obs=max(max(counts), 1), path_mode=path_mode)
-    env.reset(seed=OOD_BASE_SEED + 1000 * block)
+    env.reset(seed=base_seed + 1000 * block)
 
     scenarios: List[Dict[str, Any]] = []
     for obs_count in counts:
@@ -248,13 +293,13 @@ def build_ood_set(name: str, verbose: bool = True) -> Dict[str, Any]:
                     f"{name}: only {made}/{n_each} feasible scenarios for "
                     f"{obs_count} obstacles after {attempts} attempts")
 
-            seed = (OOD_BASE_SEED + 1_000_000 * block
+            seed = (base_seed + 1_000_000 * block
                     + obs_count * 10_000 + attempts)
             scenario = gs.build_scenario(env, obs_count, made, seed)
             if scenario is None:
                 continue
 
-            scenario["case_id"] = (OOD_CASE_ID_OFFSET + 100_000 * block
+            scenario["case_id"] = (case_offset + 100_000 * block
                                    + obs_count * 1000 + made)
             scenario["path_mode"] = path_mode          # build_scenario hardcodes "straight"
             scenario["ood_set"] = name
@@ -268,12 +313,12 @@ def build_ood_set(name: str, verbose: bool = True) -> Dict[str, Any]:
     return {
         "metadata": {
             "name": name,
-            "role": "out_of_distribution_evaluation",
+            "role": role,
             "n_scenarios": len(scenarios),
             "obstacle_counts": counts,
             "path_mode": path_mode,
-            "base_seed": OOD_BASE_SEED,
-            "case_id_offset": OOD_CASE_ID_OFFSET + 100_000 * block,
+            "base_seed": base_seed,
+            "case_id_offset": case_offset + 100_000 * block,
             "generator": "generate_suite.build_scenario",
             "protocol": "OOD_PROTOCOL.md",
             "note": (
@@ -374,15 +419,19 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--build", action="store_true", help="write both layout files")
+    ap.add_argument("--build-hard", action="store_true",
+                    help="write the hard obstacle-density ladder (5, 6, 7 obstacles)")
     ap.add_argument("--build-ood", action="store_true",
                     help="write the out-of-distribution sets (see OOD_PROTOCOL.md)")
     ap.add_argument("--check", action="store_true", help="verify disjointness and replay")
     args = ap.parse_args()
 
-    if not (args.build or args.check or args.build_ood):
-        ap.error("pass --build, --build-ood and/or --check")
+    if not (args.build or args.check or args.build_ood or args.build_hard):
+        ap.error("pass --build, --build-hard, --build-ood and/or --check")
     if args.build:
         build()
+    if args.build_hard:
+        build_hard_sets()
     if args.build_ood:
         build_ood()
     if args.check:

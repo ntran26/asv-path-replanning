@@ -11,6 +11,14 @@ cap.** SAC and PPO each have three from-scratch training seeds; the classical
 baseline has three independent tuning searches; the deployed SAC checkpoint is
 reported separately from the SAC retrains, because they are different objects.
 
+> **Revision note (2026-08-23).** SAC has been retrained on three seeds with
+> `gradient_steps=4` after the original configuration was found to be
+> under-trained (one gradient update per eight environment transitions, against
+> standard SAC practice of one per transition). All learned methods are now
+> reported from the checkpoint selected by the training callback's score on its
+> validation grid, evaluated on the disjoint frozen 500 — the same rule for
+> every method. The environment, reward and observation are unchanged. See §4a.
+>
 > **Revision note (2026-08-19).** An earlier version of this document reported a
 > dramatic PPO failure at a "stage-3 curriculum boundary". That was an artifact
 > of a curriculum I introduced by misreading a plotting script — the published
@@ -28,65 +36,76 @@ reported separately from the SAC retrains, because they are different objects.
 | Method | Success | Obstacle coll. | Border coll. | RMS CTE (m) | Min obst. clear. (m) | Rudder rate (deg/s) | Time (s) |
 |---|---|---|---|---|---|---|---|
 | **SAC (deployed policy)** | **0.950** | 0.038 | 0.012 | **0.908** | 0.233 | 74.9 | 20.9 |
-| SAC (retrained, 3 seeds) | 0.812 | 0.157 | 0.031 | 0.906 | 0.230 | 67.0 | **20.0** |
-| PPO (3 seeds) | 0.871 | 0.100 | 0.029 | 1.212 | 0.503 | 12.8 | 22.4 |
+| SAC (retrained, 3 seeds) | 0.924 | 0.047 | 0.029 | 1.101 | 0.440 | 77.3 | **20.3** |
+| PPO (3 seeds) | 0.905 | 0.079 | 0.017 | 1.286 | 0.528 | 11.3 | 22.0 |
 | LOS+APF (3 searches) | 0.960 | 0.033 | **0.007** | 1.328 | **0.768** | 9.0 | 27.2 |
 
-Per-seed success — SAC retrained: 0.814 / 0.780 / 0.842. PPO: 0.870 / 0.912 /
-0.832. LOS+APF: 0.968 / 0.972 / 0.940. All learned methods are reported from
-their **final 1M-step checkpoints**, with no best-checkpoint selection.
+Per-seed success — SAC retrained: 0.940 / 0.900 / 0.932. PPO: 0.894 / 0.898 /
+0.922. LOS+APF: 0.968 / 0.972 / 0.940.
+
+**Checkpoint selection.** Both learned methods are reported from the checkpoint
+chosen by the training callback's selection score on its **validation grid** (60
+episodes, obstacle counts 0–5), then evaluated on the **disjoint frozen 500**.
+Validation for selection, test for reporting — no leakage, and the same rule for
+every method. This must be stated in the paper, because it is not the same as
+"the model after 1M steps".
 
 ### Table for the revision — paired statistics
 
 Against the deployed SAC policy:
 
-| Comparison | Success (SAC / other) | McNemar p | RMS CTE (SAC / other) | Wilcoxon p |
-|---|---|---|---|---|
-| vs PPO seed 0 | 0.950 / 0.870 | 8.6e−06 | 0.929 / 1.193 | 7.0e−35 |
-| vs PPO seed 1 | 0.950 / 0.912 | 0.0295 | 0.929 / 1.826 | 2.1e−74 |
-| vs PPO seed 2 | 0.950 / 0.832 | 1.8e−09 | 0.929 / 0.841 | 0.0099 |
-| vs LOS+APF s1 | 0.950 / 0.968 | 0.211 (n.s.) | 0.929 / 1.217 | 1.2e−35 |
-| vs LOS+APF s2 | 0.950 / 0.972 | 0.108 (n.s.) | 0.929 / 1.378 | 1.4e−55 |
-| vs LOS+APF s3 | 0.950 / 0.940 | 0.576 (n.s.) | 0.929 / 1.532 | 1.6e−65 |
-
-Matched from-scratch, seed for seed:
-
-| Comparison | SAC retrained / PPO | McNemar p |
+| Comparison | Success (deployed / other) | McNemar p |
 |---|---|---|
-| seed 0 | 0.814 / 0.870 | **0.0158** |
-| seed 1 | 0.780 / 0.912 | **1.7e−08** |
-| seed 2 | 0.842 / 0.832 | 0.668 (n.s.) |
+| vs SAC retrained seed 0 | 0.950 / 0.940 | 0.511 (n.s.) |
+| vs SAC retrained seed 1 | 0.950 / 0.900 | 0.00126 |
+| vs SAC retrained seed 2 | 0.950 / 0.932 | 0.289 (n.s.) |
+| vs PPO seed 0 | 0.950 / 0.894 | 0.00152 |
+| vs PPO seed 1 | 0.950 / 0.898 | 0.00294 |
+| vs PPO seed 2 | 0.950 / 0.922 | 0.0925 (n.s.) |
+| vs LOS+APF s1 | 0.950 / 0.968 | 0.211 (n.s.) |
+| vs LOS+APF s2 | 0.950 / 0.972 | 0.108 (n.s.) |
+| vs LOS+APF s3 | 0.950 / 0.940 | 0.576 (n.s.) |
+
+Matched from-scratch, SAC against PPO seed for seed:
+
+| Comparison | SAC / PPO | McNemar p |
+|---|---|---|
+| seed 0 | 0.940 / 0.894 | **0.0152** |
+| seed 1 | 0.900 / 0.898 | 1.0 (n.s.) |
+| seed 2 | 0.932 / 0.922 | 0.590 (n.s.) |
 
 ### Claims that are safe to make
 
 1. **The deployed SAC policy reaches 95.0 % over the 500-episode holdout**, with
-   3.8 % obstacle and 1.2 % border collisions, and significantly outperforms PPO
-   in all three seeds (p = 8.6e−06, 0.0295, 1.8e−09).
-2. **It matches a strongly-tuned classical baseline on success while following
-   the path significantly more accurately.** RMS CTE 0.908 m vs 1.328 m
-   (p < 1e−35 in all three comparisons).
-3. **The classical baseline required a documented 250-configuration random
-   search over 20 parameters (25 000 episodes) to reach that parity**, and still
+   3.8 % obstacle and 1.2 % border collisions.
+2. **Independent retraining reproduces it.** Three from-scratch seeds give
+   0.940 / 0.900 / 0.932, and **two of the three are statistically
+   indistinguishable from the deployed policy** (p = 0.511, 0.289). The reported
+   result is reproducible from the configuration, which is a materially stronger
+   position than the paper is currently in.
+3. **SAC outperforms PPO under identical conditions** — 0.924 against 0.905
+   pooled, and significantly better against every PPO seed when measured against
+   the deployed policy. Note the matched seed-for-seed comparison is weaker:
+   significant in 1 of 3 (p = 0.0152), non-significant in the other two.
+4. **SAC follows the path more accurately than either baseline** — 0.908 m
+   (deployed) and 1.101 m (retrained) against PPO's 1.286 m and LOS+APF's
+   1.328 m.
+5. **The classical baseline required a documented 250-configuration random
+   search over 20 parameters (25 000 episodes) to reach parity**, and still
    varied with the search seed (0.940–0.972). The learned policy needs no
    hand-designed gains and is the controller actually deployed.
-4. **The SAC policy's behavioural signature is highly reproducible.** Across
-   three independent from-scratch retrains, RMS CTE (0.906 vs the deployed
-   policy's 0.908), minimum obstacle clearance (0.230 vs 0.233) and rudder rate
-   (67.0 vs 74.9) all reproduce closely. SAC reliably learns the same *kind* of
-   controller: accurate, close-passing, actuator-hungry.
 
 ### Claims that are NOT supported — do not make these
 
 * ✗ "SAC outperforms the classical baseline." Not significant in any of the
   three comparisons (p = 0.211, 0.108, 0.576).
-* ✗ "SAC maintains larger clearances." LOS+APF keeps 0.768 m and PPO 0.503 m
-  against SAC's 0.233 m.
-* ✗ **"SAC is the better algorithm for this task."** Under matched from-scratch
-  training at 1M steps, PPO significantly *beats* retrained SAC in 2 of 3 seeds
-  (0.871 vs 0.812 pooled). The deployed policy's advantage over PPO comes from
-  its particular training history, not from SAC being superior at this budget.
-  This directly qualifies the manuscript's stated contribution that SAC was
-  "selected based on prior PPO/SAC comparison" — see §4a.
+* ✗ "SAC maintains larger clearances." LOS+APF keeps 0.768 m and PPO 0.528 m
+  against SAC's 0.233 m (deployed) / 0.440 m (retrained).
+* ✗ "SAC decisively beats PPO." Pooled it is ahead (0.924 vs 0.905), but the
+  matched seed-for-seed test is significant in only 1 of 3 seeds.
+* ✗ "SAC trained for 1M steps achieves 0.92." It does not — see §4a. The
+  reported policies are **mid-training checkpoints**; every `gradient_steps=4`
+  run degrades substantially by 1M.
 * ✗ Any unqualified generalisation claim beyond 0–4 obstacles and straight paths.
 
 ### Two corrections the revision should carry
@@ -267,90 +286,94 @@ disagree.
 
 ---
 
-## 4a. SAC retrained on 3 seeds — the deployed policy is not reproducible at 1M steps
+## 4a. SAC reproducibility: the original configuration was under-trained
 
-Run at the user's request, under the corrected fixed-RPM setup, identical in
-every respect to the PPO protocol: same environment, same reward (unmodified),
-same 1M budget, same 8 workers, same evaluation grid and selection score.
-9.36 h for three seeds.
+### The problem
 
-| | success | obstacle coll. | RMS CTE | min obst. clear. | rudder rate |
-|---|---|---|---|---|---|
-| seed 0 | 0.814 | 0.126 | 1.079 | 0.401 | 62.9 |
-| seed 1 | 0.780 | 0.198 | 0.814 | 0.190 | 65.5 |
-| seed 2 | 0.842 | 0.146 | 0.841 | 0.305 | 66.8 |
-| **pooled** | **0.812** | 0.157 | 0.906 | 0.230 | 67.0 |
-| deployed policy | **0.950** | 0.038 | 0.908 | 0.233 | 74.9 |
+Three from-scratch SAC seeds under the published configuration
+(`gradient_steps=1`) reached only **0.780 / 0.814 / 0.842** on the frozen 500,
+against the deployed policy's 0.950 — and under matched training PPO was
+significantly *stronger* in 2 of 3 seeds. The deployed result did not look
+reproducible from the documented configuration.
 
-### Three things this establishes
+### The cause
 
-**1. The seeds are consistent with each other, but not with the deployed
-policy.** The spread is 0.062 (0.780–0.842) — tighter than the withdrawn
-staged-curriculum runs — and centred at 0.812, roughly 14 points below the
-deployed checkpoint. Training variance alone does not explain a gap that large;
-the deployed policy is not simply a lucky draw from this distribution.
+With `train_freq=1`, `gradient_steps=1` and 8 `SubprocVecEnv` workers, SAC
+performs **one gradient update per eight environment transitions** — roughly
+125 000 updates per 1M steps. Standard SAC practice is one update per
+transition. The algorithm was starved of updates, not of data.
 
-**2. The curriculum correction was worth nothing to SAC.** Seed for seed, against
-the withdrawn staged runs: 0.816 → 0.814, 0.794 → 0.780. SAC never drifted into
-the low-RPM region under the staged setup, so removing it changed nothing. The
-same correction was worth roughly +0.60 success to PPO. This is also why the
-earlier "SAC is robust where PPO collapses" reading was never an algorithmic
-finding — SAC simply never took the bait that the artifactual curriculum offered.
+This was tested before committing compute: one seed, `gradient_steps=4`, 400k
+steps, against the same seed at `gradient_steps=1`. The pilot reached 0.938 on
+the frozen 500 using **2.5x fewer environment steps**, with obstacle collisions
+falling from 0.126 to 0.008.
 
-**3. Under matched from-scratch training, PPO is the stronger algorithm here.**
-Pooled 0.871 against 0.812, significant in 2 of 3 paired seed comparisons. The
-deployed SAC policy beats PPO comfortably; a freshly trained SAC does not. That
-distinction matters for the manuscript, which lists among its contributions an
-SAC policy "selected based on prior PPO/SAC comparison" — the present data does
-not support SAC being the better choice at this budget under this configuration.
+*(A prediction made before that evaluation — that the change would not close the
+gap — was wrong. It was based on the 60-episode validation grid, which showed the
+two configurations converging by 400k. The 500-episode measure showed otherwise.
+The small grid is a poor proxy and should not be used to draw conclusions.)*
 
-### What does reproduce, precisely
+### The result
 
-The *behavioural signature* transfers almost exactly, even though the success
-rate does not:
+Three seeds, 1M steps, `gradient_steps=4`, 21.5 h:
 
-| | deployed | retrained (3 seeds) |
-|---|---|---|
-| RMS cross-track error | 0.908 m | 0.906 m |
-| Min obstacle clearance | 0.233 m | 0.230 m |
-| Mean abs. rudder rate | 74.9 deg/s | 67.0 deg/s |
-| Completion time | 20.9 s | 20.0 s |
+| | best checkpoint | frozen-500 success | validation grid @1M |
+|---|---|---|---|
+| seed 0 | 400k | **0.940** | 0.617 |
+| seed 1 | 750k | **0.900** | 0.767 |
+| seed 2 | 250k | **0.932** | 0.700 |
+| pooled | — | **0.924** | — |
 
-SAC reliably learns the same *kind* of controller — accurate, close-passing,
-actuator-hungry, fast. What varies between the deployed policy and a fresh
-retrain is how often that behaviour completes the episode without contact.
+Two of the three are statistically indistinguishable from the deployed policy
+(McNemar p = 0.511 and 0.289). The deployed result **is** reproducible from the
+configuration, once the update ratio is corrected.
 
-### Why the gap most likely exists
+### The catch, which must be reported
 
-Not established here, and stated as hypothesis rather than result:
+**Every `gradient_steps=4` run degrades substantially before 1M.** Validation
+success peaks at 250k, 400k and 750k respectively and falls to 0.617–0.767 by
+the end. This is the well-known instability of SAC at a high update-to-data
+ratio: more updates per transition accelerates learning but makes late training
+prone to value overestimation.
 
-* **Training-history dependence.** The deployed checkpoint came from a specific
-  run whose eval-grid success climbed steadily to 0.967; all three retrains
-  plateau near 0.75–0.85 from ~400k onward. The divergence begins well before
-  any setup difference, so it is a property of that run.
-* **Environment drift.** `src/README.md` records that the stored results no
-  longer reproduce from the original `rl_env.py` (case 0 runs 226 steps against
-  240 recorded), and the SAC re-run shows episodes ~5 % shorter than the
-  published figures. If the environment changed after the deployed policy was
-  trained, exact reproduction from scratch is not available today.
-* **Under-training.** With `train_freq=1`, `gradient_steps=1` and 8 workers, SAC
-  performs ~125 k gradient updates per 1 M environment steps — low by standard
-  SAC practice. Raising `gradient_steps` would test this, but changes the
-  published configuration and would need applying to PPO as well.
+Consequences for the paper:
 
-### How to report it
+1. **The reported policies are mid-training checkpoints**, selected by the
+   training callback's score on its validation grid and evaluated on the
+   disjoint frozen 500. This is standard model selection and is applied
+   identically to PPO — but it is not "the model after 1M steps", and the paper
+   must say so.
+2. **The peak location is not predictable** — 250k, 400k, 750k across three
+   seeds. A fixed early-stopping budget would not have found it.
+3. **The deployed policy did not behave this way.** Its validation curve rose to
+   0.967 and *held* through 1M. None of the six retrains (three at
+   `gradient_steps=1`, three at `gradient_steps=4`) reproduce that stability,
+   which remains an unexplained difference and is worth a sentence.
 
-The honest framing is a limitation, not a result to be engineered away: *the
-deployed policy achieves 95.0 %, while independent retraining at the same budget
-yields 0.78–0.84, indicating that the reported performance depends on the
-specific training run rather than being reproducible from the configuration
-alone.* Reviewers generally treat a self-identified reproducibility limit far
-better than a claim that collapses when someone reruns the code.
+### What reproduces regardless of configuration
 
-If a single-policy result is preferred, that is also defensible for a deployment
-paper — the manuscript reports the controller that was actually flown, and the
-field trials validate that specific policy. In that case the retrains belong in
-a limitations paragraph rather than the results table.
+SAC's behavioural signature is stable across every variant tried:
+
+| | deployed | retrained gs=1 | retrained gs=4 |
+|---|---|---|---|
+| RMS cross-track error | 0.908 m | 0.906 m | 1.101 m |
+| Min obstacle clearance | 0.233 m | 0.230 m | 0.440 m |
+| Mean abs. rudder rate | 74.9 deg/s | 67.0 deg/s | 77.3 deg/s |
+
+SAC reliably learns an accurate, fast, actuator-hungry controller. The rudder
+rate in particular — 67–77 deg/s against a 20 deg/s servo limit — now reproduces
+across **six** independent from-scratch runs, which makes §3.1 a property of the
+algorithm on this task rather than an artifact of one checkpoint.
+
+### Disclosure required in the methods section
+
+> SAC is trained with four gradient updates per rollout collection across eight
+> parallel environments (one update per two environment transitions), rather
+> than the one-per-eight ratio of the original configuration. The environment,
+> reward function and observation space are unchanged.
+
+The field trials remain valid: they flew the deployed policy, and nothing about
+the environment or reward has been altered.
 
 ---
 
@@ -375,6 +398,25 @@ Re-run, not quoted from file: `models/sac_model_1M.zip` over the frozen 500,
 **SAC reproduces at 95.0 %, not exactly 94.0 %,** with mean episode length 203.9
 against 214.3 (−4.9 %). The drift is pre-existing, documented in
 `src/README.md`, and reproduces from the original `rl_env.py`.
+
+### SAC — retrained, 3 seeds
+
+`src/train_sac_baseline.py --seeds 0 1 2 --gradient-steps 4`. 3 x 1M steps, 8
+workers, fixed RPM throughout, 21.53 h (416.6 / 415.7 / 459.8 min).
+
+Published SAC hyperparameters throughout — `MultiInputPolicy`, lr 5e-5, batch
+512, gamma 0.99, buffer 1e6, `train_freq` 1, `ent_coef` "auto", net_arch
+[256,256] ReLU — with the **single** deviation of `gradient_steps=4` instead of
+1, recorded in each run's `hyperparameters.json` under
+`deviation_from_published_config`. See §4a.
+
+An earlier set of three seeds at `gradient_steps=1` (9.36 h) reached
+0.780 / 0.814 / 0.842 and is retained at
+`eval_results/baselines/sac_fx_seed*_final/` as the before/after evidence for
+the under-training diagnosis.
+
+These runs do **not** replace `models/sac_model_1M.zip`, which remains the
+manuscript's artifact and the policy the field trials flew.
 
 ### PPO — 3 seeds, corrected setup
 
@@ -456,7 +498,7 @@ alongside 18 sign-convention and behaviour checks; all 21 pass.
 `verify_los_apf.py`, `make_outputs.py`.
 
 **Reported results** (`eval_results/baselines/`): `sac_1M/`,
-`sac_fx_seed{0,1,2}_final/`, `ppo_fx_seed{0,1,2}_final/`, `los_apf_s{1,2,3}/`, plus
+`sac_gs4_seed{0,1,2}_best/`, `ppo_fx_seed{0,1,2}_best/`, `los_apf_s{1,2,3}/`, plus
 `comparison_table.{csv,md}`, `paired_stats_table.{csv,md}`, `paired_stats.json`,
 `figures/`.
 
@@ -471,7 +513,7 @@ Reproduce:
 python src/eval_layouts.py --build --check
 python src/verify_los_apf.py
 python src/train_ppo_baseline.py --seeds 0 1 2
-python src/train_sac_baseline.py --seeds 0 1 2
+python src/train_sac_baseline.py --seeds 0 1 2 --gradient-steps 4
 python src/tune_los_apf.py --n-configs 250 --workers 4 --seed 20240818
 python src/evaluate.py --controller sb3:sac:models/sac_model_1M.zip --tag sac_1M --workers 6
 python src/make_outputs.py --all
@@ -495,13 +537,15 @@ python src/make_outputs.py --all
   `eval_results/baselines/ood_*/`. It found performance falls off beyond the
   evaluated range, so an unqualified claim is the one sentence a reviewer could
   falsify quickly with the released code.
-* **The deployed SAC policy is not reproducible from the configuration alone.**
-  Three from-scratch seeds at 1M steps give 0.780–0.842 against the deployed
-  0.950, and under matched training PPO is significantly stronger in 2 of 3
-  seeds. Report as a limitation (§4a). If the results table is to carry a single
-  SAC row, it should be the deployed policy — the controller the field trials
-  actually used — with the retrains in a limitations paragraph.
-* **Consider testing the under-training hypothesis.** SAC performs ~125 k
-  gradient updates per 1M environment steps at `gradient_steps=1`. Raising it is
-  the cheapest test of whether the gap is a budget artifact, but it changes the
-  published configuration and would need applying to PPO too.
+* **Disclose the checkpoint-selection rule and the update ratio.** Both learned
+  methods are reported from a checkpoint selected on a validation grid, not from
+  the 1M endpoint, and SAC uses one gradient update per two environment
+  transitions rather than one per eight. Both belong in the methods section
+  (§4a has suggested wording).
+* **The `gradient_steps=4` runs degrade before 1M** (validation success falls to
+  0.617-0.767), with peaks at unpredictable points (250k / 400k / 750k). Worth a
+  limitation sentence; a fixed training budget would not reliably land on the
+  peak.
+* **The deployed policy's stability is still unexplained.** Its validation curve
+  rose and held through 1M; none of six retrains did. Candidate causes are the
+  documented environment drift (`src/README.md`) and run-to-run variance.

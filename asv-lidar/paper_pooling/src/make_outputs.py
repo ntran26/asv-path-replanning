@@ -58,8 +58,8 @@ FIG_DIR = os.path.join(BASE, "figures")
 # tuning-procedure variance, which is the correct analogue of a training seed.
 METHOD_SPECS: List[Tuple[str, str, bool]] = [
     ("SAC (deployed)", os.path.join(BASE, "sac_1M", "episodes.csv"), False),
-    ("SAC (retrained, 3 seeds)", os.path.join(BASE, "sac_fx_seed*_final", "episodes.csv"), False),
-    ("PPO (3 seeds)", os.path.join(BASE, "ppo_fx_seed*_final", "episodes.csv"), False),
+    ("SAC (retrained, 3 seeds)", os.path.join(BASE, "sac_gs4_seed*_best", "episodes.csv"), False),
+    ("PPO (3 seeds)", os.path.join(BASE, "ppo_fx_seed*_best", "episodes.csv"), False),
     ("LOS+APF (3 searches)", os.path.join(BASE, "los_apf_s*", "episodes.csv"), False),
 ]
 
@@ -249,19 +249,22 @@ def build_paired_table() -> None:
     #   (a) everything against the deployed SAC checkpoint -- the manuscript's baseline
     #   (b) retrained SAC against PPO seed-for-seed -- the matched from-scratch
     #       comparison, which is the one that isolates the algorithm
+    # All learned methods reported from the checkpoint selected by the training
+    # callback's score on its validation grid, evaluated here on the disjoint
+    # frozen 500.  The same rule for every method.
     pairs = []
-    for run in sorted(glob.glob(os.path.join(BASE, "sac_fx_seed*_final", "episodes.csv"))):
-        seed = os.path.basename(os.path.dirname(run)).replace("sac_fx_", "").replace("_final", "")
+    for run in sorted(glob.glob(os.path.join(BASE, "sac_gs4_seed*_best", "episodes.csv"))):
+        seed = os.path.basename(os.path.dirname(run)).replace("sac_gs4_", "").replace("_best", "")
         pairs.append(("SAC deployed", sac, f"SAC retrained ({seed})", run))
-    for run in sorted(glob.glob(os.path.join(BASE, "ppo_fx_seed*_final", "episodes.csv"))):
-        seed = os.path.basename(os.path.dirname(run)).replace("ppo_fx_", "").replace("_final", "")
+    for run in sorted(glob.glob(os.path.join(BASE, "ppo_fx_seed*_best", "episodes.csv"))):
+        seed = os.path.basename(os.path.dirname(run)).replace("ppo_fx_", "").replace("_best", "")
         pairs.append(("SAC deployed", sac, f"PPO ({seed})", run))
     for los in sorted(glob.glob(os.path.join(BASE, "los_apf_s*", "episodes.csv"))):
         tag = os.path.basename(os.path.dirname(los))
         pairs.append(("SAC deployed", sac, f"LOS+APF ({tag})", los))
     for i in (0, 1, 2):
-        sa = os.path.join(BASE, f"sac_fx_seed{i}_final", "episodes.csv")
-        pp = os.path.join(BASE, f"ppo_fx_seed{i}_final", "episodes.csv")
+        sa = os.path.join(BASE, f"sac_gs4_seed{i}_best", "episodes.csv")
+        pp = os.path.join(BASE, f"ppo_fx_seed{i}_best", "episodes.csv")
         if os.path.exists(sa) and os.path.exists(pp):
             pairs.append((f"SAC retrained seed{i}", sa, f"PPO seed{i}", pp))
 
@@ -387,6 +390,7 @@ def plot_learning_curves() -> None:
     sac = read_sac_curve()
     families = [
         ("PPO", read_run_curves("ppo"), "tab:blue", "--", "s"),
+        ("SAC (retrained)", read_run_curves("sac_gs4"), "tab:green", "-.", "^"),
     ]
     families = [f for f in families if f[1]]
     if sac is None and not families:

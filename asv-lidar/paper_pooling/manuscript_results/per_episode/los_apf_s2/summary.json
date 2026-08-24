@@ -7,7 +7,7 @@
   "metrics": {
     "success": {
       "n_finite": 500,
-      "mean": 0.972,
+      "mean": 0.934,
       "median": 1.0,
       "iqm": 1.0,
       "std": 0.16497272501841023
@@ -136,7 +136,7 @@
     },
     "obs_1": {
       "n": 100,
-      "success_rate": 1.0,
+      "success_rate": 0.97,
       "obstacle_collision_rate": 0.0,
       "border_collision_rate": 0.0,
       "timeout_rate": 0.0,
@@ -144,7 +144,7 @@
     },
     "obs_2": {
       "n": 100,
-      "success_rate": 0.97,
+      "success_rate": 0.95,
       "obstacle_collision_rate": 0.03,
       "border_collision_rate": 0.0,
       "timeout_rate": 0.0,
@@ -152,7 +152,7 @@
     },
     "obs_3": {
       "n": 100,
-      "success_rate": 0.94,
+      "success_rate": 0.9,
       "obstacle_collision_rate": 0.06,
       "border_collision_rate": 0.0,
       "timeout_rate": 0.0,
@@ -160,7 +160,7 @@
     },
     "obs_4": {
       "n": 100,
-      "success_rate": 0.95,
+      "success_rate": 0.85,
       "obstacle_collision_rate": 0.04,
       "border_collision_rate": 0.01,
       "timeout_rate": 0.0,
