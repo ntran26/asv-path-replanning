@@ -63,7 +63,7 @@ U_REWARD_REF = 0.8                # speed at which the path/heading gate saturat
 W_HEADING = 0.35
 
 # Anti-stall and effort terms.
-K_PROGRESS = 0.6
+K_PROGRESS = 0.7
 K_SLOW = 0.10
 U_MIN_REWARD = 0.30
 K_THRUST_DEV = 0.025

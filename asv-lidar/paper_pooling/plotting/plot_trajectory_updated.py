@@ -825,14 +825,14 @@ def plot_comparison(
         _draw_layout(ax, layout, map_width=map_width, map_height=map_height, show_grid=show_grid)
 
         if sim is not None and len(sim) >= 2:
-            ax.plot(sim[:, 0], sim[:, 1], color="#1f77b4", linewidth=2.0, label="Simulation", zorder=4)
+            ax.plot(sim[:, 0], sim[:, 1], linestyle="-", color="#1f77b4", linewidth=2.0, label="Simulation", zorder=4)
             ax.scatter([sim[0, 0]], [sim[0, 1]], s=18, color="#1f77b4", zorder=5)
             ax.scatter([sim[-1, 0]], [sim[-1, 1]], s=24, color="#1f77b4", marker="s", zorder=5)
             if show_ship_icon and ship_icon_target in {"simulation", "both"}:
                 _add_ship_marker(ax, sim, zoom=ship_icon_zoom, facecolor="white", edgecolor="#1f77b4", zorder=9)
 
         if field is not None and len(field) >= 2:
-            ax.plot(field[:, 0], field[:, 1], color="#d62728", linewidth=2.0, label="Field", zorder=5)
+            ax.plot(field[:, 0], field[:, 1], linestyle="-.", color="#d62728", linewidth=2.0, label="Field", zorder=5)
             ax.scatter([field[0, 0]], [field[0, 1]], s=18, color="#d62728", zorder=6)
             ax.scatter([field[-1, 0]], [field[-1, 1]], s=24, color="#d62728", marker="s", zorder=6)
             if show_ship_icon and ship_icon_target in {"field", "both"}:
@@ -848,8 +848,8 @@ def plot_comparison(
 
     legend_handles = [
         Line2D([0], [0], linestyle="--", color="0.05", linewidth=1.6, label="Reference path"),
-        Line2D([0], [0], color="#1f77b4", linewidth=2.0, label="Simulation"),
-        Line2D([0], [0], color="#d62728", linewidth=2.0, label="Field experiment"),
+        Line2D([0], [0], linestyle="-", color="#1f77b4", linewidth=2.0, label="Simulation"),
+        Line2D([0], [0], linestyle="-.", color="#d62728", linewidth=2.0, label="Field experiment"),
         Rectangle((0, 0), 1, 1, facecolor="0.82", edgecolor="0.25", label="Static obstacle"),
         Line2D([0], [0], marker="o", linestyle="None", markerfacecolor="white", markeredgecolor="0.05", label="Start"),
         Line2D([0], [0], marker="*", linestyle="None", color="0.05", markersize=9, label="Goal"),

@@ -161,6 +161,7 @@ def plot_eval_reward_only(rows: List[Dict[str, Any]], out_dir: Path, title: str,
     std_reward = arr(rows, "std_ep_reward")
 
     fig, ax = plt.subplots(figsize=(7.2, 4.4))
+
     ax.plot(x, mean_reward, marker="o", linewidth=1.8, label="Mean eval reward")
     if finite_any(std_reward):
         lower = mean_reward - std_reward
@@ -169,8 +170,17 @@ def plot_eval_reward_only(rows: List[Dict[str, Any]], out_dir: Path, title: str,
 
     add_training_stage_markers(ax, x_units)
 
+    ax.text(
+            -0.15, 1.05, "(b)",
+            transform=ax.transAxes,
+            fontsize=10,
+            fontweight="bold",
+            ha="left",
+            va="top",
+        )
     ax.set_xlabel(xlabel)
     ax.set_ylabel("Mean episode reward")
+    ax.set_title("Mean evaluation return")
     ax.grid(True, alpha=0.3)
     ax.legend(loc="lower right", frameon=True)
     if title:
@@ -345,15 +355,23 @@ def plot_monitor_reward(monitor_path: Optional[Path], out_dir: Path, title: str,
         xlabel = "Training timesteps (k, approx. from episode lengths)"
     else:
         x = steps / 1_000_000.0
-        xlabel = "Training timesteps (million, approx. from episode lengths)"
+        xlabel = "Training timesteps (million)"
 
     fig, ax = plt.subplots(figsize=(7.2, 4.4))
+    ax.text(
+        -0.15, 1.05, "(a)",
+        transform=ax.transAxes,
+        fontsize=10,
+        fontweight="bold",
+        ha="left",
+        va="top",
+    )
     ax.plot(x, rewards, linewidth=0.7, alpha=0.35, label="Episode reward")
     ax.plot(x, rolling_mean(rewards, rolling_window), linewidth=2.0, label=f"Rolling mean ({rolling_window} episodes)")
     ax.set_xlabel(xlabel)
     ax.set_ylabel("Training episode reward")
     ax.grid(True, alpha=0.3)
-    ax.legend(loc="best", frameon=False)
+    ax.legend(loc="lower right", frameon=True)
     if title:
         ax.set_title(title)
     fig.tight_layout()
