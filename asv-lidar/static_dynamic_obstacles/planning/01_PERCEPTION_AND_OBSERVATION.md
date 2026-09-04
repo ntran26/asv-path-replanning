@@ -27,7 +27,8 @@ worked.
 ## 2. LiDAR configuration
 
 **Hardware (confirmed):** RPLidar C1, 360° swath, 720 beams, θ = 0.5° uniform,
-10 Hz scan rate. Localisation via `rf2o_laser_odometry` (ROS2).
+10 Hz scan rate, scanning range 1-16m (out of range returns 0). 
+Localisation via `rf2o_laser_odometry` (ROS2).
 
 ### 2.1 Raw scan — full 360°
 
