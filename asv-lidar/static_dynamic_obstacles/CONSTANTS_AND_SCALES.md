@@ -1,7 +1,8 @@
 # CONSTANTS AND SCALES — Paper 3
 
-**Revision 2** — two-vessel repositioning. One dynamic target, five encounter
-classes, ship domain resolved to 2.0 / 1.0 / 0.75 × Lpp, O4/O5/O6 closed.
+**Revision 2.2** — tracks `02a_REWARD_SPECIFICATION.md` Rev 2.2. Head-on band
+resolved to ±10°, IMU confirmed, propulsion widening resolved, a 7 m sweep level
+added, and the speed normaliser corrected after it was found to be saturating.
 
 Mirror of `src/constants.py`, which is the single source of truth. Every
 unresolved value appears there with a `TODO` marker and **nowhere else** — no
@@ -15,8 +16,13 @@ consumer buries a magic number in a function body.
 | `TODO(05)` | `planning/05_VESSEL_MODEL_AND_SIM2REAL.md` |
 | `TODO(decision)` | needs a call no open item currently covers |
 
-**42 constants are unresolved.** §11 lists them all with the placeholder in
-force. Placeholders are chosen to make the code run, not to look finished.
+**41 constants are unresolved.** §11 lists them with the placeholder in force.
+Placeholders are chosen to make the code run, not to look finished.
+
+Closed since Revision 2: the head-on band (±10°, 01 §5.3) and the propulsion
+widening decision (03 §6). Two new entries arrived —
+`TARGET_COMPLIANT_SPAWN_PROB` and `REVERSE_AVAILABLE` — and `U_MAX_SURGE`
+replaced the derived `SPEED_SCALE`.
 
 ---
 
@@ -38,7 +44,8 @@ mis-scale the ship domain by 10%. `ship.py` has no `LBP`; it is defined here.
 | `UPDATE_RATE` | 0.1 s | 10 Hz, matches the field control loop |
 | `MAX_EPISODE_STEPS` | 700 | 70 s cap — **verify against the longest corridor** (03 §8) |
 | `MAP_WIDTH` / `MAP_HEIGHT` | 10.0 / 25.0 m | **O4 resolved** |
-| `CORRIDOR_WIDTHS_M` | 10, 8, 6, 5, 4, 3.5 m | Study 1 sweep |
+| `CORRIDOR_WIDTHS_M` | 10, 8, **7**, 6, 5, 4, 3.5 m | Study 1 sweep |
+| `PREDICTED_THRESHOLDS_M` | 6.52 / 6.02 / 4.78 / 3.66 m | per-class, 02a §2.2 |
 | `HEAD_ON_WALL_CLEARANCE` | 0.65 m | `TODO(05)` |
 
 **O4 resolved (03 §5): simulation matches the basin.** Maximum corridor width
@@ -47,38 +54,72 @@ meaningful strengthening of the field-validation argument. The unconfined
 reference case comes instead from the open-water "Around the Clock" variant,
 which is unbounded by construction.
 
-The sweep in breadths, and whether a compliant head-on fits:
+The sweep, in metres and breadths:
 
-| Width | Breadths | Compliant head-on fits? |
+| 10 m | 8 m | 7 m | 6 m | 5 m | 4 m | 3.5 m |
+|---|---|---|---|---|---|---|
+| 20 B | 16 B | 14 B | 12 B | 10 B | 8 B | 7 B |
+
+02a §2.2 now predicts **four** per-class transitions, not one:
+
+| Class | Threshold | Bracket |
 |---|---|---|
-| 10 m | 20 B | Yes, comfortably |
-| 8 m | 16 B | Yes |
-| 6 m | 12 B | Yes |
-| 5 m | 10 B | Marginal |
-| 4 m | 8 B | Tight |
-| 3.5 m | 7 B | **No** — below threshold |
+| Crossing | 6.52 m (13.0 B) | 6 → 7 |
+| Head-on, target on the centreline | 6.02 m (12.0 B) | 6 → 7 ⚠ |
+| Overtaking | 4.78 m (9.6 B) | 4 → 5 |
+| Head-on, target 9(a)-compliant | 3.66 m (7.3 B) | 3.5 → 4 |
 
-Minimum width for a compliant port-to-port head-on:
-`2 × DOMAIN_LATERAL + 2 × HEAD_ON_WALL_CLEARANCE` = 2.36 + 1.30 = **3.66 m
-(7.3 B)**, bracketed between the 4.0 m and 3.5 m levels.
-`tests/test_cpa_cri.py::test_the_width_sweep_brackets_the_head_on_threshold`
-checks this arithmetic, and will fail if the ship domain moves without the
-sweep moving with it — which it will, once 05 lands.
+The 7 m level comes from 02a §11.3. **It does not achieve what that section
+claims** — see PORTING_MANIFEST F18. Crossing and centreline head-on still share
+the (6, 7) bracket, and the 6.02 m figure sits 2 cm above the 6 m sweep level,
+so that transition effectively coincides with a sample point. Separating them
+needs a level strictly between the two, e.g. 6.25 m (12.5 B).
+
+All four move with the ship domain, so recompute after the turning-circle
+identification and before freezing the suite.
+`tests/test_env.py` asserts the bracketing, asserts the crossing/head-on
+collision as the current documented state, and fails if either changes.
 
 ## 3. Actuation
 
 | Symbol | Value | Status |
 |---|---|---|
 | `CRUISE_RPM` | 12.0 | Paper 2 |
-| `RPM_STAGE` | 1 → (±3, 9, 15) | **`TODO(02)`** |
-| `U_CRUISE` | 0.55 m/s | `TODO(05)` |
+| `RPM_STAGE` | 1 → (±3, 9, 15) | curriculum entry; **stage 4 is the endpoint** |
+| `REVERSE_AVAILABLE` | False | `TODO(03)` — capability unverified |
+| `U_CRUISE` | **1.77 m/s** | `TODO(05)` — see below |
+| `U_MAX_SURGE` | 3.2 m/s | `TODO(05)` |
 
-**`RPM_STAGE` is a live decision, not a carry-over.** Rule 8(e) permits
-slackening speed or stopping, and in a narrow channel speed reduction is
-frequently the *only* admissible action when there is no room for a course
-alteration. Paper 2's stage-1 authority is ±3 RPM around cruise. If the agent
-cannot meaningfully slow down, a lawful manoeuvre has been removed from its
-repertoire and a reviewer may notice (02 §4.4).
+**Propulsion widening is resolved** (03 §6, 02 §4.4). Rule 8(e) speed reduction
+is the designated fallback whenever a compliant course alteration would push the
+vessel into the boundary, so the agent must be able to slow substantially and
+ideally stop. Staged through the curriculum as in Paper 2, but the final stage
+must expose stage 4 — it is the only one reaching 0 RPM.
+
+`REVERSE_AVAILABLE` defaults False deliberately. 02a §10.5 is explicit: do not
+flip it on a datasheet, because 05 must identify the reverse regime or the
+simulator extrapolates into an unmodelled envelope.
+
+### 3.1 Three speed figures disagree — 05 must settle it
+
+| Source | Value |
+|---|---|
+| Simulator at `CRUISE_RPM` = 12, measured | **1.77 m/s** |
+| 02a §1 `U_ref` | 0.80 m/s |
+| 02a §10.5 reachable surge target | 0.20–0.90 m/s |
+
+The simulator's speed envelope sits **2–3× above** everything 02a assumes. Its
+whole §8.1 audit table is computed at `U_ref = 0.8`, and its §10.5 propulsion
+targets are below the simulator's *stage-1 floor* (1.35 m/s at 9 RPM).
+
+Either the thrust map is wrong — 05 §2 already lists "Paper 2 used thrust ∝ RPM²;
+verify" as a task — or 02a's figures are. Until it is settled, every
+speed-normalised observation feature and every reward speed gate is scaled
+against a different vessel from the one being simulated.
+
+`U_CRUISE` now records what the simulator actually does, rather than the 0.55 m/s
+field figure it previously carried, so the discrepancy is visible instead of
+buried.
 
 ## 4. Raw LiDAR (RPLidar C1)
 
@@ -208,9 +249,21 @@ Plus a fifth that 01 does not list but 05 §6 and 03 §7 do:
 | `EGO_SPEED_NOISE`, `EGO_YAW_RATE_NOISE_DPS` | `ego` observation branch |
 |---|---|
 
-**There is no IMU on the platform.** u, v and r are differentiated from a noisy
-pose, so the `ego` branch carries field error that simulation did not model at
-all — a sim-to-real gap in the *observation*, not just in the dynamics.
+**An IMU is confirmed** (05 §4.7, Revision 2.2). That changes the character of
+this gap rather than closing it:
+
+* `r` comes from the gyro directly, so the residual is the sensor noise floor
+  rather than pose-differentiation error. `r_dead` in 02a §6.2 is now set from
+  the measured floor rather than guessed, and the yaw-rate-not-rudder criterion
+  02 §4.2 depends on becomes **directly measurable in the field** instead of
+  inferred.
+* `u` and `v` are largely rescued by the accelerometer, but are still fused
+  rather than measured, so a residual remains.
+
+Scan-to-map supplies drift-free absolute pose at 10 Hz; the IMU fills in between.
+Both magnitudes still come from 05. Log raw gyro and accelerometer at 100 Hz+,
+time-synced to the LiDAR — 05 §4.7 flags the sync as the detail that will bite,
+because a constant offset appears in the fit as actuator lag.
 
 ## 8. Ship domain — RESOLVED (provisional)
 
@@ -276,8 +329,8 @@ the normal case rather than the exception.
 
 | Symbol | Value | Status |
 |---|---|---|
-| `HEAD_ON_BEARING_HALF_DEG` | 8.0° | `TODO(decision)` — source is 5.0° |
-| `HEAD_ON_CT_HALF_DEG` | 8.0° | `TODO(decision)` |
+| `HEAD_ON_BEARING_HALF_DEG` | **10.0°** | **resolved** (01 §5.3) — source is 5.0° |
+| `HEAD_ON_CT_HALF_DEG` | **10.0°** | kept symmetric — see below |
 | `CROSSING_STBD_MAX_DEG` | 112.5° | source table |
 | `CROSSING_PORT_MIN_DEG` | 247.5° | source table |
 | `OVERTAKING_CT_HALF_DEG` | 67.5° | source table |
@@ -292,8 +345,13 @@ Three modifications to Waltz & Okhrin Table 1 (01 §5.3):
    own ship gives way either way, so the side is not a different obligation. The
    geometry is still computed and exposed as `encounter.crossing_side()` for
    02's passing-side reward term — it is simply not observed.
-2. **The head-on band is widened** from ±5° to ±8°, the midpoint of the ±6–10°
-   of common practice. 01 §5.3 marks the value and its justification `[TBC]`.
+2. **The head-on band is widened from ±5° to ±10°** — resolved in 01 §5.3
+   Revision 2.2. The source value is tight enough that a small heading error
+   flips the classification; ±10° is within common practice and gives the
+   hysteresis room to work. 01 resolves "the head-on band" without separating
+   bearing from heading; kept symmetric here, so courses within 10° of
+   reciprocal count as head-on, which is the reading matching the stated
+   rationale (a small *heading* error).
 3. **"Being overtaken" is added**, mirroring the overtaking condition with
    U_TS > U_OS. Only Rule 17(a)(i) passive course-keeping is in scope; active
    release under 17(a)(ii) is future work (S5).
@@ -314,8 +372,8 @@ are missed. 0.10 m/s is 18% of cruise.
 | # | Symbol | Placeholder | Marker |
 |---|---|---|---|
 | 1 | `HEAD_ON_WALL_CLEARANCE` | 0.65 m | `TODO(05)` |
-| 2 | `RPM_STAGE` | 1 (±3 RPM) | `TODO(02)` |
-| 3 | `U_CRUISE` | 0.55 m/s | `TODO(05)` |
+| 2 | `REVERSE_AVAILABLE` | False | `TODO(03)` |
+| 3 | `U_CRUISE`, `U_MAX_SURGE` | 1.77 / 3.2 m/s | `TODO(05)` |
 | 4 | `LIDAR_DROPOUT_P` | 0.0 | `TODO(05)` |
 | 5 | `LIDAR_NO_RETURN_GRAZING_DEG` | 0.0 | `TODO(05)` |
 | 6 | `LIDAR_AFT_MASK_HALF_DEG` | 0.0 | `TODO(05)` |
@@ -335,13 +393,14 @@ are missed. 0.10 m/s is 18% of cruise.
 | 27–28 | `CRI_TCPA_SCALE_BEFORE` / `_AFTER` | 20.0 / 6.0 s | `TODO(decision)` |
 | 29 | `CRI_ED_SCALE` | 5.0 m | `TODO(decision)` |
 | 30–31 | `CRI_BOW_CROSSING_GAIN` / `_HALF_DEG` | 1.3 / 45° | `TODO(decision)` |
-| 32–33 | `HEAD_ON_BEARING_HALF_DEG` / `HEAD_ON_CT_HALF_DEG` | 8.0° | `TODO(decision)` |
-| 34 | `BEING_OVERTAKEN_SPEED_MARGIN` | 0.10 m/s | `TODO(decision)` |
+| 32 | `BEING_OVERTAKEN_SPEED_MARGIN` | 0.10 m/s | `TODO(decision)` |
+| 33 | `TARGET_COMPLIANT_SPAWN_PROB` | 0.5 | `TODO(04)` |
+| 34 | `PREDICTED_THRESHOLDS_M` | 6.52 / 6.02 / 4.78 / 3.66 m | `TODO(05)`, `TODO(04)` |
 | 35 | `TCPA_CLIP` | 60.0 s | `TODO(decision)` |
 | 36 | `DCPA_CLIP_DOMAINS` | 10.0 | `TODO(decision)` |
 | 37 | `USE_RECURRENCE` | False | `TODO(04)` |
 | 38–40 | `R_COLLISION` / `R_TIMEOUT` / `R_GOAL` | −1000 / −1000 / +50 | `TODO(02)` |
-| 41 | `TARGET_SPEED_RANGE` | (0.30, 0.80) m/s | `TODO(03)` |
+| 41 | `TARGET_SPEED_RANGE` | (0.60, 2.40) m/s | `TODO(03)` |
 | 42 | `NO_TARGET_EPISODE_PROB` | 0.25 | `TODO(04)` |
 
 The three terminal payoffs are structural, not shaping — they exist only so the

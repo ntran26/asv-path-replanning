@@ -159,12 +159,32 @@ those features are distinctive and irregularly spaced.
 - **Operators on the deck** sit at scan height and move. Handled by the geometric gate
   (01 §3.4), but they must not enter the localisation reference either
 
-### 4.7 The one open decision
+### 4.7 IMU — CONFIRMED, specification
 
-**Is adding an IMU feasible?** A ~$30 9-DOF unit logging gyro at 100 Hz removes the yaw-rate
-observability constraint entirely and is by far the highest value-per-dollar addition to the
-project. Even a phone taped to the deck for a few runs would validate the LiDAR-derived yaw
-rate. Everything above assumes no IMU and works without one, but less comfortably.
+An IMU will be added. This removes the yaw-rate observability constraint and, via the
+accelerometer, largely rescues the surge measurements that two parallel walls could not
+constrain. The manoeuvre set in §3 is now fully covered.
+
+**Log raw gyro and accelerometer, not a fused orientation output.** Fusion firmware applies
+unknown filtering that corrupts exactly the lag and damping parameters being identified.
+BNO055 in raw mode, ICM-20948, or a Pixhawk log all work. 100 Hz or better.
+
+**Time synchronisation is the detail that will bite.** A constant offset between IMU and LiDAR
+timestamps appears in the fit as actuator lag, so a clock error would be absorbed into the
+model as a physical parameter. Log both on one clock if possible; otherwise begin each run with
+a sharp yaw impulse visible in both streams and align on it.
+
+**Mounting and calibration.** Rigid mount near the centre of gravity, axes aligned with body
+axes, mounting offset recorded. Stationary period at the start of every run for gyro bias
+estimation.
+
+**Sensor fusion.** Scan-to-map supplies absolute pose at 10 Hz and is drift-free; the IMU
+supplies yaw rate and acceleration at high rate. The two are complementary — the registration
+anchors, the IMU fills in between and provides the derivatives directly. This also improves the
+`ego` observation branch in the field, reducing the u/v/r sim-to-real gap identified in §6.
+
+**Fitting.** With a gyro available, fit to yaw rate *and* heading and cross-check the two.
+Disagreement indicates a synchronisation or mounting error rather than a model deficiency.
 
 
 ## 5. Fit and validation
@@ -272,7 +292,8 @@ deployment-oriented framing after the encounter scope was narrowed.
 
 ## 10. Open items
 
-- **IMU** — the one remaining open decision (§4.7). Assume none for now
+- ~~IMU feasibility~~ — **confirmed, will be added** (§4.7). Specify part, logging rate and
+  time-sync method
 - ~~O6 external instrumentation~~ — resolved: scan-to-map pipeline, no purchase
 - ~~O5 physical barrier~~ — resolved: software gating, walls retained for localisation
 - **Measure black-wall return rate from existing logs (§4.5a) — do this first**

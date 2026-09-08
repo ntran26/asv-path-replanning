@@ -291,8 +291,71 @@ def test_every_sweep_width_runs(width):
 
 
 def test_widths_in_breadths_are_the_declared_sweep():
-    """03 §5: 20, 16, 12, 10, 8, 7 B, bracketing the head-on threshold."""
-    assert cfg.widths_in_breadths() == (20.0, 16.0, 12.0, 10.0, 8.0, 7.0)
+    """02a §11.3: 14 B added so the crossing and head-on thresholds separate.
+
+    The original six levels bracketed all four predicted transitions, but
+    crossing (13.0 B) and centreline head-on (12.0 B) landed in the same
+    bracket.
+    """
+    assert cfg.widths_in_breadths() == (20.0, 16.0, 14.0, 12.0, 10.0, 8.0, 7.0)
+    assert 14.0 in cfg.widths_in_breadths()
+
+
+def _brackets():
+    widths = sorted(cfg.CORRIDOR_WIDTHS_M)
+    return widths, list(zip(widths, widths[1:]))
+
+
+def test_the_sweep_brackets_every_predicted_threshold():
+    """Each per-class transition must fall strictly inside some bracket.
+
+    02a §2.2 predicts four, and all four move with the ship domain -- so this
+    fails loudly when 05 replaces the provisional domain without the sweep
+    following it.
+    """
+    widths, brackets = _brackets()
+    for name, threshold in cfg.PREDICTED_THRESHOLDS_M.items():
+        holding = [(lo, hi) for lo, hi in brackets if lo < threshold < hi]
+        assert holding, f"{name} at {threshold} m is not bracketed by {widths}"
+        assert len(holding) == 1, f"{name} bracketed more than once"
+
+
+def test_crossing_and_centreline_head_on_still_share_a_bracket():
+    """A documented gap, not a passing check -- see PORTING_MANIFEST F18.
+
+    02a §11.3 adds the 7 m level to "separate the crossing threshold from the
+    head-on one cleanly".  It does not: crossing at 6.52 m and centreline
+    head-on at 6.02 m both sit in (6.0, 7.0).  The table in §11.3 places 6.02 in
+    the 6 -> 5 bracket, which only holds if the threshold is read as exactly
+    12.0 B = 6.00 m; at 6.02 m it is 2 cm above the 6 m sweep level, so the
+    transition effectively coincides with a sample point and cannot be resolved
+    either way.
+
+    Separating them needs a level strictly between the two, e.g. 6.25 m
+    (12.5 B).  Asserted as the current state so that fixing the sweep breaks
+    this test and forces the note to be updated rather than left stale.
+    """
+    _, brackets = _brackets()
+
+    def bracket_of(name):
+        t = cfg.PREDICTED_THRESHOLDS_M[name]
+        return next((lo, hi) for lo, hi in brackets if lo < t < hi)
+
+    assert bracket_of("crossing") == bracket_of("head_on_centreline_target")
+    assert not any(6.02 < w < 6.52 for w in cfg.CORRIDOR_WIDTHS_M)
+
+
+def test_the_other_two_thresholds_are_cleanly_separated():
+    _, brackets = _brackets()
+
+    def bracket_of(name):
+        t = cfg.PREDICTED_THRESHOLDS_M[name]
+        return next((lo, hi) for lo, hi in brackets if lo < t < hi)
+
+    separated = {"overtaking", "head_on_compliant_target"}
+    seen = {bracket_of(n) for n in separated}
+    assert len(seen) == len(separated)
+    assert bracket_of("crossing") not in seen
 
 
 def test_a_narrow_corridor_actually_narrows_the_navigable_space():

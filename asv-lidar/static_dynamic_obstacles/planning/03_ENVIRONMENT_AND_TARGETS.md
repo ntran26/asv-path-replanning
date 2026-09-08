@@ -155,9 +155,13 @@ the answer belongs in the paper rather than in the rebuttal.
 
 ## 6. Action space
 
-Structure unchanged (continuous rudder + propulsion), but see 02 §4.4: **propulsion
-authority may need to widen**, because Rule 8(e) makes slackening speed a legal avoidance
-action — and in a narrow channel it is frequently the *only* admissible one.
+Structure unchanged (continuous rudder + propulsion). **Propulsion authority widens — resolved
+(02 §4.4).** Rule 8(e) speed reduction is now the designated fallback whenever a compliant
+course alteration would push the vessel into the boundary, so the agent must be able to slow
+substantially and ideally stop.
+
+**Verify reverse thrust capability.** If the vessel can only reduce forward thrust, "take all
+way off" is unavailable; model what the platform can actually do and state the limitation.
 
 Rudder saturation and rate limiting stay matched to the real actuator (Paper 2 Table 2).
 Revisit once 05 delivers a calibrated actuator model.

@@ -4,11 +4,12 @@
 **Reference read:** `static_obstacles/src/` (read-only). Nothing under `static_obstacles/` was written.
 **Authoritative spec:** `planning/01_PERCEPTION_AND_OBSERVATION.md`.
 
-Step 0 deliverable per `KICKOFF_01_PERCEPTION.md` §2, **updated after the build and
-again for planning Revision 2**.
+Step 0 deliverable per `KICKOFF_01_PERCEPTION.md` §2, kept current as the planning set
+has moved.
 Sections 0-3 are the pre-build inventory, left as written so the findings can be read
-against what was known at the time. Section 4 records what the build changed.
-**Section 5 records the two-vessel repositioning** and is the current state.
+against what was known at the time. Section 4 records what the build changed, section 5
+the two-vessel repositioning, and **section 6 the Revision 2.2 reward specification** —
+which is the current state.
 
 ---
 
@@ -670,3 +671,157 @@ only admissible one.
 Acceptance checks all hold: nothing modified under `static_obstacles/`, no import
 reaches into it, `classify` is defined exactly once, and every unresolved
 constant carries a `TODO` in `constants.py` and nowhere else.
+
+---
+
+## 6. Revision 2.2 — tracking `02a_REWARD_SPECIFICATION.md`
+
+02a reached Revision 2.2 on 2026-09-07, and 00/01/02/03/05 and the brief moved
+with it. This section records what that resolved, what it changed in the code,
+and two arithmetic problems the changes exposed.
+
+### 6.1 Resolved — no longer `TODO`
+
+| | Was | Now |
+|---|---|---|
+| Head-on band | `TODO(decision)`, 8.0° placeholder | **±10°** (01 §5.3) |
+| Propulsion authority | `TODO(02)` — may be too narrow for Rule 8(e) | **Widens** (03 §6). Stage 4 is the curriculum endpoint; it is the only stage reaching 0 RPM |
+| IMU | assumed absent; `u, v, r` all differentiated from pose | **Confirmed** (05 §4.7) |
+| `R-3` | pending sign-off | **Withdrawn**, superseded by `R-8` |
+
+**The IMU changes the shape of a gap rather than closing it.** `r` now comes
+from the gyro, so its residual is the sensor noise floor rather than
+pose-differentiation error — and the yaw-rate-not-rudder criterion 02 §4.2
+depends on becomes directly measurable in the field instead of inferred. `u` and
+`v` are largely rescued by the accelerometer but stay fused rather than measured.
+`EGO_SPEED_NOISE` and `EGO_YAW_RATE_NOISE_DPS` keep their hooks; only the
+provenance of the numbers changes.
+
+The head-on band is stated as "the head-on band" without separating bearing from
+heading. Kept symmetric at ±10° for both, since the stated rationale — "a small
+*heading* error flips the classification" — points at the CT band.
+
+### 6.2 Changed in the code
+
+| File | Change |
+|---|---|
+| `constants.py` | `HEAD_ON_*_HALF_DEG` 8 → 10; `CORRIDOR_WIDTHS_M` gains 7.0 m; new `PREDICTED_THRESHOLDS_M`, `U_MAX_SURGE`, `REVERSE_AVAILABLE`, `TARGET_COMPLIANT_SPAWN_PROB`; `U_CRUISE` corrected; `SPEED_SCALE` re-derived; `TARGET_SPEED_RANGE` widened |
+| `env.py` | `_sample_target` samples a spawn lateral offset; `local_channel_width()` + `W_local` in `info`; IMU rationale |
+| `play.py` | target speeds expressed relative to cruise; `being_overtaken` staged properly |
+| `tests/` | width-bracket tests rewritten around the four predicted thresholds |
+
+### 6.3 F18 — 02a §11.3's extra sweep level does not do what it says
+
+§11.3 adds 7 m (14 B) "to separate the crossing threshold from the head-on one
+cleanly". It does not.
+
+| Class | Threshold | Bracket with 7 m added |
+|---|---|---|
+| Crossing | 6.52 m (13.0 B) | (6, 7) |
+| Head-on, centreline target | 6.02 m (12.0 B) | (6, 7) — **same bracket** |
+| Overtaking | 4.78 m (9.6 B) | (4, 5) |
+| Head-on, compliant target | 3.66 m (7.3 B) | (3.5, 4) |
+
+§11.3's own table places 6.02 m in the "6 → 5" bracket, which only holds if the
+threshold is read as exactly 12.0 B = 6.00 m. At 6.02 m it is 2 cm *above* the
+6 m sweep level, so the transition effectively coincides with a sample point and
+cannot be resolved in either direction.
+
+Separating the two needs a level strictly between them — **6.25 m (12.5 B)**
+would do it. The 7 m level has been added as specified and is useful in its own
+right, but the stated goal is unmet.
+
+Not fixed unilaterally: sweep levels are 04's, and adding an unrequested level is
+a design decision. Encoded instead as
+`tests/test_env.py::test_crossing_and_centreline_head_on_still_share_a_bracket`,
+which asserts the collision as the current state, so correcting the sweep breaks
+the test and forces this note to be updated rather than left stale.
+
+### 6.4 F19 — the simulator is 2–3× faster than 02a assumes, and one feature was saturating
+
+Measured from the simulator directly, 400 steps at zero rudder:
+
+| RPM | 0 | 6 | 9 | 12 | 15 | 18 | 24 |
+|---|---|---|---|---|---|---|---|
+| steady `u` (m/s) | 0.00 | 0.86 | 1.35 | **1.77** | 2.16 | 2.51 | 3.13 |
+
+Three figures disagree:
+
+| Source | Value |
+|---|---|
+| Simulator at `CRUISE_RPM` = 12 | **1.77 m/s** |
+| 02a §1 `U_ref` | 0.80 m/s |
+| 02a §10.5 reachable-surge target | 0.20–0.90 m/s |
+
+02a's §10.5 targets sit **below the simulator's stage-1 floor** (1.35 m/s at
+9 RPM), and its entire §8.1 scale-audit table is computed at `U_ref = 0.8`.
+Either the thrust map is wrong — 05 §2 already lists "Paper 2 used thrust ∝ RPM²;
+verify" — or 02a's figures are. This needs settling before the audit means
+anything, because every speed gate in the reward is scaled against it.
+
+**And it had already broken something here.** `SPEED_SCALE` was `2 × U_CRUISE`
+with `U_CRUISE = 0.55`, giving 1.10 m/s — below the vessel's whole operating
+range. The `ego` surge feature was therefore **pinned at 1.0 for ~45% of a plain
+straight run**, carrying no gradient at all. Now normalised by `U_MAX_SURGE`
+(3.2 m/s, the steady speed at the widest curriculum stage), so the feature keeps
+its meaning when the curriculum widens the propulsion range mid-training. Post-fix
+the same run spans 0.008–0.446 with nothing pinned.
+
+`U_CRUISE` now records what the simulator actually does rather than the 0.55 m/s
+field figure it previously carried, so the discrepancy is visible in the constant
+rather than buried in a comment.
+
+### 6.5 The spawn-DCPA bug, and why the placeholder now samples an offset
+
+02a §11.1 promotes this to a **blocking** hand-off to 04: solving backwards for a
+spawn position without sampling a DCPA puts the target on the own ship's
+projected track in every episode, so `Δy_req = d_req` always, `v_r8`'s zero
+branch never fires, and the agent learns "always alter" instead of "when to
+alter" — the exact behaviour the precedence table exists to prevent.
+
+The placeholder `_sample_target` had precisely that shape: measured mean lateral
+offset 0.47 m across 40 episodes. It now samples one, with
+`TARGET_COMPLIANT_SPAWN_PROB = 0.5` of spawns placing the target on its own
+starboard side (DCPA ≥ `d_req`). Measured after the change: 34 of 60 episodes
+have DCPA ≥ `d_req`, so both head-on regimes appear.
+
+This does not discharge 04's obligation — 04 still owns the stratification and
+must report the realised distribution, and 02a §11.1 notes it is an *evaluation*
+gap too, since neither Tier A nor Tier B currently has a target-placement axis.
+It only stops the placeholder from baking the bias into everything built on it.
+
+### 6.6 Two classes were unreachable at the old speed constants
+
+`TARGET_SPEED_RANGE` was (0.30, 0.80) m/s against an own ship that actually
+cruises at 1.77. No target could ever overtake, so **`being_overtaken` — the
+class carrying the entire Rule 17 contribution — could not occur at all.**
+Widened to (0.60, 2.40) so the range brackets cruise.
+
+The same assumption was baked into `play.make_target`'s hardcoded speeds. They
+are now expressed relative to `U_CRUISE`, and `being_overtaken` additionally
+needed staging: the target was spawning at y = −4 m, outside the boundary
+polygon where the gate correctly discarded it, and once given a real speed
+advantage it rammed the own ship at 0.62 m before the tracker had anything to
+work with. The own ship is now advanced to mid-path first, giving 11 m of clear
+water astern. All five named geometries classify correctly and acquire at
+sensible ranges.
+
+### 6.7 Still open
+
+Unchanged from §5.7 — 02a §1 keeps both conventions that conflict with the code:
+
+- **`e_y` sign.** 02a says positive to starboard; `path.py` gives positive to
+  port. 02's wrong-side and passing-side terms condition on it. Unresolved.
+- **`U_ref`.** Now a three-way disagreement rather than two — see F19.
+
+New, and needed before 02 can be implemented:
+
+- **`r_path`** — `R-8` measures every yaw-based COLREGs term as `r − r_path`,
+  the yaw rate required to track the path. Not currently computed anywhere. It
+  is path geometry (`U · curvature`), so it belongs here or in 03 rather than in
+  the reward, but its exact form should be settled with the term that consumes
+  it. `W_local` is now exposed in `info`; `r_path` is not.
+- **`R-10`'s open-water fallback** needs `W_local → 10.0`, `r_bnd = 0`,
+  `A_stbd = A_port = True`. The `W_local` hook exists; the rest is 02's.
+
+**236 tests, all passing.**

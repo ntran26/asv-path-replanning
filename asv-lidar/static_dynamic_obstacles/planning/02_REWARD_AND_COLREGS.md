@@ -64,14 +64,33 @@ That premise fails here: own ship and target are similarly sized model vessels, 
 asymmetry Rule 18 requires does not exist, and claiming it in simulation then validating
 against an identical vessel is an inconsistency a reviewer will find.
 
-### 3.2 The table to produce
+### 3.2 Precedence table (structure resolved)
 
-| Encounter | Wide channel | Narrow channel | Governing rule | Threshold |
+**The organising principle: Rule 9 constrains the available space; Rule 8(e) supplies the
+action when that space is unavailable.**
+
+| Encounter | Wide channel | Narrow channel | Governing | Fallback when inadmissible |
 |---|---|---|---|---|
-| Head-on | `[TBC]` | `[TBC]` | `[TBC]` | `[TBC]` |
-| Crossing | `[TBC]` | `[TBC]` | 9(b) throughout | — |
-| Overtaking | `[TBC]` | `[TBC]` | `[TBC]` | `[TBC]` |
-| Being overtaken | Hold course | Hold course | 13, 17(a)(i) | — |
+| Head-on | Alter to starboard | Hold starboard side; 9(a) compliance satisfies 14 without alteration | 14 + 9(a) | Slacken speed, 8(e) |
+| Crossing | Give way — alter to starboard or pass astern | Give way if room exists | 15, 16 + 9(b) | Slacken speed or stop, 8(e) |
+| Overtaking | Pass either side | **Pass to port of target** | 13 + 9(a), 9(e)\* | Hold astern at reduced speed, 8(e) |
+| Being overtaken | Hold course and speed | Hold course and speed, keep starboard | 13 + 17(a)(i) + 9(a) | — |
+
+\* Geometric constraint only. Rule 9(e) requires sound signals and the overtaken vessel's
+agreement, which the platform cannot provide. **State this as an explicit scope limitation** —
+cheap to acknowledge, awkward if a reviewer finds it first.
+
+**Head-on rationale.** Rule 9(a) already requires both vessels to keep to the starboard side
+of the fairway. If both comply, a port-to-port pass occurs without either altering course, so
+Rule 14 is satisfied by channel-keeping rather than by an evasive manoeuvre. An alteration is
+required only when the target is not where 9(a) says it should be. This is what happens in
+practice and it makes Rule 9 precedence concrete rather than abstract.
+
+**Overtaking side.** Follows from 9(a): if the overtaken vessel keeps to its starboard side,
+the room is on its port side, so overtaking means altering **to port**.
+
+Width thresholds remain open — they are an output of the Study 1 sweep (04 §5), not an input.
+The table structure is complete, which is what 01 and the reward terms were waiting on.
 
 Define "narrow" **geometrically** — in ship breadths, and in terms of the lateral excursion
 the compliant manoeuvre requires — never by reference to where a method fails. The
@@ -116,6 +135,11 @@ LiDAR returns.** Confirm the term still behaves as designed.
 is out of scope (S5). Only 17(a)(i) passive course-keeping survives, as the
 course-keeping hold term above.
 
+**Implementation trap — port turns are not globally bad.** The head-on term penalises altering
+to port, but overtaking in a narrow channel *requires* altering to port (§3.2). Class-conditional
+gating handles this in principle, but it is exactly the kind of thing that gets miscoded into a
+global "port turns are penalised" term. Assert it in a unit test.
+
 **Use yaw rate, not rudder angle, as the turn criterion.** Ship dynamics delay the sign
 change in yaw rate by several timesteps after a rudder reversal, so rudder angle is a poor
 proxy for whether the vessel is actually turning — more so for an underactuated model
@@ -132,16 +156,33 @@ small alterations be avoided. Encode as:
   must not also suppress the large single alteration Rule 8 requires. These pull in
   opposite directions and the balance needs explicit verification
 
-### 4.4 Speed as a legal action
+### 4.4 Speed as a legal action — RESOLVED, and it has consequences
 
-Rule 8(e) permits slackening speed or stopping. Paper 2's curriculum restricted the
-propulsion range. **If the agent cannot slow down, a lawful manoeuvre has been removed**
-and a reviewer may notice. Widen propulsion authority, or justify the restriction
-explicitly.
+**Decision: when compliance would push the vessel into the channel boundary, the agent
+slackens speed or stops under Rule 8(e) rather than violating the boundary.** The boundary
+remains a hard constraint; Rule 8(e) is the admissible response.
 
-This matters more in a narrow channel than in open water, because speed reduction is often
-the *only* admissible action when there is insufficient room for a course alteration —
-which is itself an argument the precedence table should make.
+**Propulsion authority must widen.** This closes the open question. An agent that cannot slow
+down cannot comply. Verify whether the Bluefin can reverse thrust — if it can only reduce
+forward thrust, "take all way off" is unavailable and the paper should say so rather than
+claim it.
+
+**Critical tension: the progress term and existence cost fight this.** Both penalise slowness,
+and Rule 8(e) compliance requires exactly that. A class-conditional carve-out is needed —
+suspend or attenuate the progress penalty while the agent is in a compliant slow-down.
+Without it, the reward actively punishes the behaviour being taught.
+
+**Degenerate-policy risk.** Loosen the progress penalty and the obvious exploit is to creep
+along slowly forever, trivially avoiding everything and never finishing. Gate the carve-out on
+(a) an encounter class being active and (b) CRI above threshold. Inspect the trained policy's
+speed profile in open stretches as an acceptance check.
+
+**Upside for Study 1.** As the corridor narrows, expected behaviour transitions from *alter
+course* to *slacken speed*. That transition is a behavioural result, not merely a degradation
+curve, and it is a considerably stronger figure than a success-rate decline.
+
+**New metric:** speed-reduction events, their timing, and whether the class and geometry made
+them appropriate.
 
 ---
 
@@ -202,10 +243,11 @@ watchkeeper operates.
 
 ## 8. Open items
 
-- **Produce the precedence table (§3.2)** — blocking for 01 and 04
-- Define the geometric threshold for "narrow" per encounter class
+- ~~Produce the precedence table~~ — **structure resolved (§3.2)**. Width thresholds remain
+  open but are an output of Study 1, not an input
+- Verify whether the vessel can reverse thrust (§4.4)
+- Design the progress-penalty carve-out and its gating conditions (§4.4)
 - Re-verify the six carried-over terms against the new observation, especially the border
   penalty
-- Decide whether propulsion authority widens (§4.4)
 - Check the Rule 8 / smoothness tension explicitly (§4.3)
 - Set per-term normalisation ranges before any coefficient tuning

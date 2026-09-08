@@ -178,6 +178,15 @@ class ASVLidarEnv(gym.Env):
         inset = 0.5 * (self.map_width - self.corridor_width)
         return inset, inset + self.corridor_width
 
+    def local_channel_width(self) -> float:
+        """Channel width at the vessel's current station.
+
+        Constant while the corridor is a straight inset rectangle.  03's
+        generator introduces variation along the path, at which point this stops
+        being a constant and `r_pf`'s normalisation starts to matter.
+        """
+        return self.corridor_width
+
     # ------------------------------------------------------------------
     # Reset
     # ------------------------------------------------------------------
@@ -271,30 +280,59 @@ class ASVLidarEnv(gym.Env):
         """PLACEHOLDER spawn -- 03 owns the real encounter geometry.
 
         Places at most one head-on target beyond the sensor horizon, so the
-        perception path is exercised in situ.  Three properties are kept because
-        they are cheap now and expensive later (03 §3):
+        perception path is exercised in situ.  Four properties are kept because
+        they are cheap now and expensive later:
 
         * spawned **outside** LiDAR range, so acquisition is part of the task
-          and track acquisition range is a measurable quantity;
+          and track acquisition range is a measurable quantity (03 §3);
         * a fraction of episodes carry **no target at all**, or the static-only
           configuration is out of distribution (01 §6.2);
-        * the hull is oriented, not a circle.
+        * the hull is oriented, not a circle (03 §3);
+        * **a spawn lateral offset is sampled** (02a §11.1).
 
-        TODO(03): replace with the encounter generator -- head-on, crossing from
-        both bows, overtaking, being overtaken -- and the reactive and
-        non-compliant evaluation strata.
+        That last one is not cosmetic.  Solving backwards for a spawn position
+        without sampling an offset puts the target on the own ship's projected
+        track in *every* episode, so `DCPA ~ 0` and the own ship must always
+        produce the whole required separation.  The agent then never meets the
+        case 02 §3.2 calls the normal one -- target correctly on its own side,
+        channel-keeping already satisfies Rule 14, holding course is right -- and
+        would learn "always alter" rather than "when to alter".  02a §11.1 makes
+        this a blocking hand-off to 04; sampling it here keeps the placeholder
+        from baking the same bias into everything built on top of it.
+
+        TODO(03)/TODO(04): replace with the encounter generator -- head-on,
+        crossing from both bows, overtaking, being overtaken -- with spawn DCPA
+        and TCPA as explicit sampled axes, plus the reactive and non-compliant
+        evaluation strata.
         """
         if self.n_max_targets < 1 or float(np.random.rand()) < self.no_target_prob:
             return []
 
         spawn_dist = cfg.LIDAR_RANGE + cfg.TARGET_SPAWN_MARGIN
         frac = min(1.0, spawn_dist / max(self.path.length, 1e-6))
-        point, tangent, _ = self.path.frame_at_frac(frac)
+        point, tangent, normal = self.path.frame_at_frac(frac)
         heading = math.degrees(math.atan2(float(tangent[0]), float(tangent[1])))
         speed = float(np.random.uniform(*cfg.TARGET_SPEED_RANGE))
-        # Reciprocal course: a head-on encounter.
-        return [TargetShip(float(point[0]), float(point[1]),
-                           (heading + 180.0) % 360.0, speed)]
+
+        # Half the draws put the target on its own starboard side of the
+        # fairway (positionally 9(a)-compliant, DCPA >= d_req); the rest leave
+        # it near the centreline.  Both head-on regimes then appear.
+        lo, hi = self.corridor_bounds_x()
+        if float(np.random.rand()) < cfg.TARGET_COMPLIANT_SPAWN_PROB:
+            offset = float(np.random.uniform(cfg.DOMAIN_LATERAL * 2.0,
+                                             cfg.DOMAIN_LATERAL * 3.0))
+        else:
+            offset = float(np.random.uniform(-cfg.DOMAIN_LATERAL, cfg.DOMAIN_LATERAL))
+
+        # `normal` is the path's left normal, so a negative multiple puts the
+        # target to starboard of the own ship's track -- which is its own port
+        # side, i.e. the side Rule 9(a) sends it to on a reciprocal course.
+        x = float(point[0]) - offset * float(normal[0])
+        y = float(point[1]) - offset * float(normal[1])
+        margin = 0.5 * cfg.BREADTH
+        x = float(np.clip(x, lo + margin, hi - margin))
+
+        return [TargetShip(x, y, (heading + 180.0) % 360.0, speed)]
 
     def _load_scenario(self, scenario: dict) -> None:
         self.start_x, self.start_y = (float(v) for v in scenario["start"])
@@ -434,11 +472,13 @@ class ASVLidarEnv(gym.Env):
     def _measured_ego(self) -> Tuple[float, float, float]:
         """u, v and r as the vessel would actually measure them.
 
-        **There is no IMU on the platform** (05 §4.7), so all three are
-        differentiated from a noisy pose estimate.  The `ego` branch therefore
-        carries field error that Paper 2's simulator did not model at all -- a
-        sim-to-real gap in the *observation*, not just in the dynamics (05 §6).
-        Nominal-zero until 05 characterises it.
+        **An IMU is confirmed** (05 §4.7), which changes this gap rather than
+        closing it.  `r` comes from the gyro directly, so its residual is the
+        sensor noise floor rather than pose-differentiation error -- and the
+        yaw-rate criterion 02 §4.2 depends on becomes directly measurable in the
+        field instead of inferred.  `u` and `v` are largely rescued by the
+        accelerometer but are still fused rather than measured, so a residual
+        remains.  Both magnitudes are nominal-zero until 05 characterises them.
         """
         u, v, r = self.u_body, self.v_body, self.asv_w
         if self.ego_speed_noise > 0.0:
@@ -619,6 +659,11 @@ class ASVLidarEnv(gym.Env):
             "true_border_clearance": float(self.true_border_clearance),
             "corridor_width": float(self.corridor_width),
             "corridor_breadths": float(self.corridor_breadths),
+            # `W_local` is the width at the vessel's current station.  Equal to
+            # `corridor_width` while the channel is a straight inset rectangle;
+            # 03's generator makes the two diverge.  02a's `r_pf` normalises on
+            # it and R-10 overrides it to 10.0 for the open-water benchmark.
+            "W_local": float(self.local_channel_width()),
             # Perception metrics (04 §7) -- the N1 evidence.
             "n_tracks": int(len(self.tracks)),
             "n_targets": int(len(self.targets)),

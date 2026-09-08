@@ -52,7 +52,23 @@ MAP_HEIGHT = 25.0
 
 # Study 1 — channel-width sweep, parameterised in **breadths** so the sweep and
 # the precedence thresholds are scale-explicit (03 §4).
-CORRIDOR_WIDTHS_M = (10.0, 8.0, 6.0, 5.0, 4.0, 3.5)
+# 02a §11.3 adds 7.0 m (14 B): the six original levels bracket all four
+# predicted transitions, but the crossing threshold (6.52 m) and the
+# centreline head-on threshold (6.02 m) land in adjacent brackets and could not
+# be separated.  7 m splits them, and it is the level carrying N2's headline
+# ordering result.
+CORRIDOR_WIDTHS_M = (10.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.5)
+
+# Per-class transitions predicted by 02a §2.2, in metres.  All four move with
+# the ship domain, so recompute after the turning-circle identification in 05
+# and before freezing the evaluation suite.
+# TODO(05): recompute; TODO(04): the sweep must resolve all four.
+PREDICTED_THRESHOLDS_M = {
+    "crossing": 6.52,                    # 13.0 B
+    "head_on_centreline_target": 6.02,   # 12.0 B
+    "overtaking": 4.78,                  # 9.6 B (range 4.16-4.78)
+    "head_on_compliant_target": 3.66,    #  7.3 B
+}
 
 
 def widths_in_breadths(widths=CORRIDOR_WIDTHS_M) -> tuple:
@@ -93,11 +109,15 @@ GOAL_CTE_RADIUS = 1.60
 CRUISE_RPM = 12.0
 FIXED_RPM = False
 
-# TODO(02 §4.4): Rule 8(e) makes slackening speed a legal avoidance action, and
-# in a narrow channel it is frequently the *only* admissible one.  Paper 2's
-# stage-1 authority (+/-3 RPM around cruise) may be too narrow to express it.
-# Either widen this or justify the restriction explicitly.
-RPM_STAGE = 1                            # TODO(02)
+# Propulsion authority WIDENS -- resolved (03 §6, 02 §4.4).  Rule 8(e) speed
+# reduction is the designated fallback whenever a compliant course alteration
+# would push the vessel into the boundary, so the agent must be able to slow
+# substantially and ideally stop.
+#
+# Staged through the curriculum as in Paper 2, but **stage 4 must be exposed by
+# the final stage** -- it is the only one that reaches 0 RPM.  Stage 1 remains
+# the curriculum entry point.
+RPM_STAGE = 1                            # curriculum entry; stage 4 is the endpoint
 RPM_STAGES = {
     1: (3.0, 9.0, 15.0),
     2: (4.0, 8.0, 16.0),
@@ -106,8 +126,35 @@ RPM_STAGES = {
 }
 RPM_DELTA, RPM_FLOOR, RPM_CEIL = RPM_STAGES[RPM_STAGE]
 
-# Nominal cruise speed, used to normalise speeds in the target branch.
-U_CRUISE = 0.55                          # m/s, TODO(05)
+# 02a §10.5: with reverse the vessel can "take all way off"; without it, only
+# slacken.  Default False deliberately -- do not flip it on a datasheet, because
+# 05 must identify the reverse regime or the simulator extrapolates into an
+# unmodelled envelope.
+REVERSE_AVAILABLE = False                # TODO(03): capability unverified
+
+# Steady surge at CRUISE_RPM, measured from the simulator itself (400 steps,
+# zero rudder).  NOT a field figure.
+#
+# TODO(05) -- THREE NUMBERS DISAGREE AND ONLY 05 CAN SETTLE IT:
+#   simulator at 12 RPM   1.77 m/s   (measured here)
+#   02a §1  U_ref          0.80 m/s
+#   02a §10.5 target range 0.20-0.90 m/s reachable surge
+# The simulator's speed envelope sits 2-3x above what 02a assumes throughout.
+# Either the thrust map is wrong -- 05 §2 already lists "Paper 2 used
+# thrust proportional to RPM^2; verify" -- or 02a's figures are.  Until that is
+# resolved, every speed-normalised feature and every reward speed gate is
+# scaled against a different vessel from the one being simulated.
+U_CRUISE = 1.77                          # m/s at CRUISE_RPM, TODO(05)
+
+# Maximum steady surge the hull reaches at the widest curriculum stage
+# (24 RPM).  Speeds are normalised against vessel *capability* rather than
+# against cruise, so the normaliser does not shift when the curriculum widens
+# the propulsion range mid-training.
+#
+# The previous value (2 x U_CRUISE = 1.10 m/s) was below the stage-1 operating
+# range, so the `ego` surge feature sat pinned at 1.0 for ~45% of a plain
+# straight run and carried no gradient at all.
+U_MAX_SURGE = 3.2                        # m/s, TODO(05): moves with the thrust map
 
 # ===========================================================================
 # 4. Raw LiDAR (RPLidar C1)
@@ -264,11 +311,19 @@ DYNAMIC_HOLD_STEPS = 5                   # steps a classification must persist
 DETECTION_DROPOUT_P = 0.0                # per-track per-step miss, TODO(05)
 TRACK_VELOCITY_NOISE = 0.0               # m/s 1-sigma on the estimate, TODO(05)
 
-# Ego velocity error.  **New sim-to-real gap, no IMU on the platform**: u, v and
-# r are differentiated from a noisy pose, so the `ego` observation branch
-# carries field error that simulation does not model (05 §6, 03 §7).
+# Ego velocity error.  **IMU CONFIRMED (05 §4.7)** -- one will be added, logging
+# raw gyro and accelerometer at 100 Hz+, time-synced to the LiDAR.  That changes
+# the character of this gap rather than closing it:
+#   r  -- now measured directly by the gyro, so the residual is the sensor noise
+#         floor rather than pose-differentiation error.  Much smaller, and the
+#         yaw-rate criterion 02 §4.2 relies on becomes directly measurable in the
+#         field instead of inferred.
+#   u,v -- "largely rescued" by the accelerometer, but still fused rather than
+#         measured, so a residual remains.
+# Scan-to-map supplies drift-free absolute pose at 10 Hz; the IMU fills in
+# between.  Both magnitudes still come from 05.
 EGO_SPEED_NOISE = 0.0                    # m/s 1-sigma on u and v, TODO(05)
-EGO_YAW_RATE_NOISE_DPS = 0.0             # deg/s 1-sigma on r,     TODO(05)
+EGO_YAW_RATE_NOISE_DPS = 0.0             # deg/s 1-sigma on r, TODO(05): gyro noise floor
 
 # ===========================================================================
 # 8. Ship domain  (01 §5.2)  -- RESOLVED, provisional
@@ -334,11 +389,15 @@ CRI_BOW_CROSSING_HALF_DEG = 45.0         # TODO(decision)
 # Baseline thresholds are Waltz & Okhrin Table 1 (after Xu et al. 2020) with the
 # three modifications 01 §5.3 requires.
 
-# Modification 2: their head-on band is +/-5 deg, narrow against common practice
-# (+/-6-10 deg).  Widened to +/-8 deg -- the midpoint of that range.
-# TODO(decision): 01 §5.3 marks the value and its justification `[TBC]`.
-HEAD_ON_BEARING_HALF_DEG = 8.0           # TODO(decision), was 5.0
-HEAD_ON_CT_HALF_DEG = 8.0                # TODO(decision), keep symmetric
+# Modification 2 (RESOLVED, 01 §5.3): the source band of +/-5 deg is tight
+# enough that a small heading error flips the classification.  Widened to
+# +/-10 deg, which is within common practice and gives the hysteresis room to
+# work.
+HEAD_ON_BEARING_HALF_DEG = 10.0          # was 5.0 in the source table
+# 01 resolves "the head-on band" without separating bearing from heading.  Kept
+# symmetric: courses within 10 deg of reciprocal count as head-on, which is the
+# reading that matches the stated rationale (a small *heading* error).
+HEAD_ON_CT_HALF_DEG = 10.0
 
 # Sector boundaries shared with the crossing and overtaking classes.
 CROSSING_STBD_MAX_DEG = 112.5
@@ -397,7 +456,9 @@ TARGET_FEATURES = 16
 # longer floats.
 D_SCALE = LIDAR_RANGE                    # m
 TCPA_CLIP = 60.0                         # s, symmetric clip, TODO(decision)
-SPEED_SCALE = 2.0 * U_CRUISE             # m/s, target + relative speed
+# Normalises `ego` u/v and the target speed features.  Tied to hull capability,
+# not to cruise -- see U_MAX_SURGE for why the old 2 x U_CRUISE saturated.
+SPEED_SCALE = U_MAX_SURGE                # m/s
 
 # DCPA is normalised in domain radii, not metres: how many radii out before the
 # feature saturates.
@@ -488,7 +549,13 @@ OFFPATH_LATERAL_MAX = 3.2
 # non-stationary and destroys attribution.
 TARGET_SPAWN_BEYOND_RANGE = True         # 03 §3: acquire it as it approaches
 TARGET_SPAWN_MARGIN = 1.0                # m beyond LIDAR_RANGE
-TARGET_SPEED_RANGE = (0.30, 0.80)        # m/s, TODO(03)
+# Must **bracket** the own ship's cruise, or whole encounter classes become
+# unreachable: at the previous (0.30, 0.80) against a 1.77 m/s cruise, no target
+# could ever overtake, so `being_overtaken` -- the class carrying the Rule 17
+# contribution -- could not occur at all.
+# TODO(03): 03 owns the real distribution; this bracket is the minimum property
+# it must have.  TODO(05): moves with the thrust map.
+TARGET_SPEED_RANGE = (0.60, 2.40)        # m/s, brackets U_CRUISE
 
 # Radius within which a dynamic track counts as "this target", for the
 # perception metrics only -- never for the observation.  A cluster centroid sits
@@ -499,3 +566,12 @@ TARGET_MATCH_RADIUS = LOA
 # Fraction of training episodes with no dynamic target at all.  Without this the
 # static-only configuration is out of distribution (01 §6.2).
 NO_TARGET_EPISODE_PROB = 0.25            # TODO(04)
+
+# Fraction of spawns placing the target on its own starboard side of the
+# fairway, i.e. positionally Rule 9(a)-compliant with DCPA >= d_req.  02a §11.1
+# makes sampling this a blocking requirement: without it every episode has the
+# target on the own ship's projected track, the "holding course is correct"
+# branch never fires, and the agent learns "always alter" instead of "when".
+# TODO(04): 04 owns the real stratification and must report the realised
+# distribution.
+TARGET_COMPLIANT_SPAWN_PROB = 0.5        # TODO(04)

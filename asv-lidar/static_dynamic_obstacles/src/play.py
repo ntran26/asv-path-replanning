@@ -59,15 +59,29 @@ KEY_HINTS = [
 # Scenario helpers
 # ---------------------------------------------------------------------------
 def make_target(env: ASVLidarEnv, kind: str) -> List[TargetShip]:
-    """Place one target in a named encounter geometry.
+    """Stage one named encounter geometry, and return the target.
 
     A convenience for eyeballing the classifier, not a scenario generator --
-    03 owns that.  The geometries here are the four non-trivial classes.
+    03 owns that, with spawn DCPA and TCPA as sampled axes (02a §11.1).
+
+    **This may reposition the own ship**, which is why it takes the whole env.
+    `being_overtaken` needs clear water astern, and the default start sits 2 m
+    from the end of the basin -- so the target would have to spawn outside the
+    boundary, where the gate correctly discards it.
     """
     if kind == "none":
         return []
 
-    speed = 0.55
+    # Speeds are expressed relative to the own ship's cruise, not as absolute
+    # figures: the overtaking pair only classifies if the speed ordering is
+    # right, and hardcoded values silently stop working when the thrust map or
+    # `U_CRUISE` moves.
+    speed = cfg.U_CRUISE
+    slower = 0.35 * cfg.U_CRUISE
+    # Only a modest overhauling margin: the own ship starts from rest and takes
+    # tens of seconds to reach cruise, so a large margin closes the gap before
+    # the encounter is observable.
+    overhauling = 1.15 * cfg.U_CRUISE
     ahead = min(env.path.length - 1.0, cfg.LIDAR_RANGE * 0.6)
     frac = ahead / max(env.path.length, 1e-6)
     point, tangent, normal = env.path.frame_at_frac(frac)
@@ -89,15 +103,40 @@ def make_target(env: ASVLidarEnv, kind: str) -> List[TargetShip]:
     if kind == "overtaking":
         # Slow vessel ahead on our course: we overtake it.
         near, _, _ = env.path.frame_at_frac(min(1.0, frac * 0.45))
-        return [TargetShip(float(near[0]), float(near[1]), course, 0.20)]
+        return [TargetShip(float(near[0]), float(near[1]), course, slower)]
 
     if kind == "being_overtaken":
         # Faster vessel astern on our course: it overtakes us.
-        back_x = env.asv_x - 6.0 * math.sin(math.radians(course))
-        back_y = env.asv_y - 6.0 * math.cos(math.radians(course))
-        return [TargetShip(back_x, back_y, course, 0.95)]
+        #
+        # Move the own ship up the path first.  The target has to sit inside the
+        # boundary polygon or the gate drops it, and it has to start far enough
+        # back that it closes gradually -- the own ship accelerates from rest,
+        # so a target already at speed eats a short gap before the tracker has
+        # anything to work with.
+        _advance_own_ship(env, 0.5)
+        course = _path_course(env)
+        gap = 11.0
+        back_x = env.asv_x - gap * math.sin(math.radians(course))
+        back_y = env.asv_y - gap * math.cos(math.radians(course))
+        return [TargetShip(back_x, back_y, course, overhauling)]
 
     raise ValueError(f"unknown target geometry {kind!r}")
+
+
+def _path_course(env: ASVLidarEnv) -> float:
+    """Course of the reference path at the own ship's current station."""
+    tangent = env.path.tangent(env.closest_idx)
+    return math.degrees(math.atan2(float(tangent[0]), float(tangent[1])))
+
+
+def _advance_own_ship(env: ASVLidarEnv, frac: float) -> None:
+    """Move the own ship along its reference path, keeping it on track."""
+    point, tangent, _ = env.path.frame_at_frac(frac)
+    env.asv_x, env.asv_y = float(point[0]), float(point[1])
+    env.asv_h = math.degrees(math.atan2(float(tangent[0]), float(tangent[1])))
+    env.distance_to_goal = float(np.hypot(env.asv_x - env.goal_x,
+                                          env.asv_y - env.goal_y))
+    env._update_path_errors(env.asv_h)
 
 
 TARGET_KINDS = ("sampled", "none", "head_on", "crossing_stbd",

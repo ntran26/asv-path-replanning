@@ -2,8 +2,15 @@
 
 **Version:** `obs-v2` — two-vessel repositioning. Supersedes `obs-v1` (91 dims,
 three slots, six encounter classes), which was never trained against.
+
 **Status:** frozen. Every checkpoint and every evaluation case depends on this
 ordering. Changing any index is a version bump, not an edit.
+
+**Index order is unchanged since v2 was frozen.** Revision 2.2 changed one
+*normaliser* (`SPEED_SCALE`, §3) and the head-on band feeding the class one-hot.
+Neither moves an index, but both change what a trained checkpoint means, so
+anything trained before this point would not be comparable. Nothing has been
+trained.
 
 Total **56** dims across **5** branches, as a `gymnasium.spaces.Dict`.
 The machine-readable copy of this layout is `src/observation.py`; the two must
@@ -125,15 +132,25 @@ error, as it will in the field. Magnitudes are `TODO(05)` and currently 0.0.
 
 | Idx | Symbol | Quantity | Normaliser |
 |---|---|---|---|
-| 0 | u | surge velocity | `SPEED_SCALE` (1.10 m/s) |
+| 0 | u | surge velocity | `SPEED_SCALE` = `U_MAX_SURGE` (3.2 m/s) |
 | 1 | v | sway velocity | `SPEED_SCALE` |
 | 2 | r | yaw rate, deg/s | 180 |
 
-**There is no IMU on the platform.** All three are differentiated from a noisy
-pose estimate, so this branch carries field error that Paper 2's simulator did
-not model at all — a sim-to-real gap in the *observation*, not just in the
-dynamics (05 §6). `EGO_SPEED_NOISE` and `EGO_YAW_RATE_NOISE_DPS` are the hooks;
-both are `TODO(05)` and currently 0.0.
+> **Normaliser corrected in Revision 2.2.** `SPEED_SCALE` was `2 × U_CRUISE`
+> = 1.10 m/s, which sits *below* the vessel's stage-1 operating range — the
+> simulator reaches 1.35–2.16 m/s at 9–15 RPM. Index 0 was therefore pinned at
+> 1.0 for roughly 45% of a plain straight run and carried no gradient at all.
+> It is now tied to hull capability (`U_MAX_SURGE`, the steady speed at the
+> widest curriculum stage) rather than to cruise, so the meaning does not shift
+> when the curriculum widens the propulsion range mid-training.
+
+**An IMU is confirmed** (05 §4.7). `r` is measured by the gyro rather than
+differentiated, so its residual is the sensor noise floor; `u` and `v` are
+largely rescued by the accelerometer but remain fused rather than measured. The
+branch still carries field error Paper 2's simulator did not model — a
+sim-to-real gap in the *observation*, not just the dynamics (05 §6) — but a
+smaller one than before. `EGO_SPEED_NOISE` and `EGO_YAW_RATE_NOISE_DPS` are the
+hooks; both are `TODO(05)` and currently 0.0.
 
 ## 4. `path` — 3 dims
 
@@ -162,7 +179,7 @@ Use `observation.split_target()` rather than re-deriving offsets. At
 | 2 | Relative bearing α | cos | [−1, 1] |
 | 3 | Heading intersection CT | sin | [−1, 1] |
 | 4 | Heading intersection CT | cos | [−1, 1] |
-| 5 | Target speed | `/ SPEED_SCALE`, clipped | [0, 1] |
+| 5 | Target speed | `/ SPEED_SCALE` (3.2 m/s), clipped | [0, 1] |
 | 6 | Relative speed | `/ SPEED_SCALE`, clipped | [0, 1] |
 | 7 | DCPA | `/ DOMAIN_RADIUS_DCPA`, clipped at `DCPA_CLIP_DOMAINS`, rescaled | [0, 1] |
 | 8 | TCPA | clipped to ±`TCPA_CLIP`, `/ TCPA_CLIP` | [−1, 1] |

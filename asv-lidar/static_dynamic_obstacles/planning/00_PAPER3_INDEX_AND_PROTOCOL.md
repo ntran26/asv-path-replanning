@@ -80,12 +80,22 @@ width-sweep design. Then `05` in parallel (basin booking lead time), then `01 �
 | O6 | Ground-truth instrumentation | **Reframed** — no external instrumentation. Scan-to-map registration against surveyed facility geometry, validated by static tests and closed-loop drift. A software deliverable, not a purchase; removes the longest lead time in the project |
 | — | Ship domain geometry | **Resolved (provisional)** — compressed asymmetric: 2.0·Lpp ahead, 1.0·Lpp astern, 0.75·Lpp abeam. Final values derived from the identified turning circle in 05 |
 
+| IMU | **Confirmed — will be added.** Removes the yaw-rate observability constraint and, via the accelerometer, rescues surge measurement. Specification in 05 §4.7 | 05 |
+| Precedence | **Structure resolved** (02 §3.2). Rule 9 constrains the space; Rule 8(e) supplies the action when space is unavailable. Width thresholds remain an output of Study 1 | 02 |
+| Boundary conflict | **Resolved** — when compliance would push the vessel into the boundary, slacken speed or stop under Rule 8(e). Boundary stays a hard constraint | 02 |
+| Overtaking | **Resolved** — overtake whenever geometry allows, passing to port of the target (follows from 9(a)). Fallback: hold astern at reduced speed | 02 |
+| Head-on band | **Resolved** — ±10°, widened from the source value of ±5° | 01 |
+| Propulsion | **Resolved** — authority widens; Rule 8(e) requires it | 03 |
+
 ### Still open
 
 | # | Question | Owner |
 |---|---|---|
-| **IMU** | **Is adding an IMU to the vessel feasible? Assume no for now.** A ~$30 9-DOF unit logging gyro at 100 Hz would remove the yaw-rate observability constraint entirely and is the highest value-per-dollar addition available | 05 |
-| — | Rule 9 vs Rules 13–16 precedence table | **02 — now blocking** |
+| Reflectivity | Measure black-wall LiDAR return rate from retained logs before committing to continuous-wall registration. **A measurement, not a decision** | 05 |
+| Compute | Wall-clock estimate per run in the new environment, then the final comparator list. **A measurement, not a decision** | 04 |
+| Width thresholds | Output of the Study 1 sweep | 04 |
+| — | Reverse thrust capability of the vessel | 03 |
+| — | Progress-penalty carve-out design and gating for Rule 8(e) | 02 |
 | — | Head-on band width (source value ±5° is narrow) | 01 |
 | — | Whether recurrence is added for occlusion | 01 |
 | — | Compute estimate → final comparator list | 04 |

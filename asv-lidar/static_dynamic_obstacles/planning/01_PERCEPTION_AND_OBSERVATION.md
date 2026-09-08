@@ -267,8 +267,9 @@ relative bearing OS→TS and CT the heading intersection angle:
 1. **Port and starboard crossing collapse into one class** under Rule 9(b) — the own ship
    gives way either way. Keep the geometric distinction internally if the passing-side
    reward term needs it, but the observation one-hot has a single crossing class.
-2. **Widen the head-on band** from ±5°, which is narrow relative to common practice
-   (±6–10°). `[TBC — value and justification]`
+2. **Head-on band widened to ±10°** (resolved). The source value of ±5° is tight enough that
+   a small heading error flips the classification; ±10° is within common practice and gives
+   the hysteresis room to work.
 3. **Add the "being overtaken" class** — the source table has no equivalent, because
    Waltz & Okhrin assume linear deterministic targets and cover only give-way cases.
    Mirror of the overtaking condition with U_TS > U_OS.
@@ -359,7 +360,6 @@ is the harder problem and the basis of N1.
 - ~~O5~~ — resolved: software gating, geometric against the pool polygon. Facility walls retained as the localisation reference (05 §4.2)
 - Verify 720 beams against field logs; characterise aft occlusion and scan distortion
 - Re-derive all CRI constants in ship lengths; finalise the ship domain from the identified turning circle (05)
-- Widen the head-on band and justify
 - Define "being overtaken" thresholds
 - Decide whether recurrence is added for occlusion
 - Expose the Study 2 degradation parameters as environment config

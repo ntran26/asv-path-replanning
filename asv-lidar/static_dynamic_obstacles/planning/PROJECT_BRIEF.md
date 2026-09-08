@@ -122,9 +122,11 @@ a non-compliant target stratum; a mandatory per-term reward scale audit.
 
 | | Question | Resolved? |
 |---|---|---|
-| **IMU** | **Is adding an IMU feasible?** ~$30 9-DOF gyro at 100 Hz removes the yaw-rate observability constraint. Assume none for now | |
-| — | Rule 9 precedence table (deliverable of doc 02) — **blocking** | |
-| — | Head-on band width (source value ±5° is narrow) | |
+| — | Black-wall LiDAR return rate — a *measurement*, do first | |
+| — | Compute estimate per run → final comparator list — a *measurement* | |
+| — | Width thresholds (output of Study 1) | |
+| — | Reverse thrust capability | |
+| — | Progress-penalty carve-out for Rule 8(e) | |
 | — | Whether recurrence is added for occlusion | |
 | — | Compute estimate → final comparator list | |
 | — | Target vessel platform and repeatability protocol | |
@@ -136,7 +138,11 @@ O5 — software gating, not a physical barrier; the facility walls are the only 
 reference and must not be occluded. O6 — no external instrumentation; scan-to-map registration
 against surveyed facility geometry, validated by static tests and closed-loop drift.
 Ship domain — compressed asymmetric, provisionally 2.0/1.0/0.75 · Lpp (ahead/astern/abeam),
-final values derived from the identified turning circle.
+final values derived from the identified turning circle. **IMU confirmed** — will be added;
+log raw gyro and accelerometer at 100 Hz+, time-synced to the LiDAR. **Precedence structure
+resolved** — Rule 9 constrains the space, Rule 8(e) supplies the action when space is
+unavailable; boundary conflict resolves to slacken speed or stop; overtaking permitted whenever
+geometry allows, passing to port; head-on band ±10°; propulsion authority widens.
 
 ---
 
