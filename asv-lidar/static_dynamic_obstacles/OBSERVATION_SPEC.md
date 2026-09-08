@@ -29,8 +29,15 @@ All arrays are `float32`.
 
 **Frame conventions.** World: +y north, +x east. Headings and bearings are
 compass style — 0° is +y, increasing clockwise. Relative bearing `α` is measured
-from the own ship's heading: 0° dead ahead, 90° abeam to starboard. Positive
-cross-track error is **port** of the path (Paper 2's convention, carried over).
+from the own ship's heading: 0° dead ahead, 90° abeam to starboard.
+
+**Cross-track error is positive to STARBOARD** — the textbook LOS convention,
+flipped from Paper 2's positive-to-port in 02b C4/T2. Paper 2's own
+`verify_los_apf.py` flagged its convention as non-standard; this paper's
+contribution is COLREGs geometry, and 02a §6.4's passing-side term has two
+opposite branches keyed on the sign of the lateral offset, so carrying a
+non-standard sign through them invites exactly the class of error the paper is
+about. **Anything comparing numbers across the two papers must account for it.**
 
 ### What changed from v1, and why
 
@@ -132,17 +139,17 @@ error, as it will in the field. Magnitudes are `TODO(05)` and currently 0.0.
 
 | Idx | Symbol | Quantity | Normaliser |
 |---|---|---|---|
-| 0 | u | surge velocity | `SPEED_SCALE` = `U_MAX_SURGE` (3.2 m/s) |
+| 0 | u | surge velocity | `SPEED_SCALE` = `2 × U_REF` (2.28 m/s) |
 | 1 | v | sway velocity | `SPEED_SCALE` |
 | 2 | r | yaw rate, deg/s | 180 |
 
-> **Normaliser corrected in Revision 2.2.** `SPEED_SCALE` was `2 × U_CRUISE`
-> = 1.10 m/s, which sits *below* the vessel's stage-1 operating range — the
-> simulator reaches 1.35–2.16 m/s at 9–15 RPM. Index 0 was therefore pinned at
-> 1.0 for roughly 45% of a plain straight run and carried no gradient at all.
-> It is now tied to hull capability (`U_MAX_SURGE`, the steady speed at the
-> widest curriculum stage) rather than to cruise, so the meaning does not shift
-> when the curriculum widens the propulsion range mid-training.
+> **Normaliser settled in Revision 2.3.** It was briefly `2 × U_CRUISE` with
+> `U_CRUISE = 0.55`, i.e. 1.10 m/s — *below* the simulator's whole operating
+> range, so index 0 sat pinned at 1.0 for ~45% of a straight run and carried no
+> gradient. The factor was never the problem; the speed was. With the thrust map
+> calibrated to the measured `U_REF = 1.14 m/s` (02b T1), `2 × U_REF` = 2.28 m/s
+> covers the widest curriculum stage's 2.16 m/s at 0.95 of scale, so nothing
+> clips and nothing is dead.
 
 **An IMU is confirmed** (05 §4.7). `r` is measured by the gyro rather than
 differentiated, so its residual is the sensor noise floor; `u` and `v` are
@@ -156,7 +163,7 @@ hooks; both are `TODO(05)` and currently 0.0.
 
 | Idx | Symbol | Quantity | Normaliser |
 |---|---|---|---|
-| 0 | e_y | cross-track error, signed, + = port | `max(MAP_WIDTH, MAP_HEIGHT)` |
+| 0 | e_y | cross-track error, signed, **+ = starboard** | `max(MAP_WIDTH, MAP_HEIGHT)` |
 | 1 | χ̃ | course error, deg | 180 |
 | 2 | χ̃_LA | look-ahead course error, deg | 180 |
 

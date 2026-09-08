@@ -8,8 +8,8 @@ Step 0 deliverable per `KICKOFF_01_PERCEPTION.md` §2, kept current as the plann
 has moved.
 Sections 0-3 are the pre-build inventory, left as written so the findings can be read
 against what was known at the time. Section 4 records what the build changed, section 5
-the two-vessel repositioning, and **section 6 the Revision 2.2 reward specification** —
-which is the current state.
+the two-vessel repositioning, section 6 the Revision 2.2 reward specification, and
+**section 7 the 02b decisions and tasks T1-T3** — which is the current state.
 
 ---
 
@@ -825,3 +825,197 @@ New, and needed before 02 can be implemented:
   `A_stbd = A_port = True`. The `W_local` hook exists; the rest is 02's.
 
 **236 tests, all passing.**
+
+---
+
+## 7. `02b_DECISIONS_AND_TASK_ORDER.md` — T1, T2, T3 and the constant decisions
+
+02b decided every open item and gave a task order. T1–T3 are done, along with
+C1–C2, C4 and all of §2's constant decisions. T4 (the reward) is next and is
+untouched.
+
+### 7.1 T1 — the field logs were mined, and the answer is neither figure
+
+02b calls this "the highest-value half-day in the project". It is, and it
+overturns its own C2.
+
+The retained logs carry `#ACTION` records with commanded `rpm` alongside the
+localiser's `x_real, y_real`. Speed over ground differentiated from the pose
+track over the last 60% of each run, excluding the acceleration ramp:
+
+**Median 1.14 m/s at 12 RPM across 18 logs**, spread 0.56–1.25, consistent trial
+to trial. Froude 0.29 — a displacement hull, exactly as 02b's plausibility
+argument requires.
+
+| Source | Value | Fr |
+|---|---|---|
+| **Measured** | **1.14 m/s** | 0.29 |
+| 02b C2 "Paper 2 field" | 0.55 m/s | 0.14 |
+| 02a §1 `U_ref` | 0.80 m/s | 0.20 |
+| Simulator, pre-calibration | 1.77 m/s | 0.45 |
+
+02b C2's direction was right — the simulator was too fast — but by **1.55×, not
+3.2×**.
+
+> **F20 — chain of custody, and it is mine.** The 0.55 m/s that 02b C2 tabulates
+> as "Paper 2 field … and it is a *measurement*" was never measured. It entered
+> as an unsourced placeholder in the first `constants.py` I wrote, under a
+> comment claiming it came from the field trials. It did not. 02b then adopted
+> it as ground truth and built the C2 decision on it.
+>
+> The lesson is narrow and worth keeping: a placeholder that *describes itself*
+> as measured is more dangerous than one marked `TODO`, because the marker is
+> the only thing stopping it being promoted. Placeholders now say what they are.
+
+`ship.THRUST_CAL = 0.3751` scales the thrust map so steady surge at `CRUISE_RPM`
+equals the measured value, solved by bisection. Envelope after calibration:
+
+| RPM | 6 | 9 | 12 | 15 | 18 | 24 |
+|---|---|---|---|---|---|---|
+| u (m/s) | 0.49 | 0.83 | **1.14** | 1.42 | 1.69 | 2.16 |
+| Fr | 0.12 | 0.21 | 0.29 | 0.36 | 0.43 | 0.55 |
+
+The discrepancy now lives in one number, per C2. When 05 identifies the thrust
+map, that number changes and nothing else does.
+
+**Caveat worth stating in the paper.** These are short avoidance runs in a 25 m
+basin; the vessel never holds a true steady state. Attempts to isolate a
+≥3 s near-straight plateau found none in any log. 1.14 m/s is a run-mean past
+the ramp, not a measured steady speed, and a dedicated straight-line run should
+confirm it — which 05's manoeuvre set already includes.
+
+**T1.2 and T1.3 were not attempted.** rf2o drift and black-wall return rate need
+the pose and scan streams cross-referenced against surveyed geometry, which is a
+larger job than the speed extraction and is properly 05's. The pose-noise
+constants remain 0.0 and no headline run should start until they are not.
+
+### 7.2 T2 — the `e_y` flip, and the gate held
+
+One change in `path.py`: cross-track error is now **positive to starboard**.
+
+02b asked for the 58 bit-identity rollouts as the gate. Those compared Paper 2's
+`src/` against its original scripts and do not exist here, so the equivalent was
+built: 30 rollouts (2 corridor widths × 5 seeds × straight/port/starboard),
+1800 steps, recording every observation branch, reward, both termination flags,
+every scalar `info` key, and the vessel pose.
+
+**Result: `path[0]` and the two cross-track log keys negated on all 1290 steps
+where the error was non-zero. Nothing else moved — not one observation index,
+reward, flag or `info` value.** No unstated coupling.
+
+02b anticipated propagation "through `obstacles.py`'s lateral-offset handling".
+There was none to do: the layout families place obstacles via `path.left_normal`
+and explicit sign constants, never via the cross-track error. They were already
+written in geometric terms, which is why the flip is genuinely one-line.
+
+Everything downstream — goal acceptance, `mean_abs_cte`, `max_abs_cte`, the
+metrics recorder — takes `abs()`, so the flip is invisible to them by
+construction. `test_cross_track_sign_is_positive_to_starboard` pins the exact
+case F17.1 measured: +1.01 for a vessel 1 m to starboard of a due-north path.
+
+### 7.3 T3 — `r_path`, and a float32 trap it walked into
+
+`ReferencePath.curvature(idx)` returns signed Menger curvature, positive to
+starboard so it matches `r > 0`; `yaw_rate_for_tracking(idx, u)` returns
+`u · κ` in rad/s. Exact against circular arcs of radius 5, 10 and 25 m.
+
+`info` now carries `r_path_radps` **and** `yaw_rate_radps`. The environment's
+own yaw rate is in degrees per second while 02a §6.2 works in rad/s
+(`r_ref = 0.20`), so emitting both in radians removes a silent unit trap from
+`R-8`'s `r − r_path`.
+
+**A deadband was needed.** `ReferencePath.points` is float32 (Paper 2's choice),
+and differencing closely-spaced float32 vertices leaves ~2×10⁻⁵ 1/m on a
+*nominally straight* path — a 49 km turn radius. Without suppression that noise
+propagates into `r_path`, and `R-8`'s `r − r_path` becomes non-zero everywhere
+for no physical reason. `CURVATURE_EPS = 1e-4` (a 10 km radius) reads as
+straight: three orders above the noise, three below any bend that fits in a
+25 m basin.
+
+The same effect sets the accuracy limit: curvature error on a known arc *grows*
+with point density, because closer float32 vertices carry less relative
+information. Relevant to 03 when it chooses the resolution for bends.
+
+**The `R-8` regression test exists and is `xfail(strict)`**, exactly as 02b asks.
+It asserts `r_path` is non-zero somewhere in the scenario distribution; with
+`κ = 0` everywhere it fails, and it will start passing — and flag itself as
+XPASS — the moment 03 delivers bends.
+
+### 7.4 C1 — thresholds computed, and 02a §2.2's derivations recovered
+
+`predicted_thresholds(d_abeam, c_wall, breadth)` implements 02a §2.2's four
+derivations directly rather than storing its four numbers:
+
+| Class | Derivation | Computed | 02a |
+|---|---|---|---|
+| Crossing | `2(d_req + c_wall + B/2)` | 6.51 | 6.52 |
+| Head-on, centreline target | `2·d_req + 2·c_wall` | 6.01 | 6.02 |
+| Overtaking | `1.15(d_req + 2·c_wall + B)` | 4.78 | 4.78 |
+| Head-on, compliant target | `d_req + 2·c_wall` | 3.66 | 3.66 |
+
+All four to within 1 cm. Sweep held at seven levels, 6.25 m not added, and the
+bracket-collision test kept as written — per C1.
+
+### 7.5 F21 — 02b §3.1's domain floor already excludes the provisional domain
+
+02b §3.1 sets `d_abeam ≥ LIDAR_MIN_RANGE + B/2 = 1.25 m` as a hard floor, and
+the reasoning is right: below it the ship domain sits inside the sensor's blind
+zone, and since `R-1` evaluates intrusion on ground truth, the agent would be
+penalised for intrusions it cannot perceive. `r_dom` would become unlearnable.
+
+**But `0.75 · Lpp = 1.18 m` does not clear 1.25 m.** The same section says the
+current value "sits 0.18 m outside the sensor blind zone" — comparing it to
+`LIDAR_MIN_RANGE` alone — and then defines a floor that excludes it. The two
+halves disagree.
+
+Not resolved unilaterally, because 02a §1 states the abeam extent explicitly and
+raising it to 1.25 m (0.796 · Lpp) moves `d_req` and all four thresholds:
+
+| | at 1.18 m | at 1.25 m |
+|---|---|---|
+| Crossing | 6.51 | 6.80 |
+| Head-on, centreline | 6.01 | 6.30 |
+| Overtaking | 4.78 | 4.94 |
+| Head-on, compliant | 3.66 | 3.80 |
+
+`constants.check_domain()` returns the breach rather than raising, so it is
+impossible to miss but does not block. T4's config validator should raise once
+the domain is final. **This is the only remaining `TODO(decision)` in the tree.**
+
+### 7.6 §2 constant decisions applied
+
+| Constant | Now |
+|---|---|
+| `R_COLLISION` / `R_GOAL` / `R_TIMEOUT` | −300 / +100 / **0** |
+| `TCPA_CLIP` | 40 s, was 60 |
+| `DCPA_CLIP_DOMAINS` | derived: `LIDAR_RANGE / d_abeam` = 13.6 |
+| `BEING_OVERTAKEN_SPEED_MARGIN` | `0.15 · U_REF` |
+| `TARGET_SPEED_RANGE` | `(0.35, 1.35) · U_REF` |
+| `TRACK_GATE_DIST` | `max(2.5 · U_REF · Δt, 0.30)` |
+| `USE_RECURRENCE` | False — closes 01's open item |
+| CRI block, `CLUSTER_*`, spawn probabilities | approved as-is |
+
+`R_TIMEOUT = 0` is only sound if SB3 bootstraps, so the env must truncate rather
+than terminate at the step limit. **It already did** — `truncated=True,
+terminated=False`, verified and now pinned by
+`test_timeout_truncates_rather_than_terminating`.
+
+The CRI approval brings a paper-ready framing worth not losing: a 320 m ship
+with 2 NM of radar sees 11.6 hull lengths ahead; the Bluefin with 16 m of LiDAR
+sees 10.2. **The perceptual horizon in ship lengths transfers almost exactly
+even though the absolute range does not** — it is the channel that is small at
+model scale, not the sensing.
+
+### 7.7 State
+
+**251 tests: 250 passing, 1 `xfail`** (the `R-8` bend test, pending 03).
+
+Every `TODO(decision)` is discharged except F21. What remains is 20 `TODO(05)`
+values needing measurement rather than a call, and one `TODO(03)`
+(`REVERSE_AVAILABLE`).
+
+Next per 02b: **T4, the reward** — `EncounterContext` first, then `reward/terms.py`
+as pure functions, then the weighted sum, the config validators including the
+`d_abeam` floor, and the eleven unit tests with test 8 `xfail`. Then T5 (03's
+corridor generator), which §3.3 correctly identifies as blocking three separate
+deliverables.
