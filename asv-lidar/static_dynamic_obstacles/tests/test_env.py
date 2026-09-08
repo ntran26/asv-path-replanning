@@ -207,6 +207,37 @@ def test_collision_returns_the_terminal_penalty():
     assert env._reward(None, False, True) == cfg.R_TIMEOUT
 
 
+def test_terminal_payoffs_are_the_decided_values():
+    """02b §2 / 02a `R-7`.  -300 rather than -200 because at -200 the margin
+    between a collision and a maximally non-compliant episode is 32 points,
+    violating the 02 §5 ordering."""
+    assert cfg.R_COLLISION == -300.0
+    assert cfg.R_GOAL == 100.0
+    assert cfg.R_TIMEOUT == 0.0
+
+
+def test_timeout_truncates_rather_than_terminating():
+    """`R_TIMEOUT = 0` is only sound if SB3 bootstraps the final state.
+
+    That needs `truncated=True, terminated=False` at the step limit.  If the env
+    terminated instead, the value of running out of time would be pinned at 0
+    rather than bootstrapped, and 02a §8.1's "a cornered agent prefers timeout
+    to collision" argument would be void.
+    """
+    env = make_env(no_target_prob=1.0)
+    env.forced_num_obs = 0
+    env.reset(seed=0)
+    for _ in range(cfg.MAX_EPISODE_STEPS + 2):
+        env.asv_x, env.asv_y = 5.0, 12.0        # park it: no goal, no collision
+        _, reward, terminated, truncated, info = env.step(
+            np.array([0.0, -1.0], dtype=np.float32))
+        if terminated or truncated:
+            break
+    assert truncated and not terminated
+    assert info["timeout"] is True
+    assert reward == 0.0
+
+
 def test_no_paper_2_reward_terms_survive_in_info():
     """Kickoff §8 acceptance check, enforced from the outside."""
     env = make_env()

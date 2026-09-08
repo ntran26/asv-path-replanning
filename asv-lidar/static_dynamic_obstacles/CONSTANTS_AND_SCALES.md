@@ -1,8 +1,9 @@
 # CONSTANTS AND SCALES — Paper 3
 
-**Revision 2.2** — tracks `02a_REWARD_SPECIFICATION.md` Rev 2.2. Head-on band
-resolved to ±10°, IMU confirmed, propulsion widening resolved, a 7 m sweep level
-added, and the speed normaliser corrected after it was found to be saturating.
+**Revision 2.3** — tracks `02b_DECISIONS_AND_TASK_ORDER.md`. The speed
+calibration is now **measured** (T1), the cross-track sign is flipped to
+textbook (T2/C4), `r_path` exists (T3), the width thresholds are **computed**
+rather than listed (C1), and the terminal payoffs are decided.
 
 Mirror of `src/constants.py`, which is the single source of truth. Every
 unresolved value appears there with a `TODO` marker and **nowhere else** — no
@@ -16,13 +17,15 @@ consumer buries a magic number in a function body.
 | `TODO(05)` | `planning/05_VESSEL_MODEL_AND_SIM2REAL.md` |
 | `TODO(decision)` | needs a call no open item currently covers |
 
-**41 constants are unresolved.** §11 lists them with the placeholder in force.
-Placeholders are chosen to make the code run, not to look finished.
+**Every `TODO(decision)` is gone.** 02b decided all of them. What remains is
+`TODO(05)` — values that need a measurement, not a call — plus three
+`TODO(03)`/`TODO(04)` items owned by later tasks, and one genuine
+`TODO(decision)` that 02b introduced without noticing (§8.1).
 
-Closed since Revision 2: the head-on band (±10°, 01 §5.3) and the propulsion
-widening decision (03 §6). Two new entries arrived —
-`TARGET_COMPLIANT_SPAWN_PROB` and `REVERSE_AVAILABLE` — and `U_MAX_SURGE`
-replaced the derived `SPEED_SCALE`.
+Closed by 02b: the terminal payoffs, `TCPA_CLIP`, `DCPA_CLIP_DOMAINS`,
+`BEING_OVERTAKEN_SPEED_MARGIN`, `TARGET_SPEED_RANGE`, `TRACK_GATE_DIST`, the CRI
+block, `DOMAIN_RADIUS_DCPA`, `USE_RECURRENCE`, `CLUSTER_*`,
+`TARGET_COMPLIANT_SPAWN_PROB`, `NO_TARGET_EPISODE_PROB`.
 
 ---
 
@@ -60,66 +63,87 @@ The sweep, in metres and breadths:
 |---|---|---|---|---|---|---|
 | 20 B | 16 B | 14 B | 12 B | 10 B | 8 B | 7 B |
 
-02a §2.2 now predicts **four** per-class transitions, not one:
+02a §2.2 predicts **four** per-class transitions, and 02b C1 makes them a
+computed function of the domain rather than four literals that silently go
+stale. `constants.predicted_thresholds(d_abeam, c_wall, breadth)` implements
+02a §2.2's derivations directly and reproduces its figures to 1 cm:
 
-| Class | Threshold | Bracket |
-|---|---|---|
-| Crossing | 6.52 m (13.0 B) | 6 → 7 |
-| Head-on, target on the centreline | 6.02 m (12.0 B) | 6 → 7 ⚠ |
-| Overtaking | 4.78 m (9.6 B) | 4 → 5 |
-| Head-on, target 9(a)-compliant | 3.66 m (7.3 B) | 3.5 → 4 |
+| Class | Derivation | Computed | 02a |
+|---|---|---|---|
+| Crossing | `2(d_req + c_wall + B/2)` | 6.51 m | 6.52 |
+| Head-on, centreline target | `2·d_req + 2·c_wall` | 6.01 m | 6.02 |
+| Overtaking | `1.15(d_req + 2·c_wall + B)` | 4.78 m | 4.78 |
+| Head-on, compliant target | `d_req + 2·c_wall` | 3.66 m | 3.66 |
 
-The 7 m level comes from 02a §11.3. **It does not achieve what that section
-claims** — see PORTING_MANIFEST F18. Crossing and centreline head-on still share
-the (6, 7) bracket, and the 6.02 m figure sits 2 cm above the 6 m sweep level,
-so that transition effectively coincides with a sample point. Separating them
-needs a level strictly between the two, e.g. 6.25 m (12.5 B).
+Re-deriving after 05 is one call.
 
-All four move with the ship domain, so recompute after the turning-circle
-identification and before freezing the suite.
-`tests/test_env.py` asserts the bracketing, asserts the crossing/head-on
-collision as the current documented state, and fails if either changes.
+**F18 stands and 02b C1 confirms it: do not add 6.25 m.** Crossing and
+centreline head-on share the (6, 7) bracket and cannot be separated by the
+current sweep — but both thresholds derive from `d_abeam` and `c_wall`, and both
+are `TODO(05)`. Adding a level to separate two numbers that will move is
+premature, and it would bake a level into a suite that 04 §4.5 requires frozen
+and hashed. The sweep holds at seven levels;
+`test_crossing_and_centreline_head_on_still_share_a_bracket` keeps the collision
+documented so it is revisited rather than forgotten.
 
-## 3. Actuation
+## 3. Actuation and the speed calibration
 
 | Symbol | Value | Status |
 |---|---|---|
 | `CRUISE_RPM` | 12.0 | Paper 2 |
 | `RPM_STAGE` | 1 → (±3, 9, 15) | curriculum entry; **stage 4 is the endpoint** |
 | `REVERSE_AVAILABLE` | False | `TODO(03)` — capability unverified |
-| `U_CRUISE` | **1.77 m/s** | `TODO(05)` — see below |
-| `U_MAX_SURGE` | 3.2 m/s | `TODO(05)` |
+| **`U_REF`** | **1.14 m/s** | **measured** (T1) |
+| `ship.THRUST_CAL` | 0.3751 | calibration, `TODO(05)` |
 
 **Propulsion widening is resolved** (03 §6, 02 §4.4). Rule 8(e) speed reduction
 is the designated fallback whenever a compliant course alteration would push the
-vessel into the boundary, so the agent must be able to slow substantially and
-ideally stop. Staged through the curriculum as in Paper 2, but the final stage
-must expose stage 4 — it is the only one reaching 0 RPM.
+vessel into the boundary. Staged through the curriculum as in Paper 2, but the
+final stage must expose stage 4 — it is the only one reaching 0 RPM.
 
-`REVERSE_AVAILABLE` defaults False deliberately. 02a §10.5 is explicit: do not
-flip it on a datasheet, because 05 must identify the reverse regime or the
-simulator extrapolates into an unmodelled envelope.
+### 3.1 `U_REF` is now measured, and all three prior figures were wrong
 
-### 3.1 Three speed figures disagree — 05 must settle it
+02b T1 mined the retained Paper 2 field logs, which carry commanded RPM
+alongside the localiser pose in their `#ACTION` records. Speed over ground
+differentiated from the pose track over the last 60% of each run, so the
+acceleration ramp is excluded:
 
-| Source | Value |
-|---|---|
-| Simulator at `CRUISE_RPM` = 12, measured | **1.77 m/s** |
-| 02a §1 `U_ref` | 0.80 m/s |
-| 02a §10.5 reachable surge target | 0.20–0.90 m/s |
+**Median 1.14 m/s at 12 RPM across 18 logs**, spread 0.56–1.25, and remarkably
+consistent trial to trial. Froude 0.29 — a displacement hull.
 
-The simulator's speed envelope sits **2–3× above** everything 02a assumes. Its
-whole §8.1 audit table is computed at `U_ref = 0.8`, and its §10.5 propulsion
-targets are below the simulator's *stage-1 floor* (1.35 m/s at 9 RPM).
+| Source | Value | Fr | Verdict |
+|---|---|---|---|
+| **Measured, this analysis** | **1.14 m/s** | 0.29 | — |
+| 02b C2 "Paper 2 field" | 0.55 m/s | 0.14 | ~2× too low |
+| 02a §1 `U_ref` | 0.80 m/s | 0.20 | assumption |
+| Simulator, pre-calibration | 1.77 m/s | 0.45 | ~1.55× too high |
 
-Either the thrust map is wrong — 05 §2 already lists "Paper 2 used thrust ∝ RPM²;
-verify" as a task — or 02a's figures are. Until it is settled, every
-speed-normalised observation feature and every reward speed gate is scaled
-against a different vessel from the one being simulated.
+02b C2's *direction* was right — the simulator was too fast and the thrust map
+needed calibrating — but by 1.55×, not 3.2×.
 
-`U_CRUISE` now records what the simulator actually does, rather than the 0.55 m/s
-field figure it previously carried, so the discrepancy is visible instead of
-buried.
+> **Chain of custody, stated plainly.** The 0.55 m/s figure 02b treats as "a
+> measurement" was not one. It entered as an unsourced placeholder in the first
+> `constants.py`, carrying a comment claiming it was measured from the field
+> trials. It was not measured; it was invented, and then adopted downstream as
+> ground truth. The 1.14 m/s above *is* measured, from the logs, and the script
+> is reproducible.
+
+**One constant, consumed by everything.** `U_REF` feeds the `ego` normaliser,
+both target-speed features, `SPEED_SCALE`, `TARGET_SPEED_RANGE`,
+`BEING_OVERTAKEN_SPEED_MARGIN`, `TRACK_GATE_DIST` and every reward speed gate.
+The earlier saturating-`ego` bug was two constants disagreeing about the same
+physical quantity; one constant makes that impossible.
+
+`ship.THRUST_CAL = 0.3751` scales the thrust map so steady surge at `CRUISE_RPM`
+equals `U_REF`. Solved by bisection. The resulting envelope:
+
+| RPM | 6 | 9 | 12 | 15 | 18 | 24 |
+|---|---|---|---|---|---|---|
+| u (m/s) | 0.49 | 0.83 | **1.14** | 1.42 | 1.69 | 2.16 |
+| Fr | 0.12 | 0.21 | 0.29 | 0.36 | 0.43 | 0.55 |
+
+`TODO(05)`: this is a *calibration*, not an identification. 05 replaces the
+thrust map; then only this one number changes.
 
 ## 4. Raw LiDAR (RPLidar C1)
 
@@ -265,7 +289,7 @@ Both magnitudes still come from 05. Log raw gyro and accelerometer at 100 Hz+,
 time-synced to the LiDAR — 05 §4.7 flags the sync as the detail that will bite,
 because a constant offset appears in the fit as actuator lag.
 
-## 8. Ship domain — RESOLVED (provisional)
+## 8. Ship domain — RESOLVED (provisional), with a floor that already bites
 
 | Direction | Multiple | Metres |
 |---|---|---|
@@ -292,8 +316,43 @@ metric would carry no signal.
 
 `DOMAIN_RADIUS_DCPA` is undefined for an asymmetric domain. Convention adopted:
 the **lateral semi-axis**, because DCPA is a closest-approach distance and
-closest approach in a channel is overwhelmingly a beam-on passing geometry. The
-alternative is `sqrt(fore × lateral)`. `TODO(decision)`.
+closest approach in a channel is overwhelmingly a beam-on passing geometry.
+
+**Resolved (02b §2), and the resolution is that observation and reward normalise
+differently on purpose.** This constant scales the observation feature only; the
+reward uses the directional `d_dom(β)` at the target's actual bearing (02a §5.3)
+and gates `ρ_t` on the constant `d_req`. Documented rather than unified, because
+the two serve different jobs.
+
+### 8.1 The sensor-resolution floor already excludes the provisional value
+
+02b §3.1 sets a hard floor: `d_abeam ≥ LIDAR_MIN_RANGE + B/2 = 1.25 m`. Below
+it the ship domain sits inside the sensor's blind zone, and because `R-1`
+evaluates domain intrusion on ground-truth geometry, the agent would be
+penalised for intrusions it cannot perceive — `r_dom` stops being a shaping
+signal and becomes unlearnable.
+
+**But `0.75 · Lpp = 1.18 m` does not clear that floor.** §3.1 says the current
+value "sits 0.18 m outside the sensor blind zone", which compares it to
+`LIDAR_MIN_RANGE` alone (1.0 m) — then defines the floor as 1.25 m. The two
+halves of the section disagree.
+
+`TODO(decision)`. Not resolved unilaterally: 02a §1 states the abeam extent as
+`0.75 · Lpp` explicitly, and raising it to 1.25 m (0.796 · Lpp) moves `d_req`
+and all four Study 1 thresholds:
+
+| | at 1.18 m | at 1.25 m |
+|---|---|---|
+| Crossing | 6.51 m | 6.80 m |
+| Head-on, centreline | 6.01 m | 6.30 m |
+| Overtaking | 4.78 m | 4.94 m |
+| Head-on, compliant | 3.66 m | 3.80 m |
+
+`constants.check_domain()` reports the breach rather than raising, so it cannot
+be missed but does not block. T4's config validator should raise once the domain
+is final.
+
+## 8b. The width thresholds are computed, not listed
 
 ## 9. Collision Risk Index
 
