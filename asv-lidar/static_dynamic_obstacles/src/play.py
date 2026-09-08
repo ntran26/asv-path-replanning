@@ -78,10 +78,10 @@ def make_target(env: ASVLidarEnv, kind: str) -> List[TargetShip]:
     # `U_CRUISE` moves.
     speed = cfg.U_CRUISE
     slower = 0.35 * cfg.U_CRUISE
-    # Only a modest overhauling margin: the own ship starts from rest and takes
-    # tens of seconds to reach cruise, so a large margin closes the gap before
-    # the encounter is observable.
-    overhauling = 1.15 * cfg.U_CRUISE
+    # The margin has to clear `BEING_OVERTAKEN_SPEED_MARGIN` (0.15 x cruise)
+    # with room to spare, or the class sits exactly on its own threshold.
+    # 1.35 x matches the top of `TARGET_SPEED_RANGE`.
+    overhauling = 1.35 * cfg.U_CRUISE
     ahead = min(env.path.length - 1.0, cfg.LIDAR_RANGE * 0.6)
     frac = ahead / max(env.path.length, 1e-6)
     point, tangent, normal = env.path.frame_at_frac(frac)

@@ -210,6 +210,7 @@ class ASVLidarEnv(gym.Env):
 
         self.cross_track_error = 0.0
         self.course_error = 0.0
+        self.r_path = 0.0
         self.lookahead_course_error = 0.0
         self.closest_idx = 0
         self.lookahead_idx = 0
@@ -505,6 +506,9 @@ class ASVLidarEnv(gym.Env):
         self.lookahead_idx = state.lookahead_idx
         self.lookahead_x, self.lookahead_y = state.lookahead
         self.lookahead_course_error = state.lookahead_course_error
+        # Yaw rate the path itself demands, rad/s (02b T3).  Zero while the
+        # corridor is straight; 03's bends make it live.
+        self.r_path = self.path.yaw_rate_for_tracking(self.closest_idx, self.u_body)
 
     # ------------------------------------------------------------------
     # Collision geometry -- carried over unchanged (Bucket A)
@@ -650,6 +654,10 @@ class ASVLidarEnv(gym.Env):
             "u_body_mps": float(self.u_body),
             "v_body_mps": float(self.v_body),
             "yaw_rate_dps": float(self.asv_w),
+            # Both in rad/s so 02a `R-8`'s `r - r_path` cannot be taken in
+            # mixed units -- the env's own yaw rate is degrees per second.
+            "yaw_rate_radps": float(math.radians(self.asv_w)),
+            "r_path_radps": float(self.r_path),
             "rpm": float(self.rpm),
             "rudder_deg": float(rudder_cmd * MAX_RUD_ANGLE),
             "distance_to_goal": float(self.distance_to_goal),

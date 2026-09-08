@@ -62,7 +62,22 @@ NV, NR = 1.10546039494704e-003, 42.2032985948020e-009
 NVV, NRR, NVR = 482.463882083071e-006, 10.1534803187344e-012, 116.985615725573e-009
 
 # --- Calibrated gains ------------------------------------------------------
-THRUST_COEF = 0.06
+# THRUST_CAL scales the whole thrust map so that steady surge at CRUISE_RPM
+# matches the measured field cruise speed (constants.U_REF).  Paper 2's map was
+# never validated against the trial logs -- 05 §2 lists "Paper 2 used thrust
+# proportional to RPM^2; verify" -- and mining those logs (02b T1) put the real
+# cruise at 1.14 m/s against the simulator's 1.77.
+#
+# The discrepancy lives in this one number by design (02b C2): when 05's
+# identification lands, this is the single value that changes, rather than every
+# speed normaliser downstream.
+#
+# Solved by bisection for steady u = 1.14 m/s at 12 RPM.
+# TODO(05): replace with the identified thrust map; this is a calibration, not
+# an identification.
+THRUST_CAL = 0.3751
+
+THRUST_COEF = 0.06 * THRUST_CAL
 DRAG_COEF = 1.5
 TURN_COEF = 3.0                         # hull sway/yaw damping scale
 

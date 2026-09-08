@@ -1,4 +1,10 @@
-"""Reference path geometry: construction, arc length, and vessel-relative errors."""
+"""Reference path geometry: construction, arc length, and vessel-relative errors.
+
+**Cross-track error is positive to STARBOARD** (02b C4), the textbook LOS
+convention.  This differs from Paper 2, which used positive-to-port; see
+`project()` for why it was flipped.  Anything comparing numbers across the two
+papers must account for it.
+"""
 
 from __future__ import annotations
 
@@ -22,7 +28,7 @@ def bearing_deg(from_xy, to_xy) -> float:
 class PathState(NamedTuple):
     """Where the vessel sits relative to the reference path."""
     closest_idx: int
-    cross_track_error: float      # signed; positive = left of the path
+    cross_track_error: float      # signed; positive = STARBOARD of the path
     course_error: float           # deg
     target: tuple                 # closest point on the path
     lookahead_idx: int
@@ -61,6 +67,50 @@ class ReferencePath:
             return np.array([0.0, 1.0], dtype=np.float32)
         return (vec / norm).astype(np.float32)
 
+    def curvature(self, idx: int) -> float:
+        """Signed path curvature at a vertex, 1/m.  **Positive = to starboard.**
+
+        Menger curvature over the three vertices centred on `idx`, signed so it
+        matches the vessel's yaw-rate convention (`r > 0` is a starboard turn).
+        A straight path returns 0.
+
+        The sign comes from the cross product of the two segment vectors: in
+        this frame (+y north, +x east, headings clockwise) a starboard turn
+        rotates the tangent from +y toward +x, which gives a *negative* cross
+        product -- hence the negation.
+        """
+        n = len(self.points)
+        if n < 3:
+            return 0.0
+        i = int(np.clip(idx, 1, n - 2))
+        a, b, c = (self.points[i - 1].astype(np.float64),
+                   self.points[i].astype(np.float64),
+                   self.points[i + 1].astype(np.float64))
+        ab, bc, ac = b - a, c - b, c - a
+        cross = float(ab[0] * bc[1] - ab[1] * bc[0])
+        denom = float(np.linalg.norm(ab) * np.linalg.norm(bc) * np.linalg.norm(ac))
+        if denom < 1e-12:
+            return 0.0
+        kappa = -2.0 * cross / denom
+        # Deadband: see `constants.CURVATURE_EPS`.  float32 vertex storage
+        # leaves ~2e-5 1/m on a straight path, which would otherwise make
+        # `r_path` non-zero everywhere.
+        return 0.0 if abs(kappa) < cfg.CURVATURE_EPS else float(kappa)
+
+    def yaw_rate_for_tracking(self, idx: int, speed: float) -> float:
+        """Yaw rate required to follow the path at `speed`, rad/s.
+
+        `r_path = u * kappa` (02b T3).  02a `R-8` measures every yaw-based
+        COLREGs term as `r - r_path`, so that following a channel which bends to
+        port is not scored as an evasive port turn -- which is what withdrew
+        `R-3` and removed the unwinnable state it was patching.
+
+        Returns rad/s to match `r_ref = 0.20 rad/s` in 02a §6.2.  Note the
+        environment reports its own yaw rate in **degrees** per second; `info`
+        emits both in rad/s so the difference cannot be taken in mixed units.
+        """
+        return float(speed) * self.curvature(idx)
+
     def left_normal(self, idx: int) -> np.ndarray:
         t = self.tangent(idx)
         return np.array([-t[1], t[0]], dtype=np.float32)
@@ -83,7 +133,19 @@ class ReferencePath:
         tangent = self.tangent(closest_idx)
         offset = pos - self.points[closest_idx]
         cross_z = float(tangent[0] * offset[1] - tangent[1] * offset[0])
-        sign = 1.0 if cross_z > 0.0 else (-1.0 if cross_z < 0.0 else 0.0)
+        # Positive to STARBOARD -- the textbook LOS convention (02b C4).
+        #
+        # Paper 2 used positive-to-port, which its own `verify_los_apf.py`
+        # flagged as non-standard.  Flipped here because this paper's
+        # contribution is COLREGs *geometry*: 02a §6.4's passing-side term has
+        # two opposite branches keyed on the sign of the lateral offset
+        # (head-on penalises one, overtaking the other), and carrying a
+        # non-standard lateral sign through them invites exactly the class of
+        # error the paper is about.
+        #
+        # `cross_z > 0` means the vessel lies to the LEFT of the path tangent,
+        # hence the negation.
+        sign = -1.0 if cross_z > 0.0 else (1.0 if cross_z < 0.0 else 0.0)
         cte = sign * float(distances[closest_idx])
 
         path_course = math.degrees(math.atan2(float(tangent[0]), float(tangent[1])))
