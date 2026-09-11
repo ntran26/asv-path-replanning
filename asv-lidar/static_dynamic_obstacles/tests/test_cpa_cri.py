@@ -98,25 +98,42 @@ def test_domain_is_asymmetric_fore_and_aft():
 
 
 def test_domain_matches_the_resolved_multiples():
-    """01 §5.2, resolved: 2.0 / 1.0 / 0.75 x Lpp (ahead / astern / abeam).
+    """01 §5.2, resolved: 2.0 / 1.0 x Lpp ahead / astern, abeam at the floor.
 
     Provisional -- the final values are an OUTPUT of 05, derived from the
     identified turning circle, not a scaled copy of Chun et al.
     """
     assert cfg.DOMAIN_FORE == pytest.approx(2.00 * cfg.LBP)
     assert cfg.DOMAIN_AFT == pytest.approx(1.00 * cfg.LBP)
-    assert cfg.DOMAIN_LATERAL == pytest.approx(0.75 * cfg.LBP)
     assert cfg.DOMAIN_FORE == pytest.approx(3.14, abs=0.01)
-    assert cfg.DOMAIN_LATERAL == pytest.approx(1.18, abs=0.01)
+
+
+def test_the_abeam_extent_sits_on_the_sensor_floor_not_on_the_lpp_multiple():
+    """F21: 02b §3.1's floor binds, so `0.75 * Lpp` is not the abeam extent.
+
+    02a §1 states the abeam domain as `0.75 * Lpp = 1.18 m`, which does not
+    clear 02b §3.1's hard floor of `LIDAR_MIN_RANGE + B/2 = 1.25 m`.  §3.1
+    anticipates exactly this case and floors the domain, because `r_dom` is
+    evaluated on ground truth per `R-1`: a domain inside the sensor's blind
+    zone would penalise the agent for intrusions it cannot perceive, and the
+    term stops being a shaping signal at all.
+
+    Pinned as its own test so the day 05's turning circle lands, it is obvious
+    whether the measured value clears the floor or is still being held up by it.
+    """
+    assert cfg.DOMAIN_LATERAL == pytest.approx(cfg.DOMAIN_ABEAM_FLOOR)
+    assert cfg.DOMAIN_LATERAL == pytest.approx(1.25, abs=0.01)
+    assert cfg.DOMAIN_LATERAL > 0.75 * cfg.LBP
+    assert not cfg.check_domain(), cfg.check_domain()
 
 
 def test_chun_domain_would_not_fit_but_the_compressed_one_does():
     """Why the compression is necessary rather than convenient."""
     chun_lateral = 1.0 * cfg.LBP
     lateral_footprint = 2.0 * cfg.DOMAIN_LATERAL
-    assert lateral_footprint == pytest.approx(2.36, abs=0.01)
-    # ~24% of the widest channel, against ~31% for Chun.
-    assert lateral_footprint / cfg.MAP_WIDTH < 0.25
+    assert lateral_footprint == pytest.approx(2.50, abs=0.01)
+    # ~25% of the widest channel, against ~31% for Chun.
+    assert lateral_footprint / cfg.MAP_WIDTH < 0.27
     assert (2.0 * chun_lateral) / cfg.MAP_WIDTH > 0.30
     # Chun fore-aft is 4.7 m in a 25 m basin: nearly a fifth of the run.
     assert 3.0 * cfg.LBP == pytest.approx(4.71, abs=0.01)
@@ -127,9 +144,12 @@ def test_the_width_sweep_brackets_the_head_on_threshold():
 
     Two non-overlapping domains abeam plus wall clearance each side.
     """
-    # 2.36 m centre-to-centre separation + 0.65 m wall clearance each side.
+    # 2.50 m centre-to-centre separation + 0.65 m wall clearance each side.
+    # Was 3.66 m before F21 floored the abeam domain; the bracket is unchanged.
     needed = 2.0 * cfg.DOMAIN_LATERAL + 2.0 * cfg.HEAD_ON_WALL_CLEARANCE
-    assert needed == pytest.approx(3.66, abs=0.02)
+    assert needed == pytest.approx(3.80, abs=0.02)
+    assert needed == pytest.approx(
+        cfg.predicted_thresholds()["head_on_compliant_target"], abs=0.02)
 
     widths = sorted(cfg.CORRIDOR_WIDTHS_M)
     below = [w for w in widths if w < needed]

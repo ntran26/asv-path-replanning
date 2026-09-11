@@ -19,6 +19,16 @@ vessel starts at cruise, so it makes way immediately and you steer from there.
     P              pause
     ESC or Q       quit
 
+    1 - 7          show/hide a telemetry block
+    , / .          scrub back / forward through the last 200 steps
+    L              jump back to live
+
+The telemetry panel on the left is described in
+`planning/RENDER_PANEL_SPEC.md`.  It opens on blocks [4] COLREGS and
+[5] REWARD, which are the two the reward is being built against; the rest are
+one keypress away.  The scrub keys are `,` and `.` rather than the arrows the
+spec suggests, because the arrows are the helm here.
+
 The helm **holds** where you put it rather than springing back, because holding
 a steady rate of turn is the thing you actually want to test.
 
@@ -49,9 +59,9 @@ RUDDER_RATE = 0.10          # full deflection in ~1.0 s of held key
 THROTTLE_RATE = 0.05        # full range in ~2.0 s
 
 KEY_HINTS = [
-    "LEFT/RIGHT rudder   UP/DOWN throttle",
-    "SPACE centre helm   T cruise   R reset",
-    "P pause             ESC quit",
+    "LEFT/RIGHT rudder   UP/DOWN throttle   SPACE centre helm",
+    "T cruise   R reset   P pause   ESC quit",
+    "1-7 blocks   , . scrub   L live",
 ]
 
 
@@ -246,11 +256,17 @@ class Helm:
 
 
 def overlay_lines(env: ASVLidarEnv, helm: Optional[Helm], mode: str) -> List[str]:
-    lines = [f"{mode}  |  corridor {env.corridor_width:.1f} m "
-             f"({env.corridor_breadths:.0f} B)  |  targets {len(env.targets)}"]
+    """The panel footer.
+
+    Short, because the panel's [1] RUN block now carries the corridor width, the
+    target count and the step counter that this used to draw over the field.
+    What is left is the mode, the helm state and the key bindings -- the things
+    that are about the harness rather than about the episode.
+    """
+    lines = [f"mode {mode}"]
     if helm is not None:
         rpm = cfg.CRUISE_RPM + cfg.RPM_DELTA * helm.throttle
-        lines.append(f"helm {helm.rudder:+.2f}   throttle {helm.throttle:+.2f} "
+        lines.append(f"helm {helm.rudder:+.2f}  throttle {helm.throttle:+.2f} "
                      f"({rpm:.1f} rpm)")
         lines += KEY_HINTS
     return lines
@@ -312,6 +328,15 @@ def run(args) -> int:
                             done = True
                         elif event.key == pygame.K_p:
                             paused = not paused
+                        elif env.renderer is not None and (
+                                pygame.K_1 <= event.key <= pygame.K_7):
+                            env.renderer.toggle_index(event.key - pygame.K_0)
+                        elif env.renderer is not None and event.key == pygame.K_COMMA:
+                            env.renderer.scrub_by(+1)
+                        elif env.renderer is not None and event.key == pygame.K_PERIOD:
+                            env.renderer.scrub_by(-1)
+                        elif env.renderer is not None and event.key == pygame.K_l:
+                            env.renderer.scrub = 0
                         elif helm is not None and event.key == pygame.K_SPACE:
                             helm.centre()
                         elif helm is not None and event.key == pygame.K_t:

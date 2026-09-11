@@ -44,8 +44,8 @@ import numpy as np
 from gymnasium.spaces import Box, Dict as DictSpace
 
 import constants as cfg
-import cpa_cri as cc
 import encounter as enc
+from colregs.context import ContextManager, EncounterContext
 from tracking import Track
 
 # Per-slot feature layout.  Documented in OBSERVATION_SPEC.md; this tuple is the
@@ -72,6 +72,43 @@ assert len(SLOT_FEATURE_NAMES) == cfg.TARGET_FEATURES
 PRESENCE_INDEX = SLOT_FEATURE_NAMES.index("presence")
 CLASS_SLICE = slice(10, 15)
 
+# Which slot features can meaningfully *saturate a normaliser*, as opposed to
+# sitting at +/-1 because that is what the quantity is.
+#
+# `bearing_sin/cos` and `ct_sin/cos` reach +/-1 whenever the target is dead
+# ahead or on a reciprocal course -- which is the head-on geometry this paper is
+# about, so they are at their bounds constantly and correctly.  The class
+# one-hot and the presence bit are indicators.  Counting any of them as clipping
+# reported a 55% clip rate on a branch whose normalised features were healthy,
+# and buried the one that was not.
+#
+# What is left is the five clipped normalisers plus `cri`.  `cri` stays in
+# deliberately: it is bounded by construction rather than clipped, but a risk
+# index pinned at 1.0 carries no gradient in exactly the regime that matters
+# most, and that is worth seeing.
+NORMALISED_SLOT_FEATURES = (
+    "distance_to_domain", "target_speed", "relative_speed",
+    "dcpa", "tcpa", "cri",
+)
+NORMALISED_SLOT_INDICES = tuple(SLOT_FEATURE_NAMES.index(n)
+                                for n in NORMALISED_SLOT_FEATURES)
+
+
+def branch_feature_names(branch: str) -> tuple:
+    """Human names for one branch's dimensions, for the panel's drill-down."""
+    if branch == "lidar":
+        return tuple(f"sector{i}" for i in range(cfg.LIDAR_SECTORS))
+    if branch == "boundary":
+        return tuple(f"bnd{b:+.0f}" for b in cfg.BOUNDARY_BEARINGS_DEG)
+    if branch == "ego":
+        return ("u", "v", "r")
+    if branch == "path":
+        return ("e_y", "chi", "chi_LA")
+    if branch == "target":
+        return tuple(f"{name}" for _ in range(cfg.N_MAX_TARGETS)
+                     for name in SLOT_FEATURE_NAMES)
+    return ()
+
 TARGET_DIM = cfg.N_MAX_TARGETS * cfg.TARGET_FEATURES
 OBS_DIM = cfg.LIDAR_SECTORS + cfg.BOUNDARY_RAYS + 3 + 3 + TARGET_DIM
 assert OBS_DIM == 56, OBS_DIM
@@ -91,47 +128,39 @@ def observation_space() -> DictSpace:
 # ---------------------------------------------------------------------------
 # Per-slot features
 # ---------------------------------------------------------------------------
-def slot_features(track: Track, p_os, v_os, heading_os_deg: float,
-                  speed_os: float, encounter_class: str) -> np.ndarray:
+def slot_features(ctx: EncounterContext) -> np.ndarray:
     """The 16 values for one occupied slot, in the frozen order.
+
+    **A pure read of the `EncounterContext`.**  Until T4 this recomputed the
+    bearing, the CPA products and the risk from the track, which meant the
+    observation and the reward each derived the same encounter from the same
+    inputs by their own route.  01 §5.3 asks for one module and two consumers;
+    two consumers computing the same thing separately satisfies the letter of
+    that and not the point of it -- they would diverge at a threshold eventually,
+    and the agent would be penalised for a role it was never shown.
 
     Angles go in as sin/cos so the wraparound at +/-180 deg is not a
     discontinuity the network has to learn around.
     """
-    p_ts = track.position
-    v_ts = track.velocity
-    heading_ts = track.course_deg
-
-    bearing = cc.relative_bearing_deg(p_os, heading_os_deg, p_ts)
-    ct = cc.heading_intersection_deg(heading_os_deg, heading_ts)
-    dcpa, tcpa = cc.cpa(p_os, v_os, p_ts, v_ts)
-
-    # Distance and DCPA are both measured to the ship domain, not the hull.
-    distance = cc.distance_to_domain(p_os, heading_os_deg, p_ts)
-    dcpa_domain = max(0.0, dcpa - cc.domain_scale(bearing))
-
-    relative_speed = float(np.linalg.norm(np.asarray(v_ts) - np.asarray(v_os)))
-    risk = cc.cri(p_os, v_os, heading_os_deg, p_ts, v_ts, heading_ts)
-
-    a = math.radians(bearing)
-    c = math.radians(ct)
+    a = math.radians(ctx.alpha)
+    c = math.radians(ctx.ct)
 
     kinematics = np.array([
-        np.clip(distance / cfg.D_SCALE, 0.0, 1.0),
+        np.clip(ctx.d_domain / cfg.D_SCALE, 0.0, 1.0),
         math.sin(a),
         math.cos(a),
         math.sin(c),
         math.cos(c),
-        np.clip(track.speed / cfg.SPEED_SCALE, 0.0, 1.0),
-        np.clip(relative_speed / cfg.SPEED_SCALE, 0.0, 1.0),
-        np.clip(dcpa_domain / cfg.DOMAIN_RADIUS_DCPA, 0.0, cfg.DCPA_CLIP_DOMAINS)
+        np.clip(ctx.speed_ts / cfg.SPEED_SCALE, 0.0, 1.0),
+        np.clip(ctx.v_rel / cfg.SPEED_SCALE, 0.0, 1.0),
+        np.clip(ctx.dcpa_domain / cfg.DOMAIN_RADIUS_DCPA, 0.0, cfg.DCPA_CLIP_DOMAINS)
         / cfg.DCPA_CLIP_DOMAINS,
-        np.clip(tcpa, -cfg.TCPA_CLIP, cfg.TCPA_CLIP) / cfg.TCPA_CLIP,
-        np.clip(risk, 0.0, 1.0),
+        np.clip(ctx.tcpa, -cfg.TCPA_CLIP, cfg.TCPA_CLIP) / cfg.TCPA_CLIP,
+        np.clip(ctx.cri, 0.0, 1.0),
     ], dtype=np.float32)
 
     presence = np.ones(1, dtype=np.float32)
-    return np.concatenate([kinematics, enc.one_hot(encounter_class), presence]).astype(np.float32)
+    return np.concatenate([kinematics, enc.one_hot(ctx.cls), presence]).astype(np.float32)
 
 
 # ---------------------------------------------------------------------------
@@ -199,79 +228,88 @@ class SlotManager:
 # Assembly
 # ---------------------------------------------------------------------------
 class ObservationBuilder:
-    """Builds the Dict observation and owns the slot and encounter state.
+    """Builds the Dict observation from the shared per-step encounter contexts.
 
-    The encounter classifier held here is the same module 02 imports for the
-    reward gate (01 §5.3).  There is one classifier per environment instance, so
-    the role shown to the policy and the role the reward conditions on are by
-    construction the same value on the same step.
+    **The builder owns the `ContextManager`, and the reward reads it back.**
+    That is the single-object arrangement 02a §10.1 asks for, arranged so there
+    is one place it can be computed: the observation cannot be assembled without
+    the contexts, so they always exist and are always the ones the reward sees.
+    An arrangement where the reward built its own would satisfy `01 §5.3` on
+    paper and fail it in practice.
+
+    The environment passes the map-side arguments (`path`, `boundary_polygon`,
+    `s_along`, `true_targets`) straight through, because it is the only object
+    holding both the perception output and the map.  Callers that supply none of
+    them -- unit tests exercising the perceived half -- get contexts whose
+    admissibility is permissive and flagged as unknown.
     """
 
     def __init__(self, n_slots: int = cfg.N_MAX_TARGETS) -> None:
         self.slots = SlotManager(n_slots)
-        self.encounters = enc.EncounterClassifier()
+        self.contexts = ContextManager()
         self.n_slots = int(n_slots)
-        self._last_classes: Dict[int, str] = {}
-        self._last_sides: Dict[int, str] = {}
+        self._last: Dict[int, EncounterContext] = {}
 
     def reset(self) -> None:
         self.slots.reset()
-        self.encounters.reset()
-        self._last_classes = {}
-        self._last_sides = {}
+        self.contexts.reset()
+        self._last = {}
+
+    @property
+    def encounters(self):
+        """The hysteretic classifier, for callers that held a reference to it."""
+        return self.contexts.classifier
+
+    @property
+    def encounter_contexts(self) -> Dict[int, EncounterContext]:
+        """`{track_id: EncounterContext}` as of the last `build`.
+
+        The reward's only input about the targets.  Returned by reference, not
+        copied: the contexts are read within the same step they were built and
+        copying eight floats per target per step to protect against a mutation
+        nobody makes is not a trade worth making.
+        """
+        return self._last
 
     @property
     def encounter_classes(self) -> Dict[int, str]:
-        """{track_id: class} as of the last `build`.  02's reward gate reads this."""
-        return dict(self._last_classes)
+        """`{track_id: class}` as of the last `build`."""
+        return {tid: ctx.cls for tid, ctx in self._last.items()}
 
     @property
     def crossing_sides(self) -> Dict[int, str]:
-        """{track_id: "port"|"starboard"|"none"} as of the last `build`.
+        """`{track_id: "port"|"starboard"|"none"}` as of the last `build`.
 
         Not in the observation -- Rule 9(b) makes the own ship give way from
-        either side -- but 02's passing-side reward term needs the geometry.
+        either side, so the side is not a different obligation -- but 02a §6.4's
+        passing-side term needs the geometry.
         """
-        return dict(self._last_sides)
+        return {tid: ctx.crossing_side for tid, ctx in self._last.items()}
 
     def build(self, *, sector_closeness, boundary_scan, u: float, v: float,
               yaw_rate_degps: float, cross_track_error: float,
               course_error_deg: float, lookahead_course_error_deg: float,
               tracks: Sequence[Track] = (), p_os=(0.0, 0.0), v_os=(0.0, 0.0),
-              heading_os_deg: float = 0.0) -> Dict[str, np.ndarray]:
-        """Assemble one observation."""
-        speed_os = float(np.linalg.norm(v_os))
+              heading_os_deg: float = 0.0,
+              r_path: float = 0.0, path=None, boundary_polygon=None,
+              s_along=None, true_targets: Sequence = (),
+              open_water: bool = False) -> Dict[str, np.ndarray]:
+        """Assemble one observation, building this step's contexts as it goes."""
+        contexts = self.contexts.update(
+            tracks=tracks, p_os=p_os, v_os=v_os, heading_os_deg=heading_os_deg,
+            u_os=float(u), r_path=float(r_path), path=path,
+            boundary_polygon=boundary_polygon, s_along=s_along,
+            cross_track=float(cross_track_error), true_targets=true_targets,
+            open_water=open_water,
+        )
+        self._last = contexts
 
-        # Encounter class per track, through the shared hysteretic classifier.
-        classes: Dict[int, str] = {}
-        sides: Dict[int, str] = {}
-        risks: List[float] = []
-        for track in tracks:
-            classes[track.id] = self.encounters.update(
-                track.id, p_os, heading_os_deg, speed_os,
-                track.position, track.course_deg, track.speed,
-            )
-            sides[track.id] = enc.crossing_side(p_os, heading_os_deg,
-                                                track.position, track.course_deg)
-            risks.append(cc.cri(p_os, v_os, heading_os_deg,
-                                track.position, track.velocity, track.course_deg))
-        self._last_classes = classes
-        self._last_sides = sides
-
-        # Drop history for tracks that have gone, so slot re-use is clean.
-        live = {t.id for t in tracks}
-        for tid in list(self.encounters._held):
-            if tid not in live:
-                self.encounters.forget(tid)
-
-        assignment = self.slots.update(tracks, risks)
-        by_id = {t.id: t for t in tracks}
+        assignment = self.slots.update(
+            tracks, [contexts[t.id].cri for t in tracks])
 
         slot_block = np.zeros((self.n_slots, cfg.TARGET_FEATURES), dtype=np.float32)
         for tid, slot in assignment.items():
-            track = by_id[tid]
-            slot_block[slot] = slot_features(track, p_os, v_os, heading_os_deg,
-                                             speed_os, classes[tid])
+            slot_block[slot] = slot_features(contexts[tid])
 
         span = max(cfg.MAP_WIDTH, cfg.MAP_HEIGHT)
         return {

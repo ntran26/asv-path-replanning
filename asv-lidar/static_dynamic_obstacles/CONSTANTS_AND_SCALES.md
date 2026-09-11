@@ -1,9 +1,15 @@
 # CONSTANTS AND SCALES — Paper 3
 
-**Revision 2.3** — tracks `02b_DECISIONS_AND_TASK_ORDER.md`. The speed
-calibration is now **measured** (T1), the cross-track sign is flipped to
+**Revision 2.4** — tracks `02b_DECISIONS_AND_TASK_ORDER.md` through **T4**.
+The speed calibration is **measured** (T1), the cross-track sign is flipped to
 textbook (T2/C4), `r_path` exists (T3), the width thresholds are **computed**
-rather than listed (C1), and the terminal payoffs are decided.
+rather than listed (C1), the terminal payoffs are decided, and §12 is the
+reward.
+
+Three things moved in T4: **F21 is resolved** — the sensor-resolution floor
+binds, `d_abeam = 1.25 m` (§8.1). **F22** — `N_ref` had to be derived from the
+measured cruise speed or `R-9` inverts (§12.2). **F23** — `02a §5.2`'s `d_safe`
+breaches `02a §2`'s own invariant (§12.3).
 
 Mirror of `src/constants.py`, which is the single source of truth. Every
 unresolved value appears there with a `TODO` marker and **nowhere else** — no
@@ -17,10 +23,11 @@ consumer buries a magic number in a function body.
 | `TODO(05)` | `planning/05_VESSEL_MODEL_AND_SIM2REAL.md` |
 | `TODO(decision)` | needs a call no open item currently covers |
 
-**Every `TODO(decision)` is gone.** 02b decided all of them. What remains is
-`TODO(05)` — values that need a measurement, not a call — plus three
-`TODO(03)`/`TODO(04)` items owned by later tasks, and one genuine
-`TODO(decision)` that 02b introduced without noticing (§8.1).
+**One `TODO(decision)` remains**, and it is `D_SAFE` (§12.3) — 02a's own
+value breaches 02a's own invariant, and the resolution changes where the
+boundary penalty begins. Everything else is `TODO(05)` — values that need a
+measurement, not a call — plus three `TODO(03)`/`TODO(04)` items owned by later
+tasks.
 
 Closed by 02b: the terminal payoffs, `TCPA_CLIP`, `DCPA_CLIP_DOMAINS`,
 `BEING_OVERTAKEN_SPEED_MARGIN`, `TARGET_SPEED_RANGE`, `TRACK_GATE_DIST`, the CRI
@@ -295,9 +302,10 @@ because a constant offset appears in the fit as actuator lag.
 |---|---|---|
 | Ahead | 2.00 · Lpp | 3.14 |
 | Astern | 1.00 · Lpp | 1.57 |
-| Abeam (each side) | 0.75 · Lpp | 1.18 |
+| Abeam (each side) | **0.796 · Lpp** (floored) | **1.25** |
 
-Lateral footprint 2.36 m, about 24% of the widest channel.
+Lateral footprint 2.50 m, about 25% of the widest channel. The abeam extent is
+set by the sensor floor rather than by an Lpp multiple — see §8.1.
 
 Chun et al.'s 3·Lpp fore/aft and 1·Lpp abeam gives 4.71 m fore-aft and 3.14 m
 across at LBP = 1.57 m — nearly a fifth of the 25 m basin lengthwise, and enough
@@ -324,7 +332,7 @@ reward uses the directional `d_dom(β)` at the target's actual bearing (02a §5.
 and gates `ρ_t` on the constant `d_req`. Documented rather than unified, because
 the two serve different jobs.
 
-### 8.1 The sensor-resolution floor already excludes the provisional value
+### 8.1 F21 — the sensor-resolution floor binds, and it is applied
 
 02b §3.1 sets a hard floor: `d_abeam ≥ LIDAR_MIN_RANGE + B/2 = 1.25 m`. Below
 it the ship domain sits inside the sensor's blind zone, and because `R-1`
@@ -332,25 +340,38 @@ evaluates domain intrusion on ground-truth geometry, the agent would be
 penalised for intrusions it cannot perceive — `r_dom` stops being a shaping
 signal and becomes unlearnable.
 
-**But `0.75 · Lpp = 1.18 m` does not clear that floor.** §3.1 says the current
-value "sits 0.18 m outside the sensor blind zone", which compares it to
+`0.75 · Lpp = 1.18 m` does not clear that floor. §3.1 says the provisional value
+"sits 0.18 m outside the sensor blind zone", which compares it to
 `LIDAR_MIN_RANGE` alone (1.0 m) — then defines the floor as 1.25 m. The two
 halves of the section disagree.
 
-`TODO(decision)`. Not resolved unilaterally: 02a §1 states the abeam extent as
-`0.75 · Lpp` explicitly, and raising it to 1.25 m (0.796 · Lpp) moves `d_req`
-and all four Study 1 thresholds:
+**Resolved in favour of the floor**, because §3.1 says what to do in exactly
+this case: "If the measured manoeuvring performance implies a smaller one, the
+domain is floored at 1.25 m and the paper states why." Applying it executes
+02b's decision rather than overriding 02a's — 02b is the later document and
+declares itself a companion that amends 02a §1.
 
-| | at 1.18 m | at 1.25 m |
+`d_abeam = 1.25 m` (0.796 · Lpp), `d_req = 2.50 m`, and all four Study 1
+thresholds move:
+
+| | at 1.18 m | **in force** |
 |---|---|---|
-| Crossing | 6.51 m | 6.80 m |
-| Head-on, centreline | 6.01 m | 6.30 m |
-| Overtaking | 4.78 m | 4.94 m |
-| Head-on, compliant | 3.66 m | 3.80 m |
+| Crossing | 6.51 m | **6.80 m** |
+| Head-on, centreline | 6.01 m | **6.30 m** |
+| Overtaking | 4.78 m | **4.94 m** |
+| Head-on, compliant | 3.66 m | **3.80 m** |
 
-`constants.check_domain()` reports the breach rather than raising, so it cannot
-be missed but does not block. T4's config validator should raise once the domain
-is final.
+02b C1's bracket collision survives: 6.80 and 6.30 still share the (6, 7)
+bracket, so the sweep stays at seven levels.
+`RewardConfig` now **raises** on a domain below the floor, which is the
+assertion 02b T4 step 4 asks for; `constants.check_domain()` still returns
+rather than raising, so 05 can enumerate the problems with a candidate domain
+without catching an exception per candidate.
+
+**A sentence for the paper.** The domain's abeam extent is not a manoeuvring
+figure at all — it is set by what the sensor can resolve. A domain smaller than
+the sensor's blind zone is not a domain, it is a blind spot, and sizing it that
+way would mean scoring intrusions the vessel cannot detect in the basin either.
 
 ## 8b. The width thresholds are computed, not listed
 
@@ -428,42 +449,153 @@ are missed. 0.10 m/s is 18% of cruise.
 
 ## 11. Every unresolved constant
 
-| # | Symbol | Placeholder | Marker |
+Current as of T4. Values are what is **in force**, not the historical
+placeholder.
+
+| # | Symbol | In force | Marker |
 |---|---|---|---|
-| 1 | `HEAD_ON_WALL_CLEARANCE` | 0.65 m | `TODO(05)` |
-| 2 | `REVERSE_AVAILABLE` | False | `TODO(03)` |
-| 3 | `U_CRUISE`, `U_MAX_SURGE` | 1.77 / 3.2 m/s | `TODO(05)` |
+| 1 | `HEAD_ON_WALL_CLEARANCE` (`c_wall`) | 0.65 m | `TODO(05)` |
+| 2 | `OVERTAKING_PRUDENCE` | 1.15 | `TODO(05)` |
+| 3 | `REVERSE_AVAILABLE` | False | `TODO(03)` |
 | 4 | `LIDAR_DROPOUT_P` | 0.0 | `TODO(05)` |
 | 5 | `LIDAR_NO_RETURN_GRAZING_DEG` | 0.0 | `TODO(05)` |
 | 6 | `LIDAR_AFT_MASK_HALF_DEG` | 0.0 | `TODO(05)` |
 | 7 | `BOUNDARY_GATE_MARGIN` | 0.30 m | `TODO(05)` |
 | 8–10 | `BOUNDARY_POSE_NOISE_XY` / `_HEADING_DEG` / `_WALK` | 0.0 | `TODO(05)` |
-| 11 | `CLUSTER_EPS` | 0.35 m | `TODO(decision)` |
-| 12 | `CLUSTER_MIN_POINTS` | 4 | `TODO(decision)` |
-| 13 | `TRACK_GATE_DIST` | 0.80 m | `TODO(decision)` |
-| 14–15 | `KF_PROCESS_NOISE_ACCEL` / `KF_MEAS_NOISE_POS` | 0.10 / 0.05 | `TODO(05)` |
-| 16–17 | `DYNAMIC_SPEED_ON` / `_OFF` | 0.15 / 0.08 m/s | `TODO(05)` |
-| 18 | `DETECTION_DROPOUT_P` | 0.0 | `TODO(05)` |
-| 19 | `TRACK_VELOCITY_NOISE` | 0.0 | `TODO(05)` |
-| 20–21 | `EGO_SPEED_NOISE` / `EGO_YAW_RATE_NOISE_DPS` | 0.0 | `TODO(05)` |
-| 22–24 | `DOMAIN_FORE` / `_AFT` / `_LATERAL` | 2.0 / 1.0 / 0.75 Lpp | `TODO(05)` |
-| 25 | `DOMAIN_RADIUS_DCPA` | lateral semi-axis | `TODO(decision)` |
-| 26 | `CRI_DCPA_SCALE` | 4.0 m | `TODO(decision)` |
-| 27–28 | `CRI_TCPA_SCALE_BEFORE` / `_AFTER` | 20.0 / 6.0 s | `TODO(decision)` |
-| 29 | `CRI_ED_SCALE` | 5.0 m | `TODO(decision)` |
-| 30–31 | `CRI_BOW_CROSSING_GAIN` / `_HALF_DEG` | 1.3 / 45° | `TODO(decision)` |
-| 32 | `BEING_OVERTAKEN_SPEED_MARGIN` | 0.10 m/s | `TODO(decision)` |
-| 33 | `TARGET_COMPLIANT_SPAWN_PROB` | 0.5 | `TODO(04)` |
-| 34 | `PREDICTED_THRESHOLDS_M` | 6.52 / 6.02 / 4.78 / 3.66 m | `TODO(05)`, `TODO(04)` |
-| 35 | `TCPA_CLIP` | 60.0 s | `TODO(decision)` |
-| 36 | `DCPA_CLIP_DOMAINS` | 10.0 | `TODO(decision)` |
-| 37 | `USE_RECURRENCE` | False | `TODO(04)` |
-| 38–40 | `R_COLLISION` / `R_TIMEOUT` / `R_GOAL` | −1000 / −1000 / +50 | `TODO(02)` |
-| 41 | `TARGET_SPEED_RANGE` | (0.60, 2.40) m/s | `TODO(03)` |
-| 42 | `NO_TARGET_EPISODE_PROB` | 0.25 | `TODO(04)` |
+| 11–12 | `KF_PROCESS_NOISE_ACCEL` / `KF_MEAS_NOISE_POS` | 0.10 / 0.05 | `TODO(05)` |
+| 13–14 | `DYNAMIC_SPEED_ON` / `_OFF` | 0.15 / 0.08 m/s | `TODO(05)` |
+| 15 | `DETECTION_DROPOUT_P` | 0.0 | `TODO(05)` |
+| 16 | `TRACK_VELOCITY_NOISE` | 0.0 | `TODO(05)` |
+| 17–18 | `EGO_SPEED_NOISE` / `EGO_YAW_RATE_NOISE_DPS` | 0.0 | `TODO(05)` |
+| 19–20 | `DOMAIN_FORE` / `_AFT` | 3.14 / 1.57 m | `TODO(05)` |
+| 21 | `DOMAIN_LATERAL` | **1.25 m, floored** (§8.1) | `TODO(05)` |
+| 22 | `TARGET_COMPLIANT_SPAWN_PROB` | 0.5, report realised | `TODO(04)` |
+| 23 | `USE_RECURRENCE` | False | `TODO(04)` |
+| 24 | `KAPPA_N` (throttle rate scale) | 0.30 | `TODO(05)` |
+| 25 | `R_REF` (full-severity yaw) | 0.20 rad/s | `TODO(05)` |
+| 26 | `R_DEAD` (gyro noise floor) | 0.02 rad/s | `TODO(05)` |
+| 27 | `DU_HOLD` | 0.10 m/s | `TODO(05)` |
+| **28** | **`D_SAFE`** | **0.35 m** (§12.3) | **`TODO(decision)`** |
 
-The three terminal payoffs are structural, not shaping — they exist only so the
-environment can be stepped before 02 lands. **02 §4.1 already states collision
-−200 and goal +100 with timeout via value bootstrapping**, so the values in
-force are Paper 2's and are known to be wrong; they are left marked rather than
-silently changed, because the whole reward is 02's to design.
+**Closed since Revision 2.2**, all by 02b or T4: the three terminal payoffs,
+`TCPA_CLIP`, `DCPA_CLIP_DOMAINS`, `BEING_OVERTAKEN_SPEED_MARGIN`,
+`TARGET_SPEED_RANGE`, `TRACK_GATE_DIST`, the whole CRI block,
+`DOMAIN_RADIUS_DCPA`, `CLUSTER_EPS`, `CLUSTER_MIN_POINTS`,
+`NO_TARGET_EPISODE_PROB`, `U_CRUISE`/`U_MAX_SURGE` (T1, measured),
+`PREDICTED_THRESHOLDS_M` (C1, now computed), and `DOMAIN_LATERAL`'s
+`TODO(decision)` half (F21).
+
+`KAPPA_DELTA` is **derived** rather than unresolved:
+`MAX_RUD_RATE_DPS · Δt / MAX_RUD_ANGLE = 0.05`. It moves when 05 delivers the
+calibrated actuator model, but it moves as a consequence rather than as a call.
+
+---
+
+## 12. Reward (`02a` Rev 2.2, with `02b` C1–C4) — T4
+
+Eight dense terms plus terminals. **Every dense term is normalised to `[-1, 0]`
+before weighting** (`r_prog` to `[-1, +1]`), so the weight *is* the maximum
+per-step contribution and the `02a §7` hierarchy holds by construction rather
+than being discovered empirically. That is the direct fix for the Paper 2
+failure, where a path term out-scaled the avoidance term through a factor nobody
+had computed.
+
+| Term | Weight | Range | Notes |
+|---|---|---|---|
+| Terminal collision | — | one-shot | −300 (`R-7`) |
+| Terminal goal | — | one-shot | +100 |
+| Terminal timeout | — | one-shot | **0**, requires `truncated=True` |
+| `r_bnd` boundary | 3.00 | `[-1,0]` | hard constraint, above the COLREGs group |
+| `r_dom` target domain | 2.50 | `[-1,0]` | ground truth, centre-to-centre |
+| `r_obs` static obstacle | 2.20 | `[-1,0]` | **shifted** exponential, zero past 2 m |
+| `r_col` COLREGs group | 1.80 | `[-1,0]` | clipped to unit range *before* the weight |
+| `r_pf` path following | 0.60 | `[-1,0]` | width-normalised on `W_local` |
+| `r_prog` progress | 0.30 | `[-1,+1]` | telescoping arclength (`R-9`) |
+| `r_smooth` smoothness | 0.10 | `[-1,0]` | `κ_δ` derived from the actuator |
+| `r_exist` existence | 0.05 | `−1` | suspended by `R-5` only |
+
+COLREGs sub-weights: `v_port` 0.55, `v_bow` 0.55, `v_side` 0.40, `v_hold` 0.45,
+`v_r8` 0.50. Pre-clip maxima 1.45 / 1.60 / 1.50 / 0.45 by class, so two
+concurrent severe violations saturate the group and one does not.
+
+### 12.1 The validators, and what each one is for
+
+They fail at **construction**, not at step 10,000. A reward whose hierarchy is
+silently violated does not crash — it trains for a week and produces a policy
+nobody can explain.
+
+| Assertion | Guards against |
+|---|---|
+| `d_abeam ≥ 1.25` | a domain inside the sensor blind zone; `r_dom` unlearnable (02b §3.1) |
+| `d_safe < c_wall − B/2` | the compliant narrow-channel manoeuvre triggering the boundary penalty |
+| `w_bnd > w_dom > w_obs > w_col > w_pf > w_prog > w_smooth > w_exist` | the `02a §7` hierarchy |
+| `\|r_collision\| > w_col · 100` | a compliant collision scoring better than a non-compliant near-miss (`02 §5`) |
+| `t_act < t_engage` | the obligation becoming urgent before the encounter engages |
+| `kappa_eng > 1` | engagement firing at the compliant separation itself |
+| `kappa_rel > kappa_eng` | an encounter clearing at the range it engages; state-machine chatter |
+| `d_cut > d_oa` | an obstacle term with no cut-off |
+| `kappa_delta` set | 05 not having delivered the actuator rate limit |
+
+### 12.2 F22 — `N_ref` is derived, not written down
+
+`02b C3` replaces `02a §5.5`'s progress form with
+`clip(N_ref · Δs / L_path, −1, +1)`, so the episode integral stops depending on
+the unresolved cruise speed. The clip binds when `u > L_path / (N_ref · Δt)`.
+
+**At C3's literal `N_ref = 250` over a 20 m path that is 0.80 m/s** — 02a's
+*assumed* cruise, not the 1.14 m/s T1 measured. Every step at cruise would clip,
+and slowing down would then *increase* the integral (175 → 250). That is `R-9`
+running backwards: the term that exists to remove the creep exploit would have
+introduced it, and invisibly, because the sum still telescopes — just to the
+wrong thing.
+
+```
+N_REF_PROG = L_REF_PATH / (U_REF · Δt) = 20.0 / (1.14 × 0.1) = 175.4
+```
+
+which binds the clip at exactly cruise and restores 02a §5.5's stated intent:
+telescoping exact for `u ≤ U_ref`, speeding gains nothing. **`w_prog · Σr_prog`
+is +52.6, not the +75 in the `02a §8.1` table** — the only row it moves. All
+three orderings survive with a 44-point margin.
+
+**This puts a constraint on 03's generator**: the clip binds at
+`U_REF · L_path / L_REF`, so a path much shorter than the 20 m design point
+brings F22 back. Today's generator produces 20.00–20.42 m. Pinned by
+`test_3d_the_generator_must_keep_path_length_near_the_design_point`.
+
+### 12.3 F23 — `02a`'s `d_safe` breaches `02a`'s invariant
+
+`02a §2` asserts `d_safe < c_wall − B/2`. With `c_wall = 0.65` and `B = 0.50`
+the ceiling is **0.40 m**, and `02a §5.2`'s stated `d_safe = 0.50 m` does not
+clear it — in the same sentence that says 0.50 was chosen *because of* this
+invariant.
+
+`D_SAFE = 0.35 m`, the largest 5 cm value that clears with margin.
+`TODO(decision)`, and the last one in the tree. `d_safe` is the free parameter
+of the pair: `c_wall` drives all four Study 1 thresholds and is a `TODO(05)`
+measurement, so moving it would move published predictions, whereas `d_safe`
+only sets where the boundary penalty begins.
+
+**A second part, narrower.** `02a §8.1`'s "loitering to timeout ≈ −86" assumes
+its own 300-step design point; `MAX_EPISODE_STEPS` is 700, a Paper 2 carry-over
+never reconciled with it. Undiscounted, a vessel stopped dead pays
+`w_pf + w_exist = 0.65` per step and reaches −455 against a collision's −300,
+inverting the `02 §5` ordering. It holds under the discount the agent actually
+uses (−65 at the headline SAC `γ = 0.99`) and is **marginal for the PPO
+comparator at `γ = 0.999`**, which reaches −327. Pinned with the numbers rather
+than fixed, because the fix is the step limit and that is a training decision.
+
+### 12.4 Speed references
+
+| | Value | When |
+|---|---|---|
+| `U_REF` | 1.14 m/s | nominal, measured (T1) |
+| `U_ref_eff`, `R-2` | 0.456 m/s | give-way, compliant alteration inadmissible |
+| `U_ref_eff`, `R-5` | `max(u_TS, 0.20)` | overtaking, port pass does not fit |
+
+`R-5` also zeroes the existence cost. It is the **one** place that happens, and
+it is gated on a geometric predicate rather than on CRI, which keeps it
+consistent with `R-6` and avoids the degenerate-policy risk `02 §4.4` warns
+about. Without it the narrow overtaking case is not a test of COLREGs reasoning
+but a test of whether the agent tolerates an unwinnable reward — and it would
+resolve it by overtaking anyway.

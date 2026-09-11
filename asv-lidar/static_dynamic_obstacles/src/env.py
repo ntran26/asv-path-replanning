@@ -7,11 +7,11 @@ Scope of this file in task 01
 -----------------------------
 Perception and observation.  Specifically:
 
-* **Reward is a placeholder.**  `_reward` is sparse terminal payoff and nothing
-  else.  02 owns the reward design -- six carried-over terms, five COLREGs
-  terms, the Rule 9 precedence table and the mandatory scale audit -- and per
-  D10 it is redesigned rather than patched, so no Paper 2 shaping term is
-  carried across.
+* **The reward is live** (02b T4).  Eight dense terms plus terminals, in
+  `reward/`, redesigned rather than patched per D10 so no Paper 2 shaping term
+  is carried across.  This file assembles the `RewardState` -- it is the only
+  object holding both the simulated truth and the map -- and owns none of the
+  reward's design.
 * **Target motion is constant-velocity and the spawn is a placeholder.**
   Constant velocity is decision D1 for training; reactive and non-compliant
   targets are evaluation-only and belong to 03.  `_sample_target` places a
@@ -54,6 +54,8 @@ from asv_lidar import Lidar
 from observation import ObservationBuilder, observation_space
 from obstacles import ObstacleSampler
 from path import ReferencePath, curved_points, straight_points
+from reward import RewardConfig, RewardFunction
+from reward import terms as rterms
 from ship import HULL_MARGIN, MAX_RUD_ANGLE, VESSEL_LENGTH, VESSEL_WIDTH, ShipModel
 
 
@@ -74,6 +76,18 @@ class TargetShip:
         self.speed = float(speed)
         self.length = float(length)
         self.width = float(width)
+
+    @property
+    def heading_deg(self) -> float:
+        """Alias for `heading`.
+
+        The truth pairing in `colregs.context` reads a heading off whichever
+        object it is handed -- a `TargetShip` here, and whatever 03's reactive
+        strata supply later.  One name for the quantity is cheaper than a
+        `getattr` chain at the call site that would silently return the wrong
+        thing for a class that spells it differently again.
+        """
+        return float(self.heading)
 
     @property
     def velocity(self) -> np.ndarray:
@@ -116,7 +130,9 @@ class ASVLidarEnv(gym.Env):
                  lidar_dropout_p: float = cfg.LIDAR_DROPOUT_P,
                  aft_mask_half_deg: float = cfg.LIDAR_AFT_MASK_HALF_DEG,
                  ego_speed_noise: float = cfg.EGO_SPEED_NOISE,
-                 ego_yaw_rate_noise_dps: float = cfg.EGO_YAW_RATE_NOISE_DPS) -> None:
+                 ego_yaw_rate_noise_dps: float = cfg.EGO_YAW_RATE_NOISE_DPS,
+                 reward_config: Optional[RewardConfig] = None,
+                 open_water: bool = False) -> None:
         super().__init__()
         self.map_width = float(map_width)
         self.map_height = float(map_height)
@@ -142,6 +158,12 @@ class ASVLidarEnv(gym.Env):
                                    velocity_noise=track_velocity_noise,
                                    rng=self._rng)
         self.observer = ObservationBuilder(self.n_max_targets)
+        # `R-10`: the 04 §4.1 benchmark also runs open water, where `r_pf`
+        # normalises on a reference width, `r_bnd` is zero and both alterations
+        # are admissible.  A flag rather than a subclass, because the difference
+        # is three constants and not a different environment.
+        self.open_water = bool(open_water)
+        self.reward_fn = RewardFunction(reward_config or RewardConfig())
         self._pose_noise = br.PoseNoise(self._rng) if pose_noise else None
 
         self.boundary_polygon = self._build_corridor()
@@ -211,6 +233,21 @@ class ASVLidarEnv(gym.Env):
         self.cross_track_error = 0.0
         self.course_error = 0.0
         self.r_path = 0.0
+        self.s_along = 0.0
+        self.prev_s_along = 0.0
+        self.prev_action = np.zeros(2, dtype=np.float32)
+        self.reward_fn.reset()
+        self.last_reward = None
+        self.last_reward_state = None
+        self.last_panel = None
+        self.episode_seed: Optional[int] = None
+        self.target_spawn_regime = "none"
+        self.clip_steps = {branch: 0 for branch in
+                           ("lidar", "boundary", "ego", "path", "target")}
+        self.dim_clip_steps: Dict[str, np.ndarray] = {}
+        self.branch_extremes: Dict[str, Tuple[float, float]] = {}
+        self.obs_steps = 0
+        self.misclassified_steps = 0
         self.lookahead_course_error = 0.0
         self.closest_idx = 0
         self.lookahead_idx = 0
@@ -230,6 +267,7 @@ class ASVLidarEnv(gym.Env):
 
     def reset(self, seed: Optional[int] = None, options: Optional[dict] = None):
         super().reset(seed=seed)
+        self._pending_seed = seed
         if seed is not None:
             np.random.seed(seed)
             self._rng = np.random.default_rng(seed)
@@ -257,12 +295,18 @@ class ASVLidarEnv(gym.Env):
         self.distance_to_goal = float(np.hypot(self.asv_x - self.goal_x,
                                                self.asv_y - self.goal_y))
 
+        self.episode_seed = self._pending_seed
         self._perceive()
         self.true_border_clearance = self._border_clearance(self.hull_polygon())
         self._update_path_errors(course_deg=self.asv_h)
+        # Prime the progress increment, or the first step would score the whole
+        # distance from the path origin to the start position as advance.
+        self.prev_s_along = self.s_along
 
         self.render()
-        return self._get_obs(), {}
+        obs = self._get_obs()
+        self._record_obs_health(obs)
+        return obs, {}
 
     def _sample_layout(self) -> None:
         self.start_x, self.start_y, self.goal_x, self.goal_y = self._random_start_goal()
@@ -322,8 +366,10 @@ class ASVLidarEnv(gym.Env):
         if float(np.random.rand()) < cfg.TARGET_COMPLIANT_SPAWN_PROB:
             offset = float(np.random.uniform(cfg.DOMAIN_LATERAL * 2.0,
                                              cfg.DOMAIN_LATERAL * 3.0))
+            self.target_spawn_regime = "COMPLIANT"
         else:
             offset = float(np.random.uniform(-cfg.DOMAIN_LATERAL, cfg.DOMAIN_LATERAL))
+            self.target_spawn_regime = "DISPLACED"
 
         # `normal` is the path's left normal, so a negative multiple puts the
         # target to starboard of the own ship's track -- which is its own port
@@ -468,7 +514,22 @@ class ASVLidarEnv(gym.Env):
             p_os=(self.asv_x, self.asv_y),
             v_os=self._own_velocity(),
             heading_os_deg=self.asv_h,
+            # The map side of `R-1`.  This environment is the only object
+            # holding both the perception output and the boundary polygon, so
+            # the admissibility predicate is fed from here rather than
+            # rediscovered inside the observation builder.
+            r_path=self.r_path,
+            path=self.path,
+            boundary_polygon=self.boundary_polygon,
+            s_along=self.s_along,
+            true_targets=self.targets,
+            open_water=self.open_water,
         )
+
+    @property
+    def encounter_contexts(self):
+        """The per-step `EncounterContext` per track, as of the last observation."""
+        return self.observer.encounter_contexts
 
     def _measured_ego(self) -> Tuple[float, float, float]:
         """u, v and r as the vessel would actually measure them.
@@ -506,6 +567,7 @@ class ASVLidarEnv(gym.Env):
         self.lookahead_idx = state.lookahead_idx
         self.lookahead_x, self.lookahead_y = state.lookahead
         self.lookahead_course_error = state.lookahead_course_error
+        self.s_along = float(state.s_along)
         # Yaw rate the path itself demands, rad/s (02b T3).  Zero while the
         # corridor is straight; 03's bends make it live.
         self.r_path = self.path.yaw_rate_for_tracking(self.closest_idx, self.u_body)
@@ -609,43 +671,182 @@ class ASVLidarEnv(gym.Env):
         self.step_count += 1
         truncated = self.step_count >= cfg.MAX_EPISODE_STEPS and not terminated
 
-        reward = self._reward(collision, reached_goal, truncated)
-        info = self._build_info(reward, rudder_cmd, collision, reached_goal, truncated)
+        # **Observation first.**  The per-step `EncounterContext` objects are
+        # built while the observation is assembled, and the reward reads them
+        # back rather than deriving its own -- which is the whole point of
+        # 02a §10.1.  Building the observation after the reward would mean two
+        # derivations of the same encounter from the same inputs.
+        obs = self._get_obs()
+        self._record_obs_health(obs)
+
+        breakdown = self._reward(action, collision, reached_goal, truncated)
+        info = self._build_info(breakdown, rudder_cmd, throttle_cmd,
+                                collision, reached_goal, truncated)
+        self.prev_action = np.array([rudder_cmd, throttle_cmd], dtype=np.float32)
+        self.prev_s_along = self.s_along
         self.render()
-        return self._get_obs(), reward, terminated, truncated, info
+        return obs, float(breakdown.total), terminated, truncated, info
 
-    def _reward(self, collision: Optional[str], reached_goal: bool,
-                truncated: bool) -> float:
-        """PLACEHOLDER.  Terminal payoff only.
+    def _reward_state(self, action) -> rterms.RewardState:
+        """Assemble one step's `RewardState`: the own ship and the scene.
 
-        TODO(02): 02 owns the entire reward -- six carried-over terms, five
-        COLREGs terms (wrong-side passing, port turn in head-on, bow crossing,
-        course-keeping hold, late-or-insufficient action), the Rule 9 precedence
-        table and the mandatory per-term scale audit.  Deliberately sparse here
-        so nothing in this file can be mistaken for a design decision, and so no
-        Paper 2 shaping term is inherited rather than chosen (D10).
-
-        02 §4.1 states collision -200, goal +100, timeout via value
-        bootstrapping.  The constants still carry Paper 2's magnitudes and are
-        marked TODO(02) in `constants.py`.
-
-        A policy trained against this reward alone will not learn the task.
-        That is intended: 01 ships perception, not a trainable agent.
+        This environment is the only object holding both the simulated truth and
+        the map, which is why the ground-truth clearances are measured here and
+        handed over rather than looked up inside a term.  Everything below is a
+        physical fact under `R-1` -- the agent pays for hitting things whether
+        or not it saw them.
         """
-        if collision is not None:
-            return float(cfg.R_COLLISION)
-        reward = 0.0
-        if reached_goal:
-            reward += float(cfg.R_GOAL)
-        if truncated:
-            reward += float(cfg.R_TIMEOUT)
-        return float(reward)
+        rudder_cmd = float(np.clip(action[0], -1.0, 1.0))
+        throttle_cmd = float(np.clip(action[1], -1.0, 1.0))
+        hull = self.hull_polygon()
 
-    def _build_info(self, reward, rudder_cmd, collision, reached_goal, truncated) -> Dict:
-        classes = self.observer.encounter_classes
+        return rterms.RewardState(
+            u=float(self.u_body),
+            v=float(self.v_body),
+            # The environment reports yaw in degrees per second; every COLREGs
+            # threshold is in rad/s.  Converted once, here, so `r - r_path` can
+            # never be taken in mixed units.
+            r=float(math.radians(self.asv_w)),
+            heading_deg=float(self.asv_h),
+            e_y=float(self.cross_track_error),
+            chi=float(math.radians(self.course_error)),
+            chi_la=float(math.radians(self.lookahead_course_error)),
+            w_local=float(self.local_channel_width()),
+            r_path=float(self.r_path),
+            ds=float(self.s_along - self.prev_s_along),
+            l_path=float(self.path.length),
+            d_bnd=self._hull_boundary_distance(hull),
+            d_clear=self._nearest_obstacle_clearance(hull),
+            d_rudder=rudder_cmd - float(self.prev_action[0]),
+            d_throttle=throttle_cmd - float(self.prev_action[1]),
+            step_index=int(self.step_count),
+            open_water=self.open_water,
+        )
+
+    def _reward(self, action, collision: Optional[str], reached_goal: bool,
+                truncated: bool):
+        """The 02a reward.  Returns the full breakdown, not just the scalar.
+
+        02 owns the design; this method owns nothing but the call.  The
+        breakdown is retained because `04 §7`'s metric set is a *read* of these
+        keys rather than a separate computation -- Paper 2's concessions came
+        from metrics that were not designed in before the campaign ran.
+        """
+        self.last_reward_state = self._reward_state(action)
+        breakdown = self.reward_fn(
+            self.last_reward_state, self.observer.encounter_contexts,
+            collision=collision, reached_goal=reached_goal, truncated=truncated)
+        self.last_reward = breakdown
+        return breakdown
+
+    # ------------------------------------------------------------------
+    # Ground-truth clearances for the safety terms
+    # ------------------------------------------------------------------
+    def _hull_boundary_distance(self, hull) -> float:
+        """Hull polygon to channel boundary, metres; 0 once any corner is out.
+
+        Measured against the boundary *polygon* rather than the axis-aligned
+        channel bounds, because 03's generator produces bends and variable
+        width, at which point the two stop agreeing and only one of them is the
+        channel.
+        """
+        xs = [p[0] for p in hull]
+        ys = [p[1] for p in hull]
+        inside = br.points_in_polygon(np.asarray(xs), np.asarray(ys),
+                                      self.boundary_polygon)
+        if not bool(np.all(inside)):
+            return 0.0
+        return float(np.min(br.points_boundary_distance(
+            np.asarray(xs), np.asarray(ys), self.boundary_polygon)))
+
+    def _nearest_obstacle_clearance(self, hull) -> float:
+        """Minimum hull-to-hull clearance to a static obstacle within the swath.
+
+        Restricted to +/-`OBS_SWATH_HALF_DEG`, matching the `c_t` swath, so the
+        agent is never charged for proximity it cannot observe and an obstacle
+        passed astern generates no signal against an action space with no
+        reverse (02a §5.4).
+        """
+        best = float("inf")
+        for obstacle in self.obstacles:
+            gap, point = _polygon_gap(hull, obstacle)
+            bearing = _wrap180(math.degrees(math.atan2(
+                point[0] - self.asv_x, point[1] - self.asv_y)) - self.asv_h)
+            if abs(bearing) <= cfg.OBS_SWATH_HALF_DEG:
+                best = min(best, gap)
+        return best
+
+    def _record_obs_health(self, obs) -> None:
+        """Per-branch clip rate: the F19 detector (RENDER_PANEL_SPEC §6).
+
+        A branch pinned at its normaliser's clip carries no gradient.  That is
+        exactly the bug where the `ego` surge feature sat at 1.0 for 45% of a
+        run, which was invisible in every training curve and obvious the moment
+        anyone counted.
+
+        The lower bound is counted only for **signed** branches.  A pooled
+        LiDAR sector reading 0.0 means "nothing within range", which is the
+        normal state of most sectors most of the time and not a saturation --
+        counting it would put every run permanently in the red.
+
+        The `target` branch's class one-hot and presence bit are excluded for
+        the same reason, and the panel found that one itself: an occupied slot
+        sets a one-hot element and the presence bit to exactly 1.0 every step,
+        so counting them reported a 90% clip rate on a branch whose ten
+        continuous features were nowhere near their bounds.  An indicator
+        variable sitting at 1 is the indicator working.
+        """
+        self.obs_steps += 1
+        for branch, box in self.observation_space.spaces.items():
+            raw = np.asarray(obs[branch], dtype=np.float64)
+            values = _normalised_dims(branch, raw)
+            hi = float(np.max(box.high))
+            lo = float(np.min(box.low))
+            at_clip = values >= hi - 1e-6
+            if lo < 0.0:
+                at_clip = at_clip | (values <= lo + 1e-6)
+
+            if bool(np.any(at_clip)):
+                self.clip_steps[branch] += 1
+            counts = self.dim_clip_steps.get(branch)
+            if counts is None:
+                counts = np.zeros(raw.size, dtype=np.int64)
+                self.dim_clip_steps[branch] = counts
+            counts[_normalised_indices(branch, raw.size)] += at_clip.astype(np.int64)
+
+            prev = self.branch_extremes.get(branch)
+            here = (float(np.min(values)), float(np.max(values)))
+            self.branch_extremes[branch] = here if prev is None else (
+                min(prev[0], here[0]), max(prev[1], here[1]))
+
+    def clip_fractions(self) -> Dict[str, float]:
+        steps = max(self.obs_steps, 1)
+        return {branch: count / steps for branch, count in self.clip_steps.items()}
+
+    def _build_info(self, breakdown, rudder_cmd, throttle_cmd, collision,
+                    reached_goal, truncated) -> Dict:
+        """One step's `info`: the reward keys, the metrics, and the panel.
+
+        **The panel is a view on this, never a separate computation**
+        (`RENDER_PANEL_SPEC` §0).  If the panel needs a number, it is added here
+        rather than derived in `render.py` -- the same principle as the single
+        `EncounterContext`, and for the same reason: two consumers, one source,
+        or they diverge.
+
+        The flat `reward/...` and `colregs/...` keys are `02a §10.3`'s logging
+        schema.  `00 §4.2`'s metric set should be a *read* of these keys rather
+        than a separate computation; Paper 2's concessions came from metrics
+        that were not designed in before the campaign ran.
+        """
+        contexts = self.observer.encounter_contexts
+        classes = {tid: ctx.cls for tid, ctx in contexts.items()}
         held = list(classes.values())
-        return {
-            "reward": float(reward),
+        governing = self._governing_context(contexts)
+        if governing is not None and governing.misclassified:
+            self.misclassified_steps += 1
+
+        info = {
+            "reward": float(breakdown.total),
             "cross_track_error": float(self.cross_track_error),
             "ye": float(abs(self.cross_track_error)),
             "course_error": float(self.course_error),
@@ -660,6 +861,10 @@ class ASVLidarEnv(gym.Env):
             "r_path_radps": float(self.r_path),
             "rpm": float(self.rpm),
             "rudder_deg": float(rudder_cmd * MAX_RUD_ANGLE),
+            "action_rudder": float(rudder_cmd),
+            "action_throttle": float(throttle_cmd),
+            "d_action_rudder": float(rudder_cmd - self.prev_action[0]),
+            "d_action_throttle": float(throttle_cmd - self.prev_action[1]),
             "distance_to_goal": float(self.distance_to_goal),
             "min_lidar": float(np.min(self.lidar.ranges)),
             "min_sector_range": float(np.min(self.lidar.sector_ranges)),
@@ -670,8 +875,16 @@ class ASVLidarEnv(gym.Env):
             # `W_local` is the width at the vessel's current station.  Equal to
             # `corridor_width` while the channel is a straight inset rectangle;
             # 03's generator makes the two diverge.  02a's `r_pf` normalises on
-            # it and R-10 overrides it to 10.0 for the open-water benchmark.
+            # it and `R-10` overrides it to 10.0 for the open-water benchmark.
             "W_local": float(self.local_channel_width()),
+            "s_along": float(self.s_along),
+            "path_length": float(self.path.length),
+            "seed": self.episode_seed,
+            "step": int(self.step_count),
+            "max_steps": int(cfg.MAX_EPISODE_STEPS),
+            "elapsed_time": float(self.elapsed_time),
+            "open_water": bool(self.open_water),
+            "spawn_regime": str(self.target_spawn_regime),
             # Perception metrics (04 §7) -- the N1 evidence.
             "n_tracks": int(len(self.tracks)),
             "n_targets": int(len(self.targets)),
@@ -681,6 +894,7 @@ class ASVLidarEnv(gym.Env):
             "dropped_detections": int(self.tracker.dropped_detections),
             "steps_target_visible": int(self.steps_target_visible),
             "steps_target_tracked": int(self.steps_target_tracked),
+            "misclassified_steps": int(self.misclassified_steps),
             "encounter_class": held[0] if held else "none",
             "encounter_classes": dict(classes),
             "crossing_sides": self.observer.crossing_sides,
@@ -695,6 +909,244 @@ class ASVLidarEnv(gym.Env):
             "path_mode": self.path_mode_used,
             "scenario_mode": self.scenario_mode_used,
         }
+        info.update(breakdown.as_info())
+        # Built once and held, because `render.py` reads it off the environment
+        # rather than off `info` -- the renderer is handed the env, not the step
+        # tuple.  Same object either way, which is the point: the panel is a
+        # view on this step's `info` and never a second computation.
+        self.last_panel = self._panel_view(breakdown, governing)
+        info["panel"] = self.last_panel
+        return info
+
+    def _governing_context(self, contexts):
+        """The target the panel and the metrics speak about.
+
+        The one the COLREGs group scored against when it scored anything, and
+        otherwise the closest.  At `N_MAX_TARGETS = 1` this is "the target"; the
+        selection exists so the panel does not silently start describing a
+        different vessel when the scope widens.
+        """
+        if not contexts:
+            return None
+        track_id = self.last_reward.colregs_track if self.last_reward else None
+        if track_id in contexts:
+            return contexts[track_id]
+        return min(contexts.values(), key=lambda c: c.rng)
+
+    def _panel_view(self, breakdown, ctx) -> Dict:
+        """Everything `render.py`'s left panel draws, computed once, here.
+
+        Structured rather than flat because the panel's blocks are structured;
+        the flat `02a §10.3` keys above are the logging schema and this is the
+        display schema, both read off the same step.
+        """
+        cfgr = self.reward_fn.cfg
+        u_ref_eff = float(breakdown.u_ref_eff)
+        g_u = float(np.clip(max(self.u_body, 0.0) / max(u_ref_eff, 1e-9), 0.0, 1.0))
+        hull = self.hull_polygon()
+
+        panel = {
+            "run": {
+                "seed": self.episode_seed,
+                "scenario": self.scenario_mode_used,
+                "step": int(self.step_count),
+                "max_steps": int(cfg.MAX_EPISODE_STEPS),
+                "t": float(self.elapsed_time),
+                "corridor_w": float(self.corridor_width),
+                "corridor_b": float(self.corridor_breadths),
+                "w_local": float(self.local_channel_width()),
+                "targets": int(len(self.targets)),
+                "spawn": str(self.target_spawn_regime),
+                "open_water": bool(self.open_water),
+            },
+            "ego": {
+                "x": float(self.asv_x), "y": float(self.asv_y),
+                "hdg": float(self.asv_h),
+                "u": float(self.u_body), "v": float(self.v_body),
+                "r_dps": float(self.asv_w),
+                "u_ref": float(cfgr.u_ref), "u_ref_eff": u_ref_eff,
+                "u_ref_rule": breakdown.u_ref_rule,
+                "u_ref_reason": breakdown.u_ref_reason,
+                "g_u": g_u,
+                "g_u_sat": bool(g_u >= 1.0 - 1e-9),
+                "r_path": float(self.r_path),
+                "r_err": float(math.radians(self.asv_w) - self.r_path),
+                "rudder": float(self.prev_action[0]),
+                "throttle": float(self.prev_action[1]),
+                "rudder_deg": float(self.rudder),
+                "rpm": float(self.rpm),
+                "d_rudder": float(getattr(self.last_reward_state, "d_rudder", 0.0)),
+                "d_throttle": float(getattr(self.last_reward_state, "d_throttle", 0.0)),
+                "kappa_delta": float(cfgr.kappa_delta),
+                "sigma": float(breakdown.sigma_smooth),
+            },
+            "reward": {
+                "rows": self._reward_rows(breakdown),
+                "step_total": float(breakdown.total),
+                "dense": float(breakdown.dense),
+                "terminal": float(breakdown.terminal),
+                "dominant": breakdown.dominant,
+                "episode_total": float(self.reward_fn.audit.episode_total),
+                "episode_dominant": self.reward_fn.audit.episode_dominant(),
+                "hierarchy": self.reward_fn.audit.hierarchy_violations(),
+            },
+            "obs_health": self._obs_health_rows(),
+            "clearance": {
+                "boundary": self._hull_boundary_distance(hull),
+                "obstacle": self._nearest_obstacle_clearance(hull),
+                "goal": float(self.distance_to_goal),
+                "steps_left": int(cfg.MAX_EPISODE_STEPS - self.step_count),
+            },
+            "colregs": None,
+            "perception": None,
+        }
+        if ctx is not None:
+            panel["colregs"] = self._colregs_block(breakdown, ctx)
+            panel["perception"] = self._perception_block(ctx)
+            panel["clearance"]["target"] = float(ctx.d_ts_true)
+            panel["clearance"]["domain_margin"] = self._domain_margin(ctx)
+        return panel
+
+    def _reward_rows(self, breakdown) -> list:
+        """The four columns of block [5], and the fourth is the important one.
+
+        `inst` / `xw` / `Sep` / **`range(ep)`**.  The range column is the direct
+        detector for the Paper 2 scale bug: a term whose episode range is
+        `[-0.44, -0.41]` varies by less than 10% of its own value -- a constant
+        offset wearing a shaping term's costume, invisible in the other three
+        columns.
+        """
+        rows = []
+        for row in self.reward_fn.audit.rows():
+            name = row["name"]
+            rows.append({
+                "name": name,
+                "inst": float(breakdown.term.get(name, 0.0)),
+                "xw": float(breakdown.weighted.get(name, 0.0)),
+                "sum": float(row["sum"]),
+                "lo": float(row["lo"]),
+                "hi": float(row["hi"]),
+                "flat": bool(row["flat"]),
+            })
+        return rows
+
+    def _obs_health_rows(self) -> list:
+        """Per-branch clip rate, and **which dimension is responsible**.
+
+        `RENDER_PANEL_SPEC` §6 asks for a per-dimension drill-down on a keypress,
+        "since a single saturating dimension inside a 27-dim branch will not move
+        the branch aggregate much".  Naming the worst dimension inline is better
+        than a keypress: it is one string, and it is exactly the thing wanted at
+        the moment the aggregate goes red.
+        """
+        from observation import branch_feature_names
+
+        rows = []
+        fractions = self.clip_fractions()
+        steps = max(self.obs_steps, 1)
+        for branch, box in self.observation_space.spaces.items():
+            lo, hi = self.branch_extremes.get(branch, (0.0, 0.0))
+            counts = self.dim_clip_steps.get(branch)
+            worst, worst_frac = "", 0.0
+            if counts is not None and counts.size:
+                index = int(np.argmax(counts))
+                worst_frac = float(counts[index]) / steps
+                names = branch_feature_names(branch)
+                worst = names[index] if index < len(names) else f"dim{index}"
+            rows.append({
+                "name": branch,
+                "dim": int(np.prod(box.shape)),
+                "lo": float(lo),
+                "hi": float(hi),
+                "clip": float(fractions.get(branch, 0.0)),
+                "worst": worst,
+                "worst_clip": worst_frac,
+            })
+        return rows
+
+    def _colregs_block(self, breakdown, ctx) -> Dict:
+        cfgr = self.reward_fn.cfg
+        state = self._reward_state(np.asarray(self.prev_action))
+        parts = rterms.r8_parts(state, ctx, cfgr)
+        return {
+            "cls": ctx.cls,
+            "cls_true": ctx.cls_true,
+            "state": ctx.state,
+            "engaged_at": int(ctx.t_engage),
+            "engaged_for": (float((self.step_count - ctx.t_engage) * cfg.UPDATE_RATE)
+                            if ctx.t_engage >= 0 else 0.0),
+            "sense": {1: "STBD", -1: "PORT", 0: "none"}[int(ctx.compliant_turn_sense)],
+            "a_stbd": bool(ctx.a_stbd),
+            "a_port": bool(ctx.a_port),
+            "known": bool(ctx.admissibility_known),
+            "dy_req": float(ctx.dy_req),
+            "r_stbd": float(ctx.r_stbd),
+            "r_port": float(ctx.r_port),
+            "d_req": float(cfgr.d_req),
+            "rho": float(ctx.rho),
+            "a_req": float(parts["a_req"]),
+            "a_t": float(parts["a_t"]),
+            "urgency": float(parts["urgency"]),
+            "in_extremis": bool(ctx.in_extremis),
+            "terms": dict(breakdown.colregs),
+            "why": rterms.explain_colregs(state, ctx, cfgr),
+            "group": float(-breakdown.term.get("col", 0.0)),
+            "pre_clip": float(breakdown.colregs_pre_clip),
+        }
+
+    def _perception_block(self, ctx) -> Dict:
+        """Block [3]: estimate against truth, which is `R-1` made visible.
+
+        Under `R-1` the safety terms read truth and the COLREGs gating reads the
+        estimate.  The panel must show both or that decision is invisible, and a
+        misclassification -- the failure `04 §6` names as the one that matters --
+        is otherwise almost impossible to spot in a replay.
+        """
+        target = self.targets[0] if self.targets else None
+        true = {}
+        if target is not None:
+            import cpa_cri as cc
+            p_true = (target.x, target.y)
+            v_os = self._own_velocity()
+            dcpa, tcpa = cc.cpa((self.asv_x, self.asv_y), v_os, p_true, target.velocity)
+            true = {
+                "range": float(np.hypot(target.x - self.asv_x, target.y - self.asv_y)),
+                "bearing": float(cc.relative_bearing_deg(
+                    (self.asv_x, self.asv_y), self.asv_h, p_true)),
+                "speed": float(target.speed),
+                "heading": float(target.heading_deg),
+                "dcpa": float(dcpa),
+                "tcpa": float(tcpa),
+                "cls": ctx.cls_true,
+            }
+        track = next((t for t in self.tracks if t.id == ctx.track_id), None)
+        return {
+            "est": {
+                "range": float(ctx.rng),
+                "bearing": float(ctx.alpha if ctx.alpha <= 180.0 else ctx.alpha - 360.0),
+                "speed": float(ctx.speed_ts),
+                "heading": float(track.course_deg) if track is not None else float("nan"),
+                "dcpa": float(ctx.dcpa),
+                "tcpa": float(ctx.tcpa),
+                "cls": ctx.cls,
+            },
+            "true": true,
+            "track": {
+                "age": int(track.age) if track is not None else 0,
+                "hits": int(track.hits) if track is not None else 0,
+                "misses": int(track.misses) if track is not None else 0,
+                "coast": float(self.tracker.max_coast * cfg.UPDATE_RATE),
+            },
+            "dropped": int(self.tracker.dropped_detections),
+            "mismatched_steps": int(self.misclassified_steps),
+        }
+
+    def _domain_margin(self, ctx) -> float:
+        """Signed: negative means the target is inside the own ship's domain."""
+        import cpa_cri as cc
+        if not np.isfinite(ctx.d_ts_true):
+            return float("nan")
+        return float(ctx.d_ts_true - cc.domain_scale(ctx.alpha))
 
     # ------------------------------------------------------------------
     def render(self):
@@ -723,6 +1175,60 @@ def _overlaps(poly_a: Sequence, poly_b: Sequence) -> bool:
             if max(a) < min(b) or max(b) < min(a):
                 return False
     return True
+
+
+def _polygon_gap(poly_a: Sequence, poly_b: Sequence):
+    """Closest distance between two convex polygons, and where on `b` it is.
+
+    Exact for convex polygons: the minimum distance between two disjoint convex
+    sets is realised at a vertex of one and a point on an edge of the other, so
+    checking both directions covers every case.  Returns 0 for overlapping
+    polygons.
+    """
+    if _overlaps(poly_a, poly_b):
+        centre = np.mean(np.asarray(poly_b, dtype=np.float64), axis=0)
+        return 0.0, (float(centre[0]), float(centre[1]))
+
+    best, at = float("inf"), (0.0, 0.0)
+    for points, edges, on_b in ((poly_a, poly_b, True), (poly_b, poly_a, False)):
+        pts = np.asarray(points, dtype=np.float64)
+        poly = np.asarray(edges, dtype=np.float64)
+        seg = np.roll(poly, -1, axis=0) - poly
+        len_sq = np.einsum("ij,ij->i", seg, seg)
+        offset = pts[:, None, :] - poly[None, :, :]
+        t = np.clip(np.einsum("nmj,mj->nm", offset, seg)
+                    / np.where(len_sq < 1e-18, 1.0, len_sq), 0.0, 1.0)
+        foot = poly[None, :, :] + t[..., None] * seg[None, :, :]
+        dist = np.linalg.norm(pts[:, None, :] - foot, axis=-1)
+        i, j = np.unravel_index(int(np.argmin(dist)), dist.shape)
+        if float(dist[i, j]) < best:
+            best = float(dist[i, j])
+            here = foot[i, j] if on_b else pts[i]
+            at = (float(here[0]), float(here[1]))
+    return best, at
+
+
+def _wrap180(angle_deg: float) -> float:
+    return (float(angle_deg) + 180.0) % 360.0 - 180.0
+
+
+def _normalised_indices(branch: str, size: int):
+    """Which dimensions of a branch are normalisers rather than definitions.
+
+    Only these can meaningfully *clip*.  For `target` that excludes the sin/cos
+    pairs, the class one-hot and the presence bit: they reach their bounds
+    because of what they are, not because information was lost.
+    """
+    if branch != "target":
+        return np.arange(size)
+    from observation import NORMALISED_SLOT_INDICES
+    return np.array([slot * cfg.TARGET_FEATURES + i
+                     for slot in range(cfg.N_MAX_TARGETS)
+                     for i in NORMALISED_SLOT_INDICES], dtype=np.int64)
+
+
+def _normalised_dims(branch: str, values: np.ndarray) -> np.ndarray:
+    return np.asarray(values, dtype=np.float64)[_normalised_indices(branch, values.size)]
 
 
 # Retained under the Paper 2 name because `metrics.py` imports it.

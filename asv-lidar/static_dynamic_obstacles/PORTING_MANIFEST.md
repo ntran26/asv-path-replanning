@@ -1010,12 +1010,231 @@ model scale, not the sensing.
 
 **251 tests: 250 passing, 1 `xfail`** (the `R-8` bend test, pending 03).
 
-Every `TODO(decision)` is discharged except F21. What remains is 20 `TODO(05)`
-values needing measurement rather than a call, and one `TODO(03)`
-(`REVERSE_AVAILABLE`).
+Every `TODO(decision)` was discharged except F21, which §8.3 now resolves. What
+remained was 20 `TODO(05)` values needing measurement rather than a call, and one
+`TODO(03)` (`REVERSE_AVAILABLE`).
 
-Next per 02b: **T4, the reward** — `EncounterContext` first, then `reward/terms.py`
-as pure functions, then the weighted sum, the config validators including the
-`d_abeam` floor, and the eleven unit tests with test 8 `xfail`. Then T5 (03's
-corridor generator), which §3.3 correctly identifies as blocking three separate
-deliverables.
+Next per 02b: **T4, the reward** — see §8.
+
+---
+
+## 8. `T4` — the reward, and the telemetry panel
+
+02b calls T4 "*the main task*". It is built: `EncounterContext` first, then the
+terms as pure functions, then the weighted sum with group clipping, the config
+validators, and all eleven `02a §10.4` tests with test 8 `xfail`. The left
+telemetry panel from `RENDER_PANEL_SPEC` is built alongside it, because §4 of
+that spec is right that the reward's two instrument blocks are worth having
+*while* the reward is being written rather than after.
+
+**318 tests passing, 2 `xfail`.**
+
+### 8.1 Layout
+
+```
+src/colregs/
+  geometry.py   CPA products, sigma_bow, channel room, the admissibility predicate
+  context.py    EncounterContext, the engagement state machine, the latches
+src/reward/
+  config.py     RewardConfig + the validators that fail at construction
+  terms.py      every term as a pure function of (state, ctx, cfg)
+  reward.py     the weighted sum, group clipping, the per-step breakdown
+  audit.py      episode accumulators, the flat detector, Table R7
+```
+
+`encounter.py` stays where it is rather than moving to `colregs/classifier.py`
+as `02a §10.2` names it. It is the single definition of the angular bands, it
+has 22 tests against it, and `colregs/__init__.py` re-exports it at the path the
+spec asks for. Moving a tested module to satisfy a filename would be the kind of
+churn that loses a threshold.
+
+### 8.2 `EncounterContext` — the move that was the point of doing this first
+
+`ObservationBuilder` used to compute the class, the crossing side and the risk
+itself, from the same track the reward would later re-derive them from.
+`01 §5.3` asks for one module and two consumers; two consumers computing the
+same thing separately satisfies the letter of that and not the point of it.
+
+The builder now **owns** a `ContextManager` and the reward reads it back. The
+arrangement matters more than the refactor: the observation cannot be assembled
+without the contexts, so they always exist, and they are always the ones the
+reward sees. `slot_features` is now a pure read of the context.
+`test_the_context_is_the_only_place_the_class_is_decided` asserts the two agree
+every step of a rollout, which would be vacuous if they were the same expression
+and is not, because they are the same *object*.
+
+The `R-1` split is visible in the dataclass layout rather than documented beside
+it: perceived fields, latched fields, map fields, ground-truth fields. When
+either the path or the boundary polygon is absent — a unit test, or `R-10`'s
+open-water variant — the admissibility predicate degrades to permissive and sets
+`admissibility_known = False`, so a permissive answer can never be mistaken for
+a measured one. The panel prints `[no map: permissive]` when it happens.
+
+### 8.3 Four defects found in the specification
+
+Three were found by writing the code and one by looking at the first rendered
+frame. All four are live; none is cosmetic.
+
+#### F21 — resolved, the floor is applied
+
+02b §3.1 sets `d_abeam >= LIDAR_MIN_RANGE + B/2 = 1.25 m` as a hard floor and
+says what to do when the derived value is smaller: "the domain is floored at
+1.25 m and the paper states why". `0.75 * Lpp = 1.18 m` is smaller, so the floor
+binds. Applying it executes 02b's decision rather than overriding 02a's — 02b is
+the later document and declares itself a companion that amends 02a §1.
+
+`d_abeam = 1.25 m` (0.796 Lpp), `d_req = 2.50 m`, and the four Study 1
+thresholds move:
+
+| | at 1.18 m | at 1.25 m |
+|---|---|---|
+| Crossing | 6.51 | **6.80** |
+| Head-on, centreline target | 6.01 | **6.30** |
+| Overtaking | 4.78 | **4.94** |
+| Head-on, compliant target | 3.66 | **3.80** |
+
+02b C1's bracket collision survives: 6.80 and 6.30 still share the (6, 7)
+bracket, so the sweep stays at seven levels and
+`test_crossing_and_centreline_head_on_still_share_a_bracket` still documents it.
+The config validator now **raises** on a domain below the floor, which is the
+assertion 02b T4 step 4 asks for.
+
+#### F22 — `02b C3`'s `N_ref = 250` inverts `R-9` at the measured speed
+
+C3 replaces 02a's progress form with `clip(N_ref * ds / L_path, -1, +1)` so the
+episode integral stops depending on the unresolved cruise speed. The clip binds
+when `u > L_path / (N_ref * dt)`. **At `N_ref = 250` over a 20 m path that is
+0.80 m/s** — 02a's *assumed* cruise, not the 1.14 m/s T1 measured.
+
+So every step at cruise would clip, and slowing down would then *increase* the
+integral: 175 at cruise against 250 at 0.8 m/s. That is `R-9` running backwards.
+The term that exists to remove the creep exploit would have introduced it, and
+it would have been invisible — the sum still telescopes, just to the wrong
+thing, and nothing in the audit table would have looked wrong.
+
+The fix is C2's own rule: a speed-scaled constant is *derived* from `U_REF`, not
+written down. `N_REF_PROG = L_REF_PATH / (U_REF * dt) = 175.4` binds the clip at
+exactly cruise, which restores 02a §5.5's stated intent — telescoping exact for
+`u <= U_ref`, speeding gains nothing.
+
+**Consequence for `02a §8.1`:** `w_prog * Sum r_prog` is **+52.6**, not the
+tabulated +75. It is the only row F22 moves. The three orderings survive with
+room (+83 nominal against −264 and −309, a 44-point margin), and the
+compliance-cost ratio is untouched because progress contributes zero to it by
+telescoping.
+
+**A constraint on 03 falls out of this**, and it is pinned as a test rather than
+left as a comment: the clip now binds at `U_REF * L_path / L_REF`, so a path
+much *shorter* than the 20 m design point brings F22 back. Today's generator
+produces 20.00–20.42 m, binding at 1.140–1.164 m/s.
+`test_3d_the_generator_must_keep_path_length_near_the_design_point` fails if T5
+changes that.
+
+#### F23 — `02a §5.2`'s `d_safe` breaches `02a §2`'s own invariant
+
+§2 asserts `d_safe < c_wall − B/2`, so that the geometry defining a compliant
+narrow-channel manoeuvre cannot itself trigger the boundary penalty. With
+`c_wall = 0.65` and `B = 0.50` the ceiling is **0.40 m**, and §5.2's stated
+`d_safe = 0.50 m` does not clear it — in the same sentence that says 0.50 was
+chosen *because of* this invariant.
+
+`D_SAFE = 0.35`, the largest 5 cm value that clears with margin, marked
+`TODO(decision)`. `d_safe` is the free parameter of the pair: `c_wall` drives all
+four Study 1 thresholds and is a `TODO(05)` measurement, so moving it would move
+published predictions, whereas `d_safe` only sets where the boundary penalty
+begins. The validator raises on 0.50.
+
+**A second, narrower part of F23**, found by the timeout test: `02a §8.1`'s
+"loitering to timeout ≈ −86" assumes its own 300-step design point, and
+`MAX_EPISODE_STEPS` is **700** — a Paper 2 carry-over never reconciled with it.
+Undiscounted, a vessel stopped dead in clear water pays `w_pf + w_exist = 0.65`
+per step (`r_pf` is a penalty form, so `g_u = 0` is maximum penalty by design)
+and reaches −455 against a collision's −300. The ordering `02 §5` requires would
+be inverted.
+
+It is sound in practice, because the undiscounted sum is not what the agent
+optimises: at the headline SAC `gamma = 0.99` the same behaviour is worth −65,
+comfortably above the collision payoff. **It is marginal for the PPO comparator
+at `gamma = 0.999`**, where the truncated geometric sum reaches −327 and crosses
+−300. Pinned with the numbers in
+`test_a_cornered_agent_prefers_timeout_to_collision`, so if that comparator ever
+prefers a collision to holding station in a corner, the reason is on record and
+the fix is the step limit rather than a coefficient.
+
+#### `r_dom`'s datum — `02a §5.3` disagrees with `02a §1`
+
+§5.3 says `r_dom` is measured "hull-to-hull". §1 defines `d_req = 2 * d_abeam`
+as the *centre* separation of two vessels passing abeam, and `kappa_eng * d_req`
+gates engagement against `cpa()`, which is centre-to-centre throughout, as is
+the observation's `distance_to_domain`.
+
+Implemented **centre-to-centre**. Reading `d_dom` as a standoff from the hull in
+this one term would put the domain on a different datum from `d_req`, `rho_t`
+and the observation, and the four would disagree about what a compliant pass is.
+One datum, and it is the one the rest of the specification already uses.
+
+### 8.4 The panel found two things in itself
+
+Built per `RENDER_PANEL_SPEC`: seven blocks, `1`–`7` to toggle, defaulting to
+`[4]` COLREGS and `[5]` REWARD. Scrub is `,` and `.` rather than the arrows the
+spec suggests, because the arrows are the helm in manual play. The panel is a
+view on `info` — `env._panel_view()` assembles it once and `render.py` only
+formats it, so a screenshot and the analysis agree by construction.
+
+**The clip detector was counting definitions as clipping.** The first frame
+reported `target 90% [!]`. The class one-hot and the presence bit sit at exactly
+1.0 every step an occupied slot exists — an indicator at 1 is the indicator
+working. Excluding them dropped it to 55%, still red, and the per-dimension
+attribution the spec asks for named the actual culprit: `bearing_cos` and
+`ct_cos` read ±1 whenever the target is dead ahead or on a reciprocal course,
+which is the head-on geometry this paper is *about*.
+
+What survives is five clipped normalisers plus `cri`, and `cri` stays in
+deliberately: it is bounded by construction rather than clipped, but a risk
+index pinned at 1.0 carries no gradient in exactly the regime that matters most.
+In a close head-on it reads `worst: cri at 48%`. That is a real observation
+about the CRI feature and it is now visible without opening a log — which is
+what the block is for.
+
+**The hierarchy check fired on every clean run.** `r_exist` is a constant 0.05
+and `r_smooth` is near zero whenever the helm is steady, so "exist outweighs
+smooth" was permanently on screen. A warning that is always showing is a warning
+nobody reads. Terms averaging under 0.01 per step are now treated as inactive
+rather than out of order — which is the same distinction `flat` needed: a term
+at zero is not active, a term at a non-zero constant is broken.
+
+A worked frame, displaced head-on at 8 m width, reading top to bottom: `A_stbd`
+is `NO` because `r_stbd = 1.88` against `Dy_req = 2.24`; `R-2` therefore drops
+`U_ref_eff` to 0.46 and the panel says why; `v_r8 = 0.829 [8(e) only: no STBD
+room, A_t 0.00]`; `v_port = 0.000 [turning STBD or holding, compliant]`;
+`v_side = 0.097 [TS to STBD at CPA, needs PORT]`. Five lines that say what the
+agent is being asked to do and why it is being charged, which is the whole
+argument for `RENDER_PANEL_SPEC` §1.
+
+### 8.5 What T4 did not do
+
+* **`r_prog` is not yet exercised over a bend**, so `R-8` remains half-tested.
+  The unit half passes against a hand-set `r_path`; the end-to-end half is the
+  `xfail` waiting on T5.
+* **The scale audit (T6) has not been run.** The accumulators and the Table R7
+  generator exist and the predictions are pre-committed in
+  `reward/audit.py::PREDICTED_NOMINAL`, but running 1,000 random-policy and
+  1,000 Paper 2 SAC episodes through the stage-5 distribution is its own task,
+  and stage 5 does not exist until T5 and 03's generator do.
+* **`metrics.py` has not been rewritten to read the reward keys.** `02a §10.3`
+  says `00 §4.2`'s metric set should be a read of them rather than a separate
+  computation. The keys are emitted; the read is 04's.
+
+### 8.6 State
+
+**318 tests: 316 passing, 2 `xfail`** — the `R-8` bend test in
+`test_path_geometry.py` and its end-to-end twin in `test_reward.py`, both
+waiting on T5.
+
+`TODO(decision)` markers: **one**, `D_SAFE` (F23). F21 is discharged. The rest
+of the tree is 20 `TODO(05)` measurements and one `TODO(03)`.
+
+Next per 02b: **T5**, 03's corridor generator — variable width, bends,
+deliberately off-centre reference paths. §3.3 identifies it as blocking three
+deliverables; it is now blocking four, since `test_3d` makes path length a
+constraint it has to respect.
