@@ -34,6 +34,7 @@ class PathState(NamedTuple):
     lookahead_idx: int
     lookahead: tuple
     lookahead_course_error: float  # deg
+    s_along: float                 # m, continuous arclength at the projection
 
 
 class ReferencePath:
@@ -111,6 +112,44 @@ class ReferencePath:
         """
         return float(speed) * self.curvature(idx)
 
+    def arclength(self, x: float, y: float, closest_idx: int = None) -> float:
+        """Continuous along-path arclength at the vessel's projection, m.
+
+        **`self.s[closest_idx]` is not good enough for `r_prog`.**  The vertex
+        spacing is ~0.2 m and a step at cruise covers ~0.11 m, so the nearest
+        vertex advances on some steps and not others.  The increment would then
+        be 0 or 0.2 m rather than a smooth 0.11, `r_prog` would alternate
+        between 0 and its clip, and 02a §10.4 test 3 -- the direct test of
+        `R-9`'s telescoping claim -- would fail for a purely numerical reason.
+
+        Projecting onto the two segments adjacent to the nearest vertex and
+        taking the better fit gives an arclength that advances smoothly with the
+        vessel, so the sum telescopes exactly.
+        """
+        pos = np.array([x, y], dtype=np.float64)
+        if closest_idx is None:
+            closest_idx = int(np.argmin(np.linalg.norm(self.points - pos.astype(np.float32),
+                                                       axis=1)))
+        i = int(np.clip(closest_idx, 0, len(self.points) - 1))
+
+        best_s, best_d = float(self.s[i]), float("inf")
+        for j in (i - 1, i):
+            if j < 0 or j + 1 >= len(self.points):
+                continue
+            a = self.points[j].astype(np.float64)
+            seg = self.points[j + 1].astype(np.float64) - a
+            len_sq = float(seg @ seg)
+            if len_sq < 1e-18:
+                continue
+            t = float(np.clip((pos - a) @ seg / len_sq, 0.0, 1.0))
+            foot = a + t * seg
+            d = float(np.linalg.norm(pos - foot))
+            if d < best_d:
+                best_d = d
+                best_s = float(self.s[j]) + t * math.sqrt(len_sq)
+
+        return float(np.clip(best_s, 0.0, self.length))
+
     def left_normal(self, idx: int) -> np.ndarray:
         t = self.tangent(idx)
         return np.array([-t[1], t[0]], dtype=np.float32)
@@ -162,6 +201,7 @@ class ReferencePath:
             lookahead_idx=lookahead_idx,
             lookahead=(float(lookahead[0]), float(lookahead[1])),
             lookahead_course_error=wrap180(bearing_deg(pos, lookahead) - course_deg),
+            s_along=self.arclength(float(x), float(y), closest_idx),
         )
 
 

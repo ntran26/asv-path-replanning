@@ -25,7 +25,8 @@ from __future__ import annotations
 
 import numpy as np
 
-from ship import VESSEL_LENGTH, VESSEL_WIDTH  # noqa: F401  (re-exported below)
+from ship import (MAX_RUD_ANGLE, MAX_RUD_RATE_DPS,  # noqa: F401
+                  VESSEL_LENGTH, VESSEL_WIDTH)
 
 # ===========================================================================
 # 1. Vessel reference lengths
@@ -388,29 +389,32 @@ EGO_YAW_RATE_NOISE_DPS = 0.0             # deg/s 1-sigma on r, TODO(05): gyro no
 # spot.
 DOMAIN_ABEAM_FLOOR = LIDAR_MIN_RANGE + 0.5 * BREADTH     # 1.25 m
 
-# TODO(decision) -- **THE FLOOR ALREADY EXCLUDES THE PROVISIONAL VALUE.**
-# 02b §3.1 observes that 0.75*Lpp = 1.18 m "sits 0.18 m outside the sensor blind
-# zone", which compares it to LIDAR_MIN_RANGE alone -- and then defines the
-# floor as LIDAR_MIN_RANGE + hull half-breadth = 1.25 m, which 1.18 m does not
-# clear.  The two halves of that section disagree.
+# **F21 RESOLVED -- the floor is applied.**  02a §1 states the abeam extent as
+# `0.75*Lpp = 1.18 m`, which does not clear this floor.  02b §3.1 anticipates
+# exactly that case and says what to do: "If the measured manoeuvring
+# performance implies a smaller one, the domain is floored at 1.25 m and the
+# paper states why."  The provisional value is smaller, so the floor binds.
 #
-# Not resolved unilaterally: 02a §1 states the abeam extent as 0.75*Lpp
-# explicitly, and raising it to 1.25 m (0.796*Lpp) moves d_req and all four
-# Study 1 thresholds.  The value below stays as 02a specifies; `check_domain()`
-# reports the breach so it cannot be missed.
+# Applying it is executing 02b's decision, not overriding 02a's: 02b is the
+# later document, declares itself a companion that amends 02a §1, and §3.1 is
+# stated as a decision rather than a recommendation.  Consequence, which belongs
+# in the paper: `d_abeam` becomes 0.796*Lpp, `d_req` 2.50 m, and all four Study 1
+# thresholds move up by 14-29 cm (see `predicted_thresholds()`).  02b C1's
+# bracket collision survives -- 6.80 m and 6.30 m still share the (6, 7)
+# bracket, so the sweep stays at seven levels.
 DOMAIN_FORE = 2.00 * LBP                 # 3.14 m, TODO(05): provisional
 DOMAIN_AFT = 1.00 * LBP                  # 1.57 m, TODO(05): provisional
-DOMAIN_LATERAL = 0.75 * LBP              # 1.18 m, TODO(05)/TODO(decision)
+DOMAIN_LATERAL = max(0.75 * LBP, DOMAIN_ABEAM_FLOOR)     # 1.25 m, TODO(05)
 
 
 def check_domain(d_abeam=None) -> list:
     """Validator for the ship domain.  Returns a list of problems, empty if ok.
 
-    02b §3.1 asks for the floor to be asserted in the config validator.  It is
-    returned rather than raised, because the provisional value breaches it today
-    and hard-failing at import would block everything on a decision that is not
-    yet made.  `T4`'s config validator should raise on this once the domain is
-    final.
+    02b §3.1 asks for the floor to be asserted in the config validator, and
+    `reward.config.RewardConfig` now does raise on it.  This function returns
+    rather than raises so that a caller sweeping candidate domains (05, after
+    the turning-circle identification) can enumerate the problems with a
+    proposed value instead of catching an exception per candidate.
     """
     d = DOMAIN_LATERAL if d_abeam is None else float(d_abeam)
     problems = []
@@ -611,15 +615,20 @@ SLOT_EMBED_DIM = 32
 USE_RECURRENCE = False
 
 # ===========================================================================
-# 13. Reward -- NOT DESIGNED HERE
+# 13. Reward  (02a Rev 2.2, with 02b C1-C4 applied)  -- T4
 # ===========================================================================
-# 02 owns the entire reward: six carried-over terms, five COLREGs terms, the
-# Rule 9 precedence table, and the mandatory per-term scale audit.  Per D10 it
-# is redesigned, not patched, and per kickoff §8 no Paper 2 reward term name may
-# appear in this tree.
+# Eight dense terms plus terminals.  Every dense term is normalised to [-1, 0]
+# before weighting (`r_prog` to [-1, +1]), so **the weight is the maximum
+# per-step contribution** and the 02a §7 hierarchy holds by construction rather
+# than being discovered empirically.  That is the direct fix for the Paper 2
+# failure, where a path term out-scaled the avoidance term through a hidden
+# scale factor nobody had computed.
+#
+# The coefficients live here; `reward/` consumes them.  `reward/config.py` reads
+# these as its dataclass defaults, so there is exactly one place to change a
+# coefficient and the ablation switches cannot fork the values.
 #
 # The three below are the structural terminal payoffs, decided in 02b §2.
-# Everything dense is still 02's.
 #
 # -300 rather than 02a's original -200 (`R-7`): at -200 the margin between a
 # collision episode and a maximally non-compliant one is 32 points, which
@@ -635,6 +644,157 @@ R_GOAL = 100.0
 # and prefer almost anything to it -- voiding the "no loitering incentive"
 # argument in 02a §8.1.
 R_TIMEOUT = 0.0
+
+# --- 13.1 Weights (02a §7) -------------------------------------------------
+# 300 >> 3.0 > 2.5 > 2.2 > 1.8 > 0.6 > 0.3 > 0.10 > 0.05
+# collision >> --- safety --- > COLREGs > --- task ---
+W_BND = 3.00                             # channel boundary -- a hard constraint
+W_DOM = 2.50                             # target ship domain
+W_OBS = 2.20                             # static obstacle proximity
+W_COL = 1.80                             # COLREGs group, after group clipping
+W_PF = 0.60                              # path following
+W_PROG = 0.30                            # progress
+W_SMOOTH = 0.10                          # action smoothness
+W_EXIST = 0.05                           # existence cost
+
+# The longest encounter the ordering assertion has to survive.  02a §8.1 prices
+# the compliance-cost ratio over a 100-step encounter, and the validator
+# `abs(R_COLLISION) > W_COL * MAX_ENCOUNTER_STEPS` is what keeps a COLREGs-
+# compliant collision worse than a maximally non-compliant near-miss (02 §5).
+MAX_ENCOUNTER_STEPS = 100
+
+# --- 13.2 Path following, r_pf (02a §5.1) ----------------------------------
+# Width normalisation is load-bearing.  Paper 2 used exp(-0.05*|e_y|), inherited
+# from a 60 x 150 m map; across a 10 m channel it varies by under 10% of its own
+# value.  Normalising by the LOCAL half-width fixes that and holds the term's
+# range constant across the Study 1 sweep, so the path-following gradient does
+# not change with corridor width and confound the study.
+PF_GAMMA_E = 4.0                         # cross-track decay
+PF_W_E = 0.70                            # cross-track vs course weighting
+PF_OMEGA_LA = 0.25                       # lookahead share of the course error
+
+# `R-2`: a give-way obligation whose compliant alteration is inadmissible
+# discharges under Rule 8(e) by slackening speed.  Without dropping the speed
+# gate's reference the path term would charge full penalty for the compliant
+# action, and 8(e) would be structurally unlearnable.
+U_REF_SLOW_FACTOR = 0.40
+
+# --- 13.3 Safety geometry (02a §5.2-5.4) -----------------------------------
+# `c_wall` is HEAD_ON_WALL_CLEARANCE in §2 -- one constant, not two.
+#
+# TODO(decision) -- **02a's own d_safe breaches 02a's own invariant.**  §2
+# asserts `d_safe < c_wall - B/2`, so that the geometry defining a compliant
+# narrow-channel manoeuvre cannot itself trigger the boundary penalty.  With
+# c_wall = 0.65 and B = 0.50 the ceiling is 0.40 m, and §5.2's stated
+# d_safe = 0.50 m does not clear it -- in the same sentence that says 0.50 was
+# chosen *because of* this invariant.
+#
+# 0.35 m is the largest 5 cm value that clears the ceiling with margin.  d_safe
+# is the free parameter of the pair: c_wall drives all four Study 1 thresholds
+# and is a TODO(05) measurement, so moving it would move published predictions,
+# whereas d_safe only sets where the boundary penalty begins.
+D_SAFE = 0.35                            # m, TODO(decision): see above
+D_OA = 0.60                              # m, static-obstacle decay scale
+D_CUT = 2.00                             # m, beyond which r_obs is exactly zero
+OBS_SWATH_HALF_DEG = POOL_SWATH_HALF_DEG  # +/-135 deg, matching the c_t swath
+
+# --- 13.4 Progress, r_prog (02b C3, corrected by T1) -----------------------
+# 02b C3 replaces 02a's `(s_t - s_{t-1})/(U_ref*dt)` with a path-fraction form,
+# so the episode integral stops depending on the unresolved cruise speed:
+#
+#     r_prog = clip(N_REF_PROG * (s_t - s_{t-1}) / L_path, -1, +1)
+#     Sum r_prog = N_REF_PROG exactly, provided the clip never binds
+#
+# **F22 -- C3's literal `N_ref = 250` inverts `R-9` at the measured speed.**
+# The clip binds when `u > L_path / (N_ref*dt)`.  At N_ref = 250 over a 20 m
+# path that is 0.80 m/s -- which is 02a's *assumed* cruise, not the 1.14 m/s T1
+# measured.  Every step at cruise would clip, and slowing down would then
+# *increase* the progress integral (175 -> 250).  That is the creep exploit
+# 02 §4.4 warns about, arriving through the very term meant to remove it.
+#
+# The fix is 02b C2's own rule: a speed-scaled constant is derived from U_REF,
+# not written down.  Deriving it restores 02a §5.5's stated intent exactly --
+# telescoping is exact for `u <= U_REF`, so a legal 8(e) slowdown costs zero
+# progress reward, and speeding gains nothing.
+#
+# Consequence for the §8.1 audit table: `W_PROG * Sum r_prog` is +52.6, not the
+# +75 tabulated.  All three orderings survive with room (nominal success ~ +83
+# against -242 and -297), and the compliance-cost ratio is untouched, because
+# progress contributes zero to it by telescoping.
+L_REF_PATH = 20.0                        # m, the 02a §8.1 design-point path
+N_REF_PROG = L_REF_PATH / (U_REF * UPDATE_RATE)          # 175.4 steps
+
+# --- 13.5 Smoothness, r_smooth (02a §5.6) ----------------------------------
+# `kappa_delta` is the actuator's per-step rate limit in normalised action
+# units, so the term saturates at exactly the physical limit and self-calibrates
+# when 05 delivers the actuator model.  Derived rather than written down.
+KAPPA_DELTA = MAX_RUD_RATE_DPS * UPDATE_RATE / MAX_RUD_ANGLE     # 0.05
+KAPPA_N = 0.30                           # throttle rate scale, TODO(05)
+SMOOTH_W_N = 0.50                        # throttle share of the penalty
+
+# `sigma_t` resolves the Rule 8 tension: 8(b) wants ONE large alteration and
+# forbids a succession of small ones, but a plain smoothness penalty suppresses
+# both.  The first two seconds after engagement are charged at a quarter rate,
+# so the committed alteration is affordable; everything after is full rate, so
+# dithering is not.
+SIGMA_ENC = 0.25
+N_FREE_STEPS = 20                        # 2.0 s at 10 Hz
+
+# --- 13.6 Encounter state machine (02a §6.1) -------------------------------
+T_ENGAGE = 25.0                          # s, TCPA within which engagement fires
+# Scaled on `d_req`, NOT on the domain.  In 02a Revision 1 it evaluated to
+# exactly the compliant separation, putting the engagement threshold on a
+# knife-edge at the geometry the agent is supposed to achieve.  At 1.5*d_req
+# engagement fires before the obligation does -- watch first, then act.
+KAPPA_ENG = 1.5
+KAPPA_REL = 2.5                          # DCPA multiple at which the encounter clears
+N_CLEAR_STEPS = 30                       # steps in CLEARING before returning to IDLE
+N_SWITCH_STEPS = 10                      # steps a new class must hold to re-latch
+
+# --- 13.7 COLREGs sub-weights and thresholds (02a §6) ----------------------
+# Pre-clip group maxima: head-on 1.45, crossing 1.60, overtaking 1.50, being
+# overtaken 0.45.  Two concurrent severe violations saturate the group; one
+# does not.
+V_PORT_W = 0.55                          # turning the wrong way while give-way
+V_BOW_W = 0.55                           # crossing ahead of the target
+V_SIDE_W = 0.40                          # wrong-side passing
+V_HOLD_W = 0.45                          # failing to hold course while stand-on
+V_R8_W = 0.50                            # late or insufficient action
+
+# TODO(05): `R_REF` from the identified turning circle, `R_DEAD` from the
+# measured gyro noise floor.  The IMU is confirmed (05 §4.7), so `r` is measured
+# rather than differentiated, and the yaw-rate-not-rudder criterion is directly
+# checkable in the field instead of inferred.
+R_REF = 0.20                             # rad/s, full-severity excess yaw rate
+R_DEAD = 0.02                            # rad/s, below which a turn is not a turn
+BETA_BOW_DEG = 67.5                      # bow arc for the crossing-ahead severity
+R_HOLD = 0.05                            # rad/s, yaw tolerance while standing on
+DU_HOLD = 0.10                           # m/s, speed tolerance, TODO(05)
+T_EXTREMIS = 5.0                         # s, 17(b) release of the hold penalty
+
+# Rule 8 deficit accounting.  `DU_MIN` is 30% of cruise, expressed as a multiple
+# so it survives T1 rather than needing re-derivation (02b C2).
+DPSI_MIN_DEG = 20.0                      # deg, the alteration that counts as "one"
+DU_MIN = 0.30 * U_REF                    # m/s
+# 2.50 m of lateral offset at cruise with a 30 deg alteration needs ~5.9 s of
+# running plus ~3.5 s of turn-in and turn-out, ~10 s, plus margin.  Worth
+# stating non-dimensionally too: T_ACT * U_REF / LBP ~ 10.9 ship lengths of
+# advance, which is the form that answers the Froude question before it is asked.
+T_ACT = 15.0                             # s
+
+U_MIN_REACHABLE = 0.20                   # m/s, lowest steady speed without reverse
+
+# --- 13.8 Open-water fallback, `R-10` (02a §5.5a) --------------------------
+# 04 §4.1 runs "Around the Clock" in an open-water variant, where three terms
+# are otherwise undefined: `r_pf` normalises on W_local, `r_bnd` needs a
+# boundary polygon, and the admissibility predicate needs `d_bnd_*`.
+#
+# 10.0 m rather than an arbitrary large value, because it is the widest trained
+# width: `e_y` then stays on the same scale as the widest sweep condition, and
+# the open-water score is directly comparable to the 20 B row of Study 1.  Any
+# other choice silently changes the path-following gradient between the two
+# variants and makes the comparison meaningless.
+W_REF_OPEN_WATER = 10.0                  # m
 
 # ===========================================================================
 # 14. Static obstacles (carried from Paper 2, replaced by 03/04)

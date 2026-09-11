@@ -191,20 +191,66 @@ def test_obstacle_collision_is_reported_separately():
 # ---------------------------------------------------------------------------
 # Reward placeholder
 # ---------------------------------------------------------------------------
-def test_reward_is_sparse_terminal_only():
-    """02 owns the reward.  Nothing dense may appear here yet."""
+def test_the_reward_is_dense_and_decomposed():
+    """T4: the placeholder is gone.  Every 02a term reports, every step.
+
+    Was `test_reward_is_sparse_terminal_only`, which asserted the opposite and
+    was correct while 01 shipped perception without a trainable agent.
+    """
     env = make_env()
     env.reset(seed=0)
-    _, r, _, _, _ = env.step(np.array([0.0, 0.0], np.float32))
-    assert r == 0.0
+    _, r, _, _, info = env.step(np.array([0.0, 0.0], np.float32))
+    assert r != 0.0, "the dense terms must contribute on an ordinary step"
+    for name in ("pf", "prog", "exist", "smooth", "obs", "bnd", "dom", "col"):
+        assert f"reward/term/{name}" in info
+        assert f"reward/weighted/{name}" in info
+    assert info["reward"] == pytest.approx(r)
+
+
+def test_every_term_stays_inside_its_declared_range():
+    """02a §10.4 test 1, on the trajectories the environment actually produces.
+
+    The exhaustive random-state version lives in `test_reward.py`; this one
+    catches a term that only leaves its range once it is fed real geometry.
+    """
+    from reward.terms import TERM_RANGE
+    env = make_env()
+    for seed in range(4):
+        env.reset(seed=seed)
+        for _ in range(60):
+            _, _, term, trunc, info = env.step(env.action_space.sample())
+            for name, (lo, hi) in TERM_RANGE.items():
+                value = info[f"reward/term/{name}"]
+                assert lo - 1e-9 <= value <= hi + 1e-9, f"{name} = {value}"
+            if term or trunc:
+                break
 
 
 def test_collision_returns_the_terminal_penalty():
+    """The terminal payoffs, isolated from the dense terms around them."""
     env = make_env()
     env.reset(seed=0)
-    assert env._reward("obstacle", False, False) == cfg.R_COLLISION
-    assert env._reward(None, True, False) == cfg.R_GOAL
-    assert env._reward(None, False, True) == cfg.R_TIMEOUT
+    still = np.zeros(2, dtype=np.float32)
+    assert env._reward(still, "obstacle", False, False).terminal == cfg.R_COLLISION
+    assert env._reward(still, None, True, False).terminal == cfg.R_GOAL
+    assert env._reward(still, None, False, True).terminal == cfg.R_TIMEOUT
+
+
+def test_a_collision_dominates_everything_dense():
+    """02 §5's ordering, at the step where it has to hold.
+
+    The dense terms are bounded by the sum of their weights, so no accumulation
+    of shaping can approach the collision payoff in one step.  Asserted rather
+    than assumed, because it is the property the whole coefficient table exists
+    to produce.
+    """
+    env = make_env()
+    env.reset(seed=0)
+    breakdown = env._reward(np.zeros(2, dtype=np.float32), "target", False, False)
+    dense_bound = sum(abs(w) for w in (
+        cfg.W_PF, cfg.W_PROG, cfg.W_EXIST, cfg.W_SMOOTH,
+        cfg.W_OBS, cfg.W_BND, cfg.W_DOM, cfg.W_COL))
+    assert abs(breakdown.terminal) > 20.0 * dense_bound
 
 
 def test_terminal_payoffs_are_the_decided_values():
@@ -235,7 +281,11 @@ def test_timeout_truncates_rather_than_terminating():
             break
     assert truncated and not terminated
     assert info["timeout"] is True
-    assert reward == 0.0
+    # The *terminal* payoff is what must be zero.  The dense terms keep running
+    # on the last step like any other, which is correct -- what `R_TIMEOUT = 0`
+    # buys is that running out of time carries no one-shot penalty of its own,
+    # so the bootstrapped value of the final state is what the agent sees.
+    assert info["reward/terminal"] == 0.0
 
 
 def test_no_paper_2_reward_terms_survive_in_info():
