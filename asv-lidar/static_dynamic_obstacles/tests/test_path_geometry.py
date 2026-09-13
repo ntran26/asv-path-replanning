@@ -130,21 +130,23 @@ def test_r_path_is_zero_on_a_straight_corridor():
             break
 
 
-@pytest.mark.xfail(reason="needs 03's corridor generator: with kappa = 0 everywhere, "
-                          "R-8 silently reduces to the absolute form and the term "
-                          "would look implemented while being untested (02b §3.3)",
-                   strict=True)
 def test_r_path_is_nonzero_somewhere_in_the_scenario_distribution():
-    """The `R-8` regression test 02a §10.4 asks for.
+    """The `R-8` regression test 02a §10.4 asks for. **Now passing (T5).**
 
-    Deliberately failing rather than absent: a term that is implemented,
-    untested and silently inert is worse than one that is missing.
+    Was `xfail(strict)` from T3 until 03a's corridor generator landed, on the
+    principle that a term which is implemented, untested and silently inert is
+    worse than one that is missing.
+
+    The width matters and is not incidental.  At the default 10 m the corridor
+    fills the basin and F25's bend ceiling is 0 deg, so the only curvature comes
+    from the width profile; 6 m admits a 39 deg bend and is where `R-8` is
+    actually exercised.
     """
-    env = ASVLidarEnv(render_mode=None)
+    env = ASVLidarEnv(render_mode=None, corridor_width=6.0)
     seen = 0.0
-    for seed in range(20):
+    for seed in range(12):
         env.reset(seed=seed)
-        for _ in range(60):
+        for _ in range(200):
             _, _, term, trunc, info = env.step(np.zeros(2, dtype=np.float32))
             seen = max(seen, abs(info["r_path_radps"]))
             if term or trunc:

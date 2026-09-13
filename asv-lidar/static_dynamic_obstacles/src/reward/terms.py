@@ -64,6 +64,11 @@ class RewardState:
     # --- clearances (ground truth, from the map and the true geometry) -----
     d_bnd: float = float("inf")        # hull to channel boundary, m
     d_clear: float = float("inf")      # hull to nearest static obstacle in swath, m
+    # Deepest ship-domain intrusion over the **true** targets, as a fraction of
+    # the domain radius at each one's bearing.  0 when clear, 1 at the centre.
+    # Carried on the state rather than read off the contexts, because contexts
+    # are perceived and this term is not (F29).
+    dom_intrusion: float = 0.0
 
     # --- action ------------------------------------------------------------
     d_rudder: float = 0.0              # change in normalised rudder command
@@ -198,6 +203,9 @@ def r_dom(state: RewardState, contexts, cfg) -> float:
     reported metric with no corresponding reward signal is precisely the pattern
     that produced Paper 2's concessions.
 
+    Reads `state.dom_intrusion`, which the environment computes over its **true**
+    targets.  See `domain_intrusion` below for why that is not a detail.
+
     **Measured centre-to-centre, not hull-to-hull as §5.3's wording says.**  The
     same document defines `d_req = 2*d_abeam` as the centre separation of two
     vessels passing abeam, and `kappa_eng * d_req` gates engagement against
@@ -207,16 +215,28 @@ def r_dom(state: RewardState, contexts, cfg) -> float:
     the four would disagree about what a compliant pass is.  One datum, and it
     is the one the rest of the specification already uses.
     """
+    return float(np.clip(-(float(state.dom_intrusion) ** 2), -1.0, 0.0))
+
+
+def domain_intrusion(p_os, heading_os_deg: float, true_targets, cfg) -> float:
+    """Deepest ship-domain intrusion over the true targets, in `[0, 1]`.
+
+    **Computed from the simulated truth, never from the tracks** (`R-1`, and
+    F29).  Routing it through the tracked contexts made an unperceived target
+    inside the domain free, which is the opposite of what `R-1` says and would
+    have made the single most safety-relevant dense term degrade *with*
+    perception under Study 2.
+    """
     worst = 0.0
-    for ctx in _iter(contexts):
-        d_ts = float(ctx.d_ts_true)
-        if not np.isfinite(d_ts):
-            continue
-        beta = _bearing_from_ctx(ctx)
+    for target in true_targets or ():
+        dx = float(target.x) - float(p_os[0])
+        dy = float(target.y) - float(p_os[1])
+        d_ts = float(np.hypot(dx, dy))
+        beta = cc.relative_bearing_deg(p_os, heading_os_deg, (target.x, target.y))
         d_dom = cc.domain_scale(beta, fore=cfg.dom_fore, aft=cfg.dom_aft,
                                 lateral=cfg.dom_abeam)
         worst = max(worst, max(0.0, 1.0 - d_ts / max(d_dom, 1e-9)))
-    return float(np.clip(-(worst ** 2), -1.0, 0.0))
+    return float(np.clip(worst, 0.0, 1.0))
 
 
 def r_obs(state: RewardState, contexts, cfg) -> float:

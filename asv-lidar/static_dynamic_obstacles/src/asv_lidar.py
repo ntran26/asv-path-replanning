@@ -82,6 +82,19 @@ class Lidar:
             safe_width_m=FEASIBILITY_SAFE_WIDTH,
         )
 
+    def repool(self, ranges) -> None:
+        """Adopt gated ranges and re-pool the sector branch from them.
+
+        The pooled `c_t` branch must be built from the **post-gate** scan
+        (01 §3.1).  Until 03a §1.2 put facility walls in the raw scan there was
+        nothing for the gate to remove, so pooling from the raw ranges gave an
+        identical answer and the ordering error was invisible -- the walls then
+        flooded 624 of 720 beams straight into the obstacle branch, and the
+        policy would have learned to treat the basin as an obstacle field.
+        """
+        self.ranges = np.asarray(ranges, dtype=np.float64).copy()
+        self._pool()
+
     def scan(self, pos, heading_deg: float, obstacles=None) -> np.ndarray:
         """Cast all 720 beams from `pos` against `obstacles`, then repool.
 

@@ -49,6 +49,8 @@ import numpy as np
 
 import boundary_raycast as br
 import constants as cfg
+import corridor as corr
+import targets as tgtmod
 import tracking as trk
 from asv_lidar import Lidar
 from observation import ObservationBuilder, observation_space
@@ -59,55 +61,12 @@ from reward import terms as rterms
 from ship import HULL_MARGIN, MAX_RUD_ANGLE, VESSEL_LENGTH, VESSEL_WIDTH, ShipModel
 
 
-class TargetShip:
-    """A COLREGs target vessel.
-
-    Oriented hull rather than a circle (03 §3): required for ship-domain metrics
-    and for correct aspect-angle computation in the encounter classifier.
-    Constant velocity (D1); 03 replaces the motion model for the reactive and
-    non-compliant evaluation strata.
-    """
-
-    def __init__(self, x: float, y: float, heading_deg: float, speed: float,
-                 length: float = cfg.LOA, width: float = cfg.BREADTH) -> None:
-        self.x = float(x)
-        self.y = float(y)
-        self.heading = float(heading_deg)
-        self.speed = float(speed)
-        self.length = float(length)
-        self.width = float(width)
-
-    @property
-    def heading_deg(self) -> float:
-        """Alias for `heading`.
-
-        The truth pairing in `colregs.context` reads a heading off whichever
-        object it is handed -- a `TargetShip` here, and whatever 03's reactive
-        strata supply later.  One name for the quantity is cheaper than a
-        `getattr` chain at the call site that would silently return the wrong
-        thing for a class that spells it differently again.
-        """
-        return float(self.heading)
-
-    @property
-    def velocity(self) -> np.ndarray:
-        a = math.radians(self.heading)
-        return np.array([self.speed * math.sin(a), self.speed * math.cos(a)])
-
-    def step(self, dt: float) -> None:
-        v = self.velocity
-        self.x += float(v[0]) * dt
-        self.y += float(v[1]) * dt
-
-    def hull(self) -> List[Tuple[float, float]]:
-        half_l, half_w = 0.5 * self.length, 0.5 * self.width
-        h = math.radians(self.heading)
-        sin_h, cos_h = math.sin(h), math.cos(h)
-        return [
-            (self.x + fwd * sin_h - lat * cos_h, self.y + fwd * cos_h + lat * sin_h)
-            for fwd, lat in ((half_l, half_w), (half_l, -half_w),
-                             (-half_l, -half_w), (-half_l, half_w))
-        ]
+# 03a §5.1 replaces the four-corner box with an oriented 11-vertex hull, and
+# 03a §5.3 adds the behaviour models.  Both live in `targets.py`; the Paper 2
+# name is kept as an alias because the play harness, the tests and 04a's named
+# cases all construct targets by it, and renaming a constructor across the tree
+# to gain nothing is churn.
+TargetShip = tgtmod.Target
 
 
 class ASVLidarEnv(gym.Env):
@@ -132,7 +91,9 @@ class ASVLidarEnv(gym.Env):
                  ego_speed_noise: float = cfg.EGO_SPEED_NOISE,
                  ego_yaw_rate_noise_dps: float = cfg.EGO_YAW_RATE_NOISE_DPS,
                  reward_config: Optional[RewardConfig] = None,
-                 open_water: bool = False) -> None:
+                 open_water: bool = False,
+                 channel: Optional[object] = None,
+                 facility_walls: bool = cfg.SIMULATE_FACILITY_WALLS) -> None:
         super().__init__()
         self.map_width = float(map_width)
         self.map_height = float(map_height)
@@ -166,7 +127,17 @@ class ASVLidarEnv(gym.Env):
         self.reward_fn = RewardFunction(reward_config or RewardConfig())
         self._pose_noise = br.PoseNoise(self._rng) if pose_noise else None
 
-        self.boundary_polygon = self._build_corridor()
+        # 03a §3.1: the corridor is a generated channel, not an inset
+        # rectangle.  A fixed one can be passed in for a named evaluation case
+        # or a Study 1 width level; otherwise each episode samples one.
+        self.channel = channel if channel is not None else corr.rectangle(
+            self.corridor_width)
+        self.resample_channel = channel is None
+        self.boundary_polygon = self.channel.polygon()
+
+        # 03a §1.2: the out-of-corridor world, so the gate has something to do.
+        self.facility_walls = bool(facility_walls)
+        self.wall_polygon = corr.facility_walls((self.map_width, self.map_height))
 
         self.forced_num_obs: Optional[int] = None
         self.forced_targets: Optional[List[TargetShip]] = None
@@ -182,14 +153,8 @@ class ASVLidarEnv(gym.Env):
     # Corridor geometry
     # ------------------------------------------------------------------
     def _build_corridor(self) -> List[Tuple[float, float]]:
-        """The navigable channel, inset in the basin and centred on it.
-
-        03 replaces this with a generator producing variable width along the
-        path, bends, and off-centre reference paths -- all three are required
-        before the boundary branch carries information (01 §3.3).
-        """
-        inset = 0.5 * (self.map_width - self.corridor_width)
-        return br.rectangle(self.corridor_width, self.map_height, x0=inset, y0=0.0)
+        """The navigable channel polygon, from the current `Corridor`."""
+        return self.channel.polygon()
 
     @property
     def corridor_breadths(self) -> float:
@@ -197,17 +162,28 @@ class ASVLidarEnv(gym.Env):
         return self.corridor_width / cfg.BREADTH
 
     def corridor_bounds_x(self) -> Tuple[float, float]:
-        inset = 0.5 * (self.map_width - self.corridor_width)
-        return inset, inset + self.corridor_width
+        """Lateral extent of the channel, for metrics that need a scalar pair.
+
+        Exact while the channel is straight; an envelope once it bends.  Every
+        clearance that matters is measured against the polygon itself.
+        """
+        left, right = self.channel.edges()
+        xs = np.concatenate([left[:, 0], right[:, 0]])
+        return float(xs.min()), float(xs.max())
 
     def local_channel_width(self) -> float:
-        """Channel width at the vessel's current station.
+        """Channel width at the vessel's current station, metres.
 
-        Constant while the corridor is a straight inset rectangle.  03's
-        generator introduces variation along the path, at which point this stops
-        being a constant and `r_pf`'s normalisation starts to matter.
+        Now genuinely local: 03a's generator varies width along `s`, so this and
+        `corridor_width` diverge, and `r_pf`'s width normalisation starts doing
+        the job it was specified for -- holding the path term's range constant
+        across the Study 1 sweep instead of letting the gradient move with the
+        channel.
         """
-        return self.corridor_width
+        # Interpolated from the known arclength rather than searched for: the
+        # path projection already located the vessel this step, and an argmin
+        # over 500 stations every step is a cost with no information in it.
+        return self.channel.width_at_s(self.s_along + self.path_start_s)
 
     # ------------------------------------------------------------------
     # Reset
@@ -235,11 +211,13 @@ class ASVLidarEnv(gym.Env):
         self.r_path = 0.0
         self.s_along = 0.0
         self.prev_s_along = 0.0
+        self.path_start_s = 0.0
         self.prev_action = np.zeros(2, dtype=np.float32)
         self.reward_fn.reset()
         self.last_reward = None
         self.last_reward_state = None
         self.last_panel = None
+        self._clearances = (float("inf"), float("inf"))
         self.episode_seed: Optional[int] = None
         self.target_spawn_regime = "none"
         self.clip_steps = {branch: 0 for branch in
@@ -309,8 +287,11 @@ class ASVLidarEnv(gym.Env):
         return obs, {}
 
     def _sample_layout(self) -> None:
-        self.start_x, self.start_y, self.goal_x, self.goal_y = self._random_start_goal()
-        self._build_path()
+        if self.resample_channel:
+            self.channel = corr.sample(
+                self._rng, width_range=(self.corridor_width, self.corridor_width))
+            self.boundary_polygon = self.channel.polygon()
+        self._build_path_from_channel()
 
         if self.forced_num_obs is not None:
             num_obs = int(self.forced_num_obs)
@@ -421,6 +402,28 @@ class ASVLidarEnv(gym.Env):
         goal_x = float(np.random.uniform(lo + margin_x, hi - margin_x))
         return start_x, cfg.START_Y, goal_x, goal_y
 
+    def _build_path_from_channel(self) -> None:
+        """Reference path from the channel's Rule 9(a) station (03a §3.2).
+
+        The path is the centreline offset by a fraction of the **local**
+        half-width, with a positive mean -- so the vessel is trained to hold the
+        starboard side of the fairway rather than the middle of it, which is the
+        behaviour the whole Rule 9 precedence argument is about.
+        """
+        # **Start the path inside the corridor, not at its mouth.**  The hull is
+        # 1.73 m long and the collision test is on the polygon, so a vessel whose
+        # origin sits exactly on the corridor's first station has its stern
+        # outside the channel and terminates on step 1 -- which is what happened
+        # the first time the generator was wired in.  The corridor is 25 m and
+        # the path 20 m, so the inset is free.
+        inset = 0.5 * VESSEL_LENGTH + HULL_MARGIN
+        self.path_start_s = float(inset)
+        points = self.channel.reference_path_points(start_s=inset)
+        self.path = ReferencePath(points, self.lookahead_fraction)
+        self.start_x, self.start_y = (float(points[0][0]), float(points[0][1]))
+        self.goal_x, self.goal_y = (float(points[-1][0]), float(points[-1][1]))
+        self.path_mode_used = "corridor"
+
     def _build_path(self) -> None:
         if self.path_mode == "mixed":
             self.path_mode_used = "curve" if np.random.rand() < self.curve_prob else "straight"
@@ -449,8 +452,17 @@ class ASVLidarEnv(gym.Env):
 
     def _perceive(self) -> None:
         """Raycast -> gate -> pool -> cluster -> track."""
+        # 03a §1.2.  The facility walls are **returned by the sensor and then
+        # gated**, which is the whole point: until they existed the gate had
+        # nothing to remove in simulation and was load-bearing only in the
+        # field -- a sim-to-real gap in the exact component 01 §3 exists to
+        # remove one from.  The corridor boundary is NOT in this list; it is a
+        # map polygon and is invisible to the sensor (01 §3.1).
         scene = list(self.obstacles) + [t.hull() for t in self.targets]
+        if self.facility_walls:
+            scene = scene + [self.wall_polygon]
         self.lidar.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=scene)
+        self.raw_ranges = self.lidar.ranges.copy()
 
         est_x, est_y, est_h = self.estimated_pose()
 
@@ -466,6 +478,12 @@ class ASVLidarEnv(gym.Env):
         gated = br.gate_beams(self.lidar.ranges, self.lidar.bearings,
                               est_x, est_y, est_h, self.boundary_polygon)
 
+        # **Pool from the gated scan, not the raw one.**  The method docstring
+        # above has always said "raycast -> gate -> pool -> cluster"; the code
+        # pooled before gating, which returned the same answer for as long as
+        # the gate had nothing to remove.  With the facility walls returned it
+        # does not: 624 of 720 beams reached the obstacle branch.
+        self.lidar.repool(gated)
         self.sector_closeness = self.lidar.sector_closeness
         self.boundary_closeness = br.boundary_scan(
             self.asv_x, self.asv_y, self.asv_h, self.boundary_polygon,
@@ -647,8 +665,13 @@ class ASVLidarEnv(gym.Env):
         self.u_body = self.model.u
         self.v_body = self.model.v
 
+        own_state = {"x": self.asv_x, "y": self.asv_y,
+                     "velocity": self._own_velocity(), "heading": self.asv_h}
         for target in self.targets:
-            target.step(cfg.UPDATE_RATE)
+            target.step(cfg.UPDATE_RATE, own=own_state)
+            # Confined classes keep the fairway; a crossing target under Rule
+            # 9(d) is not a channel user and is left alone (03a §5.2).
+            tgtmod.clamp_to_corridor(target, self.channel)
 
         moved_x = self.asv_x - x_before
         moved_y = self.asv_y - y_before
@@ -699,6 +722,12 @@ class ASVLidarEnv(gym.Env):
         rudder_cmd = float(np.clip(action[0], -1.0, 1.0))
         throttle_cmd = float(np.clip(action[1], -1.0, 1.0))
         hull = self.hull_polygon()
+        # Held for the step: `_panel_view` needs the same two numbers, and both
+        # are O(hull x polygon edges).  Recomputing them for the display would
+        # also let the panel and the reward disagree, which is the failure the
+        # whole single-source arrangement exists to prevent.
+        self._clearances = (self._hull_boundary_distance(hull),
+                            self._nearest_obstacle_clearance(hull))
 
         return rterms.RewardState(
             u=float(self.u_body),
@@ -715,8 +744,11 @@ class ASVLidarEnv(gym.Env):
             r_path=float(self.r_path),
             ds=float(self.s_along - self.prev_s_along),
             l_path=float(self.path.length),
-            d_bnd=self._hull_boundary_distance(hull),
-            d_clear=self._nearest_obstacle_clearance(hull),
+            d_bnd=self._clearances[0],
+            d_clear=self._clearances[1],
+            dom_intrusion=rterms.domain_intrusion(
+                (self.asv_x, self.asv_y), self.asv_h, self.targets,
+                self.reward_fn.cfg),
             d_rudder=rudder_cmd - float(self.prev_action[0]),
             d_throttle=throttle_cmd - float(self.prev_action[1]),
             step_index=int(self.step_count),
@@ -943,7 +975,6 @@ class ASVLidarEnv(gym.Env):
         cfgr = self.reward_fn.cfg
         u_ref_eff = float(breakdown.u_ref_eff)
         g_u = float(np.clip(max(self.u_body, 0.0) / max(u_ref_eff, 1e-9), 0.0, 1.0))
-        hull = self.hull_polygon()
 
         panel = {
             "run": {
@@ -992,19 +1023,23 @@ class ASVLidarEnv(gym.Env):
             },
             "obs_health": self._obs_health_rows(),
             "clearance": {
-                "boundary": self._hull_boundary_distance(hull),
-                "obstacle": self._nearest_obstacle_clearance(hull),
+                "boundary": self._clearances[0],
+                "obstacle": self._clearances[1],
                 "goal": float(self.distance_to_goal),
                 "steps_left": int(cfg.MAX_EPISODE_STEPS - self.step_count),
             },
             "colregs": None,
             "perception": None,
         }
+        # The domain margin is reported from **truth**, not from the context,
+        # so the panel can show an intrusion the tracker has not seen -- which
+        # is precisely the case `r_dom` charges for and the case a reader would
+        # otherwise have no way to explain (F29).
+        panel["clearance"]["domain_margin"] = self._true_domain_margin()
         if ctx is not None:
             panel["colregs"] = self._colregs_block(breakdown, ctx)
             panel["perception"] = self._perception_block(ctx)
             panel["clearance"]["target"] = float(ctx.d_ts_true)
-            panel["clearance"]["domain_margin"] = self._domain_margin(ctx)
         return panel
 
     def _reward_rows(self, breakdown) -> list:
@@ -1141,12 +1176,22 @@ class ASVLidarEnv(gym.Env):
             "mismatched_steps": int(self.misclassified_steps),
         }
 
-    def _domain_margin(self, ctx) -> float:
-        """Signed: negative means the target is inside the own ship's domain."""
+    def _true_domain_margin(self) -> Optional[float]:
+        """Signed clearance to the nearest true target's domain boundary, metres.
+
+        Negative means intruding.  `None` when there is no target at all -- as
+        opposed to a target the tracker has lost, which still reports.
+        """
         import cpa_cri as cc
-        if not np.isfinite(ctx.d_ts_true):
-            return float("nan")
-        return float(ctx.d_ts_true - cc.domain_scale(ctx.alpha))
+        if not self.targets:
+            return None
+        margins = []
+        for target in self.targets:
+            gap = float(np.hypot(target.x - self.asv_x, target.y - self.asv_y))
+            bearing = cc.relative_bearing_deg((self.asv_x, self.asv_y), self.asv_h,
+                                              (target.x, target.y))
+            margins.append(gap - cc.domain_scale(bearing))
+        return float(min(margins))
 
     # ------------------------------------------------------------------
     def render(self):

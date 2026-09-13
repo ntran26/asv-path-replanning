@@ -213,9 +213,17 @@ def gate_beams(ranges, bearings_deg, x: float, y: float, heading_deg: float,
     keep = np.ones(r.shape, dtype=bool)
     px, py = ex[hit], ey[hit]
     inside = points_in_polygon(px, py, polygon)
-    if float(margin) > 0.0:
-        near = points_boundary_distance(px, py, polygon) <= float(margin)
-        inside = inside | near
+
+    # **Only the points that fell outside need a distance.**  A point already
+    # inside the polygon is kept whatever the margin says, and the perpendicular
+    # distance is the expensive half of this function -- it is O(points x edges),
+    # and the corridor polygon has two orders more edges than the rectangle it
+    # replaced.  Restricting it to the outside points made the gate 43% of the
+    # step instead of the dominant cost.
+    if float(margin) > 0.0 and not np.all(inside):
+        outside = ~inside
+        near = points_boundary_distance(px[outside], py[outside], polygon) <= float(margin)
+        inside[outside] = near
     keep[hit] = inside
     return np.where(keep, r, float(max_range))
 
