@@ -190,9 +190,22 @@ def test_degradation_flags_reach_the_env():
 
 
 def test_pose_noise_degrades_tracking_of_a_head_on_target():
-    """Study 2's first axis, visible end to end."""
+    """Study 2's first axis, visible end to end.
+
+    **0.25 m, not 0.10 m, and the difference is a Study 2 result.**  Measured
+    over four seeds, track uptime is flat at 90% from 0.00 through 0.10 m and
+    then falls away: 59% at 0.25 m and 25% at 0.50 m.  The knee is set by
+    `TRACK_GATE_DIST` — `max(2.5 * U_REF * dt, 0.30)` = 0.30 m — so a
+    displacement inside the association gate costs nothing and the tracker
+    simply absorbs it.
+
+    That matters for choosing Study 2's nominal (04a §7.1 sweeps this axis at
+    {0, 0.5, 1, 2, 4} x nominal): a nominal at or below 0.10 m puts three of the
+    five levels on the flat part of the curve and the axis would report
+    robustness that is really insensitivity.
+    """
     clean = _built("head_on")
-    noisy = _built("head_on", pose_noise=0.10)
+    noisy = _built("head_on", pose_noise=0.25)
     for env in (clean, noisy):
         for _ in range(60):
             _, _, term, trunc, _ = env.step(np.zeros(2, dtype=np.float32))

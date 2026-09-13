@@ -82,15 +82,43 @@ def test_observation_dimension_is_56():
 
 
 def test_lidar_branch_is_obstacle_only():
-    """D5: the basin walls must be invisible to `c_t`.
+    """The corridor boundary is never in the scan (01 §3.1, acceptance T6).
 
-    An empty basin with no obstacles must pool to all-clear, even though the
-    vessel is only a few metres from a wall.
+    **Narrowed by 03a §1.2.**  It used to assert the scan was empty in a bare
+    channel, which stopped being true when the facility walls were added -- and
+    the walls are the point: until they existed the boundary gate had nothing to
+    remove in simulation and was load-bearing only in the field, a sim-to-real
+    gap in the exact component 01 §3 exists to remove one from.
+
+    What must still hold, and what this now pins, is the narrower claim: the
+    *corridor* is a map polygon and the sensor cannot see it.  Walls are
+    physical and returned; the channel limit is virtual and is not.
     """
-    env = make_env()
+    env = make_env(no_target_prob=1.0, facility_walls=False)
     env.forced_num_obs = 0
-    env.reset(seed=1)
+    env.reset(seed=0)
     assert np.allclose(env.sector_closeness, 0.0), env.sector_closeness.max()
+    assert np.allclose(env.lidar.ranges, cfg.LIDAR_RANGE)
+
+
+def test_facility_walls_are_returned_and_then_gated():
+    """Acceptance T5 (03a §10): the gate has to do real work in training.
+
+    With the walls returned, the gate's margin becomes a tunable with measurable
+    failure modes in *both* directions -- too tight gates out real obstacles near
+    the wall, too loose lets beyond-wall clutter through -- and the N1 claim
+    covers the whole perception stack rather than the part after the gate.
+    """
+    env = make_env(no_target_prob=1.0, corridor_width=4.0, facility_walls=True)
+    env.forced_num_obs = 0
+    env.reset(seed=0)
+
+    returned = int((env.raw_ranges < cfg.LIDAR_RANGE - 1e-6).sum())
+    assert returned > 0, "the walls must appear in the raw scan"
+
+    # ... and be gone from what the tracker is given.
+    assert np.allclose(env.sector_closeness, 0.0), (
+        f"{returned} wall returns survived the gate into the pooled branch")
 
 
 def test_boundary_branch_does_see_the_walls():
