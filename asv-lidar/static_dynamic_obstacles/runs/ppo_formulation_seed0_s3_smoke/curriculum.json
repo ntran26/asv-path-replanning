@@ -1,0 +1,22 @@
+[
+ {
+  "timesteps": 0,
+  "stage": 1
+ },
+ {
+  "timesteps": 960,
+  "stage": 2
+ },
+ {
+  "timesteps": 2160,
+  "stage": 3
+ },
+ {
+  "timesteps": 3840,
+  "stage": 4
+ },
+ {
+  "timesteps": 6000,
+  "stage": 5
+ }
+]

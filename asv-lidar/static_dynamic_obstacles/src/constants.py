@@ -979,6 +979,14 @@ SPAWN_INSET_M = 0.5 * LOA + 0.15 + D_SAFE + 0.05          # 0.15 = ship.HULL_MAR
 # must still be clear of the edge at its end.  About 0.45 m.
 GOAL_END_INSET_M = max(0.0, 0.5 * LOA + 0.15 - GOAL_ALONG_DIST
                        + steady_speed(2.0 * CRUISE_RPM) * UPDATE_RATE + 0.05)
+
+# A18 (decided, option 1): the emergency stop -- and R-2's slowdown -- is the
+# answer only when stopping clears.  The test is the target's DCPA recomputed
+# with the own ship stationary, against the worst-orientation hull clearance: a
+# target track passing the stopped ship's centre must clear half its length and
+# half a beam, both hull margins and D_SAFE.  About 1.76 m.  A reciprocal
+# head-on gives ~0 and never qualifies; a crossing target passing ahead does.
+ESTOP_CLEAR_DCPA_M = 0.5 * LOA + 0.5 * BREADTH + 2.0 * 0.15 + D_SAFE   # 0.15 = ship.HULL_MARGIN
 D_CUT = 2.00                             # m, beyond which r_obs is exactly zero
 OBS_SWATH_HALF_DEG = POOL_SWATH_HALF_DEG  # +/-135 deg, matching the c_t swath
 
@@ -1033,7 +1041,7 @@ T_ENGAGE = 25.0                          # s, TCPA within which engagement fires
 KAPPA_ENG = 1.5
 KAPPA_REL = 2.5                          # DCPA multiple at which the encounter clears
 N_CLEAR_STEPS = steps_for(3.0)           # 3.0 s in CLEARING before returning to IDLE
-N_SWITCH_STEPS = steps_for(1.0)          # 1.0 s a new class must hold to re-latch
+N_SWITCH_STEPS = steps_for(1.0)          # retired by A20: an engaged encounter no longer re-latches on a class switch
 
 # --- 13.7 COLREGs sub-weights and thresholds (02a §6) ----------------------
 # Pre-clip group maxima: head-on 1.45, crossing 1.60, overtaking 1.50, being

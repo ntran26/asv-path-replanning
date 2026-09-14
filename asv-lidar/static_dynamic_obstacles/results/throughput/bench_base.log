@@ -1,0 +1,103 @@
+Using cpu device
+Logging to C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\runs\tensorboard\ppo_formulation_seed0_bench_base_smoke_1
+[CURRICULUM] t=0 -> scenario stage 5
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 35.4     |
+|    ep_rew_mean     | -357     |
+| time/              |          |
+|    fps             | 138      |
+|    iterations      | 1        |
+|    time_elapsed    | 36       |
+|    total_timesteps | 5120     |
+---------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 40.9        |
+|    ep_rew_mean          | -329        |
+| time/                   |             |
+|    fps                  | 118         |
+|    iterations           | 2           |
+|    time_elapsed         | 86          |
+|    total_timesteps      | 10240       |
+| train/                  |             |
+|    approx_kl            | 0.004722615 |
+|    clip_fraction        | 0.0348      |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -2.84       |
+|    explained_variance   | -0.0172     |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.519       |
+|    n_updates            | 10          |
+|    policy_gradient_loss | -0.00472    |
+|    std                  | 1           |
+|    value_loss           | 1.85        |
+-----------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 40.7         |
+|    ep_rew_mean          | -364         |
+| time/                   |              |
+|    fps                  | 120          |
+|    iterations           | 3            |
+|    time_elapsed         | 127          |
+|    total_timesteps      | 15360        |
+| train/                  |              |
+|    approx_kl            | 0.0069458457 |
+|    clip_fraction        | 0.0564       |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -2.84        |
+|    explained_variance   | 0.433        |
+|    learning_rate        | 0.0003       |
+|    loss                 | 0.384        |
+|    n_updates            | 20           |
+|    policy_gradient_loss | -0.00833     |
+|    std                  | 0.997        |
+|    value_loss           | 0.85         |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 42.8         |
+|    ep_rew_mean          | -282         |
+| time/                   |              |
+|    fps                  | 126          |
+|    iterations           | 4            |
+|    time_elapsed         | 161          |
+|    total_timesteps      | 20480        |
+| train/                  |              |
+|    approx_kl            | 0.0054171868 |
+|    clip_fraction        | 0.0582       |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -2.83        |
+|    explained_variance   | 0.599        |
+|    learning_rate        | 0.0003       |
+|    loss                 | 0.221        |
+|    n_updates            | 30           |
+|    policy_gradient_loss | -0.00932     |
+|    std                  | 0.991        |
+|    value_loss           | 0.651        |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 40.7         |
+|    ep_rew_mean          | -350         |
+| time/                   |              |
+|    fps                  | 121          |
+|    iterations           | 5            |
+|    time_elapsed         | 211          |
+|    total_timesteps      | 25600        |
+| train/                  |              |
+|    approx_kl            | 0.0053833956 |
+|    clip_fraction        | 0.0569       |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -2.81        |
+|    explained_variance   | 0.619        |
+|    learning_rate        | 0.0003       |
+|    loss                 | 0.266        |
+|    n_updates            | 40           |
+|    policy_gradient_loss | -0.00923     |
+|    std                  | 0.986        |
+|    value_loss           | 0.61         |
+------------------------------------------
+[EVAL] t=25,600 goal 0.17 collision 0.83 timeout 0.00 return -284.6 colregs -17.7 (6.4 s)
+done in 0.06 h -> C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\runs\ppo_formulation_seed0_bench_base_smoke

@@ -1,0 +1,50 @@
+100 head-on scenarios
+done clamp=True policy=follower
+done clamp=True policy=model
+done clamp=False policy=follower
+done clamp=False policy=model
+
+== bend share and snap stats by width (clamp on, follower)
+       n  bent  mean_bend  ep_with_snap  max_jump  first_snap_s  spawn_off_centre
+wbin                                                                             
+5     21  0.62      25.18          0.62      0.32         26.00              1.44
+6     20  0.60      21.00          0.70      1.37         12.00              1.75
+7     21  0.29      12.98          0.48      0.00         26.75              1.78
+8     19  0.00       5.20          0.53      0.25         27.75              1.95
+10    19  0.00       0.00          0.42      0.00         28.75              1.50
+
+== target-collision rate: width x clamp x policy
+policy follower       model      
+clamp       off    on   off    on
+wbin                             
+5          0.48  0.57  0.43  0.43
+6          0.55  0.45  0.20  0.25
+7          0.52  0.48  0.29  0.24
+8          0.37  0.32  0.16  0.16
+10         0.47  0.47  0.05  0.05
+
+== target-collision rate: bend x clamp x policy
+Traceback (most recent call last):
+  File "C:\Users\hntran\AppData\Local\Temp\claude\C--Users-hntran-OneDrive---University-of-Tasmania-Documents-PhD-asv-path-replanning-asv-lidar\d009229f-c16f-485d-a74a-0d08e9ebc0f5\scratchpad\c14_diag.py", line 166, in <module>
+    main()
+  File "C:\Users\hntran\AppData\Local\Temp\claude\C--Users-hntran-OneDrive---University-of-Tasmania-Documents-PhD-asv-path-replanning-asv-lidar\d009229f-c16f-485d-a74a-0d08e9ebc0f5\scratchpad\c14_diag.py", line 152, in main
+    print(df.pivot_table(index="has_bend", columns=["policy", "clamp"], values="collided_target", aggfunc=["mean", "size"], observed=True).round(2))
+  File "C:\Users\hntran\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pandas\core\frame.py", line 9496, in pivot_table
+    return pivot_table(
+  File "C:\Users\hntran\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pandas\core\reshape\pivot.py", line 99, in pivot_table
+    table = concat(pieces, keys=keys, axis=1)
+  File "C:\Users\hntran\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pandas\core\reshape\concat.py", line 395, in concat
+    return op.get_result()
+  File "C:\Users\hntran\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pandas\core\reshape\concat.py", line 671, in get_result
+    for ax, new_labels in enumerate(self.new_axes):
+  File "properties.pyx", line 36, in pandas._libs.properties.CachedProperty.__get__
+  File "C:\Users\hntran\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pandas\core\reshape\concat.py", line 702, in new_axes
+    return [
+  File "C:\Users\hntran\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pandas\core\reshape\concat.py", line 703, in <listcomp>
+    self._get_concat_axis if i == self.bm_axis else self._get_comb_axis(i)
+  File "properties.pyx", line 36, in pandas._libs.properties.CachedProperty.__get__
+  File "C:\Users\hntran\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pandas\core\reshape\concat.py", line 762, in _get_concat_axis
+    concat_axis = _make_concat_multiindex(
+  File "C:\Users\hntran\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\pandas\core\reshape\concat.py", line 845, in _make_concat_multiindex
+    raise AssertionError(
+AssertionError: Cannot concat indices that do not have the same number of levels

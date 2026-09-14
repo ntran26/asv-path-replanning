@@ -265,6 +265,28 @@ def test_the_supervisor_fires_only_when_8e_is_the_only_lawful_response():
     assert es.stop_required([]) is None
 
 
+def test_the_supervisor_stops_only_when_stopping_clears():
+    """A18: a reciprocal head-on runs onto a stopped ship; a crossing target
+    passing ahead of it does not."""
+    import math
+    import pytest
+    import constants as cfg
+    reciprocal = _ctx("head_on", rng=4.0, alpha=0.0, ct=180.0, speed_ts=0.5)
+    assert reciprocal.dcpa_if_stopped == pytest.approx(0.0, abs=1e-9)
+    assert not reciprocal.stop_clears
+    assert es.stop_required([reciprocal]) is None
+
+    ahead = _ctx("crossing", rng=4.0, alpha=45.0, ct=270.0, speed_ts=0.5)
+    assert ahead.dcpa_if_stopped == pytest.approx(4.0 * math.sin(math.radians(45.0)), rel=1e-6)
+    assert ahead.stop_clears
+    assert es.stop_required([ahead]) is not None
+
+    receding = _ctx("crossing", rng=4.0, alpha=45.0, ct=90.0, speed_ts=0.5)
+    assert receding.dcpa_if_stopped == pytest.approx(4.0)
+    assert cfg.ESTOP_CLEAR_DCPA_M == pytest.approx(
+        0.5 * cfg.LOA + 0.5 * cfg.BREADTH + 0.30 + cfg.D_SAFE)
+
+
 def test_danger_passes_when_the_cpa_is_behind():
     assert not es.danger_passed([_ctx("head_on", tcpa=2.0)])
     assert es.danger_passed([_ctx("head_on", tcpa=-0.5)])

@@ -131,7 +131,11 @@ def effective_speed_reference(state: RewardState, contexts, cfg) -> dict:
                     "rule": "R-5"}
 
     for ctx in _iter(contexts):
-        if ctx.engaged and ctx.gives_way and not ctx.turn_admissible:
+        # A18: the slowdown is the paid 8(e) answer only if slowing can clear.
+        # Against a reciprocal head-on it cannot, and paying for it taught the
+        # agent to stop in the target's path; there the lateral room is the answer.
+        if (ctx.engaged and ctx.gives_way and not ctx.turn_admissible
+                and getattr(ctx, "stop_clears", True)):
             result = {"u_ref_eff": float(cfg.u_ref) * float(cfg.u_ref_slow_factor),
                       "w_exist_scale": 1.0,
                       "reason": "8(e) slowdown, alteration inadmissible",
@@ -567,7 +571,9 @@ def r8_parts(state: RewardState, ctx, cfg) -> dict:
     parts["du_red"] = max(0.0, float(ctx.u_engage) - float(state.u))
 
     a_t = parts["du_red"] / max(float(cfg.du_min), 1e-9)
-    if ctx.turn_admissible:
+    # A18: when a slowdown cannot clear, the alteration is credited even though
+    # it does not reach the domain separation -- it is the only means that helps.
+    if ctx.turn_admissible or not getattr(ctx, "stop_clears", True):
         a_t += parts["dpsi_c"] / max(float(cfg.dpsi_min_deg), 1e-9)
     parts["a_t"] = a_t
 

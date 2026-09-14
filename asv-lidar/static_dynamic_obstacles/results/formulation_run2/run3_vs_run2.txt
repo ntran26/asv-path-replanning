@@ -1,0 +1,85 @@
+
+== run2: evaluation (goal, collision, per-class collision)
+         goal  coll  head_on  crossing  overtaking  being_overtaken  null  no_target
+t                                                                                   
+200000   0.57  0.42     0.45      0.50        0.30             0.80  0.25       0.25
+400000   0.63  0.37     0.30      0.45        0.30             0.65  0.30       0.20
+600000   0.56  0.44     0.35      0.45        0.75             0.75  0.25       0.10
+800000   0.58  0.41     0.30      0.75        0.25             0.75  0.20       0.20
+1000000  0.64  0.36     0.35      0.50        0.30             0.70  0.20       0.10
+1200000  0.67  0.33     0.30      0.60        0.20             0.70  0.15       0.05
+1400000  0.68  0.32     0.20      0.70        0.30             0.60  0.10       0.05
+1600000  0.64  0.36     0.25      0.55        0.30             0.75  0.25       0.05
+1800000  0.68  0.32     0.30      0.60        0.10             0.60  0.25       0.10
+2000000  0.77  0.23     0.15      0.45        0.10             0.40  0.20       0.10
+2001920  0.70  0.30     0.20      0.45        0.30             0.40  0.30       0.15
+
+== run3: evaluation (goal, collision, per-class collision)
+         goal  coll  head_on  crossing  overtaking  being_overtaken  null  no_target
+t                                                                                   
+200000   0.57  0.43     0.45      0.45        0.30             0.90  0.25       0.25
+400000   0.61  0.39     0.35      0.60        0.25             0.90  0.15       0.10
+600000   0.68  0.32     0.10      0.45        0.30             0.85  0.20       0.05
+800000   0.64  0.36     0.25      0.50        0.35             0.80  0.20       0.05
+1000000  0.68  0.32     0.30      0.40        0.35             0.60  0.25       0.05
+1200000  0.73  0.27     0.30      0.40        0.20             0.50  0.20       0.00
+1400000  0.70  0.30     0.30      0.35        0.25             0.55  0.30       0.05
+1600000  0.71  0.29     0.30      0.50        0.25             0.40  0.20       0.10
+1800000  0.77  0.23     0.30      0.35        0.25             0.30  0.15       0.05
+2000000  0.79  0.21     0.35      0.25        0.15             0.35  0.10       0.05
+2001920  0.74  0.26     0.35      0.25        0.30             0.35  0.20       0.10
+
+== late evaluations (>= 1,600,000): per-class collision rate and mean speed
+                 run2_coll  run2_n  run2_speed  run3_coll  run3_n  run3_speed
+class                                                                        
+being_overtaken       0.54      80        0.77       0.35      80        0.86
+crossing              0.51      80        0.62       0.34      80        0.66
+head_on               0.22      80        0.66       0.32      80        0.61
+no_target             0.10      80        0.66       0.08      80        0.67
+null                  0.25      80        0.59       0.16      80        0.60
+overtaking            0.20      80        0.58       0.24      80        0.62
+
+== crossing by target side (ct < 180: from port; > 180: from starboard), late evaluations
+-- run2
+                       mean                               size                      
+dbin           (-0.01, 0.7] (0.7, 1.4] (1.4, 2.6] (-0.01, 0.7] (0.7, 1.4] (1.4, 2.6]
+side                                                                                
+from port              0.17       0.50       0.75           12         12         12
+from starboard         0.88       0.83       0.29            8         12         24
+-- run3
+                       mean                               size                      
+dbin           (-0.01, 0.7] (0.7, 1.4] (1.4, 2.6] (-0.01, 0.7] (0.7, 1.4] (1.4, 2.6]
+side                                                                                
+from port              0.17       0.33       0.83           12         12         12
+from starboard         0.25       0.50       0.12            8         12         24
+
+== being overtaken, late evaluations
+-- run2: collision by drawn DCPA
+Empty DataFrame
+Columns: [coll, n, speed, hold_frames]
+Index: []
+outcome          collision:boundary  collision:obstacle  collision:target  goal
+class                                                                          
+being_overtaken                  12                   9                22    37
+-- run3: collision by drawn DCPA
+              coll   n  speed  hold_frames
+dbin                                      
+(-0.01, 0.7]  0.55  20   0.80         7.65
+(1.0, 1.4]    0.19  16   0.89         6.62
+(1.4, 2.1]    0.32  44   0.88         6.86
+outcome          collision:boundary  collision:obstacle  collision:target  goal
+class                                                                          
+being_overtaken                   1                  16                11    52
+
+== training episodes after 1.5 M steps: goal and collision per class
+                 run2_goal  run2_coll  run2_n  run3_goal  run3_coll  run3_n
+scenario_class                                                             
+being_overtaken       0.46       0.55    1457       0.77       0.23    1671
+crossing              0.40       0.60    2294       0.45       0.55    2431
+head_on               0.60       0.40    2026       0.65       0.35    2103
+no_target             0.80       0.20    1830       0.83       0.17    1911
+overtaking            0.72       0.28    1761       0.77       0.23    1742
+
+== PPO diagnostics
+run2 {'approx_kl_last10': 0.034, 'clip_fraction_last10': 0.216, 'fps_last': 90.0, 'done': True}
+run3 {'approx_kl_last10': 0.036, 'clip_fraction_last10': 0.218, 'fps_last': 87.0, 'done': True}
