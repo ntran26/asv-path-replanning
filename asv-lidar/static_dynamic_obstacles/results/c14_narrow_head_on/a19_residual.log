@@ -1,0 +1,35 @@
+== follower: episodes that latch a port sense, by width x bend
+      mean        size      
+bent False True  False True 
+wbin                        
+5     0.38  0.15   8.0  13.0
+6     0.62  0.33   8.0  12.0
+7     0.27  0.00  15.0   6.0
+8     0.21   NaN  19.0   NaN
+10    0.11   NaN  19.0   NaN
+
+== by first engaged class
+             n  ever_port
+first_cls                
+crossing     8       0.62
+head_on     85       0.21
+never        6       0.00
+overtaking   1       1.00
+
+== drawn CT deviation from reciprocal (|ct_drawn - 180|) vs ever_port
+               n  ever_port  first_head_on
+ct_dev_drawn                              
+(-0.1, 3.0]   25       0.08           0.92
+(3.0, 6.0]    15       0.40           0.73
+(6.0, 8.0]    31       0.32           0.81
+(8.0, 10.5]   29       0.21           0.90
+
+== port-sense frames: geometry relative to the path (medians of |values|)
+            frames  episodes  rng  ct_dev_perceived  ct_dev_true  tgt_heading_change  path_turn  alpha_path
+cls                                                                                                        
+crossing       110        15  3.6              29.2          8.2                 0.0        0.0        18.3
+none             7         7  1.3              40.8          9.9                 0.0        1.8        74.1
+overtaking      27        14  1.0             164.5          5.9                 0.0        4.0        84.6
+
+share of port-sense frames where |true ct dev| <= 10 deg (a truly head-on geometry): 0.62
+share where |perceived - true ct dev| > 5 deg (tracker course error): 0.62

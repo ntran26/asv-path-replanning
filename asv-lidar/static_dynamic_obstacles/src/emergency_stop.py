@@ -200,6 +200,13 @@ def stop_required(contexts) -> Optional[str]:
       would hand the evaluated system information the comparators never get
       (04 §8).
 
+    **A18 (decided, option 1): and only when stopping clears.**  A stop cannot
+    change a reciprocal head-on target's DCPA -- the target runs onto the
+    stopped ship -- so the supervisor also requires `stop_clears`: the DCPA
+    recomputed with the own ship stationary reaches `ESTOP_CLEAR_DCPA_M`.
+    Without it the supervisor stopped the own ship dead ahead of narrow-channel
+    head-on targets and caused 74 % of their collisions (F54).
+
     `in_extremis` is 02a's own 17(b) predicate -- DCPA inside `d_req` with TCPA
     under 5 s -- reused rather than duplicated with a new free constant.  The
     stop takes 1.1-3.7 s across plausible reverse efficiencies, so a 5 s window
@@ -208,7 +215,8 @@ def stop_required(contexts) -> Optional[str]:
     for ctx in contexts:
         if (getattr(ctx, "engaged", False) and getattr(ctx, "gives_way", False)
                 and getattr(ctx, "in_extremis", False)
-                and not getattr(ctx, "turn_admissible", True)):
+                and not getattr(ctx, "turn_admissible", True)
+                and getattr(ctx, "stop_clears", True)):
             return (f"8(e) in extremis: {ctx.cls}, compliant alteration "
                     f"inadmissible (DCPA {ctx.dcpa:.2f} m, TCPA {ctx.tcpa:.1f} s)")
     return None

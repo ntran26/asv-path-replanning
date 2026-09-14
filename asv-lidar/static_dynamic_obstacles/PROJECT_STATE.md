@@ -7,9 +7,9 @@ currently blocking a full training run and a full evaluation.**
 | | |
 |---|---|
 | **Revision** | 8 — 0.55 m/s; virtual corridors back; generator wired in; e-stop reward; noise and randomisation on; scale audit; first PPO formulation run; see `OPEN_PROBLEMS.md` |
-| **Last updated** | 2026-09-14 |
-| **Tests** | **402 passing, none expected to fail** (T1 passes since F24 was decided) |
-| **Blocking a headline training run** | **nothing blocks the formulation run**; A15–A17 decided (F53), so the full budget waits on run 3 confirming the formulation, and on B5 (`OPEN_PROBLEMS.md`) |
+| **Last updated** | 2026-09-15 |
+| **Tests** | **406 passing, none expected to fail** (T1 passes since F24 was decided) |
+| **Blocking a headline training run** | **nothing decision-side**: A15–A20 decided and built (F53, F56, F58); run 3 done (F57). Before run 4: the tiered checks, including the 5 m stop rise in F58. The full budget then waits on run 4 confirming the formulation, and on B5 (`OPEN_PROBLEMS.md`) |
 | **Blocking a full evaluation** | **7 more** — B2, B5–B10 (§2) |
 | **Open `TODO(decision)`** | 1 (`D_SAFE`) |
 | **Open measurements** | 05 part 1 done from logs; basin sessions pending — `OPEN_PROBLEMS.md` Part B |
@@ -601,7 +601,9 @@ so R-2 and R-5 still make slowing free without making cruising costly. Tests:
 * The evaluation now labels collision before goal, as the reward does.
 * `mean_speed` is the episode mean. It was the final step's speed.
 * `RetryingVecMonitor` retries a locked CSV write.
-* `--runs-dir` puts long runs outside OneDrive, and `--tag` names them.
+* `--runs-dir` puts long runs elsewhere, and `--tag` names them. Runs 2 and 3
+  were written to `C:\Users\hntran\asv_runs` and moved back into `runs/` on
+  2026-09-15; outputs now stay inside the project.
 * PPO `target_kl` = 0.03 stops a KL runaway like run 1's.
 
 Also: piping the script's stdout through `grep | tail` from a backgrounded
@@ -610,10 +612,10 @@ file.
 
 Tests: **400 passed** (397 + 3).
 
-**F52 — formulation run 2** (F49–F51 in; `C:\Users\hntran\asv_runs\ppo_formulation_seed0_v2`).
+**F52 — formulation run 2** (F49–F51 in; `runs/ppo_formulation_seed0_v2`).
 The full 2 M steps completed in 6.2 h. The evaluation is 20 development
 scenarios per class, 120 per evaluation. Geometry joins are in
-`asv_runs\join_geom.txt`.
+`results/formulation_run2/join_geom.txt`.
 
 *The fixes held.*
 
@@ -703,7 +705,216 @@ explains three of them:
 * The formulation evaluation now records `dcpa_m`, `ct_deg` and
   `dcpa_below_floor` per episode.
 
-Tests: **402 passed** (400 + 2). Run 3 (`asv_runs\ppo_formulation_seed0_v3`) trains with all three.
+Tests: **402 passed** (400 + 2). Run 3 (`runs/ppo_formulation_seed0_v3`) trains with all three.
+
+**F54 — C14 diagnosed: narrow head-on collisions are the emergency-stop
+supervisor, through domain-based admissibility.** Scripts and data are in
+`results/c14_narrow_head_on/` (scripts in `tools/diagnostics/`). There were 100 head-on scenarios (20 each at 5, 6, 7, 8 and
+10 m), with obstacles off and the nominal hull.
+
+* *Run 2's 0.75 was 5 scenarios*, all on bends. At ≤ 7.5 m every sampled
+  head-on corridor bends (the F25 ceiling allows it and the bend debt forces
+  it), and at ≥ 7.7 m none do. So width and bend were confounded.
+* *The target clamp is not it.* `clamp_to_corridor` teleports a
+  wall-touching target to the nearest centreline station and snaps its
+  heading. That departs from 03a §5.2's Rule 9(a) channel-keeping. But with it
+  disabled, target collisions moved within noise for both a path follower and
+  the run 2 model, and median first snap is at 26 s, after CPA. It should
+  still be replaced (C14).
+* *Room is not it.* Starboard room from the Rule 9(a) station to the wall is
+  1.8 m at 5 m against a median 1.0 m shift for hull clearance: feasible in
+  90–100 % of draws.
+* *Bends are not it.* Holding width, bent and straight corridors do not
+  differ consistently.
+* **The supervisor is.** `emergency_stop.stop_required` fires on an engaged,
+  give-way, in-extremis encounter whose compliant turn is inadmissible.
+  `A_stbd` compares starboard room with `Dy_req = d_req − DCPA`, a domain
+  separation (`d_req` = 2.5 m). At 5 m that is "inadmissible" for DCPA below
+  about 1.3 m, and the starboard turn was inadmissible in 66 % of pre-CPA
+  frames at 5 m, 59 % at 6 m, 27 % at 7 m and 0 at 8–10 m. The ship then
+  stops ahead of a constant-velocity reciprocal target, which a stop cannot
+  clear. 74 % of target collisions had stopped before CPA (10 % of
+  non-collisions); run 2's narrow head-on collisions averaged 1.08 stops, the
+  rest 0.
+
+| run 2 model, target collision | 5 m | 6 m | 7 m | 8 m | 10 m |
+|---|---|---|---|---|---|
+| supervisor on | 0.43 | 0.25 | 0.24 | 0.16 | 0.05 |
+| supervisor off | 0.24 | 0.15 | 0.14 | 0.11 | 0.05 |
+
+Switching the supervisor off saved 10 collisions and added 1. Decision:
+`OPEN_PROBLEMS.md` A18.
+
+**F55 — regression: A17 flips head-on encounters to a port turn sense.** Class
+and `crossing_side` are computed from the own ship's instantaneous heading. A
+starboard alteration for a head-on moves the intersection angle out of the
+head-on band. The encounter re-classifies as a crossing with the target on the
+port bow, and since A17 `compliant_turn_sense` latches −1 on that class
+switch. On the same 100 head-on scenarios with the current code:
+
+* the run 2 model latched a port sense at some point in **67 %** of episodes,
+  with **43 %** of engaged pre-CPA frames carrying it;
+* a non-avoiding path follower did so in 20 % of episodes (6 % of frames).
+
+F53's unit test checks the function and the latch, not this interaction.
+Run 3 trains with it. Decision: `OPEN_PROBLEMS.md` A19.
+
+**F56 — A18 and A19 built (option 1 for both); A18 works, A19 halves the
+regression but leaves a residual.**
+
+*Built.*
+
+* `EncounterContext.dcpa_if_stopped` is the perceived DCPA with the own ship
+  stationary, `rng·|sin(α − ct)|` while the target approaches.
+  `stop_clears` compares it with `ESTOP_CLEAR_DCPA_M` = 0.5·LOA + 0.5·B +
+  2·0.15 + `D_SAFE` = 1.76 m.
+* `emergency_stop.stop_required` requires `stop_clears`. So does R-2's
+  slowdown carve-out in `effective_speed_reference`, and `r8_parts` credits
+  the alteration when a slowdown cannot clear.
+* `ContextManager.update` classifies and takes `crossing_side` (and the true
+  class) against the path tangent at the own ship, via `_path_heading`. The
+  CPA products and the Rule 8 accumulator keep the instantaneous heading, and
+  open water falls back to it.
+* Tests: `test_the_supervisor_stops_only_when_stopping_clears`,
+  `test_5c_the_class_is_judged_against_the_path_not_the_momentary_heading`,
+  `test_5d_a_slowdown_that_cannot_clear_is_not_the_paid_8e_answer`.
+  **405 passed.**
+
+*Verified* on the C14 head-on set (`tools/diagnostics/a18_a19_verify.py`,
+`results/c14_narrow_head_on/a18_a19_verify.*`). This is the run 2 model,
+trained under the old rules, so it measures the mechanism, not a retrained
+policy:
+
+| width | 5 m | 6 m | 7 m | 8 m | 10 m |
+|---|---|---|---|---|---|
+| target collision, before → after | 0.43 → **0.33** | 0.25 → **0.10** | 0.24 → **0.19** | 0.16 → 0.11 | 0.05 → 0.05 |
+| stops per episode, after | 0.05 | 0 | 0 | 0 | 0 |
+| median minimum speed, after | 0.52 | 0.53 | 0.52 | 0.54 | 0.55 m/s |
+
+*The A19 residual.* A port sense still latches in 30 % of the model's head-on
+episodes (was 67 %), and in **24 % of a non-avoiding follower's** (was 20 %).
+So it is not the own ship's manoeuvre (`tools/diagnostics/a19_residual.py`,
+`results/c14_narrow_head_on/a19_residual_*`):
+
+* on the follower's port-sense frames the target is at a median **3.6 m**, at a
+  path-relative bearing of **18°**, outside the ±10° head-on bearing band. A
+  reciprocal target 1–2 m to one side leaves that band as range closes;
+* the **perceived** heading-intersection deviation is a median 29° against 8°
+  true, with 62 % of frames more than 5° out. The tracker's course estimate
+  degrades at close range, where the cluster centroid moves along the hull as
+  the aspect changes;
+* 62 % of those frames are truly head-on (true deviation ≤ 10°). Straight
+  corridors are affected more than bent ones (6 m: 0.62 straight, 0.33 bent),
+  so it is not the bend;
+* the mechanism is the engagement latch. `_advance_state` re-engages, and
+  re-latches the sense, whenever a different class persists for
+  `N_SWITCH_STEPS` while engaged. So close-range bearing drift and tracker
+  course noise re-decide a situation that COLREGs fixes when risk first
+  develops.
+
+Decision: `OPEN_PROBLEMS.md` A20. The tracker's close-range course estimate is
+C15.
+
+**F57 — formulation run 3 (A15–A17 in; before A18–A20).** Same seed, budget and
+evaluation as run 2. `runs/ppo_formulation_seed0_v3`, compared by
+`tools/diagnostics/run3_vs_run2.py` → `results/formulation_run2/run3_vs_run2.txt`.
+2 M steps; PPO diagnostics unchanged (last-10 `approx_kl` 0.036, clip
+fraction 0.22, 87 fps).
+
+| | run 2 | run 3 |
+|---|---|---|
+| evaluation goal at 2.0 M (final) | 0.77 (0.70) | **0.79** (0.74) |
+
+Late evaluations (1.6 M – final, 80 episodes per class) and training episodes
+after 1.5 M:
+
+| class | eval collision, run 2 → 3 | training collision, run 2 → 3 |
+|---|---|---|
+| being overtaken | 0.54 → **0.35** | 0.55 → **0.23** |
+| crossing | 0.51 → **0.34** | 0.60 → 0.55 |
+| null | 0.25 → 0.16 | — |
+| no target | 0.10 → 0.08 | 0.20 → 0.17 |
+| overtaking | 0.20 → 0.24 | 0.28 → 0.23 |
+| **head-on** | 0.22 → **0.32** | 0.40 → 0.35 |
+
+*A17 worked for crossings from starboard, not yet for far crossings from port.*
+
+| crossing collision, late evals | DCPA ≤ 0.7 m | 0.7–1.4 m | > 1.4 m |
+|---|---|---|---|
+| from starboard, run 2 → 3 | 0.88 → **0.25** | 0.83 → **0.50** | 0.29 → **0.12** |
+| from port, run 2 → 3 | 0.17 → 0.17 | 0.50 → 0.33 | 0.75 → **0.83** |
+
+The port cells are 3 distinct scenarios each, evaluated four times, so the
+0.83 is weak evidence either way. It is also the geometry where F56's
+close-range re-classification acts, and run 3 trained without A19 or A20.
+
+*A15 worked.* Being-overtaken collision in run 3 by drawn DCPA: 0.55 below
+the floor (n 20, the labelled Rule 17(b) share), **0.19** at 1.0–1.4 m and
+**0.32** above 1.4 m. Run 2 (F52) was 0.69 / 0.39 / 0.50. Boundary collisions
+in this class fell from 12 to 1. But the policy still accelerates: mean
+speed 0.86–0.89 m/s against run 2's 0.77, with about 7 `v_hold` frames per
+episode, and obstacle collisions rose from 9 to 16. It avoids by outrunning
+rather than by standing on.
+
+*Head-on got worse, as F55 predicted.* 0.22 → 0.32: run 3 trained with A17's
+port sense re-latching on head-on encounters.
+
+*What it says for run 4:* A18–A20 are the head-on fixes, and run 3 could test
+none of them. Being overtaken is now a speed problem rather than a geometry
+one — `v_hold` at 0.45 of the COLREGs group does not outweigh outrunning.
+That is worth reading again in run 4 before touching the weight.
+
+*Housekeeping.* Runs 2 and 3, the smoke run, their TensorBoard logs, the C14
+diagnostics and the test logs were moved from `C:\Users\hntran\asv_runs` into
+`runs/`, `results/` and `tools/diagnostics/` (76 files, 71.8 MB, sizes
+verified), and the home-folder copy removed. `planning/READING_LIST.md`
+lists the literature behind every method in the tree.
+
+**F58 — A20 built (option 1): an engaged encounter keeps its class, side and
+turn sense; the port-sense regression is gone.**
+
+*Built.* `ContextManager._advance_state` no longer re-engages on a class switch.
+`_engage` latches the class, `crossing_side` and turn sense, and while an
+encounter is engaged or clearing `ctx.cls` and `ctx.crossing_side` are the
+latched values. The observation one-hot and every reward gate therefore still
+read one field. `N_SWITCH_STEPS` is retired, its value kept. Test:
+`test_5e_an_engaged_encounter_keeps_its_class_and_sense` — a head-on whose
+geometry drifts into a crossing from port keeps `head_on` and a starboard
+sense, while the classifier's own held class has moved. **406 passed.**
+
+*Verified* on the C14 head-on set (`tools/diagnostics/a18_a19_verify.py`;
+the pre-A20 output is kept as `a18_a19_verify_pre_a20.*`):
+
+| head-on episodes latching a port sense | original | A19 | **A19 + A20** |
+|---|---|---|---|
+| run 2 model | 0.67 | 0.30 | **0.05** |
+| path follower | 0.20 | 0.24 | **0.06** |
+
+Target collisions for the run 2 model are unchanged from F56 (0.33, 0.10,
+0.19, 0.11, 0.05 at 5, 6, 7, 8, 10 m). A20 corrects what the reward pays; it
+cannot change what a policy trained under the old rules does. The remaining
+~5 % engage *as* a crossing, so no latch can correct them; that is C15's
+tracker course error at engagement range. One thing to look at: stops at 5 m
+rose from 0.05 to 0.38 per episode. The likeliest reading is encounters now
+held in a class whose stop clears, which a Tier-1 replay should confirm
+before run 4.
+
+*Throughput benchmark* (`results/throughput/`). Three 25.6 k-step stage-5
+training runs, back to back on an otherwise idle machine:
+
+| configuration | fps (last three logs) | wall time |
+|---|---|---|
+| 10 workers, default PyTorch threads (as runs 1–3) | **120–126** | 239 s |
+| 10 workers, learner 4 threads, workers 1 | 106–111 | 278 s |
+| 8 workers, learner 4 threads, workers 1 | 78–82 | 401 s |
+
+The oversubscription hypothesis is **refuted**. Although policy inference alone
+is 1.9× faster on one thread (3,079 against 1,645 calls/s), capping threads
+slowed training, and fewer workers slowed it further. So throughput is set by
+the environment step. One stage-5 environment runs 43 steps/s against 98 in
+stage 1, and the 10-worker rate is close to linear in workers. The flags
+(`--torch-threads`, `--fixed-stage`) stay, defaulting to the old behaviour.
+Next: profile one stage-5 step (C2).
 
 ### 3.13 Earlier findings, still standing
 

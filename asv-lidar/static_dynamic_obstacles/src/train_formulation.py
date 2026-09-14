@@ -130,8 +130,11 @@ def stage_at(fraction: float) -> int:
     return stage
 
 
-def make_env(rank: int, seed: int, stage: int, randomisation):
+def make_env(rank: int, seed: int, stage: int, randomisation, torch_threads: int = 0):
     def _init():
+        if torch_threads:
+            import torch
+            torch.set_num_threads(torch_threads)
         curriculum.apply_stage(PROPULSION_STAGE)
         env = ASVLidarEnv(render_mode=None, scenario_stage=stage,
                           vessel_randomisation=randomisation)
@@ -303,9 +306,22 @@ def main() -> None:
     ap.add_argument("--eval-per-class", type=int, default=6)
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--runs-dir", type=Path, default=RUNS,
-                    help="output root; point it outside OneDrive for long runs")
+                    help="output root (default: the project's runs/; RetryingVecMonitor "
+                         "handles OneDrive's file locks)")
     ap.add_argument("--tag", default="", help="suffix for the run directory")
+    ap.add_argument("--torch-threads", type=int, default=0,
+                    help="PyTorch threads in the learner (workers get 1); 0 keeps the default, "
+                         "which oversubscribes the CPU alongside the environment workers")
+    ap.add_argument("--fixed-stage", type=int, default=0,
+                    help="train on one scenario stage throughout instead of the curriculum")
     args = ap.parse_args()
+
+    global STAGE_SCHEDULE
+    if args.fixed_stage:
+        STAGE_SCHEDULE = ((0.0, int(args.fixed_stage)),)
+    if args.torch_threads:
+        import torch
+        torch.set_num_threads(int(args.torch_threads))
 
     run_dir = args.runs_dir / (f"ppo_formulation_seed{args.seed}" + (f"_{args.tag}" if args.tag else "")
                                + ("_smoke" if args.smoke else ""))
@@ -314,6 +330,7 @@ def main() -> None:
     config = {
         "algorithm": "PPO", "seed": args.seed, "timesteps": args.timesteps,
         "num_envs": args.num_envs, "hyperparameters": PPO_HYPERPARAMS,
+        "torch_threads": args.torch_threads, "fixed_stage": args.fixed_stage,
         "policy": {"features_extractor": "ASVFeaturesExtractor", "net_arch": {"pi": [256, 256], "vf": [256, 256]},
                    "activation": "ReLU"},
         "reward_normalisation": "VecNormalize(norm_obs=False, norm_reward=True, clip_reward=10)",
@@ -334,7 +351,8 @@ def main() -> None:
         json.dump(config, fh, indent=1, default=str)
 
     base_seed = 100_000 * (args.seed + 1)
-    vec = SubprocVecEnv([make_env(i, base_seed, stage_at(0.0), cfg.VESSEL_RANDOMISATION_SCALE)
+    vec = SubprocVecEnv([make_env(i, base_seed, stage_at(0.0), cfg.VESSEL_RANDOMISATION_SCALE,
+                                  1 if args.torch_threads else 0)
                          for i in range(args.num_envs)])
     vec = RetryingVecMonitor(vec, filename=str(run_dir / "monitor.csv"),
                      info_keywords=("reached_goal", "collided", "scenario_class"))

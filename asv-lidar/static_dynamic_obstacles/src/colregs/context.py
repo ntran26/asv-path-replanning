@@ -162,6 +162,30 @@ class EncounterContext:
     def gives_way(self) -> bool:
         return self.cls in GIVE_WAY_CLASSES
 
+    @property
+    def dcpa_if_stopped(self) -> float:
+        """The target's DCPA were the own ship stationary, perceived (A18).
+
+        In the own-ship frame the target sits at bearing `alpha` and runs on
+        relative course `ct`, so its track passes the own ship at
+        `rng * |sin(alpha - ct)|`, provided it is still approaching; once it is
+        running away the present range is the closest it gets.
+        """
+        rng = float(self.rng)
+        if not np.isfinite(rng) or float(self.speed_ts) <= 1e-6:
+            return rng
+        a = np.radians(float(self.alpha))
+        c = np.radians(float(self.ct))
+        along = np.sin(a) * np.sin(c) + np.cos(a) * np.cos(c)
+        if along >= 0.0:
+            return rng
+        return float(rng * abs(np.sin(a - c)))
+
+    @property
+    def stop_clears(self) -> bool:
+        """Would stopping, alone, let the target pass clear?  (A18)"""
+        return self.dcpa_if_stopped >= cfg.ESTOP_CLEAR_DCPA_M
+
 
 class ContextManager:
     """Builds one `EncounterContext` per track per step, and owns the latches.
@@ -234,10 +258,15 @@ class ContextManager:
                     if tid not in live]:
             self.forget(tid)
 
+        # A19: the encounter is classified against the course being kept, not
+        # the momentary heading, so the own ship's alteration cannot re-label it.
+        heading_cls = self._path_heading(path, s_along, heading_os_deg)
+
         contexts: Dict[int, EncounterContext] = {}
         for track in tracks:
             ctx = self._build(track, p_os, v_os, heading_os_deg, speed_os,
-                              u_os, r_path, true_targets, d_required)
+                              u_os, r_path, true_targets, d_required,
+                              heading_cls_deg=heading_cls)
             self._attach_admissibility(ctx, path, boundary_polygon, s_along,
                                        cross_track, u_os, open_water, d_required)
             self._advance_state(ctx, heading_os_deg, u_os, d_required)
@@ -248,13 +277,36 @@ class ContextManager:
         return contexts
 
     # ------------------------------------------------------------------
+    @staticmethod
+    def _path_heading(path, s_along, heading_os_deg: float) -> float:
+        """The reference path's course at the own ship, degrees (A19).
+
+        **A19 (decided, option 1).**  Classifying against the instantaneous
+        heading let the own ship's compliant starboard alteration move a head-on
+        out of its band and re-label it a crossing from port, which A17 then
+        paid to turn back toward: 67 % of the run 2 model's head-on episodes
+        latched a port sense (F55).  The path tangent is the course the own ship
+        is keeping, and an alteration does not move it.  Without a path --
+        `R-10`'s open water, or a unit test of the perceived half -- the
+        instantaneous heading is all there is.
+        """
+        if path is None or s_along is None:
+            return float(heading_os_deg)
+        idx = int(np.clip(np.searchsorted(path.s, float(s_along)), 0, len(path.points) - 1))
+        tangent = path.tangent(idx)
+        return float(np.degrees(np.arctan2(float(tangent[0]), float(tangent[1]))) % 360.0)
+
     def _build(self, track, p_os, v_os, heading_os_deg, speed_os, u_os,
-               r_path, true_targets, d_required) -> EncounterContext:
+               r_path, true_targets, d_required,
+               heading_cls_deg: Optional[float] = None) -> EncounterContext:
         p_ts = track.position
         v_ts = track.velocity
         heading_ts = track.course_deg
+        # Class and side from the kept course (A19); CPA products from the real
+        # heading and velocity, which is what the collision geometry is.
+        heading_cls = float(heading_os_deg if heading_cls_deg is None else heading_cls_deg)
 
-        cls = self.classifier.update(track.id, p_os, heading_os_deg, speed_os,
+        cls = self.classifier.update(track.id, p_os, heading_cls, speed_os,
                                      p_ts, heading_ts, track.speed)
         products = geo.cpa_products(p_os, v_os, heading_os_deg,
                                     p_ts, v_ts, heading_ts)
@@ -272,14 +324,14 @@ class ContextManager:
             rng=products["range"],
             speed_ts=float(track.speed),
             r_path=float(r_path),
-            crossing_side=enc.crossing_side(p_os, heading_os_deg, p_ts, heading_ts),
+            crossing_side=enc.crossing_side(p_os, heading_cls, p_ts, heading_ts),
             d_domain=cc.distance_to_domain(p_os, heading_os_deg, p_ts),
             dcpa_domain=max(0.0, products["dcpa"]
                             - cc.domain_scale(products["alpha"])),
             v_rel=float(np.linalg.norm(np.asarray(v_ts, dtype=np.float64)
                                        - np.asarray(v_os, dtype=np.float64))),
         )
-        self._attach_truth(ctx, p_ts, p_os, v_os, heading_os_deg, speed_os,
+        self._attach_truth(ctx, p_ts, p_os, v_os, heading_cls, speed_os,
                            true_targets)
         return ctx
 
@@ -379,17 +431,13 @@ class ContextManager:
             if ctx.tcpa < 0.0 or ctx.dcpa > self.kappa_rel * d_required:
                 latch["state"] = CLEARING
                 latch["clear_steps"] = 0
-            elif ctx.cls != latch["cls"]:
-                # A genuinely different class must persist before the Rule 8
-                # accumulator is re-based.  A one-step flicker that reset
-                # `psi_engage` would make the agent's committed alteration stop
-                # counting toward `A_t`, and the obligation would reappear
-                # after it had already been discharged.
-                latch["switch_steps"] = latch.get("switch_steps", 0) + 1
-                if latch["switch_steps"] >= self.n_switch:
-                    latch = self._engage(ctx, heading_os_deg, u_os)
-            else:
-                latch["switch_steps"] = 0
+            # **A20 (decided, option 1): no re-engagement on a class switch.**
+            # COLREGs decides the situation when risk of collision first
+            # develops.  Re-deciding it whenever a different class persisted for
+            # `N_SWITCH_STEPS` let close-range bearing drift and tracker course
+            # noise turn a head-on into a crossing from port at a median 3.6 m,
+            # and, since A17, flip the turn sense (F56).  The class, side and
+            # sense latched at engagement stand until the encounter clears.
 
         elif state == CLEARING:
             latch["clear_steps"] = latch.get("clear_steps", 0) + 1
@@ -400,6 +448,11 @@ class ContextManager:
         if latch is not None:
             self._latch[ctx.track_id] = latch
             ctx.state = latch["state"]
+            # A20: the latched class is *the* class while the encounter is
+            # engaged or clearing, so the observation's one-hot and every
+            # reward gate still read one field (01 §5.3).
+            ctx.cls = latch["cls"]
+            ctx.crossing_side = latch.get("crossing_side", ctx.crossing_side)
             ctx.psi_engage = latch["psi_engage"]
             ctx.u_engage = latch["u_engage"]
             ctx.t_engage = latch["t_engage"]
@@ -418,6 +471,7 @@ class ContextManager:
             "u_engage": float(u_os),
             "t_engage": int(self.step_index),
             "turn_sense": compliant_turn_sense(ctx.cls, ctx.crossing_side),
+            "crossing_side": ctx.crossing_side,
             "switch_steps": 0,
             "clear_steps": 0,
         }

@@ -1,0 +1,325 @@
+Using cpu device
+Logging to C:\Users\hntran\asv_runs\tensorboard\ppo_formulation_seed0_s3_smoke_1
+[CURRICULUM] t=0 -> scenario stage 1
+[CURRICULUM] t=960 -> scenario stage 2
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 52.4     |
+|    ep_rew_mean     | -196     |
+| time/              |          |
+|    fps             | 36       |
+|    iterations      | 1        |
+|    time_elapsed    | 28       |
+|    total_timesteps | 1024     |
+---------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 53          |
+|    ep_rew_mean          | -252        |
+| time/                   |             |
+|    fps                  | 35          |
+|    iterations           | 2           |
+|    time_elapsed         | 58          |
+|    total_timesteps      | 2048        |
+| train/                  |             |
+|    approx_kl            | 0.008037448 |
+|    clip_fraction        | 0.0258      |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -2.84       |
+|    explained_variance   | -0.012      |
+|    learning_rate        | 0.0003      |
+|    loss                 | 2.73        |
+|    n_updates            | 10          |
+|    policy_gradient_loss | -0.00327    |
+|    std                  | 1           |
+|    value_loss           | 5.37        |
+-----------------------------------------
+[CURRICULUM] t=2,160 -> scenario stage 3
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 52.4         |
+|    ep_rew_mean          | -297         |
+| time/                   |              |
+|    fps                  | 31           |
+|    iterations           | 3            |
+|    time_elapsed         | 98           |
+|    total_timesteps      | 3072         |
+| train/                  |              |
+|    approx_kl            | 0.0033568963 |
+|    clip_fraction        | 0.00283      |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -2.84        |
+|    explained_variance   | 0.146        |
+|    learning_rate        | 0.0003       |
+|    loss                 | 1.33         |
+|    n_updates            | 20           |
+|    policy_gradient_loss | -0.00201     |
+|    std                  | 1            |
+|    value_loss           | 3.31         |
+------------------------------------------
+[CURRICULUM] t=3,840 -> scenario stage 4
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 52.4         |
+|    ep_rew_mean          | -283         |
+| time/                   |              |
+|    fps                  | 29           |
+|    iterations           | 4            |
+|    time_elapsed         | 138          |
+|    total_timesteps      | 4096         |
+| train/                  |              |
+|    approx_kl            | 0.0016555942 |
+|    clip_fraction        | 0.00117      |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -2.84        |
+|    explained_variance   | 0.327        |
+|    learning_rate        | 0.0003       |
+|    loss                 | 0.546        |
+|    n_updates            | 30           |
+|    policy_gradient_loss | -0.00122     |
+|    std                  | 1            |
+|    value_loss           | 1.55         |
+------------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 46.9        |
+|    ep_rew_mean          | -306        |
+| time/                   |             |
+|    fps                  | 28          |
+|    iterations           | 5           |
+|    time_elapsed         | 181         |
+|    total_timesteps      | 5120        |
+| train/                  |             |
+|    approx_kl            | 0.004205282 |
+|    clip_fraction        | 0.00635     |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -2.84       |
+|    explained_variance   | 0.345       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.75        |
+|    n_updates            | 40          |
+|    policy_gradient_loss | -0.00277    |
+|    std                  | 0.998       |
+|    value_loss           | 1.82        |
+-----------------------------------------
+[CURRICULUM] t=6,000 -> scenario stage 5
+[EVAL] t=6,000 goal 0.50 collision 0.50 timeout 0.00 return -91.7 colregs -25.2 (17.7 s)
+-----------------------------------------------
+| eval/                        |              |
+|    being_overtaken/collision | 0            |
+|    being_overtaken/colregs   | -23.9        |
+|    being_overtaken/goal      | 1            |
+|    collision_boundary        | 0            |
+|    collision_obstacle        | 0.333        |
+|    collision_rate            | 0.5          |
+|    collision_target          | 0.167        |
+|    crossing/collision        | 1            |
+|    crossing/colregs          | -31.3        |
+|    crossing/goal             | 0            |
+|    episodes                  | 6            |
+|    estops_per_episode        | 0            |
+|    eval_wall_s               | 17.7         |
+|    goal_rate                 | 0.5          |
+|    head_on/collision         | 0            |
+|    head_on/colregs           | -53.2        |
+|    head_on/goal              | 1            |
+|    mean_colregs_integral     | -25.2        |
+|    mean_return               | -91.7        |
+|    no_target/collision       | 1            |
+|    no_target/colregs         | 0            |
+|    no_target/goal            | 0            |
+|    null/collision            | 1            |
+|    null/colregs              | 0            |
+|    null/goal                 | 0            |
+|    overtaking/collision      | 0            |
+|    overtaking/colregs        | -43          |
+|    overtaking/goal           | 1            |
+|    timeout_rate              | 0            |
+|    timesteps                 | 6000         |
+| rollout/                     |              |
+|    ep_len_mean               | 41.4         |
+|    ep_rew_mean               | -335         |
+| time/                        |              |
+|    fps                       | 25           |
+|    iterations                | 6            |
+|    time_elapsed              | 242          |
+|    total_timesteps           | 6144         |
+| train/                       |              |
+|    approx_kl                 | 0.0021836348 |
+|    clip_fraction             | 0.000879     |
+|    clip_range                | 0.2          |
+|    entropy_loss              | -2.83        |
+|    explained_variance        | 0.382        |
+|    learning_rate             | 0.0003       |
+|    loss                      | 0.573        |
+|    n_updates                 | 50           |
+|    policy_gradient_loss      | -0.00193     |
+|    std                       | 0.997        |
+|    value_loss                | 1.33         |
+-----------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 38.7         |
+|    ep_rew_mean          | -342         |
+| time/                   |              |
+|    fps                  | 25           |
+|    iterations           | 7            |
+|    time_elapsed         | 286          |
+|    total_timesteps      | 7168         |
+| train/                  |              |
+|    approx_kl            | 0.0035980782 |
+|    clip_fraction        | 0.0261       |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -2.83        |
+|    explained_variance   | 0.317        |
+|    learning_rate        | 0.0003       |
+|    loss                 | 0.59         |
+|    n_updates            | 60           |
+|    policy_gradient_loss | -0.00351     |
+|    std                  | 0.997        |
+|    value_loss           | 1.44         |
+------------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 38.8        |
+|    ep_rew_mean          | -363        |
+| time/                   |             |
+|    fps                  | 25          |
+|    iterations           | 8           |
+|    time_elapsed         | 324         |
+|    total_timesteps      | 8192        |
+| train/                  |             |
+|    approx_kl            | 0.008637924 |
+|    clip_fraction        | 0.0602      |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -2.83       |
+|    explained_variance   | 0.438       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.351       |
+|    n_updates            | 70          |
+|    policy_gradient_loss | -0.00569    |
+|    std                  | 0.998       |
+|    value_loss           | 0.943       |
+-----------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 41           |
+|    ep_rew_mean          | -376         |
+| time/                   |              |
+|    fps                  | 24           |
+|    iterations           | 9            |
+|    time_elapsed         | 372          |
+|    total_timesteps      | 9216         |
+| train/                  |              |
+|    approx_kl            | 0.0076143527 |
+|    clip_fraction        | 0.0418       |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -2.83        |
+|    explained_variance   | 0.629        |
+|    learning_rate        | 0.0003       |
+|    loss                 | 0.16         |
+|    n_updates            | 80           |
+|    policy_gradient_loss | -0.00586     |
+|    std                  | 0.998        |
+|    value_loss           | 0.553        |
+------------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 43.8        |
+|    ep_rew_mean          | -374        |
+| time/                   |             |
+|    fps                  | 24          |
+|    iterations           | 10          |
+|    time_elapsed         | 419         |
+|    total_timesteps      | 10240       |
+| train/                  |             |
+|    approx_kl            | 0.007915091 |
+|    clip_fraction        | 0.063       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -2.83       |
+|    explained_variance   | 0.508       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.323       |
+|    n_updates            | 90          |
+|    policy_gradient_loss | -0.00825    |
+|    std                  | 0.998       |
+|    value_loss           | 0.908       |
+-----------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 42.5         |
+|    ep_rew_mean          | -346         |
+| time/                   |              |
+|    fps                  | 24           |
+|    iterations           | 11           |
+|    time_elapsed         | 464          |
+|    total_timesteps      | 11264        |
+| train/                  |              |
+|    approx_kl            | 0.0034084977 |
+|    clip_fraction        | 0.0123       |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -2.83        |
+|    explained_variance   | 0.574        |
+|    learning_rate        | 0.0003       |
+|    loss                 | 0.398        |
+|    n_updates            | 100          |
+|    policy_gradient_loss | -0.00372     |
+|    std                  | 1            |
+|    value_loss           | 0.894        |
+------------------------------------------
+[EVAL] t=12,000 goal 0.17 collision 0.83 timeout 0.00 return -265.3 colregs -14.9 (15.2 s)
+-----------------------------------------------
+| eval/                        |              |
+|    being_overtaken/collision | 1            |
+|    being_overtaken/colregs   | -12.1        |
+|    being_overtaken/goal      | 0            |
+|    collision_boundary        | 0            |
+|    collision_obstacle        | 0.333        |
+|    collision_rate            | 0.833        |
+|    collision_target          | 0.5          |
+|    crossing/collision        | 1            |
+|    crossing/colregs          | -13.7        |
+|    crossing/goal             | 0            |
+|    episodes                  | 6            |
+|    estops_per_episode        | 0            |
+|    eval_wall_s               | 15.2         |
+|    goal_rate                 | 0.167        |
+|    head_on/collision         | 0            |
+|    head_on/colregs           | -36.5        |
+|    head_on/goal              | 1            |
+|    mean_colregs_integral     | -14.9        |
+|    mean_return               | -265         |
+|    no_target/collision       | 1            |
+|    no_target/colregs         | 0            |
+|    no_target/goal            | 0            |
+|    null/collision            | 1            |
+|    null/colregs              | 0            |
+|    null/goal                 | 0            |
+|    overtaking/collision      | 1            |
+|    overtaking/colregs        | -27          |
+|    overtaking/goal           | 0            |
+|    timeout_rate              | 0            |
+|    timesteps                 | 12000        |
+| rollout/                     |              |
+|    ep_len_mean               | 41.5         |
+|    ep_rew_mean               | -326         |
+| time/                        |              |
+|    fps                       | 23           |
+|    iterations                | 12           |
+|    time_elapsed              | 524          |
+|    total_timesteps           | 12288        |
+| train/                       |              |
+|    approx_kl                 | 0.0020310502 |
+|    clip_fraction             | 0.021        |
+|    clip_range                | 0.2          |
+|    entropy_loss              | -2.84        |
+|    explained_variance        | 0.386        |
+|    learning_rate             | 0.0003       |
+|    loss                      | 0.472        |
+|    n_updates                 | 110          |
+|    policy_gradient_loss      | -0.0032      |
+|    std                       | 1            |
+|    value_loss                | 1.24         |
+-----------------------------------------------
+[EVAL] t=12,288 goal 0.00 collision 1.00 timeout 0.00 return -330.3 colregs -10.7 (8.9 s)
+done in 0.15 h -> C:\Users\hntran\asv_runs\ppo_formulation_seed0_s3_smoke

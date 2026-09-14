@@ -321,6 +321,68 @@ def test_5b_a_crossing_from_port_requires_a_port_turn():
     assert latch["turn_sense"] == -1
 
 
+def test_5c_the_class_is_judged_against_the_path_not_the_momentary_heading():
+    """A19.  A starboard alteration of 25 deg for a head-on must not re-label it
+    a crossing from port, which A17 would then pay to turn back toward."""
+    width = 10.0
+    inset = 0.5 * (cfg.MAP_WIDTH - width)
+    polygon = br.rectangle(width, cfg.MAP_HEIGHT, x0=inset, y0=0.0)
+    centre = inset + 0.5 * width
+    path = ReferencePath(straight_points(centre, 0.0, centre, cfg.MAP_HEIGHT))
+    h = math.radians(25.0)
+
+    def context(anchored: bool):
+        manager = ContextManager()
+        track = FakeTrack(centre, 14.0, 180.0, cfg.U_REF)
+        return manager.update(
+            tracks=[track], p_os=(centre, 4.0),
+            v_os=(cfg.U_REF * math.sin(h), cfg.U_REF * math.cos(h)),
+            heading_os_deg=25.0, u_os=cfg.U_REF,
+            path=path if anchored else None,
+            boundary_polygon=polygon if anchored else None,
+            s_along=4.0 if anchored else None, cross_track=0.0)[track.id]
+
+    anchored = context(True)
+    assert anchored.cls == enc.HEAD_ON
+    assert anchored.compliant_turn_sense == +1
+    assert context(False).cls != enc.HEAD_ON
+
+
+def test_5d_a_slowdown_that_cannot_clear_is_not_the_paid_8e_answer():
+    """A18.  With the alteration inadmissible, R-2 pays the slowdown only where
+    stopping would clear; against a reciprocal head-on the turn is credited."""
+    head_on = ctx_for(enc.HEAD_ON, a_stbd=False, rng=4.0, alpha=0.0, ct=180.0,
+                      speed_ts=cfg.U_REF)
+    crossing = ctx_for(enc.CROSSING, a_stbd=False, rng=4.0, alpha=45.0, ct=270.0,
+                       speed_ts=cfg.U_REF)
+    assert not head_on.stop_clears and crossing.stop_clears
+    assert T.effective_speed_reference(state_for(), head_on, CFG)["rule"] != "R-2"
+    assert T.effective_speed_reference(state_for(), crossing, CFG)["rule"] == "R-2"
+    turned = state_for(heading_deg=30.0)
+    assert T.r8_parts(turned, head_on, CFG)["a_t"] > T.r8_parts(turned, crossing, CFG)["a_t"]
+
+
+def test_5e_an_engaged_encounter_keeps_its_class_and_sense():
+    """A20.  COLREGs decides the situation when risk first develops.  A class
+    the perceived geometry drifts into at close range -- here a crossing from
+    port -- must not re-decide it, or flip the turn sense."""
+    manager = ContextManager()
+    head_on = FakeTrack(5.0, 14.0, 180.0, cfg.U_REF)
+    ctx = manager.update(tracks=[head_on], p_os=(5.0, 4.0), v_os=(0.0, cfg.U_REF),
+                         heading_os_deg=0.0, u_os=cfg.U_REF)[head_on.id]
+    assert ctx.cls == enc.HEAD_ON and ctx.state == "engaged"
+
+    drifted = FakeTrack(0.0, 10.0, 120.0, cfg.U_REF)      # port bow, crossing right to left
+    assert drifted.id == head_on.id
+    for _ in range(4):
+        ctx = manager.update(tracks=[drifted], p_os=(5.0, 4.0), v_os=(0.0, cfg.U_REF),
+                             heading_os_deg=0.0, u_os=cfg.U_REF)[drifted.id]
+    assert manager.classifier.held(drifted.id) != enc.HEAD_ON   # the classifier did move
+    assert ctx.state == "engaged"
+    assert ctx.cls == enc.HEAD_ON
+    assert ctx.compliant_turn_sense == +1
+
+
 def test_6_v_side_inverts_between_head_on_and_overtaking():
     """02a §10.4 test 6.  Both directions in one test so they cannot drift apart.
 

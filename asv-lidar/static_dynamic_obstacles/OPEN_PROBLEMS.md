@@ -4,8 +4,9 @@
 count. This file records only what is *not settled*, ordered so the
 highest-leverage item is first.
 
-**Last updated:** 2026-09-14, revision 6 — your option-1 calls on A15, A16 and
-A17 (`PROJECT_STATE.md` F53), after formulation runs 1 and 2 (F48–F52).
+**Last updated:** 2026-09-15, revision 8 — your option-1 call on A20
+(`PROJECT_STATE.md` F58). Revision 7 recorded A18 and A19 (F56), revision 6
+A15–A17 (F53), after formulation runs 1–3 (F48–F57).
 Revision 4 followed your answers on speed,
 corridor widths, the 2 Hz reward, the emergency-stop reward, the tracker, the
 generator, the scale audit, noise and randomisation.
@@ -14,7 +15,24 @@ generator, the scale audit, noise and randomisation.
 |---|---|---|
 | **A** | Decisions | a call from you — 3 items (A10, A3/A4/A6) |
 | **B** | Measurements | basin time — `PART2_BASIN_PLAN.md`, with one addition proposed |
-| **C** | Build work | my time — 7 items |
+| **C** | Build work | my time — 8 items |
+
+### Decided in revision 8 — option 1 for A20 (`PROJECT_STATE.md` F58)
+
+| Item | Resolution |
+|---|---|
+| A20 engaged encounters | **class, crossing side and turn sense frozen for the life of an engagement** — latched at engagement, reported as `ctx.cls` while engaged or clearing, released only when the encounter clears; `N_SWITCH_STEPS` retired |
+
+Run 4 trains with A18–A20.
+
+### Decided in revision 7 — option 1 for A18 and A19 (`PROJECT_STATE.md` F56)
+
+| Item | Resolution |
+|---|---|
+| A18 supervisor stop | **only when stopping clears** — the target's DCPA with the own ship stationary must reach `ESTOP_CLEAR_DCPA_M` = 1.76 m; the same test gates R-2's slowdown, and where a slowdown cannot clear the Rule 8 term credits the alteration |
+| A19 classification | **against the path tangent** — the own ship's alteration can no longer re-label a head-on as a crossing from port |
+
+Run 3 trained before both; its head-on results are not a test of them.
 
 ### Decided in revision 6 — option 1 for all three (`PROJECT_STATE.md` F53)
 
@@ -112,7 +130,8 @@ Run 2 (below) uses it. **To resolve:** confirm (1), or pick another.
 
 **Also changed for run 2, my call rather than yours:** 20 development
 scenarios per class instead of 6, because 6 moves a class rate in 17-pp steps.
-Runs are also written outside OneDrive.
+Runs 2 and 3 were also written outside OneDrive; both were moved back into
+`runs/` on 2026-09-15.
 
 **Run 2 (F52): the gate did its job.** Evaluation mean speed was 0.52–0.66 m/s
 against run 1's 0.9–1.0; goal 0.77 at 2.0 M and still rising. The one class
@@ -161,6 +180,138 @@ covering opposite geometry, the agent may be unable to learn either.
 each side one geometrically correct answer, and `v_r8` and R-2 already cover
 the slowdown. **To resolve:** say which. Run 3 should wait for this and A15;
 together they account for most of the collisions left.
+
+## A20. An engaged encounter is re-classified at close range
+
+**New, from verifying A19 (`PROJECT_STATE.md` F56).** A19 halved the port-sense
+regression for the run 2 model (67 % of head-on episodes → 30 %), but a
+**non-avoiding path follower** still latches a port sense in 24 %. So the cause
+is not the own ship's manoeuvre. On those frames:
+
+| | median |
+|---|---|
+| range to the target | **3.6 m** |
+| path-relative bearing (head-on band ±10°) | **18°** |
+| perceived heading-intersection deviation from reciprocal | **29°** |
+| true deviation | 8° |
+
+Two things push a truly head-on encounter (62 % of those frames) out of its
+class as the vessels close:
+
+* **bearing.** A reciprocal target 1–2 m to one side passes outside the ±10°
+  head-on bearing band inside about 8 m;
+* **tracker course.** The course estimate degrades at close range — the
+  cluster centroid slides along the hull as the aspect changes — and the
+  perceived intersection angle is 21° worse than the truth.
+
+Whenever a different class persists for `N_SWITCH_STEPS` (2) while engaged,
+the engagement latch re-engages and re-latches the turn sense. COLREGs decides
+the situation when risk of collision first develops, not at 3.6 m. Since A17
+the re-decision can flip the sense to port.
+
+**Options:**
+
+1. **freeze class and turn sense for the life of an engagement.** The latched
+   class becomes `ctx.cls` until the encounter clears, so the observation and
+   the reward still read one field (01 §5.3). A new encounter starts only
+   after CLEARING → IDLE;
+2. freeze only close in: allow class switches while TCPA > `T_EXTREMIS` or
+   range > `kappa_rel · d_req`, and freeze inside that;
+3. keep the switch rule and fix the inputs instead: widen the head-on bearing
+   band with range, and repair the tracker's close-range course (C15). This
+   treats the symptoms, and leaves a latch that can still be re-decided by
+   any future perception error;
+4. keep as is.
+
+**Recommendation:** (1). It is the rule itself — the situation is decided
+once, when the obligation arises. It also removes a whole class of
+perception-driven flips rather than the two found so far. Its cost is that a
+target which *genuinely* changes encounter geometry mid-encounter keeps its
+first label. A `T-NC` target in evaluation could do that; D1 training targets
+cannot. C15 is worth doing either way. **To resolve:** say which.
+
+**Run 3 (F57), which trained with A15–A17 but before A18–A20:** evaluation
+goal 0.79 (run 2: 0.77). Being-overtaken collision fell 0.54 → 0.35 and
+starboard-side crossings improved sharply (0.88 → 0.25 at DCPA ≤ 0.7 m). But
+head-on rose 0.22 → 0.32, as F55 predicted, and far port-side crossings stay
+at 0.83. Both are the geometry this item and A19 act on. Run 4 waits for this
+call.
+
+## A19. A17 re-labels head-on encounters as port crossings — run 3 is affected
+
+**New, and caused by my implementation of A17 (`PROJECT_STATE.md` F55).** The
+encounter class and the crossing side are computed from the own ship's
+*instantaneous* heading. When it turns to starboard for a head-on, the heading
+intersection angle leaves the head-on band. So the same encounter is
+re-classified as a crossing with the target on the port bow, and A17 then
+latches a **port** turn sense. The reward pays the agent to turn back toward
+the target. Before A17 this was harmless, because crossing and head-on shared
+the starboard sense.
+
+| head-on scenarios, current code (100) | path follower, no avoidance | run 2 model |
+|---|---|---|
+| episodes that ever latch a port sense | 0.20 | **0.67** |
+| engaged pre-CPA frames with port sense | 0.06 | **0.43** |
+| first engagement classified head-on | 0.84 | 0.45 |
+
+Run 3 is training with this. Its crossing and being-overtaken splits are
+still worth reading; its head-on learning is not.
+
+**Options:**
+
+1. classify the encounter, and take `crossing_side`, against the **path
+   tangent** (the course the own ship is keeping) instead of its instantaneous
+   heading. The agent's own manoeuvre can then neither change the class nor
+   flip the sense. The observation shares the classifier (01 §5.3), so the
+   one-hot moves consistently with it;
+2. keep the turn sense latched at first engagement across class switches.
+   It is simpler, but first engagement is already "crossing" in 52 % of the
+   model's head-ons, because it alters before engaging;
+3. revert A17.
+
+**Recommendation:** (1), then stop run 3 and restart it with A18 and A19 in.
+**To resolve:** say which, and whether to stop run 3.
+
+## A18. The emergency-stop supervisor stops in front of head-on targets
+
+**New, from the C14 diagnosis (`PROJECT_STATE.md` F54).** The supervisor fires
+when an engaged give-way encounter is in extremis (DCPA < `d_req` = 2.5 m,
+TCPA < 5 s) and the compliant alteration is inadmissible. Admissibility asks
+whether the starboard room to the wall, less B/2 and `c_wall`, covers
+`Dy_req = d_req − DCPA`. That is a *ship-domain* separation, not hull
+clearance. At a 5 m width, with the usual Rule 9(a) station, a starboard turn
+is "inadmissible" for any DCPA under about 1.3 m (0.4 m at 7 m, never at
+10 m), although about 1.8 m of physical starboard room exists. The own ship
+then stops dead ahead of a constant-velocity head-on target. A stop cannot
+change a reciprocal target's DCPA, so the target hits it.
+
+| head-on, run 2 model, obstacles off (20 per width) | 5 m | 6 m | 7 m | 8 m | 10 m |
+|---|---|---|---|---|---|
+| target collision, supervisor on | 0.43 | 0.25 | 0.24 | 0.16 | 0.05 |
+| target collision, **supervisor off** | **0.24** | **0.15** | **0.14** | 0.11 | 0.05 |
+| starboard alteration inadmissible (pre-CPA frames) | 0.66 | 0.59 | 0.27 | 0 | 0 |
+
+74 % of target collisions had stopped before CPA, against 10 % of
+non-collisions. Switching the supervisor off saved 10 collisions and caused 1.
+The remaining narrow excess (0.24 against 0.05) is a policy trained *with* the
+supervisor, and R-2 still pays the same futile slowdown.
+
+**Options:**
+
+1. the supervisor stops only when stopping clears: the DCPA recomputed with
+   the own ship stationary must reach hull clearance plus `D_SAFE`. That is
+   true for a crossing target that will pass ahead, and false for a reciprocal
+   head-on. Apply the same test to R-2, so a slowdown that cannot clear is not
+   the paid 8(e) answer; the agent must take the lateral room it has;
+2. measure admissibility against hull clearance instead of `d_req`, for the
+   supervisor and R-2. The domain-based `v_*` severities stay as they are;
+3. both;
+4. keep as is: narrow head-on stays a stop-and-be-hit case against D1
+   targets.
+
+**Recommendation:** (1). It asks the physically right question ("does
+stopping help?") rather than re-tuning a width, and it leaves the domain
+geometry the COLREGs terms are built on untouched. **To resolve:** say which.
 
 ## A10. The vessel model — keep v3
 
@@ -221,18 +372,45 @@ full budget is a day of wall clock per configuration.
 obstacles). The run took 6.2 h, of which about 24 min was ten 120-episode
 evaluations. Next is profiling one stage-5 step.
 
+**Thread oversubscription ruled out (F58).** 10 workers plus a 10-thread
+learner on 10 physical cores looked like contention, but capping the learner
+at 4 threads with 1 per worker cut stage-5 training from 120–126 to 106–111
+fps, and 8 workers gave 78–82. The rate scales with workers, so the cost is
+the environment step itself: 43 steps/s per stage-5 environment against 98 in
+stage 1. A 2 M-step curriculum run therefore stays near 6 h until one
+stage-5 step is profiled and cut. Until then the cheaper route to reliable
+debugging is the tiered protocol, not the thread count.
+
 ## C3–C6. Unchanged
 
 Classical comparators; `T-RE`'s velocity obstacle; occlusion and conflict
 obstacle placement (04a §3.6 — the generator's obstacles are currently only kept
 clear of the CPA); `metrics.py` reading the reward keys.
 
-## C14. Narrow head-on collides 75 %
+## C15. The tracker's course estimate at close range
 
-At width ≤ 7 m head-on collides 0.75 (n 20) against 0.05 (n 60) above, although
-the head-on width threshold is 3.8 m. Not yet diagnosed: replay the narrow
-cases, and check whether the confined target's Rule 9(a) station leaves the
-passing gap 02a §2 assumes. Mine; it may become a decision.
+F56: at a median 3.6 m the perceived heading-intersection angle is 21° worse
+than the truth, and 62 % of close frames are more than 5° out. A centroid-based
+constant-velocity filter sees the cluster centre move along the hull as the
+aspect changes. Candidates: a hull-fitted (oriented box) centre and heading,
+or inflating the course variance with angular extent. Mine; no decision
+needed. It matters for A20's options 2 and 3, and for every class boundary
+near CPA.
+
+## C14. Narrow head-on collides — diagnosed, now A18
+
+Run 2's 0.75 rested on only 5 development scenarios, all on bends. A 100-scenario
+diagnosis (`PROJECT_STATE.md` F54) found:
+
+* **not the target clamp.** `clamp_to_corridor` does teleport a wall-touching
+  target to the centreline. That is not 03a's 9(a) station-keeping either, and
+  is worth replacing with a tangent nudge that keeps the lateral offset. But
+  disabling it changed collisions by noise, and most snaps come after CPA;
+* **not room.** A contact-free pass fits in 90–100 % of draws even at 5 m;
+* **not bends.** There is no consistent bend effect once width is held;
+* **the supervisor stop**, via domain-based admissibility (A18).
+
+Left for me: the clamp replacement (small, no decision needed).
 
 ## C12. T8 at its own criterion; T3, T4, T10
 
@@ -260,4 +438,8 @@ settled.
 | **B5** | manoeuvring at 0.55 m/s is extrapolated | measurement | sim-to-real at the operating point | plan edit |
 | C2 | throughput | build | campaign size | mine |
 | C3–C6 | comparators, occlusion placement, metrics | build | evaluation | mine |
-| C14 | narrow head-on collisions | build | head-on in Study 1's narrow widths | mine |
+| ~~A20~~ | freeze class and sense per engagement | **decided** (option 1) | — | built, F58 |
+| ~~A19~~ | classify against the path tangent | **decided** (option 1) | — | built, F56 (residual → A20) |
+| ~~A18~~ | stop only when stopping clears | **decided** (option 1) | — | built, F56 |
+| C15 | tracker course estimate at close range | build | class boundaries near CPA | mine |
+| C14 | narrow head-on — diagnosed (A18); clamp teleport to replace | build | tidy | mine |

@@ -1,0 +1,19 @@
+== head-on scenarios, engaged pre-CPA frames, CURRENT code (A17 in)
+                n  coll  first_head_on  p_head_on  p_cross_stbd  p_cross_port_sense  ever_port_sense  never_engaged
+policy   wbin                                                                                                      
+follower 5     21  0.57           0.76       0.54          0.05                0.07             0.29           0.14
+         6     20  0.45           0.70       0.46          0.07                0.10             0.30           0.05
+         7     21  0.48           0.86       0.58          0.04                0.07             0.19           0.10
+         8     19  0.32           0.95       0.65          0.05                0.03             0.16           0.00
+         10    19  0.47           0.95       0.68          0.06                0.01             0.05           0.00
+model    5     21  0.43           0.29       0.22          0.18                0.36             0.62           0.10
+         6     20  0.25           0.30       0.19          0.12                0.46             0.70           0.05
+         7     21  0.24           0.62       0.30          0.17                0.37             0.67           0.00
+         8     19  0.16           0.47       0.27          0.18                0.44             0.74           0.00
+         10    19  0.05           0.58       0.17          0.23                0.52             0.63           0.00
+
+== overall
+          first_head_on  first_crossing  ever_port_sense  p_cross_port_sense
+policy                                                                      
+follower           0.84            0.08             0.20                0.06
+model              0.45            0.52             0.67                0.43

@@ -757,3 +757,6 @@ tracker.
 | `BEING_OVERTAKEN_DCPA_FLOOR` | **1.0 m** | F53, A15 **decided** (option 1): 80 % of being-overtaken draws uniform on [1.0, 2.0] m |
 | `BEING_OVERTAKEN_BELOW_FLOOR_FRAC` | **0.20** | F53, A15: uniform on [0, 1.0) m, labelled `dcpa_below_floor` (Rule 17(b)) |
 | crossing turn sense | **+1 from starboard, −1 from port** | F53, A17 **decided** (option 1): `compliant_turn_sense(cls, crossing_side)` |
+| `ESTOP_CLEAR_DCPA_M` | **1.76 m** | F56, A18 **decided** (option 1), derived: `0.5·LOA + 0.5·B + 2·0.15 + D_SAFE`. The supervisor stop, R-2's slowdown carve-out and the Rule 8 speed credit apply only when the target's DCPA with the own ship stationary reaches this |
+| classification heading | **path tangent at the own ship** | F56, A19 **decided** (option 1): class, crossing side and true class use it; CPA products and the Rule 8 accumulator keep the instantaneous heading; open water falls back to the heading |
+| `N_SWITCH_STEPS` | **retired** (value kept, 2 steps) | F58, A20 **decided** (option 1): an engaged encounter keeps the class, crossing side and turn sense latched at engagement until it clears; a class switch no longer re-engages |
