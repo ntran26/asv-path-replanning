@@ -38,7 +38,8 @@ def test_right_arrow_puts_the_helm_to_starboard(keys):
     helm = play.Helm()
     for _ in range(5):
         action = helm.update(FakeKeys({keys.K_RIGHT: True}))
-    assert action[0] == pytest.approx(5 * play.RUDDER_RATE)
+    # 0.5 per 2 Hz step, so five presses reach the stop.
+    assert action[0] == pytest.approx(min(1.0, 5 * play.RUDDER_RATE))
     assert action[0] > 0.0
 
 
@@ -192,12 +193,12 @@ def test_degradation_flags_reach_the_env():
 def test_pose_noise_degrades_tracking_of_a_head_on_target():
     """Study 2's first axis, visible end to end.
 
-    **0.25 m, not 0.10 m, and the difference is a Study 2 result.**  Measured
-    over four seeds, track uptime is flat at 90% from 0.00 through 0.10 m and
-    then falls away: 59% at 0.25 m and 25% at 0.50 m.  The knee is set by
-    `TRACK_GATE_DIST` — `max(2.5 * U_REF * dt, 0.30)` = 0.30 m — so a
-    displacement inside the association gate costs nothing and the tracker
-    simply absorbs it.
+    **0.75 m, and where the knee sits is a Study 2 result.**  At 10 Hz uptime
+    was flat to 0.10 m and fell away by 0.25 m, the knee set by a 0.30 m
+    association gate.  At 2 Hz the gate is `2.5 * U_REF * dt` = 1.40 m, and
+    measured over four seeds the head-on target is tracked on 7 of 11 visible
+    frames at 0.00, 0.10 and 0.25 m, 4 at 0.50 m, and 0 at 0.75 m.  A
+    displacement inside the gate and the free-space tolerance costs nothing.
 
     That matters for choosing Study 2's nominal (04a §7.1 sweeps this axis at
     {0, 0.5, 1, 2, 4} x nominal): a nominal at or below 0.10 m puts three of the
@@ -205,7 +206,7 @@ def test_pose_noise_degrades_tracking_of_a_head_on_target():
     robustness that is really insensitivity.
     """
     clean = _built("head_on")
-    noisy = _built("head_on", pose_noise=0.25)
+    noisy = _built("head_on", pose_noise=0.75)
     for env in (clean, noisy):
         for _ in range(60):
             _, _, term, trunc, _ = env.step(np.zeros(2, dtype=np.float32))

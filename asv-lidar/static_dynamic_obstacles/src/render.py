@@ -340,6 +340,15 @@ class Renderer:
                    f"r-r_path={ego['r_err']:+.3f} ({turn})")
         self._line(f"act rud={ego['rudder']:+.2f} thr={ego['throttle']:+.2f} | "
                    f"cmd rudder={ego['rudder_deg']:+.1f} rpm={ego['rpm']:.2f}")
+        if "s2" in ego:
+            # The emergency stop overrides propulsion, never the action, so the
+            # action line above can read full ahead while the vessel is going
+            # full astern.  This line is the only place that is visible.
+            active = ego.get("estop_state", "idle") != "idle"
+            reason = f"  [{ego.get('estop_reason', '')}]" if active else ""
+            self._line(f"propulsion S2={ego['s2']:+.0f}   "
+                       f"e-stop={ego.get('estop_state', 'idle').upper()}{reason}",
+                       AMBER if active else PANEL_DIM)
         frac = abs(ego["d_rudder"]) / max(ego["kappa_delta"], 1e-9)
         self._line(f"Dact rud={ego['d_rudder']:+.3f} ({frac:.0%} of the rate limit "
                    f"{ego['kappa_delta']:.3f})  sigma={ego['sigma']:.2f}",

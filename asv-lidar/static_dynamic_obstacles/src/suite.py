@@ -134,11 +134,16 @@ def width_strata() -> Dict[str, Tuple[float, float]]:
     data rather than asserted.
     """
     t = scn.width_thresholds()
-    return {
-        "wide": (t["crossing"], cfg.CORRIDOR_WIDTH_RANGE[1]),
+    specified = {
+        "wide": (t["crossing"], 10.0),
         "intermediate": (t["overtaking"], t["crossing"]),
-        "narrow": (cfg.CORRIDOR_WIDTH_RANGE[0], t["overtaking"]),
+        "narrow": (3.5, t["overtaking"]),
     }
+    # Only strata the configured corridor range can realise -- all three at
+    # 04a's 3.5-10 m.
+    lo, hi = cfg.CORRIDOR_WIDTH_RANGE
+    return {name: (a, b) for name, (a, b) in specified.items()
+            if a <= hi + 1e-9 and b >= lo - 1e-9}
 
 
 def tier_b_cells() -> List[dict]:
@@ -291,10 +296,10 @@ def freeze_checklist() -> List[Tuple[str, bool, str]]:
     unresolved = unresolved_todos()
     checks.append(("every TODO(04-*) resolved or deferred", not unresolved,
                    ", ".join(unresolved) if unresolved else "none outstanding"))
-    checks.append(("operating speed settled (F24)", False,
-                   f"U_NOM = {cfg.U_NOM} m/s measured; 03a §1.1 decides 0.55"))
+    checks.append(("operating speed settled (F24)", True,
+                   f"decided: CRUISE_RPM = {cfg.CRUISE_RPM:g}, U_NOM = {cfg.U_NOM:.3f} m/s"))
     checks.append(("throughput measured (04a §8.3)", True,
-                   "~74 steps/s single-env; 04a assumes 500"))
+                   "38 steps/s single-env at 2 Hz (19 s simulated per s); 04a assumes 500 at 10 Hz"))
     checks.append(("claim ledger committed", False, "not written"))
     checks.append(("empty result tables committed", False, "not written"))
     checks.append(("regeneration test reproduces hashes", True,

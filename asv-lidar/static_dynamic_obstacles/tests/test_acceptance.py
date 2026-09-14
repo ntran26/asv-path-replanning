@@ -3,12 +3,8 @@
 "Committed with the environment, run before the first training run."  They are
 numbered as 03a numbers them so the table can be checked off directly.
 
-`T1` is `xfail(strict)` and that is the point: it encodes 03a §1.1's decision
-that `U_nom = 0.55 m/s`, which T1 (the log-mining task, unrelated name collision)
-measured at **1.14 m/s**.  A test that hard-failed would block the suite; one
-asserting 0.29 would silently bless a number the specification rejects.  It
-fails visibly and flips the day F24 is decided, which is the same treatment
-02b §3.3 prescribed for `R-8` and endorsed afterwards.
+`T1` passes since revision 8: F24 was decided for 03a §1.1's 0.55 m/s, which is
+`CRUISE_RPM = 6` on the identified plant.
 """
 
 import math
@@ -39,12 +35,6 @@ def test_t1_froude_is_self_consistent():
     assert cfg.full_scale(50.0)["Lpp_m"] == pytest.approx(78.5, abs=0.1)
 
 
-@pytest.mark.xfail(reason="F24: 03a §1.1 decides U_nom = 0.55 m/s and calls it "
-                          "the field measurement, but the retained logs give a "
-                          "median of 1.14 m/s at 12 RPM across 18 runs. The "
-                          "environment runs the measured value; this flips when "
-                          "the decision is made either way.",
-                   strict=True)
 def test_t1_froude_at_u_nom_is_0_14():
     """03a §10 T1.  Fr = 0.14 ± 0.01."""
     assert cfg.froude() == pytest.approx(0.14, abs=0.01)
@@ -167,75 +157,146 @@ def test_t7_crossing_targets_leave_the_corridor_and_others_do_not():
 # T8 — static panels are not promoted to dynamic tracks
 # ---------------------------------------------------------------------------
 def test_t8_static_panels_are_rarely_classified_dynamic():
-    """03a §10 T8 and §6.3.  A false promotion creates a phantom give-way
-    obligation with COLREGs consequences, which is why the hysteresis is
-    asymmetric and slow in both directions."""
-    env = ASVLidarEnv(render_mode=None, corridor_width=6.0, pose_noise=False)
+    """03a §10 T8 and §6.3: static panels dynamic on fewer than 1 in 10^4 frames.
+
+    A false promotion creates a phantom give-way obligation with COLREGs
+    consequences -- and now a phantom emergency stop: with the supervisor
+    trigger on, target-free cluttered episodes produced five spurious
+    full-astern stops, every one an overtaking encounter with a panel.
+
+    **Passes since revision 7** (F37), which replaced the centroid-speed
+    classifier with a free-space consistency test: a static solid can neither
+    occupy space a ray has seen through nor vacate space a ray now sees
+    through, whatever the viewpoint.  Under the speed classifier this batch
+    carried a phantom on about a quarter of frames.
+
+    Zero phantoms here bounds the rate at ~3 in 10^3 at 95 % -- the suite cannot
+    afford the ~30,000 frames that would demonstrate 1 in 10^4, which is a
+    pre-freeze run (`OPEN_PROBLEMS.md` C12).
+    """
+    env = ASVLidarEnv(render_mode=None, pose_noise=False)
     env.forced_num_obs = 3
     env.no_target_prob = 1.0
     frames = promoted = 0
-    for seed in range(6):
+    rng = np.random.default_rng(8)
+    for seed in range(40):
         env.reset(seed=seed)
-        for _ in range(80):
-            _, _, term, trunc, info = env.step(np.zeros(2, dtype=np.float32))
+        helm = 0.0
+        for _ in range(cfg.MAX_EPISODE_STEPS):
+            # A smooth random helm, so the vessel passes panels at varied
+            # aspects; zero helm drives into the first one and never passes it.
+            helm = float(np.clip(0.8 * helm + 0.35 * rng.normal(), -1.0, 1.0))
+            _, _, term, trunc, info = env.step(np.array([helm, 0.0], dtype=np.float32))
             frames += 1
-            promoted += int(info["n_tracks"])
+            promoted += int(info["n_tracks"] > 0)
             if term or trunc:
                 break
     rate = promoted / max(frames, 1)
-    assert rate < 0.05, (
-        f"{rate:.1%} of frames carried a dynamic track with no target present")
+    assert promoted == 0, (
+        f"{rate:.2%} of {frames} frames carried a dynamic track with no target present")
 
 
 # ---------------------------------------------------------------------------
 # T9 — stopping authority decides `allow_reverse`
 # ---------------------------------------------------------------------------
-@pytest.mark.xfail(reason="F28: head reach is 29.9 m (19.1 Lpp) against 03a "
-                          "§4.3's 1.5 Lpp criterion, and 13.5 m (8.6 Lpp) even "
-                          "at half speed. Coasting cannot execute Rule 8(e); "
-                          "either the identified drag is badly low (05) or "
-                          "allow_reverse is mandatory. 03a §4.3 states the "
-                          "consequence; the call is not Claude Code's.",
-                   strict=True)
-def test_t9_head_reach_is_within_one_and_a_half_ship_lengths():
-    """03a §4.3 / §10 T9, and **it fails by an order of magnitude**.
+def _stop_from_cruise(efficiency: float, decision_dt: float = cfg.UPDATE_RATE) -> float:
+    """Distance from the stop DECISION to rest, on the identified hull.
 
-    The demanding case is crossing give-way by passing astern: the own ship must
-    shed about 3 m of along-track position, which needs deceleration from cruise
-    to ~0.2 `U_nom`.  03a §4.3 reasons that this is "of order 5 N of net
-    decelerating force -- comparable to the hull's own quadratic drag at
-    0.55 m/s" and concludes that "coasting alone plausibly achieves it; reverse
-    thrust is probably not required".
+    The latch is consulted only every `decision_dt`, as the controller would,
+    so the reaction latency is part of the measured distance rather than an
+    afterthought added to it.
+    """
+    import emergency_stop as es
+    from ship import ShipModel
 
-    Measured against the carried-over Paper 2 hull, coasting takes **29.9 m and
-    53 s** from 1.14 m/s, and **13.5 m and 54 s** from 0.51 m/s.  The result is
-    the same at either candidate operating speed, so it does not turn on F24.
+    model = ShipModel(reverse_efficiency=efficiency)
+    for _ in range(int(60.0 / cfg.UPDATE_RATE)):
+        model.update(cfg.CRUISE_RPM, 0.0, cfg.UPDATE_RATE)
+    assert model.u == pytest.approx(cfg.U_NOM, rel=0.02), model.u
 
-    03a §4.3 says what follows: `allow_reverse` must be set and the platform's
-    actual reverse capability verified, and if the platform cannot reverse then
-    "take all way off" is unavailable and the paper states the limitation rather
-    than claiming the manoeuvre.  Both routes run through 05.
+    # Worst-case reaction: the danger arises just after a decision, so the vessel
+    # runs on at cruise for one full decision interval before the stop command
+    # can take effect.  The first draft of this harness fired the stop at the
+    # instant of the request and so measured braking alone -- which is why the
+    # 2 Hz case passed at an efficiency the arithmetic said should fail.
+    every = max(1, int(round(decision_dt / cfg.UPDATE_RATE)))
+    reach, t = 0.0, 0.0
+    for _ in range(every):
+        dx, dy, _, _ = model.update(cfg.CRUISE_RPM, 0.0, cfg.UPDATE_RATE)
+        reach += math.hypot(dx, dy)
+        t += cfg.UPDATE_RATE
+
+    latch = es.EmergencyStop(stop_speed=cfg.ESTOP_STOP_SPEED, max_brake_s=60.0)
+    latch.request("T9", t=t, speed=model.u)
+    override = None
+    for k in range(int(60.0 / cfg.UPDATE_RATE)):
+        if k % every == 0:
+            override = latch.update(t=t, dt=decision_dt, speed=model.u)
+            if latch.state != es.BRAKING:
+                break
+        dx, dy, _, _ = model.update(es.s2_to_rpm(override), 0.0, cfg.UPDATE_RATE)
+        reach += math.hypot(dx, dy)
+        t += cfg.UPDATE_RATE
+    assert latch.state == es.HOLDING and not latch.events[-1].gave_up
+    return reach
+
+
+def test_t9_coasting_alone_still_misses_the_criterion():
+    """F28, restated on the identified hull.
+
+    Cutting thrust from cruise coasts **8.5 m (5.4 Lpp) over 19 s** on the
+    identified model, against 29.9 m on Paper 2's v2 hull -- the identified surge
+    drag is much stronger -- but still 3.6x 03a §4.3's 2.36 m.  So the paper
+    cannot claim Rule 8(e) "take all way off" by coasting, whichever model is
+    right.  Pinned as a failing measurement: if basin S1-C's coast-downs move
+    the drag enough to flip it, this test says so.
     """
     from ship import ShipModel
 
     model = ShipModel()
-    # Run up to cruise, then cut thrust entirely.
-    for _ in range(600):
+    for _ in range(int(60.0 / cfg.UPDATE_RATE)):
         model.update(cfg.CRUISE_RPM, 0.0, cfg.UPDATE_RATE)
-    assert model.u == pytest.approx(cfg.U_NOM, rel=0.05), model.u
-
-    target_speed = 0.2 * cfg.U_NOM
-    reach = 0.0
-    for _ in range(2000):
+    target, reach = 0.2 * model.u, 0.0
+    for _ in range(4000):
         dx, dy, _, _ = model.update(0.0, 0.0, cfg.UPDATE_RATE)
-        reach += float(math.hypot(dx, dy))
-        if model.u <= target_speed:
+        reach += math.hypot(dx, dy)
+        if model.u <= target:
             break
+    assert reach > 1.5 * cfg.LBP
+    assert reach == pytest.approx(8.5, abs=0.5)
 
+
+@pytest.mark.parametrize("efficiency", [0.3, 0.5, 1.0])
+def test_t9_the_emergency_stop_meets_the_head_reach_criterion(efficiency):
+    """03a §10 T9: head reach <= 1.5 Lpp, now met by the emergency stop.
+
+    Full astern (`S2 = -100`) from cruise until stopped, decided at the 2 Hz
+    rate with a full interval of reaction latency.  **Meets the criterion
+    across reverse efficiencies 0.3 to 1.0.**  The break-even is 0.27 -- it
+    was 0.19 at 10 Hz, and half a second of latency at cruise is the whole
+    difference.  If thrust shares the rudder's 0.73 s effective delay it rises
+    to 0.55; basin block S1-C2 measures both.
+    """
     limit = 1.5 * cfg.LBP
-    assert reach <= limit or cfg.REVERSE_AVAILABLE, (
-        f"head reach {reach:.2f} m exceeds {limit:.2f} m and reverse is not "
-        f"available: Rule 8(e) 'take all way off' cannot be executed")
+    reach = _stop_from_cruise(efficiency)
+    assert reach <= limit, f"stop took {reach:.2f} m against {limit:.2f} m"
+
+
+def test_t9_at_deployment_timing_it_depends_on_reverse_efficiency():
+    """The same stop at the bridge's 2 Hz decision rate.
+
+    Half a second of reaction at 1.1 m/s is 0.56 m of the 2.36 m budget, so the
+    margin now turns on the unmeasured efficiency: 0.5 passes, 0.2 does not.
+    And if thrust shares the rudder's 0.73 s effective delay -- also unmeasured
+    -- the break-even rises to about 0.56 and 0.5 fails too.  That is what the
+    crash-stop block proposed for basin session 1 has to measure.
+    """
+    # Revision 8: at 0.55 m/s the stop needs far less reverse thrust than at
+    # 1.1 m/s -- 0.1 passes and the break-even is about 0.05 (0.065 with a
+    # 0.73 s thrust delay, to 0.2 U), against 0.27 and 0.55 at cruise before.
+    limit = 1.5 * cfg.LBP
+    assert _stop_from_cruise(0.1, decision_dt=0.5) <= limit
+    assert _stop_from_cruise(0.02, decision_dt=0.5) > limit
 
 
 # ---------------------------------------------------------------------------
@@ -332,7 +393,7 @@ def test_the_constants_snapshot_records_what_the_geometry_depends_on():
     for key in ("U_NOM", "DOMAIN_LATERAL", "W_WALL", "MAX_EPISODE_STEPS",
                 "width_thresholds"):
         assert key in snap
-    assert snap["MAX_EPISODE_STEPS"] == 900
+    assert snap["MAX_EPISODE_STEPS"] == cfg.steps_for(90.0) == 180
 
 
 def test_the_freeze_checklist_reports_what_is_outstanding():
@@ -345,5 +406,5 @@ def test_the_freeze_checklist_reports_what_is_outstanding():
     checks = ste.freeze_checklist()
     assert all(len(row) == 3 for row in checks)
     outstanding = [name for name, ok, _ in checks if not ok]
-    assert outstanding, "the checklist should not read clean while F24 is open"
-    assert any("F24" in note or "speed" in name for name, ok, note in checks if not ok)
+    assert outstanding, "the checklist should not read clean yet"
+    assert ("operating speed settled (F24)", True) in [(n, ok) for n, ok, _ in checks]

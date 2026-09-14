@@ -1,0 +1,126 @@
+{
+  "trims": [
+    {
+      "run": "2026-07-02/calibration#1",
+      "t_cut_s": 18.5,
+      "duration_s": 24.5,
+      "samples_removed": 12,
+      "split": "train"
+    },
+    {
+      "run": "2026-07-02/trial",
+      "t_cut_s": 18.5,
+      "duration_s": 24.5,
+      "samples_removed": 12,
+      "split": "train"
+    },
+    {
+      "run": "2026-07-02/trial_2",
+      "t_cut_s": 18.5,
+      "duration_s": 27.0,
+      "samples_removed": 17,
+      "split": "train"
+    }
+  ],
+  "criteria": {
+    "psi_free": {
+      "v4": 21.13761457664186,
+      "v3": 23.531507701538402,
+      "ok": true
+    },
+    "psi_10s": {
+      "v4": 9.325765579500867,
+      "v3": 13.820201439852513,
+      "ok": true
+    },
+    "pos_free": {
+      "v4": 3.264284801522824,
+      "v3": 3.529676973733648,
+      "ok": true
+    },
+    "ks_turn_rate": {
+      "v4": 0.1520912547528517,
+      "v3": 0.17110266159695817,
+      "ok": true
+    },
+    "path_err_abs": {
+      "v4": 2.4080590645458972,
+      "v3": 1.759568514979686,
+      "ok": false
+    }
+  },
+  "acceptance": {
+    "A1": true,
+    "A2": true,
+    "A3": true,
+    "A5_draws_usable": "11/12",
+    "A5": false,
+    "steady_turn_degps": [
+      0.37,
+      3.77,
+      7.26,
+      10.09
+    ],
+    "radius_L": 2.21,
+    "speed_ratio": 0.626
+  },
+  "at_bound_v4": [
+    "Y_v",
+    "k_race",
+    "rud_rate"
+  ],
+  "adopt": false
+}
+
+holdout
+  psi_1s         v3    1.312   v4    1.422
+  psi_2s         v3    5.192   v4    3.797
+  psi_3s         v3    7.902   v4    6.246
+  psi_5s         v3   10.171   v4    6.754
+  psi_10s        v3   13.820   v4    9.326
+  psi_free       v3   23.532   v4   21.138
+  pos_3s         v3    0.262   v4    0.242
+  pos_10s        v3    1.246   v4    0.921
+  pos_free       v3    3.530   v4    3.264
+  ks_turn_rate   v3    0.171   v4    0.152
+  path_err_mean  v3   -0.789   v4   -2.009
+  path_err_abs   v3    1.760   v4    2.408
+  drift_sd_meas  v3    5.676   v4    5.676
+  drift_sd_sim   v3    4.781   v4    5.521
+  naive {'freeze_1s': 4.1, 'freeze_2s': 9.01, 'freeze_3s': 12.87, 'freeze_5s': 20.69, 'freeze_10s': 20.13, 'freeze_free': 22.94}
+
+train_trimmed
+  psi_1s         v3    1.820   v4    2.061
+  psi_2s         v3    5.549   v4    5.362
+  psi_3s         v3    8.539   v4    7.893
+  psi_5s         v3   13.544   v4   12.332
+  psi_10s        v3   17.896   v4   16.634
+  psi_free       v3   25.036   v4   23.338
+  pos_3s         v3    0.532   v4    0.535
+  pos_10s        v3    1.449   v4    1.362
+  pos_free       v3    3.029   v4    2.852
+  ks_turn_rate   v3    0.135   v4    0.142
+  path_err_mean  v3   -0.396   v4   -1.761
+  path_err_abs   v3    1.406   v4    1.909
+  drift_sd_meas  v3    7.954   v4    7.954
+  drift_sd_sim   v3    5.048   v4    6.586
+  naive {'freeze_1s': 4.85, 'freeze_2s': 10.52, 'freeze_3s': 14.35, 'freeze_5s': 19.42, 'freeze_10s': 19.55, 'freeze_free': 33.7}
+
+parameters
+  T12        v3    16.0623   v4    16.1559   [15.841, 18.998]   bounds (2.0, 45.0)
+  t_boost    v3     0.0000   v4     0.0000   [0.000, 0.000]   bounds (0.0, 0.0)
+  u_boost    v3     0.5000   v4     0.5000   [0.500, 0.500]   bounds (0.5, 0.5)
+  X_uu       v3    12.8879   v4    14.0874   [12.188, 16.292]   bounds (0.0, 40.0)
+  X_vv       v3    50.6376   v4    23.1308   [19.109, 26.882]   bounds (0.0, 60.0)
+  X_rr       v3     0.0580   v4    16.4999   [1.248, 26.396]   bounds (0.0, 200.0)
+  X_delta    v3     0.1165   v4     1.6099   [1.120, 2.153]   bounds (0.0, 6.0)
+  Y_v        v3     0.9238   v4     0.8804   [0.000, 2.880]   bounds (0.0, 300.0)
+  Y_vv       v3   220.9760   v4    87.7914   [80.712, 106.155]   bounds (0.0, 300.0)
+  k_R        v3     2.1764   v4     5.1098   [4.007, 5.714]   bounds (0.05, 15.0)
+  k_race     v3     0.0135   v4     0.0242   [0.000, 0.052]   bounds (0.0, 4.0)
+  N_r        v3     1.0380   v4    25.9298   [20.828, 32.974]   bounds (0.0, 120.0)
+  N_rr       v3     0.0173   v4     0.0000   [0.000, 0.000]   bounds (0.0, 0.0)
+  N_uv       v3   -83.9691   v4   -47.0141   [-51.757, -39.221]   bounds (-250.0, 250.0)
+  rud_rate   v3  2984.7500   v4  2986.6045   [2845.358, 3000.000]   bounds (10.0, 3000.0)
+  rud_tau    v3     0.8952   v4     1.0430   [0.945, 1.099]   bounds (0.01, 1.2)
+  rud_delay  v3     0.7301   v4     0.7249   [0.659, 0.769]   bounds (0.0, 1.6)

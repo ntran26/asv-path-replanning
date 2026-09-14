@@ -77,6 +77,8 @@ class RewardState:
     # --- bookkeeping -------------------------------------------------------
     step_index: int = 0
     open_water: bool = False
+    # The emergency-stop latch holds this step (revision 8, A8).
+    estop_active: bool = False
 
 
 # ---------------------------------------------------------------------------
@@ -110,6 +112,15 @@ def effective_speed_reference(state: RewardState, contexts, cfg) -> dict:
     result = {"u_ref_eff": float(cfg.u_ref), "w_exist_scale": 1.0,
               "reason": "nominal", "rule": ""}
 
+    # The stop latch outranks both carve-outs: while it holds, the vessel is
+    # stopping because the supervisor or an operator said so, and `r_pf` must
+    # not charge the policy's speed gate for it.  `r_pf` reads the flag itself;
+    # this only reports why.
+    if getattr(state, "estop_active", False):
+        return {"u_ref_eff": float(cfg.u_ref), "w_exist_scale": 1.0,
+                "reason": "emergency stop latched: speed gate suspended",
+                "rule": "8(e) stop"}
+
     for ctx in _iter(contexts):
         if not ctx.engaged:
             continue
@@ -127,6 +138,18 @@ def effective_speed_reference(state: RewardState, contexts, cfg) -> dict:
                       "rule": "R-2"}
             break
     return result
+
+
+def overspeed_gate(u: float, u_ref: float, cfg) -> float:
+    """`[0, 1]`: 1 up to `u_ref * (1 + tol)`, then linear to 0 over `u_ref * span`.
+
+    F50.  Called with the **nominal** `u_ref`: the carve-outs lower `U_ref_eff`
+    so that slowing is free, and gating against it would make cruising costly.
+    """
+    tol = float(getattr(cfg, "overspeed_tol", float("inf")))
+    span = max(float(getattr(cfg, "overspeed_span", 1.0)), 1e-6)
+    excess = (float(u) - float(u_ref) * (1.0 + tol)) / (float(u_ref) * span)
+    return float(np.clip(1.0 - excess, 0.0, 1.0))
 
 
 # ---------------------------------------------------------------------------
@@ -166,7 +189,13 @@ def r_pf(state: RewardState, contexts, cfg, u_ref_eff: float = None) -> float:
     q = (cfg.w_e * math.exp(-cfg.gamma_e * e_tilde * e_tilde)
          + (1.0 - cfg.w_e) * 0.5 * (1.0 + math.cos(chi_star)))
 
-    g_u = float(np.clip(max(state.u, 0.0) / max(u_ref_eff, 1e-6), 0.0, 1.0))
+    # Suspended while the emergency-stop latch holds (A8): the vessel is at
+    # rest because it was stopped, and the path term then judges geometry only.
+    if getattr(state, "estop_active", False):
+        g_u = 1.0
+    else:
+        g_u = float(np.clip(max(state.u, 0.0) / max(u_ref_eff, 1e-6), 0.0, 1.0))
+        g_u *= overspeed_gate(state.u, cfg.u_ref, cfg)
     return float(np.clip(-(1.0 - g_u * q), -1.0, 0.0))
 
 
@@ -357,8 +386,8 @@ def v_port(state: RewardState, ctx, cfg) -> float:
     v_port = rho_t * clip( (max(0, -s_c*r_err) - r_dead) / r_ref, 0, 1 )
     ```
 
-    `s_c` is the compliant turn sense: `+1` for head-on and crossing, `-1` for
-    overtaking.  Two things this shape fixes, both of them traps the documents
+    `s_c` is the compliant turn sense: `+1` for head-on and a crossing from
+    starboard, `-1` for overtaking and a crossing from port (A17).  Two things this shape fixes, both of them traps the documents
     name explicitly:
 
     1. **`02 §4.2`'s implementation trap.**  Overtaking *requires* a port turn.

@@ -1,0 +1,163 @@
+"""C1 and A8 (revision 8): the scenario generator drives the environment, and
+the emergency stop has its own reward treatment."""
+
+import numpy as np
+import pytest
+
+import constants as cfg
+import emergency_stop as es
+import scenario as scn
+from env import ASVLidarEnv
+from reward import RewardConfig
+from reward import terms as T
+
+
+# ---------------------------------------------------------------------------
+# The generator in the environment
+# ---------------------------------------------------------------------------
+def test_generated_episodes_cover_the_stage_5_classes_and_start_at_cruise():
+    env = ASVLidarEnv(render_mode=None, scenario_stage=5)
+    seen = set()
+    for seed in range(40):
+        env.reset(seed=seed)
+        cls = env.scenario.encounter_class
+        seen.add(cls)
+        assert env.u_body == pytest.approx(cfg.U_NOM)
+        assert abs(((env.asv_h - env.scenario.own_heading) + 180.0) % 360.0 - 180.0) < 1e-6
+        assert (len(env.targets) == 0) == (cls == "no_target")
+        if env.targets:
+            assert env.targets[0].encounter_class == cls
+            assert env.targets[0].confined == (cls != "crossing")
+        _, _, _, _, info = env.step(np.zeros(2, dtype=np.float32))
+        assert info["scenario_class"] == cls
+    assert {"head_on", "crossing", "overtaking", "being_overtaken"} <= seen
+
+
+def test_generated_episodes_are_reproducible_from_the_seed():
+    a, b = (ASVLidarEnv(render_mode=None, scenario_stage=4) for _ in range(2))
+    for seed in (3, 17):
+        a.reset(seed=seed)
+        b.reset(seed=seed)
+        assert a.scenario.digest() == b.scenario.digest()
+        assert a.obstacles == b.obstacles
+
+
+def test_the_stage_follows_set_scenario_stage():
+    env = ASVLidarEnv(render_mode=None, scenario_stage=1)
+    env.reset(seed=0)
+    assert env.scenario.encounter_class == "no_target"
+    env.set_scenario_stage(5)
+    classes = set()
+    for seed in range(20):
+        env.reset(seed=seed)
+        classes.add(env.scenario.encounter_class)
+    assert len(classes) > 1
+
+
+def test_a_supplied_scenario_is_used_as_given():
+    generator = scn.ScenarioGenerator(stage=5, seed_namespace="development")
+    built = generator.sample(scn.seed_for("development", 7), encounter_class="head_on", width=6.0)
+    env = ASVLidarEnv(render_mode=None)
+    env.reset(seed=0, options={"generated": built})
+    assert env.scenario is built
+    assert env.corridor_width == pytest.approx(built.channel.nominal_width)
+    assert (env.targets[0].x, env.targets[0].y) == built.target_spawn
+
+
+def test_the_being_overtaken_goal_is_clear_of_the_corridor_end():
+    """F49: the path end keeps the spawn inset at the far edge too, and a fast
+    straight run to the goal ends in a goal, not a boundary collision."""
+    generator = scn.ScenarioGenerator(stage=5, seed_namespace="development")
+    env = ASVLidarEnv(render_mode=None)
+    env.forced_num_obs = 0
+    checked = 0
+    for index in range(40):
+        built = generator.sample(scn.seed_for("development", 50_000 + index),
+                                 encounter_class="being_overtaken", width=10.0)
+        if built is None:
+            continue
+        env.reset(seed=index, options={"generated": built})
+        assert env.path_start_s + env.path.length <= \
+            built.channel.length - cfg.GOAL_END_INSET_M + 0.05
+        env.targets = []
+        while True:
+            _, _, term, trunc, info = env.step(np.array([0.0, 1.0], dtype=np.float32))
+            if term or trunc:
+                break
+        assert info["reached_goal"] and not info["collided"]
+        checked += 1
+        if checked == 5:
+            break
+    assert checked == 5
+
+
+def test_the_being_overtaken_dcpa_is_floored_with_a_labelled_fraction_below():
+    """A15: most draws pass at or above the floor; about a fifth are labelled
+    below it, and the label agrees with the drawn DCPA."""
+    generator = scn.ScenarioGenerator(stage=5, seed_namespace="development")
+    below, n = 0, 0
+    for index in range(150):
+        built = generator.sample(scn.seed_for("development", 80_000 + index),
+                                 encounter_class="being_overtaken")
+        if built is None:
+            continue
+        n += 1
+        if built.dcpa_below_floor:
+            below += 1
+            assert built.dcpa_m < cfg.BEING_OVERTAKEN_DCPA_FLOOR
+        else:
+            assert built.dcpa_m >= cfg.BEING_OVERTAKEN_DCPA_FLOOR
+    assert n >= 100
+    assert 0.08 <= below / n <= 0.35
+
+
+def test_obstacles_keep_clear_of_the_encounter():
+    """04a §3.6: the CPA stretch of the own ship's track stays clear."""
+    env = ASVLidarEnv(render_mode=None, scenario_stage=5)
+    env.forced_num_obs = 3
+    checked = 0
+    for seed in range(30):
+        env.reset(seed=seed)
+        built = env.scenario
+        if built.encounter_class in ("no_target", "null") or built.tcpa_s <= 0:
+            continue
+        guard = cfg.OBSTACLE_CPA_GUARD_FRAC * built.tcpa_s * cfg.U_NOM
+        s_cpa = built.tcpa_s * cfg.U_NOM
+        for poly in env.obstacles:
+            cx, cy = np.mean(poly, axis=0)
+            assert abs(env.path.project(cx, cy, 0.0).s_along - s_cpa) > guard
+        checked += 1
+    assert checked > 0
+
+
+# ---------------------------------------------------------------------------
+# The emergency stop in the reward (A8)
+# ---------------------------------------------------------------------------
+def test_the_speed_gate_is_suspended_while_the_latch_holds():
+    cfgr = RewardConfig()
+    stopped = T.RewardState(u=0.0, w_local=10.0, l_path=20.0)
+    held = T.RewardState(u=0.0, w_local=10.0, l_path=20.0, estop_active=True)
+    assert T.r_pf(stopped, {}, cfgr) == pytest.approx(-1.0)
+    assert T.r_pf(held, {}, cfgr) == pytest.approx(0.0)
+    assert T.effective_speed_reference(held, {}, cfgr)["rule"] == "8(e) stop"
+
+
+def test_a_stop_costs_once_and_never_as_much_as_a_collision():
+    assert RewardConfig().r_collision < cfg.R_ESTOP < 0.0
+    with pytest.raises(ValueError, match="r_estop"):
+        RewardConfig(r_estop=-400.0)
+
+    env = ASVLidarEnv(render_mode=None, no_target_prob=1.0)
+    env.forced_num_obs = 0
+    env.reset(seed=0)
+    for _ in range(cfg.steps_for(6.0)):
+        env.step(np.zeros(2, dtype=np.float32))
+    env.request_emergency_stop("test")
+    charged = []
+    for _ in range(cfg.steps_for(6.0)):
+        _, _, term, trunc, info = env.step(np.zeros(2, dtype=np.float32))
+        charged.append(info["reward/intervention"])
+        if term or trunc:
+            break
+    assert charged[0] == pytest.approx(cfg.R_ESTOP)
+    assert all(c == 0.0 for c in charged[1:])

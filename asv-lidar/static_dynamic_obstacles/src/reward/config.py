@@ -39,6 +39,7 @@ class RewardConfig:
     r_goal: float = cfg.R_GOAL
     r_collision: float = cfg.R_COLLISION
     r_timeout: float = cfg.R_TIMEOUT
+    r_estop: float = cfg.R_ESTOP
     timeout_bootstrap: bool = True
 
     # --- path following ----------------------------------------------------
@@ -47,6 +48,8 @@ class RewardConfig:
     omega_la: float = cfg.PF_OMEGA_LA
     u_ref: float = cfg.U_REF
     u_ref_slow_factor: float = cfg.U_REF_SLOW_FACTOR
+    overspeed_tol: float = cfg.PF_OVERSPEED_TOL
+    overspeed_span: float = cfg.PF_OVERSPEED_SPAN
 
     # --- safety geometry ---------------------------------------------------
     d_safe: float = cfg.D_SAFE
@@ -172,6 +175,12 @@ class RewardConfig:
                 f"|r_collision| {abs(self.r_collision)} must exceed "
                 f"w_col * max_encounter_steps = "
                 f"{self.w_col * self.max_encounter_steps} (02 §5, `R-7`)")
+
+        # A stop must cost something and must always beat a collision (A8).
+        if not (self.r_collision < self.r_estop <= 0.0):
+            raise ValueError(f"r_estop {self.r_estop} must lie in (r_collision, 0] = "
+                             f"({self.r_collision}, 0]: a stop is never free and never "
+                             f"worse than hitting something")
 
         if not self.t_act < self.t_engage:
             raise ValueError(f"t_act {self.t_act} must be below t_engage "

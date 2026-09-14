@@ -121,7 +121,11 @@ def test_r_path_is_reported_in_radians_alongside_the_yaw_rate():
 
 
 def test_r_path_is_zero_on_a_straight_corridor():
-    env = ASVLidarEnv(render_mode=None)
+    """An explicitly straight, constant-width channel.  The default generator
+    varies width along `s`, and the path follows the local half-width, so a
+    default corridor is only nearly straight."""
+    import corridor as corr
+    env = ASVLidarEnv(render_mode=None, channel=corr.rectangle(10.0))
     env.reset(seed=0)
     for _ in range(20):
         _, _, term, trunc, info = env.step(np.zeros(2, dtype=np.float32))

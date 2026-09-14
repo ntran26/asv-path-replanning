@@ -1,257 +1,273 @@
-"""Nonlinear 3-DOF manoeuvring model of the Bluefin-class ASV.
+"""Bluefin vessel plant: the model identified from the July 2026 field logs.
 
-Usage:
+**Replaces the Paper 2 v2 hull**, which is kept as `ship_v2.py` for comparison.
+The identification lives in `../bluefin/` (05 part 1): fitted on the 2026-07-02
+session, held out on 2026-07-03, with its own acceptance suite and a
+reproducible pipeline.  This module **imports** that model rather than copying
+it, so when basin session 1 refits the parameters or the structure, the
+simulator follows without a second copy drifting out of step.
+
+Same public interface as v2, so no call site changes:
 
     model = ShipModel()
     dx, dy, heading_deg, yaw_rate_degps = model.update(rpm, rudder_percent, dt)
 
-`rudder_percent` is the commanded rudder in [-100, 100].  Note the sign
-inversion in `_derivatives`: a positive command produces a *negative* rudder
-angle.  That is the convention the trained policies were built against.
+`rudder_percent` is in the simulator convention, exactly as v2 took it.
 
-Hull forces follow the MATLAB Bluefin model with three empirical adjustments
-that were needed to match the measured response:
+What this wrapper adds to the identified model, and nothing else
+---------------------------------------------------------------
+1. **Substepping.**  `bluefin/REPORT.md` §9 requires `sub_dt <= 0.05`; a single
+   0.1 s RK4 step drifts about 0.5 m over 30 s of manoeuvring.  `update` splits
+   any `dt` into equal substeps no longer than `sub_dt`.
+2. **Reverse braking.**  The identified model cannot represent reverse thrust:
+   `dynamics.thrust` clamps the command at zero and the integrator clips surge
+   at zero, because the July logs contain no reverse command at all.  The
+   emergency stop needs one, so a negative rpm command is applied by operator
+   splitting -- the identified dynamics advance with thrust at zero (which is
+   what `dynamics` already does for a negative command), then a braking force
+   `REVERSE_THRUST_EFFICIENCY * T(|rpm|)` removes surge momentum, floored at
+   zero.  Reverse thrust enters only the surge equation, so every forward-thrust
+   trajectory is **bit-identical** to `bluefin/ship_model_v3.ShipModel`, which
+   `tests/test_vessel_model.py` asserts.
+3. **Cached parameter arrays.**  The reference model rebuilds a dict of numpy
+   arrays on every call; at 10 Hz with two substeps that dominated the plant's
+   cost.
 
-* a speed-dependent propeller law (more thrust near zero speed, less at high
-  speed) instead of a constant one;
-* separate scales for rudder sway force, yaw moment and axial drag, so turning
-  authority can be tuned without bleeding an unrealistic amount of speed;
-* linear damping in all three axes.
+What it deliberately does **not** do: astern motion.  Surge stays clipped at
+zero, so a stop brings the vessel to rest and holds it there.  The emergency
+stop latches back to zero thrust at rest, so astern motion should not arise --
+but on the real vessel the latch sees speed at the telemetry rate, and full
+astern continues for up to one control interval past zero.  That overshoot is
+not modelled, and it is one of the things the crash-stop basin test must
+measure.
 """
 
 from __future__ import annotations
 
 import math
+import sys
+from collections import deque
+from pathlib import Path
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 
-# --- Geometry --------------------------------------------------------------
-VESSEL_LENGTH = 1.725
-VESSEL_WIDTH = 0.50
-HULL_MARGIN = 0.15                      # inflation applied to the collision hull
-LIDAR_OFFSET_M = VESSEL_LENGTH / 2.0    # sensor sits at the bow
+_BLUEFIN_DIR = Path(__file__).resolve().parent.parent / "bluefin"
+if str(_BLUEFIN_DIR) not in sys.path:
+    # Appended, not prepended: `src/` and the standard library keep precedence,
+    # and the assertion below catches any other module named `dynamics` that
+    # would otherwise win silently.
+    sys.path.append(str(_BLUEFIN_DIR))
 
-# --- Hull and hydrodynamics ------------------------------------------------
-RHO = 1000.0
-MASS = 64.55
-MX = 3.662                              # added mass, surge
-MY = 62.7366                            # added mass, sway
-MOMINERTIA = 9.6038 + 0.6309            # Iz + Jz
+import dynamics as dyn  # noqa: E402
+import ship_model_v3 as _v3  # noqa: E402
 
-DRAFT = 0.193
-SW = 0.7614                             # wetted surface area
+if Path(dyn.__file__).resolve().parent != _BLUEFIN_DIR:
+    raise ImportError(
+        f"`dynamics` resolved to {dyn.__file__}, not the identified model in "
+        f"{_BLUEFIN_DIR}. Another module named `dynamics` is shadowing it.")
 
-MAX_RUD_ANGLE = 40.0
-MAX_RUD_RATE_DPS = 20.0
+# --- Geometry, from the identified model -----------------------------------
+VESSEL_LENGTH = dyn.VESSEL_LENGTH
+VESSEL_WIDTH = dyn.VESSEL_WIDTH
+HULL_MARGIN = dyn.HULL_MARGIN
+LIDAR_OFFSET_M = dyn.LIDAR_OFFSET_M
+MASS = dyn.MASS
+M11 = dyn.M11                           # surge mass including added mass
 
-TP = 0.193                              # thrust deduction
-AH = 0.443853                           # rudder-hull interaction
-X_RUDDER = -1.05309
-X_HULL = -0.733125
-KX = 0.6177                             # propeller race factor
-WR = 0.22                               # wake fraction at the rudder
-AR = 0.0091                             # rudder area
-FALP = 2.69279                          # rudder lift slope
-L_R = -0.77735                          # rudder longitudinal position
+# --- Actuation --------------------------------------------------------------
+MAX_RUD_ANGLE = dyn.MAX_RUD_ANGLE_DEG   # 40 deg
 
-# Manoeuvring derivatives.
-XVV, XVR, XRR = 0.0623, 1.1415, 0.0027
-YV, YR = 2.47781051381700e-003, 94.5956792789195e-009
-YVV, YRR, YVR = 1.08140832998334e-003, 22.7583008858493e-012, 262.214901533461e-009
-NV, NR = 1.10546039494704e-003, 42.2032985948020e-009
-NVV, NRR, NVR = 482.463882083071e-006, 10.1534803187344e-012, 116.985615725573e-009
+# The rudder rate limit that matters is the **bridge's command limiter**, not a
+# servo property: `udp_live_rl.py` ramps the transmitted rudder at 50 %/s, and
+# the identified servo rate (2985 deg/s) is effectively unconstrained because
+# nothing slower than the bridge limit exists to identify (REPORT §8).
+# 50 %/s of a 40 deg rudder is 20 deg/s, the same number v2 carried as a servo
+# rate -- which is why `constants.KAPPA_DELTA` does not move.
+COMMAND_RATE_PCT_S = 50.0
+MAX_RUD_RATE_DPS = COMMAND_RATE_PCT_S / 100.0 * MAX_RUD_ANGLE     # 20 deg/s
 
-# --- Calibrated gains ------------------------------------------------------
-# THRUST_CAL scales the whole thrust map so that steady surge at CRUISE_RPM
-# matches the measured field cruise speed (constants.U_REF).  Paper 2's map was
-# never validated against the trial logs -- 05 §2 lists "Paper 2 used thrust
-# proportional to RPM^2; verify" -- and mining those logs (02b T1) put the real
-# cruise at 1.14 m/s against the simulator's 1.77.
+# Reverse thrust as a fraction of forward thrust at the same command magnitude.
 #
-# The discrepancy lives in this one number by design (02b C2): when 05's
-# identification lands, this is the single value that changes, rather than every
-# speed normaliser downstream.
-#
-# Solved by bisection for steady u = 1.14 m/s at 12 RPM.
-# TODO(05): replace with the identified thrust map; this is a calibration, not
-# an identification.
-THRUST_CAL = 0.3751
+# TODO(05): **unmeasured, and it decides whether the emergency stop meets 03a's
+# T9 on the water.**  No July log contains a reverse command.  Fixed-pitch
+# propellers typically deliver 50-70 % astern; 0.5 is the conservative end of
+# that.  In simulation (0.1 s control step) the stop meets T9 for any value
+# >= 0.19.  At the deployment's 2 Hz it needs >= 0.26, and if thrust shares
+# the rudder's 0.73 s effective delay, >= 0.56 -- so 0.5 would fail there.
+# A crash-stop run in basin session 1 settles both numbers.
+REVERSE_THRUST_EFFICIENCY = 0.5
 
-THRUST_COEF = 0.06 * THRUST_CAL
-DRAG_COEF = 1.5
-TURN_COEF = 3.0                         # hull sway/yaw damping scale
+SUB_DT = 0.05                           # REPORT §9: required <= 0.05
 
-THRUST_LOW_SPEED_BOOST = 1.6            # extra thrust near zero speed
-THRUST_BOOST_U0 = 0.7                   # e-folding speed of that boost [m/s]
-THRUST_HIGH_SPEED_DECAY = 0.26          # thrust roll-off with speed^2
-LINEAR_SURGE_DAMP = 2.0
+# --- Identified parameters, re-exported ------------------------------------
+IDENTIFIED: Dict[str, float] = dict(_v3.IDENTIFIED)
+BOOTSTRAP = _v3.BOOTSTRAP
+sample_params = _v3.sample_params
 
-RUDDER_FORCE_SCALE = 0.32               # rudder normal force scale
-RUDDER_YAW_SCALE = 2.60                 # extra yaw authority
-RUDDER_X_DRAG_SCALE = 0.02              # axial speed loss from rudder side force
-LINEAR_SWAY_DAMP = 18.0
-LINEAR_YAW_DAMP = 1.5
 
-# --- Numerical limits ------------------------------------------------------
-MIN_FLOW_SPEED = 0.05
-MAX_SURGE_SPEED = 5.0
-MAX_SWAY_SPEED = 3.0
-MAX_YAW_RATE_RAD = math.radians(160.0)
+def forward_thrust(rpm: float, params: Optional[Dict[str, float]] = None,
+                   u: float = 0.0) -> float:
+    """Identified forward thrust at a command, newtons (zero for rpm <= 0)."""
+    p = IDENTIFIED if params is None else params
+    pa = {k: np.array([float(v)]) for k, v in p.items()}
+    return float(dyn.thrust(np.array([float(rpm)]), np.array([float(u)]), pa)[0])
 
-MAX_RUD_RAD = math.radians(MAX_RUD_ANGLE)
-MAX_RUD_RATE_RADPS = math.radians(MAX_RUD_RATE_DPS)
 
-# Skin friction, evaluated once at a fixed reference Reynolds number.
-CF = 0.4631 / (math.log(4.0e7) ** 2.6)
+def braking_thrust(rpm: float, params: Optional[Dict[str, float]] = None,
+                   efficiency: float = REVERSE_THRUST_EFFICIENCY) -> float:
+    """Magnitude of reverse thrust at a negative command, newtons.
 
-# State vector layout.
-_U, _V, _R, _PSI, _DELTA, _X, _Y = range(7)
+    Mirrors the forward law at the same command magnitude, scaled by the
+    reverse efficiency.  The square-law RPM exponent is *assumed* in the forward
+    law too (REPORT §8, `T12` anchored at one operating point), so full astern
+    at -24 rpm-units inherits that extrapolation.
+    """
+    if rpm >= 0.0:
+        return 0.0
+    return float(efficiency) * forward_thrust(abs(rpm), params, u=0.0)
+
+
+def steady_speed(rpm: float, params: Optional[Dict[str, float]] = None) -> float:
+    """Straight-line steady surge at a command, from the identified balance.
+
+    Solved from thrust = drag with sway and yaw at zero.  With the identified
+    `t_boost = 0` this reduces to `(rpm/12) * sqrt(T12 / X_uu)` = 1.116 m/s at
+    12 rpm-units, but the bisection keeps it correct if a refit brings the
+    low-speed boost back.
+    """
+    p = IDENTIFIED if params is None else params
+    if rpm <= 0.0:
+        return 0.0
+    lo, hi = 0.0, float(dyn.MAX_SURGE_SPEED)
+    for _ in range(80):
+        mid = 0.5 * (lo + hi)
+        net = forward_thrust(rpm, p, u=mid) - float(p["X_uu"]) * mid * mid
+        lo, hi = (mid, hi) if net > 0.0 else (lo, mid)
+    return 0.5 * (lo + hi)
 
 
 class ShipModel:
-    """RK4-integrated 3-DOF hull.  Angles are radians internally."""
+    """The identified 3-DOF model with substepping and reverse braking."""
 
-    def __init__(self) -> None:
+    def __init__(self, params: Optional[Dict[str, float]] = None, *,
+                 sub_dt: float = SUB_DT,
+                 reverse_efficiency: float = REVERSE_THRUST_EFFICIENCY) -> None:
+        self.sub_dt = float(sub_dt)
+        self.reverse_efficiency = float(reverse_efficiency)
+        self.set_params(IDENTIFIED if params is None else params)
         self.reset()
 
-    def reset(self) -> None:
-        self._s = np.zeros(7, dtype=float)
+    # -- parameters ---------------------------------------------------------
+    def set_params(self, params: Dict[str, float]) -> None:
+        """Adopt a parameter set -- a domain-randomisation draw, typically.
 
-    # Read-only views of the integrated state.
+        Clears the actuator delay line, because its length is set by
+        `rud_delay` and a stale buffer would carry the previous vessel's delay
+        into the next episode.
+        """
+        self.p = {k: float(v) for k, v in params.items()}
+        self._pa = {k: np.array([v]) for k, v in self.p.items()}
+        self._cmd_buf = deque()
+        self._buf_dt = None
+
+    # -- state --------------------------------------------------------------
+    def reset(self) -> None:
+        self._s = np.zeros((7, 1))
+        self._cmd_buf = deque()
+        self._buf_dt = None
+        self.last_braking_force = 0.0
+        self.last_astern_impulse = 0.0
+
     @property
     def u(self) -> float:
         """Surge velocity [m/s]."""
-        return float(self._s[_U])
+        return float(self._s[0, 0])
 
     @property
     def v(self) -> float:
         """Sway velocity [m/s]."""
-        return float(self._s[_V])
+        return float(self._s[1, 0])
 
     @property
     def yaw_rate(self) -> float:
         """Yaw rate [rad/s]."""
-        return float(self._s[_R])
+        return float(self._s[2, 0])
 
     @property
     def heading_deg(self) -> float:
-        return math.degrees(float(self._s[_PSI])) % 360.0
+        return math.degrees(float(self._s[3, 0])) % 360.0
 
     @property
     def rudder_deg(self) -> float:
-        return math.degrees(float(self._s[_DELTA]))
+        return math.degrees(float(self._s[4, 0]))
 
-    def update(self, rpm: float, rud: float, dt: float):
-        """Advance one step; return (dx, dy, heading_deg, yaw_rate_degps)."""
+    def state_dict(self) -> Dict[str, float]:
+        return {
+            "u_body_mps": self.u,
+            "v_body_mps": self.v,
+            "yaw_rate_radps": self.yaw_rate,
+            "yaw_rate_degps": math.degrees(self.yaw_rate),
+            "heading_deg": self.heading_deg,
+            "rudder_deg": self.rudder_deg,
+            "x_m": float(self._s[5, 0]),
+            "y_m": float(self._s[6, 0]),
+            "speed_mps": math.hypot(self.u, self.v),
+        }
+
+    # -- actuator delay -----------------------------------------------------
+    def _delayed_command(self, delta_cmd: float, dt: float) -> float:
+        """Pure transport delay as a FIFO sized by dt.
+
+        Copied from `ship_model_v3.ShipModel._delayed_command` line for line,
+        including its initial-fill behaviour, so that trajectories match the
+        reference model exactly.
+        """
+        n = int(round(self.p["rud_delay"] / max(dt, 1e-6)))
+        if self._buf_dt != dt:
+            self._cmd_buf = deque([delta_cmd] * max(n, 0), maxlen=max(n, 1))
+            self._buf_dt = dt
+        if n <= 0:
+            return delta_cmd
+        out = self._cmd_buf[0] if len(self._cmd_buf) == self._cmd_buf.maxlen else delta_cmd
+        self._cmd_buf.append(delta_cmd)
+        return out
+
+    # -- integration --------------------------------------------------------
+    def update(self, rpm: float, rud: float, dt: float) -> Tuple[float, float, float, float]:
+        """Advance `dt` seconds; return (dx, dy, heading_deg, yaw_rate_degps)."""
         if dt <= 0.0:
             raise ValueError("dt must be > 0")
 
-        s0 = self._s
-        x_prev, y_prev = s0[_X], s0[_Y]
+        n = max(1, int(math.ceil(float(dt) / self.sub_dt - 1e-9)))
+        h = float(dt) / n
+        x_prev, y_prev = float(self._s[5, 0]), float(self._s[6, 0])
 
-        k1 = self._derivatives(s0, rpm, rud)
-        k2 = self._derivatives(s0 + 0.5 * dt * k1, rpm, rud)
-        k3 = self._derivatives(s0 + 0.5 * dt * k2, rpm, rud)
-        k4 = self._derivatives(s0 + dt * k3, rpm, rud)
-        s1 = s0 + (dt / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
+        # simulator percent -> transmitted convention -> angle (see dynamics.py)
+        delta_cmd = float(dyn.cmd_percent_to_angle(np.array([-float(rud)]))[0])
+        rpm_arr = np.array([float(rpm)])
+        self.last_braking_force = braking_thrust(float(rpm), self.p,
+                                                 self.reverse_efficiency)
+        # Impulse of the reverse thrust applied while surge was already zero:
+        # what the clip at zero throws away, and what would drive the real
+        # vessel astern.  `impulse / M11` is the astern speed it implies.
+        self.last_astern_impulse = 0.0
 
-        s1[_U] = float(np.clip(s1[_U], 0.0, MAX_SURGE_SPEED))
-        s1[_V] = float(np.clip(s1[_V], -MAX_SWAY_SPEED, MAX_SWAY_SPEED))
-        s1[_R] = float(np.clip(s1[_R], -MAX_YAW_RATE_RAD, MAX_YAW_RATE_RAD))
-        s1[_DELTA] = float(np.clip(s1[_DELTA], -MAX_RUD_RAD, MAX_RUD_RAD))
-        self._s = s1
+        for _ in range(n):
+            delayed = self._delayed_command(delta_cmd, h)
+            self._s = dyn.rk4_step(self._s, rpm_arr, np.array([delayed]), self._pa, h)
+            force = self.last_braking_force
+            if force > 0.0:
+                u = float(self._s[0, 0])
+                decel = force / M11
+                if u > 0.0:
+                    self._s[0, 0] = max(0.0, u - decel * h)
+                    if u < decel * h:
+                        self.last_astern_impulse += force * (h - u / decel)
+                else:
+                    self.last_astern_impulse += force * h
 
-        return (
-            float(s1[_X] - x_prev),
-            float(s1[_Y] - y_prev),
-            self.heading_deg,
-            math.degrees(float(s1[_R])),
-        )
-
-    @staticmethod
-    def _propeller_thrust(rpm: float, u_eff: float) -> float:
-        """Empirical thrust law: boosted at low speed, rolled off at high speed."""
-        n = max(rpm, 0.0)
-        static = THRUST_COEF * n * abs(n)
-        boost = 1.0 + THRUST_LOW_SPEED_BOOST * math.exp(-u_eff / THRUST_BOOST_U0)
-        decay = 1.0 / (1.0 + THRUST_HIGH_SPEED_DECAY * u_eff * u_eff)
-        return (1.0 - TP) * static * boost * decay
-
-    def _derivatives(self, s: np.ndarray, rpm: float, rud: float) -> np.ndarray:
-        u = float(s[_U])
-        v = float(s[_V])
-        r = float(s[_R])
-        psi = float(s[_PSI])
-        delta = float(s[_DELTA])
-
-        # Rudder servo: rate-limited tracking of the commanded angle.
-        delta_cmd = -float(np.clip(rud, -100.0, 100.0)) / 100.0 * MAX_RUD_RAD
-        delta_dot = float(np.clip(delta_cmd - delta, -MAX_RUD_RATE_RADPS, MAX_RUD_RATE_RADPS))
-
-        u_eff = max(u, 0.0)
-        flow = max(math.hypot(u_eff, v), MIN_FLOW_SPEED)
-        beta = math.atan2(v, max(abs(u_eff), MIN_FLOW_SPEED))
-        r_nd = r * VESSEL_LENGTH / flow
-
-        # Hull surge: skin friction, cross-flow drag, linear damping.
-        x_hull = (
-            -DRAG_COEF * 0.5 * RHO * SW * CF * u_eff * abs(u_eff)
-            - DRAG_COEF * 0.5 * RHO * VESSEL_LENGTH * DRAFT * flow * flow * (
-                XVV * (math.sin(beta) ** 2)
-                + XVR * abs(math.sin(beta)) * abs(r_nd)
-                + XRR * (r_nd ** 2)
-            )
-            - LINEAR_SURGE_DAMP * u_eff
-        )
-
-        # Hull sway force and yaw moment.
-        y_hull = -TURN_COEF * (
-            0.5 * RHO * VESSEL_LENGTH * DRAFT * flow * flow * (
-                YV * beta + YVV * abs(beta) * beta
-                + YR * r_nd + YRR * abs(r_nd) * r_nd
-                + YVR * beta * abs(r_nd)
-            )
-            + LINEAR_SWAY_DAMP * v
-        )
-        n_hull = -TURN_COEF * (
-            0.5 * RHO * (VESSEL_LENGTH ** 2) * DRAFT * flow * flow * (
-                NV * beta + NVV * abs(beta) * beta
-                + NR * r_nd + NRR * abs(r_nd) * r_nd
-                + NVR * abs(beta) * r_nd
-            )
-            + LINEAR_YAW_DAMP * r
-        )
-
-        # Rudder: inflow accelerated by the propeller race, then normal force.
-        n_prop = max(rpm, 0.0) / 60.0
-        u_r = max(MIN_FLOW_SPEED, (1.0 - WR) * u_eff + 0.6 * KX * n_prop)
-        v_r = v + L_R * r
-        alpha_r = delta - math.atan2(v_r, u_r)
-        f_n = RUDDER_FORCE_SCALE * 0.5 * RHO * AR * FALP * (u_r * u_r + v_r * v_r) * math.sin(alpha_r)
-
-        x_rud = -RUDDER_X_DRAG_SCALE * abs(f_n) * abs(math.sin(delta))
-        y_rud = -(1.0 + AH) * f_n * math.cos(delta)
-        n_rud = -RUDDER_YAW_SCALE * abs(X_RUDDER + AH * X_HULL) * f_n * math.cos(delta)
-
-        m11 = MASS + MX
-        m22 = MASS + MY
-
-        du = (x_hull + self._propeller_thrust(rpm, u_eff) + x_rud + m22 * v * r) / m11
-        dv = (y_hull + y_rud - m11 * u_eff * r) / m22
-        dr = (n_hull + n_rud) / MOMINERTIA
-
-        return np.array([
-            du, dv, dr, r, delta_dot,
-            u_eff * math.sin(psi) + v * math.cos(psi),
-            u_eff * math.cos(psi) - v * math.sin(psi),
-        ], dtype=float)
-
-
-if __name__ == "__main__":
-    for label, rpm, rud, steps in [("Straight demo", 14.0, 0.0, 60), ("Turning demo", 20.0, 62.5, 120)]:
-        model = ShipModel()
-        print(label)
-        for k in range(steps):
-            _, _, hdg, yaw = model.update(rpm, rud, 0.1)
-            if k % 10 == 0:
-                print(f"  t={0.1 * (k + 1):4.1f}s u={model.u:5.2f} yaw={yaw:6.2f} hdg={hdg:6.2f}")
+        return (float(self._s[5, 0]) - x_prev,
+                float(self._s[6, 0]) - y_prev,
+                self.heading_deg,
+                math.degrees(float(self._s[2, 0])))

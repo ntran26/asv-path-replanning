@@ -271,8 +271,8 @@ def test_pose_drift_creates_false_velocity_on_a_static_object():
     value in `constants.py`.
     """
     bearings = np.array([0.0])
-    tracker = trk.Tracker()
-    drift_per_step = 0.02                       # 0.2 m/s of apparent motion
+    tracker = trk.Tracker(classifier="speed")
+    drift_per_step = 0.2 * cfg.UPDATE_RATE      # 0.2 m/s of apparent motion
     for k in range(40):
         est_x = 5.0 + k * drift_per_step
         # The object is truly fixed at (5, 14), but we localise ourselves wrong.

@@ -199,7 +199,8 @@ def is_confined(encounter_class: str) -> bool:
     return str(encounter_class) not in UNCONFINED_CLASSES
 
 
-def confinement_violation(target: Target, corridor) -> Optional[float]:
+def confinement_violation(target: Target, corridor,
+                          polygon=None) -> Optional[float]:
     """How far a confined target has strayed outside its corridor, metres.
 
     `None` when the target is unconfined (crossing, under Rule 9(d)) or inside.
@@ -209,17 +210,21 @@ def confinement_violation(target: Target, corridor) -> Optional[float]:
     if not target.confined or corridor is None:
         return None
     import boundary_raycast as br
-    poly = corridor.polygon()
-    outside = [p for p in target.hull()
-               if not br.point_in_polygon(p[0], p[1], poly)]
-    if not outside:
+    # Pass the polygon when you have it.  `Corridor.polygon()` rebuilds the
+    # outline from 500 stations on every call, and testing the 11 hull vertices
+    # one call at a time multiplied that: together they were 40 % of every
+    # environment step, the single largest cost in the simulator.
+    poly = corridor.polygon() if polygon is None else polygon
+    hull = np.asarray(target.hull(), dtype=float)
+    inside = np.asarray(br.points_in_polygon(hull[:, 0], hull[:, 1], poly), dtype=bool)
+    if inside.all():
         return None
-    dist = br.points_boundary_distance(
-        np.array([p[0] for p in outside]), np.array([p[1] for p in outside]), poly)
+    outside = hull[~inside]
+    dist = br.points_boundary_distance(outside[:, 0], outside[:, 1], poly)
     return float(np.max(dist))
 
 
-def clamp_to_corridor(target: Target, corridor) -> None:
+def clamp_to_corridor(target: Target, corridor, polygon=None) -> None:
     """Keep a confined target inside the channel.
 
     Confined targets run constant-velocity down a channel that may bend, so
@@ -230,7 +235,7 @@ def clamp_to_corridor(target: Target, corridor) -> None:
     """
     if not target.confined or corridor is None:
         return
-    if confinement_violation(target, corridor) is None:
+    if confinement_violation(target, corridor, polygon) is None:
         return
 
     # Nearest centreline station, then adopt its tangent direction.

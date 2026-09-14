@@ -135,7 +135,7 @@ def test_2_coefficient_ordering_holds_and_is_enforced():
     assert (CFG.w_bnd > CFG.w_dom > CFG.w_obs > CFG.w_col
             > CFG.w_pf > CFG.w_prog > CFG.w_smooth > CFG.w_exist)
     with pytest.raises(ValueError, match="coefficient ordering"):
-        RewardConfig(w_col=5.0)
+        RewardConfig(w_col=cfg.W_OBS + 1.0)
 
 
 def test_2b_a_collision_outranks_a_whole_non_compliant_encounter():
@@ -293,6 +293,32 @@ def test_5_a_port_turn_is_a_violation_head_on_and_compliant_overtaking():
     turning_stbd = state_for(r=+0.25)
     assert T.v_port(turning_stbd, ctx_for(enc.HEAD_ON), CFG) == 0.0
     assert T.v_port(turning_stbd, ctx_for(enc.OVERTAKING), CFG) > 0.0
+
+
+def test_5b_a_crossing_from_port_requires_a_port_turn():
+    """A17.  Giving way to a target crossing from port means passing astern of
+    it, which is a port turn; from starboard it stays a starboard turn.  The
+    latch must take the side at engagement."""
+    from colregs.context import ContextManager, compliant_turn_sense
+    assert compliant_turn_sense(enc.CROSSING) == +1
+    assert compliant_turn_sense(enc.CROSSING, enc.SIDE_STARBOARD) == +1
+    assert compliant_turn_sense(enc.CROSSING, enc.SIDE_PORT) == -1
+    assert compliant_turn_sense(enc.HEAD_ON, enc.SIDE_PORT) == +1
+
+    port = ctx_for(enc.CROSSING, crossing_side=enc.SIDE_PORT,
+                   compliant_turn_sense=compliant_turn_sense(enc.CROSSING, enc.SIDE_PORT))
+    stbd = ctx_for(enc.CROSSING, crossing_side=enc.SIDE_STARBOARD,
+                   compliant_turn_sense=compliant_turn_sense(enc.CROSSING, enc.SIDE_STARBOARD))
+    assert T.v_port(state_for(r=+0.25), port, CFG) > 0.0
+    assert T.v_port(state_for(r=-0.25), port, CFG) == 0.0
+    assert T.v_port(state_for(r=-0.25), stbd, CFG) > 0.0
+    assert T.v_port(state_for(r=+0.25), stbd, CFG) == 0.0
+    assert port.turn_admissible == port.a_port
+
+    latch = ContextManager()._engage(
+        EncounterContext(track_id=1, cls=enc.CROSSING, crossing_side=enc.SIDE_PORT),
+        0.0, cfg.U_REF)
+    assert latch["turn_sense"] == -1
 
 
 def test_6_v_side_inverts_between_head_on_and_overtaking():
@@ -576,6 +602,22 @@ def test_r_pf_penalises_a_stopped_vessel_sitting_on_the_line():
     assert T.r_pf(state_for(u=cfg.U_REF, e_y=0.0), {}, CFG) == pytest.approx(0.0, abs=1e-9)
 
 
+def test_r_pf_charges_speeding_above_the_tolerance():
+    """F50.  Free inside the tolerance, full penalty at the 1.9x cruise the
+    first formulation run settled on, monotone in between."""
+    at = lambda k: T.r_pf(state_for(u=k * cfg.U_REF, e_y=0.0), {}, CFG)
+    assert at(1.0 + cfg.PF_OVERSPEED_TOL) == pytest.approx(0.0, abs=1e-9)
+    assert at(1.9) == pytest.approx(-1.0)
+    assert at(2.0 + cfg.PF_OVERSPEED_TOL) < at(1.5) < at(1.3) < 0.0
+
+
+def test_the_overspeed_gate_ignores_the_lowered_reference():
+    """R-2 lowers `U_ref_eff` so slowing is free; cruising must stay free too."""
+    slow_ref = cfg.U_REF_SLOW_FACTOR * cfg.U_REF
+    assert T.r_pf(state_for(u=cfg.U_REF, e_y=0.0), {}, CFG,
+                  u_ref_eff=slow_ref) == pytest.approx(0.0, abs=1e-9)
+
+
 def test_r_obs_is_exactly_zero_beyond_the_cut_off():
     """02a §5.4.  The shift is the point: the unshifted form reads -0.08 at 2 m
     and integrates to about -53 over an episode -- larger than the path term,
@@ -663,8 +705,8 @@ def test_r_smooth_is_cheap_in_the_free_window_after_engagement():
     and forbids a succession of small ones, and a plain smoothness penalty
     suppresses both."""
     ctx = ctx_for(enc.HEAD_ON, t_engage=100)
-    committed = state_for(d_rudder=CFG.kappa_delta, step_index=105)
-    dithering = state_for(d_rudder=CFG.kappa_delta, step_index=100 + CFG.n_free + 5)
+    committed = state_for(d_rudder=CFG.kappa_delta, step_index=100 + CFG.n_free - 1)
+    dithering = state_for(d_rudder=CFG.kappa_delta, step_index=100 + CFG.n_free + 1)
     assert T.r_smooth(committed, {1: ctx}, CFG) == pytest.approx(-CFG.sigma_enc)
     assert T.r_smooth(dithering, {1: ctx}, CFG) == pytest.approx(-1.0)
 
@@ -778,9 +820,14 @@ def test_the_pre_committed_episode_orderings_hold():
     violating = (PREDICTED_NOMINAL["prog"] - 40.0 - 26.0 - 17.0 - 4.0
                  - 15.0 - 45.0 - 270.0) + cfg.R_GOAL
 
-    assert nominal == pytest.approx(83.1, abs=1.0)
-    assert violating == pytest.approx(-264.4, abs=1.0)
-    assert collided == pytest.approx(-308.5, abs=1.0)
+    # The three episode returns move with `U_REF` through the progress row, so
+    # they are checked against their construction rather than pinned: pinned,
+    # they broke when the plant swap moved `U_REF` by 2 %, which says nothing
+    # about whether the orderings hold.
+    prog = PREDICTED_NOMINAL["prog"]
+    assert nominal == pytest.approx(prog - 69.5 + cfg.R_GOAL, abs=0.2)
+    assert violating == pytest.approx(prog - 417.0 + cfg.R_GOAL, abs=0.2)
+    assert collided == pytest.approx(0.5 * (prog - 69.5) + cfg.R_COLLISION, abs=0.2)
 
     assert nominal > violating > collided
     assert violating - collided > 20.0, "the 02 §5 margin has gone thin"
@@ -815,7 +862,9 @@ def test_a_cornered_agent_prefers_timeout_to_collision():
     def discounted(gamma):
         return -stopped_per_step * (1.0 - gamma ** horizon) / (1.0 - gamma)
 
-    sac = discounted(0.99)          # train.py: SAC, the headline architecture
+    # train.py's discounts, converted to the 2 Hz step so the horizon in
+    # seconds is unchanged (`constants.discount`).
+    sac = discounted(cfg.discount(0.99))    # SAC, the headline architecture
     assert sac > cfg.R_COLLISION, (
         f"loitering is worth {sac:.0f} against a collision at {cfg.R_COLLISION:.0f}")
     assert sac == pytest.approx(-65.0, abs=2.0)
@@ -831,7 +880,7 @@ def test_a_cornered_agent_prefers_timeout_to_collision():
         "been reconciled and this test should assert the ordering directly")
 
     # And the PPO comparator's margin, so a regression is visible as a number.
-    ppo = discounted(0.999)
+    ppo = discounted(cfg.discount(0.999))
     assert ppo < cfg.R_COLLISION, (
         "the PPO comparator's margin has flipped: loitering now scores better "
         "than colliding, so this test should assert the ordering instead")
@@ -845,10 +894,11 @@ def test_the_step_limit_leaves_room_for_a_detour():
     the traversal.  That is what makes timeout a genuine fallback rather than a
     routine outcome -- and it is also why the loiter sum gets large.
     """
-    traversal = cfg.L_REF_PATH / (cfg.U_REF * cfg.UPDATE_RATE)
-    assert traversal == pytest.approx(175.4, abs=1.0)
-    # 900 steps at 0.1 s is 90 s against a ~17.5 s traversal -- five times over.
+    traversal_s = cfg.L_REF_PATH / cfg.U_REF
+    assert 30.0 < traversal_s < 40.0, traversal_s
+    # 90 s against a ~36 s traversal at 0.55 m/s -- 2.5 times over, which is
+    # 04a §4.1's own sizing at that speed.
     # 04a §4.1 sizes it for a Rule 8(e) hold rather than for the transit: a
     # horizon tight enough to turn compliant slowing into a timeout would put
     # the horizon in direct conflict with the reward design.
-    assert cfg.MAX_EPISODE_STEPS > 4.0 * traversal
+    assert cfg.MAX_EPISODE_STEPS * cfg.UPDATE_RATE > 2.0 * traversal_s

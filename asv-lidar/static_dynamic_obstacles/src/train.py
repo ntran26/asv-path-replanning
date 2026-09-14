@@ -24,6 +24,7 @@ from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.callbacks import BaseCallback, CallbackList, CheckpointCallback
 from stable_baselines3.common.vec_env import SubprocVecEnv, VecMonitor
 
+import constants as cfg
 import rollout
 from env import ASVLidarEnv
 from rollout import Episode, run_episode
@@ -360,12 +361,12 @@ def build_model(algo: str, vec_env, tensorboard_log: str):
         return PPO(
             "MultiInputPolicy", vec_env, verbose=1, tensorboard_log=tensorboard_log,
             learning_rate=1e-4, n_steps=1024, batch_size=256, n_epochs=10,
-            gamma=0.999, gae_lambda=0.95, clip_range=0.2, ent_coef=0.03, vf_coef=0.5,
+            gamma=cfg.discount(0.999), gae_lambda=0.95, clip_range=0.2, ent_coef=0.03, vf_coef=0.5,
             policy_kwargs=dict(activation_fn=nn.Tanh, net_arch=dict(pi=[64, 64], vf=[64, 64])),
         )
     return SAC(
         "MultiInputPolicy", vec_env, verbose=1, tensorboard_log=tensorboard_log,
-        learning_rate=5e-5, batch_size=512, gamma=0.99, buffer_size=1_000_000,
+        learning_rate=5e-5, batch_size=512, gamma=cfg.discount(0.99), buffer_size=1_000_000,
         train_freq=1, gradient_steps=1, ent_coef="auto",
     )
 

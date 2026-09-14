@@ -278,7 +278,9 @@ def test_a_collision_dominates_everything_dense():
     dense_bound = sum(abs(w) for w in (
         cfg.W_PF, cfg.W_PROG, cfg.W_EXIST, cfg.W_SMOOTH,
         cfg.W_OBS, cfg.W_BND, cfg.W_DOM, cfg.W_COL))
-    assert abs(breakdown.terminal) > 20.0 * dense_bound
+    # 20x the per-step bound at 10 Hz.  A 2 Hz step carries five times each
+    # weight (`REWARD_DT_SCALE`), so the same margin per second is 4x per step.
+    assert abs(breakdown.terminal) > (20.0 / cfg.REWARD_DT_SCALE) * dense_bound
 
 
 def test_terminal_payoffs_are_the_decided_values():
@@ -332,13 +334,13 @@ def test_no_paper_2_reward_terms_survive_in_info():
 # ---------------------------------------------------------------------------
 # Pose noise wiring
 # ---------------------------------------------------------------------------
-def test_pose_noise_is_wired_but_currently_disabled():
-    """TODO(05): the hook is on the path; the magnitude is still 0.0."""
+def test_nominal_pose_noise_is_on():
+    """Revision 8: nominal jitter until S1-A measures it (TODO(05))."""
     env = make_env()
     env.reset(seed=0)
     assert env._pose_noise is not None
-    assert not env._pose_noise.enabled          # TODO(05) values are 0.0
-    assert env.estimated_pose() == (env.asv_x, env.asv_y, env.asv_h)
+    assert env._pose_noise.enabled
+    assert env.estimated_pose() != (env.asv_x, env.asv_y, env.asv_h)
 
 
 def test_pose_noise_can_be_switched_off_entirely():
@@ -402,9 +404,7 @@ def test_every_sweep_width_runs(width):
 def test_widths_in_breadths_are_the_declared_sweep():
     """02a §11.3: 14 B added so the crossing and head-on thresholds separate.
 
-    The original six levels bracketed all four predicted transitions, but
-    crossing (13.0 B) and centreline head-on (12.0 B) landed in the same
-    bracket.
+    Revision 7 fixed the corridor at 10 m; revision 8 restored the sweep.
     """
     assert cfg.widths_in_breadths() == (20.0, 16.0, 14.0, 12.0, 10.0, 8.0, 7.0)
     assert 14.0 in cfg.widths_in_breadths()
@@ -430,20 +430,7 @@ def test_the_sweep_brackets_every_predicted_threshold():
 
 
 def test_crossing_and_centreline_head_on_still_share_a_bracket():
-    """A documented gap, not a passing check -- see PORTING_MANIFEST F18.
-
-    02a §11.3 adds the 7 m level to "separate the crossing threshold from the
-    head-on one cleanly".  It does not: crossing at 6.52 m and centreline
-    head-on at 6.02 m both sit in (6.0, 7.0).  The table in §11.3 places 6.02 in
-    the 6 -> 5 bracket, which only holds if the threshold is read as exactly
-    12.0 B = 6.00 m; at 6.02 m it is 2 cm above the 6 m sweep level, so the
-    transition effectively coincides with a sample point and cannot be resolved
-    either way.
-
-    Separating them needs a level strictly between the two, e.g. 6.25 m
-    (12.5 B).  Asserted as the current state so that fixing the sweep breaks
-    this test and forces the note to be updated rather than left stale.
-    """
+    """A documented gap, not a passing check -- see PORTING_MANIFEST F18."""
     _, brackets = _brackets()
 
     def bracket_of(name):
@@ -504,8 +491,9 @@ def test_degradation_axes_default_to_nominal():
     assert env.tracker.velocity_noise == 0.0
     assert env.lidar.dropout_p == 0.0
     assert env.lidar.aft_mask_half_deg == 0.0
-    assert env.ego_speed_noise == 0.0
-    assert env.ego_yaw_rate_noise_dps == 0.0
+    # Ego noise is nominal rather than zero since revision 8.
+    assert env.ego_speed_noise == cfg.EGO_SPEED_NOISE
+    assert env.ego_yaw_rate_noise_dps == cfg.EGO_YAW_RATE_NOISE_DPS
 
 
 def test_detection_dropout_is_swept_through_the_constructor():

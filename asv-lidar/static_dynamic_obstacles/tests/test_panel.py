@@ -30,7 +30,7 @@ def render_mod():
     return pytest.importorskip("render")
 
 
-def head_on_env(steps: int = 40, width: float = 8.0) -> ASVLidarEnv:
+def head_on_env(steps: int = cfg.steps_for(4.0), width: float = 8.0) -> ASVLidarEnv:
     """A displaced head-on, which is the regime that lights every block up."""
     env = ASVLidarEnv(render_mode=None, corridor_width=width)
     env.forced_num_obs = 0
@@ -102,7 +102,7 @@ def test_the_colregs_block_explains_every_sub_term():
 def test_the_admissibility_numbers_explain_the_predicate():
     """§3's point: the three numbers behind `A_stbd` say *why* it flipped, which
     is what is wanted when the agent does something odd near a wall."""
-    env = head_on_env(width=8.0)
+    env = head_on_env()
     block = env.last_panel["colregs"]
     assert block["known"] is True
     expected = block["r_stbd"] >= block["dy_req"] - 0.15

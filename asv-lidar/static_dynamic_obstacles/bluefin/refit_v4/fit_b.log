@@ -1,0 +1,55 @@
+start 0 (physics anchor)
+C:\Users\hntran\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\numpy\lib\nanfunctions.py:1563: RuntimeWarning: All-NaN slice encountered
+  return function_base._ureduce(a,
+    gen    0  best J = 2.81464  spread = 12.4746
+    gen   25  best J = 1.07068  spread = 0.1037
+    gen   50  best J = 1.07068  spread = 0.0418
+    gen   75  best J = 1.01226  spread = 0.0360
+    gen  100  best J = 0.94443  spread = 0.0336
+    gen  109  best J = 0.94443  spread = 0.0352
+  J = 0.91406  (194 s)
+start 1 (v3 incumbent)
+    gen    0  best J = 0.90467  spread = 14.5144
+    gen   25  best J = 0.90467  spread = 0.0769
+    gen   50  best J = 0.90467  spread = 0.0328
+    gen   75  best J = 0.90349  spread = 0.0206
+    gen  100  best J = 0.88340  spread = 0.0101
+    gen  109  best J = 0.88340  spread = 0.0091
+  J = 0.88224  (249 s)
+start 2 (random)
+    gen    0  best J = 1.66989  spread = 11.6893
+    gen   25  best J = 1.15418  spread = 0.0373
+    gen   50  best J = 1.08339  spread = 0.0249
+    gen   75  best J = 0.98206  spread = 0.0311
+    gen  100  best J = 0.97197  spread = 0.0225
+    gen  109  best J = 0.95626  spread = 0.0231
+  J = 0.92030  (350 s)
+  resample 0: J = 0.7896
+  resample 1: J = 0.7677
+  resample 2: J = 0.8506
+  resample 3: J = 0.8504
+  resample 4: J = 0.9334
+  resample 5: J = 0.6117
+  resample 6: J = 0.9651
+  resample 7: J = 0.8684
+  resample 8: J = 0.7451
+  resample 9: J = 0.7904
+  resample 10: J = 0.8935
+  resample 11: J = 0.7952
+  resample 12: J = 0.9117
+  resample 13: J = 0.9130
+  resample 14: J = 0.8156
+  resample 15: J = 0.7879
+  resample 16: J = 1.0880
+  resample 17: J = 0.8571
+  resample 18: J = 0.8650
+  resample 19: J = 0.9060
+  resample 20: J = 0.9422
+  resample 21: J = 0.8738
+  resample 22: J = 0.6995
+  resample 23: J = 0.8940
+  resample 24: J = 0.8658
+  resample 25: J = 0.8871
+  resample 26: J = 0.7826
+  resample 27: J = 0.8729
+wrote out/params_v4.json

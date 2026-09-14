@@ -6,13 +6,13 @@ currently blocking a full training run and a full evaluation.**
 
 | | |
 |---|---|
-| **Revision** | 5 — tasks 03a and 04a implemented; see `OPEN_PROBLEMS.md` |
-| **Last updated** | 2026-09-13 |
-| **Tests** | **334 passing, 2 xfailed** (both deliberate; see §3.1, §3.2) |
-| **Blocking a headline training run** | **4 items** (§2) |
-| **Blocking a full evaluation** | **5 items** (§2) |
+| **Revision** | 8 — 0.55 m/s; virtual corridors back; generator wired in; e-stop reward; noise and randomisation on; scale audit; first PPO formulation run; see `OPEN_PROBLEMS.md` |
+| **Last updated** | 2026-09-14 |
+| **Tests** | **402 passing, none expected to fail** (T1 passes since F24 was decided) |
+| **Blocking a headline training run** | **nothing blocks the formulation run**; A15–A17 decided (F53), so the full budget waits on run 3 confirming the formulation, and on B5 (`OPEN_PROBLEMS.md`) |
+| **Blocking a full evaluation** | **7 more** — B2, B5–B10 (§2) |
 | **Open `TODO(decision)`** | 1 (`D_SAFE`) |
-| **Open measurements owned by 05** | 20 |
+| **Open measurements** | 05 part 1 done from logs; basin sessions pending — `OPEN_PROBLEMS.md` Part B |
 
 ---
 
@@ -23,7 +23,9 @@ currently blocking a full training run and a full evaluation.**
 | Module | Owns | Spec |
 |---|---|---|
 | `constants.py` | every constant, one place, each with a `TODO` marker | kickoff §5 |
-| `ship.py` | 3-DOF Fossen hull, thrust calibration | 05 |
+| `ship.py` | **the identified hull**, imported from `bluefin/`; substepping, reverse braking | 05 part 1 |
+| `ship_v2.py` | the Paper 2 hull, kept for comparison only | — |
+| `emergency_stop.py` | Rule 8(e) stop latch and trigger predicates — simulator-free; **the bridge imports it** | user spec |
 | `path.py` | reference path, arclength, signed curvature, `r_path` | 02b T3 |
 | `corridor.py` | **channel generator** — centreline, width profile, bends, polygon | 03a §3 |
 | `targets.py` | **oriented hull, five behaviour models, confinement** | 03a §5 |
@@ -31,15 +33,17 @@ currently blocking a full training run and a full evaluation.**
 | `suite.py` | **Tier A/B, Around the Clock, Study 2, freeze manifest** | 04a §4–§9 |
 | `asv_lidar.py` | 720-beam raycast, sector pooling, dead zone, aft mask | 01 §2 |
 | `boundary_raycast.py` | virtual boundary scan, beam gating, pose noise | 01 §3 |
-| `tracking.py` | cluster → associate → Kalman → static/dynamic | 01 §4 |
+| `tracking.py` | cluster → associate → Kalman → **free-space static/dynamic test** (F37) | 01 §4, replaces 03a §6.3 |
 | `cpa_cri.py` | CPA, ship domain, collision risk index | 01 §5 |
 | `encounter.py` | five-class classifier + hysteresis — **one definition** | 01 §5.3 |
 | `colregs/` | `EncounterContext`, engagement machine, admissibility | 02a §10.1 |
 | `reward/` | eight dense terms, group clipping, audit | 02a |
 | `observation.py` | five branches, 56 dims, frozen index order | 01 §6 |
-| `env.py` | the Gymnasium environment | 03a §4 |
+| `env.py` | the Gymnasium environment — **2 Hz decisions, 0.1 s physics and collision sub-steps, optional pose staleness** | 03a §4 |
 | `render.py` | field view + seven-block telemetry panel | RENDER_PANEL_SPEC |
 | `play.py` | manual and random harness | — |
+| `train_formulation.py` | **single-seed PPO test of the formulation** — generator curriculum, per-class evaluation | rev 8 |
+| `tools/scale_audit.py` | 02a §8.2's reward scale audit over the generator | rev 8 |
 
 ### 1.2 Task status
 
@@ -47,9 +51,9 @@ currently blocking a full training run and a full evaluation.**
 |---|---|
 | 01 perception and observation | **done** |
 | 02 / 02a / 02b reward | **done** — T1–T4, C1–C4 |
-| 03a environment and target | **done** — §1.2, §3, §4, §5, §6.3, §7, §10 |
-| 04a scenario and evaluation | modules done — §3, §4, §5, §6, §7, §9 — **but see B10** |
-| 05 vessel model and sim2real | **not started** — 20 measurements |
+| 03a environment and target | **done** — §1.2, §3, §4, §5, §7, §10; **§6.3 replaced** by the free-space classifier (F37); §4.1's 0.1 s step replaced by 2 Hz (F38) |
+| 04a scenario and evaluation | modules done — §3, §4, §5, §6, §7, §9 — and the generator drives training (F44) |
+| 05 vessel model and sim2real | **part 1 validated and integrated**; refit v4 run, **not adopted** (F40); crash-stop block added to part 2; basin sessions pending |
 | Training campaign | **blocked** — §2 |
 
 ---
@@ -63,10 +67,13 @@ moves almost everything else.**
 
 | # | Blocker | Owner | Effect |
 |---|---|---|---|
-| **B1** | **F24 — the operating speed is contested** | you | every time constant in the paper |
-| **B2** | **F28 — the vessel cannot stop; Rule 8(e) is unexecutable** | 05 / you | the whole 8(e) contribution |
-| **B3** | **Throughput is 74 steps/s against 04a's assumed 500** | 04 | the comparator list length |
-| **B4** | **Pose-noise constants are all 0.0** | 05 | the N1 sim-to-real claim |
+| ~~B1~~ | ~~F24, the operating speed~~ — **decided: 0.55 m/s, `CRUISE_RPM = 6`** (F42) | — | — |
+| **B2** | **F28 — Rule 8(e): resolved in simulation by the emergency stop; unverified on the water** | 05 | the field claim of 8(e) — moved to evaluation |
+| **B3** | **Throughput** — 38 steps/s at 2 Hz (19 simulated s per s); one policy-seed suite ~2.3 h against 04a's 50 min (§4) | 04 | the comparator list length |
+| B4 | Pose noise is **nominal**, not measured (F46) | 05 | the N1 sim-to-real claim, until S1-A |
+| ~~B11~~ | ~~Phantom dynamic tracks~~ — **fixed** (F37); confirm as §6.3's replacement (`OPEN_PROBLEMS.md` A7) | — | — |
+| ~~B12~~ | ~~Spawn boundary penalty~~ — **fixed** (F35) | — | — |
+| ~~B13~~ | ~~fixed corridor, 2 Hz reward~~ — **corridors restored, reward confirmed** (F43) | — | — |
 
 ### 2.2 Additionally blocking a full evaluation
 
@@ -77,7 +84,7 @@ moves almost everything else.**
 | **B7** | `T-RE` reactive target is a placeholder, not the VO comparator | 03 | Tier B's `re` behaviour stratum |
 | **B8** | Classical comparators (LOS-PID+DWA, COLREGs-VO, encounter VO) do not exist | 04 | every comparison in the paper |
 | **B9** | `metrics.py` does not read the reward keys | 04 | 04a §10's metric set |
-| **B10** | **the scenario generator is not wired into `env.py`** | me | **all five encounter classes in training** |
+| ~~B10~~ | ~~the scenario generator is not wired into `env.py`~~ — **wired** (F44) | — | — |
 
 **B10 corrects an overstatement.** `scenario.py` is built and tested, but `env.py`
 does not import it: episode resets still call `_sample_target`, the head-on-only
@@ -94,7 +101,7 @@ implementation disagreed, and the disagreement was resolved *or* is still open.
 
 ### 3.1 F24 — the operating speed, and it is the same placeholder for a third time
 
-**Status: OPEN. This is B1 and it is the most consequential open item.**
+**Status: DECIDED (revision 8) — 0.55 m/s, `CRUISE_RPM = 6` (F42).** The history follows.
 
 03a §1.1 decides `U_nom = 0.55 m/s`, calling it "taken from the field
 measurement and treated as authoritative". **It is not a measurement.** It is
@@ -136,7 +143,9 @@ disagreement rather than hiding it, and flips the day it is settled.
 
 ### 3.2 F28 — the vessel cannot take way off, and Rule 8(e) depends on it
 
-**Status: OPEN. This is B2.**
+**Status (revision 8): at 0.55 m/s the stop meets T9 for reverse efficiency ≥ 0.05 (≥ 0.065 with a 0.73 s thrust delay).** **Status (revision 7): resolved in simulation at the vessel's 2 Hz** for reverse efficiency ≥ 0.27 (≥ 0.55 if thrust shares the rudder's 0.73 s delay); basin block S1-C2 measures both. **Status (revision 6):** the emergency stop (full astern until stopped, then zero thrust) met T9 at the 0.1 s control step for any reverse efficiency >= 0.19. Coasting on the identified hull takes 8.5 m, not the 29.9 m below -- the v2 hull under-predicted drag. On the water the stop needs reverse efficiency >= 0.26 at 2 Hz, or >= 0.56 if thrust shares the rudder's 0.73 s delay; neither is measured. The original analysis follows.
+
+**Status (revision 5): OPEN. This is B2.**
 
 03a §4.3 reasons that shedding 3 m of along-track position needs "of order 5 N
 of net decelerating force — comparable to the hull's own quadratic drag at
@@ -189,6 +198,8 @@ carry a ≥ 20° bend" comes out at **43%** over the stage-5 width range.
 **Consequence: curriculum stage 3 (7–10 m) can carry almost no bend**, so it
 trains no `r_path` signal — and it is the stage that introduces the encounter
 machinery. Worth deciding whether stage 3 should widen its lower bound.
+
+**Revision 8:** the width sweep is back, so this stands again.
 
 ### 3.4 F26 — the null class was unconstructible
 
@@ -287,6 +298,9 @@ Flat to 0.10 m then falling. The knee is set by `TRACK_GATE_DIST` =
 `max(2.5·U_REF·Δt, 0.30)` = 0.30 m: a displacement inside the association gate
 costs nothing.
 
+**Revision 7:** at 2 Hz the gate is 1.40 m and the knee moved out — head-on
+tracked frames are flat at 7 of 11 through 0.25 m, 4 at 0.50 m, 0 at 0.75 m.
+
 **Consequence for 04a §7.1**, which sweeps this axis at `{0, 0.5, 1, 2, 4} ×
 nominal`: a nominal at or below 0.10 m puts three of the five levels on the flat
 part of the curve, and the axis would report robustness that is really
@@ -311,7 +325,387 @@ computed and reported. The predicted ordering also differs — 02a says crossing
 head-on > overtaking, 04a says crossing > overtaking > head-on, on the exposure
 margin. 04a flags this against itself.
 
-### 3.12 Earlier findings, still standing
+### 3.12 Revision 6 — 05 part 1, the emergency stop, and what they exposed
+
+Full detail in `bluefin/REVIEW.md` (the model) and `OPEN_PROBLEMS.md` (the
+decisions). Summary:
+
+**F30 — the identified hull is in, and it settles what the vessel does.**
+`src/ship.py` imports `bluefin/` rather than copying it, and forward-thrust
+trajectories are asserted bit-identical to the report's `ShipModel`. `U_REF` is
+now derived from the plant — `sqrt(T12/X_uu)` = **1.116 m/s** — and replaces
+`THRUST_CAL`. That agrees with 02b T1's independent log median (1.14 m/s) to 2 %,
+so cruise at 12 RPM is no longer in question; F24 is purely a choice of operating
+point, and 0.55 m/s is exactly `CRUISE_RPM = 6`. The bridge's 50 %/s rudder
+command limiter is now applied every step, and hull randomisation from the
+bootstrap is available (off by default).
+
+**F31 — phantom dynamic tracks on 28–33 % of frames, and T8 never tested it.**
+Static panels are promoted to dynamic tracks as the vessel passes them: the
+cluster centroid slides across the visible face. Median 0.32 m from a panel,
+apparent speed 0.17–0.24 m/s (p90 0.5–0.6), with pose noise off. It happens on
+the v2 hull too (27 %); T8 passed only because v2 covered 2.4 m in the test
+window and never reached the panels. No threshold or hysteresis setting reaches
+03a's 1 in 10⁴ (best: 6.5 %). It also **fired the emergency stop falsely** — 5
+stops in 18 target-free episodes — so the stop's trigger defaults to manual.
+T8 is rewritten to run 300 steps and is a strict xfail.
+**Correction:** §1.2 previously listed 03a §6.3 as done. It was not
+implemented; the tracker still uses 01's 0.15 m/s threshold and a 5-step hold.
+
+**F32 — pose staleness is 40.8 %, not every frame.** 443 of 1,085 July frames
+used the previous frame's pose, because the pose line races the LiDAR line at
+the bridge. The identification report models it as every frame. The
+`DeploymentTiming` wrapper uses the measured rate.
+
+**F33 — the report's holdout claims are narrower than stated.** Naive predictors
+also beat v3 at 2 s and in free run; the V6 drift regression flipped sign rather
+than going away; and three training segments contain several seconds of motion
+against the heading (most likely un-trimmed retrievals). Nine corrections in
+`bluefin/REVIEW.md` §5.
+
+**F34 — throughput was overstated about 4×.** Revision 5's 74 steps/s came from
+a target-free narrow corridor. The default environment measured 13–14 steps/s;
+fixing my confinement check (polygon rebuilt per call, hull vertices tested one
+at a time — 40 % of every step) brought it to 19–21. The hull swap itself costs
+about 8 %.
+
+**F35 — every episode starts with a boundary penalty.** The path is inset from
+the corridor's start edge by exactly the inflated hull half-length (1.0125 m),
+so the stern spawns on that edge, inside `d_safe`. `r_bnd` is negative for the
+first 16–19 steps: **−22.9 per episode** on average, against 02a §8.1's
+predicted zero. Corrupts the scale audit. Recorded, not yet fixed
+(`OPEN_PROBLEMS.md` C10).
+
+**F36 — `corridor_width` ignores a supplied channel.** An explicit 8 m channel
+reports 10 m (20 B). `W_local` and the reward are unaffected; the labels on
+named cases and Study 1 levels are wrong (`OPEN_PROBLEMS.md` C11).
+
+**The emergency stop** (user specification): full astern `S2 = −100` until speed
+≤ 0.05 m/s, then zero thrust, then back to the policy. Reverse thrust is modelled
+by operator splitting because the identified model has none; a release condition
+and a braking time-out were added because the specification had no exit.
+`field_deployment/udp_live_rl.py` is **not** edited — it drives the real vessel —
+and needs three changes before the stop exists on the water
+(`OPEN_PROBLEMS.md` C8).
+
+### 3.14 Revision 7 — 2 Hz, the fixed corridor, the tracker, the refit, the bridge
+
+**F37 — phantom tracks fixed by a free-space consistency test.** A static solid
+cannot occupy space a ray has seen through, nor leave space a ray now sees
+through, from any viewpoint; the cluster centroid's slide is invisible to that
+test. Over a 2 s window a track shows motion when its returns *appear* where an
+earlier ray returned from beyond, or *vacate* space a ray now returns from beyond.
+Two defects were found on the way: returns were lifted from the vessel origin
+instead of the sensor 0.86 m ahead (static objects moved when the vessel turned),
+and the first version treated an empty beam as free space — the C1's 1 m dead
+zone makes that false, and T8 caught it at 1.1 %. The second version checked the
+tolerance only along the ray; T8 with 3 cm of pose noise caught that at 0.17 %,
+on panel faces seen edge-on, and every beam within the tolerance's lateral width
+must now clear the point too.
+
+| Classifier | Phantom frames, target-free, three panels | With 3 cm / 0.2° pose noise |
+|---|---|---|
+| 01's centroid speed, at 2 Hz | **23.9 %** (959 of 4,015) | — |
+| free space v1 — an empty beam counted as free | 1.1 % | 1.5 % |
+| free space v2 — returned beams only, tolerance along the ray | 0 of 12,012 | 0.17 % |
+| **free space v3 — tolerance laterally too (current)** | **0 of 12,012** | **0 of 12,012** |
+
+Zero in 24,024 frames bounds the rate at about 1.25 in 10⁴ at 95 %.
+
+Detection is essentially unchanged. Head-on, crossing, slow overtaken and fast overtaking targets placed around the own ship at cruise, 25 seeds each:
+
+| | head-on | crossing | overtaking | being overtaken |
+|---|---|---|---|---|
+| promoted, median (p90) delay — speed classifier | 2.0 (4.0) s | 2.0 (4.0) s | 2.0 (3.3) s | 3.0 (4.5) s |
+| promoted, median (p90) delay — **free space** | 2.0 (4.0) s | 2.5 (4.5) s | 2.5 (4.0) s | 3.0 (5.8) s |
+| never promoted among 3 panels, of 25 — speed / **free space** | 6 / 7 | 0 / 0 | 0 / 3 | 15 / 15 |
+
+No target is missed without panels. The being-overtaken misses are the scene itself -- occluded or colliding early -- under both classifiers. Slow overtaking targets among panels are the one place the free-space test costs recall.
+
+**F38 — everything runs at 2 Hz** (your decision). `UPDATE_RATE = 0.5`; every
+step count is a duration through `steps_for`; every dense reward weight is × 5 so
+per-second rates and 02a §8.1's integrals are unchanged; the training discounts
+are converted (0.99 → 0.951). Physics and collision are sub-stepped at 0.1 s,
+because a closing target moves 1.3 m per decision. Measured pose staleness is
+native: a stale frame repeats every pose-derived observation and skips the
+tracker, and the `DeploymentTiming` wrapper is gone. Default 0.0 since the
+bridge waits for each pose line (F41). The emergency stop's
+break-even reverse efficiency at 2 Hz is **0.27** (0.55 with a 0.73 s thrust
+delay), and the astern speed the latch would impart after the vessel stops is
+reported per step because the hull cannot simulate it.
+
+**F39 — the corridor was fixed at 10 m** (your decision; **reversed in revision 8**, F43). Every configured width
+is the basin. Consequences in `OPEN_PROBLEMS.md` A11: Study 1's sweep and the
+width-driven half of N2 are gone (all four predicted transitions lie below
+10 m); no bend fits, so `r_path` is always zero; Tier B realises 13 of 39 cells;
+28 of 34 Tier A cases no longer differ in geometry; and a crossing target had no
+water outside the corridor to start from, so that containment rule is relaxed
+at a basin-wide corridor. Acceptance T3 still passes, decorrelated by the path offset alone.
+
+**F40 — the refit, and the retrievals confirmed.** The July videos are the
+bridge's own display; its telemetry at t = 21 s of `trial_2` reads surge −0.60 m/s
+under S2 = 62.5 forward thrust, so the three windows are hauled retrievals.
+Refit v4, pre-registered (trim, `N_uv` widened, same pipeline): better than v3 at
+every windowed horizon from 2 s and in position, but **A5 passed 11 of 12 draws,
+so v4 is not adopted** and the simulator keeps v3. Six parameters sit at bounds
+and the yaw and actuator parameters moved by more than their bootstrap
+intervals. `fit_final.py` documents `N_rr` as fixed at zero and bounds it
+[0, 60]; post-hoc v4b fixes it: best heading of any fit, the first to beat the freeze baseline in free run (21.1° against 22.9°), but path-length error 37 % worse and A5 11 of 12, so **also not adopted**. Recommendation: keep v3, and carry v4b's structure (`N_rr` fixed) into the basin session-1 fit, where coast-downs and turning circles pin what these logs cannot.
+
+**F41 — the bridge latch.** `udp_live_rl.py` now imports `emergency_stop.py`:
+E latches full astern (S2 = −100) until **signed** surge reads stopped, then 0;
+R releases after the minimum hold. The policy's range is still 0–100, and the
+latch is the only path below zero. **Then, on your go-ahead, the bridge's two
+parity defects were fixed:** the rudder limiter is a true 50 %/s rate limit when enabled (it was overwritten to off, and moved half the error per frame for small commands), and is **off by default in bridge and simulator alike**, since the identified model predicts the July runs that sent raw commands at least as well as limited ones, and `PoseSync` makes each frame wait for its own pose line — replayed through every July log, **0 of 1,085 frames stale** against 443 without it, at 6 ms worst added latency. `--rudder-limit` and
+`--no-pose-sync` switch the other behaviour back for comparison runs.
+The simulator's `POSE_STALE_PROB` is now 0.0; the measured 0.408 is kept as
+`MEASURED_POSE_STALE_PROB`.
+
+**F35 and F36 are fixed.** The own ship spawns 1.41 m in (half inflated hull +
+`d_safe` + 0.05), and the scenario generator honours the same inset; a supplied
+channel reports its own width.
+
+**The crash-stop block** is in `PART2_BASIN_PLAN.md`: S1-C2 (RPM 9/12/15 × 3,
+bridge latch), a P-8 bench check that the ESC reverses at all, thresholds
+T-9–T-11, three holdout stops in S2-B, and O-6/O-7 on reversal safety. S1-E gave
+up ten minutes for it.
+
+### 3.15 Revision 8 — your decisions, the generator, the audit, the formulation run
+
+**F42 — the operating speed is 0.55 m/s.** `CRUISE_RPM = 6`, so `U_REF` =
+`steady_speed(6)` = **0.558 m/s** (Fr 0.142; acceptance T1 now passes). The
+propulsion stages keep their authority relative to cruise (stage 4: 0–12
+rpm-units, stop to 1.116 m/s). Everything derived follows: `N_REF_PROG` 71.7,
+`TRACK_GATE_DIST` 0.70 m, the spawn TCPAs return to 04a's table values. Two
+consequences worth stating in the paper:
+
+* the emergency stop meets T9 for reverse efficiency ≥ 0.05, or ≥ 0.065 with a
+  0.73 s thrust delay, against 0.27 and 0.55 at 1.1 m/s — the unmeasured
+  reverse thrust no longer decides whether 8(e) is possible;
+* detection is **faster**, not slower: every class is promoted within a median
+  1.0–2.0 s with no panels, tracked on 86–92 % of visible frames.
+
+**F43 — the narrower virtual corridors are back**: the 10–3.5 m sweep, width
+variation and bends (revision 7's fixed 10 m reversed). The crossing-containment
+relaxation added then stays, and only applies to basin-wide draws.
+
+**F44 — C1: the scenario generator drives the environment.**
+`ASVLidarEnv(scenario_stage=s)` draws each episode from `ScenarioGenerator` in
+the episode's seed namespace. The own ship starts **at `U_nom` on the scenario
+heading** — 04a's backward solve assumes it, and starting from rest moved every
+CPA — the target gets its class, behaviour and confinement, and generated
+obstacles are dropped if they sit within ±0.4·T₀ of own-ship travel around the
+CPA or within 2 m of the target spawn. `set_scenario_stage` switches the
+curriculum at the next reset; `reset(options={"generated": scenario})` replays a
+given scenario. The placeholder `_sample_target` remains only for the older tests.
+
+**F45 — A8: the emergency stop in the reward.** While the latch holds, `r_pf`'s
+speed gate is suspended (the vessel was stopped, it did not choose to stop), and
+each stop costs `R_ESTOP = −20` once, logged as `reward/intervention`. A
+validator keeps it in `(R_COLLISION, 0]`.
+
+**F46 — nominal noise and hull randomisation for training.** Pose 3 cm / 0.2°
+per frame, no walk; ego 0.05 m/s and 1 °/s — all `TODO(05)` until S1-A. Hull
+randomisation at 1.0: A1–A3 pass on 12/12 draws at 1.0, 10/12 at 1.5 (2.0 passed
+12/12 by chance of the draws). The free-space tracker's tolerance stays at 0.25 m.
+
+**F47 — the scale audit** (`tools/scale_audit.py`, 240 stage-5 episodes per
+policy, nominal hull):
+
+| episode type | mean return |
+|---|---|
+| nominal success, no target (follower) | **+172** |
+| success with a COLREGs penalty | +101 |
+| any collision | **−337** |
+
+02a §8.1's orderings hold. At the design point progress (+101 vs +107 predicted),
+existence (−17 vs −15) and obstacle proximity (−12 vs −26) are within the factor
+of 3; `bnd`, `dom` and `col` are exactly zero, confirming F35's fix. `pf` and
+`smooth` come in near zero only because a scripted follower tracks a straight
+path perfectly. One finding needs a decision (`OPEN_PROBLEMS.md` A15):
+**being-overtaken episodes collide a stand-on vessel** in about a third of draws,
+because the overtaker is constant-velocity and its DCPA starts at 0.
+
+**F48 — the single-seed PPO formulation run** (`src/train_formulation.py`):
+
+PPO, seed 0, 10 workers, curriculum 1→5, propulsion stage 4 (0–12 rpm-units).
+It stopped at **1.91 M of 2 M steps** after 5.6 h on a `PermissionError` in
+`monitor.csv` (OneDrive's sync client held the file); the checkpoints to
+1.75 M and all nine evaluations survived. The evaluation is 36 fixed
+development scenarios, 6 per class, so each class rate moves in steps of 17 pp.
+
+| | 0.2 M | 0.6 M | 1.0 M | 1.6 M | 1.8 M |
+|---|---|---|---|---|---|
+| goal | 0.72 | 0.83 | 0.81 | 0.86 | 0.81 |
+| collision | 0.28 | 0.17 | 0.19 | 0.14 | 0.19 |
+| crossing collision | 0.50 | 0.67 | 0.67 | 0.50 | 0.50 |
+| COLREGs integral | −15.5 | −13.6 | −18.3 | −15.1 | −12.0 |
+
+Training episodes over the last 0.9 M steps (stage 5) tell a worse story, and
+it is the truer one:
+
+| class | goal | collision |
+|---|---|---|
+| crossing | 0.47 | 0.53 |
+| head-on | 0.63 | 0.37 |
+| overtaking | 0.75 | 0.25 |
+| no target | 0.82 | 0.18 |
+| being overtaken | 0.74 | 0.58, of which 0.34 is F49 |
+
+Training return peaked in stage 4 and declined through stage 5 while
+`approx_kl` climbed from 0.01 to 0.25, clip fraction from 0.06 to 0.53 and
+action std from 0.98 to 0.27. Replaying the 1.75 M checkpoint on the
+development set shows why the numbers cannot yet be read as a verdict on the
+formulation: **the policy holds full throttle in every class**, at 0.9–1.1 m/s,
+1.9 × cruise. Timeouts: none. Emergency stops: 0.08–0.17 per episode.
+
+What it does and does not say:
+
+* **Not yet interpretable: crossing.** Every crossing collision is with the
+  target, 6–10 s in, at about 1 m/s. 04a's generator solves the encounter for
+  the own ship at `U_NOM`; at 1.9 × that, the CPA it built is not the CPA that
+  happens. Re-read after F50.
+* **Being overtaken:** most of the "collisions" were F49. The remainder
+  (~0.24) is A15's DCPA question, and it is also confounded by speed. At
+  1.05 m/s the own ship is faster than slower overtakers, so they cannot
+  overtake it.
+* **What worked:** no-target and null classes reach 0.83–1.0 goal on the
+  development set; head-on 0.83–1.0; overtaking 0.83–1.0 from 1.0 M steps on;
+  the curriculum transitions did not collapse learning.
+
+**F49 — the being-overtaken goal sat on the corridor's end edge.**
+`own_start_s` gave this class all of `length − 20` m as astern room, so the
+20 m path ended, and the goal sat, exactly on the end edge. The goal test
+runs at the decision instant and the collision test on every sub-step. So a
+fast ship's bow crossed the edge inside the step that reached the goal, and the
+reward, which ranks collision first, paid −300 for arriving. It was 34 % of all
+being-overtaken training episodes. The development evaluation hid it by
+labelling goal before collision. **Fixed:** the path end keeps
+`GOAL_END_INSET_M` = 0.37 m (derived: a full step at the propulsion ceiling
+after the last failed goal test). Using the full `SPAWN_INSET_M` instead cut
+the class's generator yield from 200 to 129 in 200; 0.37 m keeps 198. Test:
+`test_the_being_overtaken_goal_is_clear_of_the_corridor_end`.
+
+**F50 — the speed gate is two-sided (provisional, A16).** With a one-sided
+gate, speeding cost nothing in `r_pf` or `r_prog`. Meanwhile the existence
+cost, the 10 s discount horizon and an earlier +100 goal all paid for it, so
+full throttle was the optimum. `r_pf`'s gate is now multiplied by
+`overspeed_gate(u, U_REF)`: 1 up to 1.2 · `U_REF`, falling linearly to 0 at
+1.7 · `U_REF`. It is measured against the nominal `U_REF`, not `U_ref_eff`,
+so R-2 and R-5 still make slowing free without making cruising costly. Tests:
+`test_r_pf_charges_speeding_above_the_tolerance`,
+`test_the_overspeed_gate_ignores_the_lowered_reference`.
+
+**F51 — the training harness.**
+
+* The evaluation now labels collision before goal, as the reward does.
+* `mean_speed` is the episode mean. It was the final step's speed.
+* `RetryingVecMonitor` retries a locked CSV write.
+* `--runs-dir` puts long runs outside OneDrive, and `--tag` names them.
+* PPO `target_kl` = 0.03 stops a KL runaway like run 1's.
+
+Also: piping the script's stdout through `grep | tail` from a backgrounded
+shell deadlocked a smoke run on its first log table. Always redirect to a
+file.
+
+Tests: **400 passed** (397 + 3).
+
+**F52 — formulation run 2** (F49–F51 in; `C:\Users\hntran\asv_runs\ppo_formulation_seed0_v2`).
+The full 2 M steps completed in 6.2 h. The evaluation is 20 development
+scenarios per class, 120 per evaluation. Geometry joins are in
+`asv_runs\join_geom.txt`.
+
+*The fixes held.*
+
+* Evaluation mean speed was 0.52–0.66 m/s (run 1: 0.9–1.0).
+* Goal and collision on the same step fell from 0.34 to 0.01–0.02 of
+  being-overtaken episodes.
+* `approx_kl` stayed at 0.03–0.047 (run 1: 0.25) and action std fell to 0.50.
+* fps still fell from 201 in stage 1 to 90 in stage 5 with the run outside
+  OneDrive, so the fall is the environment's cost, not sync.
+
+*Outcomes.* Evaluation at 2.0 M: goal **0.77**, collision 0.23, no timeouts.
+It was still rising: 0.57 at 0.2 M and about 0.66 at 1.0–1.8 M.
+
+| class (eval at 2.0 M) | goal | collision |
+|---|---|---|
+| head-on | 0.85 | 0.15 |
+| crossing | 0.55 | 0.45 |
+| overtaking | 0.90 | 0.10 |
+| being overtaken | 0.60 | 0.40 |
+| null | 0.80 | 0.20 |
+| no target | 0.90 | 0.10 |
+
+The run-1 and run-2 evaluation numbers are not comparable. Run 1 used 6 per
+class, labelled goal first, and ran at 1.9 × cruise. The training episodes over
+the last 0.5 M steps agree with the evaluation's ordering: crossing 0.60
+collision, being overtaken 0.55, head-on 0.40, overtaking 0.28, no target
+0.20.
+
+*Where the collisions are* (evaluations at 1.6, 1.8 and 2.0 M, 60 per class,
+joined to the drawn geometry):
+
+| case | DCPA ≤ 0.7 m | 0.7–1.4 m | > 1.4 m |
+|---|---|---|---|
+| crossing, target to starboard (give-way) | 0.88 (n 8) | 0.83 (12) | 0.29 (24) |
+| crossing, target to port | 0.17 (12) | 0.50 (12) | **0.75** (12) |
+| being overtaken | 0.69 (32) | 0.39 (28) | 0.50 (20) |
+| head-on, width ≤ 7 m | 1.00 (4) | 0.50 (8) | 0.88 (8) |
+| head-on, width > 7 m | 0.05 (20) | 0.06 (32) | 0.00 (8) |
+| overtaking | 0.19 | 0.18 | 0.25 |
+
+Replaying the final model with the nominal hull on the development set
+explains three of them:
+
+* **A port-side crossing is scored as give-way with a starboard turn sense.**
+  S3 / modification 1 collapses both sides into one crossing class, and
+  `_TURN_SENSE[CROSSING] = +1`. So `v_port` charges the port turn that passing
+  astern of a target from port needs, and a starboard turn carries the own ship
+  along the target's track. The policy does exactly what it is paid for: +27°
+  to +41° to starboard before CPA in 8 of 9 port crossings. Collisions *rise*
+  with DCPA, the signature of an alteration creating a collision out of a clear
+  pass. This is a locked decision, so it is **A17**, not a fix.
+* **Being overtaken: the policy runs.** Throttle mean up to 0.9, speed about
+  1.0 m/s, swerves of 20–50° before CPA, and 8.8 `v_hold` frames per episode.
+  In 10 m corridors that ends in the wall: 10 of 20 collisions there are
+  boundary. It is A15 made concrete. With a constant-velocity overtaker and
+  DCPA under about 0.65 m, standing on is fatal, the observation cannot tell
+  the agent which draw it is in, and −300 outweighs `v_hold` and the F50
+  over-speed gate together.
+* **Give-way crossing at DCPA < 1.4 m** fails 83–88 %. In 3 of the 5 collisions
+  replayed the policy turned *to port* (−13° to −34°). That is the wrong way,
+  and `v_port` does charge it. It looks like a learning problem, not a
+  formulation defect, but it shares the class one-hot with A17's port case. So
+  until A17 is resolved the agent is taught opposite geometry under one label,
+  which may be why it cannot learn either.
+* **Narrow head-on (≤ 7 m) collides 75 %**, against 5 % above 7 m, although
+  the head-on width threshold is 3.8 m. Not yet diagnosed (C14).
+
+**F53 — your decisions on A15, A16 and A17: option 1 for all three.**
+
+* **A17, a crossing's turn sense is side-dependent.**
+  `compliant_turn_sense(cls, crossing_side)` returns −1 for a crossing from
+  port and +1 from starboard. The engagement latch and the idle path both pass
+  `ctx.crossing_side`, so the side is fixed at engagement. `v_port`, `v_r8`'s
+  alteration credit, `turn_admissible` (now `A_port` for a port crossing) and
+  R-2's slowdown all follow the sense, with no other change. S3 still makes
+  the own ship give way either way, and the observation still has one crossing
+  class. Test: `test_5b_a_crossing_from_port_requires_a_port_turn`.
+* **A15, the being-overtaken DCPA is floored.** 80 % of draws are uniform on
+  [`BEING_OVERTAKEN_DCPA_FLOOR` = 1.0 m, 2.0 m]. The other
+  `BEING_OVERTAKEN_BELOW_FLOOR_FRAC` = 20 % are uniform on [0, 1.0 m) and
+  labelled `scenario.dcpa_below_floor` as the Rule 17(b) case. The label is
+  an attribute, not a record field, so scenario hashes are unchanged. Only
+  being-overtaken draws consume the extra random number. Test:
+  `test_the_being_overtaken_dcpa_is_floored_with_a_labelled_fraction_below`.
+* **A16, the two-sided speed gate stays** (F50); the constants lose their
+  `TODO(decision)`.
+* The formulation evaluation now records `dcpa_m`, `ct_deg` and
+  `dcpa_below_floor` per episode.
+
+Tests: **402 passed** (400 + 2). Run 3 (`asv_runs\ppo_formulation_seed0_v3`) trains with all three.
+
+### 3.13 Earlier findings, still standing
 
 | # | Finding | Status |
 |---|---|---|
@@ -324,6 +718,10 @@ margin. 04a flags this against itself.
 ---
 
 ## 4. Throughput — 04a §8.3's gate
+
+> **Revision 7.** **38 steps/s at 2 Hz = 19 simulated seconds per wall second**, against about 2 at 10 Hz (20 steps/s) -- 9.5x more simulated time, most of it from casting the LiDAR and updating the tracker once per 0.5 s instead of per 0.1 s. The free-space classifier costs nothing measurable (38.1 against 38.3 steps/s). The 1.6 M-step suite sized at 10 Hz is 320 k steps at 2 Hz: **about 2.3 h per policy seed**, against 04a §8.3's 50 minutes. Vectorised environments are still the next move.
+
+> **Corrected in revision 6.** The 74 steps/s below was measured on a narrow target-free corridor and overstated the default environment about 4×. Measured idle on the default environment with a target and random actions: **13–14 steps/s**, then **19–21** after fixing a hotspot in the confinement check. One policy-seed suite at 20 steps/s is ~22 h. The original text follows.
 
 04a §8.3 says to measure before committing to the comparator list. Measured:
 
@@ -340,7 +738,7 @@ polygon is decimated to 0.5 m spacing (a 1000-vertex channel made it 250× slowe
 than the rectangle it replaced), and the gate computes perpendicular distances
 only for beams that fell outside.
 
-**This is B3.** At 74 steps/s a 30-run protected core is not affordable on the
+**This is B3.** At ~20 steps/s (74 as first measured) a 30-run protected core is not affordable on the
 timescale 04a assumes. Options, none of which is Claude Code's to choose:
 vectorised environments (the obvious first move, and the measurement above is
 single-env), a coarser admissibility sample, or a shorter budget per run.
@@ -351,15 +749,15 @@ single-env), a coarser admissibility sample, or a shorter budget per run.
 
 | # | Test | State |
 |---|---|---|
-| T1 | Froude at `U_nom` is 0.14 ± 0.01 | **xfail** — F24 |
+| T1 | Froude at `U_nom` is 0.14 ± 0.01 | **pass** — Fr 0.142 (F42) |
 | T2 | boundary branch differs from ground truth under pose noise | pass |
-| T3 | `\|corr(e_y, b_i)\| < 0.9` for all 7 rays | pass (60 episodes; run 1000 before the freeze) |
+| T3 | `\|corr(e_y, b_i)\| < 0.9` for all 7 rays | pass at 10 m, on the path offset alone (60 episodes; run 1000 before the freeze) |
 | T4 | target invisible when fully occluded | **not written** — needs 04a §3.6's occlusion placement |
 | T5 | facility walls in the raw scan, absent after the gate | pass |
-| T6 | corridor boundary never in the raw scan | pass |
-| T7 | crossing targets leave the corridor, others do not | pass |
-| T8 | static panels classified dynamic rarely | pass |
-| T9 | head reach ≤ 1.5·Lpp, or `allow_reverse` | **xfail** — F28 |
+| T6 | corridor boundary never in the raw scan | pass (at 10 m) |
+| T7 | crossing targets leave the corridor, others do not | pass — confinement flags; containment relaxed at a basin-wide corridor (F39) |
+| T8 | static panels classified dynamic rarely | **pass** (F37) — 40 target-free episodes with zero phantoms; measured 0 in 24,024 frames with and without pose noise |
+| T9 | head reach ≤ 1.5·Lpp, or `allow_reverse` | **pass** via the emergency stop at 2 Hz, η 0.3–1.0 (break-even 0.27); coasting pinned as failing |
 | T10 | timeout rate below 5% on stage 5 | **not written** — needs a trained policy |
 | T11 | env class matches the reward gate's class every frame | pass |
 | T12 | domain intrusion does not terminate | pass |
@@ -398,9 +796,9 @@ Machine-checked in `suite.freeze_checklist()`.
 | ✅ | seed namespaces disjoint | asserted in `test_acceptance.py` |
 | ✅ | suite generated and hashed | `build_tier_a()` + `manifest()` |
 | ✅ | regeneration reproduces every hash | asserted |
-| ✅ | throughput measured | 74 steps/s — see §4 |
+| ✅ | throughput measured | 38 steps/s at 2 Hz, 19 simulated s per s — see §4 |
 | ❌ | every `TODO(04-*)` resolved or deferred | four outstanding |
-| ❌ | operating speed settled | F24 |
+| ✅ | operating speed settled | 0.55 m/s (F42) |
 | ❌ | claim ledger committed | including Study 1's §6 predictions |
 | ❌ | empty result tables committed | matching the draft skeleton |
 
@@ -433,3 +831,6 @@ Machine-checked in `suite.freeze_checklist()`.
 | 3 | 2026-09-08 | 02b T4 reward, telemetry panel; F22, F23 |
 | **4** | **2026-09-13** | **03a + 04a: corridor generator, targets, scenario generator, suite, acceptance tests; F24–F29** |
 | 5 | 2026-09-13 | `OPEN_PROBLEMS.md` added; B10 recorded (the generator is not wired into the env) |
+| **6** | **2026-09-13** | **05 part 1 validated (`bluefin/REVIEW.md`) and integrated; emergency stop; deployment timing wrapper; F30–F36; §6.3 and throughput overstatements corrected** |
+| **7** | **2026-09-14** | **2 Hz everywhere; corridor fixed at 10 m; free-space static/dynamic classifier and sensor-origin fix; bridge e-stop latch; crash-stop block in the basin plan; refit v4 (not adopted) and v4b; F35, F36 fixed; F37–F41; then the pose race fixed (0 of 1,085 stale on replay) and the rudder limiter made a true rate limit, off by default in bridge and simulator** |
+| **8** | **2026-09-14** | **F24 decided (0.55 m/s); virtual corridors restored; scenario generator wired into the environment; e-stop reward (A8); nominal pose/ego noise; hull randomisation 1.0; reward scale audit; single-seed PPO formulation run; F42–F48** |
