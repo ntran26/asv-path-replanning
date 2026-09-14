@@ -56,15 +56,25 @@ GIVE_WAY_CLASSES = (enc.HEAD_ON, enc.CROSSING, enc.OVERTAKING)
 # are penalised" constant anywhere in this tree, and nothing to miscode.
 _TURN_SENSE = {
     enc.HEAD_ON: +1,          # alter to starboard, subject to width
-    enc.CROSSING: +1,         # alter to starboard and/or slacken; never cross ahead
+    enc.CROSSING: +1,         # from starboard; -1 from port (A17): pass astern, never ahead
     enc.OVERTAKING: -1,       # pass to PORT of the target, then regain starboard
     enc.BEING_OVERTAKEN: 0,   # hold course and speed
     enc.NONE: 0,
 }
 
 
-def compliant_turn_sense(encounter_class: str) -> int:
-    """`+1` starboard, `-1` port, `0` no alteration required (02a §2.1)."""
+def compliant_turn_sense(encounter_class: str, crossing_side: str = enc.SIDE_NONE) -> int:
+    """`+1` starboard, `-1` port, `0` no alteration required (02a §2.1).
+
+    **A17 (decided): a crossing's sense depends on the side it crosses from.**
+    S3 keeps the own ship give-way either way, and giving way to a crossing
+    vessel means passing astern of it.  From starboard that is a starboard turn;
+    from port it is a port turn.  A starboard turn there carries the own ship
+    along the target's track: run 2 collided in 0.75 of port crossings at
+    DCPA > 1.4 m doing exactly that, because `v_port` paid for it.
+    """
+    if encounter_class == enc.CROSSING and crossing_side == enc.SIDE_PORT:
+        return -1
     return int(_TURN_SENSE.get(encounter_class, 0))
 
 
@@ -396,7 +406,7 @@ class ContextManager:
             ctx.compliant_turn_sense = latch["turn_sense"]
         else:
             ctx.state = IDLE
-            ctx.compliant_turn_sense = compliant_turn_sense(ctx.cls)
+            ctx.compliant_turn_sense = compliant_turn_sense(ctx.cls, ctx.crossing_side)
 
         ctx.engaged = ctx.state == ENGAGED
 
@@ -407,7 +417,7 @@ class ContextManager:
             "psi_engage": float(heading_os_deg),
             "u_engage": float(u_os),
             "t_engage": int(self.step_index),
-            "turn_sense": compliant_turn_sense(ctx.cls),
+            "turn_sense": compliant_turn_sense(ctx.cls, ctx.crossing_side),
             "switch_steps": 0,
             "clear_steps": 0,
         }

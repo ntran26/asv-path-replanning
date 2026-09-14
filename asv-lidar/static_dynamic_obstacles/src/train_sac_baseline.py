@@ -75,7 +75,7 @@ from train_ppo_baseline import (
 SAC_HYPERPARAMS: Dict[str, Any] = {
     "learning_rate": 5e-5,
     "batch_size": 512,
-    "gamma": 0.99,
+    "gamma": cfg.discount(0.99),      # 0.99 at 10 Hz, same horizon at 2 Hz
     "buffer_size": 1_000_000,
     "train_freq": 1,
     "gradient_steps": 1,

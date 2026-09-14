@@ -31,6 +31,7 @@ class RewardBreakdown:
     total: float = 0.0
     dense: float = 0.0
     terminal: float = 0.0
+    intervention: float = 0.0          # one-shot emergency-stop cost (A8)
 
     term: Dict[str, float] = field(default_factory=dict)        # pre-weight
     weighted: Dict[str, float] = field(default_factory=dict)    # post-weight
@@ -58,6 +59,7 @@ class RewardBreakdown:
         out[f"{prefix}/total"] = float(self.total)
         out[f"{prefix}/dense"] = float(self.dense)
         out[f"{prefix}/terminal"] = float(self.terminal)
+        out[f"{prefix}/intervention"] = float(self.intervention)
         out["colregs/pre_clip"] = float(self.colregs_pre_clip)
         out["colregs/u_ref_eff"] = float(self.u_ref_eff)
         return out
@@ -83,7 +85,8 @@ class RewardFunction:
     # ------------------------------------------------------------------
     def __call__(self, state: T.RewardState, contexts, *,
                  collision: Optional[str] = None, reached_goal: bool = False,
-                 truncated: bool = False, record: bool = True) -> RewardBreakdown:
+                 truncated: bool = False, estop_triggered: bool = False,
+                 record: bool = True) -> RewardBreakdown:
         cfg = self.cfg
         speed = T.effective_speed_reference(state, contexts, cfg)
         group = T.colregs_group(state, contexts, cfg)
@@ -117,11 +120,16 @@ class RewardFunction:
 
         dense = float(sum(weighted.values()))
         terminal = self._terminal(collision, reached_goal, truncated)
+        # Charged once, on the step a stop begins; a collision in the same step
+        # already carries the larger payoff.
+        intervention = (float(cfg.r_estop) if estop_triggered and collision is None
+                        else 0.0)
 
         out = RewardBreakdown(
-            total=dense + terminal,
+            total=dense + terminal + intervention,
             dense=dense,
             terminal=terminal,
+            intervention=intervention,
             term=raw,
             weighted=weighted,
             colregs=dict(group["parts"]),

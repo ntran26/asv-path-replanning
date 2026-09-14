@@ -1,0 +1,23 @@
+[
+  {
+    "run": "2026-07-02/calibration#1",
+    "t_cut_s": 18.5,
+    "duration_s": 24.5,
+    "samples_removed": 12,
+    "split": "train"
+  },
+  {
+    "run": "2026-07-02/trial",
+    "t_cut_s": 18.5,
+    "duration_s": 24.5,
+    "samples_removed": 12,
+    "split": "train"
+  },
+  {
+    "run": "2026-07-02/trial_2",
+    "t_cut_s": 18.5,
+    "duration_s": 27.0,
+    "samples_removed": 17,
+    "split": "train"
+  }
+]

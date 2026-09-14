@@ -29,7 +29,7 @@ FLAT_FRACTION = 0.05
 # Minimum steps before `flat` means anything.  A term cannot have shown its
 # range in the first few steps of an episode, and flagging it there would put a
 # permanent red marker on the panel for the first second of every run.
-FLAT_MIN_STEPS = 30
+FLAT_MIN_STEPS = cfg_mod.steps_for(3.0)
 
 # A term contributing less than this per step on average is inactive, not
 # out of order.  Without the floor the check fires on every clean run --
@@ -199,7 +199,10 @@ class TermAudit:
 # `constants.py` §13.4 (F22), where `N_ref` had to be derived from the measured
 # cruise speed rather than fixed at 250.
 PREDICTED_NOMINAL = {
-    "prog": +52.6,
+    # Derived, not written down: `W_PROG * N_REF_PROG`, and `N_REF_PROG` moves
+    # with `U_REF`.  It read +52.6 while `U_REF` was the 1.14 m/s log median and
+    # reads +53.8 now that `U_REF` comes from the identified plant (1.116 m/s).
+    "prog": round(cfg_mod.W_PROG * cfg_mod.N_REF_PROG, 1),
     "pf": -27.0,
     "obs": -26.0,
     "exist": -15.0,

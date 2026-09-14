@@ -1,5 +1,27 @@
 # CONSTANTS AND SCALES — Paper 3
 
+**Revision 2.7** — F24 decided: **`CRUISE_RPM = 6`, `U_REF` = 0.558 m/s**. The
+virtual corridor sweep is **restored**. Nominal pose and ego noise and hull
+randomisation (1.0) are on for training, and the emergency stop has its own
+reward treatment (`R_ESTOP`). New values in §14; tables quoting 1.116 m/s
+below are updated where they define a current value.
+
+**Revision 2.6** — **everything runs at 2 Hz** to match the vessel
+(`UPDATE_RATE = 0.5`). Every step count is a duration through `steps_for`,
+every dense reward weight is scaled by `REWARD_DT_SCALE = 5` so per-second
+rates and 02a §8.1's episode integrals are unchanged, and the training
+discounts are converted by `discount()`. The corridor is **fixed at 10 m**,
+which retires the Study 1 sweep (§2). The static/dynamic split is a
+**free-space consistency test** (§7.0). Pose staleness is native to the
+environment (§13.3). Tables carry the 2 Hz values; prose quoting 10 Hz step
+counts describes revision 2.5 and says so.
+
+**Revision 2.5** — the identified hull from 05 part 1 (`bluefin/`) replaces the
+calibrated v2 model: `U_REF` is now **derived from the plant** (1.116 m/s) and
+`THRUST_CAL` is gone. New constants for the emergency stop and deployment
+timing are in §13. Sections below that quote 1.14 m/s or `THRUST_CAL` describe
+revision 2.4 and are marked where it matters.
+
 **Revision 2.4** — tracks `02b_DECISIONS_AND_TASK_ORDER.md` through **T4**.
 The speed calibration is **measured** (T1), the cross-track sign is flipped to
 textbook (T2/C4), `r_path` exists (T3), the width thresholds are **computed**
@@ -51,12 +73,23 @@ mis-scale the ship domain by 10%. `ship.py` has no `LBP`; it is defined here.
 
 | Symbol | Value | Status |
 |---|---|---|
-| `UPDATE_RATE` | 0.1 s | 10 Hz, matches the field control loop |
-| `MAX_EPISODE_STEPS` | 700 | 70 s cap — **verify against the longest corridor** (03 §8) |
+| `UPDATE_RATE` | **0.5 s** | **2 Hz, the vessel's decision rate** (revision 2.6; was 0.1) |
+| `PHYSICS_DT` | 0.1 s | collision and target motion sub-step inside a decision |
+| `MAX_EPISODE_STEPS` | 180 | 90 s (04a §4.1) |
 | `MAP_WIDTH` / `MAP_HEIGHT` | 10.0 / 25.0 m | **O4 resolved** |
-| `CORRIDOR_WIDTHS_M` | 10, 8, **7**, 6, 5, 4, 3.5 m | Study 1 sweep |
-| `PREDICTED_THRESHOLDS_M` | 6.52 / 6.02 / 4.78 / 3.66 m | per-class, 02a §2.2 |
+| `CORRIDOR_WIDTHS_M` | **10 m only** | **fixed at the basin** (revision 2.6); was the Study 1 sweep, 10–3.5 m |
+| `PREDICTED_THRESHOLDS_M` | 6.80 / 6.30 / 4.95 / 3.80 m | per-class, 02a §2.2, at the floored domain — **all below 10 m** |
 | `HEAD_ON_WALL_CLEARANCE` | 0.65 m | `TODO(05)` |
+
+**Revision 2.6 fixed the corridor at 10 m; revision 2.7 restored the sweep below.** What 2.6 recorded: The generator,
+the virtual-boundary machinery and every width parameter stay in the code, but
+the curriculum, Tier B's strata, Around the Clock and Study 1 are all configured
+at 10 m. Consequences recorded in `PROJECT_STATE.md` §3.14: every class's
+compliant alteration fits a 10 m channel, so no width alone makes Rule 8(e) the
+governing rule; no bend fits (F25); Tier B realises one width stratum of three;
+28 of 34 Tier A cases no longer differ in geometry from their 10 m siblings; and
+a crossing target has no water outside the corridor to start from. The sweep
+text below describes revision 2.5.
 
 **O4 resolved (03 §5): simulation matches the basin.** Maximum corridor width
 10 m = 20 breadths, so every simulated width is physically reproducible — a
@@ -95,13 +128,18 @@ documented so it is revisited rather than forgotten.
 
 ## 3. Actuation and the speed calibration
 
+> **Superseded in revision 2.5.** `U_REF` is `ship.steady_speed(CRUISE_RPM)` on the
+> identified hull — 1.116 m/s — and `THRUST_CAL` no longer exists. The two methods
+> (hull fit, log speed over ground) agree to 2 %. The calibration history below is
+> kept because it records how the 0.55 m/s placeholder was found out.
+
 | Symbol | Value | Status |
 |---|---|---|
-| `CRUISE_RPM` | 12.0 | Paper 2 |
+| `CRUISE_RPM` | **6.0** | F24 decided, 0.55 m/s (rev 2.7; was 12.0) |
 | `RPM_STAGE` | 1 → (±3, 9, 15) | curriculum entry; **stage 4 is the endpoint** |
 | `REVERSE_AVAILABLE` | False | `TODO(03)` — capability unverified |
-| **`U_REF`** | **1.14 m/s** | **measured** (T1) |
-| `ship.THRUST_CAL` | 0.3751 | calibration, `TODO(05)` |
+| **`U_REF`** | **0.558 m/s** (1.116 at 12 rpm-units) | **derived from the identified plant** at `CRUISE_RPM`; the 1.14 m/s log median corroborates the plant at 12 |
+| ~~`ship.THRUST_CAL`~~ | removed | the identified `T12` reproduces cruise without calibration |
 
 **Propulsion widening is resolved** (03 §6, 02 §4.4). Rule 8(e) speed reduction
 is the designated fallback whenever a compliant course alteration would push the
@@ -236,14 +274,48 @@ the deck sit at scan height and move.
 
 | Symbol | Value | Status |
 |---|---|---|
-| `CLUSTER_EPS` | 0.35 m | `TODO(decision)` |
-| `CLUSTER_MIN_POINTS` | 4 | `TODO(decision)` |
-| `TRACK_GATE_DIST` | 0.80 m | `TODO(decision)` |
-| `TRACK_MAX_MISSES` / `TRACK_MIN_HITS` | 5 / 3 steps | |
+| `CLUSTER_EPS` | 0.35 m | approved 02b §2 |
+| `CLUSTER_MIN_POINTS` | 4 | approved 02b §2 |
+| `TRACK_GATE_DIST` | 1.40 m | derived, `max(2.5·U_REF·Δt, 0.30)` at Δt = 0.5 s |
+| `TRACK_MAX_MISSES` / `TRACK_MIN_HITS` | 3 / 2 updates | 1.5 s of coasting; published 0.5 s after first sight |
 | `KF_PROCESS_NOISE_ACCEL` | 0.10 m/s² | `TODO(05)` |
 | `KF_MEAS_NOISE_POS` | 0.05 m | `TODO(05)` |
-| `DYNAMIC_SPEED_ON` / `_OFF` | 0.15 / 0.08 m/s | `TODO(05)` |
-| `DYNAMIC_HOLD_STEPS` | 5 steps | |
+| `MOTION_CLASSIFIER` | `"free_space"` | F31's fix (§7.0); `"speed"` is 01's original, kept as the ablation |
+| `MOTION_WINDOW_S` | 2.0 s = 4 updates | 03a §6.3's `T_w` |
+| `MOTION_PASS_TOL_M` | 0.25 m | `max(0.25, 5·√2·σ_p)` — `TODO(05)`: σ_p |
+| `MOTION_EXPLAIN_M` | 0.30 m | "a return was near it" |
+| `MOTION_MIN_POINTS` / `MOTION_MIN_FRAC` | 3 / 0.10 | violations in one update that count as motion |
+| `DYNAMIC_PROMOTE_STEPS` / `_DEMOTE_STEPS` | 2 / 4 updates | 03a §6.3's 0.8 s / 2.0 s, asymmetric |
+| `DYNAMIC_SPEED_ON` / `_OFF` | 0.15 / 0.08 m/s | speed classifier only; `TODO(05)` |
+
+### 7.0 F31 — static and dynamic by free space, not centroid speed
+
+01 classified a track by the Kalman speed of its cluster **centroid**. The
+centroid is the mean of whatever face the sensor sees, and that face changes as
+the own ship passes a panel, so it slides: 0.17–0.24 m/s with pose noise off,
+p90 0.5–0.6 m/s, overlapping the slowest target (0.39 m/s). No threshold
+separates them.
+
+The free-space test asks what motion physically is, over a 2 s window:
+
+* **appear** — a return now where a ray 2 s ago returned from beyond it, with no
+  return then within `MOTION_EXPLAIN_M`;
+* **vacate** — a return of the track's 2 s ago that a ray now returns from beyond,
+  with no return now within `MOTION_EXPLAIN_M`.
+
+A static solid can do neither from any viewpoint: a ray through a point on its
+boundary must already have hit it, and a newly revealed face was occluded, not
+empty. Only the beam toward the point certifies free space, and only if it
+*returned* — the C1's 1 m dead zone reports nothing for a surface it is
+touching, so an empty beam certifies nothing. And the certificate has to survive
+a pose error of `MOTION_PASS_TOL_M` in **every** direction: every beam within
+`atan(tol/ρ)` of the point must clear it as well. Checked radially alone, 3 cm of
+pose noise produced phantoms on panel faces seen edge-on, where a centimetre
+sideways lets a ray graze past the corner and return from the wall. Two fixes rode along: returns are
+lifted from the **sensor**, 0.86 m ahead of the vessel origin (they were lifted
+from the origin, so static objects appeared to move whenever the vessel turned),
+and a stale-pose frame never reaches the tracker. Measured results are in
+`PROJECT_STATE.md` §3.14.
 
 **`CLUSTER_MIN_POINTS` was raised from 3 to 4.** Suspension lines run diagonally
 across the basin and descend toward their anchors, so near the pool edges they
@@ -260,8 +332,9 @@ toward **under**-detection: promoting a static panel to a target ship is a false
 positive with COLREGs consequences.
 
 `tests/test_tracking.py::test_pose_drift_creates_false_velocity_on_a_static_object`
-demonstrates the mechanism: 0.02 m/step of drift is enough to misclassify a
-fixed object as dynamic at the current threshold.
+demonstrates the mechanism under the speed classifier: 0.2 m/s of apparent drift
+misclassifies a fixed object. `tests/test_motion_classifier.py` shows the
+free-space test ignoring a close pass that fools the speed classifier.
 
 ### 7.1 Study 2 degradation axes
 
@@ -505,14 +578,19 @@ had computed.
 | Terminal collision | — | one-shot | −300 (`R-7`) |
 | Terminal goal | — | one-shot | +100 |
 | Terminal timeout | — | one-shot | **0**, requires `truncated=True` |
-| `r_bnd` boundary | 3.00 | `[-1,0]` | hard constraint, above the COLREGs group |
-| `r_dom` target domain | 2.50 | `[-1,0]` | ground truth, centre-to-centre |
-| `r_obs` static obstacle | 2.20 | `[-1,0]` | **shifted** exponential, zero past 2 m |
-| `r_col` COLREGs group | 1.80 | `[-1,0]` | clipped to unit range *before* the weight |
-| `r_pf` path following | 0.60 | `[-1,0]` | width-normalised on `W_local` |
-| `r_prog` progress | 0.30 | `[-1,+1]` | telescoping arclength (`R-9`) |
-| `r_smooth` smoothness | 0.10 | `[-1,0]` | `κ_δ` derived from the actuator |
-| `r_exist` existence | 0.05 | `−1` | suspended by `R-5` only |
+| `r_bnd` boundary | 15.0 (3.00) | `[-1,0]` | hard constraint, above the COLREGs group |
+| `r_dom` target domain | 12.5 (2.50) | `[-1,0]` | ground truth, centre-to-centre |
+| `r_obs` static obstacle | 11.0 (2.20) | `[-1,0]` | **shifted** exponential, zero past 2 m |
+| `r_col` COLREGs group | 9.0 (1.80) | `[-1,0]` | clipped to unit range *before* the weight |
+| `r_pf` path following | 3.0 (0.60) | `[-1,0]` | width-normalised on `W_local` |
+| `r_prog` progress | 1.5 (0.30) | `[-1,+1]` | telescoping arclength (`R-9`) |
+| `r_smooth` smoothness | 0.5 (0.10) | `[-1,0]` | `κ_δ` derived from the actuator |
+| `r_exist` existence | 0.25 (0.05) | `−1` | suspended by `R-5` only |
+
+**Revision 2.6:** weights are 02a's per-0.1 s values (in brackets) times
+`REWARD_DT_SCALE = 5`, so each term keeps its per-second rate at the 2 Hz step.
+The ordering is a common factor and unchanged; every episode integral in 02a
+§8.1 is unchanged.
 
 COLREGs sub-weights: `v_port` 0.55, `v_bow` 0.55, `v_side` 0.40, `v_hold` 0.45,
 `v_r8` 0.50. Pre-clip maxima 1.45 / 1.60 / 1.50 / 0.45 by class, so two
@@ -529,7 +607,7 @@ nobody can explain.
 | `d_abeam ≥ 1.25` | a domain inside the sensor blind zone; `r_dom` unlearnable (02b §3.1) |
 | `d_safe < c_wall − B/2` | the compliant narrow-channel manoeuvre triggering the boundary penalty |
 | `w_bnd > w_dom > w_obs > w_col > w_pf > w_prog > w_smooth > w_exist` | the `02a §7` hierarchy |
-| `\|r_collision\| > w_col · 100` | a compliant collision scoring better than a non-compliant near-miss (`02 §5`) |
+| `\|r_collision\| > w_col · MAX_ENCOUNTER_STEPS` | a compliant collision scoring better than a non-compliant near-miss (`02 §5`); 300 > 9.0 × 20 |
 | `t_act < t_engage` | the obligation becoming urgent before the encounter engages |
 | `kappa_eng > 1` | engagement firing at the compliant separation itself |
 | `kappa_rel > kappa_eng` | an encounter clearing at the range it engages; state-machine chatter |
@@ -550,7 +628,7 @@ introduced it, and invisibly, because the sum still telescopes — just to the
 wrong thing.
 
 ```
-N_REF_PROG = L_REF_PATH / (U_REF · Δt) = 20.0 / (1.14 × 0.1) = 175.4
+N_REF_PROG = L_REF_PATH / (U_REF · Δt) = 20.0 / (0.558 × 0.5) = 71.7     # 35.8 at 1.116 m/s
 ```
 
 which binds the clip at exactly cruise and restores 02a §5.5's stated intent:
@@ -585,11 +663,16 @@ uses (−65 at the headline SAC `γ = 0.99`) and is **marginal for the PPO
 comparator at `γ = 0.999`**, which reaches −327. Pinned with the numbers rather
 than fixed, because the fix is the step limit and that is a training decision.
 
+**Revision 2.6.** At 2 Hz with the weights ×5 and the discounts converted
+(`discount(0.99)` = 0.951, `discount(0.999)` = 0.995), a stopped vessel pays 3.25
+per step over 180 steps: −585 undiscounted, −66 at SAC's discount, −386 at
+PPO's — the 10 Hz numbers, by construction.
+
 ### 12.4 Speed references
 
 | | Value | When |
 |---|---|---|
-| `U_REF` | 1.14 m/s | nominal, measured (T1) |
+| `U_REF` | 0.558 m/s | nominal, identified plant at `CRUISE_RPM = 6` |
 | `U_ref_eff`, `R-2` | 0.456 m/s | give-way, compliant alteration inadmissible |
 | `U_ref_eff`, `R-5` | `max(u_TS, 0.20)` | overtaking, port pass does not fit |
 
@@ -599,3 +682,78 @@ consistent with `R-6` and avoids the degenerate-policy risk `02 §4.4` warns
 about. Without it the narrow overtaking case is not a test of COLREGs reasoning
 but a test of whether the agent tolerates an unwinnable reward — and it would
 resolve it by overtaking anyway.
+
+---
+
+## 13. Vessel plant, emergency stop, deployment timing — revision 2.5
+
+### 13.1 Plant (`ship.py`, from `bluefin/`)
+
+| Symbol | Value | Status |
+|---|---|---|
+| `U_REF` | 0.558 m/s | derived: `steady_speed(CRUISE_RPM = 6)` on the identified hull |
+| `U_REF_LOG_MEDIAN` | 1.14 m/s | measured, 02b T1 — corroboration only |
+| `SUB_DT` | 0.05 s | required by `bluefin/REPORT.md` §9 |
+| `COMMAND_RATE_PCT_S` | 50 %/s | the optional rudder limiter's rate — a true rate limit, identical in bridge and `env.step` |
+| `RUDDER_COMMAND_LIMIT` | **False** | off in bridge and simulator: v3 predicts the raw-command July runs at least as well (holdout heading 9.8° vs 15.1° at 10 s); S1-B measures the servo |
+| `MAX_RUD_RATE_DPS` | 20 °/s | derived from the above; `KAPPA_DELTA` = 0.25 per 2 Hz step |
+| `REVERSE_THRUST_EFFICIENCY` | 0.5 | **`TODO(05)`** — basin S1-C2; T9 at 2 Hz needs ≥ 0.27, or ≥ 0.55 if thrust shares the rudder's 0.73 s delay |
+| `VESSEL_RANDOMISATION_SCALE` | **1.0** | on for training (§14) |
+
+Identified parameters live in `bluefin/ship_model_v3.py` and are not duplicated
+here: a copy would drift out of step with part 2's refit.
+
+### 13.2 Emergency stop (`emergency_stop.py`)
+
+| Symbol | Value | Status |
+|---|---|---|
+| `EMERGENCY_STOP_ENABLED` | True | mechanism on |
+| `ESTOP_TRIGGER` | `"supervisor"` | **back on in revision 2.6** — F31 fixed, zero phantom tracks in 24,024 target-free frames |
+| `ESTOP_STOP_SPEED` | 0.05 m/s | **`TODO(05)`** — the field speed estimate's noise floor |
+| `ESTOP_MIN_HOLD_S` | 2.0 s | design |
+| `ESTOP_MAX_HOLD_S` | 10.0 s | design — a target stopped dead ahead must not pin the latch |
+| `ESTOP_MAX_BRAKE_S` | 8.0 s | design — never command full astern indefinitely |
+| `REVERSE_AVAILABLE` | False | unchanged: it describes the **action space**, which stays forward-only |
+
+`S2 = rpm / 24 · 100` forward, extended linearly through zero, so full astern
+`S2 = −100` is −24 rpm-units.
+
+### 13.3 Deployment timing — native since revision 2.6
+
+| Symbol | Value | Status |
+|---|---|---|
+| `DEPLOYED_DECISION_DT` | 0.5 s | measured, `dt_cmd` median over 1,085 July frames; asserted equal to `UPDATE_RATE` at import |
+| `POSE_STALE_PROB` | **0.0** | the bridge waits for each frame's pose line: 0 of 1,085 July frames stale on replay |
+| `MEASURED_POSE_STALE_PROB` | 0.408 | the old bridge, 443 of 1,085 frames; for robustness studies |
+| `SPAWN_INSET_M` | 1.41 m | F35: inflated half-length + `D_SAFE` + 0.05 |
+
+The `DeploymentTiming` wrapper is gone. A stale frame keeps its fresh LiDAR
+branch, repeats the previous frame's boundary, ego and path branches — in the
+bridge all three come from the latched pose line — and is not fed to the
+tracker.
+
+## 14. Revision 2.7 — decisions and training settings
+
+| Symbol | Value | Status |
+|---|---|---|
+| `CRUISE_RPM` | **6.0** | F24 decided: `U_REF` = 0.558 m/s, Fr 0.142 |
+| `RPM_STAGES` | 12-rpm table × `CRUISE_RPM`/12 | stage 4: 0–12 rpm-units |
+| `N_REF_PROG` | 71.7 steps | `L_REF_PATH / (U_REF · Δt)` |
+| `TRACK_GATE_DIST` | 0.70 m | `2.5 · U_REF · Δt` |
+| `BOUNDARY_POSE_NOISE_XY` / `_HEADING_DEG` | **0.03 m / 0.2°** | nominal, `TODO(05)`: S1-A |
+| `EGO_SPEED_NOISE` / `EGO_YAW_RATE_NOISE_DPS` | **0.05 m/s / 1.0 °/s** | nominal, `TODO(05)` |
+| `VESSEL_RANDOMISATION_SCALE` | **1.0** | A1–A3 12/12 at 1.0, 10/12 at 1.5 |
+| `R_ESTOP` | **−20** | one-off per stop; speed gate suspended while latched; `TODO(02)` |
+| corridor widths | 10–3.5 m sweep, variation 1.0–1.8, bends | restored (revision 2.6's fixed 10 m reversed) |
+
+### 14.1 After the formulation run (revision 2.8)
+
+| Symbol | Value | Status |
+|---|---|---|
+| `GOAL_END_INSET_M` | **0.37 m** | F49, derived: `0.5·LOA + 0.15 − GOAL_ALONG_DIST + steady_speed(2·CRUISE_RPM)·Δt + 0.05`; being-overtaken path end stops this far short of the corridor end |
+| `PF_OVERSPEED_TOL` | **0.20** | F50, A16 **decided** (option 1): `r_pf`'s speed gate is flat to 1.2 · `U_REF` |
+| `PF_OVERSPEED_SPAN` | **0.50** | F50, A16 **decided**: then falls to 0 by 1.7 · `U_REF` (0.95 m/s) |
+| PPO `target_kl` | **0.03** | F51: run 1's KL reached 0.25 with half of each batch clipped |
+| `BEING_OVERTAKEN_DCPA_FLOOR` | **1.0 m** | F53, A15 **decided** (option 1): 80 % of being-overtaken draws uniform on [1.0, 2.0] m |
+| `BEING_OVERTAKEN_BELOW_FLOOR_FRAC` | **0.20** | F53, A15: uniform on [0, 1.0) m, labelled `dcpa_below_floor` (Rule 17(b)) |
+| crossing turn sense | **+1 from starboard, −1 from port** | F53, A17 **decided** (option 1): `compliant_turn_sense(cls, crossing_side)` |

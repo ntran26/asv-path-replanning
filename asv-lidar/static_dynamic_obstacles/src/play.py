@@ -22,6 +22,7 @@ vessel starts at cruise, so it makes way immediately and you steer from there.
     1 - 7          show/hide a telemetry block
     , / .          scrub back / forward through the last 200 steps
     L              jump back to live
+    E              emergency stop: full astern until stopped, then hold
 
 The telemetry panel on the left is described in
 `planning/RENDER_PANEL_SPEC.md`.  It opens on blocks [4] COLREGS and
@@ -53,15 +54,15 @@ import constants as cfg
 from env import ASVLidarEnv, TargetShip
 from observation import split_target  # noqa: F401  (handy at the REPL)
 
-# Helm rates, per control step at 10 Hz.  The ship model rate-limits the
-# physical rudder anyway (20 deg/s), so these only shape the command.
-RUDDER_RATE = 0.10          # full deflection in ~1.0 s of held key
-THROTTLE_RATE = 0.05        # full range in ~2.0 s
+# Helm rates, per decision step.  The bridge limiter ramps the command anyway
+# (50 %/s), so these only shape what the keys ask for.
+RUDDER_RATE = 1.0 * cfg.UPDATE_RATE      # full deflection in ~1.0 s of held key
+THROTTLE_RATE = 0.5 * cfg.UPDATE_RATE    # full range in ~2.0 s
 
 KEY_HINTS = [
     "LEFT/RIGHT rudder   UP/DOWN throttle   SPACE centre helm",
     "T cruise   R reset   P pause   ESC quit",
-    "1-7 blocks   , . scrub   L live",
+    "1-7 blocks   , . scrub   L live   E e-stop",
 ]
 
 
@@ -341,6 +342,8 @@ def run(args) -> int:
                             helm.centre()
                         elif helm is not None and event.key == pygame.K_t:
                             helm.cruise()
+                        elif event.key == pygame.K_e:
+                            env.request_emergency_stop("manual (E key)")
                 if not running:
                     break
                 if paused:

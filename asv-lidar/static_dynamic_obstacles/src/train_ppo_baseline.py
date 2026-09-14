@@ -83,7 +83,9 @@ PPO_HYPERPARAMS: Dict[str, Any] = {
     "n_steps": 2048,
     "batch_size": 64,
     "n_epochs": 10,
-    "gamma": 0.99,              # matched to SAC (SB3 default is also 0.99)
+    # 0.99 per 0.1 s step, matched to SAC; converted so the 10 s horizon holds
+    # at the 2 Hz decision rate (`constants.discount`).
+    "gamma": cfg.discount(0.99),
     "gae_lambda": 0.95,
     "clip_range": 0.2,
     "ent_coef": 0.0,

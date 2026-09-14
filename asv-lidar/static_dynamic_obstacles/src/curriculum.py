@@ -88,7 +88,7 @@ CURRICULUM_SCHEDULE: Tuple[Tuple[int, int], ...] = PUBLISHED_SCHEDULE
 # carried over from stage 1 purely so that the r_thrust term's division by
 # RPM_DELTA stays well defined; with FIXED_RPM the numerator is identically zero,
 # so r_thrust is 0.0 throughout the phase regardless of the value used.
-STAGE_0 = (3.0, 9.0, 15.0)
+STAGE_0 = tuple(v * cfg.CRUISE_RPM / 12.0 for v in (3.0, 9.0, 15.0))
 
 
 def stage_params(stage: int) -> Tuple[float, float, float]:

@@ -146,9 +146,12 @@ def test_touching_the_wall_gives_closeness_one():
 # ---------------------------------------------------------------------------
 # Pose noise hook
 # ---------------------------------------------------------------------------
-def test_pose_noise_defaults_to_disabled_and_is_a_no_op():
-    """TODO(05) values are 0.0 today, so training currently sees a clean map."""
-    noise = br.PoseNoise(np.random.default_rng(0))
+def test_pose_noise_is_on_by_default_and_a_no_op_at_zero():
+    """Nominal jitter since revision 8 (TODO(05): S1-A measures it); zero
+    magnitudes still leave the scan untouched."""
+    assert br.PoseNoise(np.random.default_rng(0)).enabled
+    noise = br.PoseNoise(np.random.default_rng(0), sigma_xy=0.0,
+                         sigma_heading_deg=0.0, walk=0.0)
     assert not noise.enabled
     assert noise.perturb(5.0, 12.5, 30.0) == (5.0, 12.5, 30.0)
 

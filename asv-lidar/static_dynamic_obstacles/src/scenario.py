@@ -271,6 +271,9 @@ class ScenarioGenerator:
             own_spawn=(float(own[0]), float(own[1])), own_heading=own_heading,
             target_behaviour=behaviour, flags=dict(flags),
         )
+        # The corridor itself, for the environment.  An attribute, not a field,
+        # so the 04a §9.1 record and its hash are unchanged.
+        scenario.channel = channel
 
         if cls == "no_target":
             scenario.n_obstacles = self._sample_obstacle_count(rng)
@@ -306,6 +309,8 @@ class ScenarioGenerator:
         scenario.dcpa_m = solved["dcpa"]
         scenario.tcpa_s = solved["tcpa"]
         scenario.spawn_range_m = solved["range"]
+        # A15's label.  An attribute, like `channel`, so the record hash is unchanged.
+        scenario.dcpa_below_floor = solved.get("below_floor")
         scenario.n_obstacles = self._sample_obstacle_count(rng)
         return scenario
 
@@ -337,8 +342,17 @@ class ScenarioGenerator:
         t0 = float(rng.uniform(tcpa_lo, tcpa_hi)) if tcpa_hi > 0 else 0.0
 
         dcpa_max = cfg.CLASS_DCPA_MAX[cls]
-        d0 = (float(rng.uniform(cfg.NULL_MIN_DCPA, cfg.NULL_MIN_DCPA + 3.0))
-              if dcpa_max is None else float(rng.uniform(0.0, dcpa_max)))
+        below_floor = None
+        if dcpa_max is None:
+            d0 = float(rng.uniform(cfg.NULL_MIN_DCPA, cfg.NULL_MIN_DCPA + 3.0))
+        elif cls == "being_overtaken":
+            # A15: floored, with a labelled Rule 17(b) fraction below the floor.
+            floor = min(float(cfg.BEING_OVERTAKEN_DCPA_FLOOR), float(dcpa_max))
+            below_floor = bool(rng.uniform() < cfg.BEING_OVERTAKEN_BELOW_FLOOR_FRAC)
+            d0 = float(rng.uniform(0.0, floor) if below_floor
+                       else rng.uniform(floor, dcpa_max))
+        else:
+            d0 = float(rng.uniform(0.0, dcpa_max))
         side = float(rng.choice([-1.0, 1.0]))
 
         psi_ts = (own_heading + ct) % 360.0
@@ -361,7 +375,7 @@ class ScenarioGenerator:
 
         return {"x": float(spawn[0]), "y": float(spawn[1]), "heading": psi_ts,
                 "speed": u_ts, "k": k, "ct": ct, "dcpa": d0, "tcpa": t0,
-                "range": r0}
+                "range": r0, "below_floor": below_floor}
 
     # ------------------------------------------------------------------
     def _place_null(self, rng, own, own_heading) -> Optional[dict]:
@@ -429,7 +443,12 @@ class ScenarioGenerator:
         # in open basin water outside the corridor, or it is not crossing.
         in_basin = (0.0 <= solved["x"] <= cfg.MAP_WIDTH
                     and 0.0 <= solved["y"] <= cfg.MAP_HEIGHT)
-        return bool(not inside and in_basin)
+        # **Revision 7: the corridor is the basin**, so there is no water outside
+        # it and that rule would reject every crossing draw.  A crossing target
+        # then starts anywhere in the basin and stays unconfined -- it crosses
+        # the fairway rather than entering it from outside.
+        spans_basin = channel.nominal_width >= cfg.MAP_WIDTH - 1e-6
+        return bool(in_basin and (spans_basin or not inside))
 
     def _sample_obstacle_count(self, rng) -> int:
         lo, hi = cfg.CURRICULUM_STAGES[self.stage]["clutter"]
@@ -455,10 +474,20 @@ def own_start_s(encounter_class: str, channel) -> float:
     perception rather than policy reasons, so losing it to a metre of geometry
     would be an expensive accident.
     """
+    # F35: never closer to the corridor's end edge than `SPAWN_INSET_M`, or the
+    # stern starts inside the boundary penalty band.
     if encounter_class != "being_overtaken":
-        return 0.0
-    spare = max(0.0, channel.length - cfg.REF_PATH_LENGTH_M)
-    return float(min(spare, cfg.class_spawn_range("being_overtaken")[1]))
+        return float(cfg.SPAWN_INSET_M)
+    # F49: the far end needs an inset too.  Taking all of `length - 20` as
+    # astern room put the path end -- and so the goal -- on the corridor's end
+    # edge: the bow crossed it inside the step that reached the goal, and 34 %
+    # of being-overtaken training episodes scored a boundary collision there.
+    # `GOAL_END_INSET_M` rather than `SPAWN_INSET_M`: the full spawn inset
+    # leaves too little astern room and cut the class's yield from 200 to 129
+    # in 200 draws.
+    spare = max(0.0, channel.length - cfg.REF_PATH_LENGTH_M - cfg.GOAL_END_INSET_M)
+    return float(max(cfg.SPAWN_INSET_M,
+                     min(spare, cfg.class_spawn_range("being_overtaken")[1])))
 
 
 def _unit(heading_deg: float) -> np.ndarray:

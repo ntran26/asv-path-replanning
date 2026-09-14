@@ -16,6 +16,19 @@ Notes:
     local_target_cte.
 - Rudder sign is reversed by default because the real vessel rudder command uses
   the opposite sign to the simulation convention.
+- Emergency stop (Rule 8(e)): press E to latch full astern (S2 = -100) until the
+  vessel's surge reads stopped, then zero propulsion to hold; press R to hand
+  control back once the minimum hold has elapsed.  The latch is
+  `static_dynamic_obstacles/src/emergency_stop.py`, the same state machine the
+  simulator trains around.  **The policy's propulsion range is still 0-100**:
+  the latch is the only path to a negative S2.
+- The rudder command goes out unlimited by default.  The 50 %/s limiter stood
+  in for the old simulator's servo; the identified model predicts raw-command
+  runs at least as well as limited ones.  `--rudder-limit` restores it, as a
+  true rate limit, and must be paired with `RUDDER_COMMAND_LIMIT = True` in
+  training.
+- Each LiDAR frame waits for its own pose line before the policy acts on it
+  (`PoseSync`); the pose used to be the previous cycle's on 41 % of frames.
 """
 
 from __future__ import annotations
@@ -41,6 +54,18 @@ import log_viewer
 import policy_render as pr
 from test_run import TestCase
 from lidar_pooling import pool_lidar_to_sectors_shared, normalise_pooling_mode
+
+# The stop latch is imported from the simulator's source, not copied: it has no
+# simulator dependency, and one implementation is the only way the stop a policy
+# was trained around is the stop the vessel performs.  Appended to the path, so
+# every module of this directory keeps precedence.
+import dataclasses
+import sys
+_SIM_SRC = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                         "..", "static_dynamic_obstacles", "src"))
+if _SIM_SRC not in sys.path:
+    sys.path.append(_SIM_SRC)
+import emergency_stop as estop_mod  # noqa: E402
 
 try:
     from asv_lidar import LIDAR_RANGE, LIDAR_SWATH, LIDAR_BEAMS, LIDAR_SECTORS
@@ -92,7 +117,10 @@ elif RPM_STAGE == 4:
 
 RPM_MAX = 24.0
 CRUISE_RPM = 12.0
-S2_MAX_CMD = 100.0    # vessel command S2 range: 0-100
+S2_MAX_CMD = 100.0    # policy propulsion command S2 range: 0-100 (forward only)
+# The emergency-stop latch alone may command below zero.  The vessel accepts
+# S2 in [-100, 100]; the policy never sees the negative half.
+S2_ESTOP_FLOOR = estop_mod.S2_FULL_ASTERN        # -100
 RUDDER_SCALE = 100.0
 RUDDER_SIGN = -1.0    # real vessel sign is reversed vs sim
 
@@ -108,6 +136,15 @@ MAX_RUDDER_DEG_FOR_RATE = 40.0
 MAX_RUDDER_RATE_DPS = 20.0
 MAX_CMD_DT = 0.5
 MIN_CMD_DT = 1e-3
+
+# Pose/LiDAR pairing.  Telemetry sends one pose line and one LiDAR line per
+# 0.5 s cycle, stamped a few milliseconds apart and arriving in either order;
+# the previous cycle's pose is 0.5 s off.  0.1 s separates the two with margin.
+POSE_MATCH_S = 0.10
+# Wall time a frame may wait for its pose line before it is used with the
+# latched pose and counted stale -- a lost pose line costs one stale frame, not
+# a stalled controller.
+POSE_WAIT_S = 0.30
 
 # ---------------------------------------------------------------------------
 # Geometry/path helpers
@@ -337,6 +374,120 @@ def rpm_to_s2_cmd(rpm: float, *, rpm_max: float, s2_max_cmd: float) -> float:
 def rudder_to_cmd(a0: float, *, sign: float, scale: float) -> float:
     return float(sign * scale * float(np.clip(a0, -1.0, 1.0)))
 
+
+def rate_limit_rudder(previous: float, requested: float, dt: float, *,
+                      rate_pct_s: float, scale: float) -> float:
+    """The rudder command limiter: at most `rate_pct_s` percent per second.
+
+    A true rate limit, as `bluefin/REPORT.md` §9, `VesselSim` and the
+    simulator's `env.step` all model it.  The version this replaces moved
+    `clip(error, +/-rate) * dt` per frame -- a rate limit for large steps but a
+    first-order lag for small ones, half the error per 0.5 s frame -- and was
+    then overwritten by the raw command, so the vessel received no limit.
+    """
+    step = float(rate_pct_s) * float(dt)
+    out = float(previous) + float(np.clip(float(requested) - float(previous), -step, step))
+    return float(np.clip(out, -abs(float(scale)), abs(float(scale))))
+
+
+class PoseSync:
+    """Pair each LiDAR frame with its own pose line before the policy sees it.
+
+    `BluefinStreamDecoder` emits a frame on the LiDAR line with whatever pose
+    it last latched.  Telemetry sends the cycle's pose line a few milliseconds
+    before or after the LiDAR line, so on the cycles where it came second -- 443
+    of 1,085 in July (`bluefin/REVIEW.md` §3.4) -- the policy acted on the
+    previous cycle's pose, 0.5 s old.
+
+    This holds a frame until a pose line stamped within `match_s` of it has
+    arrived, then gives the frame that pose and its velocity.  A frame still
+    waiting after `wait_s` of wall time is released with the latched pose and
+    counted stale; a newer LiDAR frame supersedes a held one.  With
+    `enabled=False` frames pass straight through, as before, and are still
+    counted, so the two modes can be compared from the logs.
+    """
+
+    def __init__(self, decoder, *, enabled: bool = True,
+                 match_s: float = POSE_MATCH_S, wait_s: float = POSE_WAIT_S) -> None:
+        self.decoder = decoder
+        self.enabled = bool(enabled)
+        self.match_s = float(match_s)
+        self.wait_s = float(wait_s)
+        self._pending = None
+        self._pending_since = 0.0
+        self.released = 0
+        self.stale = 0
+        self.superseded = 0
+        self.last_fresh = True
+        self.last_wait_s = 0.0
+        self.last_pose_age_s = 0.0
+
+    def _matches(self, frame) -> bool:
+        t_pose = self.decoder._last_pose_t
+        return t_pose is not None and abs(t_pose - frame.t_sec) <= self.match_s
+
+    def _with_latest_pose(self, frame):
+        x, y, yaw = self.decoder._last_pose
+        vx, vy, spd, u, v, r = self.decoder._last_vel
+        return dataclasses.replace(frame, x_m=x, y_m=y, yaw_deg=yaw, vx_mps=vx,
+                                   vy_mps=vy, speed_mps=spd, u_body_mps=u,
+                                   v_body_mps=v, yaw_rate=r)
+
+    def _account(self, frame, since: float, now: float, fresh: bool):
+        self.released += 1
+        self.stale += int(not fresh)
+        self.last_fresh = bool(fresh)
+        self.last_wait_s = max(0.0, float(now) - float(since))
+        t_pose = self.decoder._last_pose_t
+        self.last_pose_age_s = float(frame.t_sec - t_pose) if t_pose is not None else float("nan")
+        return frame
+
+    def push(self, line: str, now: float):
+        """Feed one telemetry line.  Returns a frame ready for the policy, or None."""
+        pose_before = self.decoder._last_pose_t
+        frame = self.decoder.feed(line)
+
+        if not self.enabled:
+            return None if frame is None else self._account(frame, now, now, self._matches(frame))
+
+        if frame is not None:
+            if self._pending is not None:
+                self.superseded += 1
+                self._pending = None
+            if self._matches(frame):
+                return self._account(frame, now, now, True)
+            self._pending, self._pending_since = frame, float(now)
+            return None
+
+        if self._pending is None:
+            return None
+        if self.decoder._last_pose_t != pose_before and self._matches(self._pending):
+            held, since, self._pending = self._pending, self._pending_since, None
+            return self._account(self._with_latest_pose(held), since, now, True)
+        if float(now) - self._pending_since >= self.wait_s:
+            held, since, self._pending = self._pending, self._pending_since, None
+            return self._account(held, since, now, False)
+        return None
+
+
+def apply_emergency_stop(latch, policy_s2: float, *, t: float, dt: float, u: float,
+                         request: Optional[str] = None,
+                         release: bool = False) -> Tuple[float, str]:
+    """Run the stop latch for one frame.  Returns (S2 to transmit, latch state).
+
+    `u` is **signed** surge from the decoder (`u_body_mps`), not speed over
+    ground: astern motion must read as stopped-or-less, or a latch reading the
+    unsigned speed would keep commanding full astern while the vessel gathers
+    sternway.  With the latch idle the policy's command passes through,
+    clipped to the forward range exactly as before.
+    """
+    if request is not None:
+        latch.request(request, t=t, speed=u)
+    override = latch.update(t=t, dt=dt, speed=u, release_ok=bool(release))
+    if override is None:
+        return float(np.clip(policy_s2, 0.0, S2_MAX_CMD)), latch.state
+    return float(np.clip(override, S2_ESTOP_FLOOR, S2_MAX_CMD)), latch.state
+
 # ---------------------------------------------------------------------------
 # Drawing helpers
 # ---------------------------------------------------------------------------
@@ -441,6 +592,22 @@ def main() -> None:
     ap.add_argument("--rudder-sign", type=float, default=RUDDER_SIGN)
     ap.add_argument("--rudder-scale", type=float, default=RUDDER_SCALE)
     ap.add_argument("--shadow", action="store_true", help="compute actions but do not send $CMD")
+    ap.add_argument("--estop-stop-speed", type=float, default=0.05,
+                    help="surge [m/s] at or below which full astern ends and the hold begins")
+    ap.add_argument("--estop-min-hold-s", type=float, default=2.0,
+                    help="seconds held at zero propulsion before R can release")
+    ap.add_argument("--estop-max-brake-s", type=float, default=8.0,
+                    help="seconds of full astern before the latch gives up into the hold")
+    ap.add_argument("--estop-auto-release-s", type=float, default=0.0,
+                    help="release the hold automatically after this many seconds; "
+                         "0 holds until R is pressed")
+    ap.add_argument("--rudder-limit", action="store_true",
+                    help="rate-limit the rudder command to 50 %%/s; off by default, and must match "
+                         "the simulator's RUDDER_COMMAND_LIMIT")
+    ap.add_argument("--no-pose-sync", action="store_true",
+                    help="act on the latched pose as the old bridge did, instead of waiting for the frame's pose line")
+    ap.add_argument("--pose-wait-s", type=float, default=POSE_WAIT_S,
+                    help="wall seconds a frame may wait for its pose line before it is used stale")
 
     ap.add_argument("--fps", type=int, default=60)
     ap.add_argument("--full", action="store_true")
@@ -498,11 +665,21 @@ def main() -> None:
             f"BLOCK_D_SAFE={BLOCK_D_SAFE},"
             f"BLOCK_D_CRIT={BLOCK_D_CRIT},"
             f"SIDE_CLEAR_TIE={SIDE_CLEAR_TIE},"
-            f"BYPASS_CTE={BYPASS_CTE}\n"
+            f"BYPASS_CTE={BYPASS_CTE},"
+            f"s2_estop_floor={S2_ESTOP_FLOOR},"
+            f"estop_stop_speed={args.estop_stop_speed},"
+            f"estop_min_hold_s={args.estop_min_hold_s},"
+            f"estop_max_brake_s={args.estop_max_brake_s},"
+            f"estop_auto_release_s={args.estop_auto_release_s},"
+            f"rudder_limit={int(args.rudder_limit)},"
+            f"pose_sync={int(not args.no_pose_sync)},"
+            f"pose_match_s={POSE_MATCH_S},"
+            f"pose_wait_s={args.pose_wait_s}\n"
         )
         print(f"[UDP] Recording received lines to: {args.record_log}")
 
     decoder = BluefinStreamDecoder(lidar_out_beams=720)
+    pose_sync = PoseSync(decoder, enabled=not args.no_pose_sync, wait_s=args.pose_wait_s)
     rx_lines = 0
     rx_frames = 0
 
@@ -521,6 +698,17 @@ def main() -> None:
     prev_rudder_t = None
     rpm_cmd = args.cruise_rpm
     thrust_cmd = rpm_to_s2_cmd(rpm_cmd, rpm_max=args.rpm_max, s2_max_cmd=args.s2_max_cmd)
+    policy_thrust_cmd = thrust_cmd
+
+    estop = estop_mod.EmergencyStop(
+        stop_speed=float(args.estop_stop_speed),
+        min_hold_s=float(args.estop_min_hold_s),
+        max_hold_s=(float(args.estop_auto_release_s) if args.estop_auto_release_s > 0.0
+                    else float("inf")),
+        max_brake_s=float(args.estop_max_brake_s),
+    )
+    estop_request: Optional[str] = None
+    estop_release = False
 
     pygame.init()
     pygame.display.set_caption(f"Bluefin UDP SAC live RL bridge [{LIDAR_POOLING_MODE} pooling]")
@@ -591,6 +779,12 @@ def main() -> None:
                     follow_mode = not follow_mode
                 elif event.key == pygame.K_c:
                     path_world = []
+                elif event.key == pygame.K_e:
+                    estop_request = "manual (E key)"
+                    print("[E-STOP] requested: full astern at the next frame")
+                elif event.key == pygame.K_r:
+                    estop_release = True
+                    print("[E-STOP] release requested")
                 elif event.key == pygame.K_o:
                     if frame is not None:
                         real_origin_xy = (float(frame.x_m), float(frame.y_m))
@@ -624,7 +818,7 @@ def main() -> None:
             if log is not None:
                 log.write(line + "\n")
 
-            decoded = decoder.feed(line)
+            decoded = pose_sync.push(line, time.monotonic())
             if decoded is not None:
                 rx_frames += 1
                 if not paused:
@@ -697,23 +891,15 @@ def main() -> None:
                             / MAX_RUDDER_DEG_FOR_RATE
                         )
 
-                        # This matches the ship_model.py style:
-                        # delta_dot = clip(delta_cmd - delta, ±max_rate)
-                        rudder_error = raw_rudder_cmd - prev_rudder_cmd_for_log
-
-                        rudder_cmd_dot = float(np.clip(
-                            rudder_error,
-                            -max_cmd_rate_per_s,
-                            +max_cmd_rate_per_s,
-                        ))
-
-                        rudder_cmd = float(prev_rudder_cmd_for_log + rudder_cmd_dot * dt_cmd)
-
-                        rudder_cmd = float(np.clip(
-                            rudder_cmd,
-                            -abs(float(args.rudder_scale)),
-                            +abs(float(args.rudder_scale)),
-                        ))
+                        # Off by default; see `--rudder-limit`.
+                        if not args.rudder_limit:
+                            rudder_cmd = float(np.clip(raw_rudder_cmd,
+                                                       -abs(float(args.rudder_scale)),
+                                                       +abs(float(args.rudder_scale))))
+                        else:
+                            rudder_cmd = rate_limit_rudder(
+                                prev_rudder_cmd_for_log, raw_rudder_cmd, dt_cmd,
+                                rate_pct_s=max_cmd_rate_per_s, scale=args.rudder_scale)
 
                         # Actual realised rate of the limited command that will be sent.
                         # Units: command-percent per second.
@@ -733,10 +919,21 @@ def main() -> None:
                             rpm_ceil=args.rpm_ceil,
                         )
                         thrust_cmd = rpm_to_s2_cmd(rpm_cmd, rpm_max=args.rpm_max, s2_max_cmd=args.s2_max_cmd)
+                        policy_thrust_cmd = thrust_cmd
 
+                        # Emergency stop: the only path to a negative S2.
+                        state_before = estop.state
+                        thrust_cmd, estop_state = apply_emergency_stop(
+                            estop, policy_thrust_cmd, t=t_now, dt=dt_cmd,
+                            u=float(frame.u_body_mps),
+                            request=estop_request, release=estop_release)
+                        estop_request = None
+                        if estop_state != estop_mod.HOLDING:
+                            estop_release = False
+                        if estop_state != state_before:
+                            print(f"[E-STOP] {state_before} -> {estop_state} at t={t_now:.2f}s "
+                                  f"u={float(frame.u_body_mps):+.2f} m/s S2={thrust_cmd:.0f}")
 
-                        # # turn rate limiter off
-                        rudder_cmd = float(raw_rudder_cmd)
 
                         command = f"$CMD,{rudder_cmd:.2f},{thrust_cmd:.2f}"
                         # command = f"$CMD,{100.0},{0.0}"
@@ -776,6 +973,12 @@ def main() -> None:
                                 f"max_rudder_rate={max_cmd_rate_per_s:.3f},"
                                 f"rpm={rpm_cmd:.3f},"
                                 f"S2={thrust_cmd:.3f},"
+                                f"policy_S2={policy_thrust_cmd:.3f},"
+                                f"estop={estop.state},"
+                                f"estop_reason={estop.events[-1].reason if estop.active else ''},"
+                                f"pose_fresh={int(pose_sync.last_fresh)},"
+                                f"pose_age_ms={1000.0 * pose_sync.last_pose_age_s:.1f},"
+                                f"pose_wait_ms={1000.0 * pose_sync.last_wait_s:.1f},"
                                 f"S1_telem={frame.s1},S2_telem={frame.s2},"
                                 f"x_real={frame.x_m:+.3f},y_real={frame.y_m:+.3f},yaw_real={frame.yaw_deg:+.2f},"
                                 f"speed={frame.speed_mps:.3f},u={frame.u_body_mps:+.3f},v={frame.v_body_mps:+.3f},yaw_rate={frame.yaw_rate:+.3f},"
@@ -835,6 +1038,14 @@ def main() -> None:
                 f"raw_rudder={raw_rudder_cmd:+.3f}    rudder={rudder_cmd:+.3f}",
                 f"rpm={rpm_cmd:.3f}    S2={thrust_cmd:.3f}",
             ]
+        header_lines.append(
+            f"E-STOP: {estop.state.upper()}"
+            + (f" [{estop.events[-1].reason}]" if estop.active else "")
+            + "   (E stop, R release)")
+        header_lines.append(
+            f"Pose sync: {'ON' if pose_sync.enabled else 'OFF'}  stale {pose_sync.stale}/{pose_sync.released}"
+            f"  superseded {pose_sync.superseded}  last wait {1000.0 * pose_sync.last_wait_s:.0f} ms"
+            f"   rudder limit: {'50 %/s' if args.rudder_limit else 'OFF'}")
 
         for s in header_lines:
             screen.blit(font.render(s, True, (235, 235, 245)), (10, y))

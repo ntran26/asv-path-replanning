@@ -16,6 +16,7 @@ the paired heading test, but three things remain assumptions:
 | sustained-turn behaviour | **prior, not measured** — turn rate, radius and speed loss at held helm are imposed bands | S1-D turning circles |
 | thrust vs RPM | `T12` anchored at one operating point; square law assumed | S1-C RPM sweep |
 | actuator decomposition | `rud_rate`, `rud_tau`, `rud_delay` trade off freely; 0.73 s is an effective lump | S1-B servo tests |
+| reverse thrust and thrust delay | **absent from the logs** — no July run commands S2 < 0; the emergency stop's field viability rests on both | S1-C2 crash stops |
 
 ---
 
@@ -47,7 +48,9 @@ effective lumped delay and part 1's limitation stands.**
 **P-4 Rate-limiter switch.** The bridge's 50 %/s command limiter must be
 disableable by a config flag, not a code edit. S1-B needs it off; every other
 block needs it on (it is part of the deployment plant — see part 1 §9). Log the
-flag state in `#CONFIG`.
+flag state in `#CONFIG`. **Done, and inverted:** the limiter is off by default (`--rudder-limit` enables
+it) and logged as `rudder_limit`. The identified model needs no stand-in servo
+limit, so every block runs without it; S1-B's steps measure the real servo rate.
 
 **P-5 Clock discipline.** IMU (100 Hz+), LiDAR and command must land on one
 clock, or carry a measurable offset. A constant offset appears in the fit as
@@ -59,6 +62,15 @@ visible in both streams at the start and end of every session.
 tables, the metric definitions and the acceptance thresholds (§5) *before* the
 session, and commit the fit script that will be run. Session 1's mid-session
 check (S1-F) executes that committed script unchanged.
+
+**P-8 Reverse on the bench.**  With the vessel restrained and the propeller
+clear, confirm the ESC accepts `S2 < 0` and runs the propeller astern; record
+the dead band around zero, any ramp the ESC imposes, and the current draw on a
+direct `+62 → -100` reversal (the command the latch issues from cruise).  Run
+the bridge in `--shadow` against `fake_vessel_replay.py` and press E: the
+`#ACTION` lines must show `estop=braking` and `S2=-100.000`, then `holding` and
+`S2=0.000`.  **If the ESC cannot reverse, S1-C2 is void and the emergency stop
+does not exist on the water** — find that out here, not in the basin.
 
 **P-7 Landmark survey plan.** Mark and measure the fixed features visible in the
 basin video — recessed doorways, signage panels, the continuous aluminium deck
@@ -111,6 +123,34 @@ Coast-down is the cleanest drag measurement available — no thrust term to trad
 off against. Together with the accel runs this separates thrust from drag, which
 the July data (18 of 20 runs at a single RPM) cannot do at all.
 
+### S1-C2 Crash stops (20 min) — limiter ON, bridge latch
+
+- From settled straight-line speed at RPM {9, 12, 15}, three runs each: press E
+  as the bow crosses a marked line.  The bridge latch commands `S2 = -100` until
+  surge reads stopped, then `S2 = 0`.  Log every run to the end of the hold.
+- Pose and command at the highest rate P-1 achieves; film the marked line from
+  the side at 60 fps with the P-3 synchronising event.
+
+Directly after the coast-downs, because the settled-speed setup is the same and
+the coast-down drag is what the reverse force is separated from.
+
+Yields the three numbers the emergency stop rests on, **none of which any other
+block or the July logs can produce**:
+
+1. **reverse thrust efficiency** — deceleration during full astern, less the
+   coast-down drag at the same speed, as a fraction of forward thrust at the same
+   command magnitude.  The simulator assumes 0.5 (`ship.REVERSE_THRUST_EFFICIENCY`);
+   at 2 Hz the stop meets 03a T9 only above 0.26;
+2. **thrust transport delay** — command to deceleration onset.  If thrust shares
+   the rudder's 0.73 s effective delay, the break-even efficiency rises to 0.56;
+3. **astern overshoot** — surge after zero crossing.  At 2 Hz the latch sees the
+   vessel stopped up to half a second late and keeps full astern meanwhile; the
+   simulator clips surge at zero and only reports the implied astern speed
+   (`estop/reverse_dv_est_mps`).
+
+Plus the head reach from the request to `0.2·U` and to rest, which is 03a T9
+measured rather than simulated.
+
 ### S1-D Turning circles (70 min) — **priority 1**
 
 - Helm {25, 50, 75, 100} %, **both signs**, at RPM 12. Minimum 2 full
@@ -127,9 +167,11 @@ Basin size will limit this. If a full circle does not fit, log the largest arc
 achievable and record the constraint; a settled arc of 180° still yields steady
 r and u.
 
-### S1-E Zig-zag (40 min) — limiter ON
+### S1-E Zig-zag (30 min) — limiter ON
 
-- 10°/10° and 20°/20° zig-zags, both initial directions, RPM 12, 3 repeats each.
+- 10°/10° and 20°/20° zig-zags, both initial directions, RPM 12: 3 repeats of
+  20°/20°, 2 of 10°/10°.  (Was 40 min with 3 repeats of each; the 10 minutes
+  went to S1-C2, and 10°/10° is already first on the contingency list.)
 
 Classic manoeuvring identification, directly comparable to the literature, and
 the manoeuvre part 1's own notes flagged as the priority for fitting heading
@@ -164,7 +206,11 @@ naive freeze-heading and constant-rate baselines.
 
 This is the honest sim-to-real number and it uses data the model never saw.
 
-### S2-C Closed-loop policy runs (90 min)
+Add three crash stops at RPM 12 (10 min, taken from S2-C): the holdout for the
+reverse efficiency and thrust delay fitted in S1-C2, compared against the
+simulator's predicted head reach at 2 Hz.
+
+### S2-C Closed-loop policy runs (80 min)
 
 The frozen evaluation scenarios. Policy in the loop, limiter ON, full logging.
 
@@ -191,7 +237,9 @@ itself a deliverable**, not just the model fitted from it.
 3. The landmark survey.
 4. Standard manoeuvring quantities in reportable form: turning circle advance,
    transfer, tactical diameter, steady radius and speed loss; zig-zag first and
-   second overshoot angles; servo rate, lag and delay; thrust curve.
+   second overshoot angles; servo rate, lag and delay; thrust curve; reverse
+   thrust efficiency, thrust transport delay, crash-stop head reach and astern
+   overshoot.
 5. Updated `params_final.json` with day-to-day intervals, and a re-run of the
    part 1 acceptance suite.
 
@@ -211,6 +259,9 @@ Fill before the session; evaluate at S1-F.
 | T-6 | zig-zag overshoot | S1-E | both manoeuvres, ≥2 valid repeats | |
 | T-7 | black-wall return rate | S1-A | return rate vs bearing resolved at ≥3 headings | |
 | T-8 | localisation drift | S1-A | stationary drift rate quantified | |
+| T-9 | reverse thrust efficiency | S1-C2 | resolved to ±0.1, at ≥2 RPM settings | |
+| T-10 | thrust transport delay | S1-C2 | resolved to ±0.1 s | |
+| T-11 | crash-stop head reach at 2 Hz | S1-C2 | measured from RPM 12; ≤ 1.5 Lpp = 2.36 m, or recorded as failing 03a T9 | |
 
 ---
 
@@ -220,10 +271,11 @@ If session 1 runs short, drop in this order — last dropped is most valuable:
 
 1. S1-C RPM sweep at the extreme settings (keep 9/12/18)
 2. S1-E 10°/10° zig-zag (keep 20°/20°)
+2a. S1-C2 crash stops at RPM 9 and 15 (keep RPM 12, three runs)
 3. S1-B ramp linearity check (keep the steps)
 4. S1-D RPM 18 circles (keep RPM 12, all helm settings, both signs)
 
-**Never drop:** S1-A, S1-D at RPM 12, S1-B steps, S1-F.
+**Never drop:** S1-A, S1-D at RPM 12, S1-B steps, S1-C2 at RPM 12, S1-F.
 
 If a block is lost entirely, recover it in S2-D and accept fewer S2-C scenarios.
 Do not recover it by refitting on session 2 data that was meant for validation —
@@ -240,6 +292,8 @@ independent.
   yaw dynamics of order 1 s, 2 Hz sits near the edge of controllability and
   plausibly shapes the bang-bang command pattern seen in the July logs. Worth
   measuring the achievable rate even if the policy keeps running at 2 Hz.
+  **Decided for the simulator (revision 7): everything runs at 2 Hz to match the
+  vessel.**  A faster rate would now mean retraining, not reconfiguring.
 - **O-3** Does a full turning circle fit in the basin at RPM 12? If not, S1-D
   becomes settled-arc measurement and the tactical diameter quantities are
   unavailable.
@@ -247,3 +301,8 @@ independent.
   required?
 - **O-5** Is the matte black wall still present and still matte? The basin video
   shows only the light-walled side.
+- **O-6** Does the ESC reverse at all, with what dead band, and does it ramp a
+  direct `+62 → -100` reversal?  P-8 answers it; S1-C2 depends on it.
+- **O-7** Is a direct full-ahead-to-full-astern reversal safe for the motor,
+  gearbox and battery?  If the answer is "ramp it", the latch needs a ramp and
+  the simulator's stop distances get longer.

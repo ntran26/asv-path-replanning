@@ -50,6 +50,8 @@ import numpy as np
 import boundary_raycast as br
 import constants as cfg
 import corridor as corr
+import emergency_stop as estop_mod
+import scenario as scn
 import targets as tgtmod
 import tracking as trk
 from asv_lidar import Lidar
@@ -58,6 +60,7 @@ from obstacles import ObstacleSampler
 from path import ReferencePath, curved_points, straight_points
 from reward import RewardConfig, RewardFunction
 from reward import terms as rterms
+import ship as shipmod
 from ship import HULL_MARGIN, MAX_RUD_ANGLE, VESSEL_LENGTH, VESSEL_WIDTH, ShipModel
 
 
@@ -93,13 +96,24 @@ class ASVLidarEnv(gym.Env):
                  reward_config: Optional[RewardConfig] = None,
                  open_water: bool = False,
                  channel: Optional[object] = None,
-                 facility_walls: bool = cfg.SIMULATE_FACILITY_WALLS) -> None:
+                 facility_walls: bool = cfg.SIMULATE_FACILITY_WALLS,
+                 emergency_stop: bool = cfg.EMERGENCY_STOP_ENABLED,
+                 vessel_randomisation: Optional[float] = cfg.VESSEL_RANDOMISATION_SCALE,
+                 command_rate_limit: bool = cfg.RUDDER_COMMAND_LIMIT,
+                 pose_stale_prob: float = cfg.POSE_STALE_PROB,
+                 motion_classifier: str = cfg.MOTION_CLASSIFIER,
+                 scenario_stage: Optional[int] = None,
+                 scenario_namespace: str = "training") -> None:
         super().__init__()
         self.map_width = float(map_width)
         self.map_height = float(map_height)
-        # Study 1 sweeps this; the corridor is inset in the basin, so every
-        # simulated width is physically reproducible (03 §5).
-        self.corridor_width = float(corridor_width if corridor_width is not None else map_width)
+        # Study 1 sweeps this; the corridor is a map polygon inside the basin, so
+        # every simulated width is physically reproducible (03 §5).  F36: a
+        # supplied channel reports its own width, not the default.
+        if channel is not None:
+            self.corridor_width = float(channel.nominal_width)
+        else:
+            self.corridor_width = float(corridor_width if corridor_width is not None else map_width)
         self.max_obs = int(max_obs)
         self.path_mode = str(path_mode)
         self.curve_prob = float(curve_prob)
@@ -112,12 +126,38 @@ class ASVLidarEnv(gym.Env):
         self.ego_yaw_rate_noise_dps = float(ego_yaw_rate_noise_dps)
         self._rng = np.random.default_rng()
 
+        # The identified hull (05 part 1).  `vessel_randomisation` draws a new
+        # one per episode from the bootstrap; see `reset`.
         self.model = ShipModel()
+        self.vessel_randomisation = (None if vessel_randomisation is None
+                                     else float(vessel_randomisation))
+        # The bridge's optional 50 %/s rudder command limiter.  Off by default in
+        # both (`constants.RUDDER_COMMAND_LIMIT`): it stood in for the old
+        # simulator's servo, and the identified model predicts raw-command runs
+        # at least as well as limited ones.  Whatever this is, the bridge's
+        # `--rudder-limit` must match it.
+        self.command_rate_limit = bool(command_rate_limit)
+        self.estop_enabled = bool(emergency_stop)
+        self.estop = estop_mod.EmergencyStop(
+            stop_speed=cfg.ESTOP_STOP_SPEED, min_hold_s=cfg.ESTOP_MIN_HOLD_S,
+            max_hold_s=cfg.ESTOP_MAX_HOLD_S, max_brake_s=cfg.ESTOP_MAX_BRAKE_S)
         self.lidar = Lidar(aft_mask_half_deg=aft_mask_half_deg,
                            dropout_p=lidar_dropout_p, rng=self._rng)
         self.tracker = trk.Tracker(dropout_p=detection_dropout_p,
                                    velocity_noise=track_velocity_noise,
+                                   classifier=motion_classifier,
                                    rng=self._rng)
+        # Measured pose staleness (`constants.POSE_STALE_PROB`).  Its own stream,
+        # so switching it on or off does not reshuffle any other draw.
+        self.pose_stale_prob = float(pose_stale_prob)
+        self._stale_rng = np.random.default_rng()
+
+        # C1: episodes from 04a's scenario generator.  `None` keeps the head-on
+        # placeholder `_sample_target`, which the older tests are written against.
+        self.scenario_stage = None if scenario_stage is None else int(scenario_stage)
+        self.scenario_namespace = str(scenario_namespace)
+        self._generator: Optional[scn.ScenarioGenerator] = None
+        self.scenario = None
         self.observer = ObservationBuilder(self.n_max_targets)
         # `R-10`: the 04 §4.1 benchmark also runs open water, where `r_pf`
         # normalises on a reference width, `r_bnd` is zero and both alterations
@@ -197,6 +237,23 @@ class ASVLidarEnv(gym.Env):
         self.speed_mps = 0.0
         self.rudder = 0.0
         self.rpm = 0.0
+        self.propulsion_s2 = 0.0
+        self._estop_request: Optional[str] = None
+        self._estop_reverse_dv = 0.0
+        self.estop.reset()
+
+        # Deployment timing: whether this frame's pose is the previous frame's,
+        # and the previous frame's pose-derived quantities to serve if it is.
+        self.pose_stale = False
+        self.stale_frames = 0
+        self._has_frame = False
+        self._pose_hold: Optional[Tuple[float, float, float]] = None
+        self._boundary_hold: Optional[np.ndarray] = None
+        self._obs_hold: Optional[Tuple[float, ...]] = None
+        self._obs_fresh: Optional[Tuple[float, ...]] = None
+        self._tracker_dt = 0.0
+        self._estop_started = False
+        self.scenario = None
 
         self.start_x = self.start_y = 0.0
         self.goal_x = self.goal_y = 0.0
@@ -253,8 +310,17 @@ class ASVLidarEnv(gym.Env):
             self.tracker.rng = self._rng
             if self._pose_noise is not None:
                 self._pose_noise.rng = self._rng
+            self._stale_rng = np.random.default_rng(int(seed) + 7_919)
 
         self._clear_state()
+        if self.vessel_randomisation is not None:
+            # A separate stream, so switching randomisation on does not reshuffle
+            # the corridor, target and obstacle draws of an otherwise identical
+            # seeded episode.
+            hull_rng = (np.random.default_rng(int(seed) + 104_729) if seed is not None
+                        else self._rng)
+            self.model.set_params(shipmod.sample_params(
+                hull_rng, scale=self.vessel_randomisation))
         self.model.reset()
         self.lidar.reset()
         self.tracker.reset()
@@ -262,13 +328,24 @@ class ASVLidarEnv(gym.Env):
         if self._pose_noise is not None:
             self._pose_noise.reset()
 
-        scenario = (options or {}).get("scenario")
+        options = options or {}
+        scenario = options.get("scenario")
         if scenario is not None:
             self._load_scenario(scenario)
+        elif options.get("generated") is not None or self.scenario_stage is not None:
+            self._load_generated(options.get("generated"))
         else:
             self._sample_layout()
 
         self.asv_x, self.asv_y = self.start_x, self.start_y
+        if self.scenario is not None:
+            # 04a's backward solve places the target for an own ship already at
+            # `U_nom` on the path heading at t = 0.  Starting from rest instead
+            # would delay the own ship by its acceleration and move every CPA.
+            self.asv_h = float(self.scenario.own_heading) % 360.0
+            self.model._s[3, 0] = math.radians(self.asv_h)
+            self.model._s[0, 0] = float(cfg.U_NOM)
+            self.u_body = float(cfg.U_NOM)
         self.asv_path = [(self.asv_x, self.asv_y)]
         self.distance_to_goal = float(np.hypot(self.asv_x - self.goal_x,
                                                self.asv_y - self.goal_y))
@@ -283,6 +360,7 @@ class ASVLidarEnv(gym.Env):
 
         self.render()
         obs = self._get_obs()
+        self._obs_hold = self._obs_fresh
         self._record_obs_health(obs)
         return obs, {}
 
@@ -362,6 +440,85 @@ class ASVLidarEnv(gym.Env):
 
         return [TargetShip(x, y, (heading + 180.0) % 360.0, speed)]
 
+    # ------------------------------------------------------------------
+    # 04a's scenario generator (C1)
+    # ------------------------------------------------------------------
+    def set_scenario_stage(self, stage: Optional[int]) -> None:
+        """Switch the curriculum stage; takes effect at the next reset."""
+        self.scenario_stage = None if stage is None else int(stage)
+        self._generator = None
+
+    def _load_generated(self, built=None) -> None:
+        """One episode from `scenario.ScenarioGenerator`, or the one supplied.
+
+        Seeds are drawn inside the episode's namespace (04a §9.2) from the
+        environment's own stream, so a seeded reset reproduces the episode.
+        """
+        if built is None:
+            stage = self.scenario_stage if self.scenario_stage is not None else 5
+            if self._generator is None or self._generator.stage != stage:
+                self._generator = scn.ScenarioGenerator(
+                    stage=stage, seed_namespace=self.scenario_namespace)
+            for _ in range(20):
+                index = int(self._rng.integers(0, 10 ** 9))
+                built = self._generator.sample(scn.seed_for(self.scenario_namespace, index))
+                if built is not None:
+                    break
+            if built is None:
+                raise RuntimeError("the scenario generator capped out 20 times running")
+
+        self.scenario = built
+        self.channel = built.channel
+        self.boundary_polygon = self.channel.polygon()
+        self.corridor_width = float(self.channel.nominal_width)
+
+        start_s = scn.own_start_s(built.encounter_class, self.channel)
+        self.path_start_s = float(start_s)
+        points = self.channel.reference_path_points(start_s=start_s)
+        self.path = ReferencePath(points, self.lookahead_fraction)
+        self.start_x, self.start_y = float(points[0][0]), float(points[0][1])
+        self.goal_x, self.goal_y = float(points[-1][0]), float(points[-1][1])
+        self.path_mode_used = "corridor"
+        self.scenario_mode_used = f"generated:{built.encounter_class}"
+        self.target_spawn_regime = built.encounter_class
+
+        self.targets = [] if built.encounter_class == "no_target" else [TargetShip(
+            float(built.target_spawn[0]), float(built.target_spawn[1]),
+            float(built.target_heading), float(built.target_speed),
+            behaviour=built.target_behaviour, encounter_class=built.encounter_class,
+            confined=bool(built.target_confined))]
+
+        count = int(self.forced_num_obs) if self.forced_num_obs is not None else int(built.n_obstacles)
+        self.obstacles = self._obstacles_clear_of_encounter(count, built)
+
+    def _obstacles_clear_of_encounter(self, count: int, built) -> List[List[Tuple[float, float]]]:
+        """Static clutter that does not decide the encounter for the policy.
+
+        04a §3.6 keeps `+/- OBSTACLE_CPA_GUARD_FRAC * T_0` of own-ship travel
+        around the CPA clear, and a panel on the target's spawn would hide or
+        block it.  Obstacles violating either are dropped rather than moved, so
+        the realised count can fall short of the request; it is reported in
+        `info["num_obs"]`.  Occlusion and conflict placement (04a §3.6's flagged
+        cases) are still not written.
+        """
+        layout = self.sample_obstacles(count)
+        if not layout or built.encounter_class == "no_target":
+            return layout
+        guard = cfg.OBSTACLE_CPA_GUARD_FRAC * max(float(built.tcpa_s), 0.0) * cfg.U_NOM
+        s_cpa = max(float(built.tcpa_s), 0.0) * cfg.U_NOM
+        tx, ty = float(built.target_spawn[0]), float(built.target_spawn[1])
+        kept = []
+        for poly in layout:
+            cx = float(np.mean([p[0] for p in poly]))
+            cy = float(np.mean([p[1] for p in poly]))
+            s_obs = float(self.path.project(cx, cy, 0.0).s_along)
+            if guard > 0.0 and abs(s_obs - s_cpa) <= guard:
+                continue
+            if float(np.hypot(cx - tx, cy - ty)) < 2.0:
+                continue
+            kept.append(poly)
+        return kept
+
     def _load_scenario(self, scenario: dict) -> None:
         self.start_x, self.start_y = (float(v) for v in scenario["start"])
         self.goal_x, self.goal_y = (float(v) for v in scenario["goal"])
@@ -413,10 +570,10 @@ class ASVLidarEnv(gym.Env):
         # **Start the path inside the corridor, not at its mouth.**  The hull is
         # 1.73 m long and the collision test is on the polygon, so a vessel whose
         # origin sits exactly on the corridor's first station has its stern
-        # outside the channel and terminates on step 1 -- which is what happened
-        # the first time the generator was wired in.  The corridor is 25 m and
-        # the path 20 m, so the inset is free.
-        inset = 0.5 * VESSEL_LENGTH + HULL_MARGIN
+        # outside the channel and terminates on step 1.  F35: the inset must also
+        # clear `d_safe`, or `r_bnd` charges the stern for sitting on the end
+        # edge for the first 16-19 steps of every episode.
+        inset = cfg.SPAWN_INSET_M
         self.path_start_s = float(inset)
         points = self.channel.reference_path_points(start_s=inset)
         self.path = ReferencePath(points, self.lookahead_fraction)
@@ -464,7 +621,26 @@ class ASVLidarEnv(gym.Env):
         self.lidar.scan((self.asv_x, self.asv_y), self.asv_h, obstacles=scene)
         self.raw_ranges = self.lidar.ranges.copy()
 
-        est_x, est_y, est_h = self.estimated_pose()
+        # **Deployment timing.**  On a stale frame the bridge has this frame's
+        # scan and the previous frame's pose.  Every pose-derived quantity
+        # therefore repeats, and the tracker is not fed: the bridge can tell,
+        # because the pose timestamp has not moved, and lifting a fresh scan with
+        # an old pose would move every static object by a step's travel.
+        fresh_pose = self.estimated_pose()
+        self.pose_stale = bool(self._has_frame and self.pose_stale_prob > 0.0
+                               and self._stale_rng.random() < self.pose_stale_prob)
+        if self.pose_stale:
+            self.stale_frames += 1
+        est_x, est_y, est_h = (self._pose_hold if self.pose_stale and self._pose_hold
+                               else fresh_pose)
+        self._pose_hold = fresh_pose
+        self._has_frame = True
+
+        # Returns are lifted from the **sensor**, which the raycast casts from
+        # `LIDAR_OFFSET_M` ahead of the vessel origin.  Lifting from the origin
+        # moved every point 0.86 m along the heading, so static objects appeared
+        # to move whenever the vessel turned.
+        sensor_x, sensor_y = trk.sensor_origin(est_x, est_y, est_h)
 
         # Gate beyond-boundary returns.  A no-op in simulation, where the
         # raycast never sees the border, and a real filter in the field -- which
@@ -476,7 +652,7 @@ class ASVLidarEnv(gym.Env):
         # has, and only then gate for the tracker.  The walls are a liability
         # for tracking and an asset for localisation.
         gated = br.gate_beams(self.lidar.ranges, self.lidar.bearings,
-                              est_x, est_y, est_h, self.boundary_polygon)
+                              sensor_x, sensor_y, est_h, self.boundary_polygon)
 
         # **Pool from the gated scan, not the raw one.**  The method docstring
         # above has always said "raycast -> gate -> pool -> cluster"; the code
@@ -485,13 +661,23 @@ class ASVLidarEnv(gym.Env):
         # does not: 624 of 720 beams reached the obstacle branch.
         self.lidar.repool(gated)
         self.sector_closeness = self.lidar.sector_closeness
-        self.boundary_closeness = br.boundary_scan(
+        boundary = br.boundary_scan(
             self.asv_x, self.asv_y, self.asv_h, self.boundary_polygon,
             pose_noise=self._pose_noise,
         )
+        self.boundary_closeness = (self._boundary_hold if self.pose_stale
+                                   and self._boundary_hold is not None else boundary)
+        self._boundary_hold = boundary
 
-        detections = trk.cluster_scan(gated, self.lidar.bearings, est_x, est_y, est_h)
-        self.tracker.update(detections, cfg.UPDATE_RATE)
+        if self.pose_stale:
+            self._tracker_dt += cfg.UPDATE_RATE
+        else:
+            detections = trk.segment_scan(gated, self.lidar.bearings,
+                                          sensor_x, sensor_y, est_h)
+            scan = trk.ScanFrame.from_scan(self.raw_ranges, self.lidar.bearings,
+                                           (sensor_x, sensor_y), est_h)
+            self.tracker.update(detections, self._tracker_dt + cfg.UPDATE_RATE, scan=scan)
+            self._tracker_dt = 0.0
         self.tracks = self.tracker.dynamic_tracks()
         self._update_perception_metrics()
 
@@ -521,13 +707,21 @@ class ASVLidarEnv(gym.Env):
 
     def _get_obs(self) -> Dict[str, np.ndarray]:
         u, v, r = self._measured_ego()
+        self._obs_fresh = (u, v, r, self.cross_track_error, self.course_error,
+                           self.lookahead_course_error)
+        # A stale frame's ego and path features are the previous frame's: in the
+        # bridge both are computed from the latched pose line.
+        if self.pose_stale and self._obs_hold is not None:
+            u, v, r, cte, chi, chi_la = self._obs_hold
+        else:
+            cte, chi, chi_la = self._obs_fresh[3:]
         return self.observer.build(
             sector_closeness=self.sector_closeness,
             boundary_scan=self.boundary_closeness,
             u=u, v=v, yaw_rate_degps=r,
-            cross_track_error=self.cross_track_error,
-            course_error_deg=self.course_error,
-            lookahead_course_error_deg=self.lookahead_course_error,
+            cross_track_error=cte,
+            course_error_deg=chi,
+            lookahead_course_error_deg=chi_la,
             tracks=self.tracks,
             p_os=(self.asv_x, self.asv_y),
             v_os=self._own_velocity(),
@@ -651,27 +845,58 @@ class ASVLidarEnv(gym.Env):
         rudder_cmd = float(np.clip(action[0], -1.0, 1.0))
         throttle_cmd = float(np.clip(action[1], -1.0, 1.0))
 
-        self.rudder = rudder_cmd * 100.0
-        self.rpm = cfg.CRUISE_RPM if cfg.FIXED_RPM else float(np.clip(
+        # Rudder: the bridge's 50 %/s command limiter, when it is enabled.
+        commanded = rudder_cmd * 100.0
+        if self.command_rate_limit:
+            max_step = shipmod.COMMAND_RATE_PCT_S * cfg.UPDATE_RATE
+            commanded = self.rudder + float(np.clip(commanded - self.rudder,
+                                                    -max_step, max_step))
+        self.rudder = commanded
+
+        # Propulsion: the policy's forward command, unless the stop latch holds.
+        policy_rpm = cfg.CRUISE_RPM if cfg.FIXED_RPM else float(np.clip(
             cfg.CRUISE_RPM + cfg.RPM_DELTA * throttle_cmd, cfg.RPM_FLOOR, cfg.RPM_CEIL))
+        self._estop_started = False
+        override = self._emergency_stop_override()
+        if override is None:
+            self.rpm = policy_rpm
+            self.propulsion_s2 = estop_mod.rpm_to_s2(policy_rpm)
+        else:
+            self.propulsion_s2 = float(override)
+            self.rpm = estop_mod.s2_to_rpm(override)
 
         x_before, y_before = self.asv_x, self.asv_y
 
-        dx, dy, heading, yaw_rate = self.model.update(self.rpm, self.rudder, cfg.UPDATE_RATE)
-        self.asv_x += dx
-        self.asv_y += dy
-        self.asv_h = heading
-        self.asv_w = yaw_rate
-        self.u_body = self.model.u
-        self.v_body = self.model.v
+        # **The command holds for the whole decision interval; the physics and
+        # the collision test do not.**  At 2 Hz a closing target moves up to
+        # 1.3 m per step, more than a hull's beam, so testing only at the
+        # decision instant would let hulls pass through each other.
+        n_sub = max(1, int(round(cfg.UPDATE_RATE / cfg.PHYSICS_DT)))
+        h = cfg.UPDATE_RATE / n_sub
+        astern_impulse = 0.0
+        sub_collision = None
+        for _ in range(n_sub):
+            dx, dy, heading, yaw_rate = self.model.update(self.rpm, self.rudder, h)
+            astern_impulse += self.model.last_astern_impulse
+            self.asv_x += dx
+            self.asv_y += dy
+            self.asv_h = heading
+            self.asv_w = yaw_rate
+            self.u_body = self.model.u
+            self.v_body = self.model.v
 
-        own_state = {"x": self.asv_x, "y": self.asv_y,
-                     "velocity": self._own_velocity(), "heading": self.asv_h}
-        for target in self.targets:
-            target.step(cfg.UPDATE_RATE, own=own_state)
-            # Confined classes keep the fairway; a crossing target under Rule
-            # 9(d) is not a channel user and is left alone (03a §5.2).
-            tgtmod.clamp_to_corridor(target, self.channel)
+            own_state = {"x": self.asv_x, "y": self.asv_y,
+                         "velocity": self._own_velocity(), "heading": self.asv_h}
+            for target in self.targets:
+                target.step(h, own=own_state)
+                # Confined classes keep the fairway; a crossing target under Rule
+                # 9(d) is not a channel user and is left alone (03a §5.2).
+                tgtmod.clamp_to_corridor(target, self.channel, self.boundary_polygon)
+            sub_collision = self.collision_kind(self.hull_polygon())
+            if sub_collision is not None:
+                break
+        if self.estop.state == estop_mod.BRAKING:
+            self._estop_reverse_dv += astern_impulse / shipmod.M11
 
         moved_x = self.asv_x - x_before
         moved_y = self.asv_y - y_before
@@ -687,7 +912,7 @@ class ASVLidarEnv(gym.Env):
 
         hull = self.hull_polygon()
         self.true_border_clearance = self._border_clearance(hull)
-        collision = self.collision_kind(hull)
+        collision = sub_collision
         reached_goal = self._reached_goal()
 
         terminated = collision is not None or reached_goal
@@ -700,6 +925,7 @@ class ASVLidarEnv(gym.Env):
         # 02a §10.1.  Building the observation after the reward would mean two
         # derivations of the same encounter from the same inputs.
         obs = self._get_obs()
+        self._obs_hold = self._obs_fresh
         self._record_obs_health(obs)
 
         breakdown = self._reward(action, collision, reached_goal, truncated)
@@ -709,6 +935,42 @@ class ASVLidarEnv(gym.Env):
         self.prev_s_along = self.s_along
         self.render()
         return obs, float(breakdown.total), terminated, truncated, info
+
+    # ------------------------------------------------------------------
+    # Emergency stop
+    # ------------------------------------------------------------------
+    def request_emergency_stop(self, reason: str = "manual") -> None:
+        """Ask for a stop on the next step -- the play harness's E key, tests."""
+        self._estop_request = str(reason)
+
+    def _emergency_stop_override(self) -> Optional[float]:
+        """Run the stop latch for this step; return the S2 override or None.
+
+        Reads the contexts from the **previous** observation, which is what the
+        controller perceived when it chose this step's action -- and speed as
+        the controller measures it, noise included, because the field latch
+        will only ever have the estimate.
+        """
+        if not self.estop_enabled:
+            self._estop_request = None
+            return None
+
+        contexts = list(self.observer.encounter_contexts.values())
+        speed = float(self._measured_ego()[0])
+        was_braking = self.estop.state == estop_mod.BRAKING
+
+        reason, self._estop_request = self._estop_request, None
+        if reason is None and cfg.ESTOP_TRIGGER == "supervisor":
+            reason = estop_mod.stop_required(contexts)
+        if reason is not None and self.estop.request(reason, t=self.elapsed_time,
+                                                     speed=speed):
+            self._estop_reverse_dv = 0.0
+            self._estop_started = True
+
+        return self.estop.update(
+            t=self.elapsed_time, dt=cfg.UPDATE_RATE, speed=speed,
+            distance_step_m=self.speed_mps * cfg.UPDATE_RATE if was_braking else 0.0,
+            release_ok=estop_mod.danger_passed(contexts))
 
     def _reward_state(self, action) -> rterms.RewardState:
         """Assemble one step's `RewardState`: the own ship and the scene.
@@ -753,6 +1015,7 @@ class ASVLidarEnv(gym.Env):
             d_throttle=throttle_cmd - float(self.prev_action[1]),
             step_index=int(self.step_count),
             open_water=self.open_water,
+            estop_active=bool(self.estop.active),
         )
 
     def _reward(self, action, collision: Optional[str], reached_goal: bool,
@@ -767,7 +1030,8 @@ class ASVLidarEnv(gym.Env):
         self.last_reward_state = self._reward_state(action)
         breakdown = self.reward_fn(
             self.last_reward_state, self.observer.encounter_contexts,
-            collision=collision, reached_goal=reached_goal, truncated=truncated)
+            collision=collision, reached_goal=reached_goal, truncated=truncated,
+            estop_triggered=bool(self._estop_started))
         self.last_reward = breakdown
         return breakdown
 
@@ -892,7 +1156,22 @@ class ASVLidarEnv(gym.Env):
             "yaw_rate_radps": float(math.radians(self.asv_w)),
             "r_path_radps": float(self.r_path),
             "rpm": float(self.rpm),
-            "rudder_deg": float(rudder_cmd * MAX_RUD_ANGLE),
+            "propulsion_s2": float(self.propulsion_s2),
+            "estop/state": self.estop.state,
+            "estop/active": bool(self.estop.active),
+            "estop/events": int(len(self.estop.events)),
+            "estop/reason": self.estop.events[-1].reason if self.estop.active else "",
+            "estop/braking_force_n": float(self.model.last_braking_force),
+            # Full astern applied after surge reached zero, as the astern speed it
+            # would have produced.  The hull clips surge at zero, so the overshoot
+            # is not simulated -- this is what the 2 Hz latch would impart on the
+            # water before it sees the vessel stopped.
+            "estop/reverse_dv_est_mps": float(self._estop_reverse_dv),
+            "pose_stale": bool(self.pose_stale),
+            "stale_frames": int(self.stale_frames),
+            # The rudder the vessel is commanded, after the bridge limiter --
+            # not the policy's action, which `action_rudder` records.
+            "rudder_deg": float(self.rudder / 100.0 * MAX_RUD_ANGLE),
             "action_rudder": float(rudder_cmd),
             "action_throttle": float(throttle_cmd),
             "d_action_rudder": float(rudder_cmd - self.prev_action[0]),
@@ -940,6 +1219,9 @@ class ASVLidarEnv(gym.Env):
             "timeout": bool(truncated),
             "path_mode": self.path_mode_used,
             "scenario_mode": self.scenario_mode_used,
+            "scenario_class": (self.scenario.encounter_class if self.scenario is not None
+                               else "placeholder"),
+            "num_obs": int(len(self.obstacles)),
         }
         info.update(breakdown.as_info())
         # Built once and held, because `render.py` reads it off the environment
@@ -1006,6 +1288,9 @@ class ASVLidarEnv(gym.Env):
                 "throttle": float(self.prev_action[1]),
                 "rudder_deg": float(self.rudder),
                 "rpm": float(self.rpm),
+                "s2": float(self.propulsion_s2),
+                "estop_state": self.estop.state,
+                "estop_reason": self.estop.events[-1].reason if self.estop.active else "",
                 "d_rudder": float(getattr(self.last_reward_state, "d_rudder", 0.0)),
                 "d_throttle": float(getattr(self.last_reward_state, "d_throttle", 0.0)),
                 "kappa_delta": float(cfgr.kappa_delta),
