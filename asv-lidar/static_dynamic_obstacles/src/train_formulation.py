@@ -312,6 +312,10 @@ def main() -> None:
     ap.add_argument("--torch-threads", type=int, default=0,
                     help="PyTorch threads in the learner (workers get 1); 0 keeps the default, "
                          "which oversubscribes the CPU alongside the environment workers")
+    ap.add_argument("--init-model", type=Path, default=None,
+                    help="Tier 2: fine-tune from this saved model instead of a fresh policy")
+    ap.add_argument("--init-vecnormalize", type=Path, default=None,
+                    help="reward-normalisation statistics to continue from (with --init-model)")
     ap.add_argument("--fixed-stage", type=int, default=0,
                     help="train on one scenario stage throughout instead of the curriculum")
     args = ap.parse_args()
@@ -331,6 +335,7 @@ def main() -> None:
         "algorithm": "PPO", "seed": args.seed, "timesteps": args.timesteps,
         "num_envs": args.num_envs, "hyperparameters": PPO_HYPERPARAMS,
         "torch_threads": args.torch_threads, "fixed_stage": args.fixed_stage,
+        "init_model": str(args.init_model) if args.init_model else None,
         "policy": {"features_extractor": "ASVFeaturesExtractor", "net_arch": {"pi": [256, 256], "vf": [256, 256]},
                    "activation": "ReLU"},
         "reward_normalisation": "VecNormalize(norm_obs=False, norm_reward=True, clip_reward=10)",
@@ -356,15 +361,30 @@ def main() -> None:
                          for i in range(args.num_envs)])
     vec = RetryingVecMonitor(vec, filename=str(run_dir / "monitor.csv"),
                      info_keywords=("reached_goal", "collided", "scenario_class"))
-    vec = VecNormalize(vec, norm_obs=False, norm_reward=True, clip_reward=10.0,
-                       gamma=PPO_HYPERPARAMS["gamma"])
+    if args.init_vecnormalize:
+        vec = VecNormalize.load(str(args.init_vecnormalize), vec)
+        vec.training, vec.norm_reward = True, True
+    else:
+        vec = VecNormalize(vec, norm_obs=False, norm_reward=True, clip_reward=10.0,
+                           gamma=PPO_HYPERPARAMS["gamma"])
 
-    model = PPO("MultiInputPolicy", vec, verbose=1, seed=args.seed, device="cpu",
-                tensorboard_log=str(args.runs_dir / "tensorboard"),
-                policy_kwargs=dict(features_extractor_class=ASVFeaturesExtractor,
-                                   net_arch=dict(pi=[256, 256], vf=[256, 256]),
-                                   activation_fn=nn.ReLU),
-                **PPO_HYPERPARAMS)
+    if args.init_model:
+        # Tier 2: continue a trained policy on the current code.  The saved
+        # hyperparameters are replaced by today's, so a fine-tune and a fresh
+        # run differ only in their starting weights.
+        model = PPO.load(str(args.init_model), env=vec, device="cpu", seed=args.seed,
+                         tensorboard_log=str(args.runs_dir / "tensorboard"),
+                         custom_objects={k: v for k, v in PPO_HYPERPARAMS.items()
+                                         if k in ("learning_rate", "gamma", "gae_lambda",
+                                                  "ent_coef", "vf_coef", "max_grad_norm",
+                                                  "target_kl", "n_epochs", "batch_size")})
+    else:
+        model = PPO("MultiInputPolicy", vec, verbose=1, seed=args.seed, device="cpu",
+                    tensorboard_log=str(args.runs_dir / "tensorboard"),
+                    policy_kwargs=dict(features_extractor_class=ASVFeaturesExtractor,
+                                       net_arch=dict(pi=[256, 256], vf=[256, 256]),
+                                       activation_fn=nn.ReLU),
+                    **PPO_HYPERPARAMS)
 
     callbacks = CallbackList([
         ScenarioStageCallback(args.timesteps, str(run_dir / "curriculum.json")),

@@ -1,0 +1,12 @@
+{
+ "T0.1 head_on: compliant colregs -15.3 > wrong-way -55.3; v_port 6.8 < 13.8": true,
+ "T0.1 crossing: compliant colregs -11.9 > wrong-way -55.5; v_port 1.2 < 9.0": true,
+ "T0.1 overtaking: compliant colregs -3.2 > wrong-way -43.6; v_port 5.6 < 13.8": true,
+ "T0.2 being overtaken: holding v_hold integral 2.44 < leaving the role 3.50": true,
+ "T0.3 null: follower COLREGs penalty 0.0 >= -5": true,
+ "T0.4 head-on: follower port-sense episodes 0.00 <= 0.10": true,
+ "T0.5 straight paths: max |r_path| 0.00e+00 == 0": true,
+ "T0.6 follower: stopped episodes 0, then target collision 0.00 <= 0.25": true,
+ "T0.6 compliant: stopped episodes 0, then target collision 0.00 <= 0.25": true,
+ "T0.6 wrong_way: stopped episodes 0, then target collision 0.00 <= 0.25": true
+}

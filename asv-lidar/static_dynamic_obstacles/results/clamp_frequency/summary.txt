@@ -1,0 +1,16 @@
+== clamp frequency, path follower, obstacles off
+                  n  clamped  clamped_before_cpa  median_first_clamp_s  median_jump_m  median_turn_deg  target_collision
+cls                                                                                                                     
+being_overtaken  20     0.95                0.00                 26.50           0.13             5.54              0.05
+head_on          20     0.50                0.00                 28.50           0.12             5.02              0.35
+null             20     1.00                0.95                 24.75           0.13             2.81              0.00
+overtaking       20     0.00                0.00                   NaN           0.00             0.00              0.50
+
+== target collision by pre-CPA clamp
+                    mean        size      
+clamped_before_cpa False True  False True 
+cls                                       
+being_overtaken     0.05   NaN  20.0   NaN
+head_on             0.35   NaN  20.0   NaN
+null                0.00   0.0   1.0  19.0
+overtaking          0.50   NaN  20.0   NaN

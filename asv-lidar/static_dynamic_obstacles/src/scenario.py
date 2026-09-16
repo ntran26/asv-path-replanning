@@ -37,6 +37,7 @@ import json
 import math
 from collections import Counter
 from dataclasses import asdict, dataclass, field
+from functools import lru_cache
 from typing import Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
@@ -46,6 +47,7 @@ import corridor as corr
 import cpa_cri as cc
 import encounter as enc
 import targets as tgt
+from ship import HULL_MARGIN, VESSEL_LENGTH, VESSEL_WIDTH
 
 
 @dataclass
@@ -311,6 +313,7 @@ class ScenarioGenerator:
         scenario.spawn_range_m = solved["range"]
         # A15's label.  An attribute, like `channel`, so the record hash is unchanged.
         scenario.dcpa_below_floor = solved.get("below_floor")
+        scenario.dcpa_floor_m = solved.get("floor")
         scenario.n_obstacles = self._sample_obstacle_count(rng)
         return scenario
 
@@ -346,11 +349,13 @@ class ScenarioGenerator:
         if dcpa_max is None:
             d0 = float(rng.uniform(cfg.NULL_MIN_DCPA, cfg.NULL_MIN_DCPA + 3.0))
         elif cls == "being_overtaken":
-            # A15: floored, with a labelled Rule 17(b) fraction below the floor.
-            floor = min(float(cfg.BEING_OVERTAKEN_DCPA_FLOOR), float(dcpa_max))
+            # A15, as amended by A21: floored at hull clearance for this draw's
+            # angle and speed ratio, with a labelled Rule 17(b) fraction below.
+            floor = contact_free_dcpa(ct, k) + float(cfg.BEING_OVERTAKEN_FLOOR_MARGIN)
+            upper = max(float(dcpa_max), floor + float(cfg.BEING_OVERTAKEN_ABOVE_FLOOR_SPAN))
             below_floor = bool(rng.uniform() < cfg.BEING_OVERTAKEN_BELOW_FLOOR_FRAC)
             d0 = float(rng.uniform(0.0, floor) if below_floor
-                       else rng.uniform(floor, dcpa_max))
+                       else rng.uniform(floor, upper))
         else:
             d0 = float(rng.uniform(0.0, dcpa_max))
         side = float(rng.choice([-1.0, 1.0]))
@@ -375,7 +380,8 @@ class ScenarioGenerator:
 
         return {"x": float(spawn[0]), "y": float(spawn[1]), "heading": psi_ts,
                 "speed": u_ts, "k": k, "ct": ct, "dcpa": d0, "tcpa": t0,
-                "range": r0, "below_floor": below_floor}
+                "range": r0, "below_floor": below_floor,
+                "floor": floor if cls == "being_overtaken" else None}
 
     # ------------------------------------------------------------------
     def _place_null(self, rng, own, own_heading) -> Optional[dict]:
@@ -438,7 +444,10 @@ class ScenarioGenerator:
         poly = channel.polygon()
         inside = br.point_in_polygon(solved["x"], solved["y"], poly)
         if tgt.is_confined(cls):
-            return bool(inside)
+            # A21: the whole hull, along its whole track to CPA.  A point check
+            # let 75 % of being-overtaken targets breach the channel on the first
+            # step, and the clamp then re-drew the encounter (F60).
+            return bool(inside) and self._track_inside(cls, solved, channel, poly)
         # A crossing target under Rule 9(d) is not a channel user: it must start
         # in open basin water outside the corridor, or it is not crossing.
         in_basin = (0.0 <= solved["x"] <= cfg.MAP_WIDTH
@@ -449,6 +458,19 @@ class ScenarioGenerator:
         # the fairway rather than entering it from outside.
         spans_basin = channel.nominal_width >= cfg.MAP_WIDTH - 1e-6
         return bool(in_basin and (spans_basin or not inside))
+
+    @staticmethod
+    def _track_inside(cls, solved, channel, poly) -> bool:
+        horizon = (float(cfg.NULL_TRACK_CHECK_S) if cls == "null"
+                   else max(float(solved.get("tcpa", 0.0)), 0.0))
+        heading = float(solved["heading"])
+        v = float(solved["speed"]) * _unit(heading)
+        for t in np.arange(0.0, horizon + 1e-9, float(cfg.CONFINED_TRACK_CHECK_DT_S)):
+            probe = tgt.Target(float(solved["x"] + v[0] * t), float(solved["y"] + v[1] * t),
+                               heading, float(solved["speed"]), confined=True)
+            if tgt.confinement_violation(probe, channel, poly) is not None:
+                return False
+        return True
 
     def _sample_obstacle_count(self, rng) -> int:
         lo, hi = cfg.CURRICULUM_STAGES[self.stage]["clutter"]
@@ -495,7 +517,68 @@ def _unit(heading_deg: float) -> np.ndarray:
     return np.array([math.sin(a), math.cos(a)])
 
 
+@lru_cache(maxsize=4096)
+def _contact_free_dcpa_cached(ct_rounded: float, k_rounded: float) -> float:
+    own_half_l = 0.5 * (VESSEL_LENGTH + 2.0 * HULL_MARGIN)
+    own_half_w = 0.5 * (VESSEL_WIDTH + 2.0 * HULL_MARGIN)
+    own = [(own_half_w, own_half_l), (-own_half_w, own_half_l),
+           (-own_half_w, -own_half_l), (own_half_w, -own_half_l)]
+    h_ts = _unit(ct_rounded)
+    v_rel = k_rounded * h_ts - np.array([0.0, 1.0])
+    speed = float(np.linalg.norm(v_rel))
+    if speed < 1e-9:
+        return 0.0
+    v = v_rel / speed
+    n = np.array([v[1], -v[0]])
+    reach = VESSEL_LENGTH + 2.0
+
+    def touches(d: float) -> bool:
+        for s in np.arange(-reach, reach, 0.02):
+            p = d * n + s * v
+            if _convex_overlap(own, tgt.hull_polygon(float(p[0]), float(p[1]), ct_rounded)):
+                return True
+        return False
+
+    lo, hi = 0.0, 4.0
+    for _ in range(14):
+        mid = 0.5 * (lo + hi)
+        if touches(mid):
+            lo = mid
+        else:
+            hi = mid
+    return hi
+
+
+def contact_free_dcpa(ct_deg: float, k: float) -> float:
+    """Smallest centre DCPA at which an overtaker's hull never touches the own
+    ship's (collision hulls, margins included), for relative course `ct_deg`
+    and speed ratio `k`.  A21.  Cached on 0.5 deg and 0.05 of speed ratio,
+    rounded up in the conservative direction of the angle."""
+    ct = ((float(ct_deg) + 180.0) % 360.0) - 180.0
+    ct_r = math.copysign(math.ceil(abs(ct) * 2.0) / 2.0, ct)
+    k_r = round(float(k) * 20.0) / 20.0
+    return float(_contact_free_dcpa_cached(ct_r, k_r))
+
+
+def _convex_overlap(poly_a, poly_b) -> bool:
+    """Separating-axis test for two convex polygons (as `env._overlaps`)."""
+    for poly in (poly_a, poly_b):
+        for i in range(len(poly)):
+            x1, y1 = poly[i]
+            x2, y2 = poly[(i + 1) % len(poly)]
+            ax, ay = -(y2 - y1), x2 - x1
+            a = [p[0] * ax + p[1] * ay for p in poly_a]
+            b = [p[0] * ax + p[1] * ay for p in poly_b]
+            if max(a) < min(b) or max(b) < min(a):
+                return False
+    return True
+
+
 def _sample_ct(rng, cls: str) -> float:
+    if cls in cfg.CONFINED_CT_CLASSES:
+        # A21: channel users run near-parallel to a straight fairway.
+        half = float(cfg.CONFINED_CT_HALF_DEG)
+        return float(rng.uniform(-half, half))
     band = cfg.CLASS_CT_DEG[cls]
     if cls == "crossing":
         chosen = band[int(rng.integers(0, 2))]

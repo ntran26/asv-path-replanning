@@ -458,22 +458,24 @@ def test_8_a_compliant_port_bend_costs_nothing_in_the_term():
     assert T.v_port(state_for(r=-0.25), ctx_for(enc.HEAD_ON, r_path=0.0), CFG) > 0.0
 
 
-def test_8b_the_environment_produces_a_bend_that_exercises_r_path():
-    """02a §10.4 test 8, end to end. **T5 landed; this now passes.**
+def test_every_generated_reference_path_is_straight():
+    """F59 (your call, 2026-09-16): bends are dropped and the reference path is
+    straight, so `r_path` is zero everywhere in the distribution.
 
-    The last of the eleven to come live.  It was `xfail(strict)` rather than
-    absent so that the day the generator arrived, the suite would say so.
+    Replaces the T5 check that some episode bends the path.  Width still varies
+    -- the walls carry the boundary branch's information -- but the path's
+    Rule 9(a) offset is constant, so a narrowing wall no longer bends the path.
     """
-    env = ASVLidarEnv(render_mode=None, corridor_width=6.0)
-    seen = 0.0
+    env = ASVLidarEnv(render_mode=None, scenario_stage=5)
     for seed in range(12):
         env.reset(seed=seed)
-        for _ in range(200):
+        assert abs(env.scenario.bend_deg) < 1e-9
+        assert max(abs(env.path.curvature(i)) for i in range(1, len(env.path.points) - 1)) == 0.0
+        for _ in range(60):
             _, _, term, trunc, info = env.step(np.zeros(2, dtype=np.float32))
-            seen = max(seen, abs(info["r_path_radps"]))
+            assert info["r_path_radps"] == pytest.approx(0.0, abs=1e-9)
             if term or trunc:
                 break
-    assert seen > 1e-3, "no episode in the distribution bends the path"
 
 
 # ---------------------------------------------------------------------------

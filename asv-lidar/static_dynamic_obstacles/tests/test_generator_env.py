@@ -102,13 +102,64 @@ def test_the_being_overtaken_dcpa_is_floored_with_a_labelled_fraction_below():
         if built is None:
             continue
         n += 1
+        # A21: the floor is hull clearance for the draw, plus D_SAFE.
+        assert built.dcpa_floor_m == pytest.approx(
+            scn.contact_free_dcpa(built.ct_deg, built.speed_ratio) + cfg.BEING_OVERTAKEN_FLOOR_MARGIN)
         if built.dcpa_below_floor:
             below += 1
-            assert built.dcpa_m < cfg.BEING_OVERTAKEN_DCPA_FLOOR
+            assert built.dcpa_m < built.dcpa_floor_m
         else:
-            assert built.dcpa_m >= cfg.BEING_OVERTAKEN_DCPA_FLOOR
+            assert built.dcpa_m >= built.dcpa_floor_m
     assert n >= 100
     assert 0.08 <= below / n <= 0.35
+
+
+def test_contact_free_dcpa_matches_the_hull_geometry():
+    """A21: parallel hulls clear at their combined half-breadths; oblique ones
+    need more, which is why a 1.0 m centre floor still collided."""
+    parallel = scn.contact_free_dcpa(0.0, 1.85)
+    assert 0.55 <= parallel <= 0.75
+    assert scn.contact_free_dcpa(10.0, 1.5) > parallel
+    assert scn.contact_free_dcpa(45.0, 1.85) > 1.4
+
+
+def test_confined_targets_keep_the_channel_until_cpa():
+    """A21: no confined target breaches the corridor before its CPA, so the
+    clamp never re-draws a generated encounter."""
+    import targets as tgt
+    env = ASVLidarEnv(render_mode=None)
+    generator = scn.ScenarioGenerator(stage=5, seed_namespace="development")
+    checked = 0
+    for cls in ("overtaking", "being_overtaken", "null", "head_on"):
+        for index in range(6):
+            built = generator.sample(scn.seed_for("development", 60_000 + 100 * index), encounter_class=cls)
+            if built is None:
+                continue
+            if cls in cfg.CONFINED_CT_CLASSES:
+                assert abs(((built.ct_deg + 180.0) % 360.0) - 180.0) <= cfg.CONFINED_CT_HALF_DEG + 1e-9
+            env.forced_num_obs = 0
+            env.reset(seed=index, options={"generated": built})
+            horizon = built.tcpa_s if cls != "null" else cfg.NULL_TRACK_CHECK_S
+            for _ in range(int(horizon / cfg.UPDATE_RATE)):
+                t = env.targets[0]
+                assert tgt.confinement_violation(t, env.channel, env.boundary_polygon) is None
+                env.targets[0].step(cfg.UPDATE_RATE)
+            checked += 1
+    assert checked >= 15
+
+
+def test_the_clamp_nudges_rather_than_teleports():
+    """A21: a target breaching the wall moves inward by about the breach, not
+    to the centreline."""
+    import corridor as corr
+    import targets as tgt
+    channel = corr.rectangle(8.0)
+    centre_x = float(channel.centre[len(channel.centre) // 2][0])
+    target = tgt.Target(centre_x + 3.9, 12.0, 20.0, 0.8, confined=True)
+    assert tgt.confinement_violation(target, channel) is not None
+    tgt.clamp_to_corridor(target, channel)
+    assert abs(target.x - centre_x) > 2.5
+    assert target.heading == pytest.approx(0.0, abs=1e-6)
 
 
 def test_obstacles_keep_clear_of_the_encounter():

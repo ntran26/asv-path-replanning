@@ -105,8 +105,10 @@ def tier_a() -> List[Case]:
     cases.append(_c("A-8E-HO-N", "head_on", "N", tgt.T_NC3))
     cases.append(_c("A-8E-CRS-N", "crossing", "N"))
 
-    cases.append(_c("A-BND-HO-I", "head_on", "I", bend=40.0))
-    cases.append(_c("A-BND-CRS-I", "crossing", "I", bend=40.0))
+    # A-BND-HO-I and A-BND-CRS-I (40 deg bends) are withdrawn with bends (F59).
+    if cfg.CORRIDOR_BENDS:
+        cases.append(_c("A-BND-HO-I", "head_on", "I", bend=40.0))
+        cases.append(_c("A-BND-CRS-I", "crossing", "I", bend=40.0))
 
     cases.append(_c("A-OFF-CRP-I", "crossing", "I", side="port", offset=-0.30))
     cases.append(_c("A-OFF-OT-I", "overtaking", "I", k=0.45, offset=0.30))
