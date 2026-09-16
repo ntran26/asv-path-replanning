@@ -225,7 +225,13 @@ class Corridor:
             keep = np.ones(len(self.s), dtype=bool)
 
         # The normals are to port, so a *negative* multiple is to starboard.
-        lateral = -self.offset_frac * 0.5 * self.width
+        if cfg.STRAIGHT_REFERENCE_PATH:
+            # F59: a constant offset, sized on the narrowest section so the
+            # path stays inside it, keeps the path straight where the width
+            # varies.  A local-width offset would bend it at every taper.
+            lateral = np.full_like(self.width, -self.offset_frac * 0.5 * float(np.min(self.width)))
+        else:
+            lateral = -self.offset_frac * 0.5 * self.width
         points = self.centre + self.normals() * lateral[:, None]
         return points[keep].astype(np.float32)
 
@@ -484,7 +490,7 @@ def sample(rng, *, width_range: Tuple[float, float] = None,
     ceiling = max_bend_deg(peak_width, length=length, basin_width=basin[0])
 
     requested = 0.0
-    if allow_bend:
+    if allow_bend and cfg.CORRIDOR_BENDS:
         if force_bend:
             requested = float(rng.uniform(cfg.CORRIDOR_BEND_MIN_DEG,
                                           cfg.CORRIDOR_BEND_RANGE_DEG[1]))

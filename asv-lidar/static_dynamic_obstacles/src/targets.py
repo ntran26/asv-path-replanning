@@ -239,6 +239,7 @@ def clamp_to_corridor(target: Target, corridor, polygon=None) -> None:
         return
 
     # Nearest centreline station, then adopt its tangent direction.
+    violation = confinement_violation(target, corridor, polygon)
     deltas = corridor.centre - np.array([target.x, target.y])
     index = int(np.argmin(np.einsum("ij,ij->i", deltas, deltas)))
     tangent = corridor.tangent(index)
@@ -247,5 +248,13 @@ def clamp_to_corridor(target: Target, corridor, polygon=None) -> None:
     if abs(((target.heading - along + 180.0) % 360.0) - 180.0) > 90.0:
         along = (along + 180.0) % 360.0
     target.heading = along
-    target.x = float(corridor.centre[index][0])
-    target.y = float(corridor.centre[index][1])
+    # A21: nudge, do not teleport.  The target moves inward only as far as the
+    # breach (plus a hull-breadth of slack for the heading change), keeping its
+    # lateral station.  Snapping to the centreline put overtakers onto the own
+    # ship's track (F60).
+    toward_centre = deltas[index]                        # centre station minus target
+    normal = np.array([-float(tangent[1]), float(tangent[0])])
+    lateral = float(np.dot(toward_centre, normal))
+    shift = min(abs(lateral), float(violation or 0.0) + 0.1)
+    target.x += float(normal[0]) * math.copysign(shift, lateral)
+    target.y += float(normal[1]) * math.copysign(shift, lateral)

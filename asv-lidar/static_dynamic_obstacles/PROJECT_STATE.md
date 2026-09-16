@@ -8,7 +8,7 @@ currently blocking a full training run and a full evaluation.**
 |---|---|
 | **Revision** | 8 — 0.55 m/s; virtual corridors back; generator wired in; e-stop reward; noise and randomisation on; scale audit; first PPO formulation run; see `OPEN_PROBLEMS.md` |
 | **Last updated** | 2026-09-15 |
-| **Tests** | **406 passing, none expected to fail** (T1 passes since F24 was decided) |
+| **Tests** | **408 passing, none expected to fail** (T1 passes since F24 was decided) |
 | **Blocking a headline training run** | **nothing decision-side**: A15–A20 decided and built (F53, F56, F58); run 3 done (F57). Before run 4: the tiered checks, including the 5 m stop rise in F58. The full budget then waits on run 4 confirming the formulation, and on B5 (`OPEN_PROBLEMS.md`) |
 | **Blocking a full evaluation** | **7 more** — B2, B5–B10 (§2) |
 | **Open `TODO(decision)`** | 1 (`D_SAFE`) |
@@ -915,6 +915,184 @@ the environment step. One stage-5 environment runs 43 steps/s against 98 in
 stage 1, and the 10-worker rate is close to linear in workers. The flags
 (`--torch-threads`, `--fixed-stage`) stay, defaulting to the old behaviour.
 Next: profile one stage-5 step (C2).
+
+**F59 — straight paths only (your call, 2026-09-16).** To simplify the RL
+environment:
+
+* **No bends.** `CORRIDOR_BENDS = False`: bends are off in every curriculum
+  stage, `corridor.sample` ignores `allow_bend`, and the generator's bend quota
+  (`CORRIDOR_BEND_FRACTION`) is 0. `corridor.build` keeps the bend machinery
+  for unit tests and for re-enabling.
+* **A straight reference path in a varying-width corridor.**
+  `STRAIGHT_REFERENCE_PATH = True`: the Rule 9(a) offset is
+  `offset_frac · ½ · min(W)`, constant along the path. Before, it was a
+  fraction of the *local* half-width, which bent the path at every taper even
+  without a bend. The walls still vary, so the boundary branch keeps its
+  information; T3's decorrelation test still passes.
+* **What goes with it.** `r_path` (R-8) is identically zero in training.
+  04a's "≥ 40 % of episodes carry a ≥ 20° bend" is withdrawn. Tier A loses
+  `A-BND-HO-I` and `A-BND-CRS-I` (34 → 32 cases). The F54 width/bend
+  confound disappears.
+* **Tests.** `test_every_generated_reference_path_is_straight` replaces the
+  two tests that required some episode to bend the path. The unit test that a
+  compliant port bend costs nothing in `v_port` stays. **405 passed.**
+* **Generator yield is unchanged.** 60/60 per class except null: 40/60,
+  against 43/60 with bends, so it is not caused by this.
+
+**F60 — the tiered formulation tests: built, Tiers 0 and 1 run; Tier 0 found A21.**
+
+*The protocol* (`tools/tiers/`). Every tier replays fixed development-namespace
+scenarios, so a comparison changes the code and nothing else.
+
+| tier | what | cost | command |
+|---|---|---|---|
+| 0 | scripted policies: does the reward point the right way? | ~80 s | `tier0_scripted.py` |
+| 1 | replay a saved model under today's code | ~2 min | `tier1_replay.py --model …` |
+| 2 | short fine-tune from a saved model, stage 5 | ~1 h | `train_formulation.py --init-model … --init-vecnormalize … --fixed-stage 5 --timesteps 300000` |
+| 3 | full run from scratch | ~6 h | `train_formulation.py --timesteps 2000000` |
+
+`train_formulation.py` gains `--init-model` / `--init-vecnormalize`: today's
+hyperparameters replace the saved ones, so a fine-tune differs from a fresh
+run only in its starting weights. Outputs go to `results/tiers/<tier>_<tag>/`.
+
+*Tier 0* (`results/tiers/tier0_straight_a20/`), 12 scenarios per class, obstacles
+off, three scripted policies (path follower; one committed 30° alteration in the
+compliant sense; the same in the wrong sense):
+
+* **T0.1 passes for every give-way class.** COLREGs penalty, compliant against
+  wrong way: head-on −15.3 vs −55.3, crossing −11.9 vs −55.5, overtaking
+  −11.7 vs −32.7. The reward points the right way, including A17's port
+  crossings.
+* **T0.2 passes.** Being overtaken, `v_hold` integral 2.21 holding against 3.41
+  for leaving the role. A frame count was the wrong metric: speed-estimate noise
+  makes `v_hold` slightly positive on most frames of a held course.
+* **T0.4 passes.** No head-on episode latches a port sense (A19–A20).
+* **T0.5 passes.** `r_path` is zero throughout (F59).
+* **T0.6 passes.** Supervisor stops: 2, none followed by a collision.
+* **T0.3 fails narrowly.** A path follower collects −5.6 of COLREGs penalty on
+  null encounters, against a −5 threshold. Explained below.
+* **The scripted policies collide a lot, and one case is not the policy's
+  fault.** A held 30° alteration runs into the walls in narrow corridors
+  (head-on 7/12, overtaking 10/12 boundary collisions). That limits the
+  scripted policy, not the reward. But **holding course against an overtaker
+  collided 11/12**, including draws above A15's 1.0 m floor.
+
+*Why holding course against an overtaker collides* (traces;
+`tools/diagnostics/clamp_frequency.py`, `results/clamp_frequency/`):
+
+1. **The corridor clamp teleports confined targets.** Being-overtaken crossing
+   angles are drawn from ±67.5°, and the generator checks containment only at
+   the spawn *point*. So the hull breaches the channel on step one, and
+   `targets.clamp_to_corridor` moves the target to the nearest centreline
+   station and turns it parallel. In one trace, a 1.30 m DCPA overtaker was put
+   0.19 m off the own ship's track and hit its stern at 6 s. Path follower, 20
+   per class: the clamp fires before CPA in **75 %** of being-overtaken, **90 %**
+   of null and 10 % of overtaking episodes (median jumps 2.4, 3.5 and 3.2 m),
+   and never in head-on. This also explains T0.3: most "null" targets are
+   teleported onto the own track. **Runs 2 and 3 trained on this.**
+2. **A15's floor is centre-to-centre.** The contact-free centre DCPA for an
+   overtaker at speed ratio 1.5–2.2 is 0.66 m at 0°, 1.2–1.4 m at 15° and
+   1.5–1.7 m from 30° to 67.5°. So a 1.0 m floor is collision-free only for
+   near-parallel overtakers. Unclamped being-overtaken episodes still collided
+   at 0.80.
+
+Decision: `OPEN_PROBLEMS.md` **A21** (recommended: confined targets keep the
+channel, and the floor is on hull clearance). It absorbs C14's clamp replacement.
+
+*Tier 1* (`results/tiers/tier1_run3_straight_a20/`): the run 3 final model,
+trained with bends and before A18–A20, replayed on straight paths with
+A18–A20. That is 20 development scenarios per class plus the 100-scenario
+head-on width set, 220 episodes in 114 s.
+
+| class | collision, replay | collision, run 3's own final eval |
+|---|---|---|
+| overtaking | **0.00** | 0.30 |
+| head-on | 0.30 | 0.35 |
+| null | 0.15 | 0.20 |
+| no target | 0.10 | 0.10 |
+| being overtaken | 0.35 | 0.35 |
+| crossing | 0.35 | 0.25 |
+
+* **Narrow head-on no longer stands out.** On the width set, target collision
+  is 0.14 / 0.15 / 0.10 / 0.21 / 0.21 at 5 / 6 / 7 / 8 / 10 m, against run 2's
+  0.43 → 0.05 gradient (F54, F56). With straight paths and A18, width is no
+  longer the axis the failures lie on.
+* **F58's stop check.** 25 supervisor stops in 220 episodes, 24 of them head-on,
+  about 0.2 per episode at every width. **6 of the 22 stopped episodes then hit
+  the target (0.27).** A18 admits a stop only when the *perceived* DCPA with the
+  own ship stationary reaches 1.76 m, and near CPA that estimate carries C15's
+  tracker course error. So A18's residual is C15, not the rule. It is also a
+  policy trained under the old supervisor, so this bounds the mechanism rather
+  than measuring a retrained agent.
+* **Being overtaken:** 0.43 collision at or above the floor, against 0.17
+  below. It is inverted because of A21: the floor is not a clearance, and
+  clamped targets ignore it.
+* The crossing class's 0.55 "port sense" is correct: those are crossings from
+  port (A17).
+
+*Tier 2 and run 4 wait for A21.* Being overtaken and null are a third of the
+training distribution, and their geometry is currently decided by the clamp.
+
+**F61 — A21 built (option 1): confined targets keep the channel; Tiers 0 and 1
+re-run clean.**
+
+*Built.*
+
+* `scenario._sample_ct`: overtaking, being-overtaken and null crossing
+  angles are uniform on ±`CONFINED_CT_HALF_DEG` = 10°. The classifier's
+  bands are unchanged.
+* `ScenarioGenerator._containment_ok` → `_track_inside`: a confined target's
+  hull must stay inside the corridor every 0.5 s from spawn to CPA (null:
+  15 s).
+* `targets.clamp_to_corridor` nudges instead of teleporting: heading to the
+  local tangent, position inward by the breach + 0.1 m. This absorbs C14.
+* `scenario.contact_free_dcpa(ct, k)`: the smallest centre DCPA at which the
+  collision hulls never touch, found by bisection over the relative track and
+  cached per 0.5° and 0.05 of speed ratio. It is 0.65 m parallel, 0.82–0.96 m
+  at 5° and 0.99–1.23 m at 10°. The being-overtaken floor is that value plus
+  `BEING_OVERTAKEN_FLOOR_MARGIN` = `D_SAFE`, per draw. Above-floor draws are
+  uniform on [floor, max(2.0, floor + 0.5)]; 20 % are drawn below and
+  labelled. `scenario.dcpa_floor_m` records it.
+* Tests: `test_contact_free_dcpa_matches_the_hull_geometry`,
+  `test_confined_targets_keep_the_channel_until_cpa`,
+  `test_the_clamp_nudges_rather_than_teleports`, and the A15 test now against
+  the per-draw floor. **408 passed.**
+* Generator yield, stage 5, 60 draws per class: head-on, overtaking and no
+  target 60; crossing 59; being overtaken **54**; null **32** (40 before).
+
+*Tier 0* (`results/tiers/tier0_a21/`): **all 10 checks pass.**
+
+| | before A21 | after |
+|---|---|---|
+| being overtaken, path follower holding course: collision | 11/12 | **1/12** |
+| being overtaken: `v_hold` integral, holding vs leaving the role | 2.21 vs 3.41 | 2.44 vs 3.50 |
+| null: follower COLREGs penalty (T0.3) | −5.6 (fail) | **0.0** |
+| overtaking: COLREGs penalty, compliant vs wrong way | −11.7 vs −32.7 | −3.2 vs −43.6 |
+
+Head-on and crossing are unchanged, as they should be: A21 does not touch them.
+
+*Clamp* (`results/clamp_frequency/`, path follower): no clamp before CPA for
+being overtaken (was 75 %) or overtaking (was 10 %). Null targets are still
+nudged, but first at a median 24.8 s, after the 15 s check window, by a
+median 0.13 m, so the encounter is not re-drawn. Being-overtaken target
+collision for the follower is **0.05** (was 0.80).
+
+*Tier 1* (`results/tiers/tier1_run3_a21/`), run 3's final model replayed. Only
+the being-overtaken and null draws changed:
+
+| class | collision, F60 replay | after A21 |
+|---|---|---|
+| being overtaken | 0.35 | **0.20** |
+| null | 0.15 | 0.25 (target collisions 0; boundary and obstacle) |
+| head-on, crossing, overtaking, no target | 0.30, 0.35, 0.00, 0.10 | same |
+
+The null rise is a policy trained on teleported null targets meeting real
+ones, with no target contact; Tier 2 is the test of it. Supervisor stops are
+unchanged: 24, with 6 followed by a target collision (F60, C15).
+
+*Tier 2 launched:* fine-tune of run 3's final model, stage 5 only, 300 k steps,
+evaluation every 100 k at 20 per class
+(`runs/ppo_formulation_seed0_tier2_a21/`).
 
 ### 3.13 Earlier findings, still standing
 

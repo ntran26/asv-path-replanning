@@ -1204,7 +1204,15 @@ CORRIDOR_WIDTH_VARIATION = (1.0, 1.8)    # W_max / W_min
 CORRIDOR_WIDTH_CONTROL_POINTS = (2, 4)   # piecewise-linear along s
 CORRIDOR_BEND_RANGE_DEG = (0.0, 60.0)    # total heading change
 CORRIDOR_BEND_MIN_DEG = 20.0             # what counts as "a bend"
-CORRIDOR_BEND_FRACTION = 0.40            # >= 40% of episodes must carry one
+# F59 (your call, 2026-09-16): **straight paths only**, to simplify the RL
+# environment.  Bends are off in every curriculum stage and the reference path
+# keeps a constant lateral offset, so the path is a straight line even where
+# the width varies.  04a's ">= 40% of episodes carry a bend" is withdrawn with
+# it, and `r_path` (R-8) is identically zero in training.  The bend machinery
+# stays in `corridor.build` for unit tests and for re-enabling.
+CORRIDOR_BENDS = False
+STRAIGHT_REFERENCE_PATH = True
+CORRIDOR_BEND_FRACTION = 0.40 if CORRIDOR_BENDS else 0.0   # was 0.40
 CORRIDOR_BEND_CENTRE_FRAC = (0.30, 0.70)  # where along s the bend sits
 CORRIDOR_BEND_SPAN_FRAC = 0.40           # fraction of the length it occupies
 PATH_OFFSET_FRAC_RANGE = (-0.30, 0.30)   # of the local half-width
@@ -1337,8 +1345,24 @@ NULL_MIN_DCPA = 4.0
 # which draws those were, so run 2 abandoned the stand-on role in all of them.
 # Most draws now pass at >= the floor, where Rule 17(a)(i) holding course is
 # safe; a labelled fraction stays below it as the Rule 17(b) last-moment case.
-BEING_OVERTAKEN_DCPA_FLOOR = 1.0         # m
 BEING_OVERTAKEN_BELOW_FLOOR_FRAC = 0.20
+# A21 (decided, option 1): the floor is **hull clearance**, not a centre
+# distance.  Two hulls pass without contact at 0.66 m only when parallel; at a
+# 15 deg crossing angle they need 1.2-1.4 m, from 30 deg 1.5-1.7 m.  The floor
+# is `scenario.contact_free_dcpa(ct, k) + BEING_OVERTAKEN_FLOOR_MARGIN`, per draw.
+BEING_OVERTAKEN_FLOOR_MARGIN = D_SAFE    # m, 0.35
+BEING_OVERTAKEN_ABOVE_FLOOR_SPAN = 0.50  # m: above-floor draws are uniform on [floor, max(DCPA_max, floor + span)]
+
+# A21: confined targets keep the channel.  The classifier's bands (overtaking
+# +/-67.5 deg) are what *counts* as the class; a vessel keeping a straight
+# fairway runs near-parallel, so the generator draws confined classes' crossing
+# angles from this narrower band, and requires the target hull's whole track
+# up to CPA to stay inside the corridor (so the clamp never re-draws the
+# encounter before it happens).
+CONFINED_CT_HALF_DEG = 10.0
+CONFINED_CT_CLASSES = ("overtaking", "being_overtaken", "null")
+CONFINED_TRACK_CHECK_DT_S = 0.5
+NULL_TRACK_CHECK_S = 15.0                # null has no CPA to check up to
 
 # **The null class is mandatory** (04a §3.4).  A target on a similar course at a
 # similar speed never emerges from a class-conditional spawner but is common in
@@ -1363,14 +1387,14 @@ OCCLUSION_DURATIONS_S = (1.0, 2.0, 4.0)
 CURRICULUM_STAGES = {
     1: {"width": (8.0, 10.0), "vary": False, "bend": False,
         "classes": ("no_target",), "clutter": (0, 1), "tcpa": "full"},
-    2: {"width": (5.0, 10.0), "vary": True, "bend": True,
+    2: {"width": (5.0, 10.0), "vary": True, "bend": CORRIDOR_BENDS,
         "classes": ("no_target",), "clutter": (0, 3), "tcpa": "full"},
-    3: {"width": (7.0, 10.0), "vary": True, "bend": True,
+    3: {"width": (7.0, 10.0), "vary": True, "bend": CORRIDOR_BENDS,
         "classes": ("head_on", "null", "no_target"), "clutter": (0, 1),
         "tcpa": "upper"},
-    4: {"width": (4.5, 10.0), "vary": True, "bend": True,
+    4: {"width": (4.5, 10.0), "vary": True, "bend": CORRIDOR_BENDS,
         "classes": ENCOUNTER_SAMPLE_CLASSES, "clutter": (0, 2), "tcpa": "full"},
-    5: {"width": (3.5, 10.0), "vary": True, "bend": True,
+    5: {"width": (3.5, 10.0), "vary": True, "bend": CORRIDOR_BENDS,
         "classes": ENCOUNTER_SAMPLE_CLASSES, "clutter": (0, 3), "tcpa": "full"},
 }
 CURRICULUM_STAGE_STEPS = None            # TODO(04-3): after throughput measurement

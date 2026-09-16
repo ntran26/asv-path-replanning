@@ -4,8 +4,10 @@
 count. This file records only what is *not settled*, ordered so the
 highest-leverage item is first.
 
-**Last updated:** 2026-09-15, revision 8 — your option-1 call on A20
-(`PROJECT_STATE.md` F58). Revision 7 recorded A18 and A19 (F56), revision 6
+**Last updated:** 2026-09-16, revision 10 — your option-1 call on A21 (F61).
+Revision 9: straight paths (F59), the tiered tests (F60), a recommended
+resolution for every open item, and A21 from Tier 0.
+Revision 8 recorded A20 (F58), revision 7 A18 and A19 (F56), revision 6
 A15–A17 (F53), after formulation runs 1–3 (F48–F57).
 Revision 4 followed your answers on speed,
 corridor widths, the 2 Hz reward, the emergency-stop reward, the tracker, the
@@ -13,9 +15,35 @@ generator, the scale audit, noise and randomisation.
 
 | Part | Kind | Needs |
 |---|---|---|
-| **A** | Decisions | a call from you — 3 items (A10, A3/A4/A6) |
+| **A** | Decisions | a call from you — 3 items (A10, A3/A4/A6), each with a recommendation below |
 | **B** | Measurements | basin time — `PART2_BASIN_PLAN.md`, with one addition proposed |
 | **C** | Build work | my time — 8 items |
+
+### Decided in revision 10 — option 1 for A21 (`PROJECT_STATE.md` F61)
+
+| Item | Resolution |
+|---|---|
+| A21 confined targets | **keep the channel**: overtaking, being-overtaken and null crossing angles drawn within ±10°; the target hull's track must stay inside the corridor to CPA; the clamp nudges instead of teleporting (absorbs C14); being-overtaken floor = hull clearance for the draw + `D_SAFE`, 20 % below, labelled |
+
+### Revision 9 — straight paths, and my recommended resolution for every open item
+
+**Done (your call, `PROJECT_STATE.md` F59):** straight paths only. No bends in
+any stage, and a constant Rule 9(a) path offset, so the path stays straight in
+varying-width corridors. Tier A drops its two bend cases (34 → 32).
+
+| Item | Recommendation | Why, briefly |
+|---|---|---|
+| **A21** (new) | **option 1** — channel-keeping confined targets, hull-based floor | Tier 0 found being-overtaken geometry broken; see A21 |
+| A10 vessel model | **keep v3** in simulation; fit v4b's structure (`N_rr` fixed) in basin session 1 | both refits failed the pre-registered rule; changing the plant mid-formulation would confound every run comparison |
+| A3 `D_SAFE` | **keep 0.35 m** | satisfies 02a §2's invariant; A18's `ESTOP_CLEAR_DCPA_M` is built on it |
+| A4 crossing width threshold | **adopt 04a's 7.60 m** | the generator's width strata already use it, and bends no longer confound width (F59) |
+| A6 Study 2 | **confirm 18 conditions**; sweep pose noise around a measured nominal, not 3 cm | 3 cm sits below the tracker's knee, so {0–4}× of it is flat; wait for B4 |
+| B5 low-speed manoeuvring | **make the plan edit**: S1-D secondary circles at RPM 6, one S1-E zig-zag pair at RPM 6 | the operating point is outside the identification data |
+| B1, B2, B4 | measure in basin session 1 as planned | nothing to decide |
+| C2 throughput | profile one stage-5 step next (mine) | threads ruled out (F58); the tiers cover debugging meanwhile |
+| C14 clamp teleport | **fold into A21** | it is now load-bearing, not tidy-up |
+| C15 tracker course | after A21 (mine) | ~5 % of head-ons still engage as crossings |
+| C3–C6, C12 | after the formulation is frozen (mine) | evaluation machinery, not formulation |
 
 ### Decided in revision 8 — option 1 for A20 (`PROJECT_STATE.md` F58)
 
@@ -313,6 +341,62 @@ supervisor, and R-2 still pays the same futile slowdown.
 stopping help?") rather than re-tuning a width, and it leaves the domain
 geometry the COLREGs terms are built on untouched. **To resolve:** say which.
 
+## A21. Confined targets leave their corridor, and A15's floor is centre-to-centre
+
+**New, from Tier 0 (`PROJECT_STATE.md` F60).** With obstacles off, a path
+follower that simply holds course — the lawful Rule 17(a) action — collides
+with the overtaker in **11 of 12** being-overtaken episodes. That includes
+passes drawn at 1.0–1.9 m, above A15's floor. Two causes, both measured:
+
+1. **The generator draws confined targets that leave the corridor, and the
+   clamp teleports them.** Being-overtaken crossing angles are drawn from
+   ±67.5° (the classifier's band), and containment checks only the spawn
+   *point*. The hull breaches the channel on the first step.
+   `clamp_to_corridor` then moves the target to the nearest *centreline*
+   station and turns it parallel: a median 2.4 m jump, onto the own ship's
+   track. Over the development set (path follower, 20 per class), the clamp
+   fires **before CPA** in:
+
+   | class | clamped before CPA | median jump |
+   |---|---|---|
+   | being overtaken | **0.75** | 2.4 m |
+   | null | **0.90** | 3.5 m |
+   | overtaking | 0.10 | 3.2 m |
+   | head-on | 0 | — |
+
+   So most null episodes are not null, and most being-overtaken episodes are
+   not the geometry drawn. Runs 2 and 3 trained on this.
+2. **The floor ignores hull extent.** A15 floors the *centre* DCPA at 1.0 m.
+   Two hulls pass without contact at 0.66 m only when parallel. The
+   contact-free centre DCPA (overtaker speed ratio 1.5–2.2) is:
+
+   | crossing angle | 0° | 15° | 30° | 45–67.5° |
+   |---|---|---|---|---|
+   | contact-free centre DCPA | 0.66 m | 1.2–1.4 m | 1.5–1.7 m | 1.5–1.7 m |
+
+**Options:**
+
+1. **confined targets keep the channel, and the floor is on hull clearance.**
+   (a) Draw confined-class crossing angles from a channel-keeping band
+   (|CT| ≤ 10° for overtaking and being overtaken; head-on is already ±10°;
+   null ±10°), and require the target hull's whole pre-CPA track to stay
+   inside the corridor. (b) Replace the teleport with a heading nudge that
+   keeps the target's lateral position (C14). (c) Express A15's floor as hull
+   clearance — contact-free DCPA at the drawn angle plus `D_SAFE` — keeping
+   the labelled 20 % below it;
+2. keep the ±67.5° draws and fix only the clamp (b) and the floor (c). Oblique
+   overtakers still leave narrow corridors within seconds, so much of the
+   class keeps being re-drawn by the clamp;
+3. make confined overtaking targets unconfined (no clamp). The geometry drawn
+   is then the geometry that happens, but a target leaving through the channel
+   wall is not a channel user, which undercuts the Rule 9 framing.
+
+**Recommendation:** (1). Classification bands stay as they are — this narrows
+what the *generator* draws for channel users, not what the classifier accepts.
+In a straight corridor a vessel keeping the fairway runs near-parallel, so this
+is also what F59's simplification implies. **To resolve:** say which. Tier 2
+and run 4 should wait for it.
+
 ## A10. The vessel model — keep v3
 
 Unchanged from revision 3. Both refits failed the pre-registered rule, so the
@@ -433,7 +517,8 @@ settled.
 | ~~A15~~ | being-overtaken DCPA floor | **decided** (option 1) | — | built, F53 |
 | ~~A16~~ | two-sided speed gate | **decided** (option 1) | — | built, F50 |
 | ~~A17~~ | side-dependent crossing turn sense | **decided** (option 1) | — | built, F53 |
-| A10 | keep v3 | decision | model provenance | confirm |
+| ~~A21~~ | confined targets keep the channel; hull-clearance floor | **decided** (option 1) | — | built, F61 |
+| A10 | keep v3 | decision | model provenance | confirm (recommended) |
 | A3, A4, A6 | carried | decision | various | one call each |
 | **B5** | manoeuvring at 0.55 m/s is extrapolated | measurement | sim-to-real at the operating point | plan edit |
 | C2 | throughput | build | campaign size | mine |

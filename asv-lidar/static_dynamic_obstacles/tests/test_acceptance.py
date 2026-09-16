@@ -368,8 +368,10 @@ def test_seed_namespaces_are_disjoint():
 
 def test_the_suite_structure_matches_the_specification():
     """04a §4.2 and §5, as counts."""
-    assert len(ste.tier_a()) == 34
-    assert len({c.case_id for c in ste.tier_a()}) == 34
+    # 34 in 04a §5; 32 with the two bend cases withdrawn (F59).
+    n_tier_a = 34 if cfg.CORRIDOR_BENDS else 32
+    assert len(ste.tier_a()) == n_tier_a
+    assert len({c.case_id for c in ste.tier_a()}) == n_tier_a
     assert len(ste.tier_b_cells()) == 39
     assert sum(c["episodes"] for c in ste.tier_b_cells()) == 975
     assert len(ste.around_the_clock(open_water=True)) == 24

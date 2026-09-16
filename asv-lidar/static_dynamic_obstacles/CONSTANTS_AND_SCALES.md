@@ -759,4 +759,10 @@ tracker.
 | crossing turn sense | **+1 from starboard, −1 from port** | F53, A17 **decided** (option 1): `compliant_turn_sense(cls, crossing_side)` |
 | `ESTOP_CLEAR_DCPA_M` | **1.76 m** | F56, A18 **decided** (option 1), derived: `0.5·LOA + 0.5·B + 2·0.15 + D_SAFE`. The supervisor stop, R-2's slowdown carve-out and the Rule 8 speed credit apply only when the target's DCPA with the own ship stationary reaches this |
 | classification heading | **path tangent at the own ship** | F56, A19 **decided** (option 1): class, crossing side and true class use it; CPA products and the Rule 8 accumulator keep the instantaneous heading; open water falls back to the heading |
+| `CONFINED_CT_HALF_DEG` | **10°** | F61, A21 **decided** (option 1): overtaking, being-overtaken and null targets are drawn within ±10° of the channel direction (classifier bands unchanged) |
+| confined track check | **hull inside the corridor, every 0.5 s to CPA** (null: 15 s) | F61, A21: the generator rejects draws whose target would breach the channel before CPA |
+| `clamp_to_corridor` | **nudge, not teleport** | F61, A21: heading to the channel tangent, moved inward by the breach + 0.1 m |
+| being-overtaken DCPA floor | **`contact_free_dcpa(ct, k)` + 0.35 m** | F61, A21: hull clearance per draw (0.65 m parallel, ~1.0–1.2 m at 10°) plus `BEING_OVERTAKEN_FLOOR_MARGIN = D_SAFE`; replaces the 1.0 m centre floor; 20 % below, labelled |
+| `CORRIDOR_BENDS` | **False** | F59, your call (2026-09-16): no bends in any curriculum stage; `CORRIDOR_BEND_FRACTION` 0.40 → 0; Tier A's two bend cases withdrawn (34 → 32) |
+| `STRAIGHT_REFERENCE_PATH` | **True** | F59: the path's Rule 9(a) offset is constant, `offset_frac · ½ · min(W)`, so a varying-width corridor no longer bends the path; `r_path` ≡ 0 |
 | `N_SWITCH_STEPS` | **retired** (value kept, 2 steps) | F58, A20 **decided** (option 1): an engaged encounter keeps the class, crossing side and turn sense latched at engagement until it clears; a class switch no longer re-engages |
