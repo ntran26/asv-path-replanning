@@ -1,0 +1,44 @@
+Scripted crossing responses, triggered at engagement, obstacles off, supervisor off
+{'port': 72, 'starboard': 68} crossings, 1120 episodes, 1343 s
+
+== goal rate
+side           port  starboard
+response                      
+a17_30         0.06       0.13
+a17_60         0.06       0.13
+a17_60_slow    0.06       0.13
+other_30       0.06       0.13
+other_60       0.06       0.13
+other_60_slow  0.06       0.13
+slow           0.06       0.13
+stand_on       0.31       0.44
+
+== target collision rate
+side           port  starboard
+response                      
+a17_30         0.53       0.37
+a17_60         0.53       0.41
+a17_60_slow    0.42       0.32
+other_30       0.68       0.68
+other_60       0.60       0.63
+other_60_slow  0.58       0.47
+slow           0.60       0.46
+stand_on       0.69       0.56
+
+== wall / other collision rate
+side           port  starboard
+response                      
+a17_30         0.42       0.50
+a17_60         0.42       0.46
+a17_60_slow    0.39       0.51
+other_30       0.26       0.19
+other_60       0.35       0.24
+other_60_slow  0.35       0.34
+slow           0.00       0.00
+stand_on       0.00       0.00
+
+== share of crossings some scripted response solves
+side
+port         0.31
+starboard    0.44
+Name: goal, dtype: float64

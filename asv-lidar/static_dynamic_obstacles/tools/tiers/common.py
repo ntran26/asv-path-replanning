@@ -110,9 +110,10 @@ def run_episode(env, built, seed: int, policy: str, model=None, obstacles: Optio
     stops, stop_steps, r_path_max = [], [], 0.0
     min_range = float("inf")
     last_events = 0
+    actor = tf.EpisodeActor(model) if policy == "model" else None
     while True:
         if policy == "model":
-            action = model.predict(obs, deterministic=True)[0]
+            action = actor(obs)
         elif policy == "follower":
             action = follower_action(env)
         elif policy == "compliant":
@@ -192,8 +193,18 @@ def _init_worker(model_path: Optional[str], overrides: Optional[Dict] = None) ->
         _WORKER["env"].low_speed_start_frac = float(overrides["LOW_SPEED_START_FRAC"])
     _WORKER["model"] = None
     if model_path:
-        from stable_baselines3 import PPO
-        _WORKER["model"] = PPO.load(model_path, device="cpu")
+        _WORKER["model"] = load_model(model_path)
+
+
+def load_model(model_path):
+    """Load a saved policy with the learner its run recorded (any of the five)."""
+    import json
+    from pathlib import Path as _P
+    algo = "ppo"
+    config = _P(model_path).parent / "config.json"
+    if config.exists():
+        algo = json.loads(config.read_text()).get("algo", "ppo")
+    return tf.ALGORITHMS[algo].load(str(model_path), device="cpu")
 
 
 def _job(args) -> Dict:

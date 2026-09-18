@@ -1,0 +1,32 @@
+Development set, basin default (F74): 120 scenarios, 838 s
+geometry: {'basin': 104, 'channel': 16}; all layouts A*-feasible: True; redrawn 0, thinned 0
+
+== goal rate
+policy
+follower     0.483
+reference    0.892
+Name: outcome, dtype: float64
+
+== outcomes
+policy     outcome           
+follower   goal                  0.483
+           collision:obstacle    0.283
+           collision:target      0.233
+reference  goal                  0.892
+           collision:target      0.075
+           collision:obstacle    0.025
+           collision:boundary    0.008
+Name: proportion, dtype: float64
+
+== goal by class and mode
+policy                   follower  reference   n
+class           mode                            
+being_overtaken basin        0.80       0.95  20
+crossing        basin        0.11       0.61  18
+                channel      0.50       0.50   2
+head_on         basin        0.54       0.92  13
+                channel      0.71       1.00   7
+no_target       basin        0.35       0.95  20
+null            basin        0.45       1.00  20
+overtaking      basin        0.69       0.92  13
+                channel      0.29       0.86   7

@@ -1,0 +1,42 @@
+Using cpu device
+Logging to C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\runs\tensorboard\recurrent_ppo_formulation_seed0_check_smoke_1
+[CURRICULUM] t=0 -> scenario stage 1
+[CURRICULUM] t=240 -> scenario stage 2
+[CURRICULUM] t=540 -> scenario stage 3
+[CURRICULUM] t=960 -> scenario stage 4
+[CURRICULUM] t=1,500 -> scenario stage 5
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 42.3     |
+|    ep_rew_mean     | -239     |
+| time/              |          |
+|    fps             | 38       |
+|    iterations      | 1        |
+|    time_elapsed    | 53       |
+|    total_timesteps | 2048     |
+---------------------------------
+----------------------------------------
+| rollout/                |            |
+|    ep_len_mean          | 37.7       |
+|    ep_rew_mean          | -300       |
+| time/                   |            |
+|    fps                  | 23         |
+|    iterations           | 2          |
+|    time_elapsed         | 171        |
+|    total_timesteps      | 4096       |
+| train/                  |            |
+|    approx_kl            | 0.00521041 |
+|    clip_fraction        | 0.0174     |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -2.83      |
+|    explained_variance   | 0.00909    |
+|    learning_rate        | 0.0003     |
+|    loss                 | 2.49       |
+|    n_updates            | 10         |
+|    policy_gradient_loss | -0.0021    |
+|    std                  | 0.998      |
+|    value_loss           | 5.42       |
+----------------------------------------
+[EVAL] t=4,096 supervisor off goal 0.33 collision 0.67 timeout 0.00 return -160.6 colregs -12.6 intervention 0.00 (22.8 s)
+[EVAL] t=4,096 supervisor on goal 0.33 collision 0.67 timeout 0.00 return -160.6 colregs -12.6 intervention 0.00 (14.1 s)
+done in 0.08 h -> C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\runs\recurrent_ppo_formulation_seed0_check_smoke

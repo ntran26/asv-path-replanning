@@ -1,0 +1,41 @@
+Using cpu device
+Logging to C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\runs\tensorboard\recurrent_ppo_formulation_seed0_gate_g0_smoke_1
+[CURRICULUM] t=0 -> scenario stage 1
+[CURRICULUM] t=480 -> scenario stage 2
+[CURRICULUM] t=1,080 -> scenario stage 3
+[CURRICULUM] t=1,920 -> scenario stage 4
+[CURRICULUM] t=3,000 -> scenario stage 5
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 41.4     |
+|    ep_rew_mean     | -263     |
+| time/              |          |
+|    fps             | 67       |
+|    iterations      | 1        |
+|    time_elapsed    | 76       |
+|    total_timesteps | 5120     |
+---------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 36.2         |
+|    ep_rew_mean          | -286         |
+| time/                   |              |
+|    fps                  | 61           |
+|    iterations           | 2            |
+|    time_elapsed         | 167          |
+|    total_timesteps      | 10240        |
+| train/                  |              |
+|    approx_kl            | 0.0036695055 |
+|    clip_fraction        | 0.0159       |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -2.84        |
+|    explained_variance   | 0.00323      |
+|    learning_rate        | 0.0003       |
+|    loss                 | 1.18         |
+|    n_updates            | 10           |
+|    policy_gradient_loss | -0.00174     |
+|    std                  | 1            |
+|    value_loss           | 3.59         |
+------------------------------------------
+[EVAL] t=10,240 supervisor off goal 0.50 collision 0.50 timeout 0.00 return -111.8 colregs -17.4 intervention 0.00 (9.9 s)
+done in 0.06 h -> C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\runs\recurrent_ppo_formulation_seed0_gate_g0_smoke

@@ -8,8 +8,8 @@ currently blocking a full training run and a full evaluation.**
 |---|---|
 | **Revision** | 8 — 0.55 m/s; virtual corridors back; generator wired in; e-stop reward; noise and randomisation on; scale audit; first PPO formulation run; see `OPEN_PROBLEMS.md` |
 | **Last updated** | 2026-09-15 |
-| **Tests** | **445 passing, none expected to fail** (T1 passes since F24 was decided) |
-| **Blocking a headline training run** | **run 6 is training** (F72: A25 option 1 -- CODEX's observation fixes, the observable latch, R-2 back on the stop test). Baselines: run 4 0.87, run 5 0.76, reference controller 0.87. Then B5 (`OPEN_PROBLEMS.md`) |
+| **Tests** | **481 passing, none expected to fail** (T1 passes since F24 was decided) |
+| **Blocking a headline training run** | **port crossings** (A27: run 7 solves 2 of 12, F79); the training budget for the five learners (A26, TODO(04-4)); your sign-off and commit for the freeze (F75); B5 (`OPEN_PROBLEMS.md`) |
 | **Blocking a full evaluation** | **7 more** — B2, B5–B10 (§2) |
 | **Open `TODO(decision)`** | 1 (`D_SAFE`) |
 | **Open measurements** | 05 part 1 done from logs; basin sessions pending — `OPEN_PROBLEMS.md` Part B |
@@ -1748,6 +1748,294 @@ supervisor off in training, 15 % low-speed starts, evaluation both ways,
 `R2_SLOWDOWN_TEST = "stop"`. Compare with run 4 (0.87) and run 5 (0.76) on the
 development set, and with the reference controller's 0.87 / crossing 0.70.
 The stopped R-2-only run is kept as `ppo_formulation_seed0_v6_stopped_r2stop/`.
+
+**F73 — run 6 (A25) finished: goal level with run 4, the best COLREGs compliance
+of any run, and crossings still unsolved. The supervisor changes nothing.**
+
+*Run 6* (`runs/ppo_formulation_seed0_v6/`, 8.95 h). Final in-training
+evaluation: goal 0.82 / collision 0.17 with the supervisor off and on.
+Tier 1 under current code (`results/tiers/tier1_run6_supervisor_off/`, `…_on/`):
+
+| development set | run 4 | run 5 | **run 6** | reference controller |
+|---|---|---|---|---|
+| goal | 0.85 | 0.76 | **0.83** | 0.87 |
+| target / obstacle / boundary collision | 0.08 / 0.04 / 0.03 | 0.11 / 0.13 / 0 | 0.12 / 0.06 / 0 | 0.03 / 0.08 / 0.02 |
+| mean COLREGs integral | −17.0 | −16.9 | **−12.2** | — |
+| crossing goal | 0.45 | 0.40 | 0.40 | **0.70** |
+| head-on goal | 1.00 | 0.90 | 0.85 | 0.95 |
+| being overtaken / overtaking / null / no target | 0.85 / 1.00 / 0.85 / 0.95 | 0.80 / 0.95 / 0.65 / 0.85 | 0.90 / 1.00 / 0.85 / 0.95 | 0.75 / 0.90 / 0.90 / 1.00 |
+
+Run 4 and run 5 rows are their F69/F70 replays (pre-A25 code); runs 1–5 can no
+longer be replayed (F72). The goal gap to run 4 (0.83 against 0.85) is under one
+binomial standard error. Compliance improved in every target class (head-on
+−15.9 against run 4's −25.8 in training, overtaking −19.9 against −35.9), and
+run 5's obstacle collisions are gone. Crossings did not move: 11 of 12 failures
+are target collisions. Head-on width set: target collisions 0.09 / 0.15 / 0.20 /
+0.21 / 0.21 at 5 / 6 / 7 / 8 / 10 m.
+
+*Supervisor.* 8 stops in 6 of 220 episodes (7 head-on, 1 crossing), none then
+hit, no outcome changed; development intervention rate 0.02. With supervisor-off
+training the policy stands alone, which is the F68 framing.
+
+**F74 — basin mode (06) built, as amended by your calls: basin is the default
+geometry, Paper 2's layout, head-on-only banding, and every layout feasible.**
+
+*Your calls.* (1) Basin mode follows Paper 2: start y 2.0 m, goal y 22.0 m, both
+x drawn independently in [2.5, 7.5] m, so slant follows from the draw (up to
+14.0 deg) instead of 06 §3.2's sampled angle and midpoint. (2) The 10 m basin is
+already narrow water: confined traffic keeps to the whole navigable polygon,
+and only **head-on** traffic keeps the path band (Rule 9(a) with Rule 14).
+(3) **Basin is the default**: `DEFAULT_GEOMETRY_MODE = "basin"` for the
+environment and the generator; channel mode carries only the classes whose rule
+the width decides -- head-on, crossing, overtaking -- at 15 % (stage 3) or 25 %
+(stages 4-5) of their draws; null, being-overtaken and no-target are always
+basin. (4) Feasible but challenging (below).
+
+*Built.*
+* `corridor.Basin` (a `Corridor` with the same interface): `P_nav` is the basin
+  inset by `d_safe + 0.05` = 0.40 m; `h_+(s)`, `h_-(s)` by ray to `P_nav`;
+  `width = W_eff`; `band()` (clipped strip, head-on only); vertices at Paper
+  2's 0.2 m so a slanted float32 leg stays under `CURVATURE_EPS` (7.6e-5 worst
+  over 300 legs; 0.05 m stations gave 3.4e-4 and a phantom `r_path`).
+  `sample_basin`, `build_basin`, stage slant cap with clamp-and-record.
+* Generator: mode per draw (`p_basin`), rejection ledger keyed "basin", 06 §6
+  record fields (`geometry_mode`, slants, midpoint, clearance profile,
+  `w_eff_at_cpa`, `field_replicable`); being-overtaken starts 6.86 m along the
+  leg for water astern; basin crossings keep their hull in the water to CPA
+  (T15 caught them leaving through a wall); `suite_version` 3.0.
+* 06 M-5 side-specific normalisation: `r_pf` and the observation's cross-track
+  scale use the clearance on the deviation's side, clipped [0.60, 5.00] m; in a
+  channel this is exactly `W/2` (T14).
+* **Static feasibility** (`src/feasibility.py`): Paper 2's A* on a 0.25 m grid,
+  walls inflated 0.40 m, panels 0.45 m, route ≤ 2.25 × the leg. Every layout is
+  checked at reset, redrawn up to 20 times, then thinned nearest-the-path first.
+  The Paper 3 environment had no such check before.
+* `CHANNEL_MIN_WIDTH_BY_CLASS`: null and being-overtaken channels start at the
+  4.26 m narrow edge (06 M-6).
+
+*Deviations from 06, each measured.* Null traffic in basin mode keeps to `P_nav`
+not the band (37 of 40 draws capped out on the band); slant cap 14.0 deg not
+18.1 (Paper 2's endpoint box); Tier A basin leg 14.0 deg not 15.
+
+*Tests.* `test_basin_mode.py` (19): T13 legs and slant clamp, affine clearances,
+T14 channel reduction, side-specific normalisation, T15 (to CPA, and side walls
+through an episode), T3 **per mode passes**, T7 banding rule, default geometry,
+class mix, every class drawable, record fields, gate width, thinning, every
+generated layout routable.
+
+*Development set, basin default* (`tools/diagnostics/basin_devset_baselines.py`):
+104 basin + 16 channel scenarios, **all A*-feasible, none needed a redraw**.
+
+| class (mode) | path follower | reference controller |
+|---|---|---|
+| overall | 0.48 | **0.89** |
+| crossing (basin, 18) | 0.11 | 0.61 |
+| head-on (basin 13 / channel 7) | 0.54 / 0.71 | 0.92 / 1.00 |
+| overtaking (basin 13 / channel 7) | 0.69 / 0.29 | 0.92 / 0.86 |
+| being overtaken / null / no target | 0.80 / 0.45 / 0.35 | 0.95 / 1.00 / 0.95 |
+
+Feasible but not easy: a follower that avoids nothing reaches the goal in half,
+and the classical planner fails 11 % of feasible cases -- mostly crossings.
+
+**F75 — crossings diagnosed (port crossings turn the wrong way), SAC and
+SAC-IQN built and throughput-gated, and the suite rebuilt to 3.0 with its named
+cases realised. The freeze now waits only on you.**
+
+*1. Crossing diagnosis* (`tools/diagnostics/crossing_diagnosis.py`, run 6 vs
+the reference controller, the 20 new development crossings, supervisor off):
+
+| | reference | run 6 |
+|---|---|---|
+| goal | 0.60 | 0.45 |
+| TCPA at engagement (median) | 7.0 s | 7.1 s |
+| TCPA at first alteration > 10 deg | 3.1 s | 5.9 s |
+| first alteration in the compliant sense | **0.79** | **0.25** |
+| peak compliant alteration | 30 deg | 17 deg |
+| speed at closest approach | 0.40 m/s | 0.52 m/s |
+
+Paired: both 8, reference only 4, run 6 only 1, neither 7. Engagement timing is
+identical, so detection and the latch are not the problem. **Direction is.** In
+port crossings the compliant sense is a port turn (A17: pass astern); run 6
+turned starboard first in 8 of 12 and reached the goal in 4 (reference 6 of 12);
+in starboard crossings it reached 5 of 8 (reference 6). In its failures its peak
+compliant alteration is 2 deg against 20 deg the wrong way. `v_port` is
+symmetric in the sense (s_c = -1 penalises a starboard turn), so this is not a
+reward bug: the policy generalised "give way = starboard" from head-ons and
+starboard crossings, which are most give-way cases. It also slows less. A27.
+
+*2. SAC and SAC-IQN* (`src/sac_iqn.py`; `train_formulation.py --algo
+ppo|sac|sac_iqn`): the same environment, curriculum, development set,
+two-mode evaluation and checkpointing for all three. SAC-IQN keeps SAC's actor
+and entropy tuning with implicit-quantile critics (cosine embedding of tau,
+quantile Huber loss, 32 x 32 quantiles, clipped double-Q per sample) -- the
+DSAC construction, since IQN itself is discrete-action. The quantile loss
+recovers a median exactly; save, load and predict work; tier tools load any
+learner from its `config.json`. Smoke runs complete training and evaluation.
+
+*Throughput gate (04a §8.3)*, 10 workers, 12 cores, learner 4 threads:
+
+| learner | gradient steps per transition | steps/s | 2 M steps |
+|---|---|---|---|
+| PPO | -- | ~108 | ~6 h (9 h with two-mode evaluation) |
+| SAC | 1.0 | 12 | ~46 h |
+| SAC | 0.2 | 38 | ~15 h |
+| SAC-IQN | 1.0 | 3 | ~185 h |
+| SAC-IQN | 0.2 | 10 | ~55 h |
+
+The protected core is 30 runs. At SAC's 15 h that is ~19 days of this machine;
+with SAC-IQN in the tail, far more. TODO(04-4) is a budget and hardware call:
+A26.
+
+*3. Suite 3.0* (06 §5). Tier B restructured to 48 cells x 20 = 960 (basin 13,
+channel wide 13, intermediate 13, narrow 9 without null and being-overtaken):
+**960 of 960 realised**. Tier A: 38 named cases (the 32, plus six `A-BSN-*` on a
+fixed 14.0-deg leg). **Before this, Tier A's named features were recorded but
+never realised** -- crossing side, speed ratio, path offset, conflict and
+occlusion panels were all ignored, so `A-CRP-N` was any crossing at 4 m. Now:
+side and speed ratio are forced in the backward solve, the offset is set, basin
+cases run their leg, and the environment places the conflict panel (beside the
+path before CPA on the compliant side) and the occlusion panel (on the initial
+line of sight), each kept only if the layout stays A*-feasible. **35 of 38
+realised**; A-BO-N, A-NU-I and A-NU-N cannot be placed (the geometries 06 M-6
+calls infeasible) and are reported by `tier_a_shortfall()`. Also fixed: the
+frozen namespace holds 10,000 seeds, so `index + 10,000 x retry` retried the
+same seed and Tier B cells 0 and 10 shared seeds; Tier B now takes 200 seeds per
+cell and Tier A a disjoint block above. Draft manifest:
+`results/suite_v3/SUITE_MANIFEST_draft.json`, 995 cases, digest `2c713ca7...`.
+`test_suite_v3.py` (10).
+
+*4. Freeze checklist* (`suite.freeze_checklist()`, now checked against git
+rather than asserted): TODO(04-3) **resolved** (stage fractions of the budget,
+`CURRICULUM_STAGE_FRACTIONS`); TODO(04-1) and (04-2) **explicitly deferred** to
+basin session 1 at their nominal values; claim ledger and result tables
+**drafted** (`planning/CLAIM_LEDGER.md` with the 04a §6 predictions,
+`planning/RESULT_TABLES.md`). Open, all yours: TODO(04-4) budget (A26),
+sign-off of the ledger and tables, and a commit so the generator has a SHA.
+
+*Run 7* (`runs/ppo_formulation_seed0_v7/`): run 6's setup on the basin-default
+geometry, training. The 06 §7 edits to planning documents 01, 02a, 03a and 04a
+are left for Claude chat, which owns them.
+
+**F76 — the five baseline learners share one trainer. PPO tests the reward
+now; after the freeze PPO, RecurrentPPO, TD3, SAC and SAC-IQN all run over
+multiple seeds (your call).**
+
+`train_formulation.py --algo ppo|recurrent_ppo|td3|sac|sac_iqn`: one
+environment, curriculum, development set, two-mode evaluation, checkpointing
+and `config.json`. `sb3-contrib` 2.3.0 installed (matches SB3 2.3.2; nothing
+upgraded), recorded in the new `requirements.txt`.
+
+* **TD3**: the SAC replay settings, policy delay 2, target smoothing 0.2 clipped
+  at 0.5, Gaussian exploration 0.1 on the normalised action.
+* **RecurrentPPO**: PPO's settings with a 256-unit LSTM after the features
+  extractor, separate for actor and critic (`MultiInputLstmPolicy`).
+* **`EpisodeActor`**: every evaluation (the in-run callback, Tier 1, the
+  crossing diagnosis) now acts through one object that carries RecurrentPPO's
+  LSTM state through the episode; calling `predict` statelessly would have
+  reset its memory every step and scored a different policy from the one trained.
+
+Tests: `test_learners.py` (7) -- all five build and act on the Dict
+observation, and the recurrent state is carried and reset. Smoke runs of TD3 and
+RecurrentPPO trained, evaluated both ways and saved. Throughput for both is
+measured once run 7 frees the CPU, as SAC's was (F75).
+
+**F77 — TQC, not SAC-IQN (your correction).** The distributional arm is TQC
+(Kuznetsov et al., 2020; 04a §8.2's original rank-1 entry), from `sb3-contrib`
+2.3.0: SAC's settings, 2 critics x 25 quantiles, the top 2 per critic dropped.
+`--algo tqc`; `src/sac_iqn.py` removed. The baselines after the freeze: PPO,
+RecurrentPPO, TD3, SAC, TQC, multiple seeds. SAC-IQN's throughput rows in F75
+no longer apply; TQC's is measured with TD3's and RecurrentPPO's once run 7
+finishes. `test_learners.py` passes with TQC.
+
+**F78 — port crossings are solvable, and A17's port turn is the right answer
+in this simulator. Run 6's failure is learned, and one reward gap invites it.**
+
+*Scripted responses* (`tools/diagnostics/port_crossing_responses.py`,
+`results/port_crossing_responses/`): 140 crossings (20 development + 60 per
+side, basin default, obstacles off, supervisor off). Each response starts when
+the encounter engages, holds until the target is past and opening, then resumes
+the path at cruise. Goal rate over the 109 crossings that engaged (port 57,
+starboard 52):
+
+| response | port | starboard |
+|---|---|---|
+| hold course and speed (Rule 17 stand-on) | 0.32 | 0.40 |
+| slow (coast to the RPM floor) | 0.40 | 0.54 |
+| A17 sense, 30 deg | 0.51 | 0.65 |
+| A17 sense, 60 deg | 0.37 | 0.44 |
+| **A17 sense, 60 deg + slow** | **0.65** | **0.67** |
+| other way, 30 deg | 0.33 | 0.27 |
+| other way, 60 deg | 0.12 | 0.19 |
+| other way, 60 deg + slow | 0.42 | 0.48 |
+| **some response solves it** | **0.81** | **0.81** |
+
+A17's sense beats the other way on both sides: the A17 family solves 0.67 of
+port crossings against 0.56, with 14 crossings only A17 solves and 8 only the
+other way solves. Holding course solves 0.32, because a constant-velocity
+target never gives way. Port crossings are **not** harder than starboard
+crossings once the turn is combined with slowing (0.65 against 0.67). By drawn
+DCPA (port): below 0.7 m only an A17 turn works (0.61 with slowing, other way
+0.09); above 1.4 m holding course is enough (0.78).
+
+(A first version held each turn to the end of the episode. 40-50 % of turned
+episodes then ended on a wall before the encounter could be judged; it is kept
+as `results/port_crossing_responses_v1_heldturn/` and not used.)
+
+*The reward gap.* A held wrong-way heading costs exactly what no action costs.
+Port crossing, engaged, TCPA 4 s: `v_port` 0.000 and `v_r8` 0.733 both for no
+action and for 30 deg to starboard held; a compliant 30 deg port turn scores
+`v_r8` 0.000. `v_port` measures the wrong-way **yaw rate**, which is zero once
+the heading is held, and `v_r8` credits compliant displacement but charges none
+for wrong-way displacement. So a swerve to starboard costs only the seconds of
+turning, and in port crossings that swerve is what run 6 learned (8 of 12 first
+turns, F75).
+
+*Conclusion.* The geometry is solvable (0.81 by the best scripted response),
+A17 is the better rule for these targets, and the policy's failure is learned.
+A27 has the options.
+
+**F79 — run 7 (basin default) matches run 6 on goals but not on compliance,
+and confirms the port-crossing failure on the basin geometry.**
+
+*Run 7* (`runs/ppo_formulation_seed0_v7/`, 6.0 h, run 6's setup on the
+basin-default distribution): in-run 0.84 goal / 0.16 collision with the
+supervisor off and on. Tier 1 on the basin-default development set, with run 6
+replayed on the same set for comparison:
+
+| development set (basin default) | run 6 (trained on channels) | run 7 (trained basin default) |
+|---|---|---|
+| goal | **0.875** | 0.842 |
+| target / boundary / obstacle collision | 0.12 / 0 / 0.01 | 0.13 / 0.03 / 0 |
+| mean COLREGs integral | **−11.1** | −19.8 |
+| mean / max speed (m/s) | 0.61 / 0.81 | 0.66 / 0.84 |
+| crossing goal (port / starboard) | 0.45 (0.33 / 0.62) | 0.30 (0.17 / 0.50) |
+| head-on / overtaking / being overtaken | 1.00 / 1.00 / 0.85 | 0.85 / 1.00 / 0.90 |
+| null / no target | 1.00 / 0.95 | 1.00 / 1.00 |
+
+Reference controller on the same port / starboard crossings: 0.50 / 0.75.
+
+*Reading it.*
+* **Run 6 transfers to the basin without training on it** (0.875, and its best
+  compliance), which is C-8's claim; run 7 gains nothing from the basin
+  distribution on goals and loses on compliance. One seed each.
+* **Port crossings, confirmed and worse:** 2 of 12 (reference 6). The first
+  alteration is compliant in 0.22 of port crossings, and speed at closest
+  approach is 0.72 m/s (reference 0.40), so the policy neither turns the A17
+  way nor slows. A27's options 1 and 2 target exactly this.
+* **Run 7 outruns overtakers:** being-overtaken max speed 0.94 m/s against run
+  6's 0.68, and the stand-on `v_hold` integral doubles (8.7 against 4.3). Goals
+  hold (0.90), but it is the stand-on violation `v_hold` exists to price;
+  watch it in run 8.
+* Supervisor: 10 stops in 8 of 220 episodes (6 head-on, 4 overtaking), none
+  then hit; outcomes identical off and on. Head-on width set: target
+  collisions 0.09 / 0.15 / 0.15 / 0.00 / 0.00 at 5 / 6 / 7 / 8 / 10 m.
+
+**F80 — throughput for all five baselines** (10 workers, 12 cores; 1.0 / 0.2
+gradient steps per transition for the off-policy learners): PPO ~108 steps/s,
+RecurrentPPO 61, TD3 18 / 53, SAC 12 / 38, TQC 13 / 32. Per 2 M-step seed:
+~6, ~9, ~31 / ~10.5, ~46 / ~15, ~43 / ~17 h. One seed of all five is ~135 h at
+1.0 and ~58 h at 0.2; five seeds one at a time are ~28 or ~12 days, before
+ablations. A26 carries the decision.
 
 ### 3.13 Earlier findings, still standing
 

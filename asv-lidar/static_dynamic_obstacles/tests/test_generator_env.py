@@ -234,3 +234,26 @@ def test_a_stop_costs_once_and_never_as_much_as_a_collision():
             break
     assert charged[0] == pytest.approx(cfg.R_ESTOP)
     assert all(c == 0.0 for c in charged[1:])
+
+
+def test_a27_training_crossings_favour_port_and_other_namespaces_do_not(monkeypatch):
+    """A27 option 2 (F81): the port share applies to training draws only, so the
+    development and frozen sets -- and every comparison on them -- are unchanged."""
+    import constants as cfg
+    train = scn.ScenarioGenerator(stage=5, seed_namespace="training")
+    sides = [b.ct_deg < 180.0 for b in
+             (train.sample(scn.seed_for("training", 61_000 + i), encounter_class="crossing")
+              for i in range(160)) if b is not None]
+    assert 0.50 < np.mean(sides) < 0.72
+    dev = scn.ScenarioGenerator(stage=5, seed_namespace="development")
+    seed = scn.seed_for("development", 10_000 * 2 + 3)
+    before = dev.sample(seed, encounter_class="crossing")
+    monkeypatch.setattr(cfg, "CROSSING_PORT_SHARE_TRAINING", 0.99)
+    after = scn.ScenarioGenerator(stage=5, seed_namespace="development").sample(
+        seed, encounter_class="crossing")
+    assert before.ct_deg == after.ct_deg
+
+
+def test_a27_stage_3_teaches_crossings():
+    import constants as cfg
+    assert "crossing" in cfg.CURRICULUM_STAGES[3]["classes"]

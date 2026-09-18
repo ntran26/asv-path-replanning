@@ -416,6 +416,10 @@ def v_port(state: RewardState, ctx, cfg) -> float:
        boundary conflict to *slacken speed*, so suppressing the penalty near the
        wall would license a port turn instead.
 
+    **A27 (F81): and the wrong-way heading held since engagement**, at full
+    severity `dpsi_min` past a 5 deg deadband; the larger of the two forms is
+    charged.
+
     `r_dead` is subtracted rather than used as a gate, so the term is continuous
     where it starts.  It fires on **yaw rate crossing `r_dead`, not on rudder
     reversal** -- locked principle 5, and the exact bug that principle exists to
@@ -429,7 +433,19 @@ def v_port(state: RewardState, ctx, cfg) -> float:
         return 0.0
     wrong_way = max(0.0, -s_c * (float(state.r) - float(ctx.r_path)))
     severity = (wrong_way - float(cfg.r_dead)) / max(float(cfg.r_ref), 1e-9)
-    return float(ctx.rho) * float(np.clip(severity, 0.0, 1.0))
+    # A27 option 1 (F81): the yaw-rate form charges only the seconds of turning,
+    # so a wrong-way heading, once held, cost exactly what doing nothing cost
+    # (F78) -- and in port crossings that is what run 6 and run 7 learned.  The
+    # heading form charges the displacement held the wrong way since engagement,
+    # the mirror of the compliant displacement `v_r8` credits.  Read on the same
+    # perceived heading the latch recorded; ENGAGED only, so returning to the
+    # path after the target has passed (CLEARING) is never charged.
+    heading = (state.heading_deg if state.perceived_heading_deg is None
+               else state.perceived_heading_deg)
+    held = max(0.0, -s_c * _wrap180(float(heading) - float(ctx.psi_engage)))
+    held_severity = ((held - float(cfg.v_port_heading_dead_deg))
+                     / max(float(cfg.dpsi_min_deg), 1e-9))
+    return float(ctx.rho) * float(np.clip(max(severity, held_severity), 0.0, 1.0))
 
 
 def v_bow(state: RewardState, ctx, cfg) -> float:

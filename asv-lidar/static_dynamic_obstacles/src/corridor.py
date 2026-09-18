@@ -89,6 +89,9 @@ class Corridor:
     offset_frac: float = 0.0            # reference-path offset, +ve to starboard
     basin: Tuple[float, float] = (cfg.MAP_WIDTH, cfg.MAP_HEIGHT)
 
+    # 06 M-1: which navigable geometry this is.  Not a dataclass field.
+    mode = "channel"
+
     # ------------------------------------------------------------------
     @property
     def length(self) -> float:
@@ -238,6 +241,21 @@ class Corridor:
     def contains(self, x: float, y: float) -> bool:
         import boundary_raycast as br
         return br.point_in_polygon(float(x), float(y), self.polygon())
+
+    # --- the interface basin mode shares (06 §9) -------------------------
+    def clearances_at_s(self, s_query: float) -> Tuple[float, float]:
+        """(starboard, port) clearance at a station: `W/2` each in a channel."""
+        half = 0.5 * self.width_at_s(s_query)
+        return half, half
+
+    def half_width_on_side(self, s_query: float, e_y: float) -> float:
+        """06 M-5.  In a channel `h_+ = h_- = W/2`, so this is exactly the
+        width normalisation every channel-mode result used (T14)."""
+        return 0.5 * self.width_at_s(s_query)
+
+    def band(self) -> "Corridor":
+        """The water confined targets keep to: the channel itself."""
+        return self
 
     def fits_basin(self, margin: float = 0.0) -> bool:
         left, right = self.edges()
@@ -533,6 +551,215 @@ def rectangle(width: float, *, length: float = None,
     """
     return build(float(width), bend_deg=0.0, width_ratio=1.0, offset_frac=0.0,
                  length=length, basin=basin, rng=np.random.default_rng(0))
+
+
+# ---------------------------------------------------------------------------
+# Basin mode  (06)
+# ---------------------------------------------------------------------------
+def nav_polygon(basin: Tuple[float, float] = None, inset: float = None) -> list:
+    """`P_nav`: the basin envelope inset by `d_safe + 0.05` (06 §3.1)."""
+    w, h = (cfg.MAP_WIDTH, cfg.MAP_HEIGHT) if basin is None else basin
+    i = cfg.BASIN_NAV_INSET_M if inset is None else float(inset)
+    return [(i, i), (w - i, i), (w - i, h - i), (i, h - i)]
+
+
+def _ray_to_rectangle(points: np.ndarray, direction: np.ndarray, rect) -> np.ndarray:
+    """Distance from each point along `direction` to the rectangle's boundary.
+
+    The points lie inside; the exit is the smallest positive slab crossing.
+    """
+    (x0, y0), _, (x1, y1), _ = rect
+    out = np.full(len(points), np.inf)
+    for axis, lo, hi in ((0, x0, x1), (1, y0, y1)):
+        d = float(direction[axis])
+        if abs(d) < 1e-12:
+            continue
+        bound = hi if d > 0 else lo
+        out = np.minimum(out, (bound - points[:, axis]) / d)
+    return np.maximum(out, 0.0)
+
+
+def _clip_convex(subject: list, clip: list) -> list:
+    """Sutherland-Hodgman: `subject` clipped to the convex, CCW `clip`."""
+    def inside(p, a, b):
+        return (b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0]) >= -1e-12
+
+    def cut(p, q, a, b):
+        dx, dy = q[0] - p[0], q[1] - p[1]
+        ex, ey = b[0] - a[0], b[1] - a[1]
+        denom = dx * ey - dy * ex
+        t = ((a[0] - p[0]) * ey - (a[1] - p[1]) * ex) / denom
+        return (p[0] + t * dx, p[1] + t * dy)
+
+    out = list(subject)
+    for i in range(len(clip)):
+        a, b = clip[i], clip[(i + 1) % len(clip)]
+        src, out = out, []
+        for j in range(len(src)):
+            p, q = src[j], src[(j + 1) % len(src)]
+            if inside(q, a, b):
+                if not inside(p, a, b):
+                    out.append(cut(p, q, a, b))
+                out.append(q)
+            elif inside(p, a, b):
+                out.append(cut(p, q, a, b))
+        if not out:
+            break
+    return [(float(x), float(y)) for x, y in out]
+
+
+class _Band(Corridor):
+    """The path band confined targets keep to in basin mode (06 §3.5).
+
+    A constant-width strip along the leg's line, clipped to `P_nav`, so a
+    head-on, overtaking, being-overtaken or null target behaves as channel
+    traffic on the fairway the leg defines.  Its polygon is the clipped strip,
+    not an offset of the centreline.
+    """
+
+    _clipped: list = None
+
+    def polygon(self, spacing: float = POLYGON_SPACING_M) -> list:
+        return list(self._clipped)
+
+
+@dataclass
+class Basin(Corridor):
+    """A straight survey leg inside the whole basin (06 §3).
+
+    `centre` is the leg itself, start to goal; `width` holds `W_eff(s) =
+    h_+(s) + h_-(s)`, the clear width across the leg, so every consumer that
+    reads a width gets the basin's honest one.  The navigable polygon is
+    `P_nav`, not an offset of the centreline: the walls stay where the basin
+    puts them and the leg runs obliquely between them.
+    """
+
+    mode = "basin"
+    h_plus: np.ndarray = None           # starboard clearance to P_nav, per station
+    h_minus: np.ndarray = None          # port clearance to P_nav, per station
+    slant_requested_deg: float = 0.0
+    slant_realised_deg: float = 0.0
+    nav: list = None
+
+    def polygon(self, spacing: float = POLYGON_SPACING_M) -> list:
+        return list(self.nav)
+
+    def edges(self) -> Tuple[np.ndarray, np.ndarray]:
+        n = self.normals()
+        return (self.centre + n * self.h_minus[:, None],
+                self.centre - n * self.h_plus[:, None])
+
+    def reference_path_points(self, length: float = None,
+                              start_s: float = 0.0) -> np.ndarray:
+        """The leg from `start_s` to the goal; there is no Rule 9(a) offset to
+        apply, because the leg is already off-centre by its own endpoints."""
+        start = float(np.clip(start_s, 0.0, max(0.0, self.length - 1.0)))
+        # Paper 2's 0.2 m vertex spacing, not the 5 cm stations: on a slanted
+        # line, float32 vertices 5 cm apart leave up to 3e-4 1/m of Menger
+        # curvature -- above `CURVATURE_EPS`, so `r_path` would read a bend on a
+        # straight leg.  At 0.2 m the residue is under the deadband.
+        idx = np.flatnonzero(self.s >= start - 1e-9)
+        step = max(1, int(round(0.2 / STATION_SPACING_M)))
+        keep = np.unique(np.append(idx[::step], idx[-1]))
+        return self.centre[keep].astype(np.float32)
+
+    def clearances_at_s(self, s_query: float) -> Tuple[float, float]:
+        s = float(s_query)
+        return (float(np.interp(s, self.s, self.h_plus)),
+                float(np.interp(s, self.s, self.h_minus)))
+
+    def half_width_on_side(self, s_query: float, e_y: float) -> float:
+        """06 M-5: the clearance on the side of the deviation, clipped."""
+        h_plus, h_minus = self.clearances_at_s(s_query)
+        h = h_plus if float(e_y) > 0.0 else h_minus
+        return float(np.clip(h, *cfg.BASIN_H_SIDE_CLIP))
+
+    def band(self) -> Corridor:
+        cached = getattr(self, "_band", None)
+        if cached is not None:
+            return cached
+        half = float(np.min(np.minimum(self.h_plus, self.h_minus)))
+        t = self.tangent(0)
+        n = np.array([-t[1], t[0]])
+        # The leg's line across the whole basin, so a target ahead of the goal
+        # or astern of the start is still on the fairway.
+        (x0, y0), _, (x1, y1), _ = self.nav
+        reach = math.hypot(x1 - x0, y1 - y0)
+        a = self.centre[0] - t * reach
+        b = self.centre[-1] + t * reach
+        strip = [tuple(a - n * half), tuple(b - n * half), tuple(b + n * half), tuple(a + n * half)]
+        clipped = _clip_convex(strip, self.nav)
+        length = float(np.linalg.norm(b - a))
+        n_st = max(8, int(round(length / STATION_SPACING_M)) + 1)
+        s = np.linspace(0.0, length, n_st)
+        centre = a[None, :] + s[:, None] * t[None, :]
+        band = _Band(centre=centre, width=np.full(n_st, 2.0 * half), s=s, basin=self.basin)
+        band._clipped = clipped
+        self._band = band
+        return band
+
+    def fits_basin(self, margin: float = 0.0) -> bool:
+        return True
+
+    def describe(self) -> dict:
+        out = super().describe()
+        out.update({
+            "geometry_mode": "basin",
+            "slant_requested_deg": self.slant_requested_deg,
+            "slant_realised_deg": self.slant_realised_deg,
+            "path_start": [float(v) for v in self.centre[0]],
+            "path_goal": [float(v) for v in self.centre[-1]],
+            "path_midpoint": [float(v) for v in 0.5 * (self.centre[0] + self.centre[-1])],
+            "clearance_profile": self.clearance_profile(),
+        })
+        return out
+
+    def clearance_profile(self) -> dict:
+        mid = 0.5 * self.length
+        ends = (0.0, mid, self.length)
+        return {"h_plus": [round(self.clearances_at_s(s)[0], 3) for s in ends],
+                "h_minus": [round(self.clearances_at_s(s)[1], 3) for s in ends]}
+
+
+def build_basin(start: Tuple[float, float], goal: Tuple[float, float], *,
+                slant_requested_deg: float = None,
+                basin: Tuple[float, float] = None) -> Basin:
+    """A basin leg from explicit endpoints."""
+    basin = (cfg.MAP_WIDTH, cfg.MAP_HEIGHT) if basin is None else tuple(basin)
+    p0, p1 = np.asarray(start, dtype=float), np.asarray(goal, dtype=float)
+    length = float(np.linalg.norm(p1 - p0))
+    n = max(8, int(round(length / STATION_SPACING_M)) + 1)
+    s = np.linspace(0.0, length, n)
+    t = (p1 - p0) / max(length, 1e-9)
+    centre = p0[None, :] + s[:, None] * t[None, :]
+    nav = nav_polygon(basin)
+    port = np.array([-t[1], t[0]])
+    h_minus = _ray_to_rectangle(centre, port, nav)
+    h_plus = _ray_to_rectangle(centre, -port, nav)
+    slant = math.degrees(math.atan2(float(t[0]), float(t[1])))
+    return Basin(centre=centre, width=h_plus + h_minus, s=s, basin=basin,
+                 h_plus=h_plus, h_minus=h_minus,
+                 slant_requested_deg=float(slant if slant_requested_deg is None
+                                           else slant_requested_deg),
+                 slant_realised_deg=float(slant), nav=nav)
+
+
+def sample_basin(rng, *, slant_max_deg: Optional[float] = None,
+                 basin: Tuple[float, float] = None) -> Basin:
+    """Paper 2's layout: fixed start and goal y, both x drawn independently.
+
+    With a stage slant cap (06 §4, stage 1), the goal x is pulled toward the
+    start x until the cap holds, and the requested and realised slants are both
+    recorded -- the F25 clamp-and-record pattern.
+    """
+    y0, y1 = float(cfg.BASIN_START_Y), float(cfg.BASIN_GOAL_Y)
+    x0 = float(rng.uniform(*cfg.BASIN_X_RANGE))
+    x1 = float(rng.uniform(*cfg.BASIN_X_RANGE))
+    requested = math.degrees(math.atan2(x1 - x0, y1 - y0))
+    if slant_max_deg is not None and abs(requested) > float(slant_max_deg):
+        x1 = x0 + math.copysign(math.tan(math.radians(float(slant_max_deg))) * (y1 - y0),
+                                x1 - x0)
+    return build_basin((x0, y0), (x1, y1), slant_requested_deg=requested, basin=basin)
 
 
 # ---------------------------------------------------------------------------

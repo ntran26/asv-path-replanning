@@ -1,0 +1,89 @@
+{
+ "algorithm": "PPO",
+ "seed": 0,
+ "timesteps": 8000,
+ "algo": "sac_iqn",
+ "num_envs": 10,
+ "hyperparameters": {
+  "learning_rate": 0.0003,
+  "buffer_size": 20000,
+  "batch_size": 256,
+  "tau": 0.005,
+  "gamma": 0.9509900498999999,
+  "learning_starts": 256,
+  "train_freq": 1,
+  "ent_coef": "auto",
+  "gradient_steps": 10,
+  "n_quantiles": 32,
+  "n_target_quantiles": 32,
+  "kappa": 1.0
+ },
+ "torch_threads": 0,
+ "fixed_stage": 0,
+ "train_supervisor": "off",
+ "eval_supervisor": "off",
+ "low_speed_start_frac": 0.15,
+ "r2_slowdown_test": "stop",
+ "observation_schema": "a25-v3-context",
+ "observation_dim": 70,
+ "init_model": null,
+ "policy": {
+  "features_extractor": "ASVFeaturesExtractor",
+  "net_arch": {
+   "pi": [
+    256,
+    256
+   ],
+   "vf": [
+    256,
+    256
+   ]
+  },
+  "activation": "ReLU"
+ },
+ "reward_normalisation": "VecNormalize(norm_obs=False, norm_reward=True, clip_reward=10)",
+ "scenario_schedule": [
+  [
+   0.0,
+   1
+  ],
+  [
+   0.08,
+   2
+  ],
+  [
+   0.18,
+   3
+  ],
+  [
+   0.32,
+   4
+  ],
+  [
+   0.5,
+   5
+  ]
+ ],
+ "propulsion_stage": 4,
+ "rpm_stage_params": [
+  6.0,
+  0.0,
+  12.0
+ ],
+ "constants": {
+  "UPDATE_RATE": 0.5,
+  "CRUISE_RPM": 6.0,
+  "U_NOM": 0.5581909514189132,
+  "MAX_EPISODE_STEPS": 180,
+  "VESSEL_RANDOMISATION_SCALE": 1.0,
+  "BOUNDARY_POSE_NOISE_XY": 0.03,
+  "BOUNDARY_POSE_NOISE_HEADING_DEG": 0.2,
+  "EGO_SPEED_NOISE": 0.05,
+  "ESTOP_TRIGGER": "supervisor",
+  "R_ESTOP": -20.0,
+  "RUDDER_COMMAND_LIMIT": false,
+  "MOTION_CLASSIFIER": "free_space",
+  "PF_OVERSPEED_TOL": 0.2,
+  "PF_OVERSPEED_SPAN": 0.5
+ }
+}
