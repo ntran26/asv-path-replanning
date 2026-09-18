@@ -1,0 +1,13 @@
+CODEX reference controller, development set, GOAL_CTE_RADIUS 1.6 m (120 episodes, 1348 s)
+overall goal 0.867, collision 0.133, timeout 0.000
+
+                 goal  target  obstacle  ...  fallback_frac  steps  wall_s
+class                                    ...                              
+being_overtaken  0.75    0.00      0.20  ...           0.17   1517   98.80
+crossing         0.70    0.15      0.15  ...           0.39   1400   69.78
+head_on          0.95    0.05      0.00  ...           0.15   1466  100.65
+no_target        1.00    0.00      0.00  ...           0.08   1533   76.98
+null             0.90    0.00      0.10  ...           0.14   1459   96.39
+overtaking       0.90    0.00      0.05  ...           0.16   1224   93.96
+
+[6 rows x 9 columns]

@@ -1,7 +1,6 @@
 """Observation assembly, slot management, and the features extractor.
 
-Revision 2: one target slot with a presence bit, 56 dims, five encounter
-classes.
+Revision 3: target slots plus explicit encounter memory and previous action.
 
 Kickoff §7, restated for the new scope:
 * shape and dtype exactly match `observation_space`; 0- and 1-target cases both
@@ -47,12 +46,12 @@ def base_kwargs(tracks=()):
 # ---------------------------------------------------------------------------
 # Space and dimensions
 # ---------------------------------------------------------------------------
-def test_total_dimension_is_56():
-    """S6: observation reduced to ~56 dims by the two-vessel repositioning."""
+def test_total_dimension_is_70_and_schema_is_versioned():
     space = obs.observation_space()
     total = sum(int(np.prod(space[k].shape)) for k in space.spaces)
-    assert total == 56
-    assert obs.OBS_DIM == 56
+    assert total == 70
+    assert obs.OBS_DIM == 70
+    assert obs.OBSERVATION_SCHEMA_VERSION == 3
 
 
 def test_branch_dimensions_match_the_spec():
@@ -62,11 +61,12 @@ def test_branch_dimensions_match_the_spec():
     assert space["ego"].shape == (3,)
     assert space["path"].shape == (3,)
     assert space["target"].shape == (16,)          # 15 features + presence
+    assert space["context"].shape == (14,)         # 12 per slot + 2 actions
 
 
-def test_there_are_exactly_five_branches():
+def test_there_are_exactly_six_branches():
     assert set(obs.observation_space().spaces) == {
-        "lidar", "boundary", "ego", "path", "target"}
+        "lidar", "boundary", "ego", "path", "target", "context"}
 
 
 def test_one_target_slot_but_the_count_stays_configurable():
@@ -263,15 +263,16 @@ def test_zero_and_one_target_episodes_are_representable():
         builder.reset()
 
 
-def test_crossing_side_is_exposed_for_the_reward_but_not_observed():
-    """Rule 9(b) collapses the class; 02's passing-side term still needs the side."""
+def test_crossing_class_keeps_an_observable_turn_direction():
+    """The scoped research rule collapses the class, but observes its obligation."""
     builder = obs.ObservationBuilder()
     track = make_track(12.0, 17.0, -0.5, 0.0)           # crossing from starboard
     o = builder.build(**base_kwargs([track]))
 
     assert builder.encounter_classes[track.id] == enc.CROSSING
     assert builder.crossing_sides[track.id] == enc.SIDE_STARBOARD
-    # ...and the one-hot carries no side information at all.
+    assert o["context"][obs.CONTEXT_FEATURE_NAMES.index("compliant_turn_sense")] == 1.0
+    # The class one-hot remains unchanged; direction is in the context branch.
     slots, _ = obs.split_target(o["target"])
     assert float(slots[0][obs.CLASS_SLICE].sum()) == pytest.approx(1.0)
 
@@ -311,6 +312,7 @@ def test_absent_slot_garbage_is_byte_identical_to_zeros():
     dirty = {k: v.copy() for k, v in clean.items()}
     rng = np.random.default_rng(0)
     dirty["target"][:obs.PRESENCE_INDEX] = rng.normal(size=obs.PRESENCE_INDEX).astype(np.float32)
+    dirty["context"][:-2] = rng.normal(size=obs.CONTEXT_FEATURES).astype(np.float32)
 
     with torch.no_grad():
         a = ex(_batch(clean))
@@ -349,7 +351,7 @@ def test_slot_encoder_weights_are_shared_across_slots():
     """One encoder for every slot -- what makes the extension a retrain."""
     space = obs.observation_space()
     ex = ASVFeaturesExtractor(space)
-    assert ex.slot_encoder[0].in_features == cfg.TARGET_FEATURES
+    assert ex.slot_encoder[0].in_features == cfg.TARGET_FEATURES + obs.CONTEXT_FEATURES
     assert ex.n_slots == cfg.N_MAX_TARGETS
 
 
@@ -360,3 +362,58 @@ def test_no_aggregation_flag_survives_from_revision_1():
     assert not hasattr(ex, "aggregate")
     assert not hasattr(ex, "attn_query")
     assert not hasattr(cfg, "AGGREGATE")
+
+
+@pytest.mark.parametrize("n_slots", [1, 2, 3])
+def test_space_builder_split_and_extractor_share_slot_count(n_slots):
+    tracks = [make_track(5.0 + i, 16.0 + i, 0.0, -0.4) for i in range(n_slots)]
+    built = obs.ObservationBuilder(n_slots=n_slots).build(**base_kwargs(tracks))
+    space = obs.observation_space(n_slots=n_slots)
+    assert space.contains(built)
+    slots, presence = obs.split_target(built["target"])
+    assert slots.shape == (n_slots, cfg.TARGET_FEATURES)
+    assert np.all(presence == 1.0)
+    extractor = ASVFeaturesExtractor(space)
+    assert extractor.n_slots == n_slots
+    assert extractor(_batch(built, 2)).shape == (2, extractor.features_dim)
+
+
+def test_encounter_memory_and_previous_action_are_observable():
+    builder = obs.ObservationBuilder()
+    track = make_track(5.0, 16.0, 0.0, -0.4)
+    first = builder.build(**base_kwargs([track]))
+    kwargs = base_kwargs([track])
+    kwargs.update(heading_os_deg=15.0, u=0.35, previous_action=(0.3, -0.4))
+    altered = builder.build(**kwargs)
+    names = dict(zip(obs.CONTEXT_FEATURE_NAMES, altered["context"][:-2]))
+    assert names["engaged"] == 1.0
+    assert names["clearing"] == 0.0
+    assert names["compliant_turn_sense"] == 1.0
+    assert names["heading_change"] == pytest.approx(15.0 / 180.0)
+    assert names["speed_change"] == pytest.approx(-0.2 / cfg.SPEED_SCALE)
+    assert names["engagement_age"] > first["context"][11]
+    assert altered["context"][-2:] == pytest.approx((0.3, -0.4))
+
+
+def test_context_inputs_do_not_depend_on_target_truth():
+    from colregs.context import ENGAGED, EncounterContext
+    context = EncounterContext(track_id=1, state=ENGAGED, cls=enc.HEAD_ON,
+                               rng=5.0, ct=180.0, speed_ts=0.4, t_engage=1)
+    first = obs.context_features(context, 10.0, 0.4, 2)
+    context.d_ts_true = 0.0
+    context.dcpa_true = 0.0
+    context.cls_true = enc.CROSSING
+    second = obs.context_features(context, 10.0, 0.4, 2)
+    assert np.array_equal(first, second)
+
+
+def test_cross_track_error_uses_local_scale_when_supplied():
+    kwargs = base_kwargs()
+    kwargs.update(cross_track_error=1.0, cross_track_scale=2.5)
+    built = obs.ObservationBuilder().build(**kwargs)
+    assert built["path"][0] == pytest.approx(0.4)
+
+
+def test_extractor_rejects_slot_count_inconsistent_with_space():
+    with pytest.raises(ValueError, match="n_slots"):
+        ASVFeaturesExtractor(obs.observation_space(2), n_slots=1)

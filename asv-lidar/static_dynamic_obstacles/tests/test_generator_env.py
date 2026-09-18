@@ -162,6 +162,28 @@ def test_the_clamp_nudges_rather_than_teleports():
     assert target.heading == pytest.approx(0.0, abs=1e-6)
 
 
+def test_crossings_are_escapable_except_a_labelled_fraction():
+    """A22: every crossing carries the label, the label agrees with the escape
+    check, and about a fifth are drawn unescapable."""
+    generator = scn.ScenarioGenerator(stage=5, seed_namespace="development")
+    labels = []
+    for index in range(80):
+        built = generator.sample(scn.seed_for("development", 70_000 + index), encounter_class="crossing")
+        if built is None:
+            continue
+        assert built.crossing_escapable in (True, False)
+        if index < 12:
+            solved = {"x": built.target_spawn[0], "y": built.target_spawn[1],
+                      "heading": built.target_heading, "speed": built.target_speed,
+                      "ct": built.ct_deg, "tcpa": built.tcpa_s}
+            assert scn.crossing_escape_feasible(np.array(built.own_spawn), built.own_heading,
+                                                solved, built.channel) == built.crossing_escapable
+        labels.append(built.crossing_escapable)
+    assert len(labels) >= 60
+    unescapable = labels.count(False) / len(labels)
+    assert 0.08 <= unescapable <= 0.35
+
+
 def test_obstacles_keep_clear_of_the_encounter():
     """04a §3.6: the CPA stretch of the own ship's track stays clear."""
     env = ASVLidarEnv(render_mode=None, scenario_stage=5)

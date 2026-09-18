@@ -45,6 +45,7 @@ def test_the_observation_carries_the_flipped_sign():
     env.reset(seed=0)
     env.asv_x = env.path.points[env.closest_idx][0] + 1.0     # 1 m to starboard
     env._update_path_errors(env.asv_h)
+    env._perceive()  # deliver the changed pose before reading the policy state
     assert env.cross_track_error > 0.0
     assert env._get_obs()["path"][0] > 0.0
 

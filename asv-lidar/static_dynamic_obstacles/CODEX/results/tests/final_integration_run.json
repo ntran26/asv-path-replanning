@@ -1,0 +1,19 @@
+{
+  "command": [
+    "C:\\Users\\hntran\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\\python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "tests/test_perception_consistency.py",
+    "tests/test_behavior_contracts.py",
+    "tests/test_reference_actuator.py",
+    "tests/test_reference_geometry.py",
+    "tests/test_codex_training.py",
+    "--junitxml=C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\CODEX\\results\\tests\\final_integration.xml"
+  ],
+  "exit_code": 0,
+  "seconds": 143.51974749565125
+}

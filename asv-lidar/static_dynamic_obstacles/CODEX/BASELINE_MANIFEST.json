@@ -1,0 +1,401 @@
+{
+  "source_directory": "..",
+  "source_git_commit": "585607d9c7819488a91258641ed818e5a6d0844a",
+  "source_has_uncommitted_changes": true,
+  "created_date": "2026-09-17",
+  "note": "Snapshot of source files at CODEX creation. Original experiment outputs and bytecode were not copied.",
+  "files": [
+    {
+      "path": "src/asv_lidar.py",
+      "sha256": "2f27eadc63511ea2ef2030279ef0cdebbf3893fd5010e0584c65829e60c1fcf0"
+    },
+    {
+      "path": "src/boundary_raycast.py",
+      "sha256": "ad3f2d52212e141332df7350b8bbf8c2d0d2cdb944bb4bab2241bc66f40f6e9e"
+    },
+    {
+      "path": "src/compare.py",
+      "sha256": "4ef8865061997eb3d3e5d725385da29a649e90331c9d34704264dbf957ca8b8c"
+    },
+    {
+      "path": "src/constants.py",
+      "sha256": "b0e124d52af7a12bc86982b35de89035a2733e1d1a6babf84f78a9941194aa0b"
+    },
+    {
+      "path": "src/corridor.py",
+      "sha256": "353ca3bcbbcbf3eee94b950ac6c1a3c51b34373f807076318e81d074997520f2"
+    },
+    {
+      "path": "src/cpa_cri.py",
+      "sha256": "379751c7fc30099d49d24cf373ac3481ef31a624c6a52b4ad38ca98cca627886"
+    },
+    {
+      "path": "src/curriculum.py",
+      "sha256": "4c280d3d11cbe053f1f8a75507e7e069e3a6177098d4ab26dbaaf4d9ff8cf7d6"
+    },
+    {
+      "path": "src/emergency_stop.py",
+      "sha256": "bb170a7b67cb8cf8de486310659849eb0e3f65f2ac1e85003ccefe80d5d70bb5"
+    },
+    {
+      "path": "src/encounter.py",
+      "sha256": "df6fae6070e2320a6b8f71bcc5d50c061b2a4f920743f5a949bce821cac7f889"
+    },
+    {
+      "path": "src/env.py",
+      "sha256": "ef3261b75d45639d23882934036862cd62110ce9d38c1ba29f76dd1772fd98c7"
+    },
+    {
+      "path": "src/features_extractor.py",
+      "sha256": "eb65e96fbafbaead98faa422ec6f8ee2829baea6c088f680d999b05d4a4101b7"
+    },
+    {
+      "path": "src/lidar_pooling.py",
+      "sha256": "081d84bfb128a81b888750acf5320d89589a0f8db61dba0d750061c6a1d1f5f6"
+    },
+    {
+      "path": "src/metrics.py",
+      "sha256": "7a24076f0ea373045d084baa3166702c9d57988e2940a72916e5d7841c98b21c"
+    },
+    {
+      "path": "src/observation.py",
+      "sha256": "89e31f3321c8ee0f9c47c246b82ac450cd4c00319a4f118c83d255db163140e7"
+    },
+    {
+      "path": "src/obstacles.py",
+      "sha256": "7c3a54c809cd2a5089c49a3e2a8f2f5b17e1689544351537d5ef6dc6c6c0fc34"
+    },
+    {
+      "path": "src/path.py",
+      "sha256": "619a8e329d94f62af9bf86d0949f2257cfa88093f4d6cdada10d8675c6c8b628"
+    },
+    {
+      "path": "src/play.py",
+      "sha256": "82637fe3207863766dfe333c392544d227583117cfd032da1cd8162b75bb80ee"
+    },
+    {
+      "path": "src/render.py",
+      "sha256": "d1afc258190ffdace5bba2a9f4c6f6fc0e80e260aec51b3c45ad2deb079319f5"
+    },
+    {
+      "path": "src/rollout.py",
+      "sha256": "e38f34a332ec23da3c8d43de5b007e1698c7f0cd0a617ebefc633693b3701142"
+    },
+    {
+      "path": "src/scenario.py",
+      "sha256": "6363e4880f73402735eafe7b9d176455e8d97bf9ab17b9abdcb0eb63ed124988"
+    },
+    {
+      "path": "src/ship.py",
+      "sha256": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a"
+    },
+    {
+      "path": "src/ship_v2.py",
+      "sha256": "cbcb9b7f48cd8d8b880f81580260f124e846c8034dfdc176d5cc504d7c74c895"
+    },
+    {
+      "path": "src/stopping.py",
+      "sha256": "ac8487dd356db861cd0ec3419efbf17882e80ede56d81f7e6fb029a9cabc8fb8"
+    },
+    {
+      "path": "src/suite.py",
+      "sha256": "fc17932bc71b3af1767eb12dc3f2b83151656606ef5211a3af8ccf714c11cebb"
+    },
+    {
+      "path": "src/targets.py",
+      "sha256": "1c0e11462b2107c2a9069b1388e8de172c5f63ad49a31e696d09a82219878589"
+    },
+    {
+      "path": "src/tracking.py",
+      "sha256": "9929426c0c9aa74bb0846358c0edc73ec5dca817beca755c7fe79d06d4b1d639"
+    },
+    {
+      "path": "src/train.py",
+      "sha256": "a99850593c115c69504c860f8907a4ee10caedbec843d485d0db29198452d4bc"
+    },
+    {
+      "path": "src/train_formulation.py",
+      "sha256": "22d4e1bce54c4b1052ccee65491dcaad64b42fb6ed81b559d1db7f2c95fd7284"
+    },
+    {
+      "path": "src/train_ppo_baseline.py",
+      "sha256": "c2654edf5ef5964ab058eda2472df07203cc9cb3c0c20a7cda4617229dbf89eb"
+    },
+    {
+      "path": "src/train_sac_baseline.py",
+      "sha256": "26b1a3a97a336f67cc1bbe622842676242ad21cf8a2ede5dfd42fe6423c6391a"
+    },
+    {
+      "path": "src/colregs/context.py",
+      "sha256": "f5b9a2f1e3e472981dccb33639936f9b3db1b4dd94669eaa6d2ba9c6eda15957"
+    },
+    {
+      "path": "src/colregs/geometry.py",
+      "sha256": "bcb7fb573035e0b6a253f4972c1644cfccf354a0bb48c40bbe127801621ac32b"
+    },
+    {
+      "path": "src/colregs/__init__.py",
+      "sha256": "1a0821f3514c72917ae387c0f3e02bfdcad400536f2f0222d6de923acfb6feaf"
+    },
+    {
+      "path": "src/reward/audit.py",
+      "sha256": "dfaf209ad4c4e8daf4f8e2a062869ef94d17e6a623012c460d85136519bf69c5"
+    },
+    {
+      "path": "src/reward/config.py",
+      "sha256": "c6bbbc57a3f7113c9bf5f137228e59d556689410692888c994f86b91d7efc931"
+    },
+    {
+      "path": "src/reward/reward.py",
+      "sha256": "bdf33a7e6764b14b934c51225600a134dc6d45c8ba2db8bcd8183e82abb1df92"
+    },
+    {
+      "path": "src/reward/terms.py",
+      "sha256": "d8f095632af46d5100b0d1cd4b89955bbd9fdca008de7a965eb00a32a505bbac"
+    },
+    {
+      "path": "src/reward/__init__.py",
+      "sha256": "1b84ded9b181373a42255f2492a9eda3e12acdc405e53ea35e2c33afc7e61635"
+    },
+    {
+      "path": "tests/test_acceptance.py",
+      "sha256": "9f138e3eca54c90ed156eb9a127106b50d5e6c97bfaf9419b5e993ea972afa35"
+    },
+    {
+      "path": "tests/test_boundary_raycast.py",
+      "sha256": "add747ff845105abdc3345516edea49ab347f9ea3addef676f9ce430e9f79e13"
+    },
+    {
+      "path": "tests/test_cpa_cri.py",
+      "sha256": "036d00865cd227edb1642d41d40b3bc30871fac3fe564d6ab95407f6dfe5f122"
+    },
+    {
+      "path": "tests/test_emergency_stop.py",
+      "sha256": "332e9d240dd8a367febac3a8b5a746c73d303c40847c570cb299fa82c7613361"
+    },
+    {
+      "path": "tests/test_encounter.py",
+      "sha256": "2941d0b2ce3abf006261698de37bd4cff9848cdf667c9a2ebe3ad5cbae659e12"
+    },
+    {
+      "path": "tests/test_env.py",
+      "sha256": "d854f4a2c672f004dd2cba6e58a4902cd021e6d3a412baacd1686c205096f559"
+    },
+    {
+      "path": "tests/test_generator_env.py",
+      "sha256": "be9bc5f1399af5029987fb68643111c422090af2be1bb008a2286b8d87e7dd59"
+    },
+    {
+      "path": "tests/test_lidar_pooling.py",
+      "sha256": "61d588bec917be9e13838106c77f0e4334bbbd87c7ec4fa8ebe917edd732c87b"
+    },
+    {
+      "path": "tests/test_motion_classifier.py",
+      "sha256": "f737f5acb31a27b94e319c2fa769acf7d60bcc21a648d94e02d4aa9dd773cb9c"
+    },
+    {
+      "path": "tests/test_observation.py",
+      "sha256": "bcf92ffe1ac311f24fa1b76684cb159b8864f26511804bb6748c65dfde8caba4"
+    },
+    {
+      "path": "tests/test_panel.py",
+      "sha256": "dda0611b3841aee306bab338168823b56f6cbf0e62f5d261d8ba3eb3dea860ef"
+    },
+    {
+      "path": "tests/test_path_geometry.py",
+      "sha256": "8841792e6277822610d0f6b0aed9af6a1950f0c44adc35c216de3805bc59a799"
+    },
+    {
+      "path": "tests/test_play.py",
+      "sha256": "2eb3cafbf7002257734b9fdba40f29156584d7b6f806fce1e6c74aa9eeca7ca7"
+    },
+    {
+      "path": "tests/test_ported_harness.py",
+      "sha256": "baaf25f8f8433b5d2c81d683541a8b1e3ea65380ae30eb847955af46fab9c8f1"
+    },
+    {
+      "path": "tests/test_reward.py",
+      "sha256": "18d7be4e48106fcebe278a346e7b8b3eed594ea7de03f8054d613d630e987b5e"
+    },
+    {
+      "path": "tests/test_tracking.py",
+      "sha256": "8be26d82ca8b3e59df2191b4884dc73f29e4b8b63de88110ca2877fbe69a0a9e"
+    },
+    {
+      "path": "tests/test_vessel_model.py",
+      "sha256": "61aae39403e6b3592f494bec16b63711409795ead8c0060ad5c1d36859902a9b"
+    },
+    {
+      "path": "bluefin/acceptance.py",
+      "sha256": "dcf367bbc038e817df269cbeaeea598560c4d0f2e1ec1ae8cabca47f26cb0020"
+    },
+    {
+      "path": "bluefin/baseline_v2.py",
+      "sha256": "4e8c2579ba3d3306b6f044de7ee9c75d5f4865de23a0768d443cdd3def688c38"
+    },
+    {
+      "path": "bluefin/build_dataset.py",
+      "sha256": "f86c0663d9ac9a382afa7e3ab33cb138a90a583e8810824dea9308c4ccfa39bd"
+    },
+    {
+      "path": "bluefin/dynamics.py",
+      "sha256": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711"
+    },
+    {
+      "path": "bluefin/figures.py",
+      "sha256": "86ed9fab4ccb2d95454be17bbd953b8bc339c0f00c083744227b963832b351b1"
+    },
+    {
+      "path": "bluefin/fit_final.py",
+      "sha256": "d0c2a1a0eb251a4942a5d06e6be9db5f1e79fc05706ebf049bbb3068a4d4d661"
+    },
+    {
+      "path": "bluefin/fit_model.py",
+      "sha256": "dba8f970a7fb0d2240f524bbae1080f73d979a1c4d9f50524b77af64e5a6e2b0"
+    },
+    {
+      "path": "bluefin/make_model.py",
+      "sha256": "f413cd938187d0fdfee7b8f5af35fdf8796ce81c36f154723e1b54d4e709122b"
+    },
+    {
+      "path": "bluefin/params_final.json",
+      "sha256": "ca431019e3ebb73cd89b366bab2b98f90be8db3202b527bdd180d50348a4eea2"
+    },
+    {
+      "path": "bluefin/ship_model_v3.py",
+      "sha256": "21afbc6605035bd905f16db7f1149fec50fc9b73ca0d4bd0a1e76b06b6c4136c"
+    },
+    {
+      "path": "bluefin/simulate.py",
+      "sha256": "8d9255ee228d3d3311208c1f5480bb9a775ba5fa307e3d90cf1bdaaaac3f7cef"
+    },
+    {
+      "path": "bluefin/validate.py",
+      "sha256": "dc74446cf54ab4a062818d7b709e2969beaa25dfc90fb2877bedaa918007190b"
+    },
+    {
+      "path": "bluefin/validation.json",
+      "sha256": "c1a26521dd7882d156c316ded2a5f59e86ca7da5e715581de6b9342ea4ca1334"
+    },
+    {
+      "path": "bluefin/vessel_sim.py",
+      "sha256": "d48beda5ed951f2653eb6c1a3b95605ac04496876530e0ded79f2c3c8bb36ba2"
+    },
+    {
+      "path": "bluefin/refit_v4/refit_v4.py",
+      "sha256": "d0125395bf4eb605a31b5fe64bd0543dd1711fdefbf4313a5fa6f36beafc6974"
+    },
+    {
+      "path": "bluefin/refit_v4/out/boot.json",
+      "sha256": "7dbc4a97ffd03ef554c436bf992c4e0f88a36c4fbab048030ddd4661235b8095"
+    },
+    {
+      "path": "bluefin/refit_v4/out/params_v4.json",
+      "sha256": "f59e52005d1da36c72e1fd48e30a1b21775d8ed843a30fc5d8fc689de7df1fd2"
+    },
+    {
+      "path": "bluefin/refit_v4/out/starts.json",
+      "sha256": "c3c899307172aa243d9b9449ce0fb1a7555d4eed4a5b6889fb899dd43490b997"
+    },
+    {
+      "path": "bluefin/refit_v4/out/trims.json",
+      "sha256": "65f4f5e2c05fe61316446a87d7a72fb6f843d1244b7ec7e22442639f20013d49"
+    },
+    {
+      "path": "bluefin/refit_v4/out/validation_v4.json",
+      "sha256": "df9705cea2ab44ae68449060254c7f6e3634ad884dd365ddb09669e60ac88357"
+    },
+    {
+      "path": "bluefin/refit_v4/out_b/boot.json",
+      "sha256": "b012987d25f605472c2f67bf966a46322c02533a158ce1bb6fa732c52b4ce3ba"
+    },
+    {
+      "path": "bluefin/refit_v4/out_b/params_v4.json",
+      "sha256": "f59bc080e230eded3020127646e7b5689c1f82888ea4a62d3db1d8f50f44a535"
+    },
+    {
+      "path": "bluefin/refit_v4/out_b/starts.json",
+      "sha256": "6acb4d6acee8bb0e3b349ff7f1ae9b9743dbcafff4aa07805147a095c629908e"
+    },
+    {
+      "path": "bluefin/refit_v4/out_b/trims.json",
+      "sha256": "65f4f5e2c05fe61316446a87d7a72fb6f843d1244b7ec7e22442639f20013d49"
+    },
+    {
+      "path": "bluefin/refit_v4/out_b/validation_v4.json",
+      "sha256": "dd20604ff14f57c63cfb582ab86f98c47b0a379ce6d68840c249a434b953970e"
+    },
+    {
+      "path": "tools/scale_audit.py",
+      "sha256": "75d16ee25692ebcb149dfd8775de23f230647907bdb332b592b7b36710d81244"
+    },
+    {
+      "path": "tools/diagnostics/a18_a19_verify.py",
+      "sha256": "0e50c9165b234b03bc87cccb18903575f72a73afe5e5fc618b80d420051513ca"
+    },
+    {
+      "path": "tools/diagnostics/a19_residual.py",
+      "sha256": "8f9de3b9a72ac17e7330d8827a94a8182bbee55ab6d53b7ebe3121ec9a9dc2ee"
+    },
+    {
+      "path": "tools/diagnostics/c14_clamp_and_policy.py",
+      "sha256": "64542e4f6905c4c9e87fc69eb4ed0bb4032ed7fc829e289ed14ba5a26ec9abff"
+    },
+    {
+      "path": "tools/diagnostics/c14_common.py",
+      "sha256": "a6bd92d912719fbbb55330d25da152d71fc51d968865d97ed7b4c2e2b28b49e9"
+    },
+    {
+      "path": "tools/diagnostics/c14_estop_counterfactual.py",
+      "sha256": "d0cf2952a54b78337a8832a277bded10b708d644c5d9983d5cdb0fced5622404"
+    },
+    {
+      "path": "tools/diagnostics/c14_pre_cpa.py",
+      "sha256": "bad202144e3cb289a9c754dc9904debb5b55bc8787a9dc11e47345b5f594669d"
+    },
+    {
+      "path": "tools/diagnostics/c14_turn_sense.py",
+      "sha256": "0e4e1df9a6b5262c67b91c84068c05f59a45162b38198d2848824f66cf25bacf"
+    },
+    {
+      "path": "tools/diagnostics/c15_track_error.py",
+      "sha256": "c684486ef726dcb0ef737aa3e62256130b042887928bcecff2dc783d1481eb2c"
+    },
+    {
+      "path": "tools/diagnostics/clamp_frequency.py",
+      "sha256": "587b1ef45a9bf7a10614cb2328f848f1454966b873d3015f7f7174268c23021a"
+    },
+    {
+      "path": "tools/diagnostics/crossing_feasibility.py",
+      "sha256": "65171adc8e7bacb4a463f1e4873b4d7416ddbb50333c5cdcca6d70c54fab4342"
+    },
+    {
+      "path": "tools/diagnostics/f49_goal_geometry.py",
+      "sha256": "975836951889535dbc8369db1c137c9a63a45a0c30d9328845ea080e6f66e028"
+    },
+    {
+      "path": "tools/diagnostics/run1_replay.py",
+      "sha256": "c37ec7bc0035b635394b2c25d40fde46a2a54cac8fa6c6b2c1c9840d5c9b95eb"
+    },
+    {
+      "path": "tools/diagnostics/run2_geometry_join.py",
+      "sha256": "3b243ee67965d550521262b30b9ca149ddc5c6c5d7f587943e124c432871a41b"
+    },
+    {
+      "path": "tools/diagnostics/run3_vs_run2.py",
+      "sha256": "7c26dd7b543a9de8be1c98f71b5a85cf2b181df51e5dfe69fc35e94469a85ba2"
+    },
+    {
+      "path": "tools/tiers/common.py",
+      "sha256": "2004d0f00c4d78dcdd37ae4bc9330912c0f48925e14e9485b4770d33fcee5181"
+    },
+    {
+      "path": "tools/tiers/tier0_scripted.py",
+      "sha256": "d00531d751a96abd69a8e055bb21b940749e937e09e210bb2d5c4c7fcd1f48fb"
+    },
+    {
+      "path": "tools/tiers/tier1_replay.py",
+      "sha256": "626659330aef0a72fefa9af96ddf9f8c8a707cd99d28c716a69199b69d4d259c"
+    }
+  ]
+}

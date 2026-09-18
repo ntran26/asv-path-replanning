@@ -1,0 +1,15 @@
+R-2 candidate frames (give-way, engaged, alteration inadmissible), run 5 final, supervisor off
+
+== all candidate frames
+          frames  episodes  already_clear  slowdown_clears  stop_clears
+class                                                                  
+crossing      16         4            0.0             0.06         0.38
+head_on       69         7            0.0             0.00         0.01
+
+== frames not already clear (DCPA < 1.7625000000000002 m)
+          frames  slowdown_clears  ...  dcpa_if_slowed  dcpa_if_stopped
+class                              ...                                 
+crossing      16             0.06  ...            0.66             1.44
+head_on       69             0.00  ...            0.65             0.70
+
+[2 rows x 6 columns]

@@ -47,7 +47,7 @@ import corridor as corr
 import cpa_cri as cc
 import encounter as enc
 import targets as tgt
-from ship import HULL_MARGIN, VESSEL_LENGTH, VESSEL_WIDTH
+from ship import HULL_MARGIN, VESSEL_LENGTH, VESSEL_WIDTH, ShipModel
 
 
 @dataclass
@@ -202,6 +202,10 @@ class ScenarioGenerator:
         rng = np.random.default_rng(int(seed))
         stage = cfg.CURRICULUM_STAGES[self.stage]
         cls = encounter_class or self._sample_class(rng, stage)
+        # A22: drawn once per sample, not per attempt -- per attempt, rejection
+        # would shrink the realised unescapable share from 20 % to about 8 %.
+        self._want_unescapable = (cls == "crossing"
+                                  and bool(rng.uniform() < cfg.CROSSING_UNESCAPABLE_FRAC))
 
         # **The corridor is sampled once.**  04a §3.1 puts the geometry at step 2
         # and the target kinematics at step 3, so a rejected draw rejects the
@@ -302,6 +306,13 @@ class ScenarioGenerator:
             self.rejections.record(cls, width, "containment")
             return None
 
+        escapable = None
+        if cls == "crossing":
+            escapable = crossing_escape_feasible(own, own_heading, solved, channel)
+            if escapable == bool(getattr(self, "_want_unescapable", False)):
+                self.rejections.record(cls, width, "escape_label_mismatch")
+                return None
+
         scenario.target_spawn = (solved["x"], solved["y"])
         scenario.target_heading = solved["heading"]
         scenario.target_speed = solved["speed"]
@@ -314,6 +325,8 @@ class ScenarioGenerator:
         # A15's label.  An attribute, like `channel`, so the record hash is unchanged.
         scenario.dcpa_below_floor = solved.get("below_floor")
         scenario.dcpa_floor_m = solved.get("floor")
+        # A22's label: can a lawful escape clear this crossing?  None otherwise.
+        scenario.crossing_escapable = escapable
         scenario.n_obstacles = self._sample_obstacle_count(rng)
         return scenario
 
@@ -572,6 +585,81 @@ def _convex_overlap(poly_a, poly_b) -> bool:
             if max(a) < min(b) or max(b) < min(a):
                 return False
     return True
+
+
+def crossing_escape_feasible(own, own_heading: float, solved: dict, channel) -> bool:
+    """A22: does either lawful escape clear this crossing in the own ship's physics?
+
+    The own ship starts where the environment starts it -- on the path, at
+    `U_NOM`, nominal hull -- holds course for `CROSSING_ESCAPE_DELAY_S`, then
+    either coasts to a stop or makes a committed `CROSSING_ESCAPE_TURN_DEG`
+    alteration in the A17 compliant sense (starboard for a target from
+    starboard, port from port).  The target is constant-velocity and
+    unconfined, as a crossing target is.  An escape counts only if the hulls
+    never touch and the own hull stays inside the corridor, up to
+    `CROSSING_ESCAPE_TAIL_S` past the drawn TCPA.
+    """
+    import boundary_raycast as br
+    full = channel.polygon()
+    # The wall test runs every physics step; a straight corridor's outline at
+    # every 8th station (0.4 m) is exact to well under a centimetre.
+    poly = list(full[::8]) + ([full[-1]] if (len(full) - 1) % 8 else [])
+    sense = -1.0 if float(solved["ct"]) < 180.0 else +1.0
+    horizon = max(float(solved.get("tcpa", 0.0)), 0.0) + float(cfg.CROSSING_ESCAPE_TAIL_S)
+    dt = float(cfg.CROSSING_ESCAPE_DT_S)
+    half_l = 0.5 * (VESSEL_LENGTH + 2.0 * HULL_MARGIN)
+    half_w = 0.5 * (VESSEL_WIDTH + 2.0 * HULL_MARGIN)
+    t_heading = float(solved["heading"])
+    t_vel = float(solved["speed"]) * _unit(t_heading)
+
+    def own_hull(x, y, heading):
+        a = math.radians(heading)
+        s, c = math.sin(a), math.cos(a)
+        return [(x + f * s - l * c, y + f * c + l * s)
+                for f, l in ((half_l, half_w), (half_l, -half_w), (-half_l, -half_w), (-half_l, half_w))]
+
+    for response in ("stop", "turn"):
+        model = ShipModel()
+        model._s[3, 0] = math.radians(float(own_heading))
+        model._s[0, 0] = float(cfg.U_NOM)
+        x, y, heading = float(own[0]), float(own[1]), float(own_heading)
+        clear = True
+        per_decision = max(1, int(round(float(cfg.UPDATE_RATE) / dt)))
+        rpm, rudder, last_range = float(cfg.CRUISE_RPM), 0.0, float("inf")
+        for i in range(int(math.ceil(horizon / dt))):
+            t = (i + 1) * dt
+            if i % per_decision == 0:
+                # Commands at the environment's decision rate, held for the step.
+                responding = t > float(cfg.CROSSING_ESCAPE_DELAY_S)
+                want = float(own_heading)
+                rpm = float(cfg.CRUISE_RPM)
+                if responding and response == "turn":
+                    want = float(own_heading) + sense * float(cfg.CROSSING_ESCAPE_TURN_DEG)
+                if responding and response == "stop":
+                    rpm = float(cfg.CROSSING_ESCAPE_STOP_RPM)
+                error = ((want - heading) + 180.0) % 360.0 - 180.0
+                rudder = float(np.clip(error / 20.0, -1.0, 1.0)) * 100.0
+            dx, dy, heading, _ = model.update(rpm, rudder, dt)
+            x += dx
+            y += dy
+            hull = own_hull(x, y, heading)
+            tx = float(solved["x"]) + float(t_vel[0]) * t
+            ty = float(solved["y"]) + float(t_vel[1]) * t
+            if _convex_overlap(hull, tgt.hull_polygon(tx, ty, t_heading)):
+                clear = False
+                break
+            rng_now = math.hypot(tx - x, ty - y)
+            if t > float(solved.get("tcpa", 0.0)) and rng_now > 3.0 and rng_now > last_range:
+                break                        # passed and opening: nothing left to hit
+            last_range = rng_now
+            xs = np.array([p[0] for p in hull])
+            ys = np.array([p[1] for p in hull])
+            if not np.all(br.points_in_polygon(xs, ys, poly)):
+                clear = False
+                break
+        if clear:
+            return True
+    return False
 
 
 def _sample_ct(rng, cls: str) -> float:

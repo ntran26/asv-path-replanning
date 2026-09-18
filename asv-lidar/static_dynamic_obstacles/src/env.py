@@ -1,34 +1,15 @@
 """Gymnasium environment: path following with static obstacles and one target vessel.
 
-**Revision 2** — two-vessel encounters.  One dynamic target, `N_MAX_TARGETS`
-configurable so a multi-vessel extension costs a retrain, not a redesign (S1).
-
-Scope of this file in task 01
------------------------------
-Perception and observation.  Specifically:
-
-* **The reward is live** (02b T4).  Eight dense terms plus terminals, in
-  `reward/`, redesigned rather than patched per D10 so no Paper 2 shaping term
-  is carried across.  This file assembles the `RewardState` -- it is the only
-  object holding both the simulated truth and the map -- and owns none of the
-  reward's design.
-* **Target motion is constant-velocity and the spawn is a placeholder.**
-  Constant velocity is decision D1 for training; reactive and non-compliant
-  targets are evaluation-only and belong to 03.  `_sample_target` places a
-  single head-on target beyond the sensor horizon purely so the perception path
-  is exercised in situ -- 03 owns the real encounter geometry.
-* **The corridor is a straight inset rectangle.**  03 owns variable width along
-  the path, bends, and deliberately off-centre reference paths.  Until those
-  land the boundary branch is an affine function of cross-track error and must
-  not be ablated (01 §3.3).
-
-What is fully built here is the perception path:
+CODEX revision 3 uses one synchronized perceived state per decision and exposes
+the encounter latch and previous executed action to the policy. Scenarios may
+be supplied explicitly or generated with variable corridor geometry. The
+training wrapper controls the empty/static/dynamic/combined scene mixture.
 
     raycast (obstacles only, aft mask, dropout, 1 m dead zone)
         -> gate against the boundary polygon
         -> cluster -> track -> Kalman -> static/dynamic split
         -> CPA/CRI -> encounter class (shared with 02)
-        -> five-branch Dict observation
+        -> six-branch Dict observation (70 values for one target)
 
 Collision and termination stay geometric and exact, as in Paper 2.  What the
 policy *sees* and what *counts* as a collision are deliberately separate: the
@@ -98,6 +79,7 @@ class ASVLidarEnv(gym.Env):
                  channel: Optional[object] = None,
                  facility_walls: bool = cfg.SIMULATE_FACILITY_WALLS,
                  emergency_stop: bool = cfg.EMERGENCY_STOP_ENABLED,
+                 low_speed_start_frac: float = 0.0,
                  vessel_randomisation: Optional[float] = cfg.VESSEL_RANDOMISATION_SCALE,
                  command_rate_limit: bool = cfg.RUDDER_COMMAND_LIMIT,
                  pose_stale_prob: float = cfg.POSE_STALE_PROB,
@@ -151,6 +133,12 @@ class ASVLidarEnv(gym.Env):
         # so switching it on or off does not reshuffle any other draw.
         self.pose_stale_prob = float(pose_stale_prob)
         self._stale_rng = np.random.default_rng()
+        # F68: a fraction of generated episodes starts slow or at rest, so a
+        # policy resuming after a supervisor stop is in distribution.  Its own
+        # stream, like staleness, so it reshuffles no other draw.
+        self.low_speed_start_frac = float(low_speed_start_frac)
+        self._start_rng = np.random.default_rng()
+        self.start_speed = float(cfg.U_NOM)
 
         # C1: episodes from 04a's scenario generator.  `None` keeps the head-on
         # placeholder `_sample_target`, which the older tests are written against.
@@ -181,7 +169,7 @@ class ASVLidarEnv(gym.Env):
 
         self.forced_num_obs: Optional[int] = None
         self.forced_targets: Optional[List[TargetShip]] = None
-        self.observation_space = observation_space()
+        self.observation_space = observation_space(self.n_max_targets)
         self.action_space = gym.spaces.Box(-1.0, 1.0, shape=(2,), dtype=np.float32)
 
         self.renderer = None
@@ -251,6 +239,9 @@ class ASVLidarEnv(gym.Env):
         self._boundary_hold: Optional[np.ndarray] = None
         self._obs_hold: Optional[Tuple[float, ...]] = None
         self._obs_fresh: Optional[Tuple[float, ...]] = None
+        self._ego_hold: Optional[Tuple[float, float, float]] = None
+        self._obs_cache: Optional[Dict[str, np.ndarray]] = None
+        self._executed_action = np.zeros(2, dtype=np.float32)
         self._tracker_dt = 0.0
         self._estop_started = False
         self.scenario = None
@@ -277,8 +268,7 @@ class ASVLidarEnv(gym.Env):
         self._clearances = (float("inf"), float("inf"))
         self.episode_seed: Optional[int] = None
         self.target_spawn_regime = "none"
-        self.clip_steps = {branch: 0 for branch in
-                           ("lidar", "boundary", "ego", "path", "target")}
+        self.clip_steps = {branch: 0 for branch in self.observation_space.spaces}
         self.dim_clip_steps: Dict[str, np.ndarray] = {}
         self.branch_extremes: Dict[str, Tuple[float, float]] = {}
         self.obs_steps = 0
@@ -290,6 +280,7 @@ class ASVLidarEnv(gym.Env):
         self.lookahead_x = self.lookahead_y = 0.0
 
         self.sector_closeness = np.zeros(cfg.LIDAR_SECTORS, dtype=np.float32)
+        self.gated_ranges = np.full(cfg.LIDAR_BEAMS, cfg.LIDAR_RANGE)
         self.boundary_closeness = np.zeros(cfg.BOUNDARY_RAYS, dtype=np.float32)
         self.tracks: List[trk.Track] = []
         self.true_border_clearance = min(self.corridor_width, self.map_height)
@@ -311,6 +302,7 @@ class ASVLidarEnv(gym.Env):
             if self._pose_noise is not None:
                 self._pose_noise.rng = self._rng
             self._stale_rng = np.random.default_rng(int(seed) + 7_919)
+            self._start_rng = np.random.default_rng(int(seed) + 15_485_863)
 
         self._clear_state()
         if self.vessel_randomisation is not None:
@@ -344,8 +336,17 @@ class ASVLidarEnv(gym.Env):
             # would delay the own ship by its acceleration and move every CPA.
             self.asv_h = float(self.scenario.own_heading) % 360.0
             self.model._s[3, 0] = math.radians(self.asv_h)
-            self.model._s[0, 0] = float(cfg.U_NOM)
-            self.u_body = float(cfg.U_NOM)
+            start_speed = float(cfg.U_NOM)
+            if self.low_speed_start_frac > 0.0 and self._start_rng.uniform() < self.low_speed_start_frac:
+                start_speed = (0.0 if self._start_rng.uniform() < cfg.LOW_SPEED_START_ZERO_SHARE
+                               else float(self._start_rng.uniform(0.0, 0.5 * cfg.U_NOM)))
+            self.start_speed = start_speed
+            self.model._s[0, 0] = start_speed
+            self.u_body = start_speed
+        if "obstacles" in options:
+            self.obstacles = [[tuple(map(float, p)) for p in poly]
+                              for poly in options["obstacles"]]
+        self._apply_initial_conditions(options)
         self.asv_path = [(self.asv_x, self.asv_y)]
         self.distance_to_goal = float(np.hypot(self.asv_x - self.goal_x,
                                                self.asv_y - self.goal_y))
@@ -363,6 +364,37 @@ class ASVLidarEnv(gym.Env):
         self._obs_hold = self._obs_fresh
         self._record_obs_health(obs)
         return obs, {}
+
+    def _apply_initial_conditions(self, options: dict) -> None:
+        """Explicit, reproducible starts for recovery training and replay.
+
+        Generated target encounters retain their backward-solved start unless
+        the caller requests a perturbation. Invalid requested recovery poses
+        raise instead of silently becoming a different training case.
+        """
+        if "initial_heading_deg" in options:
+            self.asv_h = float(options["initial_heading_deg"]) % 360.0
+        delta = float(options.get("recovery_heading_deg",
+                                  options.get("initial_heading_error_deg", 0.0)))
+        half_width = 0.5 * self.channel.width_at_s(self.path_start_s)
+        lateral = float(options.get("initial_lateral_offset_m",
+                                    float(options.get("recovery_fraction", 0.0)) * half_width))
+        tangent = self.path.tangent(0)
+        self.asv_x += lateral * float(tangent[1])
+        self.asv_y -= lateral * float(tangent[0])
+        self.asv_h = (self.asv_h + delta) % 360.0
+        self.model._s[3, 0] = math.radians(self.asv_h)
+        if "initial_speed" in options:
+            speed = float(options["initial_speed"])
+            if not np.isfinite(speed) or speed < 0.0:
+                raise ValueError("initial_speed must be finite and nonnegative")
+            self.start_speed = self.u_body = speed
+            self.model._s[0, 0] = speed
+        if not np.isfinite([self.asv_x, self.asv_y, self.asv_h]).all():
+            raise ValueError("initial pose must be finite")
+        if lateral or delta or "initial_heading_deg" in options:
+            if self.collision_kind(self.hull_polygon()) is not None:
+                raise ValueError("requested recovery start intersects a boundary or obstacle")
 
     def _sample_layout(self) -> None:
         if self.resample_channel:
@@ -459,9 +491,17 @@ class ASVLidarEnv(gym.Env):
             if self._generator is None or self._generator.stage != stage:
                 self._generator = scn.ScenarioGenerator(
                     stage=stage, seed_namespace=self.scenario_namespace)
+            # C16: the class is drawn once, then retried on cap-out.  Redrawing it
+            # with each seed let hard classes lose their share: null caps out on
+            # about half its draws and trained at 4.3 % against an intended 11 %.
+            stage_spec = cfg.CURRICULUM_STAGES[stage]
+            classes = stage_spec["classes"]
+            weights = np.array([cfg.CLASS_SAMPLE_WEIGHTS[c] for c in classes], dtype=float)
+            cls = str(self._rng.choice(classes, p=weights / weights.sum()))
             for _ in range(20):
                 index = int(self._rng.integers(0, 10 ** 9))
-                built = self._generator.sample(scn.seed_for(self.scenario_namespace, index))
+                built = self._generator.sample(scn.seed_for(self.scenario_namespace, index),
+                                               encounter_class=cls)
                 if built is not None:
                     break
             if built is None:
@@ -596,19 +636,14 @@ class ASVLidarEnv(gym.Env):
     # Perception
     # ------------------------------------------------------------------
     def estimated_pose(self) -> Tuple[float, float, float]:
-        """The pose the localiser would report.
-
-        One estimate feeds both the boundary raycast and the tracker, which is
-        the field arrangement: they share rf2o's output and therefore share its
-        drift.  Using ground truth for the tracker and a noisy pose for the
-        boundary would understate the coupling 01 §4 step 3 warns about.
-        """
-        if self._pose_noise is None:
-            return self.asv_x, self.asv_y, self.asv_h
-        return self._pose_noise.perturb(self.asv_x, self.asv_y, self.asv_h)
+        """The last received pose; reading it never draws more sensor noise."""
+        if self._pose_hold is None:
+            raise RuntimeError("reset the environment before reading its estimated pose")
+        return self._pose_hold
 
     def _perceive(self) -> None:
         """Raycast -> gate -> pool -> cluster -> track."""
+        self._obs_cache = None
         # 03a §1.2.  The facility walls are **returned by the sensor and then
         # gated**, which is the whole point: until they existed the gate had
         # nothing to remove in simulation and was load-bearing only in the
@@ -626,14 +661,18 @@ class ASVLidarEnv(gym.Env):
         # therefore repeats, and the tracker is not fed: the bridge can tell,
         # because the pose timestamp has not moved, and lifting a fresh scan with
         # an old pose would move every static object by a step's travel.
-        fresh_pose = self.estimated_pose()
         self.pose_stale = bool(self._has_frame and self.pose_stale_prob > 0.0
                                and self._stale_rng.random() < self.pose_stale_prob)
         if self.pose_stale:
             self.stale_frames += 1
-        est_x, est_y, est_h = (self._pose_hold if self.pose_stale and self._pose_hold
-                               else fresh_pose)
-        self._pose_hold = fresh_pose
+        else:
+            true_pose = (self.asv_x, self.asv_y, self.asv_h)
+            self._pose_hold = (self._pose_noise.perturb(*true_pose)
+                               if self._pose_noise is not None else true_pose)
+            self._ego_hold = self._sample_ego()
+        # Consecutive stale frames hold the last estimate actually received,
+        # not an unavailable fresh estimate from the preceding simulation step.
+        est_x, est_y, est_h = self.estimated_pose()
         self._has_frame = True
 
         # Returns are lifted from the **sensor**, which the raycast casts from
@@ -653,6 +692,7 @@ class ASVLidarEnv(gym.Env):
         # for tracking and an asset for localisation.
         gated = br.gate_beams(self.lidar.ranges, self.lidar.bearings,
                               sensor_x, sensor_y, est_h, self.boundary_polygon)
+        self.gated_ranges = gated.copy()
 
         # **Pool from the gated scan, not the raw one.**  The method docstring
         # above has always said "raycast -> gate -> pool -> cluster"; the code
@@ -661,13 +701,9 @@ class ASVLidarEnv(gym.Env):
         # does not: 624 of 720 beams reached the obstacle branch.
         self.lidar.repool(gated)
         self.sector_closeness = self.lidar.sector_closeness
-        boundary = br.boundary_scan(
-            self.asv_x, self.asv_y, self.asv_h, self.boundary_polygon,
-            pose_noise=self._pose_noise,
-        )
-        self.boundary_closeness = (self._boundary_hold if self.pose_stale
-                                   and self._boundary_hold is not None else boundary)
-        self._boundary_hold = boundary
+        self.boundary_closeness = br.boundary_scan(
+            est_x, est_y, est_h, self.boundary_polygon)
+        self._boundary_hold = self.boundary_closeness
 
         if self.pose_stale:
             self._tracker_dt += cfg.UPDATE_RATE
@@ -706,16 +742,30 @@ class ASVLidarEnv(gym.Env):
                 self.acquisition_range = gap
 
     def _get_obs(self) -> Dict[str, np.ndarray]:
+        if self._obs_cache is not None:
+            return {key: value.copy() for key, value in self._obs_cache.items()}
         u, v, r = self._measured_ego()
-        self._obs_fresh = (u, v, r, self.cross_track_error, self.course_error,
-                           self.lookahead_course_error)
-        # A stale frame's ego and path features are the previous frame's: in the
-        # bridge both are computed from the latched pose line.
-        if self.pose_stale and self._obs_hold is not None:
-            u, v, r, cte, chi, chi_la = self._obs_hold
-        else:
-            cte, chi, chi_la = self._obs_fresh[3:]
-        return self.observer.build(
+        x, y, heading = self.estimated_pose()
+        a = math.radians(heading)
+        velocity = np.array([u * math.sin(a) + v * math.cos(a),
+                             u * math.cos(a) - v * math.sin(a)])
+        # Course is not observable at rest. Use heading below the estimate's
+        # noise floor instead of turning near-zero velocity jitter into 180 deg.
+        course = (math.degrees(math.atan2(velocity[0], velocity[1]))
+                  if math.hypot(u, v) > max(0.10, 2.0 * self.ego_speed_noise)
+                  else heading)
+        perceived = self.path.project(x, y, course)
+        cte, chi, chi_la = (perceived.cross_track_error, perceived.course_error,
+                            perceived.lookahead_course_error)
+        self._obs_fresh = (u, v, r, cte, chi, chi_la)
+        self.perceived_path_state = perceived
+        self.perceived_velocity = velocity
+        # The surge the controller perceived in this observation: what the stop
+        # latch reads next step (F68).  It used to draw its own noisy estimate
+        # from the shared stream, so switching the supervisor on shifted every
+        # later noise draw and an on/off comparison changed more than the stop.
+        self._observed_surge = float(u)
+        observation = self.observer.build(
             sector_closeness=self.sector_closeness,
             boundary_scan=self.boundary_closeness,
             u=u, v=v, yaw_rate_degps=r,
@@ -723,20 +773,31 @@ class ASVLidarEnv(gym.Env):
             course_error_deg=chi,
             lookahead_course_error_deg=chi_la,
             tracks=self.tracks,
-            p_os=(self.asv_x, self.asv_y),
-            v_os=self._own_velocity(),
-            heading_os_deg=self.asv_h,
+            p_os=(x, y),
+            v_os=velocity,
+            heading_os_deg=heading,
             # The map side of `R-1`.  This environment is the only object
             # holding both the perception output and the boundary polygon, so
             # the admissibility predicate is fed from here rather than
             # rediscovered inside the observation builder.
-            r_path=self.r_path,
+            r_path=self.path.yaw_rate_for_tracking(perceived.closest_idx, u),
             path=self.path,
             boundary_polygon=self.boundary_polygon,
-            s_along=self.s_along,
-            true_targets=self.targets,
+            s_along=perceived.s_along,
+            true_targets=(),
             open_water=self.open_water,
+            previous_action=self._executed_action,
+            cross_track_scale=0.5 * self.channel.width_at_s(
+                perceived.s_along + self.path_start_s),
         )
+        # Diagnostic truth uses a wholly true reference frame. It never enters
+        # the policy branches or the context's perceived CPA/admissibility.
+        self.observer.contexts.attach_truth(
+            tracks=self.tracks, p_os=(self.asv_x, self.asv_y),
+            v_os=self._own_velocity(), heading_os_deg=self.asv_h,
+            true_targets=self.targets, path=self.path, s_along=self.s_along)
+        self._obs_cache = observation
+        return {key: value.copy() for key, value in observation.items()}
 
     @property
     def encounter_contexts(self):
@@ -744,16 +805,13 @@ class ASVLidarEnv(gym.Env):
         return self.observer.encounter_contexts
 
     def _measured_ego(self) -> Tuple[float, float, float]:
-        """u, v and r as the vessel would actually measure them.
+        """Last synchronized ego estimate, also read by the stop latch."""
+        if self._ego_hold is None:
+            raise RuntimeError("reset the environment before reading its ego estimate")
+        return self._ego_hold
 
-        **An IMU is confirmed** (05 §4.7), which changes this gap rather than
-        closing it.  `r` comes from the gyro directly, so its residual is the
-        sensor noise floor rather than pose-differentiation error -- and the
-        yaw-rate criterion 02 §4.2 depends on becomes directly measurable in the
-        field instead of inferred.  `u` and `v` are largely rescued by the
-        accelerometer but are still fused rather than measured, so a residual
-        remains.  Both magnitudes are nominal-zero until 05 characterises them.
-        """
+    def _sample_ego(self) -> Tuple[float, float, float]:
+        """Draw once when a fresh telemetry frame arrives."""
         u, v, r = self.u_body, self.v_body, self.asv_w
         if self.ego_speed_noise > 0.0:
             u += float(self._rng.normal(0.0, self.ego_speed_noise))
@@ -834,6 +892,13 @@ class ASVLidarEnv(gym.Env):
     def _reached_goal(self) -> bool:
         if self.distance_to_goal <= cfg.GOAL_RADIUS:
             return True
+        # Signed CTE is zero on the exact extension of a straight path, even
+        # beyond its endpoint. Do not let that degenerate sign report success
+        # after overshooting the goal capture region.
+        delta = np.array([self.asv_x, self.asv_y]) - self.path.points[-1]
+        if (float(delta @ self.path.tangent(len(self.path) - 1)) > 0.0
+                and float(np.linalg.norm(delta)) > cfg.GOAL_CTE_RADIUS):
+            return False
         remaining = self.path.length - float(self.path.s[self.closest_idx])
         return remaining <= cfg.GOAL_ALONG_DIST and abs(self.cross_track_error) <= cfg.GOAL_CTE_RADIUS
 
@@ -864,6 +929,10 @@ class ASVLidarEnv(gym.Env):
         else:
             self.propulsion_s2 = float(override)
             self.rpm = estop_mod.s2_to_rpm(override)
+        self._executed_action = np.array([
+            np.clip(self.rudder / 100.0, -1.0, 1.0),
+            np.clip((self.rpm - cfg.CRUISE_RPM) / max(cfg.RPM_DELTA, 1e-6), -1.0, 1.0),
+        ], dtype=np.float32)
 
         x_before, y_before = self.asv_x, self.asv_y
 
@@ -956,7 +1025,7 @@ class ASVLidarEnv(gym.Env):
             return None
 
         contexts = list(self.observer.encounter_contexts.values())
-        speed = float(self._measured_ego()[0])
+        speed = float(getattr(self, "_observed_surge", self.u_body))
         was_braking = self.estop.state == estop_mod.BRAKING
 
         reason, self._estop_request = self._estop_request, None
@@ -999,6 +1068,8 @@ class ASVLidarEnv(gym.Env):
             # never be taken in mixed units.
             r=float(math.radians(self.asv_w)),
             heading_deg=float(self.asv_h),
+            perceived_heading_deg=float(self.estimated_pose()[2]),
+            perceived_u=float(self._measured_ego()[0]),
             e_y=float(self.cross_track_error),
             chi=float(math.radians(self.course_error)),
             chi_la=float(math.radians(self.lookahead_course_error)),
@@ -1222,6 +1293,7 @@ class ASVLidarEnv(gym.Env):
             "scenario_class": (self.scenario.encounter_class if self.scenario is not None
                                else "placeholder"),
             "num_obs": int(len(self.obstacles)),
+            "start_speed": float(self.start_speed),
         }
         info.update(breakdown.as_info())
         # Built once and held, because `render.py` reads it off the environment
@@ -1371,7 +1443,7 @@ class ASVLidarEnv(gym.Env):
             if counts is not None and counts.size:
                 index = int(np.argmax(counts))
                 worst_frac = float(counts[index]) / steps
-                names = branch_feature_names(branch)
+                names = branch_feature_names(branch, n_slots=self.n_max_targets)
                 worst = names[index] if index < len(names) else f"dim{index}"
             rows.append({
                 "name": branch,
@@ -1549,11 +1621,16 @@ def _normalised_indices(branch: str, size: int):
     pairs, the class one-hot and the presence bit: they reach their bounds
     because of what they are, not because information was lost.
     """
+    if branch == "context":
+        from observation import CONTEXT_FEATURES, NORMALISED_CONTEXT_INDICES
+        return np.array([slot * CONTEXT_FEATURES + i
+                         for slot in range((size - 2) // CONTEXT_FEATURES)
+                         for i in NORMALISED_CONTEXT_INDICES], dtype=np.int64)
     if branch != "target":
         return np.arange(size)
     from observation import NORMALISED_SLOT_INDICES
     return np.array([slot * cfg.TARGET_FEATURES + i
-                     for slot in range(cfg.N_MAX_TARGETS)
+                     for slot in range(size // cfg.TARGET_FEATURES)
                      for i in NORMALISED_SLOT_INDICES], dtype=np.int64)
 
 

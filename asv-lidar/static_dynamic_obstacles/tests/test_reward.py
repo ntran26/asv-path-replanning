@@ -362,6 +362,18 @@ def test_5d_a_slowdown_that_cannot_clear_is_not_the_paid_8e_answer():
     assert T.r8_parts(turned, head_on, CFG)["a_t"] > T.r8_parts(turned, crossing, CFG)["a_t"]
 
 
+def test_r2_reads_the_configured_slowing_test(monkeypatch):
+    """F70.  R-2 reads the policy's coast (F68) or the braking-path stop (A23),
+    per `R2_SLOWDOWN_TEST`; the two disagree for most crossings at cruise."""
+    from types import SimpleNamespace
+    ctx = SimpleNamespace(engaged=True, cls=enc.CROSSING, a_port=True, gives_way=True,
+                          turn_admissible=False, slowdown_clears=False, stop_clears=True)
+    monkeypatch.setattr(cfg, "R2_SLOWDOWN_TEST", "coast")
+    assert T.effective_speed_reference(state_for(), {1: ctx}, CFG)["rule"] != "R-2"
+    monkeypatch.setattr(cfg, "R2_SLOWDOWN_TEST", "stop")
+    assert T.effective_speed_reference(state_for(), {1: ctx}, CFG)["rule"] == "R-2"
+
+
 def test_5e_an_engaged_encounter_keeps_its_class_and_sense():
     """A20.  COLREGs decides the situation when risk first develops.  A class
     the perceived geometry drifts into at close range -- here a crossing from
@@ -811,8 +823,9 @@ def test_a_cleared_encounter_returns_to_idle():
                           v_os=(0.0, cfg.U_REF), heading_os_deg=0.0,
                           u_os=cfg.U_REF)[1].state == "engaged"
 
-    # Now astern and opening: TCPA goes negative.
-    passed = FakeTrack(5.0, 2.0, 180.0, cfg.U_REF)
+    # A25: now astern and opening outside the required separation.  Opening
+    # while still inside the domain keeps the original obligation.
+    passed = FakeTrack(5.0, 4.0 - D_REQ - 1.0, 180.0, cfg.U_REF)
     state = manager.update(tracks=[passed], p_os=(5.0, 4.0), v_os=(0.0, cfg.U_REF),
                            heading_os_deg=0.0, u_os=cfg.U_REF)[1].state
     assert state == "clearing"

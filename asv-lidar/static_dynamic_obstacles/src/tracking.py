@@ -114,10 +114,15 @@ def sensor_origin(x: float, y: float, heading_deg: float,
 
 @dataclass
 class Cluster:
-    """One segment of the scan: its centroid and the world-frame returns in it."""
+    """One segment of the scan: its centroid and the world-frame returns in it.
+
+    `origin` is the sensor position the returns were lifted from, which the
+    hull fit needs to know which faces are the near ones (C15).
+    """
 
     centroid: np.ndarray
     points: np.ndarray
+    origin: Optional[np.ndarray] = None
 
     def __array__(self, dtype=None, copy=None):
         return np.asarray(self.centroid, dtype=dtype)
@@ -175,7 +180,107 @@ def segment_scan(ranges, bearings_deg, x: float, y: float, heading_deg: float, *
             groups[0] = groups[-1] + groups[0]
             groups.pop()
 
-    return [Cluster(pts[g].mean(axis=0), pts[g]) for g in groups if len(g) >= int(min_points)]
+    origin = np.array([float(x), float(y)])
+    return [Cluster(pts[g].mean(axis=0), pts[g], origin)
+            for g in groups if len(g) >= int(min_points)]
+
+
+# ---------------------------------------------------------------------------
+# C15 -- hull-fitted measurement
+# ---------------------------------------------------------------------------
+def hull_fit_centre(points, origin, *, length: float = None, breadth: float = None,
+                    prior_axis_deg: Optional[float] = None,
+                    step_deg: float = None, return_heading: bool = False):
+    """Centre of a known-size hull fitted to the returns from its visible faces.
+
+    **C15.**  A centroid is the mean of the faces the sensor can see, so it sits
+    up to half a hull length toward the own ship, and it slides along the hull
+    as the aspect changes and as the 1 m dead zone cuts the near end off.  At
+    close range that slide became a false velocity: the perceived
+    heading-intersection angle was 21 deg worse than the truth at a median 3.6 m
+    (F56), and the stop test's perceived DCPA inherits the same error (F60).
+
+    L-shape fit (Zhang et al., 2017, "Efficient L-shape fitting for vehicle
+    detection using laser scanners"): the orientation maximising the closeness
+    criterion gives the rectangle's axes.  Each axis's extent is then completed
+    to the known dimension **away from the sensor** -- the unseen faces are the
+    far ones -- or centred when the full dimension is already visible.  Targets
+    and own ship are the same class of vessel (S3), so the dimensions are
+    `LOA` x `BREADTH`.
+
+    `prior_axis_deg` (the track's course) says which axis is the length; without
+    it the longer observed extent is taken, and a cluster too short to tell
+    returns `None` so the caller keeps the centroid.
+    """
+    pts = np.asarray(points, dtype=np.float64)
+    if pts.ndim != 2 or len(pts) < 3:
+        return None
+    length = float(cfg.LOA if length is None else length)
+    breadth = float(cfg.BREADTH if breadth is None else breadth)
+    step = float(cfg.TRACK_FIT_STEP_DEG if step_deg is None else step_deg)
+    origin = np.asarray(origin, dtype=np.float64)
+
+    best_score, best_theta = -np.inf, 0.0
+    for theta in np.radians(np.arange(0.0, 90.0, step)):
+        e1 = np.array([np.cos(theta), np.sin(theta)])
+        e2 = np.array([-np.sin(theta), np.cos(theta)])
+        c1, c2 = pts @ e1, pts @ e2
+        d1 = np.minimum(c1 - c1.min(), c1.max() - c1)
+        d2 = np.minimum(c2 - c2.min(), c2.max() - c2)
+        score = float(np.sum(1.0 / np.maximum(np.minimum(d1, d2), 0.01)))
+        if score > best_score:
+            best_score, best_theta = score, theta
+    e1 = np.array([np.cos(best_theta), np.sin(best_theta)])
+    e2 = np.array([-np.sin(best_theta), np.cos(best_theta)])
+    ext1 = float(np.ptp(pts @ e1))
+    ext2 = float(np.ptp(pts @ e2))
+
+    if prior_axis_deg is not None:
+        a = np.radians(float(prior_axis_deg))
+        heading = np.array([np.sin(a), np.cos(a)])      # compass -> world
+        length_axis_first = abs(float(heading @ e1)) >= abs(float(heading @ e2))
+    else:
+        if max(ext1, ext2) < breadth + float(cfg.TRACK_FIT_AMBIGUOUS_M):
+            return None
+        length_axis_first = ext1 >= ext2
+    axes = ((e1, length), (e2, breadth)) if length_axis_first else ((e1, breadth), (e2, length))
+
+    centre = np.zeros(2)
+    tol = float(cfg.TRACK_FIT_FULL_EXTENT_TOL_M)
+    ranges = np.linalg.norm(pts - origin, axis=1)
+    clip_at = float(cfg.LIDAR_MIN_RANGE) + float(cfg.TRACK_FIT_DEAD_ZONE_TOL_M)
+    for axis, size in axes:
+        proj = pts @ axis
+        lo, hi = float(proj.min()), float(proj.max())
+        mid = 0.5 * (lo + hi)
+        s = float(origin @ axis)
+        # An observed end that sits on the dead-zone circle is where the sensor
+        # stopped seeing, not where the hull stops; anchor on the other end.
+        lo_clipped = bool(np.min(ranges[proj <= lo + 0.05]) <= clip_at)
+        hi_clipped = bool(np.min(ranges[proj >= hi - 0.05]) <= clip_at)
+        if hi - lo >= size - tol and not (lo_clipped or hi_clipped):
+            c = mid
+        elif lo_clipped and not hi_clipped:
+            c = hi - 0.5 * size
+        elif hi_clipped and not lo_clipped:
+            c = lo + 0.5 * size
+        elif hi - lo >= size - tol:
+            c = mid
+        elif s <= mid:
+            c = lo + 0.5 * size          # sensor on the low side: the unseen faces are high
+        else:
+            c = hi - 0.5 * size
+        centre += c * axis
+    if not return_heading:
+        return centre
+    # The length axis as a compass heading, pointed the way the track moves.
+    heading_deg = None
+    if prior_axis_deg is not None:
+        length_axis = axes[0][0] if axes[0][1] == length else axes[1][0]
+        heading_deg = float(np.degrees(np.arctan2(length_axis[0], length_axis[1]))) % 360.0
+        if abs(((heading_deg - float(prior_axis_deg)) + 180.0) % 360.0 - 180.0) > 90.0:
+            heading_deg = (heading_deg + 180.0) % 360.0
+    return centre, heading_deg
 
 
 def cluster_scan(ranges, bearings_deg, x: float, y: float, heading_deg: float,
@@ -346,6 +451,16 @@ class Track:
         # Velocity-estimate noise (Study 2 axis).  Held for the step rather than
         # resampled per read, so every consumer in one step sees one value.
         self._vel_noise = np.zeros(2, dtype=np.float64)
+        # C15: the learned offset from this track's cluster centroid to its
+        # hull-fitted centre, applied on every update so the measurement never
+        # jumps between the two.
+        self.fit_offset = np.zeros(2, dtype=np.float64)
+        self.fit_offset_known = False
+        # The latest hull fit, whichever measurement mode feeds the filter:
+        # the A18 stop test reads it at close range (C15, F66).  None when this
+        # update produced no reliable fit.
+        self.last_fit_centre: Optional[np.ndarray] = None
+        self.last_fit_heading_deg: Optional[float] = None
 
         # Step 6 state.  `history` holds (scan serial, world points) for the
         # last `MOTION_WINDOW_STEPS` detections, oldest first.
@@ -510,9 +625,13 @@ class Tracker:
                  dropout_p: float = cfg.DETECTION_DROPOUT_P,
                  velocity_noise: float = cfg.TRACK_VELOCITY_NOISE,
                  classifier: str = cfg.MOTION_CLASSIFIER,
+                 measurement: Optional[str] = None,
                  rng: Optional[np.random.Generator] = None) -> None:
         if classifier not in ("free_space", "speed"):
             raise ValueError(f"unknown motion classifier {classifier!r}")
+        self.measurement = cfg.TRACK_MEASUREMENT if measurement is None else measurement
+        if self.measurement not in ("centroid", "hull_fit"):
+            raise ValueError(f"unknown track measurement {self.measurement!r}")
         self.dt = float(dt)
         self.gate_dist = float(gate_dist)
         self.max_misses = int(max_misses)
@@ -547,10 +666,13 @@ class Tracker:
         matches, unmatched = self._associate(detections)
         matched_ids = {id(t) for t, _ in matches}
         for track, det in matches:
-            track.update(_centroid(det))
+            fit = self._fit(det, track, with_heading=True)
+            track.last_fit_centre, track.last_fit_heading_deg = fit if fit is not None else (None, None)
+            track.update(self._measure(det, track, fitted=None if fit is None else fit[0]))
         for track in self.tracks:
             if id(track) not in matched_ids:
                 track.mark_missed()
+                track.last_fit_centre = track.last_fit_heading_deg = None
 
         use_space = self.classifier == "free_space" and scan is not None
         for track, det in matches:
@@ -561,6 +683,12 @@ class Tracker:
 
         for det in unmatched:
             fresh = Track(_centroid(det), dt=dt)
+            if self.measurement == "hull_fit":
+                fitted = self._fit(det, None)
+                if fitted is not None:
+                    fresh.fit_offset = fitted - _centroid(det)
+                    fresh.fit_offset_known = True
+                    fresh.state[:2] = fitted
             points = _points(det)
             if use_space and points is not None:
                 fresh.history.append((scan.serial, points))
@@ -586,6 +714,41 @@ class Tracker:
         if reference is None:
             return None
         return motion_evidence(points, scan, reference_points, reference)
+
+    def _fit(self, detection, track: Optional[Track], *, with_heading: bool = False):
+        """A reliable hull fit for a detection, or None (C15).
+
+        The centre, or `(centre, heading_deg)` with `with_heading`; the heading
+        is None without a course prior to orient the length axis.
+        """
+        if not isinstance(detection, Cluster) or detection.origin is None \
+                or len(detection.points) < int(cfg.TRACK_FIT_MIN_POINTS):
+            return None
+        prior = None
+        if track is not None and track.hits >= 2 and track.speed > float(cfg.TRACK_FIT_PRIOR_SPEED):
+            prior = track.course_deg
+        return hull_fit_centre(detection.points, detection.origin, prior_axis_deg=prior,
+                               return_heading=with_heading)
+
+    def _measure(self, detection, track: Track, *, fitted: Optional[np.ndarray] = None) -> np.ndarray:
+        """The Kalman measurement for a matched detection (C15).
+
+        `centroid`: the centroid.  `hull_fit`: the centroid **plus the track's
+        learned offset** to the fitted centre.  The offset is refreshed (a
+        `TRACK_FIT_OFFSET_GAIN` blend) whenever a fit is reliable and held when
+        it is not.  Feeding the fit directly made the measurement jump ~0.7 m
+        whenever a sparse far cluster fell back to its centroid, which read as
+        velocity, broke associations and made the stop test worse at range.
+        """
+        centroid = _centroid(detection)
+        if self.measurement != "hull_fit":
+            return centroid
+        if fitted is not None:
+            fresh = fitted - centroid
+            gain = float(cfg.TRACK_FIT_OFFSET_GAIN) if track.fit_offset_known else 1.0
+            track.fit_offset = (1.0 - gain) * track.fit_offset + gain * fresh
+            track.fit_offset_known = True
+        return centroid + track.fit_offset
 
     def _apply_dropout(self, detections):
         """Randomly discard detections (Study 2 axis)."""
@@ -617,8 +780,10 @@ class Tracker:
         if not self.tracks or not dets:
             return [], dets
 
+        # Association compares like with like: each track against the detection
+        # as that track would measure it -- centroid plus its learned offset.
         centres = np.array([_centroid(d) for d in dets])
-        cost = np.array([[float(np.linalg.norm(t.position - c)) for c in centres]
+        cost = np.array([[float(np.linalg.norm(t.position - (c + t.fit_offset))) for c in centres]
                          for t in self.tracks])
         matches = []
         used_t, used_d = set(), set()

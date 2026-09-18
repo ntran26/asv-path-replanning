@@ -8,8 +8,8 @@ currently blocking a full training run and a full evaluation.**
 |---|---|
 | **Revision** | 8 — 0.55 m/s; virtual corridors back; generator wired in; e-stop reward; noise and randomisation on; scale audit; first PPO formulation run; see `OPEN_PROBLEMS.md` |
 | **Last updated** | 2026-09-15 |
-| **Tests** | **408 passing, none expected to fail** (T1 passes since F24 was decided) |
-| **Blocking a headline training run** | **nothing decision-side**: A15–A20 decided and built (F53, F56, F58); run 3 done (F57). Before run 4: the tiered checks, including the 5 m stop rise in F58. The full budget then waits on run 4 confirming the formulation, and on B5 (`OPEN_PROBLEMS.md`) |
+| **Tests** | **445 passing, none expected to fail** (T1 passes since F24 was decided) |
+| **Blocking a headline training run** | **run 6 is training** (F72: A25 option 1 -- CODEX's observation fixes, the observable latch, R-2 back on the stop test). Baselines: run 4 0.87, run 5 0.76, reference controller 0.87. Then B5 (`OPEN_PROBLEMS.md`) |
 | **Blocking a full evaluation** | **7 more** — B2, B5–B10 (§2) |
 | **Open `TODO(decision)`** | 1 (`D_SAFE`) |
 | **Open measurements** | 05 part 1 done from logs; basin sessions pending — `OPEN_PROBLEMS.md` Part B |
@@ -1093,6 +1093,661 @@ unchanged: 24, with 6 followed by a target collision (F60, C15).
 *Tier 2 launched:* fine-tune of run 3's final model, stage 5 only, 300 k steps,
 evaluation every 100 k at 20 per class
 (`runs/ppo_formulation_seed0_tier2_a21/`).
+
+**F62 — Tier 2 (fine-tune on A18–A21 and straight paths), crossing
+feasibility, and a class-share bug.**
+
+*Tier 2* (`runs/ppo_formulation_seed0_tier2_a21/`). Run 3's final weights and
+reward statistics, 302 k stage-5 steps, 1.25 h. PPO stayed stable: `approx_kl`
+0.025 → 0.036, clip fraction 0.17 → 0.22, action std 0.43. Throughput averaged
+71 fps; each 120-episode evaluation cost 140–300 s.
+
+| evaluation (20 per class) | 100 k | 200 k | 300 k | final |
+|---|---|---|---|---|
+| goal | 0.83 | 0.81 | 0.80 | **0.82** |
+| collision | 0.17 | 0.19 | 0.20 | **0.18** |
+| head-on collision | 0.25 | 0.25 | 0.20 | 0.15 |
+| crossing | 0.35 | 0.40 | 0.55 | 0.45 |
+| overtaking | **0.00** | 0.00 | 0.00 | 0.00 |
+| being overtaken | 0.15 | 0.25 | 0.30 | 0.35 |
+| null | 0.20 | 0.15 | 0.10 | 0.05 |
+| no target | 0.05 | 0.10 | 0.05 | 0.05 |
+
+Training-episode collision by 100 k block: crossing 0.60 / 0.58 / 0.58,
+head-on 0.39 / 0.39 / 0.37, being overtaken 0.27 / 0.23 / 0.21, overtaking
+0.12 / 0.11 / 0.13, no target 0.20 / 0.16 / 0.11. The evaluation's rise in
+being overtaken (0.15 → 0.35) runs against the training trend (0.27 → 0.21).
+With 20 scenarios, one scenario is 5 pp, so it reads as noise until a larger
+set says otherwise.
+
+What it says:
+
+* **Overtaking is solved** under the current formulation: 0 collisions at
+  every evaluation, 0.11–0.13 in training.
+* **Null improved as the Tier 1 replay predicted** once the policy saw real
+  channel-keeping null targets: 0.25 → 0.05.
+* **Head-on is middling**, 0.15–0.25; supervisor stops fell to 0.02 per
+  episode.
+* **Crossing is now the dominant failure**, and flat in training at ~0.58.
+  Both sides fail alike (port 0.48, starboard 0.44 over the last two
+  evaluations), so it is no longer A17's side problem.
+
+*Crossing feasibility* (`tools/diagnostics/crossing_feasibility.py`,
+`results/crossing_feasibility/`). The 20 development crossings, obstacles
+and supervisor off, each replayed under scripted responses taken **from
+t = 0**, so late engagement cannot be the excuse:
+
+| response | target hit, from port | from starboard |
+|---|---|---|
+| hold path and speed | 0.82 | 0.56 |
+| half speed | 0.73 | 0.67 |
+| full astern (coasts: no reverse at stage 4) | 0.45 | 0.67 |
+| 30° compliant alteration | 0.45 | 0.89 |
+| 60° compliant alteration | 0.27 | 0.67 |
+
+**Even the best of these for each scenario still hits the target in 5 of 20
+(0.25).** Unavoidable draws have a median TCPA of 8.8 s and spawn range 6.7 m,
+against 9.9 s and 8.9 m for avoidable ones. So about a quarter of generated
+crossings cannot be escaped by the own ship, which is A15's problem in another
+class. Decision: `OPEN_PROBLEMS.md` **A22**. Tier 2's ~0.45 crossing collision
+sits above that 0.25 floor, so the class is partly geometry and partly still
+learning.
+
+*C16 — the class share is not the configured one (fixed).* When a draw capped
+out, `env._load_generated` retried with a fresh seed, which redrew the *class*
+too. Classes that cap out often lost share to the rest: null caps on about
+half its draws and trained at **4.3 %** against an intended 11 %. The class is
+now drawn once from `CLASS_SAMPLE_WEIGHTS` and only the seed is retried. 400
+stage-5 resets now give null 0.12 (0.11), crossing 0.22 (0.22), overtaking
+0.16 (0.16), being overtaken 0.16 (0.14), no target 0.20 (0.17), head-on 0.15
+(0.20). (A reading slip on the way: pandas parses the class label "null" as a
+missing value, which briefly made null look absent from training. Read
+`monitor.csv` with `keep_default_na=False`.)
+
+*Where the tiers leave run 4.* Tiers 0 and 1 are clean on A18–A21. Tier 2 shows
+the formulation trains stably and improves overtaking, null and head-on. The
+one open formulation issue is A22. A 6 h run 4 before A22 would spend a
+quarter of its crossing episodes on draws no policy can win.
+
+**F63 — A22 built (option 1): crossings must be escapable, 20 % labelled; Tiers
+0 and 1 re-run.**
+
+*Built.* `scenario.crossing_escape_feasible(own, own_heading, solved, channel)`
+rolls the nominal hull out from the environment's start state (on the path, at
+`U_NOM`). It holds course for `CROSSING_ESCAPE_DELAY_S` = 1.5 s, then either
+coasts (`CROSSING_ESCAPE_STOP_RPM` = 0, the policy's floor at propulsion stage
+4) or steers a 60° alteration in the A17 compliant sense, with commands at the
+2 Hz decision rate. The target is constant-velocity and unconfined. An escape
+counts if the hulls never overlap and the own hull stays inside the corridor
+until `CROSSING_ESCAPE_TAIL_S` = 6 s past TCPA; the rollout stops early once the
+target has passed and is opening beyond 3 m.
+
+`ScenarioGenerator.sample` draws `want_unescapable` (p = 0.20) **once per
+sample**. Per attempt, rejection would cut the realised share to about 8 %.
+`_attempt` rejects crossing draws whose feasibility disagrees with the label
+(`escape_label_mismatch`) and records `scenario.crossing_escapable`.
+
+Cost after optimisation (a decimated wall outline, 2 Hz steering, early exit):
+0.21 s per crossing sample, down from 0.6 s. Across all 80 draws, 78 built;
+wanted unescapable 16 %, built unescapable 17 % (13 of 78), and cap-outs are
+flat across width strata. Test:
+`test_crossings_are_escapable_except_a_labelled_fraction`. **409 passed.**
+
+*Crossing feasibility re-run* (`results/crossing_feasibility/`; the pre-A22 file
+is kept as `summary_pre_a22.txt`): **every one of the 20 development crossings
+is now escapable by some scripted response** (was 15 of 20). Hit rates: coast
+0.1 / 0.2, 60° turn 0.0 / 0.2, hold 0.8 / 0.5 (port / starboard). The
+generator's labels agree with the replay in all 20.
+
+*Caution on comparisons.* The label draw consumes one random number before the
+corridor is sampled, so development crossing seeds now produce different
+corridors. The 20-crossing development set happens to carry no unescapable
+draw (p ≈ 0.03) and is narrower: median width 5.6 m, against 7.7 m before. So
+crossing results before and after A22 are **not like-for-like**. Other classes
+are unchanged.
+
+*Tier 0* (`results/tiers/tier0_a22/`): **all 10 checks pass.** On crossings,
+scripted compliant collision 0.58 (was 0.83); COLREGs penalty compliant −7.2
+against wrong way −35.3. Other classes are identical to F61.
+
+*Tier 1* (`results/tiers/tier1_tier2model_a22/`), replaying the Tier 2 (A21)
+final model:
+
+* Crossing collision **0.80** on the new, narrower, all-escapable set (0.45 on
+  its old set). The policy never saw this distribution, so this is the gap
+  Tier 2 has to close, not a regression in the code.
+* Head-on 0.15, null 0.05, no target 0.05, overtaking 0.00, being overtaken
+  0.35: as in its own evaluation.
+* Head-on width set: 0.41 at 5 m (0.16–0.20 elsewhere), with **5 of 6** stopped
+  episodes then hitting the target at 5 m. In total, 12 stops, 6 followed by a
+  target collision. This model was fine-tuned under A18; the stop-then-hit pattern
+  at narrow widths is the perceived-DCPA error of C15, and is now worth building.
+
+*Tier 2 launched* on A22: fine-tune from the A21 Tier 2 final model, stage 5,
+300 k steps (`runs/ppo_formulation_seed0_tier2_a22/`).
+
+**F64 — C15, a hull-fitted tracker measurement: built behind a switch, not
+adopted.** `TRACK_MEASUREMENT` stays `"centroid"`.
+
+*Why C15 exists.* The Kalman filter was fed the centroid of a cluster's
+returns. Those lie on the faces nearest the sensor, so the centroid sits up to
+half a hull length toward the own ship and slides as the aspect changes or as
+the 1 m dead zone clips the near end. Close in, that slide reads as velocity
+(F56, F60).
+
+*Built* (`src/tracking.py`):
+
+* `hull_fit_centre(points, origin, prior_axis_deg=…)`: an L-shape fit
+  (Zhang et al., 2017) over orientation, then each axis completed to the known
+  `LOA` × `BREADTH` away from the sensor. An observed end on the dead-zone
+  circle is treated as clipped, and the far end is anchored instead. It
+  returns `None` when the length axis is unknowable (a short cluster with no
+  course prior).
+* `Cluster.origin` records the sensor position.
+* `Tracker(measurement="hull_fit")`: each track learns the offset from its
+  centroid to the fitted centre (blend 0.5, fits need ≥ 8 returns) and is
+  always measured as centroid + offset; association uses the same.
+* Tests: synthetic returns from bow-on, quarter and beam-on views recover the
+  centre within 5 cm, and within 15 cm with the near end clipped by the dead
+  zone (the first version failed both: a tie completed the hull toward the
+  sensor, and it anchored on the dead-zone cut). **50 tracking tests pass.**
+
+*Measured* (`tools/diagnostics/c15_track_error.py`,
+`results/c15_track_error/`): path follower, obstacles and supervisor off, 40
+head-on width-set and 24 development scenarios, each step's nearest dynamic
+track paired with the truth. Three variants:
+
+| true range | stop-test disagreement with truth: centroid | v1 fit fed directly | **v2 learned offset** | v3 range-dependent gain |
+|---|---|---|---|---|
+| < 2 m | 0.34 | 0.06 | **0.06** | 0.06 |
+| 2–3 m | 0.20 | 0.04 | **0.03** | 0.03 |
+| 3–4 m | 0.06 | 0.05 | **0.03** | 0.03 |
+| 4–6 m | 0.01 | 0.16 | 0.05 | 0.07 |
+| 6–9 m | 0.01 | 0.32 | **0.23** | 0.24 |
+| 9–16 m | 0.06 | 0.34 | 0.09 | 0.09 |
+| overall | 0.090 | 0.137 | 0.083 | 0.087 |
+
+| v2 against centroid | < 2 m | 2–4 m | 6–9 m |
+|---|---|---|---|
+| position error, median | 0.33 → 0.18 m | 0.37–0.55 → 0.05–0.07 m | 0.73 → 0.08 m |
+| course error, p90 | **162° → 22°** | 7–11° → 10–12° | **7° → 33°** |
+| frames tracked | 304 → 328 | similar | 447 → 447 |
+
+v1 also lost up to 80 % of long-range tracked frames: sparse far clusters fell
+back to the centroid, and the ~0.7 m jump between the two measurements read as
+velocity and broke associations. v2's learned offset fixed that. v3 learned
+slowly beyond 4 m and did no better.
+
+*Why not adopted.* The hull fit sharply improves exactly what C15 was opened
+for: close-range position, and the A18 stop test inside 4 m. But every variant
+worsens course at 6–9 m, which is where encounters engage and where A20 now
+freezes the class. The mechanism is structural. A track arrives from range
+with little learned offset and acquires ~0.6 m of it while closing, and any
+time-varying correction to a measurement reads as velocity. Trading
+engagement-range course for close-range position is the wrong trade while the
+class is latched at engagement.
+
+*What would make it adoptable* (not done): estimate the centre offset as
+filter state rather than correcting the measurement, e.g. a
+constant-velocity-plus-extent model whose offset has its own slow process noise,
+so it is not differentiated into velocity. Alternatively, use the fitted centre
+only in the stop test's DCPA, not in the track state. Both are real work. The
+second is the smaller, and targets the one consumer C15 was measured against.
+Recorded as C15's next step.
+
+**F65 — Tier 2 on A22.** A fine-tune of the A21 Tier 2 final model, 302 k stage-5
+steps, 1.50 h. That is slower than F62's 1.25 h because the C15 diagnostics
+shared the CPU (48–58 fps). PPO stayed stable: `approx_kl` 0.044 → 0.037, clip
+fraction 0.23 → 0.18, std 0.43. Class shares in training now match the
+configured weights (C16): crossing 0.22, head-on 0.20, no target 0.17,
+overtaking 0.16, being overtaken 0.14, null 0.11.
+
+| evaluation, 20 per class | 100 k | 200 k | 300 k | final | A21 Tier 2 final (F62) |
+|---|---|---|---|---|---|
+| goal | 0.79 | 0.82 | 0.81 | **0.81** | 0.82 |
+| collision | 0.21 | 0.18 | 0.19 | **0.19** | 0.18 |
+| head-on | 0.15 | 0.15 | 0.10 | 0.15 | 0.15 |
+| crossing | 0.75 | 0.70 | 0.60 | **0.60** | 0.45 (different set) |
+| overtaking | 0.05 | 0.00 | 0.00 | 0.00 | 0.00 |
+| being overtaken | 0.15 | 0.10 | 0.15 | 0.20 | 0.35 |
+| null | 0.15 | 0.10 | 0.25 | 0.15 | 0.05 |
+| no target | 0.00 | 0.00 | 0.05 | 0.05 | 0.05 |
+
+Training-episode collision by 100 k block: crossing 0.58 / 0.61 / 0.53,
+head-on 0.40 / 0.33 / 0.36, being overtaken 0.23 / 0.20 / **0.18**,
+overtaking 0.08 / 0.12 / 0.14, null 0.12 / 0.16 / 0.18, no target
+0.14 / 0.12 / 0.15.
+
+What it says:
+
+* **Crossing is learning but far from learned.** On A22's escapable set the
+  policy started at 0.80 (Tier 1, F63) and reached 0.60, with
+  target collisions 0.50 from port and 0.37 from starboard over the last
+  two evaluations. Training includes the labelled 20 % unescapable, so its
+  0.53 means about 0.41 of *escapable* crossings still collide. A scripted
+  60° turn or a coast escapes every one of them by construction, so this is
+  learning, not geometry.
+* **Being overtaken improved further** (evaluation 0.35 → 0.20 against F62;
+  training 0.23 → 0.18), consistent with A21.
+* **Head-on, overtaking and no target held.** Null wandered (0.05–0.25,
+  obstacles not targets) at 20 scenarios.
+* **The limit of Tier 2 is showing.** 300 k fine-tuning steps from a policy
+  trained on bent corridors and earlier generator geometry cannot say whether
+  crossing converges. That is a from-scratch question: run 4.
+
+*Stop-test note (C15).* Supervisor stops rose to 0.06–0.08 per episode (F62:
+0.02). The close-range perceived-DCPA error F64 measured is the likely reader;
+the stop-test-only use of the fitted centre is C15's next step.
+
+**F66 — run 4 launched; C15's stop-test view built, measured more accurate, and
+switched off, because it exposes A18's premise.**
+
+*Run 4* (`runs/ppo_formulation_seed0_v4/`): from scratch, 2 M steps, curriculum
+1 → 5, 20 evaluation scenarios per class, with A15–A22 and C16 in and
+`TRACK_MEASUREMENT = "centroid"`. Its processes loaded the code before the stop
+view existed, so it trains without it.
+
+*Built.*
+
+* `Track.last_fit_centre` / `last_fit_heading_deg`: each matched update's hull
+  fit, in either measurement mode. `hull_fit_centre(..., return_heading=True)`
+  gives the length axis pointed along the track's course.
+* `ContextManager._attach_stop_view` sets `ctx.stop_rng`, `stop_alpha` and
+  `stop_ct` from the fit when it lies within `STOP_TEST_FIT_RANGE_M` = 4 m.
+  `EncounterContext.dcpa_if_stopped` reads them when set. Nothing else does, so
+  the track state and every other consumer are untouched.
+* Switch: `STOP_TEST_USES_HULL_FIT`. Tests:
+  `test_the_stop_test_reads_the_close_range_hull_fit_view` and
+  `test_tracks_carry_their_latest_hull_fit`.
+* Tier 1 gained `--processes` and `--stop-test-fit on|off`, which apply
+  `constants` overrides in every worker.
+
+*Against ground truth* (`results/c15_track_error/summary_f66_stop_view.txt`):
+the stop test's disagreement with the truth about `stop_clears` fell from
+0.090 to **0.046**. By range: < 2 m 0.34 → 0.12, 2–3 m 0.20 → 0.03, 3–4 m
+0.06 → 0.08, unchanged beyond 4 m. Position and course are identical.
+
+*Against behaviour* (Tier 1 A/B on the Tier 2 A22 final model;
+`results/tiers/tier1_f66_stopfit_off/`, `…_on/`):
+
+| | stop view off | **on** |
+|---|---|---|
+| supervisor stops (220 episodes) | 13 | **29** |
+| … followed by a target collision | 6 | **15** |
+| head-on target collision at 5 / 6 / 7 / 8 / 10 m | 0.32 / 0.25 / 0.25 / 0.16 / 0.05 | 0.32 / **0.35 / 0.30** / 0.16 / 0.05 |
+| development set, per class | — | identical |
+
+**A more accurate stop test made outcomes worse.** A18 asks whether the target
+would clear *an own ship stationary where it is now* (`dcpa_if_stopped` ≥
+`ESTOP_CLEAR_DCPA_M` = 1.76 m). But a stopping vessel does not stop where it
+is. At stage 4 it cannot reverse, so it coasts. Even the supervisor's astern
+brake takes 1.1–3.7 s (F28), during which it keeps closing on the target's
+track. The centroid's bias toward the own ship had been understating that
+DCPA and so suppressing stops, which masked the flaw. With accurate geometry
+the supervisor fires in draws whose stationary DCPA is 1.76–2.5 m, the vessel
+slides forward while stopping, and the hulls meet.
+
+**`STOP_TEST_USES_HULL_FIT` is `False`**, which matches run 4. The view stays
+built for A23, the decision on how "stopping clears" should be evaluated. **418 tests pass.**
+
+**F67 — A23 built (option 1): the stop test follows the braking path. Stops
+that end in a collision fall to zero; C15's view stays off.**
+
+*Built.*
+
+* `src/stopping.py`, kept out of `emergency_stop.py`, which the bridge
+  imports simulator-free. `braking_profile(u0)` is the supervisor latch's full
+  astern (`S2 = −100`) on the nominal identified hull, from surge `u0` to
+  `ESTOP_STOP_SPEED` (cap `ESTOP_MAX_BRAKE_S`), sampled at `STOP_TEST_DT_S` =
+  0.05 s and cached per cm/s. `dcpa_over_stop(rng, alpha, ct, speed_ts,
+  u_own)` is the minimum centre distance between the target's
+  constant-velocity track and the own ship along that path, then stopped.
+* `EncounterContext.u_own` holds the own surge when the context was built;
+  `dcpa_if_stopped` now calls `dcpa_over_stop`, still against
+  `ESTOP_CLEAR_DCPA_M` = 1.76 m. At `u_own` below the stop speed it equals
+  A18's stationary DCPA exactly, so every A18 test passes unchanged.
+* The supervisor's trigger, R-2's slowdown carve-out and `r8_parts`'
+  alteration credit all read `stop_clears`, so all three now account for
+  braking.
+* Braking from cruise (0.56 m/s) takes 1.05 s over 0.32 m; from 1.05 m/s,
+  1.9 s over 0.99 m. A crossing target clearing a stationary ship by 1.9 m
+  passes within 1.58 m of a braking one. 0.06 ms per evaluation.
+* Tests: `test_the_braking_profile_stops_and_grows_with_speed`,
+  `test_the_stop_test_follows_the_braking_path`.
+
+*Tier 1 A/B* (the Tier 2 A22 final model; `results/tiers/tier1_a23_stopfit_off/`,
+`…_on/`; F66's rows for comparison):
+
+| stop test | C15 view | stops | then a target collision | head-on target collision 5 / 6 / 7 / 8 / 10 m |
+|---|---|---|---|---|
+| A18, stationary | off | 13 | 6 | 0.32 / 0.25 / 0.25 / 0.16 / 0.05 |
+| A18, stationary | on | 29 | 15 | 0.32 / 0.35 / 0.30 / 0.16 / 0.05 |
+| **A23, braking path** | **off** | **7** | **0** | 0.32 / 0.25 / 0.25 / 0.16 / 0.05 |
+| A23, braking path | on | 23 | 8 | 0.32 / 0.35 / 0.30 / 0.16 / 0.05 |
+
+Development-set outcomes per class are unchanged in all four.
+
+*Reading it.* The braking path removes every stop that ended in a collision,
+and halves the stops. The hull-fitted view still doubles stops and still ends
+8 of them in collisions, so geometry accuracy was not the whole story. The
+likeliest remainder is the fitted *heading*: `stop_ct` comes from the fitted
+length axis, whose orientation at < 2 m is set by one or two faces. Two
+further candidates are the nominal hull under-predicting stopping distance
+(reverse efficiency 0.5 is unmeasured, B1) and the stop test's constant-velocity
+target. **`STOP_TEST_USES_HULL_FIT` stays `False`**; A23 is on by default.
+
+Run 4 trains without A23 (its processes started first). **420 tests pass.**
+
+**F68 — your five suggestions: supervisor as a runtime layer, not a training
+signal. Built behind switches, and one confound found and fixed on the way.**
+
+1. **Train with the supervisor off.** `train_formulation.py --train-supervisor
+   off` builds the training environments with `emergency_stop=False`. `R_ESTOP`
+   and the latch-held speed-gate suspension only act while the latch holds, so
+   both drop out of the training reward with nothing else changed. Actions stay
+   0–100. The environment default is still on, so run 4 and every earlier
+   result are reproducible.
+   **R-2 keeps a slowdown test, now about the agent's own slowdown.** A23's
+   `stop_clears` models the latch's full astern. The policy cannot reverse at
+   propulsion stage 4 (RPM floor 0), so its slowdown is a coast.
+   `stopping.braking_profile(u0, "coast")` (RPM `POLICY_SLOWDOWN_RPM` = 0, cap
+   `SLOWDOWN_TEST_MAX_S` = 20 s) backs `EncounterContext.dcpa_if_slowed` /
+   `slowdown_clears`. R-2's carve-out and the Rule 8 alteration credit read that;
+   the supervisor still reads `stop_clears`. From cruise the latch stops in
+   1.05 s over 0.32 m; a coast is still moving after 20 s, 6.0 m on.
+2. **The stop stays as a runtime layer.** The environment, bridge and latch are
+   unchanged; only where it is applied moves.
+3. **Evaluate with it off and on; report interventions.** `--eval-supervisor
+   off|on|both`. With `both`, every evaluation runs the development set twice,
+   each row tagged `supervisor`, and the summaries carry `intervention_rate` (share
+   of episodes with at least one stop) overall and per class. The best model is
+   chosen on the policy's own score, supervisor off. Tier 1 gained `--supervisor
+   on|off` and an intervention column. Tier B has no runner yet (C3–C6); the
+   metric is ready for it.
+4. **8(e) as two layers.** A writing item, recorded here: the policy slackens
+   speed (learned, reported with the supervisor off); the safety layer takes all
+   way off (engineered, reported as the intervention rate). Only the first is a
+   learned-compliance claim.
+5. **Low-speed starts.** `ASVLidarEnv(low_speed_start_frac=…)`, default 0.
+   `--low-speed-start-frac` sets it for training. The chosen share of generated
+   episodes starts from rest (half, `LOW_SPEED_START_ZERO_SHARE`) or uniform on
+   (0, 0.5 `U_NOM`], on its own seeded stream, so the scenario draw is
+   unchanged. `info["start_speed"]` records it.
+
+**Confound found: the supervisor perturbed the noise stream.** The latch read
+the own speed by drawing a fresh noisy estimate from the environment's shared
+random stream. Switching the supervisor on therefore shifted every later noise
+draw (pose, ego, tracker dropout). A replay with the supervisor on differed from
+one with it off *even when no stop fired*, so an on/off comparison would have
+attributed noise to the stop. The latch now reads the surge the controller
+perceived in its last observation (`_observed_surge`), which is also the more
+faithful field model. Verified: with no stop, all six classes replay
+identically with the supervisor off and on; replays were already
+deterministic, and a reused environment matches a fresh one.
+
+Tests: `test_the_policy_slowdown_is_a_coast_not_the_latch`,
+`test_a_fraction_of_episodes_can_start_slow`. A smoke run
+(`runs/ppo_formulation_seed0_f68_smoke/`, 4 k steps, supervisor off in training,
+20 % low-speed starts, evaluation both ways) exercised every flag. **422 tests pass.**
+
+*Experiment, next:* (a) when run 4 finishes, Tier 1 of its final policy with the
+supervisor off and on — how much it leans on the stop it trained with, and its
+intervention rate; (b) run 5 from scratch with `--train-supervisor off
+--low-speed-start-frac 0.15 --eval-supervisor both`, compared with run 4 on the
+same development set in both modes. A Tier 2 fine-tune cannot answer this
+question: weights trained with the supervisor have already learned around it.
+Run 5 also carries A23, the coast test and the noise fix, which run 4 lacks, so
+the comparison is of the formulation as a whole.
+
+**F69 — run 4 finished; its policy barely leans on the stop it trained with.
+The runtime layer intervened in 5 % of development episodes and rescued 3
+crossings.**
+
+*Run 4* (`runs/ppo_formulation_seed0_v4/`, 2 M steps, 7.6 h, supervisor on in
+training, pre-A23 stop test). Final in-training evaluation: **goal 0.87,
+collision 0.13** (boundary 0.03, obstacle 0.03, target 0.07), the best
+formulation run so far. The curve rose to 0.85–0.86 from 1.4 M and held.
+
+| class | run 3 | Tier 2 A22 | **run 4** |
+|---|---|---|---|
+| head-on | 0.65 | 0.85 | **0.95** |
+| crossing | 0.75 | 0.40 | **0.60** |
+| overtaking | 0.70 | 1.00 | **0.95** |
+| being overtaken | 0.65 | 0.80 | **0.85** |
+| null | 0.80 | 0.85 | **0.95** |
+| no target | 0.90 | 0.95 | **0.90** |
+
+Goal rate per class. Run 3's development set predates A21/A22, so its column is
+indicative only. Crossings remain the weak class: all 8 in-training crossing
+failures were target collisions with no stop, at mean speed 0.39–0.71 m/s — the
+policy steers but does not slacken. Compliance integrals worsened for head-on
+(−25.8) and overtaking (−35.9) against the A22 fine-tune (−17.2, −25.9).
+
+*Tier 1, current code, supervisor off vs on* (`results/tiers/tier1_run4_supervisor_off/`,
+`…_on/`; paired episodes, identical noise since F68):
+
+| | supervisor off | supervisor on |
+|---|---|---|
+| crossing goal / collision / target | 0.45 / 0.55 / 0.50 | **0.60 / 0.40 / 0.35** |
+| head-on goal | 1.00 | 1.00 |
+| overtaking, being overtaken, null, no target | 1.00, 0.85, 0.85, 0.95 | identical |
+| stops (development set + head-on width set) | 0 | 8 in 8 episodes, **0 then hit** |
+| intervention rate, development set | — | **0.05** (crossing 0.20, head-on 0.10) |
+| intervention rate, head-on width set | — | 0.02 |
+
+*Reading it.* Paired episode by episode, the stop changed exactly three outcomes,
+all crossings from target collision to goal (fired at TCPA 4.4–4.9 s, predicted
+DCPA 0.19–0.88 m). It harmed none. The four head-on stops fired at TCPA
+0.1–1.4 s with the target already at ~2 m and a predicted DCPA of 1.8–2.0 m;
+they changed neither outcome nor closest range, so they are late, harmless
+triggers near the 1.76 m clear threshold. Seven crossing target collisions got
+no stop: the in-extremis condition did not hold in time, not a stop that failed.
+
+So run 4's policy, trained with the latch, performs the same without it in
+every class but crossings, where the layer adds 0.15 goal rate. That is the
+runtime-assurance picture F68 asked for, measured on a policy that was not
+trained for it. Run 5 (`--train-supervisor off --low-speed-start-frac 0.15
+--eval-supervisor both`, same seed and budget, all of A23 and F68) is training;
+adopt it if its supervisor-off outcomes match or beat run 4's 0.87 / crossing
+0.45 and its intervention rate stays near 5 %.
+
+**F70 — run 5 (the F68 formulation) did not improve on run 4: goal 0.76
+against 0.87. Low-speed starts are ruled out. The likeliest cause is the R-2
+coasting test, which all but switched off the 8(e) slowdown in crossings. Run 6
+isolates it.**
+
+*Run 5* (`runs/ppo_formulation_seed0_v5/`, 2 M steps, 11.1 h — evaluation runs
+twice; supervisor off in training, 15 % low-speed starts, R-2 on the coast
+test, A23 and the noise fix). Final: **goal 0.76, collision 0.24** with the
+supervisor off *and* on; intervention rate 0.03. The curve sat at 0.64–0.73 from
+0.2 M to 1.8 M, then 0.78 at 2.0 M.
+
+| class (goal) | run 4, Tier 1, supervisor off | run 5, supervisor off | run 5, supervisor on |
+|---|---|---|---|
+| head-on | 1.00 | 0.90 | 0.90 |
+| crossing | 0.45 | 0.40 | 0.40 (target 0.50 → 0.40) |
+| overtaking | 1.00 | 0.95 | 0.95 |
+| being overtaken | 0.85 | 0.80 | 0.80 |
+| null | 0.85 | **0.65** | 0.65 |
+| no target | 0.95 | 0.85 | 0.85 |
+| intervention rate | — | — | 0.03 (crossing 0.15); 3 stops, 1 then hit |
+
+Run 5 is faster everywhere (crossing mean speed 0.79 m/s against run 4's 0.55;
+no target 0.70 against 0.64), and hits static obstacles more (development
+obstacle collisions 0.13 against 0.04, Tier 1). It is better on the head-on width set
+(target collisions 0.00–0.10 against 0.10–0.20). In training, its last quarter
+had shorter episodes (45 against 56 steps) and lower being-overtaken success
+(0.52 against 0.80, stochastic actions, 15 % slow starts included).
+
+*Low-speed starts ruled out* (`tools/diagnostics/f70_low_speed_start.py`,
+`results/f70_low_speed_start/`). The development set, supervisor off, every
+episode at cruise, then every episode from rest:
+
+| policy | goal, cruise | goal, rest | target collision, cruise | rest |
+|---|---|---|---|---|
+| path follower | 0.38 | 0.45 | 0.26 | 0.16 |
+| run 4 | 0.85 | 0.84 | 0.08 | 0.08 |
+| run 5 | 0.76 | 0.75 | 0.11 | 0.14 |
+
+Starting from rest does not break the solved encounters: the follower never
+collides with an overtaker from rest, and crossings become *easier* (target
+collision 0.65 → 0.10) because the late own ship misses the CPA. Run 4, which
+never trained from rest, loses 0.01 overall from rest, though its head-on goal
+rate falls from 1.00 to 0.80 (3 target collisions). Suggestion 5's
+out-of-distribution concern shows only in head-ons, and run 5, trained on slow
+starts, scores the same from rest as from cruise; the start share is not what
+cost run 5.
+
+*The R-2 slowing test* (`tools/diagnostics/f70_r2_activation.py`). Run 5's
+final policy on development crossings and head-ons; every frame with a
+give-way context engaged and its compliant alteration inadmissible (the R-2
+candidates):
+
+| class | frames (episodes) | carve-out admitted, coast test (F68) | stop test (A23) |
+|---|---|---|---|
+| crossing | 16 (4) | **0.06** | **0.38** |
+| head-on | 69 (7) | 0.00 | 0.01 |
+
+Mean predicted DCPA in those crossing frames: coasting 0.66 m, stopping 1.44 m.
+From cruise, a coast is still at most of its speed when the target passes, so it
+barely differs from holding course. Under F68 the policy is almost never paid to
+slacken in a crossing, which fits the faster, worse crossings. The sample is
+small (4 episodes) and is run 5's own trajectory, so this is a lead, not proof.
+
+*The physics behind it.* At propulsion stage 4 the policy has no reverse; its
+only slowdown is a coast, which takes way off too slowly to matter within a
+crossing's TCPA. The coast test is therefore the honest model of "the agent's
+own slowdown" — and it says that slowdown rarely avoids anything. Reading your
+suggestion 1 literally, R-2 kept the pre-F68 "does slowing clear" test
+(`stop_clears`); I had substituted the coast.
+
+*Run 6, training* (`runs/ppo_formulation_seed0_v6/`): run 5's command plus
+`--r2-slowdown-test stop`. One change from run 5, so run 5 against run 6 is the
+R-2 test alone; run 6 against run 4 is supervisor-off training plus low-speed
+starts plus A23 and the noise fix. The switch is `R2_SLOWDOWN_TEST` ("coast"
+default, F68 as built), read by R-2 and the Rule 8 alteration credit. Test
+`test_r2_reads_the_configured_slowing_test`. **423 tests pass.**
+
+*Caveat.* Every run is seed 0 and no two runs share a formulation, so run-to-run
+spread at a fixed formulation is unmeasured. A 0.11 gap on 120 episodes is about
+two binomial standard errors, before seed variance.
+
+**F71 — review of `CODEX/` (a separate Codex working copy, copied from this tree
+after F68). Nothing in it trained a policy; one real observation defect, a
+usable comparator, and several formulation changes that need your call. Run 6
+was stopped (by you) before its first evaluation.**
+
+*What CODEX is.* A full copy of `src/`, `tests/` and the trainer with: a
+synchronised perception state, a sixth observation branch (70 values), a
+clearing-latch change, a stricter goal, scene strata with mastery-gated
+curriculum, a rewritten trainer, a predictive LOS reference controller, and
+behaviour contracts. Its verification is 460 tests plus 20/20 reference-
+controller cases on ten hand-built scenes in a 10 m channel, and two 1 k-step
+PPO smokes. No learned-policy result exists.
+
+*Checked against this tree.*
+
+| CODEX change | Verified here | Worth |
+|---|---|---|
+| Path branch cross-track error divided by the local half-width | **real defect**: `observation.py` divides by `max(MAP_WIDTH, MAP_HEIGHT)` = 25 m and observations are not normalised, so a 2.5 m offset in a 5 m corridor reads 0.1 | **port**; retrain needed (same shape, new meaning) |
+| Context branch: latch state, turn sense, heading/speed change since engagement, admissibility, slowdown-clears, gates, age; previous executed action | the reward reads `psi_engage`, `u_engage`, latched sense and clearing state the policy cannot observe, so R-8/R-hold are non-Markov in the observation | **strong candidate** (A25); 56 → 70, retrain |
+| Clearing latch: risk returning restores the obligation; release only after opening outside the required separation | current code releases after `n_clear` steps of CLEARING whatever happens in them | candidate (A25) |
+| One pose and ego draw per decision; boundary scan, tracker, path errors and CPA all from that estimate; stale frames hold the last received pose | real, but small at nominal settings (pose 3 cm / 0.2 deg jitter, `WALK` 0, `POSE_STALE_PROB` 0): the boundary scan draws a second jitter, CPA uses true own pose against tracks built from the estimate | port for fidelity; negligible performance effect expected |
+| Goal overshoot guard; `metrics.EpisodeRecorder` collision kind from the physics sub-step | edge-case bug fixes | port |
+| `GOAL_CTE_RADIUS` 1.60 → 0.60 m | a stricter task; goal rates stop being comparable with runs 1–5 | decision (A25) |
+| Training excludes unescapable crossings and below-floor being-overtaken draws | reverses the labelled 20 % of A15/A22 in *training* (the development set already has no unescapable crossings) | decision (A25) |
+| Scene strata 20 % empty / 25 % static / 40 % dynamic / 15 % combined, 35 % recovery starts in empty/static, curriculum advancing only on ≥ 0.9 goal and zero collisions per stratum and class, no step override | run 5's obstacle collisions argue for more static practice, but with crossings at 0.45–0.70 for every policy measured, the gate would never pass level 4 | strata and recovery starts: candidate; the gate: **do not adopt** |
+| R-8 slowdown credit only when the coast clears | the opposite direction to F70's evidence | do not adopt (A24 open) |
+| Rewritten trainer (`ent_coef` 0.01, own development cases, lexicographic checkpoint ranking) | drops the development set, Tier 1 comparability, low-speed starts and `RetryingVecMonitor` | do not replace; cherry-pick |
+
+*The reference controller on the development set* (`tools/diagnostics/codex_reference_devset.py`,
+`results/codex_reference_devset/`; CODEX's own environment, goal tolerance
+restored to 1.60 m, supervisor off, nominal noise, seeds as Tier 1):
+
+| class | reference goal | collisions (target / obstacle / boundary) | run 4 Tier 1 goal | run 5 |
+|---|---|---|---|---|
+| head-on | 0.95 | 0.05 / 0 / 0 | 1.00 | 0.90 |
+| crossing | **0.70** | 0.15 / 0.15 / 0 | 0.45 | 0.40 |
+| overtaking | 0.90 | 0 / 0.05 / 0.05 | 1.00 | 0.95 |
+| being overtaken | 0.75 | 0 / 0.20 / 0.05 | 0.85 | 0.80 |
+| null | 0.90 | 0 / 0.10 / 0 | 0.85 | 0.65 |
+| no target | 1.00 | 0 | 0.95 | 0.85 |
+| **overall** | **0.87** | 0.13 | 0.85 | 0.76 |
+
+It matches run 4 overall and beats every PPO run on crossings. Paired by
+scenario, 7 crossings are reference-only goals, 2 run-4-only, 4 failed by both:
+at least 16 of 20 development crossings are solvable from perception, so the
+PPO crossing weakness is not mainly infeasible draws. 95 % of development
+scenarios are solved by at least one of the two. It costs ~1.3 s of CPU per
+decision (budget 0.5 s) and fell back on 39 % of crossing steps, so it is a
+comparator (C3–C6), not a deployable controller. It gives way to both crossing
+sides under the project's narrow-channel convention; CODEX's README notes this
+is not the open-water Rule 15 role table, which the paper should state.
+
+**F72 — A25 option 1 built: the CODEX fixes and the observable encounter latch
+are in, the rest is not. Observation 56 -> 70. Run 6 trains on it.**
+
+*Ported from `CODEX/` (F71), by copying its `env.py`, `observation.py`,
+`features_extractor.py`, `metrics.py` and `colregs/context.py`, then re-applying
+this tree's F70 work on top:*
+
+1. **Cross-track error is scaled by the local channel half-width**, not by
+   `max(MAP_WIDTH, MAP_HEIGHT)` = 25 m. In a 5 m corridor a 2.5 m offset read
+   0.10 and now reads 1.0. Observations are not normalised (`norm_obs=False`),
+   so this was the policy's whole view of where it sat in the channel.
+2. **A sixth observation branch, `context`, 14 values**: per slot, ENGAGED and
+   CLEARING indicators, the latched compliant turn sense, heading and surge
+   change since engagement, `turn_admissible`, `slowdown_clears`,
+   `admissibility_known`, `a_req`, `rho`, `in_extremis` and engagement age; then
+   the previous executed rudder and throttle. `r_pf`'s gate, `v_hold` and `v_r8`
+   are all defined against state latched at engagement, which the policy could
+   not see: the reward was non-Markov in the observation. The slot encoder now
+   takes `TARGET_FEATURES + CONTEXT_FEATURES` and shares weights across slots as
+   before; the previous action joins the scene branch. Truth fields never enter
+   it (`test_context_inputs_do_not_depend_on_target_truth`).
+3. **Clearing is a confirmation window, not a grace period.** CLEARING used to
+   release the latch after `N_CLEAR_STEPS` whatever happened in them, so a
+   give-way vessel could turn back into the target and lose the obligation.
+   Renewed risk now restores ENGAGED, and release requires the range to be
+   opening *and* outside the required separation.
+4. **One perceived state per decision.** `estimated_pose()` returns the last
+   received estimate instead of drawing fresh noise on every call; the boundary
+   scan, the tracker, the path errors and the encounter CPA all use it, with the
+   ego estimate drawn once per frame; consecutive stale frames hold the last
+   estimate actually received. Truth-side geometry moved to
+   `ContextManager.attach_truth`, for diagnostics only.
+5. **Two bug fixes.** The goal is no longer reached by overshooting the last
+   path point along its extension (signed cross-track error is zero there), and
+   `metrics.EpisodeRecorder` takes the collision kind from the physics sub-step,
+   so ship contacts stop being recorded as obstacle contacts.
+6. **A24 decided with A25 (option 1): `R2_SLOWDOWN_TEST = "stop"`.** R-2 and the
+   Rule 8 credit read the braking-path test again, as before F68.
+
+*Deliberately not taken* (F71 has the table): CODEX's Rule 8 credit gated on its
+coast test (A24 the other way), `GOAL_CTE_RADIUS` 0.60 m, excluding the A15/A22
+labelled hard cases from training, the mastery-gated curriculum, and its
+rewritten trainer. Its scene strata and recovery starts are not in run 6 (A25
+option 2 keeps them available; `env.reset` accepts the recovery options).
+
+*Cost.* 26-27 steps/s per process against 30 before (~12 %), from the extra
+path projection and context assembly; run 6 should take 9-11 h.
+
+*Compatibility.* `OBSERVATION_SCHEMA_VERSION = "a25-v3-context"`, recorded in
+each run's `config.json` with the dimension. **Runs 1-5's checkpoints cannot be
+loaded any more**, so Tier 1 and Tier 2 on them are frozen at the numbers in
+F69-F71; their results stand as recorded.
+
+*Tests.* CODEX's `test_perception_consistency.py` and `test_context_regression.py`
+were added (minus three tests belonging to changes not adopted, each with the
+reason in the file), and its adapted `test_observation.py`, `test_env.py`,
+`test_path_geometry.py`, plus its stale-frame and cleared-encounter tests.
+**445 pass.** A 5 k-step smoke ran with the schema stamped.
+
+*Run 6* (`runs/ppo_formulation_seed0_v6/`): 2 M steps, seed 0, 10 workers,
+supervisor off in training, 15 % low-speed starts, evaluation both ways,
+`R2_SLOWDOWN_TEST = "stop"`. Compare with run 4 (0.87) and run 5 (0.76) on the
+development set, and with the reference controller's 0.87 / crossing 0.70.
+The stopped R-2-only run is kept as `ppo_formulation_seed0_v6_stopped_r2stop/`.
 
 ### 3.13 Earlier findings, still standing
 

@@ -355,3 +355,68 @@ def test_min_points_rejects_a_taut_suspension_line():
 
     ranges[100:106] = 5.0                      # a genuine small obstacle
     assert len(cluster(ranges, bearings)) == 1
+
+
+# ---------------------------------------------------------------------------
+# C15 -- hull-fitted measurement
+# ---------------------------------------------------------------------------
+def _visible_face_returns(centre, heading_deg, sensor, *, spacing=0.03, dead_zone=cfg.LIDAR_MIN_RANGE):
+    """Points on the faces of an LOA x BREADTH box that face the sensor."""
+    a = np.radians(heading_deg)
+    fwd = np.array([np.sin(a), np.cos(a)])
+    stbd = np.array([np.cos(a), -np.sin(a)])
+    half_l, half_w = 0.5 * cfg.LOA, 0.5 * cfg.BREADTH
+    faces = [(fwd, half_l, stbd, half_w), (-fwd, half_l, stbd, half_w),
+             (stbd, half_w, fwd, half_l), (-stbd, half_w, fwd, half_l)]
+    pts = []
+    for normal, offset, along, half in faces:
+        mid = np.asarray(centre) + normal * offset
+        if np.dot(np.asarray(sensor) - mid, normal) <= 0.0:
+            continue
+        for t in np.arange(-half, half + 1e-9, spacing):
+            p = mid + along * t
+            if np.linalg.norm(p - sensor) >= dead_zone:
+                pts.append(p)
+    return np.array(pts)
+
+
+@pytest.mark.parametrize("heading, sensor", [
+    (180.0, (5.0, 4.0)),      # head-on, bow face only
+    (135.0, (5.0, 4.0)),      # quarter view, two faces
+    (90.0, (5.0, 6.0)),       # beam-on, one long face
+    (0.0, (5.0, 13.0)),       # sensor ahead of the target: bow face only
+])
+def test_hull_fit_recovers_the_centre_the_centroid_misses(heading, sensor):
+    """C15: the fitted centre is within 5 cm of the truth from every aspect,
+    given the track's course; the centroid is biased toward the sensor."""
+    centre = np.array([5.0, 9.0])
+    pts = _visible_face_returns(centre, heading, np.array(sensor))
+    fitted = trk.hull_fit_centre(pts, sensor, prior_axis_deg=heading)
+    assert fitted is not None
+    assert np.linalg.norm(fitted - centre) < 0.05
+    assert np.linalg.norm(pts.mean(axis=0) - centre) > np.linalg.norm(fitted - centre)
+
+
+def test_hull_fit_completes_a_near_end_the_dead_zone_cut_off():
+    """At close range the 1 m dead zone removes the near end of the hull; the
+    fit completes it from the far faces instead of sliding with the cut."""
+    centre = np.array([5.0, 5.4])
+    sensor = np.array([5.3, 4.0])
+    pts = _visible_face_returns(centre, 180.0, sensor)
+    fitted = trk.hull_fit_centre(pts, sensor, prior_axis_deg=180.0)
+    assert fitted is not None
+    assert np.linalg.norm(fitted - centre) < 0.15
+
+
+def test_hull_fit_declines_when_the_length_axis_is_unknowable():
+    """A bow-only cluster without a course prior could be either axis."""
+    centre = np.array([5.0, 9.0])
+    pts = _visible_face_returns(centre, 180.0, np.array([5.0, 4.0]))
+    assert trk.hull_fit_centre(pts, (5.0, 4.0)) is None
+
+
+def test_the_tracker_can_be_fed_either_measurement():
+    assert trk.Tracker(measurement="centroid").measurement == "centroid"
+    assert trk.Tracker(measurement="hull_fit").measurement == "hull_fit"
+    with pytest.raises(ValueError):
+        trk.Tracker(measurement="box")

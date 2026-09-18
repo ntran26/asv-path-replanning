@@ -59,6 +59,7 @@ import constants as cfg  # noqa: E402
 import curriculum  # noqa: E402
 import scenario as scn  # noqa: E402
 from env import ASVLidarEnv  # noqa: E402
+from observation import observation_space  # noqa: E402
 from features_extractor import ASVFeaturesExtractor  # noqa: E402
 
 RUNS = Path(__file__).resolve().parent.parent / "runs"
@@ -130,14 +131,23 @@ def stage_at(fraction: float) -> int:
     return stage
 
 
-def make_env(rank: int, seed: int, stage: int, randomisation, torch_threads: int = 0):
+def make_env(rank: int, seed: int, stage: int, randomisation, torch_threads: int = 0,
+             supervisor: bool = True, low_speed_start_frac: float = 0.0,
+             r2_slowdown_test: str = None):
     def _init():
         if torch_threads:
             import torch
             torch.set_num_threads(torch_threads)
+        if r2_slowdown_test:
+            cfg.R2_SLOWDOWN_TEST = r2_slowdown_test
         curriculum.apply_stage(PROPULSION_STAGE)
+        # F68: `supervisor=False` trains without the stop latch, so R_ESTOP and
+        # the latch-held speed-gate suspension never act -- the stop becomes a
+        # runtime layer evaluated around the policy, not part of what it learns.
         env = ASVLidarEnv(render_mode=None, scenario_stage=stage,
-                          vessel_randomisation=randomisation)
+                          vessel_randomisation=randomisation,
+                          emergency_stop=supervisor,
+                          low_speed_start_frac=low_speed_start_frac)
         env.reset(seed=seed + rank)
         return env
     return _init
@@ -228,11 +238,21 @@ def run_eval_episode(model, env: ASVLidarEnv, built, seed: int) -> Dict:
 
 
 class FormulationEvalCallback(BaseCallback):
-    def __init__(self, run_dir: Path, eval_freq: int, per_class: int):
+    """Per-class development evaluation.
+
+    `supervisor_modes` (F68): evaluate with the stop latch off, on, or both.  With
+    both, outcomes and compliance are attributable to the policy in the "off"
+    rows, and the "on" rows report the runtime layer's intervention rate.  The
+    best model is chosen on the policy's own ("off") score when it is evaluated.
+    """
+
+    def __init__(self, run_dir: Path, eval_freq: int, per_class: int,
+                 supervisor_modes=("on",)):
         super().__init__(0)
         self.run_dir = Path(run_dir)
         self.eval_freq = int(eval_freq)
         self.scenarios = development_set(per_class)
+        self.supervisor_modes = tuple(supervisor_modes)
         curriculum.apply_stage(PROPULSION_STAGE)
         self.env = ASVLidarEnv(render_mode=None)
         self.best = -np.inf
@@ -240,17 +260,25 @@ class FormulationEvalCallback(BaseCallback):
         self.history: List[Dict] = []
 
     def _evaluate(self) -> None:
+        select_on = "off" if "off" in self.supervisor_modes else self.supervisor_modes[0]
+        for mode in self.supervisor_modes:
+            self._evaluate_mode(mode, select=(mode == select_on))
+
+    def _evaluate_mode(self, mode: str, select: bool) -> None:
         started = time.time()
-        rows = [run_eval_episode(self.model, self.env, built, 900_000 + i)
+        self.env.estop_enabled = (mode == "on")
+        rows = [dict(run_eval_episode(self.model, self.env, built, 900_000 + i), supervisor=mode)
                 for i, built in enumerate(self.scenarios)]
         n = len(rows)
-        summary = {"timesteps": int(self.num_timesteps), "episodes": n,
+        summary = {"timesteps": int(self.num_timesteps), "supervisor": mode, "episodes": n,
                    "goal_rate": sum(r["outcome"] == "goal" for r in rows) / n,
                    "collision_rate": sum(r["outcome"].startswith("collision") for r in rows) / n,
                    "timeout_rate": sum(r["outcome"] == "timeout" for r in rows) / n,
                    "mean_return": float(np.mean([r["return"] for r in rows])),
                    "mean_colregs_integral": float(np.mean([r["colregs_integral"] for r in rows])),
                    "estops_per_episode": float(np.mean([r["estops"] for r in rows])),
+                   # F68: the share of episodes in which the runtime layer had to act.
+                   "intervention_rate": float(np.mean([r["estops"] > 0 for r in rows])),
                    "eval_wall_s": round(time.time() - started, 1)}
         for kind in ("boundary", "obstacle", "target"):
             summary[f"collision_{kind}"] = sum(r["outcome"] == f"collision:{kind}" for r in rows) / n
@@ -261,6 +289,7 @@ class FormulationEvalCallback(BaseCallback):
             summary[f"{cls}/goal"] = sum(r["outcome"] == "goal" for r in sel) / len(sel)
             summary[f"{cls}/collision"] = sum(r["outcome"].startswith("collision") for r in sel) / len(sel)
             summary[f"{cls}/colregs"] = float(np.mean([r["colregs_integral"] for r in sel]))
+            summary[f"{cls}/intervention"] = float(np.mean([r["estops"] > 0 for r in sel]))
         self.history.append(summary)
 
         with open(self.run_dir / "eval_summary.json", "w") as fh:
@@ -276,15 +305,16 @@ class FormulationEvalCallback(BaseCallback):
 
         for key, value in summary.items():
             if isinstance(value, (int, float)):
-                self.logger.record(f"eval/{key}", value)
+                self.logger.record(f"eval_supervisor_{mode}/{key}", value)
         score = summary["goal_rate"] - 2.0 * summary["collision_rate"]
-        if score > self.best:
+        if select and score > self.best:
             self.best = score
             self.model.save(self.run_dir / "best_model.zip")
             self.training_env.save(str(self.run_dir / "best_vecnormalize.pkl"))
-        print(f"[EVAL] t={self.num_timesteps:,} goal {summary['goal_rate']:.2f} "
+        print(f"[EVAL] t={self.num_timesteps:,} supervisor {mode} goal {summary['goal_rate']:.2f} "
               f"collision {summary['collision_rate']:.2f} timeout {summary['timeout_rate']:.2f} "
               f"return {summary['mean_return']:.1f} colregs {summary['mean_colregs_integral']:.1f} "
+              f"intervention {summary['intervention_rate']:.2f} "
               f"({summary['eval_wall_s']} s)", flush=True)
 
     def _on_step(self) -> bool:
@@ -316,6 +346,14 @@ def main() -> None:
                     help="Tier 2: fine-tune from this saved model instead of a fresh policy")
     ap.add_argument("--init-vecnormalize", type=Path, default=None,
                     help="reward-normalisation statistics to continue from (with --init-model)")
+    ap.add_argument("--train-supervisor", choices=("on", "off"), default="on",
+                    help="F68: run the stop latch in the training environments")
+    ap.add_argument("--eval-supervisor", choices=("on", "off", "both"), default="on",
+                    help="F68: evaluate with the stop latch off, on, or both")
+    ap.add_argument("--low-speed-start-frac", type=float, default=0.0,
+                    help="F68: share of training episodes starting slow or at rest")
+    ap.add_argument("--r2-slowdown-test", choices=("coast", "stop"), default=None,
+                    help="F70: R-2's slowing test (default: constants.R2_SLOWDOWN_TEST)")
     ap.add_argument("--fixed-stage", type=int, default=0,
                     help="train on one scenario stage throughout instead of the curriculum")
     args = ap.parse_args()
@@ -326,6 +364,8 @@ def main() -> None:
     if args.torch_threads:
         import torch
         torch.set_num_threads(int(args.torch_threads))
+    if args.r2_slowdown_test:
+        cfg.R2_SLOWDOWN_TEST = args.r2_slowdown_test      # the evaluation process too
 
     run_dir = args.runs_dir / (f"ppo_formulation_seed{args.seed}" + (f"_{args.tag}" if args.tag else "")
                                + ("_smoke" if args.smoke else ""))
@@ -335,6 +375,14 @@ def main() -> None:
         "algorithm": "PPO", "seed": args.seed, "timesteps": args.timesteps,
         "num_envs": args.num_envs, "hyperparameters": PPO_HYPERPARAMS,
         "torch_threads": args.torch_threads, "fixed_stage": args.fixed_stage,
+        "train_supervisor": args.train_supervisor, "eval_supervisor": args.eval_supervisor,
+        "low_speed_start_frac": args.low_speed_start_frac,
+        "r2_slowdown_test": cfg.R2_SLOWDOWN_TEST,
+        # A25: 70-value schema with the encounter-context branch.  A checkpoint
+        # from an earlier schema cannot be resumed; the run records its own.
+        "observation_schema": cfg.OBSERVATION_SCHEMA_VERSION,
+        "observation_dim": int(sum(int(np.prod(space.shape))
+                                   for space in observation_space().spaces.values())),
         "init_model": str(args.init_model) if args.init_model else None,
         "policy": {"features_extractor": "ASVFeaturesExtractor", "net_arch": {"pi": [256, 256], "vf": [256, 256]},
                    "activation": "ReLU"},
@@ -357,7 +405,10 @@ def main() -> None:
 
     base_seed = 100_000 * (args.seed + 1)
     vec = SubprocVecEnv([make_env(i, base_seed, stage_at(0.0), cfg.VESSEL_RANDOMISATION_SCALE,
-                                  1 if args.torch_threads else 0)
+                                  1 if args.torch_threads else 0,
+                                  supervisor=args.train_supervisor == "on",
+                                  low_speed_start_frac=args.low_speed_start_frac,
+                                  r2_slowdown_test=args.r2_slowdown_test)
                          for i in range(args.num_envs)])
     vec = RetryingVecMonitor(vec, filename=str(run_dir / "monitor.csv"),
                      info_keywords=("reached_goal", "collided", "scenario_class"))
@@ -390,7 +441,9 @@ def main() -> None:
         ScenarioStageCallback(args.timesteps, str(run_dir / "curriculum.json")),
         CheckpointCallback(save_freq=max(250_000 // args.num_envs, 1), save_path=str(run_dir),
                            name_prefix="ppo", save_vecnormalize=True),
-        FormulationEvalCallback(run_dir, args.eval_freq, args.eval_per_class),
+        FormulationEvalCallback(run_dir, args.eval_freq, args.eval_per_class,
+                                supervisor_modes=(("off", "on") if args.eval_supervisor == "both"
+                                                  else (args.eval_supervisor,))),
     ])
 
     started = time.time()

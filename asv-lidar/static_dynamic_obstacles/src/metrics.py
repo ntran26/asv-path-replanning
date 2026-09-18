@@ -149,19 +149,25 @@ class EpisodeRecorder:
         collided = bool(info.get("collided", False))
         timed_out = bool(info.get("timeout", False)) or truncated or hit_max_steps
 
-        # `_collided` is true for border contact as well, so the two are split
-        # the same way `rollout.termination_reason` splits them.
-        border_collision = bool(collided and env.hit_border())
-        obstacle_collision = bool(collided and not border_collision)
+        # Trust the collision captured at the physics substep. Rechecking final
+        # geometry can miss the contact and used to label ships as obstacles.
+        kind = info.get("collision_kind")
+        if collided and kind is None:
+            kind = env.collision_kind(env.hull_polygon())
+        border_collision = bool(collided and kind == "boundary")
+        obstacle_collision = bool(collided and kind == "obstacle")
+        target_collision = bool(collided and kind == "target")
 
         if reached_goal:
             reason = "goal"
-        elif timed_out:
-            reason = "timeout"
         elif border_collision:
             reason = "border"
         elif obstacle_collision:
             reason = "obstacle"
+        elif target_collision:
+            reason = "target"
+        elif timed_out:
+            reason = "timeout"
         else:
             reason = "terminated"
 
@@ -178,6 +184,7 @@ class EpisodeRecorder:
 
             "success": int(reason == "goal"),
             "obstacle_collision": int(obstacle_collision),
+            "target_collision": int(target_collision),
             "border_collision": int(border_collision),
             "timeout": int(reason == "timeout"),
             "term_reason": reason,
@@ -280,7 +287,7 @@ def stratified_bootstrap_ci(values: np.ndarray, strata: np.ndarray,
 
 # Metrics that get the full mean/median/IQM/CI treatment in the summary.
 HEADLINE_METRICS = (
-    "success", "obstacle_collision", "border_collision", "timeout",
+    "success", "obstacle_collision", "target_collision", "border_collision", "timeout",
     "rms_cte", "mean_cte", "max_cte",
     "min_obstacle_clearance", "min_border_clearance", "min_lateral_border_clearance",
     "path_completion_steps", "path_completion_time_s", "mean_speed",
@@ -330,6 +337,7 @@ def summarise(rows: List[Dict[str, Any]], *, method: str, deterministic: bool,
             "n": len(subset),
             "success_rate": float(np.mean([r["success"] for r in subset])),
             "obstacle_collision_rate": float(np.mean([r["obstacle_collision"] for r in subset])),
+            "target_collision_rate": float(np.mean([r.get("target_collision", 0) for r in subset])),
             "border_collision_rate": float(np.mean([r["border_collision"] for r in subset])),
             "timeout_rate": float(np.mean([r["timeout"] for r in subset])),
             "mean_rms_cte": float(np.nanmean([r["rms_cte"] for r in subset])),

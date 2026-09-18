@@ -1,10 +1,10 @@
 """SB3 features extractor: per-branch encoders with presence-gated target slots.
 
-**Revision 2** — plain concatenation.  The shared-encoder-plus-DeepSets
+**Revision 3** — plain concatenation with observable encounter memory.  The shared-encoder-plus-DeepSets
 aggregation comparison from Revision 1 is **not built**: superseded decision D3.
 
-01 §6.3 settles the architecture: plain concatenation of the five branches into
-the SAC `MultiInputPolicy`.  Permutation invariance is meaningless at one
+The original architecture used five branches; CODEX adds a sixth for encounter
+memory and executed action within the same `MultiInputPolicy`.  Permutation invariance is meaningless at one
 target, and the measured advantages of attention in the literature come from
 high-density regimes -- dozens of aircraft, eight-ship encounters -- that this
 scope deliberately does not enter.  The scaling question is pre-empted **by
@@ -34,7 +34,7 @@ import torch.nn as nn
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 
 import constants as cfg
-from observation import PRESENCE_INDEX
+from observation import CONTEXT_FEATURES, PREVIOUS_ACTION_FEATURES, PRESENCE_INDEX
 
 
 def _mlp(in_dim: int, hidden, out_dim: int) -> nn.Sequential:
@@ -48,45 +48,69 @@ def _mlp(in_dim: int, hidden, out_dim: int) -> nn.Sequential:
 
 
 class ASVFeaturesExtractor(BaseFeaturesExtractor):
-    """Encodes the five-branch Dict observation into one flat feature vector.
+    """Encodes the revision-3 Dict observation into one flat feature vector.
 
     `lidar`, `boundary`, `ego` and `path` are concatenated and passed through a
-    small MLP.  `target` is reshaped to (batch, n_slots, 16), gated by its
-    presence bit, encoded slot-by-slot with shared weights, and concatenated.
+    small MLP together with the previous executed action.  Each `target` slot
+    and its `context` features share a presence gate and a common encoder.
     """
 
     def __init__(self, observation_space: gym.spaces.Dict, *,
                  slot_hidden=cfg.SLOT_ENCODER_HIDDEN,
                  slot_embed: int = cfg.SLOT_EMBED_DIM,
                  scene_hidden: int = cfg.SCENE_ENCODER_HIDDEN,
-                 n_slots: int = cfg.N_MAX_TARGETS,
+                 n_slots: int | None = None,
                  n_features: int = cfg.TARGET_FEATURES) -> None:
-        self.n_slots = int(n_slots)
         self.n_features = int(n_features)
+        target_width = int(observation_space["target"].shape[0])
+        if self.n_features <= PRESENCE_INDEX or target_width % self.n_features:
+            raise ValueError("target space width must be a multiple of valid slot features")
+        inferred_slots = target_width // self.n_features
+        self.n_slots = inferred_slots if n_slots is None else int(n_slots)
+        if self.n_slots != inferred_slots:
+            raise ValueError("n_slots does not match the target observation space")
+        # Original spaces remain readable for explicit baseline construction;
+        # a v2 checkpoint still cannot be used with a v3 environment.
+        self.has_context = "context" in observation_space.spaces
+        if self.has_context:
+            expected_context = self.n_slots * CONTEXT_FEATURES + PREVIOUS_ACTION_FEATURES
+            if observation_space["context"].shape != (expected_context,):
+                raise ValueError("context width does not match the target slots")
 
         scene_dim = sum(
             int(observation_space[k].shape[0])
             for k in ("lidar", "boundary", "ego", "path")
         )
+        if self.has_context:
+            scene_dim += PREVIOUS_ACTION_FEATURES
         super().__init__(observation_space,
                          features_dim=scene_hidden + slot_embed * self.n_slots)
 
         self.scene_net = _mlp(scene_dim, (scene_hidden,), scene_hidden)
         # One encoder applied to every slot -- the weight sharing that makes the
         # multi-vessel extension a retrain rather than a redesign.
-        self.slot_encoder = _mlp(self.n_features, slot_hidden, slot_embed)
+        self.slot_encoder = _mlp(
+            self.n_features + (CONTEXT_FEATURES if self.has_context else 0),
+            slot_hidden, slot_embed)
 
     def forward(self, observations: Dict[str, torch.Tensor]) -> torch.Tensor:
-        scene = torch.cat([
+        scene_inputs = [
             observations["lidar"],
             observations["boundary"],
             observations["ego"],
             observations["path"],
-        ], dim=1)
+        ]
+        if self.has_context:
+            scene_inputs.append(observations["context"][:, -PREVIOUS_ACTION_FEATURES:])
+        scene = torch.cat(scene_inputs, dim=1)
         scene_feat = self.scene_net(scene)
 
         slots = observations["target"].reshape(-1, self.n_slots, self.n_features)
         presence = slots[..., PRESENCE_INDEX].unsqueeze(-1)
+        if self.has_context:
+            slot_context = observations["context"][:, :-PREVIOUS_ACTION_FEATURES].reshape(
+                -1, self.n_slots, CONTEXT_FEATURES)
+            slots = torch.cat((slots, slot_context), dim=-1)
 
         # Gate the slot's inputs before encoding, so an absent target cannot
         # reach the encoder at all.  Gating only the output would still let the

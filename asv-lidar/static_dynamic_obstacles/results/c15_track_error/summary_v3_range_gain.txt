@@ -1,0 +1,33 @@
+== by true range (medians unless noted)
+                      frames  pos_err  course_err  course_err_p90  speed_err  stop_dcpa_err  stop_test_disagrees
+range_bin   mode                                                                                                
+(0.0, 2.0]  centroid     304    0.329       2.909         161.868      0.160          0.268                0.339
+            hull_fit     328    0.180       4.381          24.511      0.048          0.095                0.055
+(2.0, 3.0]  centroid     351    0.368       2.503          11.150      0.066          0.328                0.199
+            hull_fit     365    0.070       2.723          12.645      0.025          0.077                0.030
+(3.0, 4.0]  centroid     324    0.549       2.315           6.991      0.034          0.487                0.062
+            hull_fit     324    0.052       2.504          10.307      0.027          0.047                0.031
+(4.0, 6.0]  centroid     493    0.680       2.306           6.918      0.027          0.619                0.008
+            hull_fit     493    0.074       2.582          10.486      0.024          0.057                0.067
+(6.0, 9.0]  centroid     447    0.727       2.543           6.745      0.025          0.608                0.013
+            hull_fit     447    0.208       4.566          49.514      0.056          0.173                0.235
+(9.0, 16.0] centroid     740    0.769       2.845           7.514      0.020          0.800                0.057
+            hull_fit     740    0.649       2.977           8.102      0.020          0.201                0.086
+
+== by scenario set
+                          frames  pos_err  course_err  course_err_p90  speed_err  stop_dcpa_err  stop_test_disagrees
+set             mode                                                                                                
+being_overtaken centroid     424    0.374       1.152           3.886      0.037          0.306                0.208
+                hull_fit     424    0.051       1.284           6.158      0.019          0.045                0.026
+crossing        centroid     153    0.377       2.478           7.325      0.051          0.354                0.085
+                hull_fit     156    0.111       2.553          20.043      0.058          0.087                0.109
+head_on_width   centroid    1806    0.729       2.937           8.941      0.030          0.600                0.073
+                hull_fit    1841    0.251       3.855          17.104      0.030          0.192                0.110
+overtaking      centroid     350    0.619       3.415           8.592      0.023          0.618                0.037
+                hull_fit     350    0.042       3.918          10.979      0.016          0.023                0.029
+
+== overall
+          frames  pos_err  course_err  course_err_p90  speed_err  stop_dcpa_err  stop_test_disagrees
+mode                                                                                                
+centroid    2733    0.696       2.651           8.389      0.030          0.541                0.090
+hull_fit    2771    0.152       3.179          15.070      0.027          0.128                0.087

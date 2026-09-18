@@ -1,0 +1,98 @@
+Using cpu device
+Logging to C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\runs\tensorboard\ppo_formulation_seed0_a25_smoke_1
+[CURRICULUM] t=0 -> scenario stage 1
+[CURRICULUM] t=330 -> scenario stage 2
+[CURRICULUM] t=740 -> scenario stage 3
+[CURRICULUM] t=1,320 -> scenario stage 4
+[CURRICULUM] t=2,050 -> scenario stage 5
+[EVAL] t=4,100 supervisor off goal 0.42 collision 0.58 timeout 0.00 return -117.1 colregs -13.9 intervention 0.00 (18.7 s)
+[EVAL] t=4,100 supervisor on goal 0.42 collision 0.58 timeout 0.00 return -117.1 colregs -13.9 intervention 0.00 (15.0 s)
+----------------------------------------------
+| eval_supervisor_off/            |          |
+|    being_overtaken/collision    | 1        |
+|    being_overtaken/colregs      | -5.95    |
+|    being_overtaken/goal         | 0        |
+|    being_overtaken/intervention | 0        |
+|    collision_boundary           | 0        |
+|    collision_obstacle           | 0.417    |
+|    collision_rate               | 0.583    |
+|    collision_target             | 0.167    |
+|    crossing/collision           | 0.5      |
+|    crossing/colregs             | 0        |
+|    crossing/goal                | 0.5      |
+|    crossing/intervention        | 0        |
+|    episodes                     | 12       |
+|    estops_per_episode           | 0        |
+|    eval_wall_s                  | 18.7     |
+|    goal_rate                    | 0.417    |
+|    head_on/collision            | 0        |
+|    head_on/colregs              | -32.2    |
+|    head_on/goal                 | 1        |
+|    head_on/intervention         | 0        |
+|    intervention_rate            | 0        |
+|    mean_colregs_integral        | -13.9    |
+|    mean_return                  | -117     |
+|    no_target/collision          | 1        |
+|    no_target/colregs            | 0        |
+|    no_target/goal               | 0        |
+|    no_target/intervention       | 0        |
+|    null/collision               | 0.5      |
+|    null/colregs                 | 0        |
+|    null/goal                    | 0.5      |
+|    null/intervention            | 0        |
+|    overtaking/collision         | 0.5      |
+|    overtaking/colregs           | -45.1    |
+|    overtaking/goal              | 0.5      |
+|    overtaking/intervention      | 0        |
+|    timeout_rate                 | 0        |
+|    timesteps                    | 4100     |
+| eval_supervisor_on/             |          |
+|    being_overtaken/collision    | 1        |
+|    being_overtaken/colregs      | -5.95    |
+|    being_overtaken/goal         | 0        |
+|    being_overtaken/intervention | 0        |
+|    collision_boundary           | 0        |
+|    collision_obstacle           | 0.417    |
+|    collision_rate               | 0.583    |
+|    collision_target             | 0.167    |
+|    crossing/collision           | 0.5      |
+|    crossing/colregs             | 0        |
+|    crossing/goal                | 0.5      |
+|    crossing/intervention        | 0        |
+|    episodes                     | 12       |
+|    estops_per_episode           | 0        |
+|    eval_wall_s                  | 15       |
+|    goal_rate                    | 0.417    |
+|    head_on/collision            | 0        |
+|    head_on/colregs              | -32.2    |
+|    head_on/goal                 | 1        |
+|    head_on/intervention         | 0        |
+|    intervention_rate            | 0        |
+|    mean_colregs_integral        | -13.9    |
+|    mean_return                  | -117     |
+|    no_target/collision          | 1        |
+|    no_target/colregs            | 0        |
+|    no_target/goal               | 0        |
+|    no_target/intervention       | 0        |
+|    null/collision               | 0.5      |
+|    null/colregs                 | 0        |
+|    null/goal                    | 0.5      |
+|    null/intervention            | 0        |
+|    overtaking/collision         | 0.5      |
+|    overtaking/colregs           | -45.1    |
+|    overtaking/goal              | 0.5      |
+|    overtaking/intervention      | 0        |
+|    timeout_rate                 | 0        |
+|    timesteps                    | 4100     |
+| rollout/                        |          |
+|    ep_len_mean                  | 36.2     |
+|    ep_rew_mean                  | -330     |
+| time/                           |          |
+|    fps                          | 27       |
+|    iterations                   | 1        |
+|    time_elapsed                 | 188      |
+|    total_timesteps              | 5120     |
+----------------------------------------------
+[EVAL] t=5,120 supervisor off goal 0.33 collision 0.67 timeout 0.00 return -154.9 colregs -13.7 intervention 0.00 (14.5 s)
+[EVAL] t=5,120 supervisor on goal 0.33 collision 0.67 timeout 0.00 return -154.9 colregs -13.7 intervention 0.00 (14.3 s)
+done in 0.06 h -> C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\runs\ppo_formulation_seed0_a25_smoke

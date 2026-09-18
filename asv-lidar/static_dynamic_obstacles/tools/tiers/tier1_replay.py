@@ -44,6 +44,11 @@ def main() -> None:
     ap.add_argument("--model", type=Path, default=ROOT / "runs" / "ppo_formulation_seed0_v3" / "final_model.zip")
     ap.add_argument("--per-class", type=int, default=20)
     ap.add_argument("--tag", default="run3")
+    ap.add_argument("--processes", type=int, default=None, help="worker processes (default: cores - 2)")
+    ap.add_argument("--stop-test-fit", choices=("on", "off"), default=None,
+                    help="override STOP_TEST_USES_HULL_FIT in the workers (F66 A/B)")
+    ap.add_argument("--supervisor", choices=("on", "off"), default=None,
+                    help="F68: run the replay with the stop latch on or off")
     args = ap.parse_args()
     model = args.model if args.model.is_absolute() else ROOT / args.model
 
@@ -54,7 +59,13 @@ def main() -> None:
     ho = head_on_width_set()
     jobs = [(b, 900_000 + i, "model", None, {"set": "development", "scenario": i}) for i, b in enumerate(dev)]
     jobs += [(b, 700_000 + i, "model", 0, {"set": "head_on_width", "scenario": i}) for i, b in enumerate(ho)]
-    d = pd.DataFrame(run_pool(jobs, model_path=model))
+    overrides = {}
+    if args.stop_test_fit is not None:
+        overrides["STOP_TEST_USES_HULL_FIT"] = args.stop_test_fit == "on"
+    if args.supervisor is not None:
+        overrides["EMERGENCY_STOP_ENABLED"] = args.supervisor == "on"
+    overrides = overrides or None
+    d = pd.DataFrame(run_pool(jobs, model_path=model, processes=args.processes, overrides=overrides))
     d.to_csv(out / "episodes.csv", index=False)
 
     pd.set_option("display.width", 250)
@@ -64,13 +75,19 @@ def main() -> None:
         n=("steps", "size"), goal=("outcome", lambda s: (s == "goal").mean()),
         collision=("collided", "mean"), target=("collided_target", "mean"),
         speed=("mean_speed", "mean"), colregs=("colregs_integral", "mean"),
-        estops=("estops", "mean"), port_sense=("ever_port_sense_non_overtaking", "mean")).round(2)
+        estops=("estops", "mean"), intervention=("estops", lambda x: float((x > 0).mean())),
+        port_sense=("ever_port_sense_non_overtaking", "mean")).round(2)
     per_class = per_class.join(_own_eval(model))
 
     cr = dv[dv["class"] == "crossing"].copy()
     cr["dcpa_bin"] = pd.cut(cr.dcpa_m, [-0.01, 0.7, 1.4, 2.6])
     crossing = cr.pivot_table(index="crossing_side", columns="dcpa_bin", values="collided",
                               aggfunc=["mean", "size"], observed=True).round(2)
+    if "crossing_escapable" in cr and cr.crossing_escapable.notna().any():
+        crossing = crossing.to_string() + "\n\n-- by A22 label (escapable by a lawful response)\n" + \
+            cr.groupby(cr.crossing_escapable.astype(str)).agg(
+                n=("steps", "size"), collision=("collided", "mean"),
+                target=("collided_target", "mean")).round(2).to_string()
 
     bo = dv[dv["class"] == "being_overtaken"].copy()
     bo["floor"] = np.where(bo.dcpa_below_floor.astype(str) == "True", "below floor", "at/above floor")
@@ -94,7 +111,7 @@ def main() -> None:
              f"{len(d)} episodes, {time.time() - started:.0f} s", "",
              "== development set, per class (own_* = the model's last in-training evaluation, before today's code)",
              per_class.to_string(), "",
-             "== crossing collision by side x drawn DCPA", crossing.to_string(), "",
+             "== crossing collision by side x drawn DCPA", crossing if isinstance(crossing, str) else crossing.to_string(), "",
              "== being overtaken, A15 floor", overtaken.to_string(), "",
              "== head-on width set (obstacles off)", head_on.to_string(), "",
              f"== supervisor stops: {int(d.estops.sum())} in {len(stopped)} episodes; "

@@ -1,0 +1,14 @@
+{
+  "command": [
+    "C:\\Users\\hntran\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\\python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--junitxml=C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\CODEX\\results\\tests\\pytest.xml"
+  ],
+  "exit_code": 0,
+  "seconds": 1607.765953540802
+}

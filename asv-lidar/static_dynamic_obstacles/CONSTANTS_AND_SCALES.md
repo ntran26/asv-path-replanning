@@ -759,6 +759,16 @@ tracker.
 | crossing turn sense | **+1 from starboard, −1 from port** | F53, A17 **decided** (option 1): `compliant_turn_sense(cls, crossing_side)` |
 | `ESTOP_CLEAR_DCPA_M` | **1.76 m** | F56, A18 **decided** (option 1), derived: `0.5·LOA + 0.5·B + 2·0.15 + D_SAFE`. The supervisor stop, R-2's slowdown carve-out and the Rule 8 speed credit apply only when the target's DCPA with the own ship stationary reaches this |
 | classification heading | **path tangent at the own ship** | F56, A19 **decided** (option 1): class, crossing side and true class use it; CPA products and the Rule 8 accumulator keep the instantaneous heading; open water falls back to the heading |
+| stop test (`dcpa_if_stopped`) | **closest approach along the latch's braking path, then stopped** | F67, A23 **decided** (option 1): `stopping.dcpa_over_stop`, nominal hull, `STOP_TEST_DT_S` 0.05; against `ESTOP_CLEAR_DCPA_M` 1.76 m. From cruise: 1.05 s, 0.32 m |
+| `POLICY_SLOWDOWN_RPM` / `SLOWDOWN_TEST_MAX_S` | **0 / 20 s** | F68: the agent's own slowdown (a coast) for R-2 and the Rule 8 credit (`slowdown_clears`); the supervisor keeps the latch profile (`stop_clears`) |
+| training supervisor | **switch** (`--train-supervisor`, default on) | F68: off trains without the latch, so `R_ESTOP` and the gate suspension drop out |
+| low-speed starts | **`low_speed_start_frac`**, env default 0; `LOW_SPEED_START_ZERO_SHARE` 0.5 | F68: from rest, or uniform on (0, 0.5 `U_NOM`] |
+| `R2_SLOWDOWN_TEST` | **"stop"** (A24, decided) | F70/F72: R-2's and the Rule 8 credit's slowing test — "stop" (A23, `stop_clears`, the default) or "coast" (F68, `slowdown_clears`); `train_formulation.py --r2-slowdown-test` |
+| observation | **70 values, 6 branches** (`OBSERVATION_SCHEMA_VERSION` "a25-v3-context") | F72: adds `context` (12 per slot + 2 previous-action values); cross-track error scaled by the local channel half-width, not 25 m |
+| `STOP_TEST_USES_HULL_FIT` | **False** | F66–F67: the C15 hull-fitted close-range view (within `STOP_TEST_FIT_RANGE_M` 4 m) is built but off — it doubles stops in Tier 1 |
+| `TRACK_MEASUREMENT` | **"centroid"** | F64: `hull_fit` built but not adopted — better within 4 m, worse course at 6–9 m |
+| crossing escape check | **accept only if coasting (RPM 0) or a 60° compliant alteration, after 1.5 s at cruise, clears the target hull and keeps the own hull in the corridor** | F63, A22 **decided** (option 1): `CROSSING_ESCAPE_DELAY_S` 1.5, `_TURN_DEG` 60, `_STOP_RPM` 0, `_TAIL_S` 6, steering at 2 Hz on the nominal hull |
+| `CROSSING_UNESCAPABLE_FRAC` | **0.20** | F63, A22: drawn once per sample, labelled `scenario.crossing_escapable = False` |
 | `CONFINED_CT_HALF_DEG` | **10°** | F61, A21 **decided** (option 1): overtaking, being-overtaken and null targets are drawn within ±10° of the channel direction (classifier bands unchanged) |
 | confined track check | **hull inside the corridor, every 0.5 s to CPA** (null: 15 s) | F61, A21: the generator rejects draws whose target would breach the channel before CPA |
 | `clamp_to_corridor` | **nudge, not teleport** | F61, A21: heading to the channel tangent, moved inward by the breach + 0.1 m |
