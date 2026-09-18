@@ -1,0 +1,39 @@
+cruise follower done (178 s)
+cruise run4     done (379 s)
+cruise run5     done (512 s)
+rest   follower done (647 s)
+rest   run4     done (800 s)
+rest   run5     done (934 s)
+F70 -- development set, supervisor off, start at cruise vs rest (720 episodes, 934 s)
+
+== overall
+           goal        target       
+start    cruise   rest cruise   rest
+who                                 
+follower  0.375  0.450  0.258  0.158
+run4      0.850  0.842  0.083  0.083
+run5      0.758  0.750  0.108  0.142
+
+== per class
+                           goal       target        other      
+start                    cruise  rest cruise  rest cruise  rest
+who      class                                                 
+follower being_overtaken   0.45  0.45   0.05  0.00   0.50  0.55
+         crossing          0.15  0.60   0.65  0.10   0.20  0.30
+         head_on           0.60  0.50   0.35  0.45   0.05  0.05
+         no_target         0.25  0.25   0.00  0.00   0.75  0.75
+         null              0.35  0.35   0.00  0.00   0.65  0.65
+         overtaking        0.45  0.55   0.50  0.40   0.05  0.05
+run4     being_overtaken   0.85  0.85   0.00  0.00   0.15  0.15
+         crossing          0.45  0.55   0.50  0.35   0.05  0.10
+         head_on           1.00  0.80   0.00  0.15   0.00  0.05
+         no_target         0.95  0.90   0.00  0.00   0.05  0.10
+         null              0.85  0.95   0.00  0.00   0.15  0.05
+         overtaking        1.00  1.00   0.00  0.00   0.00  0.00
+run5     being_overtaken   0.80  0.80   0.00  0.05   0.20  0.15
+         crossing          0.40  0.15   0.50  0.70   0.10  0.15
+         head_on           0.90  0.95   0.10  0.05   0.00  0.00
+         no_target         0.85  0.95   0.00  0.00   0.15  0.05
+         null              0.65  0.75   0.00  0.00   0.35  0.25
+         overtaking        0.95  0.90   0.05  0.05   0.00  0.05
+

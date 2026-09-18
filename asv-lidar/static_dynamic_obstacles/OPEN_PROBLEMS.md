@@ -4,7 +4,16 @@
 count. This file records only what is *not settled*, ordered so the
 highest-leverage item is first.
 
-**Last updated:** 2026-09-16, revision 10 — your option-1 call on A21 (F61).
+**Last updated:** 2026-09-18, revision 19 — your option-1 call on A25 (and A24 with it) built; run 6 training (F72).
+Revision 18: CODEX reviewed; A25 opened (F71).
+Revision 17: run 5 did not improve on run 4; low-speed starts ruled out; A24 opened (F70).
+Revision 16: run 4 finished and replayed with the supervisor off and on (F69).
+Revision 15: your supervisor-as-runtime-layer suggestions, built (F68).
+Revision 14: your option-1 call on A23 (F67).
+Revision 13: run 4 launched, C15's stop-test view (F66), A23.
+Revision 12: your option-1 call on A22 (F63).
+Revision 11: Tier 2 and A22 (F62).
+Revision 10: your option-1 call on A21 (F61).
 Revision 9: straight paths (F59), the tiered tests (F60), a recommended
 resolution for every open item, and A21 from Tier 0.
 Revision 8 recorded A20 (F58), revision 7 A18 and A19 (F56), revision 6
@@ -18,6 +27,63 @@ generator, the scale audit, noise and randomisation.
 | **A** | Decisions | a call from you — 3 items (A10, A3/A4/A6), each with a recommendation below |
 | **B** | Measurements | basin time — `PART2_BASIN_PLAN.md`, with one addition proposed |
 | **C** | Build work | my time — 8 items |
+
+### Under test in revision 15 — the supervisor as a runtime layer (`PROJECT_STATE.md` F68)
+
+| Item | State |
+|---|---|
+| Train with the supervisor off; R-2 tests the agent's own (coasting) slowdown | **built** (`--train-supervisor off`, `slowdown_clears`) |
+| Stop kept as a runtime safety layer | unchanged in the environment and bridge |
+| Evaluate off and on; intervention rate as a metric | **built** (`--eval-supervisor both`, Tier 1 `--supervisor`) |
+| Paper: 8(e) as two layers — policy slackens (learned), safety layer stops (engineered) | recorded; a writing item |
+| 10–20 % of training episodes start slow or at rest | **built** (`--low-speed-start-frac`) |
+| Fixed on the way: the supervisor's speed read drew from the shared noise stream | **fixed** — on/off replays are identical when no stop fires |
+
+**Test:** Tier 1 of run 4 off/on, then run 5 from scratch with all of it, against run 4. Adopt if run 5's policy-only (supervisor off) outcomes match or beat run 4's and its intervention rate is low.
+
+**Run 4 baseline (F69):** goal 0.87 / collision 0.13 in training. Tier 1 under current code — supervisor off: crossing goal 0.45, all other classes 0.85–1.00; supervisor on: crossing 0.60, others identical. Intervention rate 0.05 on the development set (crossing 0.20, head-on 0.10), 0.02 on the head-on width set; 8 stops, 0 then hit; 3 outcomes changed, all crossing collisions turned to goals.
+
+**Run 5 (F70):** goal 0.76 / collision 0.24, the same with the supervisor off and on; intervention rate 0.03. Worse than run 4 in every class, most in null (0.65 against 0.85) and crossing (0.40); faster everywhere. **Not adopted as built.**
+Low-speed starts are ruled out: run 4 scores 0.85 from cruise and 0.84 from rest (head-on 1.00 → 0.80), and starting from rest makes solved encounters easier, not infeasible.
+Lead: R-2's coast test admitted the 8(e) carve-out on 6 % of candidate crossing frames against 38 % for the stop test. See A24.
+
+### Decided in revision 19 — option 1 for A25, and A24 with it (`PROJECT_STATE.md` F72)
+
+| Item | Resolution |
+|---|---|
+| A25 what to take from CODEX | **port the fixes and the observable latch**: cross-track error scaled by the local half-width; a 14-value `context` branch (latch state, turn sense, change since engagement, admissibility, gates, age) plus the previous action, 56 -> 70; clearing restores the obligation when risk returns; one perceived state per decision; goal-overshoot and collision-kind fixes. Our trainer, development set, curriculum, 1.60 m goal and the A15/A22 labelled cases stay. CODEX's coast-gated Rule 8 credit, 0.60 m goal, excluded hard cases, mastery gate and trainer are not taken. Run 6 trains on it; the CODEX reference controller is the comparator |
+| A24 R-2's slowing test | **the braking-path stop** (`R2_SLOWDOWN_TEST = "stop"`), as before F68 |
+
+### A24 (decided in revision 19 — option 1) — which slowing test R-2 reads
+
+| Option | What it means | Evidence |
+|---|---|---|
+| **1. The braking-path stop (`stop_clears`, A23), as before F68 (recommended if run 6 ≥ run 5)** | R-2 pays a slowdown where stopping would clear. The policy cannot itself stop (no reverse), so the reward credits an intent the safety layer completes; the paper's two-layer framing covers that | run 4 used the stationary form of this test (0.87); run 6 tests it under the F68 formulation |
+| 2. The policy's own coast (`slowdown_clears`, F68) | R-2 pays only a slowdown this hull can deliver unaided. Honest, but a coast from cruise rarely clears within a crossing's TCPA, so 8(e) slackening is almost never paid | run 5: 0.76, crossings 0.40, faster everywhere |
+| 3. Unlock reverse for the policy (propulsion stage 5) | makes the agent's slowdown a real brake, so option 2 becomes meaningful | untested; changes the action space and Part B's reverse measurements (B1) |
+
+**Test:** run 6 = run 5 + `--r2-slowdown-test stop` — stopped before its first evaluation; folded into A25's next run.
+
+### A25 (new, open) — what to take from CODEX (`PROJECT_STATE.md` F71)
+
+| Option | Contents | Cost |
+|---|---|---|
+| **1. Port the fixes and the observable latch, one run (recommended)** | cross-track scaled by local half-width; context branch + previous action (56 → 70); clearing-latch fix; synchronised perception; goal-overshoot and metrics fixes. Keep our trainer, development set, curriculum, goal tolerance 1.60 m, A15/A22 labelled cases, and R-2 on the stop test (A24 option 1). Run 7 from scratch; the CODEX reference controller becomes the comparator | ~1 day build and tests, one 8–11 h run; old checkpoints retire |
+| 2. Option 1 plus CODEX's scene strata and recovery starts (not its mastery gate) | more static-only and recovery practice, aimed at run 5's obstacle collisions | two changes in one run; harder to attribute |
+| 3. Adopt CODEX wholesale | its trainer, gate, 0.60 m goal, excluded hard cases | loses comparability with runs 1–5; the gate would stall at level 4 given every measured crossing rate |
+| 4. Fix only the cross-track scaling | smallest change, same observation shape | leaves the reward non-Markov in the observation |
+
+### Decided in revision 14 — option 1 for A23 (`PROJECT_STATE.md` F67)
+
+| Item | Resolution |
+|---|---|
+| A23 stop test | **along the braking path**: the target's closest approach to the own ship as it brakes under the latch's full astern, then stopped (`stopping.dcpa_over_stop`), against 1.76 m. Tier 1: stops 13 → 7, stop-then-hit 6 → 0. C15's hull-fitted view stays off (with it: 23 stops, 8 then hit) |
+
+### Decided in revision 12 — option 1 for A22 (`PROJECT_STATE.md` F63)
+
+| Item | Resolution |
+|---|---|
+| A22 crossing feasibility | **a crossing is accepted only if a lawful escape clears it** — coasting to a stop, or a 60° alteration in the A17 compliant sense, after 1.5 s at cruise, in the own ship's physics, hulls apart and own hull inside the corridor; 20 % drawn unescapable and labelled `crossing_escapable = False` |
 
 ### Decided in revision 10 — option 1 for A21 (`PROJECT_STATE.md` F61)
 
@@ -33,7 +99,7 @@ varying-width corridors. Tier A drops its two bend cases (34 → 32).
 
 | Item | Recommendation | Why, briefly |
 |---|---|---|
-| **A21** (new) | **option 1** — channel-keeping confined targets, hull-based floor | Tier 0 found being-overtaken geometry broken; see A21 |
+| **A22** (new) | **option 1** — feasibility-floor crossings, 20 % labelled below | a quarter of crossings are unavoidable by any lawful response; see A22 |
 | A10 vessel model | **keep v3** in simulation; fit v4b's structure (`N_rr` fixed) in basin session 1 | both refits failed the pre-registered rule; changing the plant mid-formulation would confound every run comparison |
 | A3 `D_SAFE` | **keep 0.35 m** | satisfies 02a §2's invariant; A18's `ESTOP_CLEAR_DCPA_M` is built on it |
 | A4 crossing width threshold | **adopt 04a's 7.60 m** | the generator's width strata already use it, and bends no longer confound width (F59) |
@@ -341,6 +407,76 @@ supervisor, and R-2 still pays the same futile slowdown.
 stopping help?") rather than re-tuning a width, and it leaves the domain
 geometry the COLREGs terms are built on untouched. **To resolve:** say which.
 
+## A22. A quarter of generated crossings cannot be avoided
+
+**New, from Tier 2 and a feasibility replay (`PROJECT_STATE.md` F62).** Crossing
+is now the dominant failure: evaluation 0.35–0.55 in Tier 2, and flat at
+~0.58 in training, on both sides alike. So I replayed the 20 development
+crossings under scripted responses taken from t = 0 (hold, half speed, full
+astern, a 30° or 60° compliant alteration), with obstacles and the supervisor
+off. **The best response per scenario still hits the target in 5 of 20.**
+
+| drawn geometry, medians | TCPA | spawn range | DCPA | speed ratio |
+|---|---|---|---|---|
+| avoidable | 9.9 s | 8.9 m | 1.26 m | 0.90 |
+| unavoidable | **8.8 s** | **6.7 m** | 1.00 m | 0.87 |
+
+The generator draws crossing TCPA and range from 04a's windows, scaled to
+0.55 m/s. At the short end, a target on a crossing course reaches the own
+ship's track before the own ship can leave it or stop short of it. No reverse
+is available at propulsion stage 4 (`RPM_FLOOR` = 0), so "full astern" coasts.
+
+**Options:**
+
+1. **feasibility-floor crossings, as A15 did for being overtaken.** Accept a
+   crossing draw only if a scripted escape (the best of stop, and a 60°
+   compliant alteration, from engagement) avoids the target hull. Keep a
+   labelled 20 % below that floor as the last-moment case;
+2. raise the crossing windows instead (e.g. TCPA ≥ 10 s and spawn range
+   ≥ 8 m) and leave the rest as drawn. Simpler, but the threshold is a proxy
+   and some unavoidable draws would remain;
+3. keep as is and report crossing against the feasible subset only. Training
+   still pays −300 for draws no policy can win, which is the pressure that made
+   the being-overtaken policy abandon its role in run 2.
+
+**Recommendation:** (1). It is the A15/A21 principle applied consistently —
+the drawn encounter must be winnable by a lawful response, except in a
+labelled fraction — and the check reuses the environment's own physics, so it
+stays true when the vessel model changes. Cost: an escape rollout per accepted
+draw at generation time, about 10–20 simulated steps × 2 responses. **To
+resolve:** say which. Run 4 should wait for it.
+
+## A23. "Stopping clears" assumes the own ship stops where it is
+
+**New, from C15's stop-test view (`PROJECT_STATE.md` F66).** A18 lets the
+supervisor stop only when the target's DCPA *with the own ship stationary at
+its current position* reaches `ESTOP_CLEAR_DCPA_M` = 1.76 m. With the
+hull-fitted geometry that test agrees with the truth twice as often (0.090 →
+0.046 disagreement), yet in a Tier 1 replay it **more than doubled stops (13 →
+29) and stop-then-hit episodes (6 → 15)**, and raised head-on collision at 6
+and 7 m. A stopping vessel keeps moving toward the target's track: it coasts at
+propulsion stage 4, and even the astern latch takes 1.1–3.7 s. The centroid's
+bias had understated DCPA-if-stopped and masked this.
+
+**Options:**
+
+1. **evaluate the stop where the vessel will actually stop.** Project the own
+   ship along its heading by the stopping distance of the latch the supervisor
+   would use (the identified hull's braking, as in F28), and require the target
+   hull to clear that swept stretch by hull clearance + `D_SAFE`. Then re-enable
+   the hull-fitted view (C15), since the test would at last ask the right
+   question with the right geometry;
+2. keep the current test and raise `ESTOP_CLEAR_DCPA_M` by an empirical margin
+   (e.g. to ~2.5 m). Simple, but a proxy for stopping distance that is wrong at
+   other speeds;
+3. keep as is, with the view off (today). The centroid's bias acts as an
+   accidental margin, which is fragile: any perception improvement brings the
+   failure back.
+
+**Recommendation:** (1). It keeps A18's principle, "stop only when stopping
+helps", and makes it physically true. It also lets the better perception help
+instead of hurt. **To resolve:** say which. Run 4 is unaffected either way.
+
 ## A21. Confined targets leave their corridor, and A15's floor is centre-to-centre
 
 **New, from Tier 0 (`PROJECT_STATE.md` F60).** With obstacles off, a path
@@ -517,6 +653,8 @@ settled.
 | ~~A15~~ | being-overtaken DCPA floor | **decided** (option 1) | — | built, F53 |
 | ~~A16~~ | two-sided speed gate | **decided** (option 1) | — | built, F50 |
 | ~~A17~~ | side-dependent crossing turn sense | **decided** (option 1) | — | built, F53 |
+| ~~A22~~ | crossings must be escapable, 20 % labelled | **decided** (option 1) | — | built, F63 |
+| ~~C16~~ | class share lost on generator cap-outs | **fixed** (mine) | — | F62 |
 | ~~A21~~ | confined targets keep the channel; hull-clearance floor | **decided** (option 1) | — | built, F61 |
 | A10 | keep v3 | decision | model provenance | confirm (recommended) |
 | A3, A4, A6 | carried | decision | various | one call each |
@@ -526,5 +664,6 @@ settled.
 | ~~A20~~ | freeze class and sense per engagement | **decided** (option 1) | — | built, F58 |
 | ~~A19~~ | classify against the path tangent | **decided** (option 1) | — | built, F56 (residual → A20) |
 | ~~A18~~ | stop only when stopping clears | **decided** (option 1) | — | built, F56 |
-| C15 | tracker course estimate at close range | build | class boundaries near CPA | mine |
+| ~~A23~~ | stop test along the braking path | **decided** (option 1) | — | built, F67 |
+| C15 | tracker close-range bias — hull fit and stop-test view built, both **off** (F64, F66, F67); the view still over-stops with A23 — next suspect is the fitted heading | build | stop test | mine |
 | C14 | narrow head-on — diagnosed (A18); clamp teleport to replace | build | tidy | mine |

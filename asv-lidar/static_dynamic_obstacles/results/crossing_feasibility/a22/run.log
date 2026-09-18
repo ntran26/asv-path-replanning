@@ -1,0 +1,25 @@
+== target-collision rate by scripted response (development crossings, obstacles off, supervisor off)
+side      port  starboard
+policy                   
+follower   0.8        0.5
+slow       0.3        0.1
+stop       0.1        0.2
+turn30     0.0        0.2
+turn60     0.0        0.2
+
+best of all responses still hits the target: 0.00 (0/20)
+
+== unavoidable draws (best response still hits)
+Empty DataFrame
+Columns: [side, width, dcpa, tcpa, k, ct, range0, label_escapable, best_hit]
+Index: []
+
+== drawn geometry, avoidable vs unavoidable (medians)
+          dcpa   tcpa    k  range0  width
+best_hit                                 
+False     1.09  10.75  0.9    8.54   5.61
+
+== A22 label against this replay's best response (label from the generator's escape check)
+best_hit         some response clears
+label_escapable                      
+True                               20

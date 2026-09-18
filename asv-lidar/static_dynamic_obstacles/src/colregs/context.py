@@ -102,6 +102,15 @@ class EncounterContext:
     d_domain: float = float("inf")     # range from the domain boundary to the TS
     dcpa_domain: float = float("inf")  # DCPA less the domain radius at the bearing
     v_rel: float = 0.0                 # relative speed magnitude, m/s
+    # The A18 stop test's view at close range (F66): range, bearing and
+    # heading-intersection from the hull-fitted centre and axis.  None beyond
+    # `STOP_TEST_FIT_RANGE_M`, or without a fit, when the track's own values are used.
+    stop_rng: Optional[float] = None
+    stop_alpha: Optional[float] = None
+    stop_ct: Optional[float] = None
+    # Own-ship surge when the context was built: where the braking path of
+    # the A23 stop test starts from.
+    u_own: float = 0.0
 
     # --- latched on engagement --------------------------------------------
     state: str = IDLE
@@ -164,22 +173,41 @@ class EncounterContext:
 
     @property
     def dcpa_if_stopped(self) -> float:
-        """The target's DCPA were the own ship stationary, perceived (A18).
+        """The target's closest approach if the own ship stopped now, perceived.
 
-        In the own-ship frame the target sits at bearing `alpha` and runs on
-        relative course `ct`, so its track passes the own ship at
-        `rng * |sin(alpha - ct)|`, provided it is still approaching; once it is
-        running away the present range is the closest it gets.
+        A18 evaluated this with the own ship stationary where it is.  **A23
+        (decided, option 1)** evaluates it along the own ship's braking path --
+        the supervisor latch's full astern from its present surge `u_own`, then
+        stopped (`stopping.dcpa_over_stop`).  At `u_own` below the stop speed
+        the two agree exactly.
         """
-        rng = float(self.rng)
-        if not np.isfinite(rng) or float(self.speed_ts) <= 1e-6:
-            return rng
-        a = np.radians(float(self.alpha))
-        c = np.radians(float(self.ct))
-        along = np.sin(a) * np.sin(c) + np.cos(a) * np.cos(c)
-        if along >= 0.0:
-            return rng
-        return float(rng * abs(np.sin(a - c)))
+        import stopping
+        # F66 (C15): at close range the stop test can read the hull-fitted
+        # centre and axis instead of the centroid track.
+        use_fit = self.stop_rng is not None
+        return stopping.dcpa_over_stop(
+            self.stop_rng if use_fit else self.rng,
+            self.stop_alpha if use_fit else self.alpha,
+            self.stop_ct if use_fit else self.ct,
+            self.speed_ts, self.u_own)
+
+    @property
+    def dcpa_if_slowed(self) -> float:
+        """The target's closest approach if the policy itself slowed now (F68).
+
+        The same test as `dcpa_if_stopped`, on the policy's own slowdown -- a
+        coast at the propulsion floor, with no reverse -- rather than the
+        supervisor's full astern.  This is what R-2's carve-out and the Rule 8
+        alteration credit ask about: whether *the agent's* slowdown helps.
+        """
+        import stopping
+        return stopping.dcpa_over_stop(self.rng, self.alpha, self.ct,
+                                       self.speed_ts, self.u_own, mode="coast")
+
+    @property
+    def slowdown_clears(self) -> bool:
+        """Would the policy's own slowdown let the target pass clear?  (F68)"""
+        return self.dcpa_if_slowed >= cfg.ESTOP_CLEAR_DCPA_M
 
     @property
     def stop_clears(self) -> bool:
@@ -276,6 +304,27 @@ class ContextManager:
         self.contexts = contexts
         return contexts
 
+    def attach_truth(self, *, tracks: Sequence, p_os, v_os,
+                     heading_os_deg: float, true_targets: Sequence,
+                     path=None, s_along: Optional[float] = None) -> None:
+        """Attach diagnostics using the physical own-ship pose and velocity.
+
+        Call after ``update(..., true_targets=())`` when perception and physical
+        state differ.  Pairing still uses each perceived track's position, but
+        all ``*_true`` geometry uses physical own-ship and target states.  This
+        never changes the perceived obligation or any policy input.
+        """
+        speed_os = float(np.linalg.norm(np.asarray(v_os, dtype=np.float64)))
+        heading_cls = self._path_heading(path, s_along, heading_os_deg)
+        for track in tracks:
+            ctx = self.contexts.get(track.id)
+            if ctx is None:
+                continue
+            ctx.d_ts_true = ctx.dcpa_true = float("inf")
+            ctx.cls_true = enc.NONE
+            self._attach_truth(ctx, track.position, p_os, v_os, heading_cls,
+                               speed_os, true_targets)
+
     # ------------------------------------------------------------------
     @staticmethod
     def _path_heading(path, s_along, heading_os_deg: float) -> float:
@@ -323,6 +372,7 @@ class ContextManager:
             beta_cpa=products["beta_cpa"],
             rng=products["range"],
             speed_ts=float(track.speed),
+            u_own=float(u_os),
             r_path=float(r_path),
             crossing_side=enc.crossing_side(p_os, heading_cls, p_ts, heading_ts),
             d_domain=cc.distance_to_domain(p_os, heading_os_deg, p_ts),
@@ -331,9 +381,32 @@ class ContextManager:
             v_rel=float(np.linalg.norm(np.asarray(v_ts, dtype=np.float64)
                                        - np.asarray(v_os, dtype=np.float64))),
         )
+        self._attach_stop_view(ctx, track, p_os, heading_os_deg)
         self._attach_truth(ctx, p_ts, p_os, v_os, heading_cls, speed_os,
                            true_targets)
         return ctx
+
+    @staticmethod
+    def _attach_stop_view(ctx, track, p_os, heading_os_deg: float) -> None:
+        """F66 (C15): the stop test's close-range view from the hull fit.
+
+        Only the stop test reads it.  Feeding the fit into the track state
+        (F64) cut close-range error but, as a time-varying correction, read as
+        velocity at engagement range; a view that only a boolean test consumes
+        has no such effect.
+        """
+        centre = getattr(track, "last_fit_centre", None)
+        if not cfg.STOP_TEST_USES_HULL_FIT or centre is None:
+            return
+        rng = float(np.linalg.norm(np.asarray(centre, dtype=np.float64)
+                                   - np.asarray(p_os, dtype=np.float64)))
+        if rng > float(cfg.STOP_TEST_FIT_RANGE_M):
+            return
+        ctx.stop_rng = rng
+        ctx.stop_alpha = cc.relative_bearing_deg(p_os, heading_os_deg, centre)
+        fit_heading = getattr(track, "last_fit_heading_deg", None)
+        ctx.stop_ct = (cc.heading_intersection_deg(heading_os_deg, fit_heading)
+                       if fit_heading is not None else ctx.ct)
 
     # ------------------------------------------------------------------
     def _attach_truth(self, ctx, p_ts, p_os, v_os, heading_os_deg, speed_os,
@@ -440,10 +513,26 @@ class ContextManager:
             # sense latched at engagement stand until the encounter clears.
 
         elif state == CLEARING:
-            latch["clear_steps"] = latch.get("clear_steps", 0) + 1
-            if latch["clear_steps"] >= self.n_clear:
-                self._latch.pop(ctx.track_id, None)
-                latch = None
+            # Clearing is a confirmation window, not a grace period in which
+            # the vessel may turn back into the encounter without obligation.
+            # Require continuous safe geometry.  If risk returns, restore the
+            # original latch rather than reclassifying from close-range angles
+            # or resetting the heading/speed against which action is judged.
+            remains_clear = (ctx.tcpa < 0.0
+                             or ctx.dcpa > self.kappa_rel * d_required)
+            if not remains_clear:
+                latch["state"] = ENGAGED
+                latch["clear_steps"] = 0
+            else:
+                # A predicted safe DCPA is not yet a completed passage.  Keep
+                # the original obligation available while closing; release
+                # only after continuously opening outside required separation.
+                passed_clear = ctx.tcpa < 0.0 and ctx.rng > d_required
+                latch["clear_steps"] = (latch.get("clear_steps", 0) + 1
+                                        if passed_clear else 0)
+                if passed_clear and latch["clear_steps"] >= self.n_clear:
+                    self._latch.pop(ctx.track_id, None)
+                    latch = None
 
         if latch is not None:
             self._latch[ctx.track_id] = latch

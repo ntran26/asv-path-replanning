@@ -50,6 +50,11 @@ class RewardState:
     r: float = 0.0                     # yaw rate, **rad/s**
     heading_deg: float = 0.0
 
+    # --- perceived motion, for terms compared with a perceived latch (A25) ----
+    # None keeps the physical value, for isolated reward callers and old tests.
+    perceived_heading_deg: Optional[float] = None
+    perceived_u: Optional[float] = None
+
     # --- path errors -------------------------------------------------------
     e_y: float = 0.0                   # cross-track error, m, +ve to starboard
     chi: float = 0.0                   # course error, rad
@@ -84,6 +89,12 @@ class RewardState:
 # ---------------------------------------------------------------------------
 # Speed reference:  `R-2` and `R-5`
 # ---------------------------------------------------------------------------
+def _slowing_clears(ctx) -> bool:
+    """R-2's and the Rule 8 credit's "does slowing clear" test (F70 switch)."""
+    name = "stop_clears" if cfg_mod.R2_SLOWDOWN_TEST == "stop" else "slowdown_clears"
+    return bool(getattr(ctx, name, True))
+
+
 def effective_speed_reference(state: RewardState, contexts, cfg) -> dict:
     """`U_ref_eff` and the existence-cost scale, with the reason for each.
 
@@ -135,7 +146,7 @@ def effective_speed_reference(state: RewardState, contexts, cfg) -> dict:
         # Against a reciprocal head-on it cannot, and paying for it taught the
         # agent to stop in the target's path; there the lateral room is the answer.
         if (ctx.engaged and ctx.gives_way and not ctx.turn_admissible
-                and getattr(ctx, "stop_clears", True)):
+                and _slowing_clears(ctx)):
             result = {"u_ref_eff": float(cfg.u_ref) * float(cfg.u_ref_slow_factor),
                       "w_exist_scale": 1.0,
                       "reason": "8(e) slowdown, alteration inadmissible",
@@ -509,7 +520,8 @@ def v_hold(state: RewardState, ctx, cfg) -> float:
     if ctx.in_extremis:
         return 0.0
     yaw = (float(state.r) - float(ctx.r_path)) / max(float(cfg.r_hold), 1e-9)
-    surge = (float(state.u) - float(ctx.u_engage)) / max(float(cfg.du_hold), 1e-9)
+    perceived_u = state.u if state.perceived_u is None else state.perceived_u
+    surge = (float(perceived_u) - float(ctx.u_engage)) / max(float(cfg.du_hold), 1e-9)
     return float(ctx.rho) * float(np.clip(yaw * yaw + surge * surge, 0.0, 1.0))
 
 
@@ -566,14 +578,20 @@ def r8_parts(state: RewardState, ctx, cfg) -> dict:
     if s_c == 0:
         return parts
 
-    dpsi = _wrap180(float(state.heading_deg) - float(ctx.psi_engage))
+    # A25: `psi_engage` and `u_engage` were latched from the perceived state, so
+    # the change since engagement is measured in the same frame the policy sees.
+    perceived_heading = (state.heading_deg if state.perceived_heading_deg is None
+                         else state.perceived_heading_deg)
+    perceived_u = state.u if state.perceived_u is None else state.perceived_u
+    dpsi = _wrap180(float(perceived_heading) - float(ctx.psi_engage))
     parts["dpsi_c"] = max(0.0, s_c * dpsi)
-    parts["du_red"] = max(0.0, float(ctx.u_engage) - float(state.u))
+    parts["du_red"] = max(0.0, float(ctx.u_engage) - float(perceived_u))
 
     a_t = parts["du_red"] / max(float(cfg.du_min), 1e-9)
     # A18: when a slowdown cannot clear, the alteration is credited even though
     # it does not reach the domain separation -- it is the only means that helps.
-    if ctx.turn_admissible or not getattr(ctx, "stop_clears", True):
+    # F68: the agent's own slowdown (a coast), not the supervisor's stop.
+    if ctx.turn_admissible or not _slowing_clears(ctx):
         a_t += parts["dpsi_c"] / max(float(cfg.dpsi_min_deg), 1e-9)
     parts["a_t"] = a_t
 

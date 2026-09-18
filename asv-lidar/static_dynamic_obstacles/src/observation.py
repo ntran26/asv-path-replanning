@@ -1,7 +1,9 @@
-"""Observation assembly: five branches, 56 dims, one dynamic target.
+"""CODEX observation assembly: six branches, 70 dims at one dynamic target.
 
-**Revision 2** — one target slot with a presence bit.  Supersedes the
-three-slot-plus-mask-vector version.
+**Revision 3** retains the 56 revision-2 features and adds the encounter state
+used by the reward plus the previous executed action.  Existing checkpoints
+require retraining; this module intentionally does not silently reinterpret
+their inputs.
 
 The index order of every element is frozen in `OBSERVATION_SPEC.md`.  Every
 checkpoint and every frozen evaluation case depends on it, so change it only
@@ -13,7 +15,8 @@ with a deliberate version bump -- never by editing a loop here.
     ego         u, v, r                                       3
     path        e_y, chi_tilde, chi_tilde_LA                  3
     target      15 features + 1 presence bit                 16
-                                                       total 56
+    context     12 per-slot context features + 2 actions     14
+                                                       total 70
 
 Slot management (01 §6.2)
 -------------------------
@@ -45,7 +48,7 @@ from gymnasium.spaces import Box, Dict as DictSpace
 
 import constants as cfg
 import encounter as enc
-from colregs.context import ContextManager, EncounterContext
+from colregs.context import CLEARING, ENGAGED, IDLE, ContextManager, EncounterContext
 from tracking import Track
 
 # Per-slot feature layout.  Documented in OBSERVATION_SPEC.md; this tuple is the
@@ -71,6 +74,16 @@ SLOT_FEATURE_NAMES = (
 assert len(SLOT_FEATURE_NAMES) == cfg.TARGET_FEATURES
 PRESENCE_INDEX = SLOT_FEATURE_NAMES.index("presence")
 CLASS_SLICE = slice(10, 15)
+OBSERVATION_SCHEMA_VERSION = 3
+CONTEXT_FEATURE_NAMES = (
+    "engaged", "clearing", "compliant_turn_sense", "heading_change",
+    "speed_change", "turn_admissible", "slowdown_clears",
+    "admissibility_known", "action_required", "proximity_gate",
+    "in_extremis", "engagement_age",
+)
+CONTEXT_FEATURES = len(CONTEXT_FEATURE_NAMES)
+PREVIOUS_ACTION_FEATURES = 2
+NORMALISED_CONTEXT_INDICES = (3, 4, 11)
 
 # Which slot features can meaningfully *saturate a normaliser*, as opposed to
 # sitting at +/-1 because that is what the quantity is.
@@ -94,7 +107,7 @@ NORMALISED_SLOT_INDICES = tuple(SLOT_FEATURE_NAMES.index(n)
                                 for n in NORMALISED_SLOT_FEATURES)
 
 
-def branch_feature_names(branch: str) -> tuple:
+def branch_feature_names(branch: str, n_slots: int = cfg.N_MAX_TARGETS) -> tuple:
     """Human names for one branch's dimensions, for the panel's drill-down."""
     if branch == "lidar":
         return tuple(f"sector{i}" for i in range(cfg.LIDAR_SECTORS))
@@ -105,23 +118,32 @@ def branch_feature_names(branch: str) -> tuple:
     if branch == "path":
         return ("e_y", "chi", "chi_LA")
     if branch == "target":
-        return tuple(f"{name}" for _ in range(cfg.N_MAX_TARGETS)
+        return tuple(f"{name}" for _ in range(n_slots)
                      for name in SLOT_FEATURE_NAMES)
+    if branch == "context":
+        return (tuple(name for _ in range(n_slots) for name in CONTEXT_FEATURE_NAMES)
+                + ("previous_rudder", "previous_throttle"))
     return ()
 
 TARGET_DIM = cfg.N_MAX_TARGETS * cfg.TARGET_FEATURES
-OBS_DIM = cfg.LIDAR_SECTORS + cfg.BOUNDARY_RAYS + 3 + 3 + TARGET_DIM
-assert OBS_DIM == 56, OBS_DIM
+CONTEXT_DIM = cfg.N_MAX_TARGETS * CONTEXT_FEATURES + PREVIOUS_ACTION_FEATURES
+OBS_DIM = cfg.LIDAR_SECTORS + cfg.BOUNDARY_RAYS + 3 + 3 + TARGET_DIM + CONTEXT_DIM
 
 
-def observation_space() -> DictSpace:
-    """The frozen observation space.  Five branches, 56 dims."""
+def observation_space(n_slots: int = cfg.N_MAX_TARGETS) -> DictSpace:
+    """Revision-3 space, with target and context widths derived from slots."""
+    n_slots = int(n_slots)
+    if n_slots < 1:
+        raise ValueError("n_slots must be at least 1")
     return DictSpace({
         "lidar": Box(0.0, 1.0, shape=(cfg.LIDAR_SECTORS,), dtype=np.float32),
         "boundary": Box(0.0, 1.0, shape=(cfg.BOUNDARY_RAYS,), dtype=np.float32),
         "ego": Box(-1.0, 1.0, shape=(3,), dtype=np.float32),
         "path": Box(-1.0, 1.0, shape=(3,), dtype=np.float32),
-        "target": Box(-1.0, 1.0, shape=(TARGET_DIM,), dtype=np.float32),
+        "target": Box(-1.0, 1.0, shape=(n_slots * cfg.TARGET_FEATURES,), dtype=np.float32),
+        "context": Box(-1.0, 1.0,
+                       shape=(n_slots * CONTEXT_FEATURES + PREVIOUS_ACTION_FEATURES,),
+                       dtype=np.float32),
     })
 
 
@@ -163,6 +185,28 @@ def slot_features(ctx: EncounterContext) -> np.ndarray:
     return np.concatenate([kinematics, enc.one_hot(ctx.cls), presence]).astype(np.float32)
 
 
+def context_features(ctx: EncounterContext, heading_os_deg: float,
+                     u: float, step_index: int) -> np.ndarray:
+    """Observable memory of the same obligation the reward reads.
+
+    Only perceived state, known map geometry and retained encounter history
+    enter this branch.  Ground-truth target fields never enter policy inputs.
+    """
+    latched = ctx.state != IDLE
+    heading_change = ((heading_os_deg - ctx.psi_engage + 180.0) % 360.0 - 180.0
+                      if latched else 0.0)
+    age_seconds = (max(0, step_index - ctx.t_engage) * cfg.UPDATE_RATE if latched else 0.0)
+    return np.array([
+        float(ctx.state == ENGAGED), float(ctx.state == CLEARING),
+        float(ctx.compliant_turn_sense), heading_change / 180.0,
+        np.clip((u - ctx.u_engage) / cfg.SPEED_SCALE, -1.0, 1.0) if latched else 0.0,
+        float(ctx.turn_admissible), float(ctx.slowdown_clears),
+        float(ctx.admissibility_known), np.clip(ctx.a_req, 0.0, 1.0),
+        np.clip(ctx.rho, 0.0, 1.0), float(ctx.in_extremis),
+        np.clip(age_seconds / max(cfg.T_ENGAGE, 1e-9), 0.0, 1.0),
+    ], dtype=np.float32)
+
+
 # ---------------------------------------------------------------------------
 # Slot management
 # ---------------------------------------------------------------------------
@@ -176,6 +220,8 @@ class SlotManager:
 
     def __init__(self, n_slots: int = cfg.N_MAX_TARGETS) -> None:
         self.n_slots = int(n_slots)
+        if self.n_slots < 1:
+            raise ValueError("n_slots must be at least 1")
         self.reset()
 
     def reset(self) -> None:
@@ -293,14 +339,16 @@ class ObservationBuilder:
               heading_os_deg: float = 0.0,
               r_path: float = 0.0, path=None, boundary_polygon=None,
               s_along=None, true_targets: Sequence = (),
-              open_water: bool = False) -> Dict[str, np.ndarray]:
+              open_water: bool = False, previous_action=(0.0, 0.0),
+              cross_track_scale: Optional[float] = None,
+              advance_clock: bool = True) -> Dict[str, np.ndarray]:
         """Assemble one observation, building this step's contexts as it goes."""
         contexts = self.contexts.update(
             tracks=tracks, p_os=p_os, v_os=v_os, heading_os_deg=heading_os_deg,
             u_os=float(u), r_path=float(r_path), path=path,
             boundary_polygon=boundary_polygon, s_along=s_along,
             cross_track=float(cross_track_error), true_targets=true_targets,
-            open_water=open_water,
+            open_water=open_water, advance_clock=advance_clock,
         )
         self._last = contexts
 
@@ -308,10 +356,17 @@ class ObservationBuilder:
             tracks, [contexts[t.id].cri for t in tracks])
 
         slot_block = np.zeros((self.n_slots, cfg.TARGET_FEATURES), dtype=np.float32)
+        context_block = np.zeros((self.n_slots, CONTEXT_FEATURES), dtype=np.float32)
         for tid, slot in assignment.items():
             slot_block[slot] = slot_features(contexts[tid])
+            context_block[slot] = context_features(
+                contexts[tid], heading_os_deg, u, self.contexts.step_index)
 
-        span = max(cfg.MAP_WIDTH, cfg.MAP_HEIGHT)
+        span = (max(cfg.MAP_WIDTH, cfg.MAP_HEIGHT) if cross_track_scale is None
+                else max(float(cross_track_scale), 1e-9))
+        previous = np.asarray(previous_action, dtype=np.float32)
+        if previous.shape != (PREVIOUS_ACTION_FEATURES,) or not np.all(np.isfinite(previous)):
+            raise ValueError("previous_action must contain two finite executed action values")
         return {
             "lidar": np.asarray(sector_closeness, dtype=np.float32),
             "boundary": np.asarray(boundary_scan, dtype=np.float32),
@@ -326,6 +381,8 @@ class ObservationBuilder:
                 np.clip(lookahead_course_error_deg / 180.0, -1.0, 1.0),
             ], dtype=np.float32),
             "target": slot_block.reshape(-1).astype(np.float32),
+            "context": np.concatenate((context_block.reshape(-1),
+                                       np.clip(previous, -1.0, 1.0))).astype(np.float32),
         }
 
 
@@ -336,5 +393,8 @@ def split_target(target) -> tuple:
     extractor and any analysis script all agree.
     """
     arr = np.asarray(target, dtype=np.float32)
-    slots = arr.reshape(*arr.shape[:-1], cfg.N_MAX_TARGETS, cfg.TARGET_FEATURES)
+    if arr.ndim == 0 or arr.shape[-1] % cfg.TARGET_FEATURES:
+        raise ValueError("target width must be a multiple of TARGET_FEATURES")
+    n_slots = arr.shape[-1] // cfg.TARGET_FEATURES
+    slots = arr.reshape(*arr.shape[:-1], n_slots, cfg.TARGET_FEATURES)
     return slots, slots[..., PRESENCE_INDEX]

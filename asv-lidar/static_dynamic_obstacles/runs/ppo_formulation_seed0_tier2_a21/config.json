@@ -61,5 +61,6 @@
   "MOTION_CLASSIFIER": "free_space",
   "PF_OVERSPEED_TOL": 0.2,
   "PF_OVERSPEED_SPAN": 0.5
- }
+ },
+ "wall_clock_s": 4482.11695766449
 }

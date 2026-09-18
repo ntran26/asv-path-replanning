@@ -1,0 +1,3677 @@
+{
+  "controller": "perception-only predictive LOS reference; no PPO weights",
+  "scope": "narrow-channel research give-way assumptions",
+  "seconds": 176.43602657318115,
+  "source_sha256": {
+    "src\\asv_lidar.py": "2f27eadc63511ea2ef2030279ef0cdebbf3893fd5010e0584c65829e60c1fcf0",
+    "src\\boundary_raycast.py": "ad3f2d52212e141332df7350b8bbf8c2d0d2cdb944bb4bab2241bc66f40f6e9e",
+    "src\\colregs\\__init__.py": "1a0821f3514c72917ae387c0f3e02bfdcad400536f2f0222d6de923acfb6feaf",
+    "src\\colregs\\context.py": "d7df571173f2051bdc0d4635b199277798ca4239da92c931958094143faa2676",
+    "src\\colregs\\geometry.py": "bcb7fb573035e0b6a253f4972c1644cfccf354a0bb48c40bbe127801621ac32b",
+    "src\\compare.py": "4ef8865061997eb3d3e5d725385da29a649e90331c9d34704264dbf957ca8b8c",
+    "src\\constants.py": "37b9d31d6349482af36ec45e5a577dfe557d6d0a1e86b4e50997c9b409acac0a",
+    "src\\corridor.py": "353ca3bcbbcbf3eee94b950ac6c1a3c51b34373f807076318e81d074997520f2",
+    "src\\cpa_cri.py": "379751c7fc30099d49d24cf373ac3481ef31a624c6a52b4ad38ca98cca627886",
+    "src\\curriculum.py": "4c280d3d11cbe053f1f8a75507e7e069e3a6177098d4ab26dbaaf4d9ff8cf7d6",
+    "src\\emergency_stop.py": "bb170a7b67cb8cf8de486310659849eb0e3f65f2ac1e85003ccefe80d5d70bb5",
+    "src\\encounter.py": "df6fae6070e2320a6b8f71bcc5d50c061b2a4f920743f5a949bce821cac7f889",
+    "src\\env.py": "53263c2d45df474fd9e532773c63e1b77d4056a53467d22ce93e9f1d085d6ac5",
+    "src\\features_extractor.py": "a8119112e5a6b4bacd77529915df9aa8560824da5daaef5d25cdf86f671b62b1",
+    "src\\lidar_pooling.py": "081d84bfb128a81b888750acf5320d89589a0f8db61dba0d750061c6a1d1f5f6",
+    "src\\metrics.py": "227a39459a8b7f4aef00756a473cdfaf52d67a44d9f10d62ed27b49e5355d420",
+    "src\\observation.py": "68ba8dc34f89e016cc2b696eccd5e0eb13eb1431f3bb1fb46cef667fd275f2e7",
+    "src\\obstacles.py": "7c3a54c809cd2a5089c49a3e2a8f2f5b17e1689544351537d5ef6dc6c6c0fc34",
+    "src\\path.py": "619a8e329d94f62af9bf86d0949f2257cfa88093f4d6cdada10d8675c6c8b628",
+    "src\\play.py": "82637fe3207863766dfe333c392544d227583117cfd032da1cd8162b75bb80ee",
+    "src\\reference_controller.py": "2136930bceff7e934d2ae911298c175d3579f985b4304c28681c655ee593ead3",
+    "src\\render.py": "d1afc258190ffdace5bba2a9f4c6f6fc0e80e260aec51b3c45ad2deb079319f5",
+    "src\\reward\\__init__.py": "1b84ded9b181373a42255f2492a9eda3e12acdc405e53ea35e2c33afc7e61635",
+    "src\\reward\\audit.py": "dfaf209ad4c4e8daf4f8e2a062869ef94d17e6a623012c460d85136519bf69c5",
+    "src\\reward\\config.py": "c6bbbc57a3f7113c9bf5f137228e59d556689410692888c994f86b91d7efc931",
+    "src\\reward\\reward.py": "bdf33a7e6764b14b934c51225600a134dc6d45c8ba2db8bcd8183e82abb1df92",
+    "src\\reward\\terms.py": "7feb77c6a43ba19b7c8c1d40e52b46221a93167345ac02d0756a40467ba174c0",
+    "src\\rollout.py": "e38f34a332ec23da3c8d43de5b007e1698c7f0cd0a617ebefc633693b3701142",
+    "src\\scenario.py": "6363e4880f73402735eafe7b9d176455e8d97bf9ab17b9abdcb0eb63ed124988",
+    "src\\scene_sampling.py": "69a276c68f8ce75df7a83e3138d0dd91d753363aa6a4cde8308f2baa5f0c140c",
+    "src\\ship.py": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+    "src\\ship_v2.py": "cbcb9b7f48cd8d8b880f81580260f124e846c8034dfdc176d5cc504d7c74c895",
+    "src\\stopping.py": "ac8487dd356db861cd0ec3419efbf17882e80ede56d81f7e6fb029a9cabc8fb8",
+    "src\\suite.py": "fc17932bc71b3af1767eb12dc3f2b83151656606ef5211a3af8ccf714c11cebb",
+    "src\\targets.py": "1c0e11462b2107c2a9069b1388e8de172c5f63ad49a31e696d09a82219878589",
+    "src\\tracking.py": "9929426c0c9aa74bb0846358c0edc73ec5dca817beca755c7fe79d06d4b1d639",
+    "src\\train.py": "a99850593c115c69504c860f8907a4ee10caedbec843d485d0db29198452d4bc",
+    "src\\train_formulation.py": "71cf255f2d1cc837dc071536089aab1bf4439b5f3c3b3fdb8e0525520be07314",
+    "src\\train_ppo_baseline.py": "c2654edf5ef5964ab058eda2472df07203cc9cb3c0c20a7cda4617229dbf89eb",
+    "src\\train_sac_baseline.py": "26b1a3a97a336f67cc1bbe622842676242ad21cf8a2ede5dfd42fe6423c6391a"
+  },
+  "results": [
+    {
+      "case": "overtaking",
+      "noise": "nominal",
+      "seed": 812,
+      "checks": {
+        "goal": true,
+        "no_collision": true,
+        "returned_to_path": false,
+        "boundary_margin": true,
+        "target_hull_margin": true,
+        "completed_port_pass": true
+      },
+      "passed": false,
+      "steps": 97,
+      "outcome": "goal",
+      "max_cte_m": 3.0367379188537598,
+      "final_cte_m": 1.4835100173950195,
+      "mean_cte_m": 1.3722369336359894,
+      "min_target_centre_distance_m": 2.1184151633399915,
+      "min_static_hull_clearance_m": null,
+      "min_target_hull_clearance_m": 1.0972694584239424,
+      "min_boundary_clearance_m": 1.3052124778023737,
+      "first_alteration": 1.0,
+      "supervisor_events": 0,
+      "trajectory": [
+        {
+          "t": 0.5,
+          "x": 5.001007131776003,
+          "y": 4.2790866131761645,
+          "heading": 0.44328961173818543,
+          "speed": 0.5581768607477607,
+          "offset": 2.0,
+          "rudder": 1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 10.099999999999998,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": -7.647023105135372
+        },
+        {
+          "t": 1.0,
+          "x": 5.00787927442479,
+          "y": 4.5580350962538345,
+          "heading": 2.665101707352415,
+          "speed": 0.558066241788261,
+          "offset": 2.0,
+          "rudder": 0.8774088025093079,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 10.199999999999996,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": -8.654309668213827
+        },
+        {
+          "t": 1.5,
+          "x": 5.02543889431332,
+          "y": 4.836189811124436,
+          "heading": 6.784455021350163,
+          "speed": 0.5574168481679588,
+          "offset": 3.0,
+          "rudder": 1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 10.299999999999994,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": -3.1495693383805197
+        },
+        {
+          "t": 2.0,
+          "x": 5.0565567395240745,
+          "y": 5.111884763670732,
+          "heading": 12.086124063985391,
+          "speed": 0.5548910781407996,
+          "offset": 2.5,
+          "rudder": 0.5710545182228088,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 10.399999999999991,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": -5.467188913184247
+        },
+        {
+          "t": 2.5,
+          "x": 5.102288307271052,
+          "y": 5.382658012755661,
+          "heading": 17.778122989320764,
+          "speed": 0.5492159091235624,
+          "offset": 0.5,
+          "rudder": -0.9710411429405212,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 10.49999999999999,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [],
+          "cost": -10.315965705289095
+        },
+        {
+          "t": 3.0,
+          "x": 5.1589594550911375,
+          "y": 5.639873180780861,
+          "heading": 22.802032573681636,
+          "speed": 0.526768494340647,
+          "offset": -1.0,
+          "rudder": -1.0,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 10.599999999999987,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -3.4905752025835506
+        },
+        {
+          "t": 3.5,
+          "x": 5.217778985405692,
+          "y": 5.879470235128261,
+          "heading": 25.025371285510335,
+          "speed": 0.4934226812718518,
+          "offset": -2.0,
+          "rudder": -1.0,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 10.699999999999985,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -2.4801548239971916
+        },
+        {
+          "t": 4.0,
+          "x": 5.27245302266487,
+          "y": 6.109416895510718,
+          "heading": 23.332070268446166,
+          "speed": 0.4727143618349796,
+          "offset": -2.5,
+          "rudder": -1.0,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 10.799999999999983,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -10.309727744772305
+        },
+        {
+          "t": 4.5,
+          "x": 5.319723724581823,
+          "y": 6.33876359209701,
+          "heading": 18.35096814246491,
+          "speed": 0.4683350360362369,
+          "offset": -2.5,
+          "rudder": -1.0,
+          "throttle": -0.25,
+          "target_x": 5.0,
+          "target_y": 10.89999999999998,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -16.445956208505756
+        },
+        {
+          "t": 5.0,
+          "x": 5.355060624506774,
+          "y": 6.569667710186609,
+          "heading": 11.166257346923347,
+          "speed": 0.46718479533067686,
+          "offset": -2.0,
+          "rudder": -0.7747793793678284,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 10.999999999999979,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -13.219348336684767
+        },
+        {
+          "t": 5.5,
+          "x": 5.374404302061603,
+          "y": 6.796977382531253,
+          "heading": 2.9157567084088676,
+          "speed": 0.45626249025215543,
+          "offset": -2.5,
+          "rudder": -0.5726678371429443,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 11.099999999999977,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 0.3565161224220219
+        },
+        {
+          "t": 6.0,
+          "x": 5.37807221179195,
+          "y": 7.015614823654614,
+          "heading": 354.7117288372584,
+          "speed": 0.43733641157699726,
+          "offset": -1.5,
+          "rudder": -0.47609463334083557,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 11.199999999999974,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -1.8983261935904228
+        },
+        {
+          "t": 6.5,
+          "x": 5.369507719294677,
+          "y": 7.222478292792979,
+          "heading": 347.52939356284327,
+          "speed": 0.4140813707265521,
+          "offset": -3.5,
+          "rudder": -0.8853393793106079,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 11.299999999999972,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 104.10547141181783
+        },
+        {
+          "t": 7.0,
+          "x": 5.352718327177527,
+          "y": 7.416296275461223,
+          "heading": 341.9679907670084,
+          "speed": 0.389087620431445,
+          "offset": -3.5,
+          "rudder": -0.941495418548584,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 11.39999999999997,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 679.6237546234399
+        },
+        {
+          "t": 7.5,
+          "x": 5.330550147629719,
+          "y": 7.597521986990602,
+          "heading": 337.9746850252686,
+          "speed": 0.3651530457427052,
+          "offset": -3.5,
+          "rudder": -0.7024440765380859,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 11.499999999999968,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 81.65683838920012
+        },
+        {
+          "t": 8.0,
+          "x": 5.304584771942073,
+          "y": 7.767374795359283,
+          "heading": 335.18858204936606,
+          "speed": 0.343652017281019,
+          "offset": -3.0,
+          "rudder": -0.6213837265968323,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 11.599999999999966,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 4.768610338343119
+        },
+        {
+          "t": 8.5,
+          "x": 5.276026649913493,
+          "y": 7.92737648533682,
+          "heading": 333.39207418252386,
+          "speed": 0.3250606535984775,
+          "offset": -1.5,
+          "rudder": -0.3276195526123047,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 11.699999999999964,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 0.01676131146649973
+        },
+        {
+          "t": 9.0,
+          "x": 5.245878786467139,
+          "y": 8.079125981258613,
+          "heading": 332.4583711380639,
+          "speed": 0.3094304650993389,
+          "offset": -2.0,
+          "rudder": -0.6913285255432129,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 11.799999999999962,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 1.3030451515950716
+        },
+        {
+          "t": 9.5,
+          "x": 5.214989961536281,
+          "y": 8.224159533744658,
+          "heading": 332.3039033078926,
+          "speed": 0.2965727624198239,
+          "offset": -3.0,
+          "rudder": -0.8337469100952148,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 11.89999999999996,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 14.850757661755004
+        },
+        {
+          "t": 10.0,
+          "x": 5.181962109077498,
+          "y": 8.367301004983041,
+          "heading": 332.70719749328055,
+          "speed": 0.2938048319978968,
+          "offset": -2.5,
+          "rudder": -0.9255543351173401,
+          "throttle": -0.25,
+          "target_x": 5.0,
+          "target_y": 11.999999999999957,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -13.679605533495067
+        },
+        {
+          "t": 10.5,
+          "x": 5.147042688087799,
+          "y": 8.509049475370396,
+          "heading": 333.3461222501145,
+          "speed": 0.291972565967495,
+          "offset": -2.5,
+          "rudder": -0.9926359057426453,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 12.099999999999955,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 19.368059260466513
+        },
+        {
+          "t": 11.0,
+          "x": 5.111365558387191,
+          "y": 8.647761883291086,
+          "heading": 333.968079600754,
+          "speed": 0.2864541128685688,
+          "offset": -2.0,
+          "rudder": -0.740222692489624,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 12.199999999999953,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -8.967041696664367
+        },
+        {
+          "t": 11.5,
+          "x": 5.074893593085587,
+          "y": 8.783591289811646,
+          "heading": 334.40834099923643,
+          "speed": 0.2812815808309465,
+          "offset": -3.0,
+          "rudder": -1.0,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 12.299999999999951,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 531.9832810075151
+        },
+        {
+          "t": 12.0,
+          "x": 5.03844397488861,
+          "y": 8.9151141006599,
+          "heading": 334.65184360083794,
+          "speed": 0.2729602494146809,
+          "offset": -3.0,
+          "rudder": -0.9932845830917358,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 12.399999999999949,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 42.84449043133735
+        },
+        {
+          "t": 12.5,
+          "x": 5.001949535301713,
+          "y": 9.042520641642806,
+          "heading": 334.68248100088306,
+          "speed": 0.2650605274724276,
+          "offset": -3.0,
+          "rudder": -0.8242471218109131,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 12.499999999999947,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 41.816653960783306
+        },
+        {
+          "t": 13.0,
+          "x": 4.9644552669565565,
+          "y": 9.167536542062487,
+          "heading": 334.44977303664837,
+          "speed": 0.2610348292200279,
+          "offset": -1.0,
+          "rudder": 0.24429117143154144,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 12.599999999999945,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -9.13874810602119
+        },
+        {
+          "t": 13.5,
+          "x": 4.925051358243624,
+          "y": 9.29175489214207,
+          "heading": 333.9541364308046,
+          "speed": 0.26063665527588975,
+          "offset": -2.5,
+          "rudder": -1.0,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 12.699999999999942,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -2.5031430478866064
+        },
+        {
+          "t": 14.0,
+          "x": 4.881613322907896,
+          "y": 9.420179285745853,
+          "heading": 333.43913795179844,
+          "speed": 0.271143414349878,
+          "offset": -2.5,
+          "rudder": -0.36513185501098633,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 12.79999999999994,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -20.007486548892693
+        },
+        {
+          "t": 14.5,
+          "x": 4.834342770958975,
+          "y": 9.552526514837897,
+          "heading": 332.93050481276106,
+          "speed": 0.2810714793777385,
+          "offset": -1.0,
+          "rudder": 0.15240627527236938,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 12.899999999999938,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -7.128804552689762
+        },
+        {
+          "t": 15.0,
+          "x": 4.785638085494105,
+          "y": 9.683734226049689,
+          "heading": 332.3766736394015,
+          "speed": 0.2799114850638955,
+          "offset": -2.0,
+          "rudder": -0.06797832250595093,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 12.999999999999936,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -4.927606276476491
+        },
+        {
+          "t": 15.5,
+          "x": 4.73682214287059,
+          "y": 9.812512820095733,
+          "heading": 332.04438465992195,
+          "speed": 0.27544090138320626,
+          "offset": -3.5,
+          "rudder": -1.0,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 13.099999999999934,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 173.4866405115879
+        },
+        {
+          "t": 16.0,
+          "x": 4.689219251060993,
+          "y": 9.937768352955029,
+          "heading": 332.0835572621853,
+          "speed": 0.2679924164636176,
+          "offset": -2.0,
+          "rudder": -0.6356835961341858,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 13.199999999999932,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 21.82898849165348
+        },
+        {
+          "t": 16.5,
+          "x": 4.639186067844937,
+          "y": 10.066042360631894,
+          "heading": 332.19191053816735,
+          "speed": 0.2753727689385117,
+          "offset": -3.0,
+          "rudder": -0.7930921316146851,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 13.29999999999993,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -18.011783947307006
+        },
+        {
+          "t": 17.0,
+          "x": 4.586419547819215,
+          "y": 10.196804831058637,
+          "heading": 332.0847926100355,
+          "speed": 0.28201510106893163,
+          "offset": -2.0,
+          "rudder": -0.617383599281311,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 13.399999999999928,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 28.566065759826625
+        },
+        {
+          "t": 17.5,
+          "x": 4.534144120131592,
+          "y": 10.32348723138998,
+          "heading": 331.72974797504384,
+          "speed": 0.27408867830418904,
+          "offset": -2.5,
+          "rudder": -0.4644585847854614,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 13.499999999999925,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 47.29797292165212
+        },
+        {
+          "t": 18.0,
+          "x": 4.480169664795522,
+          "y": 10.44970742500466,
+          "heading": 331.1199643242582,
+          "speed": 0.2745525749648192,
+          "offset": -1.5,
+          "rudder": 0.018897483125329018,
+          "throttle": -0.25,
+          "target_x": 5.0,
+          "target_y": 13.599999999999923,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -11.99888905903895
+        },
+        {
+          "t": 18.5,
+          "x": 4.423583068857926,
+          "y": 10.576878829085615,
+          "heading": 330.3265862881984,
+          "speed": 0.2783854080639,
+          "offset": -2.0,
+          "rudder": -0.017357051372528076,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 13.699999999999921,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 4.683243820534932
+        },
+        {
+          "t": 19.0,
+          "x": 4.366720082720396,
+          "y": 10.701553220664916,
+          "heading": 329.6112462993627,
+          "speed": 0.2740591403923314,
+          "offset": -1.0,
+          "rudder": 0.3577561676502228,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 13.799999999999919,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 11.853974064448805
+        },
+        {
+          "t": 19.5,
+          "x": 4.310039378712424,
+          "y": 10.82418042612677,
+          "heading": 329.20676659194606,
+          "speed": 0.27018611160622547,
+          "offset": -0.5,
+          "rudder": 0.5585487484931946,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 13.899999999999917,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -8.25675194675625
+        },
+        {
+          "t": 20.0,
+          "x": 4.253176110182949,
+          "y": 10.946799472036135,
+          "heading": 329.28955676280077,
+          "speed": 0.27032470643711615,
+          "offset": 0.0,
+          "rudder": 0.9118334054946899,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 13.999999999999915,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -11.204392430661368
+        },
+        {
+          "t": 20.5,
+          "x": 4.197764218026356,
+          "y": 11.06839763967263,
+          "heading": 330.01510686532447,
+          "speed": 0.26725712087745823,
+          "offset": -1.0,
+          "rudder": 0.34285297989845276,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 14.099999999999913,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 2.1280341702536067
+        },
+        {
+          "t": 21.0,
+          "x": 4.145368274178882,
+          "y": 11.188040275730458,
+          "heading": 331.4565808524638,
+          "speed": 0.2612255369946322,
+          "offset": -1.5,
+          "rudder": 0.018385926261544228,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 14.19999999999991,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 7.65349981605087
+        },
+        {
+          "t": 21.5,
+          "x": 4.095495648631354,
+          "y": 11.307769295456012,
+          "heading": 333.49037868687617,
+          "speed": 0.25940174975081465,
+          "offset": -2.0,
+          "rudder": -0.35682612657546997,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 14.299999999999908,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -9.054429477073132
+        },
+        {
+          "t": 22.0,
+          "x": 4.046387803267664,
+          "y": 11.43123629626345,
+          "heading": 335.7837136989653,
+          "speed": 0.2657493613512386,
+          "offset": -3.0,
+          "rudder": -0.8798787593841553,
+          "throttle": -0.25,
+          "target_x": 5.0,
+          "target_y": 14.399999999999906,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -11.905989187864066
+        },
+        {
+          "t": 22.5,
+          "x": 3.997839331091256,
+          "y": 11.557976717900832,
+          "heading": 337.89680189957033,
+          "speed": 0.27144125425207566,
+          "offset": -2.0,
+          "rudder": -0.21063266694545746,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 14.499999999999904,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -6.309898874893533
+        },
+        {
+          "t": 23.0,
+          "x": 3.9464320089062594,
+          "y": 11.694091218790962,
+          "heading": 339.3241676326512,
+          "speed": 0.29099738917592605,
+          "offset": -2.5,
+          "rudder": -0.056190382689237595,
+          "throttle": 0.25,
+          "target_x": 5.0,
+          "target_y": 14.599999999999902,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -24.23307641380753
+        },
+        {
+          "t": 23.5,
+          "x": 3.892205968508014,
+          "y": 11.83680296266764,
+          "heading": 339.8892149592452,
+          "speed": 0.3053332952535288,
+          "offset": -2.0,
+          "rudder": -0.4453336000442505,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 14.6999999999999,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 23.890461811261844
+        },
+        {
+          "t": 24.0,
+          "x": 3.838912619177451,
+          "y": 11.975277120723383,
+          "heading": 339.87069680082766,
+          "speed": 0.2967508957500639,
+          "offset": -2.5,
+          "rudder": -0.431598961353302,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 14.799999999999898,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 50.85021658006061
+        },
+        {
+          "t": 24.5,
+          "x": 3.7821258468686727,
+          "y": 12.120174333229695,
+          "heading": 339.3555821412828,
+          "speed": 0.31125513458478554,
+          "offset": -1.5,
+          "rudder": 0.5731996893882751,
+          "throttle": 0.25,
+          "target_x": 5.0,
+          "target_y": 14.899999999999896,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -26.830113478220262
+        },
+        {
+          "t": 25.0,
+          "x": 3.7206856252787626,
+          "y": 12.272314082827625,
+          "heading": 338.3077262342541,
+          "speed": 0.3281548673217463,
+          "offset": -2.5,
+          "rudder": -0.1835416853427887,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 14.999999999999893,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -7.060371283199096
+        },
+        {
+          "t": 25.5,
+          "x": 3.6590547745917914,
+          "y": 12.420995878838784,
+          "heading": 337.23978132736784,
+          "speed": 0.32189835800453315,
+          "offset": -3.5,
+          "rudder": -0.6784883737564087,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 15.099999999999891,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 539.8085571448755
+        },
+        {
+          "t": 26.0,
+          "x": 3.5940961167055514,
+          "y": 12.575345156793931,
+          "heading": 336.4289143681165,
+          "speed": 0.334922837917373,
+          "offset": -2.5,
+          "rudder": 0.33617380261421204,
+          "throttle": 0.25,
+          "target_x": 5.0,
+          "target_y": 15.19999999999989,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -18.368101452247828
+        },
+        {
+          "t": 26.5,
+          "x": 3.5248293983319634,
+          "y": 12.736166718687379,
+          "heading": 335.5276495910268,
+          "speed": 0.35020824115999305,
+          "offset": -2.0,
+          "rudder": 0.040488891303539276,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 15.299999999999887,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 6.279870582272771
+        },
+        {
+          "t": 27.0,
+          "x": 3.455958388620575,
+          "y": 12.892896880099704,
+          "heading": 334.68761026452546,
+          "speed": 0.3423890154487994,
+          "offset": -3.5,
+          "rudder": -0.6178892850875854,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 15.399999999999885,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 88.02163441201537
+        },
+        {
+          "t": 27.5,
+          "x": 3.388911821577839,
+          "y": 13.044500349356179,
+          "heading": 334.201518844287,
+          "speed": 0.33153493959349223,
+          "offset": -3.5,
+          "rudder": -0.4978519380092621,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 15.499999999999883,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 48.73704119574953
+        },
+        {
+          "t": 28.0,
+          "x": 3.316285165037482,
+          "y": 13.205762772873229,
+          "heading": 333.7558249489306,
+          "speed": 0.35372418904464675,
+          "offset": -2.0,
+          "rudder": 1.0,
+          "throttle": 0.5,
+          "target_x": 5.0,
+          "target_y": 15.59999999999988,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -32.21762645518113
+        },
+        {
+          "t": 28.5,
+          "x": 3.235880065017982,
+          "y": 13.378875453976486,
+          "heading": 332.9901185817936,
+          "speed": 0.3817485060502728,
+          "offset": -2.5,
+          "rudder": -0.11372251808643341,
+          "throttle": -0.25,
+          "target_x": 5.0,
+          "target_y": 15.699999999999878,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -3.880860195742546
+        },
+        {
+          "t": 29.0,
+          "x": 3.1510690401472825,
+          "y": 13.5592234048878,
+          "heading": 332.68349168969587,
+          "speed": 0.39858897795864145,
+          "offset": -2.5,
+          "rudder": 0.3215077817440033,
+          "throttle": 0.25,
+          "target_x": 5.0,
+          "target_y": 15.799999999999876,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -26.304274862416467
+        },
+        {
+          "t": 29.5,
+          "x": 3.060515897622846,
+          "y": 13.75335575119127,
+          "heading": 333.22078683467186,
+          "speed": 0.42842614066996904,
+          "offset": -2.5,
+          "rudder": 0.4635605216026306,
+          "throttle": 0.25,
+          "target_x": 5.0,
+          "target_y": 15.899999999999874,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -26.31772096044972
+        },
+        {
+          "t": 30.0,
+          "x": 2.9697693790457276,
+          "y": 13.952320775559468,
+          "heading": 334.3609628513175,
+          "speed": 0.4373648891061317,
+          "offset": -3.5,
+          "rudder": -0.4695114195346832,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 15.999999999999872,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 2.570984978084617
+        },
+        {
+          "t": 30.5,
+          "x": 2.8801903135663607,
+          "y": 14.156650329950649,
+          "heading": 336.1026797902503,
+          "speed": 0.4462061217413112,
+          "offset": -3.0,
+          "rudder": 0.07985088974237442,
+          "throttle": 0.25,
+          "target_x": 5.0,
+          "target_y": 16.09999999999987,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -24.06342878805303
+        },
+        {
+          "t": 31.0,
+          "x": 2.7895543188327783,
+          "y": 14.370424040607576,
+          "heading": 337.6838555798361,
+          "speed": 0.46438812607291097,
+          "offset": -2.5,
+          "rudder": 0.29141464829444885,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 16.199999999999868,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -19.647379934613912
+        },
+        {
+          "t": 31.5,
+          "x": 2.6985159065287307,
+          "y": 14.588692652637182,
+          "heading": 338.58668153811965,
+          "speed": 0.472987016786602,
+          "offset": -2.5,
+          "rudder": 0.28394249081611633,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 16.299999999999866,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -18.5948956955512
+        },
+        {
+          "t": 32.0,
+          "x": 2.6083307423360607,
+          "y": 14.808142355225486,
+          "heading": 339.2117142740614,
+          "speed": 0.4745167470450514,
+          "offset": -3.5,
+          "rudder": -0.33751291036605835,
+          "throttle": -0.25,
+          "target_x": 5.0,
+          "target_y": 16.399999999999864,
+          "perceived_classes": [
+            "overtaking"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 1.7591880868361205
+        },
+        {
+          "t": 32.5,
+          "x": 2.5194549629123624,
+          "y": 15.028943662532779,
+          "heading": 339.8747108298517,
+          "speed": 0.4760341226289527,
+          "offset": -1.0,
+          "rudder": 1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 16.49999999999986,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -22.172461498763422
+        },
+        {
+          "t": 33.0,
+          "x": 2.4320348677815713,
+          "y": 15.248582523734301,
+          "heading": 340.21037503429363,
+          "speed": 0.47279383406545455,
+          "offset": -1.0,
+          "rudder": 1.0,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 16.59999999999986,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 2.5540102475139754
+        },
+        {
+          "t": 33.5,
+          "x": 2.3476387584067018,
+          "y": 15.46459662831494,
+          "heading": 340.8044490160441,
+          "speed": 0.46383098928549427,
+          "offset": -1.0,
+          "rudder": 1.0,
+          "throttle": -0.25,
+          "target_x": 5.0,
+          "target_y": 16.699999999999857,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 1.2121350940754674
+        },
+        {
+          "t": 34.0,
+          "x": 2.2689555520904574,
+          "y": 15.678090564050821,
+          "heading": 342.5550878465238,
+          "speed": 0.45506354524264553,
+          "offset": -1.0,
+          "rudder": 1.0,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 16.799999999999855,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 4.264227188460399
+        },
+        {
+          "t": 34.5,
+          "x": 2.197232864556303,
+          "y": 15.892806844254155,
+          "heading": 345.4859830300207,
+          "speed": 0.45275699836216066,
+          "offset": -0.5,
+          "rudder": 1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 16.899999999999853,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 1.6946959044322112
+        },
+        {
+          "t": 35.0,
+          "x": 2.1342536154375673,
+          "y": 16.108417756182543,
+          "heading": 349.3279521473528,
+          "speed": 0.44924136569176776,
+          "offset": -1.0,
+          "rudder": 1.0,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 16.99999999999985,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 7.450117573061144
+        },
+        {
+          "t": 35.5,
+          "x": 2.0813307900055165,
+          "y": 16.324359367952294,
+          "heading": 353.6596038226392,
+          "speed": 0.4446643909531273,
+          "offset": -0.5,
+          "rudder": 1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 17.09999999999985,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 3.304417271745656
+        },
+        {
+          "t": 36.0,
+          "x": 2.039010389050445,
+          "y": 16.537584290233774,
+          "heading": 358.0926665353659,
+          "speed": 0.43476836968179355,
+          "offset": 0.0,
+          "rudder": 1.0,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 17.199999999999847,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 4.160470385933972
+        },
+        {
+          "t": 36.5,
+          "x": 2.007104180846621,
+          "y": 16.74021874098286,
+          "heading": 2.243805961986023,
+          "speed": 0.41026199800776175,
+          "offset": 0.0,
+          "rudder": 1.0,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 17.299999999999844,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 5.9211965217986195
+        },
+        {
+          "t": 37.0,
+          "x": 1.9842835773503293,
+          "y": 16.93400709600981,
+          "heading": 5.934101699815887,
+          "speed": 0.3902548218176736,
+          "offset": 0.0,
+          "rudder": 1.0,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 17.399999999999842,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 6.969667790359965
+        },
+        {
+          "t": 37.5,
+          "x": 1.9702749838681206,
+          "y": 17.126200161363965,
+          "heading": 9.132056388543257,
+          "speed": 0.3854058383656157,
+          "offset": 0.0,
+          "rudder": 0.7147601246833801,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 17.49999999999984,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": -4.815228043111933
+        },
+        {
+          "t": 38.0,
+          "x": 1.964409066712237,
+          "y": 17.316544273988743,
+          "heading": 11.863531256826247,
+          "speed": 0.3808689548650246,
+          "offset": 1.0,
+          "rudder": 1.0,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 17.599999999999838,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 2.0703783239741975
+        },
+        {
+          "t": 38.5,
+          "x": 1.9660602050945188,
+          "y": 17.505290703594216,
+          "heading": 14.075283401600151,
+          "speed": 0.37750730295861157,
+          "offset": 3.5,
+          "rudder": 1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 17.699999999999836,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 8172.849392927037
+        },
+        {
+          "t": 39.0,
+          "x": 1.9739512038815783,
+          "y": 17.690900399382635,
+          "heading": 15.8202523679672,
+          "speed": 0.37155471754521746,
+          "offset": 1.0,
+          "rudder": 1.0,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 17.799999999999834,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 9.372437372828239
+        },
+        {
+          "t": 39.5,
+          "x": 1.9877176172220814,
+          "y": 17.87392909445468,
+          "heading": 17.26680673616974,
+          "speed": 0.3670913638648433,
+          "offset": 3.5,
+          "rudder": 1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 17.89999999999983,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 11108.798324265885
+        },
+        {
+          "t": 40.0,
+          "x": 2.0092880615694146,
+          "y": 18.061317374054852,
+          "heading": 18.63335984001586,
+          "speed": 0.37725138250696033,
+          "offset": 3.0,
+          "rudder": 1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 17.99999999999983,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 17324.12420954225
+        },
+        {
+          "t": 40.5,
+          "x": 2.0387390699093877,
+          "y": 18.25260741278899,
+          "heading": 20.069454883070293,
+          "speed": 0.38708779785030273,
+          "offset": 3.5,
+          "rudder": 1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 18.099999999999827,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 6679.738215999102
+        },
+        {
+          "t": 41.0,
+          "x": 2.07625664892191,
+          "y": 18.447210071971043,
+          "heading": 21.67818674130349,
+          "speed": 0.39637236884367705,
+          "offset": 3.5,
+          "rudder": 1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 18.199999999999825,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 11357.034236199548
+        },
+        {
+          "t": 41.5,
+          "x": 2.122112534672865,
+          "y": 18.644416514803783,
+          "heading": 23.51722528517179,
+          "speed": 0.4049352706433347,
+          "offset": 3.5,
+          "rudder": 1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 18.299999999999823,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 6349.724001967683
+        },
+        {
+          "t": 42.0,
+          "x": 2.1766200443616324,
+          "y": 18.843418237078232,
+          "heading": 25.603278757482858,
+          "speed": 0.41266332078665796,
+          "offset": 3.5,
+          "rudder": 1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 18.39999999999982,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 6070.855614893628
+        },
+        {
+          "t": 42.5,
+          "x": 2.240082944708078,
+          "y": 19.043333625990535,
+          "heading": 27.919811502916847,
+          "speed": 0.4194935157751068,
+          "offset": 3.5,
+          "rudder": 1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 18.49999999999982,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 5169.9300094418195
+        },
+        {
+          "t": 43.0,
+          "x": 2.311183525619895,
+          "y": 19.24052829210096,
+          "heading": 30.408621741668924,
+          "speed": 0.4192423115497793,
+          "offset": 3.5,
+          "rudder": 0.7906746864318848,
+          "throttle": -0.25,
+          "target_x": 5.0,
+          "target_y": 18.599999999999817,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 1723.9714229188783
+        },
+        {
+          "t": 43.5,
+          "x": 2.3899990828102102,
+          "y": 19.434533640328816,
+          "heading": 32.97733758711859,
+          "speed": 0.4188076751743257,
+          "offset": 3.5,
+          "rudder": 0.7967797517776489,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 18.699999999999815,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 3712.2468099950556
+        },
+        {
+          "t": 44.0,
+          "x": 2.478017744320555,
+          "y": 19.62752834791931,
+          "heading": 35.502727938798,
+          "speed": 0.4242369240507605,
+          "offset": 3.5,
+          "rudder": 0.9496789574623108,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 18.799999999999812,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 5156.960967782885
+        },
+        {
+          "t": 44.5,
+          "x": 2.5749270251514833,
+          "y": 19.819043493649687,
+          "heading": 37.85640005510614,
+          "speed": 0.42927594740584113,
+          "offset": 3.5,
+          "rudder": 0.9204483032226562,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 18.89999999999981,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 7525.384512846351
+        },
+        {
+          "t": 45.0,
+          "x": 2.677080808450127,
+          "y": 20.00449866073926,
+          "heading": 40.04270709578585,
+          "speed": 0.4234572679383231,
+          "offset": 3.5,
+          "rudder": 0.4118790328502655,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 18.999999999999808,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 1152.3998535604678
+        },
+        {
+          "t": 45.5,
+          "x": 2.784388270527296,
+          "y": 20.18413989508436,
+          "heading": 42.08610788176922,
+          "speed": 0.4185014432208081,
+          "offset": 3.5,
+          "rudder": 0.4962271451950073,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 19.099999999999806,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 3501.2563730463403
+        },
+        {
+          "t": 46.0,
+          "x": 2.897700678253281,
+          "y": 20.360107413259577,
+          "heading": 43.80309276947352,
+          "speed": 0.41858938924633543,
+          "offset": 3.5,
+          "rudder": 0.5488040447235107,
+          "throttle": -0.25,
+          "target_x": 5.0,
+          "target_y": 19.199999999999804,
+          "perceived_classes": [],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 5173.178024992826
+        },
+        {
+          "t": 46.5,
+          "x": 3.012531974833111,
+          "y": 20.529465226684827,
+          "heading": 44.964211879805084,
+          "speed": 0.4092348745763824,
+          "offset": 2.0,
+          "rudder": 0.4043389558792114,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 19.2999999999998,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 5835.544971531176
+        },
+        {
+          "t": 47.0,
+          "x": 3.1307734036186687,
+          "y": 20.695644916912894,
+          "heading": 45.63078050553006,
+          "speed": 0.4079055033977657,
+          "offset": -1.5,
+          "rudder": -1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 19.3999999999998,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 10586.699522453262
+        },
+        {
+          "t": 47.5,
+          "x": 3.255763070997058,
+          "y": 20.863155784572974,
+          "heading": 45.880720657343794,
+          "speed": 0.41800625706127154,
+          "offset": -1.5,
+          "rudder": -1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 19.499999999999797,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 11907.141489724458
+        },
+        {
+          "t": 48.0,
+          "x": 3.3854721652508784,
+          "y": 21.03411518525892,
+          "heading": 44.8732358627627,
+          "speed": 0.42919257130124633,
+          "offset": -1.5,
+          "rudder": -0.8622007369995117,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 19.599999999999795,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 8267.460197298531
+        },
+        {
+          "t": 48.5,
+          "x": 3.516541076157502,
+          "y": 21.212293762977364,
+          "heading": 41.76767306495227,
+          "speed": 0.4423874544514856,
+          "offset": -2.0,
+          "rudder": -1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 19.699999999999793,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "overtaking",
+              -1
+            ]
+          ],
+          "cost": 7319.161151111793
+        }
+      ]
+    },
+    {
+      "case": "combined",
+      "noise": "nominal",
+      "seed": 812,
+      "checks": {
+        "goal": true,
+        "no_collision": true,
+        "returned_to_path": true,
+        "boundary_margin": true,
+        "static_hull_margin": true,
+        "target_hull_margin": true
+      },
+      "passed": true,
+      "steps": 80,
+      "outcome": "goal",
+      "max_cte_m": 3.2636988162994385,
+      "final_cte_m": 0.08341791480779648,
+      "mean_cte_m": 1.6801605974324048,
+      "min_target_centre_distance_m": 3.07591082019435,
+      "min_static_hull_clearance_m": 0.25976818412206937,
+      "min_target_hull_clearance_m": 2.0216146243786475,
+      "min_boundary_clearance_m": 1.092415020630364,
+      "first_alteration": 1.0,
+      "supervisor_events": 0,
+      "trajectory": [
+        {
+          "t": 0.5,
+          "x": 5.001007131776003,
+          "y": 4.2790866131761645,
+          "heading": 0.44328961173818543,
+          "speed": 0.5581768607477607,
+          "offset": 3.5,
+          "rudder": 1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 22.825,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": 19.068378367083742
+        },
+        {
+          "t": 1.0,
+          "x": 5.00787927442479,
+          "y": 4.5580350962538345,
+          "heading": 2.665101707352415,
+          "speed": 0.558066241788261,
+          "offset": 3.5,
+          "rudder": 1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 22.65,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": 1.6455320009910124
+        },
+        {
+          "t": 1.5,
+          "x": 5.025449898240334,
+          "y": 4.83618804751129,
+          "heading": 6.790125864049247,
+          "speed": 0.5574147149636425,
+          "offset": 3.5,
+          "rudder": 1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 22.474999999999998,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": 203.5603887415956
+        },
+        {
+          "t": 2.0,
+          "x": 5.056847030133143,
+          "y": 5.111820689121397,
+          "heading": 12.200626531027899,
+          "speed": 0.5548301830724794,
+          "offset": 3.5,
+          "rudder": 0.8469981551170349,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 22.299999999999997,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": 376.8126270978418
+        },
+        {
+          "t": 2.5,
+          "x": 5.103389576565835,
+          "y": 5.382310262418789,
+          "heading": 18.11199632437186,
+          "speed": 0.5489292045101793,
+          "offset": 2.0,
+          "rudder": -0.20328587293624878,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 22.124999999999996,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": -2.4089421009735013
+        },
+        {
+          "t": 3.0,
+          "x": 5.164518468763646,
+          "y": 5.645186746936857,
+          "heading": 23.680459988573748,
+          "speed": 0.5397806501678604,
+          "offset": 3.5,
+          "rudder": 0.31183305382728577,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 21.949999999999996,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": 11.504114178771584
+        },
+        {
+          "t": 3.5,
+          "x": 5.236540764286665,
+          "y": 5.900350329546583,
+          "heading": 27.38900700037815,
+          "speed": 0.530266593111939,
+          "offset": 3.5,
+          "rudder": 0.8690668344497681,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 21.774999999999995,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": 1344.0742597005474
+        },
+        {
+          "t": 4.0,
+          "x": 5.315168811392098,
+          "y": 6.150512597364007,
+          "heading": 28.657026499448392,
+          "speed": 0.5244560230607357,
+          "offset": 3.5,
+          "rudder": 0.7251728773117065,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 21.599999999999994,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": 64.56933099206569
+        },
+        {
+          "t": 4.5,
+          "x": 5.399215835297087,
+          "y": 6.397834988048715,
+          "heading": 28.775168390218806,
+          "speed": 0.5224261370233508,
+          "offset": 3.5,
+          "rudder": 1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 21.424999999999994,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": 879.5415482764928
+        },
+        {
+          "t": 5.0,
+          "x": 5.48880219737934,
+          "y": 6.642933637762546,
+          "heading": 28.90417319737349,
+          "speed": 0.5219159486456632,
+          "offset": 3.5,
+          "rudder": 0.9555252194404602,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 21.249999999999993,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": 257.57086407984906
+        },
+        {
+          "t": 5.5,
+          "x": 5.5845878858967035,
+          "y": 6.885448646146611,
+          "heading": 29.686066396979925,
+          "speed": 0.5214918116951348,
+          "offset": 3.5,
+          "rudder": 0.9156461358070374,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 21.074999999999992,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": 402.34224705338886
+        },
+        {
+          "t": 6.0,
+          "x": 5.687732406643203,
+          "y": 7.124322131115251,
+          "heading": 31.38917671837154,
+          "speed": 0.5203819135253964,
+          "offset": 3.5,
+          "rudder": 0.41945788264274597,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 20.89999999999999,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": 117.45724351304546
+        },
+        {
+          "t": 6.5,
+          "x": 5.799149418538375,
+          "y": 7.358382230411984,
+          "heading": 33.86523198349469,
+          "speed": 0.5184510801317535,
+          "offset": 1.5,
+          "rudder": -0.5189951658248901,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 20.72499999999999,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": 197.55850111061795
+        },
+        {
+          "t": 7.0,
+          "x": 5.91861846838525,
+          "y": 7.5871257412913735,
+          "heading": 36.43955357219691,
+          "speed": 0.5161257507264843,
+          "offset": 0.0,
+          "rudder": -1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 20.54999999999999,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": 155.27229479757384
+        },
+        {
+          "t": 7.5,
+          "x": 6.0432684060469475,
+          "y": 7.812569235631211,
+          "heading": 37.53232969354385,
+          "speed": 0.5152179193282063,
+          "offset": 3.5,
+          "rudder": 0.4187317192554474,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 20.37499999999999,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": 638.9764075274957
+        },
+        {
+          "t": 8.0,
+          "x": 6.168143219595908,
+          "y": 8.039725045755665,
+          "heading": 35.718451594898944,
+          "speed": 0.5184341081841916,
+          "offset": 2.5,
+          "rudder": 0.3290543556213379,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 20.19999999999999,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": 410.31007120433463
+        },
+        {
+          "t": 8.5,
+          "x": 6.290528823537919,
+          "y": 8.271892803919949,
+          "heading": 32.25231756732007,
+          "speed": 0.5249003866764819,
+          "offset": 1.5,
+          "rudder": -0.07345461845397949,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 20.024999999999988,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": 325.6624932541997
+        },
+        {
+          "t": 9.0,
+          "x": 6.410692748996079,
+          "y": 8.508330845785999,
+          "heading": 29.229215630162123,
+          "speed": 0.5304425194984517,
+          "offset": 2.0,
+          "rudder": 0.12274345755577087,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 19.849999999999987,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": 194.73763936162007
+        },
+        {
+          "t": 9.5,
+          "x": 6.529124983117183,
+          "y": 8.747720499324778,
+          "heading": 27.130330970546417,
+          "speed": 0.5341670162049796,
+          "offset": 2.0,
+          "rudder": 0.032209984958171844,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 19.674999999999986,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": 79.81341137654627
+        },
+        {
+          "t": 10.0,
+          "x": 6.646552735127113,
+          "y": 8.989080633370286,
+          "heading": 25.920071514215945,
+          "speed": 0.5368202352690179,
+          "offset": 2.5,
+          "rudder": 0.14440694451332092,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 19.499999999999986,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": 55.06269599302724
+        },
+        {
+          "t": 10.5,
+          "x": 6.764088645976932,
+          "y": 9.231566346698806,
+          "heading": 25.504302363117706,
+          "speed": 0.5389397424860697,
+          "offset": 2.0,
+          "rudder": -0.3721827268600464,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 19.324999999999985,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": 7.011819313425715
+        },
+        {
+          "t": 11.0,
+          "x": 6.88266434496372,
+          "y": 9.474600508787208,
+          "heading": 25.697870618485357,
+          "speed": 0.5408356509410878,
+          "offset": 2.5,
+          "rudder": -0.20637637376785278,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 19.149999999999984,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": 5.134351180734495
+        },
+        {
+          "t": 11.5,
+          "x": 7.0018660676733155,
+          "y": 9.71828772443276,
+          "heading": 25.815378080656828,
+          "speed": 0.5425587885787732,
+          "offset": 3.0,
+          "rudder": -0.23456713557243347,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 18.974999999999984,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": 8.487408538389966
+        },
+        {
+          "t": 12.0,
+          "x": 7.120129512775611,
+          "y": 9.963276467802775,
+          "heading": 25.352398913974223,
+          "speed": 0.544079872171294,
+          "offset": 2.0,
+          "rudder": -0.7065898180007935,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 18.799999999999983,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": -3.882819318273236
+        },
+        {
+          "t": 12.5,
+          "x": 7.236312153144276,
+          "y": 10.209996023590781,
+          "heading": 24.351396092142245,
+          "speed": 0.5454134033236284,
+          "offset": 2.5,
+          "rudder": -0.33918866515159607,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 18.624999999999982,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": -1.8687463897201608
+        },
+        {
+          "t": 13.0,
+          "x": 7.3484563363669375,
+          "y": 10.459132882251353,
+          "heading": 22.520629830530122,
+          "speed": 0.5464265446478082,
+          "offset": 3.5,
+          "rudder": 0.3793085217475891,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 18.44999999999998,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": 7.513404340320605
+        },
+        {
+          "t": 13.5,
+          "x": 7.454822650896581,
+          "y": 10.711055240380393,
+          "heading": 20.084450741387368,
+          "speed": 0.5469137679448753,
+          "offset": 1.0,
+          "rudder": -1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 18.27499999999998,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": -5.179416873590914
+        },
+        {
+          "t": 14.0,
+          "x": 7.556945234232824,
+          "y": 10.964746793692196,
+          "heading": 18.378083948619388,
+          "speed": 0.546949453785351,
+          "offset": 3.0,
+          "rudder": 0.126020148396492,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 18.09999999999998,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": 4.040493825396811
+        },
+        {
+          "t": 14.5,
+          "x": 7.655324056441687,
+          "y": 11.219811313663577,
+          "heading": 17.01231860804972,
+          "speed": 0.5467588207150714,
+          "offset": 3.0,
+          "rudder": -0.17200471460819244,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 17.92499999999998,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": 4.85987678978532
+        },
+        {
+          "t": 15.0,
+          "x": 7.749558030813387,
+          "y": 11.476237753268322,
+          "heading": 15.83917284129439,
+          "speed": 0.5463865329755192,
+          "offset": 2.0,
+          "rudder": -0.6637668013572693,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 17.74999999999998,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": -4.054745687147829
+        },
+        {
+          "t": 15.5,
+          "x": 7.841345104266701,
+          "y": 11.733553228687779,
+          "heading": 15.336733420249676,
+          "speed": 0.5463922427833877,
+          "offset": 1.0,
+          "rudder": -1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 17.574999999999978,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": -8.051697853709419
+        },
+        {
+          "t": 16.0,
+          "x": 7.930265949220265,
+          "y": 11.991916780797705,
+          "heading": 14.75511165832884,
+          "speed": 0.546474671786771,
+          "offset": 1.0,
+          "rudder": -1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 17.399999999999977,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": -6.651430249043808
+        },
+        {
+          "t": 16.5,
+          "x": 8.013534814214418,
+          "y": 12.25182840225823,
+          "heading": 13.124631861230704,
+          "speed": 0.5458488979476043,
+          "offset": 0.0,
+          "rudder": -1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 17.224999999999977,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": -7.786010691619611
+        },
+        {
+          "t": 17.0,
+          "x": 8.087788596801127,
+          "y": 12.513511623243403,
+          "heading": 10.166621671452987,
+          "speed": 0.544028427101412,
+          "offset": -1.0,
+          "rudder": -1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 17.049999999999976,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": -9.38828844866436
+        },
+        {
+          "t": 17.5,
+          "x": 8.150325140433816,
+          "y": 12.776484159483045,
+          "heading": 6.18863621810341,
+          "speed": 0.5406121497185695,
+          "offset": -1.0,
+          "rudder": -1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 16.874999999999975,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": -8.816334138792405
+        },
+        {
+          "t": 18.0,
+          "x": 8.199341519623777,
+          "y": 13.039568494404183,
+          "heading": 1.6749634449798099,
+          "speed": 0.535223215900772,
+          "offset": 2.0,
+          "rudder": -0.6035485863685608,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 16.699999999999974,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": 0.7256803975158306
+        },
+        {
+          "t": 18.5,
+          "x": 8.234008363121436,
+          "y": 13.301260799268734,
+          "heading": 357.0979095124133,
+          "speed": 0.5279570151571528,
+          "offset": 1.0,
+          "rudder": -0.8649463653564453,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 16.524999999999974,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": -8.051683300257233
+        },
+        {
+          "t": 19.0,
+          "x": 8.254978948091026,
+          "y": 13.560353900119459,
+          "heading": 353.0697862914438,
+          "speed": 0.5198807568756928,
+          "offset": -1.0,
+          "rudder": -1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 16.349999999999973,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": -8.825908371130895
+        },
+        {
+          "t": 19.5,
+          "x": 8.26365794771309,
+          "y": 13.81641934971506,
+          "heading": 349.862644160028,
+          "speed": 0.5124249779666763,
+          "offset": -1.0,
+          "rudder": -1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 16.174999999999972,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": -10.05826907435788
+        },
+        {
+          "t": 20.0,
+          "x": 8.260859748471319,
+          "y": 14.069477552111435,
+          "heading": 347.2169358181517,
+          "speed": 0.5061473450254624,
+          "offset": -1.0,
+          "rudder": -1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 15.999999999999972,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": -10.072799783298018
+        },
+        {
+          "t": 20.5,
+          "x": 8.247063920502502,
+          "y": 14.31961725474303,
+          "heading": 344.8451049380762,
+          "speed": 0.50103970182798,
+          "offset": -1.0,
+          "rudder": -1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 15.82499999999997,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [],
+          "cost": -9.890566476183857
+        },
+        {
+          "t": 21.0,
+          "x": 8.222616164797374,
+          "y": 14.56686358652086,
+          "heading": 342.5665655795463,
+          "speed": 0.49690418125272673,
+          "offset": 0.0,
+          "rudder": -1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 15.64999999999997,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -7.9728573532650175
+        },
+        {
+          "t": 21.5,
+          "x": 8.187745400523353,
+          "y": 14.811132874974295,
+          "heading": 340.27538243290866,
+          "speed": 0.49349146084852,
+          "offset": 0.0,
+          "rudder": -1.0,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 15.47499999999997,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -7.5526445181425785
+        },
+        {
+          "t": 22.0,
+          "x": 8.142598132383238,
+          "y": 15.05223253285285,
+          "heading": 337.9179698006938,
+          "speed": 0.49058055750170876,
+          "offset": 0.0,
+          "rudder": -0.9914358258247375,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 15.299999999999969,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -7.095797472392446
+        },
+        {
+          "t": 22.5,
+          "x": 8.087280356499987,
+          "y": 15.289881733222039,
+          "heading": 335.4772157427125,
+          "speed": 0.4880049129456981,
+          "offset": 1.0,
+          "rudder": -0.48141971230506897,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 15.124999999999968,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -7.471738269007005
+        },
+        {
+          "t": 23.0,
+          "x": 8.021924350646607,
+          "y": 15.523760048066894,
+          "heading": 332.97758016866226,
+          "speed": 0.4856767388120458,
+          "offset": 0.5,
+          "rudder": -0.3625982105731964,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 14.949999999999967,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -6.384512163340263
+        },
+        {
+          "t": 23.5,
+          "x": 7.948766562135979,
+          "y": 15.751219350946718,
+          "heading": 330.7556477355964,
+          "speed": 0.47786942353049267,
+          "offset": -1.0,
+          "rudder": -1.0,
+          "throttle": -0.25,
+          "target_x": 5.0,
+          "target_y": 14.774999999999967,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -6.894293046984074
+        },
+        {
+          "t": 24.0,
+          "x": 7.869268855923535,
+          "y": 15.973564332715032,
+          "heading": 329.2606065844879,
+          "speed": 0.47225915008855923,
+          "offset": 0.0,
+          "rudder": -0.7382873892784119,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 14.599999999999966,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -7.134044677901671
+        },
+        {
+          "t": 24.5,
+          "x": 7.782494879829423,
+          "y": 16.19429878724806,
+          "heading": 328.1605797626181,
+          "speed": 0.47435607868003193,
+          "offset": 0.5,
+          "rudder": -0.42625072598457336,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 14.424999999999965,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -7.2019424592786345
+        },
+        {
+          "t": 25.0,
+          "x": 7.688415738037309,
+          "y": 16.413363845172604,
+          "heading": 327.02896341648216,
+          "speed": 0.476824431101534,
+          "offset": 0.5,
+          "rudder": -0.5912382006645203,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 14.249999999999964,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -7.4388270251734925
+        },
+        {
+          "t": 25.5,
+          "x": 7.589274141689545,
+          "y": 16.628365617098286,
+          "heading": 325.98554855469206,
+          "speed": 0.4735179745587941,
+          "offset": 0.0,
+          "rudder": -0.6810685992240906,
+          "throttle": -0.25,
+          "target_x": 5.0,
+          "target_y": 14.074999999999964,
+          "perceived_classes": [
+            "head_on"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -7.516267872161767
+        },
+        {
+          "t": 26.0,
+          "x": 7.487355249353483,
+          "y": 16.837441438614526,
+          "heading": 325.12690786870695,
+          "speed": 0.4651888208360154,
+          "offset": 0.5,
+          "rudder": -0.09183050692081451,
+          "throttle": -0.25,
+          "target_x": 5.0,
+          "target_y": 13.899999999999963,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -6.786672343749366
+        },
+        {
+          "t": 26.5,
+          "x": 7.382775256587452,
+          "y": 17.04116856292886,
+          "heading": 324.314198813888,
+          "speed": 0.4580031269252688,
+          "offset": 0.0,
+          "rudder": -0.6926119327545166,
+          "throttle": -0.25,
+          "target_x": 5.0,
+          "target_y": 13.724999999999962,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -6.768233444331263
+        },
+        {
+          "t": 27.0,
+          "x": 7.278249762158454,
+          "y": 17.237561018816294,
+          "heading": 323.7947583165008,
+          "speed": 0.4449520230996783,
+          "offset": 0.0,
+          "rudder": -1.0,
+          "throttle": -0.75,
+          "target_x": 5.0,
+          "target_y": 13.549999999999962,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -6.428847766714829
+        },
+        {
+          "t": 27.5,
+          "x": 7.176199067909771,
+          "y": 17.424944827513528,
+          "heading": 323.52695012846283,
+          "speed": 0.42674130786001935,
+          "offset": 0.0,
+          "rudder": -1.0,
+          "throttle": -0.75,
+          "target_x": 5.0,
+          "target_y": 13.374999999999961,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -6.286529023293992
+        },
+        {
+          "t": 28.0,
+          "x": 7.075870748628413,
+          "y": 17.603679368218735,
+          "heading": 322.9975444809026,
+          "speed": 0.4099356422216711,
+          "offset": 0.5,
+          "rudder": -0.44085055589675903,
+          "throttle": -0.75,
+          "target_x": 5.0,
+          "target_y": 13.19999999999996,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -5.491558098277211
+        },
+        {
+          "t": 28.5,
+          "x": 6.976482340226221,
+          "y": 17.773785996388565,
+          "heading": 321.97292378530096,
+          "speed": 0.39402700756181397,
+          "offset": 0.0,
+          "rudder": -1.0,
+          "throttle": -0.75,
+          "target_x": 5.0,
+          "target_y": 13.02499999999996,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -5.299558658373949
+        },
+        {
+          "t": 29.0,
+          "x": 6.877848388369551,
+          "y": 17.935640056565397,
+          "heading": 320.6749159686194,
+          "speed": 0.37907990321086465,
+          "offset": 0.0,
+          "rudder": -0.8009703159332275,
+          "throttle": -0.75,
+          "target_x": 5.0,
+          "target_y": 12.849999999999959,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -5.182135831296144
+        },
+        {
+          "t": 29.5,
+          "x": 6.779921659884034,
+          "y": 18.089679880588427,
+          "heading": 319.2304043676933,
+          "speed": 0.3650638932401955,
+          "offset": 0.5,
+          "rudder": -0.3471432030200958,
+          "throttle": -0.75,
+          "target_x": 5.0,
+          "target_y": 12.674999999999958,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -4.9686513814501065
+        },
+        {
+          "t": 30.0,
+          "x": 6.682558118779194,
+          "y": 18.23617248577768,
+          "heading": 317.65458551616405,
+          "speed": 0.35179393122456226,
+          "offset": 0.0,
+          "rudder": -0.8574206829071045,
+          "throttle": -0.75,
+          "target_x": 5.0,
+          "target_y": 12.499999999999957,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -4.686575900519257
+        },
+        {
+          "t": 30.5,
+          "x": 6.586018170093725,
+          "y": 18.375763678432996,
+          "heading": 316.1998953094814,
+          "speed": 0.33944462145761994,
+          "offset": 0.5,
+          "rudder": -0.10995345562696457,
+          "throttle": -0.75,
+          "target_x": 5.0,
+          "target_y": 12.324999999999957,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -4.278189140409872
+        },
+        {
+          "t": 31.0,
+          "x": 6.4905011036839095,
+          "y": 18.50910354081687,
+          "heading": 314.94740525023946,
+          "speed": 0.3280428562007565,
+          "offset": 0.5,
+          "rudder": -0.11891216039657593,
+          "throttle": -0.75,
+          "target_x": 5.0,
+          "target_y": 12.149999999999956,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -4.223914203034668
+        },
+        {
+          "t": 31.5,
+          "x": 6.396266542119472,
+          "y": 18.63695421563547,
+          "heading": 314.0314460479952,
+          "speed": 0.3176535700716309,
+          "offset": 0.5,
+          "rudder": -0.20070043206214905,
+          "throttle": -0.75,
+          "target_x": 5.0,
+          "target_y": 11.974999999999955,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -4.153161214789652
+        },
+        {
+          "t": 32.0,
+          "x": 6.303780269356341,
+          "y": 18.760419963345477,
+          "heading": 313.6747849229402,
+          "speed": 0.308528776662452,
+          "offset": 0.0,
+          "rudder": -0.6779344081878662,
+          "throttle": -0.75,
+          "target_x": 5.0,
+          "target_y": 11.799999999999955,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -3.814400168043606
+        },
+        {
+          "t": 32.5,
+          "x": 6.213264017020007,
+          "y": 18.88040741184247,
+          "heading": 313.8537374937886,
+          "speed": 0.3006005970308997,
+          "offset": 0.5,
+          "rudder": 0.29575419425964355,
+          "throttle": -0.75,
+          "target_x": 5.0,
+          "target_y": 11.624999999999954,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -3.262837026636071
+        },
+        {
+          "t": 33.0,
+          "x": 6.124594435634276,
+          "y": 18.997356727953218,
+          "heading": 314.30017281348216,
+          "speed": 0.2935264022325248,
+          "offset": 0.5,
+          "rudder": 0.18012891709804535,
+          "throttle": -0.75,
+          "target_x": 5.0,
+          "target_y": 11.449999999999953,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -3.1076148204465186
+        },
+        {
+          "t": 33.5,
+          "x": 6.03787704617548,
+          "y": 19.111808899553758,
+          "heading": 315.01695308808604,
+          "speed": 0.28718777981403015,
+          "offset": 0.5,
+          "rudder": 0.20006701350212097,
+          "throttle": -0.75,
+          "target_x": 5.0,
+          "target_y": 11.274999999999952,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -3.1937169944179766
+        },
+        {
+          "t": 34.0,
+          "x": 5.953484428480969,
+          "y": 19.22456339772078,
+          "heading": 316.1554289587712,
+          "speed": 0.28167847470638335,
+          "offset": 0.5,
+          "rudder": 0.4165947437286377,
+          "throttle": -0.75,
+          "target_x": 5.0,
+          "target_y": 11.099999999999952,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -2.6596900282991736
+        },
+        {
+          "t": 34.5,
+          "x": 5.871642168888361,
+          "y": 19.336183680698298,
+          "heading": 317.6840902768604,
+          "speed": 0.27681938535590583,
+          "offset": 0.5,
+          "rudder": 0.3409554958343506,
+          "throttle": -0.75,
+          "target_x": 5.0,
+          "target_y": 10.924999999999951,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -2.9115323484689055
+        },
+        {
+          "t": 35.0,
+          "x": 5.792890194544013,
+          "y": 19.4467792355085,
+          "heading": 319.56494427761555,
+          "speed": 0.2715382124630673,
+          "offset": 1.0,
+          "rudder": 1.0,
+          "throttle": -1.0,
+          "target_x": 5.0,
+          "target_y": 10.74999999999995,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": 2385.6016746107066
+        },
+        {
+          "t": 35.5,
+          "x": 5.717427792418984,
+          "y": 19.556676874810954,
+          "heading": 321.73937619606846,
+          "speed": 0.2666238193315192,
+          "offset": 0.5,
+          "rudder": 0.6491637825965881,
+          "throttle": -0.75,
+          "target_x": 5.0,
+          "target_y": 10.57499999999995,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -2.2374359746351917
+        },
+        {
+          "t": 36.0,
+          "x": 5.645350494500246,
+          "y": 19.666552450530894,
+          "heading": 324.2642402646061,
+          "speed": 0.2628138429767712,
+          "offset": 0.0,
+          "rudder": -0.22510682046413422,
+          "throttle": -0.75,
+          "target_x": 5.0,
+          "target_y": 10.399999999999949,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -2.3359081752768898
+        },
+        {
+          "t": 36.5,
+          "x": 5.575013206959738,
+          "y": 19.779603990244667,
+          "heading": 327.13518933812645,
+          "speed": 0.26629295634853634,
+          "offset": 0.0,
+          "rudder": 0.4050000309944153,
+          "throttle": -0.25,
+          "target_x": 5.0,
+          "target_y": 10.224999999999948,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -2.138436617603124
+        },
+        {
+          "t": 37.0,
+          "x": 5.5029234081216645,
+          "y": 19.901178018589924,
+          "heading": 329.98947544617903,
+          "speed": 0.28268132916489075,
+          "offset": 0.0,
+          "rudder": 0.6921855211257935,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 10.049999999999947,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -1.945450622984769
+        },
+        {
+          "t": 37.5,
+          "x": 5.429480761992489,
+          "y": 20.03059241552353,
+          "heading": 332.563920843961,
+          "speed": 0.2976031478606626,
+          "offset": 0.0,
+          "rudder": -0.30730482935905457,
+          "throttle": -0.25,
+          "target_x": 5.0,
+          "target_y": 9.874999999999947,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -2.0070589521201008
+        },
+        {
+          "t": 38.0,
+          "x": 5.356894698419678,
+          "y": 20.164751262538275,
+          "heading": 334.9516045985443,
+          "speed": 0.3050726658179794,
+          "offset": 0.0,
+          "rudder": 0.20244552195072174,
+          "throttle": -0.25,
+          "target_x": 5.0,
+          "target_y": 9.699999999999946,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -1.7144423893251308
+        },
+        {
+          "t": 38.5,
+          "x": 5.285054014104654,
+          "y": 20.303122666111147,
+          "heading": 336.9006898594963,
+          "speed": 0.31181872457937887,
+          "offset": 0.0,
+          "rudder": 0.3960341513156891,
+          "throttle": -0.25,
+          "target_x": 5.0,
+          "target_y": 9.524999999999945,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -1.5584890560935885
+        },
+        {
+          "t": 39.0,
+          "x": 5.2122041246133834,
+          "y": 20.44804115984354,
+          "heading": 338.191058275157,
+          "speed": 0.32439775723365477,
+          "offset": 0.0,
+          "rudder": 0.7687005996704102,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 9.349999999999945,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -1.3423386236218717
+        },
+        {
+          "t": 39.5,
+          "x": 5.1392789761462065,
+          "y": 20.596977133938477,
+          "heading": 339.0280439738697,
+          "speed": 0.3316624890370768,
+          "offset": 0.0,
+          "rudder": 0.5865889191627502,
+          "throttle": -0.5,
+          "target_x": 5.0,
+          "target_y": 9.174999999999944,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -1.0109873369227473
+        },
+        {
+          "t": 40.0,
+          "x": 5.066774550614128,
+          "y": 20.750002115861474,
+          "heading": 339.7966789085398,
+          "speed": 0.33866524365083644,
+          "offset": 0.0,
+          "rudder": 0.9719040989875793,
+          "throttle": 0.0,
+          "target_x": 5.0,
+          "target_y": 8.999999999999943,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [
+            [
+              "head_on",
+              1
+            ]
+          ],
+          "cost": -0.6553511700216414
+        }
+      ]
+    }
+  ]
+}

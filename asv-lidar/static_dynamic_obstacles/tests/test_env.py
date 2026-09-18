@@ -75,10 +75,11 @@ def test_action_space_is_the_paper_2_two_channel_box():
 # ---------------------------------------------------------------------------
 # Observation contract
 # ---------------------------------------------------------------------------
-def test_observation_dimension_is_56():
+def test_observation_dimension_matches_versioned_space():
     env = make_env()
     o, _ = env.reset(seed=0)
-    assert sum(int(v.size) for v in o.values()) == 56
+    assert sum(int(v.size) for v in o.values()) == obs.OBS_DIM
+    assert env.observation_space.contains(o)
 
 
 def test_lidar_branch_is_obstacle_only():
@@ -533,7 +534,10 @@ def test_ego_noise_perturbs_the_ego_branch():
     env = make_env(ego_speed_noise=0.05, ego_yaw_rate_noise_dps=2.0)
     env.reset(seed=0)
     env.u_body, env.v_body, env.asv_w = 0.5, 0.0, 0.0
-    samples = [env._measured_ego() for _ in range(30)]
+    samples = []
+    for _ in range(30):
+        env._perceive()
+        samples.append(env._measured_ego())
     assert np.std([s[0] for s in samples]) > 0.0
     assert np.std([s[2] for s in samples]) > 0.0
 

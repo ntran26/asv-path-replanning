@@ -349,22 +349,18 @@ def test_staleness_is_off_now_the_bridge_waits_for_the_pose_line():
     assert 0 < env.stale_frames < 20
 
 
-def test_a_stale_frame_serves_the_previous_frames_pose_derived_observation():
-    """Fresh scan, previous pose: the LiDAR branch moves on, the rest repeats."""
-    fresh, stale = straight_env(pose_stale_prob=0.0), straight_env(pose_stale_prob=1.0)
-    fresh.reset(seed=0)
-    stale.reset(seed=0)
+def test_consecutive_stale_frames_hold_the_last_received_pose():
+    """Missing telemetry cannot advance to unreceived intermediate poses."""
+    stale = straight_env(pose_stale_prob=1.0)
+    initial, _ = stale.reset(seed=0)
+    initial_pose = stale.estimated_pose()
     helm = np.array([0.4, 0.0], dtype=np.float32)
-    previous = None
     for _ in range(6):
-        o_fresh, _, _, _, _ = fresh.step(helm)
         o_stale, _, _, _, info = stale.step(helm)
         assert info["pose_stale"]
-        assert np.array_equal(o_stale["lidar"], o_fresh["lidar"])
-        if previous is not None:
-            for branch in ("boundary", "ego", "path"):
-                assert np.allclose(o_stale[branch], previous[branch]), branch
-        previous = o_fresh
+        assert stale.estimated_pose() == initial_pose
+        for branch in ("boundary", "ego", "path"):
+            assert np.allclose(o_stale[branch], initial[branch]), branch
 
 
 def test_stale_frames_do_not_feed_the_tracker():
@@ -378,3 +374,108 @@ def test_stale_frames_do_not_feed_the_tracker():
         env.step(np.zeros(2, dtype=np.float32))
     assert len(env.tracker._scans) == fed
     assert env.stale_frames == 4
+
+
+def test_the_stop_test_reads_the_close_range_hull_fit_view():
+    """F66 (C15): inside STOP_TEST_FIT_RANGE_M the stop test uses the fitted
+    centre and axis; the track's own values otherwise."""
+    import pytest
+    # Centroid track: a reciprocal head-on dead ahead -- a stop cannot clear it.
+    ctx = _ctx("head_on", rng=3.0, alpha=0.0, ct=180.0, speed_ts=0.5)
+    assert not ctx.stop_clears
+    # The fit says the hull is 2 m to starboard on a parallel reciprocal track.
+    ctx.stop_rng, ctx.stop_alpha, ctx.stop_ct = 3.0, 41.8, 180.0
+    assert ctx.dcpa_if_stopped == pytest.approx(3.0 * abs(np.sin(np.radians(41.8 - 180.0))), rel=1e-6)
+    assert ctx.stop_clears
+
+
+def test_tracks_carry_their_latest_hull_fit():
+    """F66: the tracker records a fit on every matched update, in either mode."""
+    import tracking as trk
+    import constants as cfg
+    tracker = trk.Tracker(measurement="centroid")
+    a = np.radians(180.0)
+    pts = np.array([[5.0 + t * np.cos(a), 9.0 - 0.865] for t in np.linspace(-0.25, 0.25, 12)])
+    pts = np.vstack([pts, [[5.25, 9.0 - 0.865 + d] for d in np.linspace(0.05, 1.2, 12)]])
+    for step in range(4):
+        shift = np.array([0.0, -0.25 * step])
+        cluster = trk.Cluster((pts + shift).mean(axis=0), pts + shift, np.array([5.6, 4.0]))
+        tracker.update([cluster], cfg.UPDATE_RATE)
+    track = tracker.tracks[0]
+    assert track.last_fit_centre is not None
+    tracker.update([], cfg.UPDATE_RATE)
+    assert track.last_fit_centre is None
+
+
+def test_the_braking_profile_stops_and_grows_with_speed():
+    """A23: the latch's full astern brings the nominal hull below the stop speed,
+    and a faster vessel travels further doing it."""
+    import constants as cfg
+    import stopping
+    t0, s0 = stopping.braking_profile(0.0)
+    assert len(t0) == 1 and s0[-1] == 0.0
+    t1, s1 = stopping.braking_profile(cfg.U_REF)
+    t2, s2 = stopping.braking_profile(2.0 * cfg.U_REF)
+    assert 0.0 < s1[-1] < s2[-1]
+    assert t1[-1] < cfg.ESTOP_MAX_BRAKE_S
+    assert np.all(np.diff(s2) >= -1e-9)
+
+
+def test_the_stop_test_follows_the_braking_path():
+    """A23: a crossing target that clears a stationary own ship by more than the
+    hull clearance can still meet one that slides forward while stopping."""
+    import math
+    import pytest
+    import constants as cfg
+    import stopping
+    ahead = 1.9
+    rng, alpha = math.hypot(3.0, ahead), math.degrees(math.atan2(3.0, ahead))
+    stationary = stopping.dcpa_over_stop(rng, alpha, 270.0, 0.5, 0.0)
+    moving = stopping.dcpa_over_stop(rng, alpha, 270.0, 0.5, cfg.U_REF)
+    assert stationary == pytest.approx(ahead, abs=1e-6)
+    assert stationary >= cfg.ESTOP_CLEAR_DCPA_M > moving
+    # And the context reads it from its own surge.
+    ctx = _ctx("crossing", rng=rng, alpha=alpha, ct=270.0, speed_ts=0.5, u_own=cfg.U_REF)
+    assert ctx.dcpa_if_stopped == pytest.approx(moving)
+    assert not ctx.stop_clears
+
+
+def test_the_policy_slowdown_is_a_coast_not_the_latch():
+    """F68: R-2 and the Rule 8 credit ask whether the agent's own slowdown
+    clears -- a coast at the propulsion floor -- which carries the vessel much
+    further than the supervisor's full astern."""
+    import math
+    import constants as cfg
+    import stopping
+    _, latch = stopping.braking_profile(cfg.U_REF, "latch")
+    _, coast = stopping.braking_profile(cfg.U_REF, "coast")
+    assert coast[-1] > 3.0 * latch[-1]
+    ahead = 2.6
+    rng, alpha = math.hypot(3.0, ahead), math.degrees(math.atan2(3.0, ahead))
+    ctx = _ctx("crossing", rng=rng, alpha=alpha, ct=270.0, speed_ts=0.5, u_own=cfg.U_REF)
+    assert ctx.dcpa_if_slowed <= ctx.dcpa_if_stopped
+    assert ctx.stop_clears and not ctx.slowdown_clears
+
+
+def test_a_fraction_of_episodes_can_start_slow():
+    """F68: off by default; with a fraction set, some generated episodes start
+    at rest or below half cruise, on their own random stream."""
+    import constants as cfg
+    from env import ASVLidarEnv
+    default = ASVLidarEnv(render_mode=None, scenario_stage=5)
+    default.reset(seed=3)
+    assert default.start_speed == pytest.approx(cfg.U_NOM)
+    slow = ASVLidarEnv(render_mode=None, scenario_stage=5, low_speed_start_frac=1.0)
+    speeds = []
+    for seed in range(12):
+        slow.reset(seed=seed)
+        speeds.append(slow.start_speed)
+        assert slow.u_body == pytest.approx(slow.start_speed)
+    assert all(s <= 0.5 * cfg.U_NOM + 1e-9 for s in speeds)
+    assert any(s == 0.0 for s in speeds) and any(s > 0.0 for s in speeds)
+    # The same seed reproduces the start, and the scenario is the default's.
+    again = ASVLidarEnv(render_mode=None, scenario_stage=5, low_speed_start_frac=1.0)
+    again.reset(seed=3)
+    slow.reset(seed=3)
+    assert again.start_speed == slow.start_speed
+    assert again.scenario.digest() == default.scenario.digest()

@@ -152,6 +152,7 @@ def run_episode(env, built, seed: int, policy: str, model=None, obstacles: Optio
         "dcpa_m": float(getattr(built, "dcpa_m", 0.0)), "ct_deg": ct,
         "crossing_side": ("port" if ct < 180.0 else "starboard") if built.encounter_class == "crossing" else "",
         "dcpa_below_floor": getattr(built, "dcpa_below_floor", None),
+        "crossing_escapable": getattr(built, "crossing_escapable", None),
         "outcome": outcome, "collided": bool(info["collided"]),
         "collided_target": info["collision_kind"] == "target",
         "steps": steps, "return": total, "colregs_integral": col,
@@ -175,12 +176,20 @@ def run_episode(env, built, seed: int, policy: str, model=None, obstacles: Optio
 _WORKER = {}
 
 
-def _init_worker(model_path: Optional[str]) -> None:
+def _init_worker(model_path: Optional[str], overrides: Optional[Dict] = None) -> None:
     import torch
     torch.set_num_threads(1)
+    for name, value in (overrides or {}).items():
+        setattr(cfg, name, value)
     curriculum.apply_stage(tf.PROPULSION_STAGE)
     from env import ASVLidarEnv
     _WORKER["env"] = ASVLidarEnv(render_mode=None)
+    if overrides and "EMERGENCY_STOP_ENABLED" in overrides:
+        # The constructor default is bound at import; apply the switch directly.
+        _WORKER["env"].estop_enabled = bool(overrides["EMERGENCY_STOP_ENABLED"])
+    if overrides and "LOW_SPEED_START_FRAC" in overrides:
+        # F70: force episodes to start slow or at rest (a constructor argument too).
+        _WORKER["env"].low_speed_start_frac = float(overrides["LOW_SPEED_START_FRAC"])
     _WORKER["model"] = None
     if model_path:
         from stable_baselines3 import PPO
@@ -194,12 +203,14 @@ def _job(args) -> Dict:
     return row
 
 
-def run_pool(jobs: List, model_path: Optional[str] = None, processes: int = None) -> List[Dict]:
-    """jobs: (built, seed, policy, obstacles, extra-columns) tuples."""
+def run_pool(jobs: List, model_path: Optional[str] = None, processes: int = None,
+             overrides: Optional[Dict] = None) -> List[Dict]:
+    """jobs: (built, seed, policy, obstacles, extra-columns) tuples.  `overrides`
+    sets `constants` attributes in every worker, for A/B switches."""
     processes = processes or max(1, min(10, (os.cpu_count() or 2) - 2))
     curriculum.apply_stage(tf.PROPULSION_STAGE)
     with ProcessPoolExecutor(max_workers=processes, initializer=_init_worker,
-                             initargs=(str(model_path) if model_path else None,)) as pool:
+                             initargs=(str(model_path) if model_path else None, overrides)) as pool:
         return list(pool.map(_job, jobs, chunksize=1))
 
 

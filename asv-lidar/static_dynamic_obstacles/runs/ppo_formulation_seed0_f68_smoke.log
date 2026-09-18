@@ -1,0 +1,242 @@
+Using cpu device
+Logging to C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\runs\tensorboard\ppo_formulation_seed0_f68_smoke_1
+[CURRICULUM] t=0 -> scenario stage 1
+[CURRICULUM] t=328 -> scenario stage 2
+[CURRICULUM] t=738 -> scenario stage 3
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 50.3     |
+|    ep_rew_mean     | -198     |
+| time/              |          |
+|    fps             | 32       |
+|    iterations      | 1        |
+|    time_elapsed    | 31       |
+|    total_timesteps | 1024     |
+---------------------------------
+[CURRICULUM] t=1,312 -> scenario stage 4
+[CURRICULUM] t=2,048 -> scenario stage 5
+[EVAL] t=2,048 supervisor off goal 0.00 collision 1.00 timeout 0.00 return -367.6 colregs -17.0 intervention 0.00 (22.3 s)
+[EVAL] t=2,048 supervisor on goal 0.00 collision 1.00 timeout 0.00 return -367.7 colregs -16.2 intervention 0.00 (25.0 s)
+-------------------------------------------------
+| eval_supervisor_off/            |             |
+|    being_overtaken/collision    | 1           |
+|    being_overtaken/colregs      | -3.3        |
+|    being_overtaken/goal         | 0           |
+|    being_overtaken/intervention | 0           |
+|    collision_boundary           | 0.5         |
+|    collision_obstacle           | 0.5         |
+|    collision_rate               | 1           |
+|    collision_target             | 0           |
+|    crossing/collision           | 1           |
+|    crossing/colregs             | 0           |
+|    crossing/goal                | 0           |
+|    crossing/intervention        | 0           |
+|    episodes                     | 6           |
+|    estops_per_episode           | 0           |
+|    eval_wall_s                  | 22.3        |
+|    goal_rate                    | 0           |
+|    head_on/collision            | 1           |
+|    head_on/colregs              | -67.2       |
+|    head_on/goal                 | 0           |
+|    head_on/intervention         | 0           |
+|    intervention_rate            | 0           |
+|    mean_colregs_integral        | -17         |
+|    mean_return                  | -368        |
+|    no_target/collision          | 1           |
+|    no_target/colregs            | 0           |
+|    no_target/goal               | 0           |
+|    no_target/intervention       | 0           |
+|    null/collision               | 1           |
+|    null/colregs                 | -12.4       |
+|    null/goal                    | 0           |
+|    null/intervention            | 0           |
+|    overtaking/collision         | 1           |
+|    overtaking/colregs           | -19         |
+|    overtaking/goal              | 0           |
+|    overtaking/intervention      | 0           |
+|    timeout_rate                 | 0           |
+|    timesteps                    | 2048        |
+| eval_supervisor_on/             |             |
+|    being_overtaken/collision    | 1           |
+|    being_overtaken/colregs      | -1.42       |
+|    being_overtaken/goal         | 0           |
+|    being_overtaken/intervention | 0           |
+|    collision_boundary           | 0.5         |
+|    collision_obstacle           | 0.5         |
+|    collision_rate               | 1           |
+|    collision_target             | 0           |
+|    crossing/collision           | 1           |
+|    crossing/colregs             | 0           |
+|    crossing/goal                | 0           |
+|    crossing/intervention        | 0           |
+|    episodes                     | 6           |
+|    estops_per_episode           | 0           |
+|    eval_wall_s                  | 25          |
+|    goal_rate                    | 0           |
+|    head_on/collision            | 1           |
+|    head_on/colregs              | -71.5       |
+|    head_on/goal                 | 0           |
+|    head_on/intervention         | 0           |
+|    intervention_rate            | 0           |
+|    mean_colregs_integral        | -16.2       |
+|    mean_return                  | -368        |
+|    no_target/collision          | 1           |
+|    no_target/colregs            | 0           |
+|    no_target/goal               | 0           |
+|    no_target/intervention       | 0           |
+|    null/collision               | 1           |
+|    null/colregs                 | -13.2       |
+|    null/goal                    | 0           |
+|    null/intervention            | 0           |
+|    overtaking/collision         | 1           |
+|    overtaking/colregs           | -11.1       |
+|    overtaking/goal              | 0           |
+|    overtaking/intervention      | 0           |
+|    timeout_rate                 | 0           |
+|    timesteps                    | 2048        |
+| rollout/                        |             |
+|    ep_len_mean                  | 42.5        |
+|    ep_rew_mean                  | -276        |
+| time/                           |             |
+|    fps                          | 11          |
+|    iterations                   | 2           |
+|    time_elapsed                 | 181         |
+|    total_timesteps              | 2048        |
+| train/                          |             |
+|    approx_kl                    | 0.010311799 |
+|    clip_fraction                | 0.0784      |
+|    clip_range                   | 0.2         |
+|    entropy_loss                 | -2.84       |
+|    explained_variance           | -0.00944    |
+|    learning_rate                | 0.0003      |
+|    loss                         | 2.67        |
+|    n_updates                    | 10          |
+|    policy_gradient_loss         | -0.0072     |
+|    std                          | 0.999       |
+|    value_loss                   | 5.04        |
+-------------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 39.6         |
+|    ep_rew_mean          | -308         |
+| time/                   |              |
+|    fps                  | 11           |
+|    iterations           | 3            |
+|    time_elapsed         | 261          |
+|    total_timesteps      | 3072         |
+| train/                  |              |
+|    approx_kl            | 0.0014068233 |
+|    clip_fraction        | 9.77e-05     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -2.83        |
+|    explained_variance   | 0.13         |
+|    learning_rate        | 0.0003       |
+|    loss                 | 1.42         |
+|    n_updates            | 20           |
+|    policy_gradient_loss | -0.000904    |
+|    std                  | 0.998        |
+|    value_loss           | 3.27         |
+------------------------------------------
+[EVAL] t=4,096 supervisor off goal 0.00 collision 1.00 timeout 0.00 return -331.3 colregs -18.8 intervention 0.00 (18.1 s)
+[EVAL] t=4,096 supervisor on goal 0.00 collision 1.00 timeout 0.00 return -324.4 colregs -10.3 intervention 0.00 (17.6 s)
+--------------------------------------------------
+| eval_supervisor_off/            |              |
+|    being_overtaken/collision    | 1            |
+|    being_overtaken/colregs      | -4.12        |
+|    being_overtaken/goal         | 0            |
+|    being_overtaken/intervention | 0            |
+|    collision_boundary           | 0.333        |
+|    collision_obstacle           | 0.667        |
+|    collision_rate               | 1            |
+|    collision_target             | 0            |
+|    crossing/collision           | 1            |
+|    crossing/colregs             | -7.08        |
+|    crossing/goal                | 0            |
+|    crossing/intervention        | 0            |
+|    episodes                     | 6            |
+|    estops_per_episode           | 0            |
+|    eval_wall_s                  | 18.1         |
+|    goal_rate                    | 0            |
+|    head_on/collision            | 1            |
+|    head_on/colregs              | -70.6        |
+|    head_on/goal                 | 0            |
+|    head_on/intervention         | 0            |
+|    intervention_rate            | 0            |
+|    mean_colregs_integral        | -18.8        |
+|    mean_return                  | -331         |
+|    no_target/collision          | 1            |
+|    no_target/colregs            | 0            |
+|    no_target/goal               | 0            |
+|    no_target/intervention       | 0            |
+|    null/collision               | 1            |
+|    null/colregs                 | -13.5        |
+|    null/goal                    | 0            |
+|    null/intervention            | 0            |
+|    overtaking/collision         | 1            |
+|    overtaking/colregs           | -17.5        |
+|    overtaking/goal              | 0            |
+|    overtaking/intervention      | 0            |
+|    timeout_rate                 | 0            |
+|    timesteps                    | 4096         |
+| eval_supervisor_on/             |              |
+|    being_overtaken/collision    | 1            |
+|    being_overtaken/colregs      | -1.01        |
+|    being_overtaken/goal         | 0            |
+|    being_overtaken/intervention | 0            |
+|    collision_boundary           | 0.333        |
+|    collision_obstacle           | 0.667        |
+|    collision_rate               | 1            |
+|    collision_target             | 0            |
+|    crossing/collision           | 1            |
+|    crossing/colregs             | 0            |
+|    crossing/goal                | 0            |
+|    crossing/intervention        | 0            |
+|    episodes                     | 6            |
+|    estops_per_episode           | 0            |
+|    eval_wall_s                  | 17.6         |
+|    goal_rate                    | 0            |
+|    head_on/collision            | 1            |
+|    head_on/colregs              | -22.6        |
+|    head_on/goal                 | 0            |
+|    head_on/intervention         | 0            |
+|    intervention_rate            | 0            |
+|    mean_colregs_integral        | -10.3        |
+|    mean_return                  | -324         |
+|    no_target/collision          | 1            |
+|    no_target/colregs            | 0            |
+|    no_target/goal               | 0            |
+|    no_target/intervention       | 0            |
+|    null/collision               | 1            |
+|    null/colregs                 | -15.8        |
+|    null/goal                    | 0            |
+|    null/intervention            | 0            |
+|    overtaking/collision         | 1            |
+|    overtaking/colregs           | -22.4        |
+|    overtaking/goal              | 0            |
+|    overtaking/intervention      | 0            |
+|    timeout_rate                 | 0            |
+|    timesteps                    | 4096         |
+| rollout/                        |              |
+|    ep_len_mean                  | 38.7         |
+|    ep_rew_mean                  | -316         |
+| time/                           |              |
+|    fps                          | 10           |
+|    iterations                   | 4            |
+|    time_elapsed                 | 372          |
+|    total_timesteps              | 4096         |
+| train/                          |              |
+|    approx_kl                    | 0.0031260527 |
+|    clip_fraction                | 0.00293      |
+|    clip_range                   | 0.2          |
+|    entropy_loss                 | -2.84        |
+|    explained_variance           | 0.258        |
+|    learning_rate                | 0.0003       |
+|    loss                         | 0.605        |
+|    n_updates                    | 30           |
+|    policy_gradient_loss         | -0.00182     |
+|    std                          | 1            |
+|    value_loss                   | 1.26         |
+--------------------------------------------------
+[EVAL] t=4,096 supervisor off goal 0.00 collision 1.00 timeout 0.00 return -344.4 colregs -15.2 intervention 0.00 (18.9 s)
+[EVAL] t=4,096 supervisor on goal 0.00 collision 1.00 timeout 0.00 return -343.6 colregs -16.6 intervention 0.00 (19.3 s)
+done in 0.12 h -> C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\runs\ppo_formulation_seed0_f68_smoke

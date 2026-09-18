@@ -1,0 +1,31 @@
+Tier 0 (a22) — 180 episodes, 79 s
+
+                            n  goal  collision  colregs  v_port  v_bow  v_side  v_hold   v_r8  estops  port_sense
+class           policy                                                                                           
+being_overtaken compliant  12  0.92       0.08    -9.88    0.00   0.00    0.00   10.33   0.00    0.00        0.00
+                follower   12  0.92       0.08    -9.88    0.00   0.00    0.00   10.33   0.00    0.00        0.00
+                wrong_way  12  0.75       0.25   -14.19    0.00   0.00    0.00    8.33   0.00    0.00        0.00
+crossing        compliant  12  0.42       0.58    -7.19    1.17   1.08    0.00    0.00   3.25    0.17        0.42
+                follower   12  0.33       0.67   -15.15    0.00   1.75    0.00    0.00   7.17    0.08        0.42
+                wrong_way  12  0.25       0.75   -35.34    5.83   3.25    0.00    0.00   8.42    0.08        0.42
+head_on         compliant  12  0.08       0.92   -15.29    6.75   0.00    6.33    0.00   4.58    0.00        0.00
+                follower   12  0.67       0.33   -41.58    0.00   0.00   15.67    0.00  21.08    0.00        0.00
+                wrong_way  12  0.25       0.75   -55.27   13.75   0.00   22.75    0.00  10.42    0.00        0.00
+null            compliant  12  1.00       0.00     0.00    0.00   0.00    0.00    0.00   0.00    0.00        0.00
+                follower   12  1.00       0.00     0.00    0.00   0.00    0.00    0.00   0.00    0.00        0.00
+                wrong_way  12  1.00       0.00     0.00    0.00   0.00    0.00    0.00   0.00    0.00        0.00
+overtaking      compliant  12  0.08       0.92    -3.24    5.58   0.08    1.42    0.00   1.08    0.00        0.00
+                follower   12  0.33       0.67   -31.10    0.00   1.08   11.08    0.00  23.42    0.00        0.00
+                wrong_way  12  0.00       1.00   -43.63   13.75   0.25   22.00    0.00   6.83    0.00        0.00
+
+Checks:
+  [PASS] T0.1 head_on: compliant colregs -15.3 > wrong-way -55.3; v_port 6.8 < 13.8
+  [PASS] T0.1 crossing: compliant colregs -7.2 > wrong-way -35.3; v_port 1.2 < 5.8
+  [PASS] T0.1 overtaking: compliant colregs -3.2 > wrong-way -43.6; v_port 5.6 < 13.8
+  [PASS] T0.2 being overtaken: holding v_hold integral 2.44 < leaving the role 3.50
+  [PASS] T0.3 null: follower COLREGs penalty 0.0 >= -5
+  [PASS] T0.4 head-on: follower port-sense episodes 0.00 <= 0.10
+  [PASS] T0.5 straight paths: max |r_path| 0.00e+00 == 0
+  [PASS] T0.6 follower: stopped episodes 1, then target collision 0.00 <= 0.25
+  [PASS] T0.6 compliant: stopped episodes 2, then target collision 0.00 <= 0.25
+  [PASS] T0.6 wrong_way: stopped episodes 1, then target collision 0.00 <= 0.25

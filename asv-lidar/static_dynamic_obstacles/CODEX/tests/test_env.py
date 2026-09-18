@@ -1,0 +1,560 @@
+"""End-to-end environment: the ported env steps, and the observation contract holds.
+
+Revision 2: one dynamic target, 56-dim observation, corridor width as a Study 1
+parameter, Study 2 degradation axes as constructor arguments.
+"""
+
+import numpy as np
+import pytest
+
+import constants as cfg
+import observation as obs
+from env import ASVLidarEnv, TargetShip
+
+
+def make_env(**kwargs):
+    return ASVLidarEnv(render_mode=None, **kwargs)
+
+
+# ---------------------------------------------------------------------------
+# Stepping
+# ---------------------------------------------------------------------------
+def test_reset_returns_a_valid_observation():
+    env = make_env()
+    o, info = env.reset(seed=0)
+    assert env.observation_space.contains(o)
+    assert info == {}
+
+
+def test_env_steps_end_to_end():
+    """Build-order step 2: the ported environment still runs a full episode."""
+    env = make_env()
+    env.reset(seed=0)
+    steps = 0
+    for _ in range(cfg.MAX_EPISODE_STEPS + 10):
+        o, r, terminated, truncated, info = env.step(np.array([0.0, 0.0], np.float32))
+        steps += 1
+        assert env.observation_space.contains(o)
+        assert np.isfinite(r)
+        if terminated or truncated:
+            break
+    assert steps > 1
+    assert terminated or truncated
+
+
+def test_a_full_random_rollout_stays_finite():
+    env = make_env()
+    rng = np.random.default_rng(0)
+    for seed in range(5):
+        env.reset(seed=seed)
+        for _ in range(120):
+            action = rng.uniform(-1, 1, 2).astype(np.float32)
+            o, r, term, trunc, info = env.step(action)
+            for key, value in o.items():
+                assert np.all(np.isfinite(value)), key
+            assert np.isfinite(r)
+            if term or trunc:
+                break
+
+
+def test_seeded_resets_reproduce_the_same_layout():
+    a, b = make_env(), make_env()
+    a.reset(seed=42)
+    b.reset(seed=42)
+    assert a.obstacles == b.obstacles
+    assert (a.start_x, a.start_y) == (b.start_x, b.start_y)
+
+
+def test_action_space_is_the_paper_2_two_channel_box():
+    env = make_env()
+    assert env.action_space.shape == (2,)
+    assert env.action_space.low.min() == -1.0
+    assert env.action_space.high.max() == 1.0
+
+
+# ---------------------------------------------------------------------------
+# Observation contract
+# ---------------------------------------------------------------------------
+def test_observation_dimension_matches_versioned_space():
+    env = make_env()
+    o, _ = env.reset(seed=0)
+    assert sum(int(v.size) for v in o.values()) == obs.OBS_DIM
+    assert env.observation_space.contains(o)
+
+
+def test_lidar_branch_is_obstacle_only():
+    """The corridor boundary is never in the scan (01 §3.1, acceptance T6).
+
+    **Narrowed by 03a §1.2.**  It used to assert the scan was empty in a bare
+    channel, which stopped being true when the facility walls were added -- and
+    the walls are the point: until they existed the boundary gate had nothing to
+    remove in simulation and was load-bearing only in the field, a sim-to-real
+    gap in the exact component 01 §3 exists to remove one from.
+
+    What must still hold, and what this now pins, is the narrower claim: the
+    *corridor* is a map polygon and the sensor cannot see it.  Walls are
+    physical and returned; the channel limit is virtual and is not.
+    """
+    env = make_env(no_target_prob=1.0, facility_walls=False)
+    env.forced_num_obs = 0
+    env.reset(seed=0)
+    assert np.allclose(env.sector_closeness, 0.0), env.sector_closeness.max()
+    assert np.allclose(env.lidar.ranges, cfg.LIDAR_RANGE)
+
+
+def test_facility_walls_are_returned_and_then_gated():
+    """Acceptance T5 (03a §10): the gate has to do real work in training.
+
+    With the walls returned, the gate's margin becomes a tunable with measurable
+    failure modes in *both* directions -- too tight gates out real obstacles near
+    the wall, too loose lets beyond-wall clutter through -- and the N1 claim
+    covers the whole perception stack rather than the part after the gate.
+    """
+    env = make_env(no_target_prob=1.0, corridor_width=4.0, facility_walls=True)
+    env.forced_num_obs = 0
+    env.reset(seed=0)
+
+    returned = int((env.raw_ranges < cfg.LIDAR_RANGE - 1e-6).sum())
+    assert returned > 0, "the walls must appear in the raw scan"
+
+    # ... and be gone from what the tracker is given.
+    assert np.allclose(env.sector_closeness, 0.0), (
+        f"{returned} wall returns survived the gate into the pooled branch")
+
+
+def test_boundary_branch_does_see_the_walls():
+    """The complement of the test above: the walls reach the policy, but
+    through the map, not through the sensor."""
+    env = make_env()
+    env.forced_num_obs = 0
+    env.reset(seed=1)
+    assert np.any(env.boundary_closeness > 0.0)
+
+
+def test_an_obstacle_shows_up_in_the_lidar_branch():
+    env = make_env()
+    env.forced_num_obs = 0
+    env.reset(seed=1)
+    # Drop a box squarely ahead of the vessel.
+    env.obstacles = [[(env.asv_x - 0.5, env.asv_y + 3.0), (env.asv_x + 0.5, env.asv_y + 3.0),
+                      (env.asv_x + 0.5, env.asv_y + 4.0), (env.asv_x - 0.5, env.asv_y + 4.0)]]
+    env._perceive()
+    assert np.max(env.sector_closeness) > 0.0
+
+
+def test_no_target_gives_a_zero_presence_bit():
+    env = make_env(no_target_prob=1.0)
+    o, _ = env.reset(seed=0)
+    assert env.targets == []
+    _, presence = obs.split_target(o["target"])
+    assert np.allclose(presence, 0.0)
+
+
+# ---------------------------------------------------------------------------
+# Target ships
+# ---------------------------------------------------------------------------
+def test_target_ship_moves_at_constant_velocity():
+    """D1: constant velocity for training."""
+    t = TargetShip(5.0, 20.0, 180.0, 0.5)
+    for _ in range(10):
+        t.step(cfg.UPDATE_RATE)
+    assert t.y == pytest.approx(20.0 - 0.5 * 10 * cfg.UPDATE_RATE)
+    assert t.x == pytest.approx(5.0)
+
+
+def test_target_ship_velocity_follows_its_heading():
+    assert TargetShip(0, 0, 0.0, 1.0).velocity == pytest.approx([0.0, 1.0])
+    assert TargetShip(0, 0, 90.0, 1.0).velocity == pytest.approx([1.0, 0.0])
+    assert TargetShip(0, 0, 180.0, 1.0).velocity == pytest.approx([0.0, -1.0])
+
+
+def test_a_target_ship_is_eventually_tracked_and_occupies_the_slot():
+    """The whole perception chain, end to end: hull -> raycast -> cluster ->
+    track -> Kalman -> dynamic -> slot."""
+    env = make_env(pose_noise=False)
+    env.forced_num_obs = 0
+    env.reset(seed=3)
+    env.obstacles = []
+    # Head-on target, closing from ahead well inside the sensor horizon.
+    env.targets = [TargetShip(env.asv_x, env.asv_y + 9.0, 180.0, 0.6)]
+
+    for _ in range(60):
+        env.step(np.array([0.0, 0.0], np.float32))
+        if env.tracks:
+            break
+
+    assert env.tracks, "target ship was never tracked"
+    o = env._get_obs()
+    _, presence = obs.split_target(o["target"])
+    assert float(presence[0]) == 1.0
+    assert env.acquisition_range is not None
+
+
+def test_target_collision_is_reported_separately():
+    env = make_env()
+    env.reset(seed=0)
+    env.obstacles = []
+    env.targets = [TargetShip(env.asv_x, env.asv_y, 180.0, 0.0)]   # sitting on us
+    kind = env.collision_kind(env.hull_polygon())
+    assert kind == "target"
+
+
+def test_boundary_collision_is_reported_separately():
+    env = make_env()
+    env.reset(seed=0)
+    env.obstacles = []
+    env.targets = []
+    env.asv_x = -1.0
+    assert env.collision_kind(env.hull_polygon()) == "boundary"
+
+
+def test_obstacle_collision_is_reported_separately():
+    env = make_env()
+    env.reset(seed=0)
+    env.targets = []
+    env.obstacles = [[(env.asv_x - 0.5, env.asv_y - 0.5), (env.asv_x + 0.5, env.asv_y - 0.5),
+                      (env.asv_x + 0.5, env.asv_y + 0.5), (env.asv_x - 0.5, env.asv_y + 0.5)]]
+    assert env.collision_kind(env.hull_polygon()) == "obstacle"
+
+
+# ---------------------------------------------------------------------------
+# Reward placeholder
+# ---------------------------------------------------------------------------
+def test_the_reward_is_dense_and_decomposed():
+    """T4: the placeholder is gone.  Every 02a term reports, every step.
+
+    Was `test_reward_is_sparse_terminal_only`, which asserted the opposite and
+    was correct while 01 shipped perception without a trainable agent.
+    """
+    env = make_env()
+    env.reset(seed=0)
+    _, r, _, _, info = env.step(np.array([0.0, 0.0], np.float32))
+    assert r != 0.0, "the dense terms must contribute on an ordinary step"
+    for name in ("pf", "prog", "exist", "smooth", "obs", "bnd", "dom", "col"):
+        assert f"reward/term/{name}" in info
+        assert f"reward/weighted/{name}" in info
+    assert info["reward"] == pytest.approx(r)
+
+
+def test_every_term_stays_inside_its_declared_range():
+    """02a §10.4 test 1, on the trajectories the environment actually produces.
+
+    The exhaustive random-state version lives in `test_reward.py`; this one
+    catches a term that only leaves its range once it is fed real geometry.
+    """
+    from reward.terms import TERM_RANGE
+    env = make_env()
+    for seed in range(4):
+        env.reset(seed=seed)
+        for _ in range(60):
+            _, _, term, trunc, info = env.step(env.action_space.sample())
+            for name, (lo, hi) in TERM_RANGE.items():
+                value = info[f"reward/term/{name}"]
+                assert lo - 1e-9 <= value <= hi + 1e-9, f"{name} = {value}"
+            if term or trunc:
+                break
+
+
+def test_collision_returns_the_terminal_penalty():
+    """The terminal payoffs, isolated from the dense terms around them."""
+    env = make_env()
+    env.reset(seed=0)
+    still = np.zeros(2, dtype=np.float32)
+    assert env._reward(still, "obstacle", False, False).terminal == cfg.R_COLLISION
+    assert env._reward(still, None, True, False).terminal == cfg.R_GOAL
+    assert env._reward(still, None, False, True).terminal == cfg.R_TIMEOUT
+
+
+def test_a_collision_dominates_everything_dense():
+    """02 §5's ordering, at the step where it has to hold.
+
+    The dense terms are bounded by the sum of their weights, so no accumulation
+    of shaping can approach the collision payoff in one step.  Asserted rather
+    than assumed, because it is the property the whole coefficient table exists
+    to produce.
+    """
+    env = make_env()
+    env.reset(seed=0)
+    breakdown = env._reward(np.zeros(2, dtype=np.float32), "target", False, False)
+    dense_bound = sum(abs(w) for w in (
+        cfg.W_PF, cfg.W_PROG, cfg.W_EXIST, cfg.W_SMOOTH,
+        cfg.W_OBS, cfg.W_BND, cfg.W_DOM, cfg.W_COL))
+    # 20x the per-step bound at 10 Hz.  A 2 Hz step carries five times each
+    # weight (`REWARD_DT_SCALE`), so the same margin per second is 4x per step.
+    assert abs(breakdown.terminal) > (20.0 / cfg.REWARD_DT_SCALE) * dense_bound
+
+
+def test_terminal_payoffs_are_the_decided_values():
+    """02b §2 / 02a `R-7`.  -300 rather than -200 because at -200 the margin
+    between a collision and a maximally non-compliant episode is 32 points,
+    violating the 02 §5 ordering."""
+    assert cfg.R_COLLISION == -300.0
+    assert cfg.R_GOAL == 100.0
+    assert cfg.R_TIMEOUT == 0.0
+
+
+def test_timeout_truncates_rather_than_terminating():
+    """`R_TIMEOUT = 0` is only sound if SB3 bootstraps the final state.
+
+    That needs `truncated=True, terminated=False` at the step limit.  If the env
+    terminated instead, the value of running out of time would be pinned at 0
+    rather than bootstrapped, and 02a §8.1's "a cornered agent prefers timeout
+    to collision" argument would be void.
+    """
+    env = make_env(no_target_prob=1.0)
+    env.forced_num_obs = 0
+    env.reset(seed=0)
+    for _ in range(cfg.MAX_EPISODE_STEPS + 2):
+        env.asv_x, env.asv_y = 5.0, 12.0        # park it: no goal, no collision
+        _, reward, terminated, truncated, info = env.step(
+            np.array([0.0, -1.0], dtype=np.float32))
+        if terminated or truncated:
+            break
+    assert truncated and not terminated
+    assert info["timeout"] is True
+    # The *terminal* payoff is what must be zero.  The dense terms keep running
+    # on the last step like any other, which is correct -- what `R_TIMEOUT = 0`
+    # buys is that running out of time carries no one-shot penalty of its own,
+    # so the bootstrapped value of the final state is what the agent sees.
+    assert info["reward/terminal"] == 0.0
+
+
+def test_no_paper_2_reward_terms_survive_in_info():
+    """Kickoff §8 acceptance check, enforced from the outside."""
+    env = make_env()
+    env.reset(seed=0)
+    _, _, _, _, info = env.step(np.array([0.0, 0.0], np.float32))
+    for banned in ("r_pf", "r_oa", "lam", "g_u", "w_chi", "r_heading",
+                   "r_border", "r_progress", "r_slow", "r_thrust",
+                   "r_cte_recovery", "r_wrong_side", "gamma_e_eff",
+                   "block_alpha", "local_target_cte", "side_clearance_diff",
+                   "front_clearance"):
+        assert banned not in info, banned
+
+
+# ---------------------------------------------------------------------------
+# Pose noise wiring
+# ---------------------------------------------------------------------------
+def test_nominal_pose_noise_is_on():
+    """Revision 8: nominal jitter until S1-A measures it (TODO(05))."""
+    env = make_env()
+    env.reset(seed=0)
+    assert env._pose_noise is not None
+    assert env._pose_noise.enabled
+    assert env.estimated_pose() != (env.asv_x, env.asv_y, env.asv_h)
+
+
+def test_pose_noise_can_be_switched_off_entirely():
+    env = make_env(pose_noise=False)
+    env.reset(seed=0)
+    assert env._pose_noise is None
+    assert env.estimated_pose() == (env.asv_x, env.asv_y, env.asv_h)
+
+
+# ---------------------------------------------------------------------------
+# SB3 integration
+# ---------------------------------------------------------------------------
+def test_sb3_can_build_a_policy_over_this_space():
+    """The custom extractor is required: MlpPolicy cannot mask."""
+    from stable_baselines3 import SAC
+    from features_extractor import policy_kwargs
+
+    env = make_env()
+    model = SAC("MultiInputPolicy", env, policy_kwargs=policy_kwargs(),
+                buffer_size=1000, learning_starts=10, verbose=0)
+    o, _ = env.reset(seed=0)
+    action, _ = model.predict(o, deterministic=True)
+    assert action.shape == (2,)
+    assert np.all(np.isfinite(action))
+
+
+def test_sb3_learns_a_few_steps_without_error():
+    from stable_baselines3 import SAC
+    from features_extractor import policy_kwargs
+
+    env = make_env()
+    model = SAC("MultiInputPolicy", env, policy_kwargs=policy_kwargs(),
+                buffer_size=1000, learning_starts=20, batch_size=8, verbose=0)
+    model.learn(total_timesteps=60)
+
+
+# ---------------------------------------------------------------------------
+# Study 1 -- corridor width
+# ---------------------------------------------------------------------------
+def test_corridor_width_defaults_to_the_basin():
+    """O4 resolved: simulation matches the basin, so every width is reproducible."""
+    env = make_env()
+    assert env.corridor_width == cfg.MAP_WIDTH
+    assert env.corridor_breadths == pytest.approx(20.0)
+
+
+@pytest.mark.parametrize("width", cfg.CORRIDOR_WIDTHS_M)
+def test_every_sweep_width_runs(width):
+    env = make_env(corridor_width=width)
+    env.reset(seed=0)
+    info = {}
+    for _ in range(20):
+        o, r, term, trunc, info = env.step(np.array([0.0, 0.0], np.float32))
+        assert env.observation_space.contains(o)
+        if term or trunc:
+            break
+    assert info["corridor_width"] == pytest.approx(width)
+    assert info["corridor_breadths"] == pytest.approx(width / cfg.BREADTH)
+
+
+def test_widths_in_breadths_are_the_declared_sweep():
+    """02a §11.3: 14 B added so the crossing and head-on thresholds separate.
+
+    Revision 7 fixed the corridor at 10 m; revision 8 restored the sweep.
+    """
+    assert cfg.widths_in_breadths() == (20.0, 16.0, 14.0, 12.0, 10.0, 8.0, 7.0)
+    assert 14.0 in cfg.widths_in_breadths()
+
+
+def _brackets():
+    widths = sorted(cfg.CORRIDOR_WIDTHS_M)
+    return widths, list(zip(widths, widths[1:]))
+
+
+def test_the_sweep_brackets_every_predicted_threshold():
+    """Each per-class transition must fall strictly inside some bracket.
+
+    02a §2.2 predicts four, and all four move with the ship domain -- so this
+    fails loudly when 05 replaces the provisional domain without the sweep
+    following it.
+    """
+    widths, brackets = _brackets()
+    for name, threshold in cfg.PREDICTED_THRESHOLDS_M.items():
+        holding = [(lo, hi) for lo, hi in brackets if lo < threshold < hi]
+        assert holding, f"{name} at {threshold} m is not bracketed by {widths}"
+        assert len(holding) == 1, f"{name} bracketed more than once"
+
+
+def test_crossing_and_centreline_head_on_still_share_a_bracket():
+    """A documented gap, not a passing check -- see PORTING_MANIFEST F18."""
+    _, brackets = _brackets()
+
+    def bracket_of(name):
+        t = cfg.PREDICTED_THRESHOLDS_M[name]
+        return next((lo, hi) for lo, hi in brackets if lo < t < hi)
+
+    assert bracket_of("crossing") == bracket_of("head_on_centreline_target")
+    assert not any(6.02 < w < 6.52 for w in cfg.CORRIDOR_WIDTHS_M)
+
+
+def test_the_other_two_thresholds_are_cleanly_separated():
+    _, brackets = _brackets()
+
+    def bracket_of(name):
+        t = cfg.PREDICTED_THRESHOLDS_M[name]
+        return next((lo, hi) for lo, hi in brackets if lo < t < hi)
+
+    separated = {"overtaking", "head_on_compliant_target"}
+    seen = {bracket_of(n) for n in separated}
+    assert len(seen) == len(separated)
+    assert bracket_of("crossing") not in seen
+
+
+def test_a_narrow_corridor_actually_narrows_the_navigable_space():
+    narrow = make_env(corridor_width=4.0)
+    lo, hi = narrow.corridor_bounds_x()
+    assert hi - lo == pytest.approx(4.0)
+    assert lo == pytest.approx(3.0)          # centred in a 10 m basin
+
+    narrow.reset(seed=0)
+    narrow.asv_x = lo - 0.5                  # outside the channel
+    assert narrow.collision_kind(narrow.hull_polygon()) == "boundary"
+
+
+def test_boundary_branch_reflects_the_corridor_width():
+    """A narrower channel must read as closer walls, not the basin walls."""
+    wide = make_env(corridor_width=10.0)
+    tight = make_env(corridor_width=4.0)
+    wide.forced_num_obs = 0
+    tight.forced_num_obs = 0
+    wide.reset(seed=1)
+    tight.reset(seed=1)
+    for env in (wide, tight):
+        lo, hi = env.corridor_bounds_x()
+        env.asv_x = 0.5 * (lo + hi)
+        env.asv_y = 12.0
+        env.asv_h = 0.0
+        env._perceive()
+    assert np.max(tight.boundary_closeness) > np.max(wide.boundary_closeness)
+
+
+# ---------------------------------------------------------------------------
+# Study 2 -- degradation axes
+# ---------------------------------------------------------------------------
+def test_degradation_axes_default_to_nominal():
+    env = make_env()
+    assert env.tracker.dropout_p == 0.0
+    assert env.tracker.velocity_noise == 0.0
+    assert env.lidar.dropout_p == 0.0
+    assert env.lidar.aft_mask_half_deg == 0.0
+    # Ego noise is nominal rather than zero since revision 8.
+    assert env.ego_speed_noise == cfg.EGO_SPEED_NOISE
+    assert env.ego_yaw_rate_noise_dps == cfg.EGO_YAW_RATE_NOISE_DPS
+
+
+def test_detection_dropout_is_swept_through_the_constructor():
+    env = make_env(detection_dropout_p=1.0, pose_noise=False)
+    env.forced_num_obs = 0
+    env.reset(seed=3)
+    env.obstacles = []
+    env.targets = [TargetShip(env.asv_x, env.asv_y + 8.0, 180.0, 0.6)]
+    for _ in range(40):
+        env.step(np.array([0.0, 0.0], np.float32))
+    # Everything dropped, so no track can ever form.
+    assert env.tracks == []
+    assert env.tracker.dropped_detections > 0
+
+
+def test_lidar_dropout_removes_returns():
+    env = make_env(lidar_dropout_p=1.0)
+    env.forced_num_obs = 0
+    env.reset(seed=1)
+    env.obstacles = [[(env.asv_x - 0.5, env.asv_y + 3.0), (env.asv_x + 0.5, env.asv_y + 3.0),
+                      (env.asv_x + 0.5, env.asv_y + 4.0), (env.asv_x - 0.5, env.asv_y + 4.0)]]
+    env._perceive()
+    assert np.allclose(env.sector_closeness, 0.0)
+
+
+def test_aft_mask_blinds_the_stern_arc():
+    """The arc that gates the being-overtaken class."""
+    env = make_env(aft_mask_half_deg=30.0)
+    masked = env.lidar.aft_mask
+    assert masked.sum() > 0
+    astern = np.abs(env.lidar.bearings) >= 150.0
+    assert np.array_equal(masked, astern)
+
+
+def test_ego_noise_perturbs_the_ego_branch():
+    """No IMU: u, v and r are differentiated from a noisy pose (05 §6)."""
+    env = make_env(ego_speed_noise=0.05, ego_yaw_rate_noise_dps=2.0)
+    env.reset(seed=0)
+    env.u_body, env.v_body, env.asv_w = 0.5, 0.0, 0.0
+    samples = []
+    for _ in range(30):
+        env._perceive()
+        samples.append(env._measured_ego())
+    assert np.std([s[0] for s in samples]) > 0.0
+    assert np.std([s[2] for s in samples]) > 0.0
+
+
+def test_perception_metrics_are_reported():
+    """04 §7: acquisition range, occlusion duration, track uptime."""
+    env = make_env(pose_noise=False)
+    env.forced_num_obs = 0
+    env.reset(seed=3)
+    env.obstacles = []
+    env.targets = [TargetShip(env.asv_x, env.asv_y + 9.0, 180.0, 0.6)]
+    info = {}
+    for _ in range(40):
+        _, _, term, trunc, info = env.step(np.array([0.0, 0.0], np.float32))
+        if term or trunc:
+            break
+    for key in ("acquisition_range", "max_coast_steps", "dropped_detections",
+                "steps_target_visible", "steps_target_tracked", "encounter_class"):
+        assert key in info, key
+    assert info["steps_target_visible"] > 0

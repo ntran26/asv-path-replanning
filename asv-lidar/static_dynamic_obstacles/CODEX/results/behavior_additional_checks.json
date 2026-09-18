@@ -1,0 +1,65 @@
+{
+  "interpretation": "Post-hoc trajectory measurements, not independent trials or COLREG certification.",
+  "results": [
+    {
+      "case": "being_overtaken",
+      "noise": "off",
+      "seed": 812,
+      "reference_speed_mps": 0.5581909514189132,
+      "mean_speed_mps": 0.554279728193965,
+      "min_speed_mps": 0.5360979158513075,
+      "max_speed_mps": 0.558190951418922,
+      "mean_absolute_speed_error_mps": 0.003911223224958817,
+      "max_absolute_speed_error_mps": 0.022093035567605668,
+      "mean_absolute_speed_error_fraction": 0.007006962787584689,
+      "max_absolute_speed_error_fraction": 0.03957970925799764,
+      "cruise_command_fraction": 0.96,
+      "max_absolute_throttle_action": 0.25,
+      "active_encounter": {
+        "active_steps": 32,
+        "max_speed_error_fraction": 1.5911730877084067e-14,
+        "mean_speed_error_fraction": 1.4917247697266314e-14,
+        "cruise_command_fraction": 1.0,
+        "override_steps": 0
+      }
+    },
+    {
+      "case": "combined",
+      "noise": "off",
+      "seed": 812,
+      "passing_time_s": 22.5,
+      "starboard_offset_m": 2.390529415520488,
+      "starboard_pass": true
+    },
+    {
+      "case": "being_overtaken",
+      "noise": "nominal",
+      "seed": 812,
+      "reference_speed_mps": 0.5581909514189132,
+      "mean_speed_mps": 0.5488615370836709,
+      "min_speed_mps": 0.5120634820387143,
+      "max_speed_mps": 0.5591725085550869,
+      "mean_absolute_speed_error_mps": 0.009776081072549877,
+      "max_absolute_speed_error_mps": 0.04612746938019885,
+      "mean_absolute_speed_error_fraction": 0.017513865188425615,
+      "max_absolute_speed_error_fraction": 0.08263743663874074,
+      "cruise_command_fraction": 0.9,
+      "max_absolute_throttle_action": 0.5,
+      "active_encounter": {
+        "active_steps": 31,
+        "max_speed_error_fraction": 0.0017584612105922839,
+        "mean_speed_error_fraction": 0.0006686265906545387,
+        "cruise_command_fraction": 1.0,
+        "override_steps": 0
+      }
+    },
+    {
+      "case": "combined",
+      "noise": "nominal",
+      "seed": 812,
+      "passing_time_s": 22.5,
+      "starboard_offset_m": 2.419961656143607,
+      "starboard_pass": true
+    }
+  ]
+}

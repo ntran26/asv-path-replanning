@@ -1,0 +1,5447 @@
+{
+  "controller": "perception-only predictive LOS reference; no PPO weights",
+  "scope": "narrow-channel research give-way assumptions",
+  "seconds": 34.137104749679565,
+  "source_sha256": {
+    "src\\asv_lidar.py": "2f27eadc63511ea2ef2030279ef0cdebbf3893fd5010e0584c65829e60c1fcf0",
+    "src\\boundary_raycast.py": "ad3f2d52212e141332df7350b8bbf8c2d0d2cdb944bb4bab2241bc66f40f6e9e",
+    "src\\colregs\\__init__.py": "1a0821f3514c72917ae387c0f3e02bfdcad400536f2f0222d6de923acfb6feaf",
+    "src\\colregs\\context.py": "d7df571173f2051bdc0d4635b199277798ca4239da92c931958094143faa2676",
+    "src\\colregs\\geometry.py": "bcb7fb573035e0b6a253f4972c1644cfccf354a0bb48c40bbe127801621ac32b",
+    "src\\compare.py": "4ef8865061997eb3d3e5d725385da29a649e90331c9d34704264dbf957ca8b8c",
+    "src\\constants.py": "a1db6c1f17cb0f67fd5434df5af9210ce4e242a6d390abfec27a8e4cc16daa99",
+    "src\\corridor.py": "353ca3bcbbcbf3eee94b950ac6c1a3c51b34373f807076318e81d074997520f2",
+    "src\\cpa_cri.py": "379751c7fc30099d49d24cf373ac3481ef31a624c6a52b4ad38ca98cca627886",
+    "src\\curriculum.py": "4c280d3d11cbe053f1f8a75507e7e069e3a6177098d4ab26dbaaf4d9ff8cf7d6",
+    "src\\emergency_stop.py": "bb170a7b67cb8cf8de486310659849eb0e3f65f2ac1e85003ccefe80d5d70bb5",
+    "src\\encounter.py": "df6fae6070e2320a6b8f71bcc5d50c061b2a4f920743f5a949bce821cac7f889",
+    "src\\env.py": "5115cbcabeeb84bbd1b22e2fff2e6b24ed418dbf12a11f75213f7c1e319a59dc",
+    "src\\features_extractor.py": "a8119112e5a6b4bacd77529915df9aa8560824da5daaef5d25cdf86f671b62b1",
+    "src\\lidar_pooling.py": "081d84bfb128a81b888750acf5320d89589a0f8db61dba0d750061c6a1d1f5f6",
+    "src\\metrics.py": "227a39459a8b7f4aef00756a473cdfaf52d67a44d9f10d62ed27b49e5355d420",
+    "src\\observation.py": "68ba8dc34f89e016cc2b696eccd5e0eb13eb1431f3bb1fb46cef667fd275f2e7",
+    "src\\obstacles.py": "7c3a54c809cd2a5089c49a3e2a8f2f5b17e1689544351537d5ef6dc6c6c0fc34",
+    "src\\path.py": "619a8e329d94f62af9bf86d0949f2257cfa88093f4d6cdada10d8675c6c8b628",
+    "src\\play.py": "82637fe3207863766dfe333c392544d227583117cfd032da1cd8162b75bb80ee",
+    "src\\reference_controller.py": "7d07979607c2933f9fa6c0e4393ad27a0596c039f0a910c3b56aac6fe0b3ec1c",
+    "src\\render.py": "d1afc258190ffdace5bba2a9f4c6f6fc0e80e260aec51b3c45ad2deb079319f5",
+    "src\\reward\\__init__.py": "1b84ded9b181373a42255f2492a9eda3e12acdc405e53ea35e2c33afc7e61635",
+    "src\\reward\\audit.py": "dfaf209ad4c4e8daf4f8e2a062869ef94d17e6a623012c460d85136519bf69c5",
+    "src\\reward\\config.py": "c6bbbc57a3f7113c9bf5f137228e59d556689410692888c994f86b91d7efc931",
+    "src\\reward\\reward.py": "bdf33a7e6764b14b934c51225600a134dc6d45c8ba2db8bcd8183e82abb1df92",
+    "src\\reward\\terms.py": "7feb77c6a43ba19b7c8c1d40e52b46221a93167345ac02d0756a40467ba174c0",
+    "src\\rollout.py": "e38f34a332ec23da3c8d43de5b007e1698c7f0cd0a617ebefc633693b3701142",
+    "src\\scenario.py": "6363e4880f73402735eafe7b9d176455e8d97bf9ab17b9abdcb0eb63ed124988",
+    "src\\scene_sampling.py": "69a276c68f8ce75df7a83e3138d0dd91d753363aa6a4cde8308f2baa5f0c140c",
+    "src\\ship.py": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+    "src\\ship_v2.py": "cbcb9b7f48cd8d8b880f81580260f124e846c8034dfdc176d5cc504d7c74c895",
+    "src\\stopping.py": "ac8487dd356db861cd0ec3419efbf17882e80ede56d81f7e6fb029a9cabc8fb8",
+    "src\\suite.py": "fc17932bc71b3af1767eb12dc3f2b83151656606ef5211a3af8ccf714c11cebb",
+    "src\\targets.py": "1c0e11462b2107c2a9069b1388e8de172c5f63ad49a31e696d09a82219878589",
+    "src\\tracking.py": "9929426c0c9aa74bb0846358c0edc73ec5dca817beca755c7fe79d06d4b1d639",
+    "src\\train.py": "a99850593c115c69504c860f8907a4ee10caedbec843d485d0db29198452d4bc",
+    "src\\train_formulation.py": "71cf255f2d1cc837dc071536089aab1bf4439b5f3c3b3fdb8e0525520be07314",
+    "src\\train_ppo_baseline.py": "c2654edf5ef5964ab058eda2472df07203cc9cb3c0c20a7cda4617229dbf89eb",
+    "src\\train_sac_baseline.py": "26b1a3a97a336f67cc1bbe622842676242ad21cf8a2ede5dfd42fe6423c6391a",
+    "tools\\validate_behaviors.py": "6550e2aec631f8318415f5b028ea4651c5dcb36526d6b2e34bb3f76674088eee"
+  },
+  "complete": true,
+  "results": [
+    {
+      "case": "being_overtaken",
+      "noise": "off",
+      "seed": 812,
+      "checks": {
+        "goal": true,
+        "no_collision": true,
+        "returned_to_path": true,
+        "boundary_margin": true,
+        "target_hull_margin": true,
+        "holds_path": true,
+        "stand_on_observed": true,
+        "stand_on_speed": true,
+        "stand_on_cruise_command": true,
+        "stand_on_no_override": true
+      },
+      "passed": true,
+      "steps": 50,
+      "outcome": "goal",
+      "max_cte_m": 0.0,
+      "final_cte_m": 0.0,
+      "mean_cte_m": 0.0,
+      "min_target_centre_distance_m": 2.600920621298318,
+      "min_static_hull_clearance_m": null,
+      "min_target_hull_clearance_m": 1.9499999999999997,
+      "min_boundary_clearance_m": 3.1305067951508754,
+      "prediction_fallback_steps": 0,
+      "rule_relaxation_steps": 0,
+      "stand_on_speed": {
+        "active_steps": 32,
+        "max_speed_error_fraction": 1.5911730877084067e-14,
+        "mean_speed_error_fraction": 1.4917247697266314e-14,
+        "cruise_command_fraction": 1.0,
+        "override_steps": 0
+      },
+      "first_alteration": null,
+      "supervisor_events": 0,
+      "trajectory": [
+        {
+          "t": 0.5,
+          "x": 5.0,
+          "y": 7.279095475709457,
+          "heading": 0.0,
+          "speed": 0.5581909514189132,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 3.4499999999999993,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": -14.289688356324405,
+          "perception": {
+            "pose": [
+              5.0,
+              7.0,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [],
+            "contexts": []
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 1.0,
+          "x": 5.0,
+          "y": 7.558190951418913,
+          "heading": 0.0,
+          "speed": 0.5581909514189132,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 3.8999999999999986,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.2896883563244,
+          "perception": {
+            "pose": [
+              5.0,
+              7.279095475709457,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [],
+            "contexts": []
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 1.5,
+          "x": 5.0,
+          "y": 7.83728642712837,
+          "heading": 0.0,
+          "speed": 0.5581909514189132,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 4.349999999999998,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.250068849272367,
+          "perception": {
+            "pose": [
+              5.0,
+              7.558190951418913,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.582929444040541,
+                  4.184408216402324
+                ],
+                "velocity": [
+                  -0.0018726005606912255,
+                  0.908786744082648
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 9.58590172000869,
+                "dcpa": 2.4350558542342795
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 2.0,
+          "x": 5.0,
+          "y": 8.116381902837826,
+          "heading": 0.0,
+          "speed": 0.5581909514189132,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 4.799999999999997,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.254338020745012,
+          "perception": {
+            "pose": [
+              5.0,
+              7.83728642712837,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.5883158988081836,
+                  4.609828384664787
+                ],
+                "velocity": [
+                  0.004464147643939112,
+                  0.8797494184809711
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 10.139091492094497,
+                "dcpa": 2.366649733172946
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 2.5,
+          "x": 5.0,
+          "y": 8.395477378547287,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 5.2499999999999964,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.274285503684931,
+          "perception": {
+            "pose": [
+              5.0,
+              8.116381902837826,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.589343757630305,
+                  5.0641800227010805
+                ],
+                "velocity": [
+                  0.003321473557158559,
+                  0.8934865097754855
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 9.173340332293481,
+                "dcpa": 2.3803040171760648
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 3.0,
+          "x": 5.0,
+          "y": 8.674572854256748,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 5.699999999999996,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.278660235813273,
+          "perception": {
+            "pose": [
+              5.0,
+              8.395477378547287,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.5905582680394414,
+                  5.500978748923552
+                ],
+                "velocity": [
+                  0.0028947674167784172,
+                  0.8839770057765254
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 8.94966943236784,
+                "dcpa": 2.3836286108827713
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 3.5,
+          "x": 5.0,
+          "y": 8.95366832996621,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 6.149999999999995,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.276897751796465,
+          "perception": {
+            "pose": [
+              5.0,
+              8.674572854256748,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.5923860865960275,
+                  5.948248167648551
+                ],
+                "velocity": [
+                  0.003262750098547796,
+                  0.8890850698274669
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 8.310203253237823,
+                "dcpa": 2.380615519238608
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 4.0,
+          "x": 5.0,
+          "y": 9.23276380567567,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 6.599999999999994,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.261827523400969,
+          "perception": {
+            "pose": [
+              5.0,
+              8.95366832996621,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.5960148889457733,
+                  6.3966129319209175
+                ],
+                "velocity": [
+                  0.005201851713707129,
+                  0.8927956885423942
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 7.751837311788675,
+                "dcpa": 2.3639468176825047
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 4.5,
+          "x": 5.0,
+          "y": 9.511859281385131,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 7.049999999999994,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.284685422289577,
+          "perception": {
+            "pose": [
+              5.0,
+              9.23276380567567,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.595782481686471,
+                  6.850328001108999
+                ],
+                "velocity": [
+                  0.002451405901758466,
+                  0.8998988528378228
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 7.022255291732036,
+                "dcpa": 2.38706454420822
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 5.0,
+          "x": 5.0,
+          "y": 9.790954757094593,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 7.499999999999993,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.217709806625622,
+          "perception": {
+            "pose": [
+              5.0,
+              9.511859281385131,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.5954461771832604,
+                  7.281503998950409
+                ],
+                "velocity": [
+                  0.0009358365909611496,
+                  0.8816835542257614
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 6.916055294458949,
+                "dcpa": 2.3980915599066397
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 5.5,
+          "x": 5.0,
+          "y": 10.070050232804054,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 7.949999999999992,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.260793294300411,
+          "perception": {
+            "pose": [
+              5.0,
+              9.790954757094593,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.6014302564482716,
+                  7.724157078052705
+                ],
+                "velocity": [
+                  0.006287077144976577,
+                  0.8834407024879072
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 6.494617553498541,
+                "dcpa": 2.3581780237778456
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 6.0,
+          "x": 5.0,
+          "y": 10.349145708513515,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 8.399999999999991,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.280280022181973,
+          "perception": {
+            "pose": [
+              5.0,
+              10.070050232804054,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.602120104472537,
+                  8.169613337997195
+                ],
+                "velocity": [
+                  0.003906736572616105,
+                  0.8870649309224838
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 5.86440272499031,
+                "dcpa": 2.3751367833802806
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 6.5,
+          "x": 5.0,
+          "y": 10.628241184222976,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 8.84999999999999,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.270151940745126,
+          "perception": {
+            "pose": [
+              5.0,
+              10.349145708513515,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.606270368200259,
+                  8.602336526180718
+                ],
+                "velocity": [
+                  0.006038016736786845,
+                  0.8765784972867534
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 5.626980175330512,
+                "dcpa": 2.360178132409669
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 7.0,
+          "x": 5.0,
+          "y": 10.907336659932437,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 9.29999999999999,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.276237018568217,
+          "perception": {
+            "pose": [
+              5.0,
+              10.628241184222976,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.608730869387232,
+                  9.047443993153376
+                ],
+                "velocity": [
+                  0.005496184754564903,
+                  0.8831931458991119
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 4.986960030853636,
+                "dcpa": 2.364197872285029
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 7.5,
+          "x": 5.0,
+          "y": 11.186432135641898,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 9.74999999999999,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.279006171951545,
+          "perception": {
+            "pose": [
+              5.0,
+              10.907336659932437,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.6113474329215434,
+                  9.479201815801423
+                ],
+                "velocity": [
+                  0.0053685828350269,
+                  0.8736481411992255
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 4.6547065882541805,
+                "dcpa": 2.364005654310106
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 8.0,
+          "x": 5.0,
+          "y": 11.465527611351359,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 10.199999999999989,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.286215473257169,
+          "perception": {
+            "pose": [
+              5.0,
+              11.186432135641898,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.6119914518989495,
+                  9.921091773154167
+                ],
+                "velocity": [
+                  0.003389226932987988,
+                  0.8785627754641188
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 4.028003353745301,
+                "dcpa": 2.3744895913351405
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 8.5,
+          "x": 5.0,
+          "y": 11.74462308706082,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 10.649999999999988,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.288470417064328,
+          "perception": {
+            "pose": [
+              5.0,
+              11.465527611351359,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.6125659608982774,
+                  10.363023745771951
+                ],
+                "velocity": [
+                  0.002302566046268815,
+                  0.8811342203665149
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 3.466457810596954,
+                "dcpa": 2.3795127712442956
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 9.0,
+          "x": 5.0,
+          "y": 12.02371856277028,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 11.099999999999987,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.288777810903083,
+          "perception": {
+            "pose": [
+              5.0,
+              11.74462308706082,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.6140169102742643,
+                  10.810638702511815
+                ],
+                "velocity": [
+                  0.0025932850842079543,
+                  0.8879716352146454
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 2.888853390693642,
+                "dcpa": 2.3785650078540153
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 9.5,
+          "x": 5.0,
+          "y": 12.302814038479742,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 11.549999999999986,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.287445998696981,
+          "perception": {
+            "pose": [
+              5.0,
+              12.02371856277028,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.616925686986126,
+                  11.243563517335573
+                ],
+                "velocity": [
+                  0.00415728490914961,
+                  0.8772408866568069
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 2.542138974966936,
+                "dcpa": 2.3727073177885267
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 10.0,
+          "x": 5.0,
+          "y": 12.581909514189203,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 11.999999999999986,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -13.841781619270396,
+          "perception": {
+            "pose": [
+              5.0,
+              12.302814038479742,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.618834218885104,
+                  11.681319124782972
+                ],
+                "velocity": [
+                  0.0039922534295525475,
+                  0.876401872613555
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 2.0466499136879355,
+                "dcpa": 2.373181783904695
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 10.5,
+          "x": 5.0,
+          "y": 12.861004989898664,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 12.449999999999985,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -13.39581159658363,
+          "perception": {
+            "pose": [
+              5.0,
+              12.581909514189203,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.6206909361800768,
+                  12.11706591236421
+                ],
+                "velocity": [
+                  0.0038570064259818952,
+                  0.8740209986244496
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 1.5635838210934434,
+                "dcpa": 2.3734552796160036
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 11.0,
+          "x": 5.0,
+          "y": 13.140100465608125,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 12.899999999999984,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -12.949938355799565,
+          "perception": {
+            "pose": [
+              5.0,
+              12.861004989898664,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.620882144783594,
+                  12.554086450515753
+                ],
+                "velocity": [
+                  0.0021715830876861226,
+                  0.8740307377291386
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 1.023497029571657,
+                "dcpa": 2.376951427981555
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 11.5,
+          "x": 5.0,
+          "y": 13.419195941317586,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 13.349999999999984,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -12.503434634921271,
+          "perception": {
+            "pose": [
+              5.0,
+              13.140100465608125,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.62260483384002,
+                  12.989208370470147
+                ],
+                "velocity": [
+                  0.0027894644328758196,
+                  0.8721938224695345
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 0.547760158029748,
+                "dcpa": 2.3759609558194623
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 12.0,
+          "x": 5.0,
+          "y": 13.698291417027047,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 13.799999999999983,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -12.056924550648716,
+          "perception": {
+            "pose": [
+              5.0,
+              13.419195941317586,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.6234774392038127,
+                  13.425845186186425
+                ],
+                "velocity": [
+                  0.002282926982767104,
+                  0.8727176067529554
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 0.03370047127092511,
+                "dcpa": 2.3765082232017085
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 12.5,
+          "x": 5.0,
+          "y": 13.977386892736508,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 14.249999999999982,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -11.610371789513579,
+          "perception": {
+            "pose": [
+              5.0,
+              13.698291417027047,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.6258562935436296,
+                  13.860699178208282
+                ],
+                "velocity": [
+                  0.0034833724340130267,
+                  0.8712577253032694
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -0.4343314700537829,
+                "dcpa": 2.3758036950893704
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 13.0,
+          "x": 5.0,
+          "y": 14.256482368445969,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 14.699999999999982,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -11.163819028378441,
+          "perception": {
+            "pose": [
+              5.0,
+              13.977386892736508,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.6270802074569035,
+                  14.290365961204028
+                ],
+                "velocity": [
+                  0.002981059516768824,
+                  0.8654736584398912
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -0.9435325529332712,
+                "dcpa": 2.3758443142398153
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 13.5,
+          "x": 5.0,
+          "y": 14.53557784415543,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 15.14999999999998,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -10.717266267243303,
+          "perception": {
+            "pose": [
+              5.0,
+              14.256482368445969,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.6292620632621464,
+                  14.722795434479957
+                ],
+                "velocity": [
+                  0.00365174429628943,
+                  0.8651754793759258
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -1.4269445242990966,
+                "dcpa": 2.3761168700704114
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 14.0,
+          "x": 5.0,
+          "y": 14.814673319864891,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 15.59999999999998,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -10.270713506108166,
+          "perception": {
+            "pose": [
+              5.0,
+              14.53557784415543,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.631656822275656,
+                  15.147879463014478
+                ],
+                "velocity": [
+                  0.004203645622156623,
+                  0.8578958102771278
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -1.9317986933668463,
+                "dcpa": 2.376697520997078
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 14.5,
+          "x": 5.0,
+          "y": 15.093768795574352,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 16.04999999999998,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -9.824160744973028,
+          "perception": {
+            "pose": [
+              5.0,
+              14.814673319864891,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.633670495138977,
+                  15.574727323855589
+                ],
+                "velocity": [
+                  0.0041181276114513774,
+                  0.85585846805198
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -2.442918455137967,
+                "dcpa": 2.37661716168823
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 15.0,
+          "x": 5.0,
+          "y": 15.372864271283813,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 16.49999999999998,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -9.37760798383789,
+          "perception": {
+            "pose": [
+              5.0,
+              15.093768795574352,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.634927188483761,
+                  16.002650396734243
+                ],
+                "velocity": [
+                  0.003339713926430822,
+                  0.8558524908611003
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -2.9638858002672754,
+                "dcpa": 2.3751208238207835
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 15.5,
+          "x": 5.0,
+          "y": 15.651959746993274,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 16.949999999999978,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -8.931055222702753,
+          "perception": {
+            "pose": [
+              5.0,
+              15.372864271283813,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.6369700422473916,
+                  16.430791589552136
+                ],
+                "velocity": [
+                  0.003701573974932317,
+                  0.856061020456855
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -3.4525240876621823,
+                "dcpa": 2.3759931668343777
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 16.0,
+          "x": 5.0,
+          "y": 15.931055222702735,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 17.399999999999977,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -8.484502461567615,
+          "perception": {
+            "pose": [
+              5.0,
+              15.651959746993274,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.6369558290173454,
+                  16.867770569956573
+                ],
+                "velocity": [
+                  0.0018922580011435895,
+                  0.8647423116858837
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -3.918360128216522,
+                "dcpa": 2.370503879134425
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 16.5,
+          "x": 5.0,
+          "y": 16.210150698412196,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 17.849999999999977,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -8.037949700432478,
+          "perception": {
+            "pose": [
+              5.0,
+              15.931055222702735,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.6368133372230242,
+                  17.30373827115012
+                ],
+                "velocity": [
+                  0.0008361407014759053,
+                  0.8682314731842078
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -4.406842960587309,
+                "dcpa": 2.3668800108165167
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 17.0,
+          "x": 5.0,
+          "y": 16.489246174121657,
+          "heading": 0.0,
+          "speed": 0.558190951418922,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 18.299999999999976,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -7.59139693929734,
+          "perception": {
+            "pose": [
+              5.0,
+              16.210150698412196,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.638698808945977,
+                  17.731847975303445
+                ],
+                "velocity": [
+                  0.002259729137433152,
+                  0.8624047658580942
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -4.944135493022968,
+                "dcpa": 2.3725390496933723
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 17.5,
+          "x": 5.0,
+          "y": 16.765231903494477,
+          "heading": 0.0,
+          "speed": 0.5519714587456406,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": -0.25,
+          "target_x": 2.4,
+          "target_y": 18.749999999999975,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -7.395244291810383,
+          "perception": {
+            "pose": [
+              5.0,
+              16.489246174121657,
+              0.0
+            ],
+            "ego": [
+              0.5581909514189132,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.640214267962837,
+                  18.158602784364614
+                ],
+                "velocity": [
+                  0.00263381069939688,
+                  0.8580899854263282
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -5.49686684791375,
+                "dcpa": 2.374354999541298
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 18.0,
+          "x": 5.0,
+          "y": 17.03541028826363,
+          "heading": 0.0,
+          "speed": 0.540356769538306,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": -0.25,
+          "target_x": 2.4,
+          "target_y": 19.199999999999974,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -6.953667124813876,
+          "perception": {
+            "pose": [
+              5.0,
+              16.765231903494477,
+              0.0
+            ],
+            "ego": [
+              0.5459644504404579,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.636561339188889,
+                  18.588990019358956
+                ],
+                "velocity": [
+                  -0.002187636602625243,
+                  0.8593921517087939
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -5.8710975282091855,
+                "dcpa": 2.3506520885778923
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 18.5,
+          "x": 5.0,
+          "y": 17.303459246189284,
+          "heading": 0.0,
+          "speed": 0.5360979158513075,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 19.649999999999974,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -6.556985275696417,
+          "perception": {
+            "pose": [
+              5.0,
+              17.03541028826363,
+              0.0
+            ],
+            "ego": [
+              0.5349367077303375,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.6306640180304917,
+                  19.013863494779805
+                ],
+                "velocity": [
+                  -0.006847718873852587,
+                  0.8547135420669888
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -6.3427365534737286,
+                "dcpa": 2.326435929071833
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 19.0,
+          "x": 5.0,
+          "y": 17.572594136681225,
+          "heading": 0.0,
+          "speed": 0.5382697809838817,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 20.099999999999973,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -6.128106943015365,
+          "perception": {
+            "pose": [
+              5.0,
+              17.303459246189284,
+              0.0
+            ],
+            "ego": [
+              0.5372205754389344,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.623545577695441,
+                  19.439754657428246
+                ],
+                "velocity": [
+                  -0.010431988823348292,
+                  0.8532916930840776
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -6.999439850983696,
+                "dcpa": 2.3046906185169846
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 19.5,
+          "x": 5.0,
+          "y": 17.84270996023844,
+          "heading": 0.0,
+          "speed": 0.5402316471144317,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 20.549999999999972,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -5.697491118228266,
+          "perception": {
+            "pose": [
+              5.0,
+              17.572594136681225,
+              0.0
+            ],
+            "ego": [
+              0.5392840174048676,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.6180211337337598,
+                  19.862350783882608
+                ],
+                "velocity": [
+                  -0.010731228840960816,
+                  0.8493628875133311
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -7.641134982197832,
+                "dcpa": 2.3013570497417586
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 20.0,
+          "x": 5.0,
+          "y": 18.113711540618333,
+          "heading": 0.0,
+          "speed": 0.5420031607597835,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 20.99999999999997,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -5.265305800536737,
+          "perception": {
+            "pose": [
+              5.0,
+              17.84270996023844,
+              0.0
+            ],
+            "ego": [
+              0.5411475799654911,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.6146563471510564,
+                  20.28948912413416
+                ],
+                "velocity": [
+                  -0.008790140720059354,
+                  0.8517464272214806
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -8.088483756075451,
+                "dcpa": 2.315171325432061
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 20.5,
+          "x": 5.0,
+          "y": 18.38551266783396,
+          "heading": 0.0,
+          "speed": 0.5436022544312564,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 21.44999999999997,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -4.831703271928916,
+          "perception": {
+            "pose": [
+              5.0,
+              18.113711540618333,
+              0.0
+            ],
+            "ego": [
+              0.5428300313475042,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.608706824744549,
+                  20.719264972761867
+                ],
+                "velocity": [
+                  -0.010298180714785672,
+                  0.8555325393139975
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -8.574914701092874,
+                "dcpa": 2.304235693013873
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 21.0,
+          "x": 5.0,
+          "y": 18.658035304065493,
+          "heading": 0.0,
+          "speed": 0.5450452724630637,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 21.89999999999997,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -4.396821468383917,
+          "perception": {
+            "pose": [
+              5.0,
+              18.38551266783396,
+              0.0
+            ],
+            "ego": [
+              0.54434848934003,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.60340120457534,
+                  21.14378366098915
+                ],
+                "velocity": [
+                  -0.010450036937767877,
+                  0.8523819225463484
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -9.207803421120762,
+                "dcpa": 2.3017002879472073
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 21.5,
+          "x": 5.0,
+          "y": 18.93120885023697,
+          "heading": 0.0,
+          "speed": 0.5463470923429554,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 22.34999999999997,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -3.9607852504134713,
+          "perception": {
+            "pose": [
+              5.0,
+              18.658035304065493,
+              0.0
+            ],
+            "ego": [
+              0.5457185450595486,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.600061442905579,
+                  21.570959788770825
+                ],
+                "velocity": [
+                  -0.008621069193250872,
+                  0.8533376744459635
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -9.680296153111241,
+                "dcpa": 2.3173935687033285
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 22.0,
+          "x": 5.0,
+          "y": 19.204969470542835,
+          "heading": 0.0,
+          "speed": 0.5475212406117294,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 22.79999999999997,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -3.5237075765391186,
+          "perception": {
+            "pose": [
+              5.0,
+              18.93120885023697,
+              0.0
+            ],
+            "ego": [
+              0.5469543816917943,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.5938956477966046,
+                  21.99855895331778
+                ],
+                "velocity": [
+                  -0.010420936265121916,
+                  0.854240224521999
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -10.235845968687686,
+                "dcpa": 2.30075914316913
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 22.5,
+          "x": 5.0,
+          "y": 19.479259471900292,
+          "heading": 0.0,
+          "speed": 0.5485800027149139,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 23.249999999999968,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -3.0856905840497406,
+          "perception": {
+            "pose": [
+              5.0,
+              19.204969470542835,
+              0.0
+            ],
+            "ego": [
+              0.5480688874471983,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.5875580317629936,
+                  22.43250567745307
+                ],
+                "velocity": [
+                  -0.011514430347879986,
+                  0.8608630108332437
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -10.587967559836327,
+                "dcpa": 2.2920789619211175
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 23.0,
+          "x": 5.0,
+          "y": 19.754026735121272,
+          "heading": 0.0,
+          "speed": 0.5495345264419598,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 23.699999999999967,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -2.6468265818778036,
+          "perception": {
+            "pose": [
+              5.0,
+              19.479259471900292,
+              0.0
+            ],
+            "ego": [
+              0.5490737622489053,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.583137941999461,
+                  22.876507510435964
+                ],
+                "velocity": [
+                  -0.01021722815921966,
+                  0.8740281623461789
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -10.677833087043393,
+                "dcpa": 2.3089046490820735
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 23.5,
+          "x": 5.0,
+          "y": 20.029224194514757,
+          "heading": 0.0,
+          "speed": 0.5503949187869708,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 24.149999999999967,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -2.2071989607242415,
+          "perception": {
+            "pose": [
+              5.0,
+              19.754026735121272,
+              0.0
+            ],
+            "ego": [
+              0.5499796178962502,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.582719157014686,
+                  23.313617821635432
+                ],
+                "velocity": [
+                  -0.005667425635901995,
+                  0.8741215191845583
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -11.108576225579219,
+                "dcpa": 2.3546836490674496
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 24.0,
+          "x": 5.0,
+          "y": 20.304809362623992,
+          "heading": 0.0,
+          "speed": 0.551170336218469,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 24.599999999999966,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -1.7668830256946706,
+          "perception": {
+            "pose": [
+              5.0,
+              20.029224194514757,
+              0.0
+            ],
+            "ego": [
+              0.5507960716212542,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.5784709524586615,
+                  23.763160053144816
+                ],
+                "velocity": [
+                  -0.007039684187111279,
+                  0.886230325555713
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -11.278185409472712,
+                "dcpa": 2.342649917738851
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 24.5,
+          "x": 5.0,
+          "y": 20.58074389685515,
+          "heading": 0.0,
+          "speed": 0.5518690684623166,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 25.049999999999965,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -1.3259467567198897,
+          "perception": {
+            "pose": [
+              5.0,
+              20.304809362623992,
+              0.0
+            ],
+            "ego": [
+              0.5515318330895433,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.5747540509498292,
+                  24.20471872727752
+                ],
+                "velocity": [
+                  -0.0072308599009247975,
+                  0.8847203097700572
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -11.85719697306944,
+                "dcpa": 2.340059081664382
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 25.0,
+          "x": 5.0,
+          "y": 20.856993204849125,
+          "heading": 0.0,
+          "speed": 0.5524986159879504,
+          "offset": 0.0,
+          "rudder": 0.0,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 25.499999999999964,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -0.8844515019500307,
+          "perception": {
+            "pose": [
+              5.0,
+              20.58074389685515,
+              0.0
+            ],
+            "ego": [
+              0.5521947849973556,
+              0.0,
+              0.0
+            ],
+            "tracks": [
+              {
+                "id": 1,
+                "position": [
+                  2.568998083504775,
+                  24.570132793191142
+                ],
+                "velocity": [
+                  -0.009307486297582983,
+                  0.8100716386389311
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 1,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -15.78980851608636,
+                "dcpa": 2.285525699551978
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        }
+      ]
+    },
+    {
+      "case": "being_overtaken",
+      "noise": "nominal",
+      "seed": 812,
+      "checks": {
+        "goal": true,
+        "no_collision": true,
+        "returned_to_path": true,
+        "boundary_margin": true,
+        "target_hull_margin": true,
+        "holds_path": true,
+        "stand_on_observed": true,
+        "stand_on_speed": true,
+        "stand_on_cruise_command": true,
+        "stand_on_no_override": true
+      },
+      "passed": true,
+      "steps": 50,
+      "outcome": "goal",
+      "max_cte_m": 0.11217294633388519,
+      "final_cte_m": 0.08615898340940475,
+      "mean_cte_m": 0.06350189788267016,
+      "min_target_centre_distance_m": 2.6062300874726794,
+      "min_static_hull_clearance_m": null,
+      "min_target_hull_clearance_m": 1.872096865089555,
+      "min_boundary_clearance_m": 3.267960366319965,
+      "prediction_fallback_steps": 0,
+      "rule_relaxation_steps": 0,
+      "stand_on_speed": {
+        "active_steps": 31,
+        "max_speed_error_fraction": 0.0017584612105922839,
+        "mean_speed_error_fraction": 0.0006686265906545387,
+        "cruise_command_fraction": 1.0,
+        "override_steps": 0
+      },
+      "first_alteration": null,
+      "supervisor_events": 0,
+      "trajectory": [
+        {
+          "t": 0.5,
+          "x": 4.999959120514195,
+          "y": 7.279095461393919,
+          "heading": 359.98198660113684,
+          "speed": 0.5581909287755118,
+          "offset": 0.0,
+          "rudder": -0.039960827678442,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 3.4499999999999993,
+          "perceived_classes": [],
+          "obligations": [],
+          "cost": -15.122458688198883,
+          "perception": {
+            "pose": [
+              4.966708465301721,
+              7.017537602065494,
+              0.10137251556294974
+            ],
+            "ego": [
+              0.6793346147345882,
+              0.018040365766917327,
+              0.27720596921484053
+            ],
+            "tracks": [],
+            "contexts": []
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 1.0,
+          "x": 4.999674005281503,
+          "y": 7.558190691933244,
+          "heading": 359.8893496634258,
+          "speed": 0.5581907523436573,
+          "offset": 0.0,
+          "rudder": -0.06184019893407822,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 3.8999999999999986,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -15.09604474990648,
+          "perception": {
+            "pose": [
+              4.966569444137342,
+              7.243890785145455,
+              359.65595653381337
+            ],
+            "ego": [
+              0.6788163796728192,
+              0.04052862858598558,
+              -0.07313303912516772
+            ],
+            "tracks": [],
+            "contexts": []
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 1.5,
+          "x": 4.998931728917405,
+          "y": 7.837284524326174,
+          "heading": 359.7133274493184,
+          "speed": 0.5581896389363518,
+          "offset": 0.0,
+          "rudder": 0.04460006207227707,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 4.349999999999998,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -12.47572906796725,
+          "perception": {
+            "pose": [
+              4.975672074477572,
+              7.589356385350556,
+              359.80334363629464
+            ],
+            "ego": [
+              0.6665054761619996,
+              -0.03436572813088327,
+              1.1030445389047174
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.5717347874928826,
+                  4.177514214272026
+                ],
+                "velocity": [
+                  0.020550639418835108,
+                  0.9086151078495296
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 15.560859587867695,
+                "dcpa": 1.5554352653372534
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 2.0,
+          "x": 4.997544961582012,
+          "y": 8.116373421697713,
+          "heading": 359.46432791502804,
+          "speed": 0.5581846854212457,
+          "offset": 0.0,
+          "rudder": -0.008571000769734383,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 4.799999999999997,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": 2.0192812092741885,
+          "perception": {
+            "pose": [
+              5.061530841695489,
+              7.848219274212549,
+              359.75454891263075
+            ],
+            "ego": [
+              0.614310210488,
+              -0.044014928668892284,
+              1.6630662541314747
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6265845702907993,
+                  4.6419009823110615
+                ],
+                "velocity": [
+                  0.06522375213704404,
+                  0.9187166286988955
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 11.862168300849094,
+                "dcpa": 1.180285038062518
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 2.5,
+          "x": 4.995657464005201,
+          "y": 8.395454779901895,
+          "heading": 359.27699780036534,
+          "speed": 0.5581754818843037,
+          "offset": 0.0,
+          "rudder": -0.3638918399810791,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 5.2499999999999964,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -13.84513180465055,
+          "perception": {
+            "pose": [
+              4.983943496620923,
+              8.108072720280514,
+              359.48733951395553
+            ],
+            "ego": [
+              0.5322829118494433,
+              0.12182674856174601,
+              0.37299925879668794
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6015946408396315,
+                  5.082732470811355
+                ],
+                "velocity": [
+                  0.01056566323479035,
+                  0.9011366086768929
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 5.859008570475311,
+                "dcpa": 3.129785743007971
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 3.0,
+          "x": 4.9935879569290895,
+          "y": 8.674531055525645,
+          "heading": 359.20536466599106,
+          "speed": 0.5581678975919739,
+          "offset": 0.0,
+          "rudder": -0.16311736404895782,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 5.699999999999996,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.817329450039466,
+          "perception": {
+            "pose": [
+              4.968868801655676,
+              8.4247120172047,
+              359.51440852287277
+            ],
+            "ego": [
+              0.6544127925658743,
+              0.09850150138665956,
+              -0.8494477057405552
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.5717339724792643,
+                  5.554440935223375
+                ],
+                "velocity": [
+                  -0.023040479884198946,
+                  0.921351989769851
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 5.764358995720001,
+                "dcpa": 3.3442977544902392
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 3.5,
+          "x": 4.990439140760228,
+          "y": 8.953583236937746,
+          "heading": 358.8091318943188,
+          "speed": 0.5581398928373339,
+          "offset": 0.0,
+          "rudder": 0.38482189178466797,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 6.149999999999995,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -12.956693160140617,
+          "perception": {
+            "pose": [
+              4.9655869672015855,
+              8.694600853033156,
+              359.5714597030132
+            ],
+            "ego": [
+              0.6057182970277392,
+              -0.11439927277485691,
+              -0.8004199638993332
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.5533276088814656,
+                  5.990501724986405
+                ],
+                "velocity": [
+                  -0.029701211049678225,
+                  0.8975424748529381
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 10.751769990565851,
+                "dcpa": 1.5189384151318046
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 4.0,
+          "x": 4.984942122016858,
+          "y": 9.23256237643258,
+          "heading": 357.976473993437,
+          "speed": 0.5580665820073569,
+          "offset": 0.0,
+          "rudder": 0.07573564350605011,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 6.599999999999994,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.269908520679303,
+          "perception": {
+            "pose": [
+              5.028248076382131,
+              8.942184846697995,
+              358.78553805167405
+            ],
+            "ego": [
+              0.5800082654712689,
+              0.044574111132735475,
+              -3.3316693462980815
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.5981671723722264,
+                  6.4133040720496695
+                ],
+                "velocity": [
+                  0.0282459808806415,
+                  0.8723318865950827
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 8.55840008243135,
+                "dcpa": 2.46476315495556
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 4.5,
+          "x": 4.978326629301,
+          "y": 9.511474887972366,
+          "heading": 357.58866966644956,
+          "speed": 0.5579819131022229,
+          "offset": 0.0,
+          "rudder": 0.346519410610199,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 7.049999999999994,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -7.348677754409212,
+          "perception": {
+            "pose": [
+              4.982789980276831,
+              9.236408170081665,
+              357.7446292971674
+            ],
+            "ego": [
+              0.5028861524147387,
+              -0.06933922685991979,
+              -0.8371556273397209
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6057877805685044,
+                  6.848086218577581
+                ],
+                "velocity": [
+                  0.021933821569461484,
+                  0.8709885718934287
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 7.663227700094051,
+                "dcpa": 1.5930937139391386
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 5.0,
+          "x": 4.9728161527558985,
+          "y": 9.790429886039236,
+          "heading": 358.0337003316313,
+          "speed": 0.5580188394606115,
+          "offset": 0.0,
+          "rudder": 0.09401340782642365,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 7.499999999999993,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -12.374405833698775,
+          "perception": {
+            "pose": [
+              5.016653494699932,
+              9.555469753279823,
+              357.4476678003609
+            ],
+            "ego": [
+              0.5882738501934185,
+              0.006309051240585049,
+              -0.8919035404264715
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6333574389158954,
+                  7.303988279890756
+                ],
+                "velocity": [
+                  0.038042973043102474,
+                  0.8907896285183998
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 8.62516754439134,
+                "dcpa": 1.9177437811347138
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 5.5,
+          "x": 4.970104496932117,
+          "y": 10.069516489306453,
+          "heading": 359.2404658211938,
+          "speed": 0.5581995528501958,
+          "offset": 0.0,
+          "rudder": 0.08388655632734299,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 7.949999999999992,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -9.341690367980267,
+          "perception": {
+            "pose": [
+              5.00828539840219,
+              9.837749222439452,
+              357.7237690036427
+            ],
+            "ego": [
+              0.644313324279385,
+              -0.03492294055043659,
+              1.1585896970528278
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6506800690869095,
+                  7.748202488215302
+                ],
+                "velocity": [
+                  0.036394908556105436,
+                  0.8896443199621903
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 10.566326332227014,
+                "dcpa": 1.4326971869653375
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 6.0,
+          "x": 4.971260479243869,
+          "y": 10.348692160022303,
+          "heading": 0.8556749213466762,
+          "speed": 0.558356127985534,
+          "offset": 0.0,
+          "rudder": -0.39247432351112366,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 8.399999999999991,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -13.77844430937752,
+          "perception": {
+            "pose": [
+              5.007266260003153,
+              10.084047680179662,
+              358.93734449940644
+            ],
+            "ego": [
+              0.4944841215740271,
+              0.04837026514417608,
+              4.6521501911040115
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.659152708348885,
+                  8.16604709336033
+                ],
+                "velocity": [
+                  0.026960804586379852,
+                  0.8634732250105972
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 4.9920811629040935,
+                "dcpa": 2.410498365043672
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 6.5,
+          "x": 4.975819584842761,
+          "y": 10.627783864865444,
+          "heading": 2.289161748664961,
+          "speed": 0.5582578800379373,
+          "offset": 0.0,
+          "rudder": -0.26900261640548706,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 8.84999999999999,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.15355233218926,
+          "perception": {
+            "pose": [
+              4.945437723788916,
+              10.405284751442352,
+              0.7739813237282364
+            ],
+            "ego": [
+              0.548225236030487,
+              0.041709341240234295,
+              2.8494863001585258
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6168898662529774,
+                  8.632019650096764
+                ],
+                "velocity": [
+                  -0.02711754107059218,
+                  0.8966866349280542
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 3.458298693580334,
+                "dcpa": 2.65325538404607
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 7.0,
+          "x": 4.981476013648867,
+          "y": 10.906752061286394,
+          "heading": 2.7364035778019082,
+          "speed": 0.5580510722190077,
+          "offset": 0.0,
+          "rudder": -0.21719281375408173,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 9.29999999999999,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -14.04894576155507,
+          "perception": {
+            "pose": [
+              4.98905396517355,
+              10.635111350277393,
+              2.5626250121721528
+            ],
+            "ego": [
+              0.5381693206971965,
+              0.03180163180790735,
+              0.9813512216144635
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6092878176144705,
+                  9.066425956685084
+                ],
+                "velocity": [
+                  -0.021338667422679126,
+                  0.8831657376500197
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 2.854471642004393,
+                "dcpa": 2.66358576230404
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 7.5,
+          "x": 4.9850216592952705,
+          "y": 11.18580674717504,
+          "heading": 1.8593580313799234,
+          "speed": 0.5581544206380905,
+          "offset": 0.0,
+          "rudder": 0.14784522354602814,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 9.74999999999999,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -13.148692484162645,
+          "perception": {
+            "pose": [
+              5.0096635374885246,
+              10.911475589204246,
+              3.121045737803214
+            ],
+            "ego": [
+              0.548108445223551,
+              -0.07619385889239194,
+              -0.31011179613845863
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.618451897294883,
+                  9.496944745321128
+                ],
+                "velocity": [
+                  -0.0020974001643775837,
+                  0.8724319864959349
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 5.330436020438514,
+                "dcpa": 2.176208733178144
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 8.0,
+          "x": 4.984511550180728,
+          "y": 11.465077163466944,
+          "heading": 0.10973697325566702,
+          "speed": 0.5585417643369646,
+          "offset": 0.0,
+          "rudder": 0.4137870967388153,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 10.199999999999989,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -13.913534653707513,
+          "perception": {
+            "pose": [
+              4.942136439642824,
+              11.189121047594439,
+              2.0894842330715306
+            ],
+            "ego": [
+              0.5272728166234713,
+              -0.06703069447968453,
+              -4.114875679978683
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.5846075227360292,
+                  9.935223129420695
+                ],
+                "velocity": [
+                  -0.033913892197819984,
+                  0.8744328004187103
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 3.9016774766146742,
+                "dcpa": 2.3053537183443416
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 8.5,
+          "x": 4.980270119663727,
+          "y": 11.744412578129715,
+          "heading": 358.4680436437182,
+          "speed": 0.5587352275189134,
+          "offset": 0.0,
+          "rudder": 0.3931034803390503,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 10.649999999999988,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -13.98106448321239,
+          "perception": {
+            "pose": [
+              4.961331811850306,
+              11.47343926778578,
+              0.13633051315262057
+            ],
+            "ego": [
+              0.5271195159773575,
+              -0.03747142144356936,
+              -4.599082203639794
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.5818548641513033,
+                  10.376112040323747
+                ],
+                "velocity": [
+                  -0.020133709975684796,
+                  0.8779956589233245
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 3.431964434672431,
+                "dcpa": 2.326721102652031
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 9.0,
+          "x": 4.975245780643889,
+          "y": 12.02368068839684,
+          "heading": 357.99646010981564,
+          "speed": 0.5586266065799498,
+          "offset": 0.0,
+          "rudder": 0.23018968105316162,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 11.099999999999987,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -13.78807191389508,
+          "perception": {
+            "pose": [
+              5.001460191166317,
+              11.724281338965277,
+              358.5068278086522
+            ],
+            "ego": [
+              0.5313291136888394,
+              -0.013841498001911711,
+              -2.6252608299560163
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.612145626967099,
+                  10.801438361141102
+                ],
+                "velocity": [
+                  0.01901892664735605,
+                  0.8647323485702775
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 3.691840839194121,
+                "dcpa": 2.2384750023171467
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 9.5,
+          "x": 4.972995857900713,
+          "y": 12.303005578096737,
+          "heading": 359.01991301252764,
+          "speed": 0.5586679019174442,
+          "offset": 0.0,
+          "rudder": 0.14144213497638702,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 11.549999999999986,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -12.838516655361955,
+          "perception": {
+            "pose": [
+              5.009644542187133,
+              12.021430418370072,
+              357.5860344125747
+            ],
+            "ego": [
+              0.5946829243540033,
+              -0.02543161637741587,
+              -0.15880252837908648
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6423814082378763,
+                  11.2356317264116
+                ],
+                "velocity": [
+                  0.0391264079284058,
+                  0.8665049841454341
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 5.157031832693036,
+                "dcpa": 2.0049369774697743
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 10.0,
+          "x": 4.97568287753276,
+          "y": 12.582440917560712,
+          "heading": 1.0176794676738052,
+          "speed": 0.558896516417305,
+          "offset": 0.0,
+          "rudder": -0.08322859555482864,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 11.999999999999986,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -13.399268326185526,
+          "perception": {
+            "pose": [
+              4.998725888756732,
+              12.329006180756723,
+              358.9176088590685
+            ],
+            "ego": [
+              0.4930614595299136,
+              -0.024249788133367714,
+              3.5178425597696728
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.650285852139821,
+                  11.696619272985584
+                ],
+                "velocity": [
+                  0.027815749300598273,
+                  0.8934119392429131
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 2.417593481419795,
+                "dcpa": 2.225692927952274
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 10.5,
+          "x": 4.9835641151482015,
+          "y": 12.861745738705448,
+          "heading": 3.1728819239821013,
+          "speed": 0.5588319855593236,
+          "offset": 0.0,
+          "rudder": -0.2074417769908905,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 12.449999999999985,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -13.47837697975249,
+          "perception": {
+            "pose": [
+              4.967058909302348,
+              12.578211067050376,
+              0.9316234379115689
+            ],
+            "ego": [
+              0.5737899136901163,
+              0.021714031378475333,
+              2.528500746236764
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.631464678479766,
+                  12.125001103648314
+                ],
+                "velocity": [
+                  -0.00393609157168855,
+                  0.875634913194921
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 0.5972639342550321,
+                "dcpa": 2.372207740146682
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 11.0,
+          "x": 4.995093467098227,
+          "y": 13.140676475526679,
+          "heading": 4.665643399470327,
+          "speed": 0.5583378256934494,
+          "offset": 0.0,
+          "rudder": -0.21204735338687897,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 12.899999999999984,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -12.894887567968675,
+          "perception": {
+            "pose": [
+              4.995840521262381,
+              12.89128979464204,
+              3.2052284286073776
+            ],
+            "ego": [
+              0.5490539312850675,
+              -0.0286405811870675,
+              3.7531542439062826
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.630822314438901,
+                  12.581733245181944
+                ],
+                "velocity": [
+                  -0.0026499913674076173,
+                  0.8939848529541828
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 0.8043348310670345,
+                "dcpa": 2.3690672939883832
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 11.5,
+          "x": 5.00750315291769,
+          "y": 13.419363343357137,
+          "heading": 4.938601026677185,
+          "speed": 0.5579260546104269,
+          "offset": 0.0,
+          "rudder": -0.32381948828697205,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 13.349999999999984,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -12.780625129047063,
+          "perception": {
+            "pose": [
+              5.047491914272034,
+              13.107206532282358,
+              4.71591697035866
+            ],
+            "ego": [
+              0.6237173785536306,
+              0.030138380047196232,
+              1.4209961416151002
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6584337697380604,
+                  12.978669337515752
+                ],
+                "velocity": [
+                  0.02542248953426552,
+                  0.8454230758006107
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -1.9222827755308094,
+                "dcpa": 2.35018064896907
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 12.0,
+          "x": 5.018044920430381,
+          "y": 13.698200668369326,
+          "heading": 3.9747405016437014,
+          "speed": 0.5580730514269426,
+          "offset": 0.0,
+          "rudder": -0.022107768803834915,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 13.799999999999983,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -12.025731419113495,
+          "perception": {
+            "pose": [
+              4.931982412015774,
+              13.476498186444303,
+              4.8262972232341035
+            ],
+            "ego": [
+              0.6138935483368785,
+              -0.03572013726256085,
+              0.42994690240610467
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.594357880695045,
+                  13.444322159863278
+                ],
+                "velocity": [
+                  -0.04907197242318779,
+                  0.8870822408446751
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -1.8296287266283902,
+                "dcpa": 2.2810093896390673
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 12.5,
+          "x": 5.024462581215579,
+          "y": 13.977455765708477,
+          "heading": 2.047246257650182,
+          "speed": 0.5586576617566524,
+          "offset": 0.0,
+          "rudder": 0.15490974485874176,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 14.249999999999982,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -11.660423417775734,
+          "perception": {
+            "pose": [
+              5.044461951736497,
+              13.714989851977949,
+              3.789738962814531
+            ],
+            "ego": [
+              0.6267069594432374,
+              -0.04866699098255027,
+              -2.9777490061835996
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6219294701494467,
+                  13.867180768853963
+                ],
+                "velocity": [
+                  0.0014798013052906497,
+                  0.8670172574969315
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -0.2707188067995698,
+                "dcpa": 2.426448575263816
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 13.0,
+          "x": 5.0260365810777445,
+          "y": 14.257006374891226,
+          "heading": 359.88143573672517,
+          "speed": 0.5591100806460646,
+          "offset": 0.0,
+          "rudder": 0.37758493423461914,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 14.699999999999982,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -11.326836947302352,
+          "perception": {
+            "pose": [
+              5.037125859301528,
+              13.943711620876003,
+              2.312621194913269
+            ],
+            "ego": [
+              0.5287891577586411,
+              -0.07598767316156463,
+              -4.217862290051076
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.635429768520488,
+                  14.278903358744765
+                ],
+                "velocity": [
+                  0.013859205450551932,
+                  0.8458816952914848
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "engaged",
+                "tcpa": 0.5695408821095919,
+                "dcpa": 2.418036906630042
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 13.5,
+          "x": 5.024447185126329,
+          "y": 14.53651958807631,
+          "heading": 358.4237647019824,
+          "speed": 0.5590354640791237,
+          "offset": 0.0,
+          "rudder": 0.07418357580900192,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 15.14999999999998,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -10.825678118456231,
+          "perception": {
+            "pose": [
+              5.027910726643883,
+              14.283915648151545,
+              359.25981393468174
+            ],
+            "ego": [
+              0.5230100807212436,
+              0.04372100240274787,
+              -3.741123466956278
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6326071694759183,
+                  14.70980337956941
+                ],
+                "velocity": [
+                  0.0043981800435559,
+                  0.8536032274584161
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -1.986870070557981,
+                "dcpa": 2.3419194492525723
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 14.0,
+          "x": 5.022874834313551,
+          "y": 14.81592744858456,
+          "heading": 358.32863164112916,
+          "speed": 0.5588245692554198,
+          "offset": 0.0,
+          "rudder": 0.2452896684408188,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 15.59999999999998,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -10.4068626910221,
+          "perception": {
+            "pose": [
+              5.043521371310062,
+              14.527110024611535,
+              358.58361936054473
+            ],
+            "ego": [
+              0.46635591981366764,
+              -0.032956909606239204,
+              -2.120799949827915
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.646291562095986,
+                  15.137382123599247
+                ],
+                "velocity": [
+                  0.01554056022123179,
+                  0.854357154591212
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -0.6036605600899956,
+                "dcpa": 2.46225502344508
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 14.5,
+          "x": 5.023821663469946,
+          "y": 15.09538657863555,
+          "heading": 359.3571449154636,
+          "speed": 0.5589214680232183,
+          "offset": 0.0,
+          "rudder": -0.06077014282345772,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 16.04999999999998,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -9.922698161890725,
+          "perception": {
+            "pose": [
+              5.05667697645037,
+              14.830136684455004,
+              358.56487360725913
+            ],
+            "ego": [
+              0.5761398628475743,
+              -0.012827360445181785,
+              1.819956320047205
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.66315995270454,
+                  15.588325824656446
+                ],
+                "velocity": [
+                  0.02436702388630308,
+                  0.8774127111735535
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -1.1228689153790712,
+                "dcpa": 2.4870852700755988
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 15.0,
+          "x": 5.028461175197312,
+          "y": 15.374921279533384,
+          "heading": 0.9765449231120318,
+          "speed": 0.5591463997026533,
+          "offset": 0.0,
+          "rudder": -0.00665911054238677,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 16.49999999999998,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -9.63526992347924,
+          "perception": {
+            "pose": [
+              5.017621390890932,
+              15.01837546267521,
+              359.22751159383495
+            ],
+            "ego": [
+              0.5468153430251365,
+              -0.041501865372233764,
+              2.5415954835886163
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6444957333288355,
+                  15.963943290060564
+                ],
+                "velocity": [
+                  -0.005559671299169396,
+                  0.8162074975203849
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -2.0397179178381597,
+                "dcpa": 2.49293398194838
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 15.5,
+          "x": 5.0366947862411235,
+          "y": 15.654386270596891,
+          "heading": 2.533960298508713,
+          "speed": 0.5591725085550869,
+          "offset": 0.0,
+          "rudder": -0.3858444094657898,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 16.949999999999978,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -8.874345663422366,
+          "perception": {
+            "pose": [
+              5.050867708050514,
+              15.37039622673016,
+              0.46170302078117087
+            ],
+            "ego": [
+              0.6330639163279306,
+              0.041016182684237436,
+              4.201817338416971
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.645567873667962,
+                  16.402776193431464
+                ],
+                "velocity": [
+                  -0.0018227056829822636,
+                  0.8460191564017625
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -7.019593388566827,
+                "dcpa": 2.1203909796919196
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 16.0,
+          "x": 5.047044550494964,
+          "y": 15.93366483444071,
+          "heading": 3.477741193174034,
+          "speed": 0.5589405472598185,
+          "offset": 0.0,
+          "rudder": -0.3037601411342621,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 17.399999999999977,
+          "perceived_classes": [
+            "being_overtaken"
+          ],
+          "obligations": [],
+          "cost": -8.28217667097337,
+          "perception": {
+            "pose": [
+              5.008300512674106,
+              15.649895367545954,
+              2.5456764278586594
+            ],
+            "ego": [
+              0.5768729325060187,
+              0.06506040612967451,
+              0.7513714733433228
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6225734090225132,
+                  16.846777595637516
+                ],
+                "velocity": [
+                  -0.023246470979461864,
+                  0.8663842170247514
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -6.298802329612082,
+                "dcpa": 1.7901021815027633
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 16.5,
+          "x": 5.057038682346777,
+          "y": 16.212874005888327,
+          "heading": 3.324146197057332,
+          "speed": 0.5587759625894303,
+          "offset": 0.0,
+          "rudder": -0.04870233312249184,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 17.849999999999977,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -8.278441721574167,
+          "perception": {
+            "pose": [
+              5.018603191556705,
+              15.97873898932086,
+              3.3597292605400475
+            ],
+            "ego": [
+              0.46307121422311676,
+              -0.013620846012014106,
+              -0.20400303594236502
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6075587031374066,
+                  17.32634197787686
+                ],
+                "velocity": [
+                  -0.026536680548000506,
+                  0.9113719305956576
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "being_overtaken",
+                "state": "clearing",
+                "tcpa": -3.4592006163635807,
+                "dcpa": 2.2814713506770627
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 17.0,
+          "x": 5.063791513507687,
+          "y": 16.492267234108304,
+          "heading": 1.9729688563949759,
+          "speed": 0.5589496460464677,
+          "offset": 0.0,
+          "rudder": -0.18638817965984344,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 18.299999999999976,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -7.639318672362438,
+          "perception": {
+            "pose": [
+              5.033280237757687,
+              16.233732258708397,
+              3.4109059207199364
+            ],
+            "ego": [
+              0.611168876137786,
+              0.048520149899616484,
+              -1.1258443888422665
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6093299681602202,
+                  17.76905035550088
+                ],
+                "velocity": [
+                  -0.011946120264150331,
+                  0.8987818212439315
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -7.227963663024865,
+                "dcpa": 1.8171484823872444
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 17.5,
+          "x": 5.06615087624813,
+          "y": 16.768746509693482,
+          "heading": 0.12257431434161559,
+          "speed": 0.5529786846548274,
+          "offset": 0.0,
+          "rudder": 0.12285645306110382,
+          "throttle": -0.25,
+          "target_x": 2.4,
+          "target_y": 18.749999999999975,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -7.180608210976005,
+          "perception": {
+            "pose": [
+              5.10398286043407,
+              16.494321131164156,
+              1.6831933452524765
+            ],
+            "ego": [
+              0.645141431258001,
+              0.007641047485453276,
+              -4.650936056202634
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.646678259674174,
+                  18.17712046666368
+                ],
+                "velocity": [
+                  0.03008176413140337,
+                  0.8586947575486155
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -7.672047060998448,
+                "dcpa": 2.484443589402576
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 18.0,
+          "x": 5.064496034896836,
+          "y": 17.042495199569508,
+          "heading": 358.36823502201213,
+          "speed": 0.5475073833611327,
+          "offset": 0.0,
+          "rudder": 0.12612561881542206,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 19.199999999999974,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -6.969108046208358,
+          "perception": {
+            "pose": [
+              5.103422850006387,
+              16.77272452279317,
+              0.47185899725409874
+            ],
+            "ego": [
+              0.5314577502128766,
+              -0.000802265781529022,
+              -3.686755200058819
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6729997404543298,
+                  18.606784944264923
+                ],
+                "velocity": [
+                  0.04102555237138035,
+                  0.859002388597374
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -4.689573507667511,
+                "dcpa": 2.62303084275731
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 18.5,
+          "x": 5.060138613803503,
+          "y": 17.316606412959956,
+          "heading": 357.22893249982593,
+          "speed": 0.5482916903436283,
+          "offset": 0.0,
+          "rudder": 0.20153166353702545,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 19.649999999999974,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -6.47223670088931,
+          "perception": {
+            "pose": [
+              5.044195009504727,
+              17.036969294726696,
+              358.25522634226587
+            ],
+            "ego": [
+              0.5980158701256312,
+              -0.006445695474100453,
+              -2.9335201723126825
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6384148795555133,
+                  19.01627643354646
+                ],
+                "velocity": [
+                  -0.012427007021882874,
+                  0.8395901233448633
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -7.655870807367918,
+                "dcpa": 2.502548252112033
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 19.0,
+          "x": 5.05542788481536,
+          "y": 17.58797711526014,
+          "heading": 357.06836645646473,
+          "speed": 0.5428231720716996,
+          "offset": 0.0,
+          "rudder": -0.0348975695669651,
+          "throttle": -0.25,
+          "target_x": 2.4,
+          "target_y": 20.099999999999973,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -5.931315032089765,
+          "perception": {
+            "pose": [
+              5.07276337574031,
+              17.326501080198284,
+              357.53133151733186
+            ],
+            "ego": [
+              0.5613533759034176,
+              0.03935151490179746,
+              -1.0218854791169356
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6419058284932886,
+                  19.44615468855275
+                ],
+                "velocity": [
+                  -0.003012305260743215,
+                  0.8493722577352207
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -7.894110321980596,
+                "dcpa": 2.2921683849235697
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 19.5,
+          "x": 5.052476632226791,
+          "y": 17.854057426704166,
+          "heading": 357.83351484274704,
+          "speed": 0.5321933559524802,
+          "offset": 0.0,
+          "rudder": -0.1349446028470993,
+          "throttle": -0.25,
+          "target_x": 2.4,
+          "target_y": 20.549999999999972,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -5.25887752728548,
+          "perception": {
+            "pose": [
+              5.04147951647714,
+              17.63184197006087,
+              356.9237794507206
+            ],
+            "ego": [
+              0.47374302284072545,
+              0.0745323521962922,
+              -1.0759536969176315
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.613335462680487,
+                  19.88512611593604
+                ],
+                "velocity": [
+                  -0.02926844870201235,
+                  0.8632310329525443
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -6.828827723230012,
+                "dcpa": 1.9321543120124707
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 20.0,
+          "x": 5.0521143610375505,
+          "y": 18.113228338239743,
+          "heading": 359.02826621188717,
+          "speed": 0.5183423294564949,
+          "offset": 0.0,
+          "rudder": -0.2427821010351181,
+          "throttle": -0.5,
+          "target_x": 2.4,
+          "target_y": 20.99999999999997,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -5.012946064501838,
+          "perception": {
+            "pose": [
+              5.031137595385529,
+              17.886314689051606,
+              357.62392469380075
+            ],
+            "ego": [
+              0.46803977846227673,
+              0.0478448339913906,
+              2.2233306400160426
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.5868740539025605,
+                  20.31662235467059
+                ],
+                "velocity": [
+                  -0.040742502971624836,
+                  0.8631153165459811
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -7.050023003029491,
+                "dcpa": 1.9867894903801246
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 20.5,
+          "x": 5.053527978667725,
+          "y": 18.369256176754618,
+          "heading": 0.009600550568001258,
+          "speed": 0.5120634820387143,
+          "offset": 0.0,
+          "rudder": -0.19573743641376495,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 21.44999999999997,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -4.859987494223047,
+          "perception": {
+            "pose": [
+              5.028897529159684,
+              18.08646346565523,
+              358.57116902365107
+            ],
+            "ego": [
+              0.47654613680067953,
+              0.04388374821953838,
+              1.211669989574037
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.5628414052474597,
+                  20.700319041244402
+                ],
+                "velocity": [
+                  -0.044294579975463134,
+                  0.8166833538023583
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -8.891503561995295,
+                "dcpa": 1.8324484525729925
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 21.0,
+          "x": 5.0551781301622345,
+          "y": 18.627524402492043,
+          "heading": 0.3433843975344413,
+          "speed": 0.5165469946694573,
+          "offset": 0.0,
+          "rudder": -0.17865459620952606,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 21.89999999999997,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -4.311413839565449,
+          "perception": {
+            "pose": [
+              5.057974159269232,
+              18.377856002320428,
+              -0.2264296290204698
+            ],
+            "ego": [
+              0.5333984512239766,
+              0.02788516825166518,
+              1.109986200220855
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.5776567477343995,
+                  21.132230480900247
+                ],
+                "velocity": [
+                  -0.008435559294532359,
+                  0.839549382369001
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -9.783626853185334,
+                "dcpa": 2.1589595041835667
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 21.5,
+          "x": 5.0555346584869545,
+          "y": 18.887806904772326,
+          "heading": 359.94778989626263,
+          "speed": 0.5205654929237319,
+          "offset": 0.0,
+          "rudder": -0.07271207123994827,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 22.34999999999997,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -4.063105499437898,
+          "perception": {
+            "pose": [
+              5.057467735985138,
+              18.602915761247647,
+              0.2726809276307813
+            ],
+            "ego": [
+              0.48196421323109573,
+              0.013902531727523431,
+              -0.35838576286800083
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.588394625261932,
+                  21.5542114829919
+                ],
+                "velocity": [
+                  0.006073559348343249,
+                  0.8416898183485639
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -8.389090987419129,
+                "dcpa": 2.385097401084554
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 22.0,
+          "x": 5.053569502190136,
+          "y": 19.149904732818477,
+          "heading": 359.03386310314966,
+          "speed": 0.5242103902281254,
+          "offset": 0.0,
+          "rudder": 0.06020545959472656,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 22.79999999999997,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -3.5291155981137905,
+          "perception": {
+            "pose": [
+              5.047364427339828,
+              18.895437983538525,
+              360.03516209013577
+            ],
+            "ego": [
+              0.4609587169318214,
+              0.020087066669412686,
+              -2.943215657878935
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.593274867311048,
+                  22.008853082365363
+                ],
+                "velocity": [
+                  0.007861980545695308,
+                  0.8744774238750356
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -7.701306035532209,
+                "dcpa": 2.3588401258736655
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 22.5,
+          "x": 5.049042847248181,
+          "y": 19.41359061942743,
+          "heading": 357.9812215956653,
+          "speed": 0.527449475880728,
+          "offset": 0.0,
+          "rudder": 0.18431948125362396,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 23.249999999999968,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -3.0063375465891595,
+          "perception": {
+            "pose": [
+              5.01814613487248,
+              19.14916596557715,
+              359.30455893485424
+            ],
+            "ego": [
+              0.5284494263869726,
+              0.0006827589164126843,
+              -3.212042680695626
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.5794965381447006,
+                  22.449625663003662
+                ],
+                "velocity": [
+                  -0.009318582890917615,
+                  0.877905780091598
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -9.514347239428437,
+                "dcpa": 2.4046457357619038
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 23.0,
+          "x": 5.042726264475804,
+          "y": 19.6786634191497,
+          "heading": 357.2539555902498,
+          "speed": 0.5302960998179124,
+          "offset": 0.0,
+          "rudder": 0.330181360244751,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 23.699999999999967,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -2.571969274402199,
+          "perception": {
+            "pose": [
+              5.02413609433582,
+              19.401598665941133,
+              358.09335342803615
+            ],
+            "ego": [
+              0.5806193504972468,
+              -0.09719067938965344,
+              -0.3600635302671473
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.5726550646068427,
+                  22.873700232444545
+                ],
+                "velocity": [
+                  -0.011435610481810275,
+                  0.8634716889419818
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -7.919592995988375,
+                "dcpa": 3.496947315664327
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 23.5,
+          "x": 5.036472732907738,
+          "y": 19.939710993373318,
+          "heading": 357.2270849897708,
+          "speed": 0.5222449335900078,
+          "offset": 0.0,
+          "rudder": -0.1417940855026245,
+          "throttle": -0.5,
+          "target_x": 2.4,
+          "target_y": 24.149999999999967,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -2.1544241776322366,
+          "perception": {
+            "pose": [
+              5.055000860906426,
+              19.694839093201843,
+              356.9968546944953
+            ],
+            "ego": [
+              0.5014583636640875,
+              0.06713957409004423,
+              -0.47329051468586625
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.572169983372555,
+                  23.317509675292044
+                ],
+                "velocity": [
+                  -0.006359122531459616,
+                  0.8751847998567174
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -10.449256972261166,
+                "dcpa": 2.0063157063836727
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 24.0,
+          "x": 5.03221415699736,
+          "y": 20.197431012654494,
+          "heading": 358.069194076604,
+          "speed": 0.515510402638296,
+          "offset": 0.0,
+          "rudder": -0.1499837040901184,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 24.599999999999966,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -1.8297542450716766,
+          "perception": {
+            "pose": [
+              5.0928145775921605,
+              19.94458662629953,
+              357.57812943796455
+            ],
+            "ego": [
+              0.5881497176953642,
+              0.04868732689103125,
+              0.4180832400524006
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.625600038016713,
+                  23.758902110070895
+                ],
+                "velocity": [
+                  0.048560271779625755,
+                  0.8788713751672135
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -12.368186524320977,
+                "dcpa": 2.7837286283908274
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 24.5,
+          "x": 5.030381435349018,
+          "y": 20.45735947305098,
+          "heading": 359.2509943150146,
+          "speed": 0.5198698429135002,
+          "offset": 0.0,
+          "rudder": -0.0747581422328949,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 25.049999999999965,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -1.2741770599194713,
+          "perception": {
+            "pose": [
+              5.097783902458126,
+              20.194588143771814,
+              357.96994854274277
+            ],
+            "ego": [
+              0.5293562391166988,
+              -0.03460395463759233,
+              3.1612027748866502
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.6373037012569847,
+                  24.190264412163398
+                ],
+                "velocity": [
+                  0.03635930116039049,
+                  0.8710390407822365
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -9.14348049859753,
+                "dcpa": 3.3907461136061805
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        },
+        {
+          "t": 25.0,
+          "x": 5.029919513394754,
+          "y": 20.719202173396816,
+          "heading": 0.04838935350665227,
+          "speed": 0.5236862155768169,
+          "offset": 0.0,
+          "rudder": -0.2287628948688507,
+          "throttle": 0.0,
+          "target_x": 2.4,
+          "target_y": 25.499999999999964,
+          "perceived_classes": [
+            "none"
+          ],
+          "obligations": [],
+          "cost": -1.121887877721047,
+          "perception": {
+            "pose": [
+              5.031223745713377,
+              20.42077509508422,
+              359.44033599790487
+            ],
+            "ego": [
+              0.45525078986643414,
+              0.015702037046131913,
+              3.0216360523971684
+            ],
+            "tracks": [
+              {
+                "id": 2,
+                "position": [
+                  2.603280430078977,
+                  24.54297243932761
+                ],
+                "velocity": [
+                  -0.014284971869003703,
+                  0.7907000917023161
+                ]
+              }
+            ],
+            "contexts": [
+              {
+                "id": 2,
+                "cls": "none",
+                "state": "idle",
+                "tcpa": -12.770814912318688,
+                "dcpa": 2.107871236740461
+              }
+            ]
+          },
+          "fallback": false,
+          "rule_relaxed": false,
+          "stand_on_override": false
+        }
+      ]
+    }
+  ]
+}

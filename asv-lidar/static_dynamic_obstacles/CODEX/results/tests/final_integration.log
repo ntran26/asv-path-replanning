@@ -1,0 +1,8 @@
+....................................                                     [100%]
+============================== warnings summary ===============================
+tests/test_codex_training.py::test_schema_guard_rejects_legacy_checkpoint_and_output_escape
+  C:\Users\hntran\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\tensorboard\compat\tensorflow_stub\dtypes.py:326: DeprecationWarning: `np.bool8` is a deprecated alias for `np.bool_`.  (Deprecated NumPy 1.24)
+    np.bool8: (False, True),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+36 passed, 1 warning in 141.65s (0:02:21)

@@ -1,0 +1,25 @@
+== target-collision rate by scripted response (development crossings, obstacles off, supervisor off)
+side      port  starboard
+policy                   
+follower  0.82       0.56
+slow      0.73       0.67
+stop      0.45       0.67
+turn30    0.45       0.89
+turn60    0.27       0.67
+
+best of all responses still hits the target: 0.25 (5/20)
+
+== unavoidable draws (best response still hits)
+          side  width  dcpa   tcpa     k      ct  range0  best_hit
+idx                                                               
+7         port   8.61  1.06  10.09  1.02   68.91    6.54      True
+9    starboard   7.64  0.90   7.95  0.87  232.05    7.54      True
+12   starboard   6.87  1.00   8.82  0.89  258.35    7.29      True
+13        port   7.39  1.34   8.24  0.80  103.22    6.65      True
+14   starboard   8.21  0.54   8.85  0.65  273.75    5.74      True
+
+== drawn geometry, avoidable vs unavoidable (medians)
+          dcpa  tcpa     k  range0  width
+best_hit                                 
+False     1.26  9.88  0.90    8.89   7.72
+True      1.00  8.82  0.87    6.65   7.64

@@ -47,6 +47,9 @@ BREADTH = float(VESSEL_WIDTH)            # 0.50 m — the unit for channel width
 # policy, the tracker, the encounter latches, the reward, the emergency-stop
 # latch, the bridge's rudder limiter -- runs at this rate.  Only the physics and
 # the collision test sub-step (`PHYSICS_DT`).
+# A25 (F71): the observation schema a checkpoint was trained against. Revision 3
+# adds the encounter-context branch; 56-value policies cannot be loaded.
+OBSERVATION_SCHEMA_VERSION = "a25-v3-context"
 UPDATE_RATE = 0.5                        # decision period [s] -> 2 Hz
 
 # 02a, 03a and 04a were written at 10 Hz.  Their step counts and per-step
@@ -533,6 +536,31 @@ KF_PROCESS_NOISE_ACCEL = 0.10            # m/s^2, TODO(05)
 KF_MEAS_NOISE_POS = 0.05                 # m,     TODO(05)
 KF_INIT_VEL_VAR = 0.50                   # (m/s)^2
 
+# C15: what the Kalman filter is fed.  "centroid" is 01's original, the mean of
+# the visible returns; "hull_fit" adds each track's learned offset to the
+# centre of an LOA x BREADTH hull fitted to them (`tracking.hull_fit_centre`).
+# **Stays "centroid" (F64):** hull_fit cuts close-range error sharply (stop-test
+# disagreement 0.34 -> 0.06 inside 2 m) but worsens course at 6-9 m, where
+# encounters engage and A20 freezes the class (p90 7 -> 33 deg).
+TRACK_MEASUREMENT = "centroid"
+TRACK_FIT_STEP_DEG = 2.0                 # orientation search resolution
+TRACK_FIT_AMBIGUOUS_M = 0.15             # extent below BREADTH + this: length axis unknowable without a prior
+TRACK_FIT_FULL_EXTENT_TOL_M = 0.15       # an extent within this of the dimension counts as fully seen
+TRACK_FIT_PRIOR_SPEED = 0.15             # m/s: track course trusted as the length-axis prior above this
+TRACK_FIT_DEAD_ZONE_TOL_M = 0.10         # an observed end within this of LIDAR_MIN_RANGE was clipped by the dead zone
+TRACK_FIT_MIN_POINTS = 8                 # fewer returns: no fit this frame, the learned offset is held
+TRACK_FIT_OFFSET_GAIN = 0.5              # blend of a fresh fit into the track's centroid-to-centre offset
+
+# F66 (C15): the A18 stop test can read the hull-fitted centre and axis inside
+# this range.  It halves the test's disagreement with truth (0.090 -> 0.046), but
+# **off**: with accurate geometry the supervisor stopped 29 times, 15 then hit
+# (13 and 6 with the centroid), because A18 assumes the own ship stops where it
+# is.  The centroid's bias had been hiding that.  Still off after A23 (F67):
+# with the braking-path test the view gave 23 stops and 8 stop-then-hit, the
+# centroid 7 and 0.
+STOP_TEST_USES_HULL_FIT = False
+STOP_TEST_FIT_RANGE_M = 4.0              # m, own ship to fitted centre
+
 # Static vs dynamic split, with hysteresis so a track cannot chatter.
 #
 # **This threshold is set by localisation quality, not by obstacle behaviour**
@@ -987,6 +1015,29 @@ GOAL_END_INSET_M = max(0.0, 0.5 * LOA + 0.15 - GOAL_ALONG_DIST
 # half a beam, both hull margins and D_SAFE.  About 1.76 m.  A reciprocal
 # head-on gives ~0 and never qualifies; a crossing target passing ahead does.
 ESTOP_CLEAR_DCPA_M = 0.5 * LOA + 0.5 * BREADTH + 2.0 * 0.15 + D_SAFE   # 0.15 = ship.HULL_MARGIN
+
+# A23 (decided, option 1): the stop test evaluates that clearance along the own
+# ship's braking path (`stopping.dcpa_over_stop`), not with the ship stationary
+# where it is.  The path is the latch's full astern on the nominal hull.
+STOP_TEST_DT_S = 0.05                    # s, braking-profile resolution
+
+# F68: the policy's own slowdown -- coasting at propulsion stage 4's RPM floor,
+# no reverse -- is what R-2's carve-out and the Rule 8 alteration credit test
+# (`EncounterContext.slowdown_clears`), separately from the supervisor's stop.
+POLICY_SLOWDOWN_RPM = 0.0
+SLOWDOWN_TEST_MAX_S = 20.0               # s, coasting profile cap
+# F70: which "does slowing clear" test R-2 and the Rule 8 alteration credit read.
+# "coast" (F68) -- the policy's own slowdown; "stop" (A23) -- the braking path
+# under full astern, as before F68.  Run 5 trained on "coast": in crossings it
+# admitted the carve-out on 6 % of candidate frames against 38 % for "stop".
+# A24 decided with A25 (option 1): "stop", as before F68.
+R2_SLOWDOWN_TEST = "stop"
+
+# F68: training with the supervisor off, the stop kept as a runtime layer.
+# A fraction of training episodes starts slow or at rest, so a policy resuming
+# after a supervisor stop is not out of distribution.  0 in the environment by
+# default; `train_formulation.py --low-speed-start-frac` sets it for training.
+LOW_SPEED_START_ZERO_SHARE = 0.5         # of low-speed starts: from rest; the rest uniform on (0, 0.5 U_NOM]
 D_CUT = 2.00                             # m, beyond which r_obs is exactly zero
 OBS_SWATH_HALF_DEG = POOL_SWATH_HALF_DEG  # +/-135 deg, matching the c_t swath
 
@@ -1362,6 +1413,19 @@ BEING_OVERTAKEN_ABOVE_FLOOR_SPAN = 0.50  # m: above-floor draws are uniform on [
 CONFINED_CT_HALF_DEG = 10.0
 CONFINED_CT_CLASSES = ("overtaking", "being_overtaken", "null")
 CONFINED_TRACK_CHECK_DT_S = 0.5
+
+# A22 (decided, option 1): a crossing draw is accepted only if a lawful escape
+# works in the own ship's physics -- coasting to a stop, or a committed
+# alteration in the A17 compliant sense -- taken after a detection delay at
+# cruise.  A labelled fraction is kept where neither works, as the
+# last-moment case.  Before this, 5 of 20 development crossings were
+# unescapable by any scripted response (F62).
+CROSSING_ESCAPE_DELAY_S = 1.5            # s at cruise before responding (tracker latency, 1-2 s median)
+CROSSING_ESCAPE_TURN_DEG = 60.0          # committed alteration, compliant sense
+CROSSING_ESCAPE_STOP_RPM = 0.0           # coast: the policy has no reverse at propulsion stage 4
+CROSSING_ESCAPE_TAIL_S = 6.0             # s simulated past the drawn TCPA
+CROSSING_ESCAPE_DT_S = 0.1               # physics step of the check
+CROSSING_UNESCAPABLE_FRAC = 0.20         # labelled `crossing_escapable = False`
 NULL_TRACK_CHECK_S = 15.0                # null has no CPA to check up to
 
 # **The null class is mandatory** (04a §3.4).  A target on a similar course at a
