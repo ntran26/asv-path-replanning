@@ -32,6 +32,7 @@ import boundary_raycast as br
 import constants as cfg
 import corridor as corr
 import emergency_stop as estop_mod
+import feasibility as feas
 import scenario as scn
 import targets as tgtmod
 import tracking as trk
@@ -85,7 +86,8 @@ class ASVLidarEnv(gym.Env):
                  pose_stale_prob: float = cfg.POSE_STALE_PROB,
                  motion_classifier: str = cfg.MOTION_CLASSIFIER,
                  scenario_stage: Optional[int] = None,
-                 scenario_namespace: str = "training") -> None:
+                 scenario_namespace: str = "training",
+                 geometry_mode: Optional[str] = None) -> None:
         super().__init__()
         self.map_width = float(map_width)
         self.map_height = float(map_height)
@@ -158,8 +160,18 @@ class ASVLidarEnv(gym.Env):
         # 03a §3.1: the corridor is a generated channel, not an inset
         # rectangle.  A fixed one can be passed in for a named evaluation case
         # or a Study 1 width level; otherwise each episode samples one.
-        self.channel = channel if channel is not None else corr.rectangle(
-            self.corridor_width)
+        # F74: with neither a channel nor a width given, the default geometry is
+        # the basin (Paper 2's layout, 06).  A width asks for a channel.
+        if geometry_mode is None:
+            geometry_mode = ("channel" if channel is not None or corridor_width is not None
+                             else cfg.DEFAULT_GEOMETRY_MODE)
+        self.geometry_mode = str(geometry_mode)
+        if channel is not None:
+            self.channel = channel
+        elif self.geometry_mode == "basin":
+            self.channel = corr.sample_basin(np.random.default_rng(0))
+        else:
+            self.channel = corr.rectangle(self.corridor_width)
         self.resample_channel = channel is None
         self.boundary_polygon = self.channel.polygon()
 
@@ -211,13 +223,19 @@ class ASVLidarEnv(gym.Env):
         # Interpolated from the known arclength rather than searched for: the
         # path projection already located the vessel this step, and an argmin
         # over 500 stations every step is a cost with no information in it.
-        return self.channel.width_at_s(self.s_along + self.path_start_s)
+        #
+        # 06 M-5: twice the clearance on the side of the deviation.  In a
+        # channel `h_+ = h_- = W/2`, so this is exactly `W(s)` there (T14).
+        return 2.0 * self.channel.half_width_on_side(
+            self.s_along + self.path_start_s, self.cross_track_error)
 
     # ------------------------------------------------------------------
     # Reset
     # ------------------------------------------------------------------
     def _clear_state(self) -> None:
         self.step_count = 0
+        self._confine_geom = None                # 06 §3.5, set by a generated reset
+        self._confine_poly = None
         self.elapsed_time = 0.0
         self.asv_x = self.asv_y = 0.0
         self.asv_h = self.asv_w = 0.0
@@ -398,8 +416,9 @@ class ASVLidarEnv(gym.Env):
 
     def _sample_layout(self) -> None:
         if self.resample_channel:
-            self.channel = corr.sample(
-                self._rng, width_range=(self.corridor_width, self.corridor_width))
+            self.channel = (corr.sample_basin(self._rng) if self.geometry_mode == "basin"
+                            else corr.sample(self._rng, width_range=(self.corridor_width,
+                                                                     self.corridor_width)))
             self.boundary_polygon = self.channel.polygon()
         self._build_path_from_channel()
 
@@ -511,6 +530,9 @@ class ASVLidarEnv(gym.Env):
         self.channel = built.channel
         self.boundary_polygon = self.channel.polygon()
         self.corridor_width = float(self.channel.nominal_width)
+        # 06 §3.5: confined targets keep the path band in basin mode.
+        self._confine_geom = scn.confinement_geometry(built.encounter_class, self.channel)
+        self._confine_poly = self._confine_geom.polygon()
 
         start_s = scn.own_start_s(built.encounter_class, self.channel)
         self.path_start_s = float(start_s)
@@ -541,9 +563,10 @@ class ASVLidarEnv(gym.Env):
         `info["num_obs"]`.  Occlusion and conflict placement (04a §3.6's flagged
         cases) are still not written.
         """
-        layout = self.sample_obstacles(count)
+        layout = self._feasible_layout(count)
+        flagged = self._flagged_panels(built, layout)
         if not layout or built.encounter_class == "no_target":
-            return layout
+            return layout + flagged
         guard = cfg.OBSTACLE_CPA_GUARD_FRAC * max(float(built.tcpa_s), 0.0) * cfg.U_NOM
         s_cpa = max(float(built.tcpa_s), 0.0) * cfg.U_NOM
         tx, ty = float(built.target_spawn[0]), float(built.target_spawn[1])
@@ -557,7 +580,89 @@ class ASVLidarEnv(gym.Env):
             if float(np.hypot(cx - tx, cy - ty)) < 2.0:
                 continue
             kept.append(poly)
-        return kept
+        return kept + flagged
+
+    def _flagged_panels(self, built, layout) -> List[List[Tuple[float, float]]]:
+        """04a §3.6's flagged panels, placed on purpose (F75).
+
+        * `conflict`: a panel beside the path, just before CPA, on the side the
+          compliant alteration would use -- so the textbook turn runs out of
+          water and the vessel must slow, alter less, or pass the other way.
+        * `occlusion`: a panel on the initial line of sight to the target, off
+          the path, so the target is hidden until the geometry opens.  Its
+          realised occlusion time is measured by the tracker, not set here.
+
+        Both are kept only if the layout stays A*-feasible, moving outward in
+        0.25 m steps until it is.  They are exempt from the CPA guard, which is
+        exactly what they are for.
+        """
+        flags = dict(getattr(built, "flags", {}) or {})
+        if built.encounter_class == "no_target" or not (flags.get("conflict") or flags.get("occlusion")):
+            return []
+        from colregs.context import compliant_turn_sense
+        start, goal = (self.start_x, self.start_y), (self.goal_x, self.goal_y)
+        pts = np.asarray(self.path.points, dtype=float)
+        t = (pts[-1] - pts[0]) / max(float(np.linalg.norm(pts[-1] - pts[0])), 1e-9)
+        starboard = np.array([t[1], -t[0]])
+        half = 0.5 * cfg.OBSTACLE_SIZE
+        out: List[List[Tuple[float, float]]] = []
+
+        def box(c):
+            return [(float(c[0] - half), float(c[1] - half)), (float(c[0] + half), float(c[1] - half)),
+                    (float(c[0] + half), float(c[1] + half)), (float(c[0] - half), float(c[1] + half))]
+
+        def place(centre, step_dir):
+            for k in range(8):
+                panel = box(centre + step_dir * 0.25 * k)
+                inside = br.points_in_polygon(np.array([p[0] for p in panel]),
+                                              np.array([p[1] for p in panel]), self.boundary_polygon)
+                if np.all(inside) and feas.layout_feasible(start, goal, self.boundary_polygon,
+                                                           layout + out + [panel]):
+                    return panel
+            return None
+
+        s_cpa = max(float(built.tcpa_s), 0.0) * cfg.U_NOM
+        if flags.get("conflict"):
+            side = ("port" if float(getattr(built, "ct_deg", 0.0)) < 180.0 else "starboard")
+            sense = compliant_turn_sense(built.encounter_class, side) or 1
+            p = pts[0] + t * max(s_cpa - 1.0, 2.0)
+            lateral = starboard * float(sense)
+            panel = place(p + lateral * 1.5, lateral)
+            if panel is not None:
+                out.append(panel)
+        if flags.get("occlusion"):
+            own = pts[0]
+            target = np.array(built.target_spawn, dtype=float)
+            centre = own + 0.4 * (target - own)
+            away = centre - (pts[0] + t * float(np.dot(centre - pts[0], t)))
+            norm = float(np.linalg.norm(away))
+            away = away / norm if norm > 1e-6 else starboard
+            if norm < 1.2:
+                centre = centre + away * (1.2 - norm)
+            panel = place(centre, away)
+            if panel is not None:
+                out.append(panel)
+        self.flagged_panels = len(out)
+        return out
+
+    def _feasible_layout(self, count: int) -> List[List[Tuple[float, float]]]:
+        """A layout that leaves a route from start to goal (F74).
+
+        Redrawn up to `FEASIBILITY_REDRAWS` times, then thinned nearest-the-path
+        first.  `info["layout_redraws"]` and `info["layout_thinned"]` record it.
+        """
+        start, goal = (self.start_x, self.start_y), (self.goal_x, self.goal_y)
+        nav = self.boundary_polygon
+        self.layout_redraws, self.layout_thinned = 0, 0
+        layout = self.sample_obstacles(count)
+        while layout and not feas.layout_feasible(start, goal, nav, layout):
+            if self.layout_redraws >= int(cfg.FEASIBILITY_REDRAWS):
+                kept = feas.thin_to_feasible(start, goal, nav, layout, self.path.points)
+                self.layout_thinned = len(layout) - len(kept)
+                return kept
+            self.layout_redraws += 1
+            layout = self.sample_obstacles(count)
+        return layout
 
     def _load_scenario(self, scenario: dict) -> None:
         self.start_x, self.start_y = (float(v) for v in scenario["start"])
@@ -613,7 +718,8 @@ class ASVLidarEnv(gym.Env):
         # outside the channel and terminates on step 1.  F35: the inset must also
         # clear `d_safe`, or `r_bnd` charges the stern for sitting on the end
         # edge for the first 16-19 steps of every episode.
-        inset = cfg.SPAWN_INSET_M
+        # A basin leg starts at Paper 2's start y, already clear of the wall.
+        inset = 0.0 if getattr(self.channel, "mode", "channel") == "basin" else cfg.SPAWN_INSET_M
         self.path_start_s = float(inset)
         points = self.channel.reference_path_points(start_s=inset)
         self.path = ReferencePath(points, self.lookahead_fraction)
@@ -787,8 +893,8 @@ class ASVLidarEnv(gym.Env):
             true_targets=(),
             open_water=self.open_water,
             previous_action=self._executed_action,
-            cross_track_scale=0.5 * self.channel.width_at_s(
-                perceived.s_along + self.path_start_s),
+            cross_track_scale=self.channel.half_width_on_side(
+                perceived.s_along + self.path_start_s, cte),
         )
         # Diagnostic truth uses a wholly true reference frame. It never enters
         # the policy branches or the context's perceived CPA/admissibility.
@@ -960,7 +1066,8 @@ class ASVLidarEnv(gym.Env):
                 target.step(h, own=own_state)
                 # Confined classes keep the fairway; a crossing target under Rule
                 # 9(d) is not a channel user and is left alone (03a §5.2).
-                tgtmod.clamp_to_corridor(target, self.channel, self.boundary_polygon)
+                tgtmod.clamp_to_corridor(target, self._confine_geom or self.channel,
+                                         self._confine_poly or self.boundary_polygon)
             sub_collision = self.collision_kind(self.hull_polygon())
             if sub_collision is not None:
                 break
@@ -1293,6 +1400,9 @@ class ASVLidarEnv(gym.Env):
             "scenario_class": (self.scenario.encounter_class if self.scenario is not None
                                else "placeholder"),
             "num_obs": int(len(self.obstacles)),
+            "layout_redraws": int(getattr(self, "layout_redraws", 0)),
+            "layout_thinned": int(getattr(self, "layout_thinned", 0)),
+            "geometry_mode": str(getattr(self.channel, "mode", "channel")),
             "start_speed": float(self.start_speed),
         }
         info.update(breakdown.as_info())

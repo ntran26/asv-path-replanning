@@ -1,0 +1,264 @@
+Using cpu device
+Logging to C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\runs\tensorboard\td3_formulation_seed0_gate_g2_smoke_1
+[CURRICULUM] t=0 -> scenario stage 1
+[CURRICULUM] t=480 -> scenario stage 2
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 34       |
+|    ep_rew_mean     | -322     |
+| time/              |          |
+|    episodes        | 4        |
+|    fps             | 118      |
+|    time_elapsed    | 4        |
+|    total_timesteps | 520      |
+| train/             |          |
+|    actor_loss      | 0.0714   |
+|    critic_loss     | 0.779    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 52       |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 55.2     |
+|    ep_rew_mean     | -253     |
+| time/              |          |
+|    episodes        | 8        |
+|    fps             | 93       |
+|    time_elapsed    | 11       |
+|    total_timesteps | 1060     |
+| train/             |          |
+|    actor_loss      | 0.0855   |
+|    critic_loss     | 1.39     |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 160      |
+---------------------------------
+[CURRICULUM] t=1,080 -> scenario stage 3
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 71.6     |
+|    ep_rew_mean     | -369     |
+| time/              |          |
+|    episodes        | 12       |
+|    fps             | 79       |
+|    time_elapsed    | 16       |
+|    total_timesteps | 1330     |
+| train/             |          |
+|    actor_loss      | 0.116    |
+|    critic_loss     | 0.379    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 214      |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 67.2     |
+|    ep_rew_mean     | -400     |
+| time/              |          |
+|    episodes        | 16       |
+|    fps             | 60       |
+|    time_elapsed    | 29       |
+|    total_timesteps | 1810     |
+| train/             |          |
+|    actor_loss      | 0.161    |
+|    critic_loss     | 0.541    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 310      |
+---------------------------------
+[CURRICULUM] t=1,920 -> scenario stage 4
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 82.5     |
+|    ep_rew_mean     | -432     |
+| time/              |          |
+|    episodes        | 20       |
+|    fps             | 53       |
+|    time_elapsed    | 42       |
+|    total_timesteps | 2280     |
+| train/             |          |
+|    actor_loss      | 0.203    |
+|    critic_loss     | 0.902    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 404      |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 88.4     |
+|    ep_rew_mean     | -486     |
+| time/              |          |
+|    episodes        | 24       |
+|    fps             | 50       |
+|    time_elapsed    | 49       |
+|    total_timesteps | 2510     |
+| train/             |          |
+|    actor_loss      | 0.164    |
+|    critic_loss     | 0.221    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 450      |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 84.1     |
+|    ep_rew_mean     | -487     |
+| time/              |          |
+|    episodes        | 28       |
+|    fps             | 49       |
+|    time_elapsed    | 56       |
+|    total_timesteps | 2750     |
+| train/             |          |
+|    actor_loss      | 0.175    |
+|    critic_loss     | 0.343    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 498      |
+---------------------------------
+[CURRICULUM] t=3,000 -> scenario stage 5
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 83.9     |
+|    ep_rew_mean     | -506     |
+| time/              |          |
+|    episodes        | 32       |
+|    fps             | 50       |
+|    time_elapsed    | 64       |
+|    total_timesteps | 3300     |
+| train/             |          |
+|    actor_loss      | 0.241    |
+|    critic_loss     | 0.551    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 608      |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 87.8     |
+|    ep_rew_mean     | -526     |
+| time/              |          |
+|    episodes        | 36       |
+|    fps             | 52       |
+|    time_elapsed    | 69       |
+|    total_timesteps | 3630     |
+| train/             |          |
+|    actor_loss      | 0.31     |
+|    critic_loss     | 0.567    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 674      |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 87.3     |
+|    ep_rew_mean     | -529     |
+| time/              |          |
+|    episodes        | 40       |
+|    fps             | 50       |
+|    time_elapsed    | 76       |
+|    total_timesteps | 3900     |
+| train/             |          |
+|    actor_loss      | 0.212    |
+|    critic_loss     | 0.314    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 728      |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 83.4     |
+|    ep_rew_mean     | -519     |
+| time/              |          |
+|    episodes        | 44       |
+|    fps             | 51       |
+|    time_elapsed    | 81       |
+|    total_timesteps | 4190     |
+| train/             |          |
+|    actor_loss      | 0.2      |
+|    critic_loss     | 0.345    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 786      |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 84.4     |
+|    ep_rew_mean     | -526     |
+| time/              |          |
+|    episodes        | 48       |
+|    fps             | 51       |
+|    time_elapsed    | 87       |
+|    total_timesteps | 4520     |
+| train/             |          |
+|    actor_loss      | 0.182    |
+|    critic_loss     | 0.192    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 852      |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 84.1     |
+|    ep_rew_mean     | -533     |
+| time/              |          |
+|    episodes        | 52       |
+|    fps             | 52       |
+|    time_elapsed    | 93       |
+|    total_timesteps | 4870     |
+| train/             |          |
+|    actor_loss      | 0.291    |
+|    critic_loss     | 0.732    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 922      |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 84.3     |
+|    ep_rew_mean     | -536     |
+| time/              |          |
+|    episodes        | 56       |
+|    fps             | 52       |
+|    time_elapsed    | 97       |
+|    total_timesteps | 5100     |
+| train/             |          |
+|    actor_loss      | 0.297    |
+|    critic_loss     | 0.455    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 968      |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 84.5     |
+|    ep_rew_mean     | -539     |
+| time/              |          |
+|    episodes        | 60       |
+|    fps             | 53       |
+|    time_elapsed    | 103      |
+|    total_timesteps | 5530     |
+| train/             |          |
+|    actor_loss      | 0.346    |
+|    critic_loss     | 0.491    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 1054     |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 82.3     |
+|    ep_rew_mean     | -533     |
+| time/              |          |
+|    episodes        | 64       |
+|    fps             | 53       |
+|    time_elapsed    | 107      |
+|    total_timesteps | 5760     |
+| train/             |          |
+|    actor_loss      | 0.491    |
+|    critic_loss     | 0.89     |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 1100     |
+---------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 82.7     |
+|    ep_rew_mean     | -539     |
+| time/              |          |
+|    episodes        | 68       |
+|    fps             | 53       |
+|    time_elapsed    | 111      |
+|    total_timesteps | 5970     |
+| train/             |          |
+|    actor_loss      | 0.418    |
+|    critic_loss     | 0.643    |
+|    learning_rate   | 0.0003   |
+|    n_updates       | 1142     |
+---------------------------------
+[EVAL] t=6,000 supervisor off goal 0.00 collision 1.00 timeout 0.00 return -507.3 colregs -7.7 intervention 0.00 (10.0 s)
+done in 0.03 h -> C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\runs\td3_formulation_seed0_gate_g2_smoke

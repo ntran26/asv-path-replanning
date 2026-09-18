@@ -1,0 +1,10 @@
+# Paper 3 -- package versions the tests and runs were made with (F76).
+# Python 3.10.
+numpy==1.26.4
+torch==2.2.1
+gymnasium==0.29.1
+stable-baselines3==2.3.2
+sb3-contrib==2.3.0
+pandas==2.2.1
+pytest==9.1.1
+tensorboard==2.10.1

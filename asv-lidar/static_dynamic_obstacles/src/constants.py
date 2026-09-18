@@ -1110,6 +1110,10 @@ V_R8_W = 0.50                            # late or insufficient action
 # checkable in the field instead of inferred.
 R_REF = 0.20                             # rad/s, full-severity excess yaw rate
 R_DEAD = 0.02                            # rad/s, below which a turn is not a turn
+# A27 option 1 (F81): `v_port` also charges the heading held the wrong way since
+# engagement, at full severity `DPSI_MIN_DEG` past this deadband.  5 deg is 25x
+# the nominal heading noise (0.2 deg) and a quarter of the alteration that counts.
+V_PORT_HEADING_DEAD_DEG = 5.0            # deg, TODO(05): from measured heading noise
 BETA_BOW_DEG = 67.5                      # bow arc for the crossing-ahead severity
 R_HOLD = 0.05                            # rad/s, yaw tolerance while standing on
 DU_HOLD = 0.10                           # m/s, speed tolerance, TODO(05)
@@ -1448,20 +1452,89 @@ OCCLUSION_DURATIONS_S = (1.0, 2.0, 4.0)
 # pair where the compliant response is available at *every* width, so the agent
 # learns the encounter machinery before it meets a geometry where the textbook
 # manoeuvre is inadmissible.
+# 06 §4: `p_basin` is the share of episodes on basin geometry; `slant_max` caps
+# the basin leg's slant (None = the full range the endpoint box allows).
 CURRICULUM_STAGES = {
     1: {"width": (8.0, 10.0), "vary": False, "bend": False,
-        "classes": ("no_target",), "clutter": (0, 1), "tcpa": "full"},
+        "classes": ("no_target",), "clutter": (0, 1), "tcpa": "full",
+        "p_basin": 1.00, "slant_max": 6.0},
     2: {"width": (5.0, 10.0), "vary": True, "bend": CORRIDOR_BENDS,
-        "classes": ("no_target",), "clutter": (0, 3), "tcpa": "full"},
+        "classes": ("no_target",), "clutter": (0, 3), "tcpa": "full",
+        "p_basin": 1.00, "slant_max": None},
+    # A27 option 2 (F81): stage 3 teaches crossings from both sides alongside
+    # head-on, so "give way" is not learned as "turn starboard" first.
     3: {"width": (7.0, 10.0), "vary": True, "bend": CORRIDOR_BENDS,
-        "classes": ("head_on", "null", "no_target"), "clutter": (0, 1),
-        "tcpa": "upper"},
+        "classes": ("head_on", "crossing", "null", "no_target"), "clutter": (0, 1),
+        "tcpa": "upper", "p_basin": 0.85, "slant_max": None},
     4: {"width": (4.5, 10.0), "vary": True, "bend": CORRIDOR_BENDS,
-        "classes": ENCOUNTER_SAMPLE_CLASSES, "clutter": (0, 2), "tcpa": "full"},
+        "classes": ENCOUNTER_SAMPLE_CLASSES, "clutter": (0, 2), "tcpa": "full",
+        "p_basin": 0.75, "slant_max": None},
     5: {"width": (3.5, 10.0), "vary": True, "bend": CORRIDOR_BENDS,
-        "classes": ENCOUNTER_SAMPLE_CLASSES, "clutter": (0, 3), "tcpa": "full"},
+        "classes": ENCOUNTER_SAMPLE_CLASSES, "clutter": (0, 3), "tcpa": "full",
+        "p_basin": 0.75, "slant_max": None},
 }
-CURRICULUM_STAGE_STEPS = None            # TODO(04-3): after throughput measurement
+# A27 option 2 (F81): training crossings come from port this often (0.5 before).
+# Training namespace only -- the development and frozen sets keep the even draw,
+# so runs stay comparable on the same scenarios.
+CROSSING_PORT_SHARE_TRAINING = 0.60
+
+# F74 (your call): **basin is the default geometry.**  06 §4 put channel mode
+# at 50 % of stages 4-5; it now carries only the classes whose rule the width
+# decides -- head-on, crossing, overtaking (Rule 9 with 14/15/13) -- at
+# `1 - p_basin` of their draws.  Every other class is always basin.
+DEFAULT_GEOMETRY_MODE = "basin"
+CHANNEL_CLASSES = ("head_on", "crossing", "overtaking")
+
+# --- 17.4 Basin mode (06, Paper 2's layout) ---------------------------------
+# The navigable polygon is the 10 x 25 m basin inset by `d_safe + 0.05`.  The
+# reference leg is straight from a fixed start y to a fixed goal y, with both
+# x-coordinates drawn independently -- Paper 2's training layout, so the Paper 2
+# policy meets its own map.  Slant then follows from the two x draws (up to
+# atan(5/20) = 14.0 deg), not from a sampled angle and midpoint as 06 §3.2 wrote
+# it; the endpoints sit inside `P_nav` eroded by 1.5 m either way.
+GEOMETRY_MODES = ("basin", "channel")
+BASIN_NAV_INSET_M = D_SAFE + 0.05          # 0.40 m (06 §3.1)
+BASIN_START_Y = START_Y                     # 2.0 m (Paper 2)
+BASIN_GOAL_Y = MAP_HEIGHT - GOAL_Y_MARGIN   # 22.0 m (Paper 2)
+BASIN_X_RANGE = (2.5, 7.5)                  # Paper 2: max(2.0, 0.25 * W) from each wall
+BASIN_H_SIDE_CLIP = (0.60, 5.00)            # 06 §3.4: side clearance clip for e~_y
+# Being overtaken needs water astern; in basin mode the own ship starts this far
+# along the leg (the target's 6 m spawn plus half a hull), start y unchanged.
+BASIN_BEING_OVERTAKEN_START_S = 6.0 + 0.5 * LOA
+
+# 06 M-6, applied to training: the narrow stratum carries only the classes whose
+# rules the width decides (head-on, crossing, overtaking).  Null and
+# being-overtaken channels start at the narrow/intermediate edge.
+CHANNEL_NARROW_EDGE_M = 4.26
+CHANNEL_MIN_WIDTH_BY_CLASS = {"null": CHANNEL_NARROW_EDGE_M,
+                              "being_overtaken": CHANNEL_NARROW_EDGE_M}
+
+# --- 17.5 Static feasibility (Paper 2's A* filter) ---------------------------
+# Every layout must leave a route: A* on a 0.25 m grid over the navigable
+# polygon, walls inflated by the hull half-breadth plus margin, panels by that
+# plus 0.05 m, and the route no longer than 2.25 x the leg (Paper 2's bounds).
+# A layout that fails is redrawn; after `FEASIBILITY_REDRAWS` it is thinned,
+# nearest-the-path panel first, until it passes.  The check is kinematic, not a
+# dynamics proof: challenge stays (gates, recovery-side panels, oblique walls),
+# impossibility does not.
+FEASIBILITY_GRID_M = 0.25
+FEASIBILITY_WALL_INFLATION_M = 0.5 * VESSEL_WIDTH + 0.15            # 0.40 m, 0.15 = HULL_MARGIN
+FEASIBILITY_OBSTACLE_INFLATION_M = FEASIBILITY_WALL_INFLATION_M + 0.05
+FEASIBILITY_MAX_ROUTE_RATIO = 2.25
+FEASIBILITY_REDRAWS = 20
+# TODO(04-3) resolved (F75): stages advance at fixed fractions of each run's
+# budget, which is how every formulation run trained.  A fraction rather than a
+# step count, so the SAC and PPO arms see the same curriculum at any budget.
+CURRICULUM_STAGE_FRACTIONS = ((0.00, 1), (0.08, 2), (0.18, 3), (0.32, 4), (0.50, 5))
+CURRICULUM_STAGE_STEPS = CURRICULUM_STAGE_FRACTIONS
+
+# 04a §9.3 asks for every TODO(04-*) "resolved or explicitly deferred".  These
+# two wait on basin session 1 and are frozen at their nominal values until then;
+# a changed value re-versions the suite.
+DEFERRED_TODOS = {
+    "04-1": "w_wall from measured pose drift -- basin session 1 (B4); nominal 0.65 m",
+    "04-2": "D_max effective, black-wall side -- basin session 1; nominal 12.0 m",
+}
 
 NO_TARGET_TRAINING_FRACTION = (0.15, 0.20)   # 04a §3.4
 
@@ -1499,7 +1572,7 @@ STUDY1_WIDTHS_M = (10.0, 8.0, 7.0, 6.0, 5.0, 4.5, 4.0, 3.5)
 STUDY1_BASE_CONSTELLATIONS = 12
 
 # --- 18.3 Tier B strata (04a §4.3) -----------------------------------------
-TIER_B_EPISODES_PER_CELL = 25
+TIER_B_EPISODES_PER_CELL = 20          # 06 M-6: 48 cells x 20 = 960
 TIER_B_BEHAVIOURS = ("cv", "re", "nc")
 TIER_A_ROLLOUTS = 10
 AROUND_THE_CLOCK_SPOKES = 24
@@ -1523,4 +1596,4 @@ SEED_NAMESPACES = {
     "study2": (500_000, 509_999),
 }
 
-SUITE_VERSION = "paper3-suite-v0"        # bumped on any generator change
+SUITE_VERSION = "3.0"                    # 06 §6: basin mode; bumped on any generator change

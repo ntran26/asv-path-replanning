@@ -49,7 +49,9 @@ from typing import Dict, List
 
 import numpy as np
 import torch.nn as nn
-from stable_baselines3 import PPO
+from sb3_contrib import TQC, RecurrentPPO
+from stable_baselines3 import PPO, SAC, TD3
+from stable_baselines3.common.noise import NormalActionNoise
 from stable_baselines3.common.callbacks import BaseCallback, CallbackList, CheckpointCallback
 from stable_baselines3.common.vec_env import SubprocVecEnv, VecMonitor, VecNormalize
 
@@ -100,7 +102,7 @@ PROPULSION_STAGE = 4
 
 # Scenario curriculum on the fraction of the budget.  Stages 1-2 teach the
 # channel with no target; 3 introduces head-on and null; 4-5 all classes.
-STAGE_SCHEDULE = ((0.00, 1), (0.08, 2), (0.18, 3), (0.32, 4), (0.50, 5))
+STAGE_SCHEDULE = cfg.CURRICULUM_STAGE_FRACTIONS    # TODO(04-3), resolved (F75)
 
 PPO_HYPERPARAMS = {
     "learning_rate": 3e-4,
@@ -118,6 +120,76 @@ PPO_HYPERPARAMS = {
     # epochs at a KL budget keeps the update inside the trust region.
     "target_kl": 0.03,
 }
+
+# The off-policy arms (04a §8: SAC is the protected core's method; TQC is the
+# distributional comparator, 04a §8.2 rank 1).  Same discount as PPO, so the three differ in
+# the learner and nothing else.  One gradient step per transition collected
+# (`gradient_steps = num_envs` per vectorised step) is SAC's usual
+# update-to-data ratio; `--gradient-steps` lowers it if throughput demands.
+SAC_HYPERPARAMS = {
+    "learning_rate": 3e-4,
+    "buffer_size": 1_000_000,
+    "batch_size": 256,
+    "tau": 0.005,
+    "gamma": PPO_HYPERPARAMS["gamma"],
+    "learning_starts": 10_000,
+    "train_freq": 1,
+    "ent_coef": "auto",
+}
+# TQC (Kuznetsov et al., 2020): SAC's settings with distributional critics, the
+# paper's defaults -- 2 critics x 25 quantiles, the top 2 per critic dropped.
+TQC_HYPERPARAMS = {"top_quantiles_to_drop_per_net": 2}
+TQC_POLICY = {"n_quantiles": 25, "n_critics": 2}
+# TD3 (Fujimoto et al., 2018) on the same replay settings as SAC, with the
+# paper's target smoothing and delayed actor, and Gaussian exploration noise of
+# 0.1 on the normalised action.
+TD3_HYPERPARAMS = {
+    "learning_rate": 3e-4,
+    "buffer_size": 1_000_000,
+    "batch_size": 256,
+    "tau": 0.005,
+    "gamma": PPO_HYPERPARAMS["gamma"],
+    "learning_starts": 10_000,
+    "train_freq": 1,
+    "policy_delay": 2,
+    "target_policy_noise": 0.2,
+    "target_noise_clip": 0.5,
+}
+TD3_ACTION_NOISE_SIGMA = 0.1
+# RecurrentPPO: PPO's settings with an LSTM after the features extractor, for
+# actor and critic separately.  It answers the memory question (04a §8.2, rank 2)
+# the context branch now partly answers by construction (A25).
+RECURRENT_PPO_POLICY = {"lstm_hidden_size": 256, "n_lstm_layers": 1,
+                        "enable_critic_lstm": True, "shared_lstm": False}
+ALGORITHMS = {"ppo": PPO, "recurrent_ppo": RecurrentPPO, "td3": TD3,
+              "sac": SAC, "tqc": TQC}
+OFF_POLICY = ("td3", "sac", "tqc")
+
+
+class EpisodeActor:
+    """Deterministic actions for one episode, for any learner.
+
+    RecurrentPPO's policy carries an LSTM state; calling `predict` without it
+    would reset the memory every step and evaluate a different policy from the
+    one trained.  `reset()` at each episode start.
+    """
+
+    def __init__(self, model) -> None:
+        self.model = model
+        self.recurrent = isinstance(model, RecurrentPPO)
+        self.reset()
+
+    def reset(self) -> None:
+        self.state = None
+        self.start = np.ones((1,), dtype=bool)
+
+    def __call__(self, obs):
+        if not self.recurrent:
+            return self.model.predict(obs, deterministic=True)[0]
+        action, self.state = self.model.predict(obs, state=self.state,
+                                                episode_start=self.start, deterministic=True)
+        self.start = np.zeros((1,), dtype=bool)
+        return action
 
 EVAL_CLASSES = ("head_on", "crossing", "overtaking", "being_overtaken", "null", "no_target")
 COLREGS_PARTS = ("port", "bow", "side", "hold", "r8")
@@ -205,8 +277,9 @@ def run_eval_episode(model, env: ASVLidarEnv, built, seed: int) -> Dict:
     cte = []
     min_range = float("inf")
     speeds = []
+    actor = EpisodeActor(model)
     while True:
-        action, _ = model.predict(obs, deterministic=True)
+        action = actor(obs)
         obs, reward, term, trunc, info = env.step(action)
         speeds.append(float(info["speed_mps"]))
         steps += 1
@@ -354,6 +427,10 @@ def main() -> None:
                     help="F68: share of training episodes starting slow or at rest")
     ap.add_argument("--r2-slowdown-test", choices=("coast", "stop"), default=None,
                     help="F70: R-2's slowing test (default: constants.R2_SLOWDOWN_TEST)")
+    ap.add_argument("--algo", choices=tuple(ALGORITHMS), default="ppo",
+                    help="learner: PPO, RecurrentPPO, TD3, SAC, TQC (the five baselines)")
+    ap.add_argument("--gradient-steps", type=int, default=0,
+                    help="TD3/SAC/TQC gradient steps per vectorised step (0 = num_envs)")
     ap.add_argument("--fixed-stage", type=int, default=0,
                     help="train on one scenario stage throughout instead of the curriculum")
     args = ap.parse_args()
@@ -367,13 +444,28 @@ def main() -> None:
     if args.r2_slowdown_test:
         cfg.R2_SLOWDOWN_TEST = args.r2_slowdown_test      # the evaluation process too
 
-    run_dir = args.runs_dir / (f"ppo_formulation_seed{args.seed}" + (f"_{args.tag}" if args.tag else "")
+    run_dir = args.runs_dir / (f"{args.algo}_formulation_seed{args.seed}"
+                               + (f"_{args.tag}" if args.tag else "")
                                + ("_smoke" if args.smoke else ""))
+    if args.algo in ("ppo", "recurrent_ppo"):
+        hyperparameters = dict(PPO_HYPERPARAMS)
+    elif args.algo == "td3":
+        hyperparameters = dict(TD3_HYPERPARAMS,
+                               gradient_steps=int(args.gradient_steps or args.num_envs))
+        if args.smoke:
+            hyperparameters.update(learning_starts=256, buffer_size=20_000)
+    else:
+        hyperparameters = dict(SAC_HYPERPARAMS,
+                               gradient_steps=int(args.gradient_steps or args.num_envs))
+        if args.smoke:
+            hyperparameters.update(learning_starts=256, buffer_size=20_000)
+        if args.algo == "tqc":
+            hyperparameters.update(TQC_HYPERPARAMS)
     run_dir.mkdir(parents=True, exist_ok=True)
 
     config = {
         "algorithm": "PPO", "seed": args.seed, "timesteps": args.timesteps,
-        "num_envs": args.num_envs, "hyperparameters": PPO_HYPERPARAMS,
+        "algo": args.algo, "num_envs": args.num_envs, "hyperparameters": hyperparameters,
         "torch_threads": args.torch_threads, "fixed_stage": args.fixed_stage,
         "train_supervisor": args.train_supervisor, "eval_supervisor": args.eval_supervisor,
         "low_speed_start_frac": args.low_speed_start_frac,
@@ -417,9 +509,33 @@ def main() -> None:
         vec.training, vec.norm_reward = True, True
     else:
         vec = VecNormalize(vec, norm_obs=False, norm_reward=True, clip_reward=10.0,
-                           gamma=PPO_HYPERPARAMS["gamma"])
+                           gamma=hyperparameters["gamma"])
 
-    if args.init_model:
+    if args.algo != "ppo" and args.init_model:
+        raise SystemExit("--init-model is PPO-only (Tier 2)")
+    if args.algo in OFF_POLICY:
+        extra = {}
+        if args.algo == "td3":
+            extra["action_noise"] = NormalActionNoise(
+                mean=np.zeros(2), sigma=TD3_ACTION_NOISE_SIGMA * np.ones(2))
+        policy_kwargs = dict(features_extractor_class=ASVFeaturesExtractor,
+                             net_arch=dict(pi=[256, 256], qf=[256, 256]),
+                             activation_fn=nn.ReLU)
+        if args.algo == "tqc":
+            policy_kwargs.update(TQC_POLICY)
+        model = ALGORITHMS[args.algo](
+            "MultiInputPolicy", vec, verbose=1, seed=args.seed, device="cpu",
+            tensorboard_log=str(args.runs_dir / "tensorboard"),
+            policy_kwargs=policy_kwargs, **hyperparameters, **extra)
+    elif args.algo == "recurrent_ppo":
+        model = RecurrentPPO(
+            "MultiInputLstmPolicy", vec, verbose=1, seed=args.seed, device="cpu",
+            tensorboard_log=str(args.runs_dir / "tensorboard"),
+            policy_kwargs=dict(features_extractor_class=ASVFeaturesExtractor,
+                               net_arch=dict(pi=[256, 256], vf=[256, 256]),
+                               activation_fn=nn.ReLU, **RECURRENT_PPO_POLICY),
+            **hyperparameters)
+    elif args.init_model:
         # Tier 2: continue a trained policy on the current code.  The saved
         # hyperparameters are replaced by today's, so a fine-tune and a fresh
         # run differ only in their starting weights.
@@ -440,7 +556,7 @@ def main() -> None:
     callbacks = CallbackList([
         ScenarioStageCallback(args.timesteps, str(run_dir / "curriculum.json")),
         CheckpointCallback(save_freq=max(250_000 // args.num_envs, 1), save_path=str(run_dir),
-                           name_prefix="ppo", save_vecnormalize=True),
+                           name_prefix=args.algo, save_vecnormalize=True),
         FormulationEvalCallback(run_dir, args.eval_freq, args.eval_per_class,
                                 supervisor_modes=(("off", "on") if args.eval_supervisor == "both"
                                                   else (args.eval_supervisor,))),

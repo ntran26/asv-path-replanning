@@ -91,6 +91,7 @@ class RewardConfig:
     # --- COLREGs thresholds ------------------------------------------------
     r_ref: float = cfg.R_REF
     r_dead: float = cfg.R_DEAD
+    v_port_heading_dead_deg: float = cfg.V_PORT_HEADING_DEAD_DEG
     beta_bow_deg: float = cfg.BETA_BOW_DEG
     r_hold: float = cfg.R_HOLD
     du_hold: float = cfg.DU_HOLD

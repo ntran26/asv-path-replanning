@@ -4,7 +4,9 @@
 count. This file records only what is *not settled*, ordered so the
 highest-leverage item is first.
 
-**Last updated:** 2026-09-18, revision 19 — your option-1 call on A25 (and A24 with it) built; run 6 training (F72).
+**Last updated:** 2026-09-18, revision 21 — basin mode as default (F74); crossings diagnosed, SAC built, suite 3.0 (F75); TQC replaces SAC-IQN (F77); A26, A27 opened.
+Revision 20: run 6 finished: goal 0.83, best compliance, crossings 0.40 (F73).
+Revision 19: your option-1 call on A25 (and A24 with it) built (F72).
 Revision 18: CODEX reviewed; A25 opened (F71).
 Revision 17: run 5 did not improve on run 4; low-speed starts ruled out; A24 opened (F70).
 Revision 16: run 4 finished and replayed with the supervisor off and on (F69).
@@ -24,9 +26,43 @@ generator, the scale audit, noise and randomisation.
 
 | Part | Kind | Needs |
 |---|---|---|
-| **A** | Decisions | a call from you — 3 items (A10, A3/A4/A6), each with a recommendation below |
+| **A** | Decisions | a call from you — 5 items (A26, A27, A10, A3/A4/A6), plus the freeze sign-off |
 | **B** | Measurements | basin time — `PART2_BASIN_PLAN.md`, with one addition proposed |
 | **C** | Build work | my time — 8 items |
+
+### Open in revision 21 (`PROJECT_STATE.md` F74, F75)
+
+**A26 — training budget and the off-policy update ratio (TODO(04-4)).** PPO is the development vehicle for testing and adjusting the reward now (your call, 2026-09-18). **Baseline learner set: PPO, RecurrentPPO, TD3, SAC and TQC (your correction: TQC, not SAC-IQN), multiple seeds, trained once everything is decided and the suite is frozen.** All five are built in the shared trainer (F76, F77); `sb3-contrib` 2.3.0 supplies RecurrentPPO and TQC. All five go through the A26 budget. Measured on this machine (10 workers, 12 cores; steps/s, and hours per 2 M-step seed), at 1.0 / 0.2 gradient steps per transition for the off-policy learners:
+
+| Learner | steps/s | h per seed |
+|---|---|---|
+| PPO | ~108 | ~6 |
+| RecurrentPPO | 61 | ~9 |
+| TD3 | 18 / 53 | ~31 / ~10.5 |
+| SAC | 12 / 38 | ~46 / ~15 |
+| TQC | 13 / 32 | ~43 / ~17 |
+
+**One seed of all five: ~135 h at 1.0, ~58 h at 0.2. Five seeds, run one at a time: ~28 days at 1.0, ~12 days at 0.2** -- before the ablations (2 x 2, leave-one-out) and the P-clean and randomisation-off contrasts.
+
+| Option | What it means | Cost |
+|---|---|---|
+| **1. Move the headline runs to GPU/HPC (recommended)** | SAC at 1.0 gradient step per transition, 2 M steps, 5 seeds; the machine here keeps doing development runs | needs access; the code is device-agnostic apart from `device="cpu"` |
+| 2. This machine, off-policy at 0.2, 2 M steps | ~12 days for five learners × five seeds, ablations extra | a lower update ratio than SAC is usually run at; state it |
+
+**A27 — port crossings (F75, F78).** Port crossings are solvable (the best scripted response reaches the goal in 0.81 of engaged crossings, on both sides), and A17's port turn beats the starboard turn (0.67 against 0.56). Run 6 turns starboard first in 8 of 12 port crossings anyway. The reward charges a wrong-way *turn* but not a wrong-way *heading*: holding 30 deg to starboard scores exactly like doing nothing.
+
+| Option | Change | Why | Cost |
+|---|---|---|---|
+| **1. Charge the wrong-way heading (recommended)** | `v_port` also reads the heading displaced the wrong way since engagement, `ρ · clip(max(0, −s_c · Δψ) / Δψ_min, 0, 1)` taken as the max with the yaw-rate form, so a held wrong-way heading keeps costing while the encounter is engaged | closes the measured gap; it is the mirror of the displacement credit `v_r8` already gives | a reward change: reward-scale audit, `test_reward` additions, one PPO run |
+| **2. Train port crossings earlier and more (recommended, with 1)** | stage 3 gains crossings from both sides; stages 4-5 weight crossings 60/40 port/starboard | stage 3 teaches only head-on (starboard), so "give way = starboard" is learned first and never unlearned | no formulation change; the development set is unchanged |
+| 3. Pay turn plus slowdown | R-2 / `v_r8` credit the combined response more than either alone | the scripted optimum is the A17 turn *with* slowing (0.65-0.67 against 0.37-0.44 turning alone) | touches A24's settled slowing test; hold unless 1 + 2 leave crossings slow |
+| 4. Revisit A17 (Rule 15/17 stand-on for a target from port) | hold course and speed, act only by starboard turn or slowing | textbook open-water roles | **not recommended**: against a constant-velocity target that never gives way, holding course solves 0.32 and the Rule 17(c) direction does worse than A17's; the paper should state the narrow-channel convention instead (CODEX flagged the same) |
+
+Recommendation: 1 and 2 together in run 8. **Run 7 confirmed the pattern on the basin geometry (F79): 2 of 12 port crossings, first alteration compliant in 0.22, 0.72 m/s at closest approach.** Both aim at the same learned failure from two sides; this is PPO's debugging phase, so fewer runs outweighs clean attribution. If run 8 fixes it, a one-off run with 2 alone attributes it.
+
+**Freeze sign-off.** `planning/CLAIM_LEDGER.md` and `planning/RESULT_TABLES.md` are drafts for you to sign off; then a commit, so the generator has a SHA and the manifest can be finalised.
+
+**06 deviations to confirm:** basin null traffic keeps `P_nav` not the band; slant cap 14.0 deg (Paper 2's endpoint box) not 18.1; Tier A basin leg 14.0 deg not 15.
 
 ### Under test in revision 15 — the supervisor as a runtime layer (`PROJECT_STATE.md` F68)
 

@@ -83,6 +83,14 @@ class Scenario:
     flags: Dict[str, object] = field(default_factory=dict)
     rejection_count: int = 0
     suite_version: str = cfg.SUITE_VERSION
+    # geometry mode (06 §6)
+    geometry_mode: str = "channel"
+    slant_requested_deg: float = 0.0
+    slant_realised_deg: float = 0.0
+    path_midpoint: Tuple[float, float] = (0.0, 0.0)
+    clearance_profile: Dict[str, list] = field(default_factory=dict)
+    w_eff_at_cpa: float = 0.0
+    field_replicable: bool = True
 
     def to_record(self) -> dict:
         """Canonical JSON-ready dict with sorted keys (04a §9.1)."""
@@ -131,8 +139,14 @@ class RejectionLog:
         }
 
 
-def _width_bucket(width: float) -> str:
-    """04a §4.3's three strata, cut at the §1.1 derived thresholds."""
+def _width_bucket(width) -> str:
+    """04a §4.3's three strata, cut at the §1.1 derived thresholds.
+
+    06: a basin draw has no single width, so the generator passes the string
+    "basin" and the ledger keys it as its own stratum.
+    """
+    if isinstance(width, str):
+        return width
     w_cross, w_over = width_thresholds()["crossing"], width_thresholds()["overtaking"]
     if width >= w_cross:
         return "wide"
@@ -197,8 +211,13 @@ class ScenarioGenerator:
                encounter_class: Optional[str] = None,
                width: Optional[float] = None,
                behaviour: str = tgt.T_CV,
-               flags: Optional[dict] = None) -> Optional[Scenario]:
-        """Generate one scenario, or `None` if it capped out (04a §3.5)."""
+               flags: Optional[dict] = None,
+               geometry_mode: Optional[str] = None) -> Optional[Scenario]:
+        """Generate one scenario, or `None` if it capped out (04a §3.5).
+
+        `geometry_mode` forces "basin" or "channel"; otherwise the stage's
+        `p_basin` decides (06 M-1, §4).  A forced `width` implies a channel.
+        """
         rng = np.random.default_rng(int(seed))
         stage = cfg.CURRICULUM_STAGES[self.stage]
         cls = encounter_class or self._sample_class(rng, stage)
@@ -213,18 +232,50 @@ class ScenarioGenerator:
         # would also bias the width distribution toward whatever widths happen
         # to admit a target easily -- which is exactly the contamination the
         # rejection ledger exists to measure rather than to hide.
-        channel = self._sample_corridor(rng, stage, width)
+        flags = dict(flags or {})
+        channel = self._sample_geometry(rng, stage, width, cls, geometry_mode, flags)
+        key = _ledger_key(channel)
 
         for attempt in range(cfg.GENERATOR_MAX_ATTEMPTS):
-            self.rejections.attempt(cls, channel.nominal_width)
+            self.rejections.attempt(cls, key)
             scenario = self._attempt(rng, cls, channel, case_id, int(seed),
-                                     behaviour, flags or {}, attempt)
+                                     behaviour, flags, attempt)
             if scenario is not None:
                 scenario.rejection_count = attempt
                 return scenario
 
-        self.rejections.cap_out(cls, channel.nominal_width)
+        self.rejections.cap_out(cls, key)
         return None
+
+    def _sample_geometry(self, rng, stage, width, cls, geometry_mode, flags=None):
+        """Basin or channel for this episode (06 §4).
+
+        Basin draws Paper 2's leg.  Channel draws keep 03a's corridor, with the
+        narrow stratum reserved for the classes whose rules the width decides
+        (06 M-6): null and being-overtaken start at the narrow edge.
+        """
+        mode = geometry_mode
+        if mode is None:
+            p_basin = (float(stage.get("p_basin", 1.0)) if cls in cfg.CHANNEL_CLASSES
+                       else 1.0)
+            mode = ("channel" if width else
+                    "basin" if rng.uniform() < p_basin else "channel")
+        flags = flags or {}
+        if mode == "basin":
+            # F75: a named basin case fixes its leg (06 §5.2).
+            if flags.get("basin_leg"):
+                start, goal = flags["basin_leg"]
+                return corr.build_basin(tuple(start), tuple(goal))
+            return corr.sample_basin(rng, slant_max_deg=stage.get("slant_max"))
+        if not width:
+            lo, hi = stage["width"]
+            lo = max(float(lo), float(cfg.CHANNEL_MIN_WIDTH_BY_CLASS.get(cls, 0.0)))
+            stage = dict(stage, width=(min(lo, hi), hi))
+        channel = self._sample_corridor(rng, stage, width)
+        if "offset" in flags:
+            # F75: the named offset cases (A-OFF-*) set the Rule 9(a) station.
+            channel.offset_frac = float(flags["offset"])
+        return channel
 
     # ------------------------------------------------------------------
     def _sample_class(self, rng, stage) -> str:
@@ -257,7 +308,7 @@ class ScenarioGenerator:
     # ------------------------------------------------------------------
     def _attempt(self, rng, cls, channel, case_id, seed, behaviour, flags,
                  attempt) -> Optional[Scenario]:
-        width = channel.nominal_width
+        width = _ledger_key(channel)
         start_s = own_start_s(cls, channel)
         path_points = channel.reference_path_points(start_s=start_s)
         if len(path_points) < 2:
@@ -270,7 +321,7 @@ class ScenarioGenerator:
 
         scenario = Scenario(
             case_id=case_id or f"gen-{seed}", encounter_class=cls, seed=seed,
-            nominal_width=width, width_ratio=channel.width_ratio,
+            nominal_width=channel.nominal_width, width_ratio=channel.width_ratio,
             bend_deg=channel.bend_deg,
             bend_requested_deg=channel.bend_requested_deg,
             path_offset_frac=channel.offset_frac,
@@ -280,13 +331,14 @@ class ScenarioGenerator:
         # The corridor itself, for the environment.  An attribute, not a field,
         # so the 04a §9.1 record and its hash are unchanged.
         scenario.channel = channel
+        _record_geometry(scenario, channel, start_s)
 
         if cls == "no_target":
             scenario.n_obstacles = self._sample_obstacle_count(rng)
             return scenario
 
         solved = (self._place_null(rng, own, own_heading) if cls == "null"
-                  else self._backward_solve(rng, cls, own, own_heading, channel))
+                  else self._backward_solve(rng, cls, own, own_heading, channel, flags))
         if solved is None:
             self.rejections.record(cls, width, "spawn_unsolvable")
             return None
@@ -328,10 +380,14 @@ class ScenarioGenerator:
         # A22's label: can a lawful escape clear this crossing?  None otherwise.
         scenario.crossing_escapable = escapable
         scenario.n_obstacles = self._sample_obstacle_count(rng)
+        # 06 §3.3: the clear width where the encounter happens.
+        scenario.w_eff_at_cpa = float(channel.width_at_s(
+            start_s + cfg.U_NOM * max(float(solved.get("tcpa", 0.0)), 0.0)))
         return scenario
 
     # ------------------------------------------------------------------
-    def _backward_solve(self, rng, cls, own, own_heading, channel) -> Optional[dict]:
+    def _backward_solve(self, rng, cls, own, own_heading, channel,
+                        flags: Optional[dict] = None) -> Optional[dict]:
         """04a §3.3: solve for the spawn that produces the sampled `(DCPA, TCPA)`.
 
         ```
@@ -350,8 +406,13 @@ class ScenarioGenerator:
         alter" rather than "when to alter", and the M5 ablation could not tell
         the two apart.
         """
-        ct = _sample_ct(rng, cls)
-        k = float(rng.uniform(*cfg.CLASS_SPEED_RATIO[cls]))
+        flags = flags or {}
+        # F75: named cases fix the crossing side and the speed ratio they name.
+        port_share = (cfg.CROSSING_PORT_SHARE_TRAINING
+                      if self.seed_namespace == "training" else None)
+        ct = _sample_ct(rng, cls, side=flags.get("side"), port_share=port_share)
+        k = (float(flags["speed_ratio"]) if flags.get("speed_ratio") is not None
+             else float(rng.uniform(*cfg.CLASS_SPEED_RATIO[cls])))
         u_os, u_ts = cfg.U_NOM, k * cfg.U_NOM
 
         tcpa_lo, tcpa_hi = cfg.class_tcpa_range(cls)
@@ -454,13 +515,17 @@ class ScenarioGenerator:
     def _containment_ok(self, cls, solved, channel) -> bool:
         """Confined classes spawn inside; crossing spawns outside (03a §5.2)."""
         import boundary_raycast as br
-        poly = channel.polygon()
+        # 06 §3.5: in basin mode confined traffic keeps the path band, and a
+        # crossing target is anything that starts off it.  In a channel the
+        # band is the channel.
+        band = confinement_geometry(cls, channel)
+        poly = band.polygon()
         inside = br.point_in_polygon(solved["x"], solved["y"], poly)
         if tgt.is_confined(cls):
             # A21: the whole hull, along its whole track to CPA.  A point check
             # let 75 % of being-overtaken targets breach the channel on the first
             # step, and the clamp then re-drew the encounter (F60).
-            return bool(inside) and self._track_inside(cls, solved, channel, poly)
+            return bool(inside) and self._track_inside(cls, solved, band, poly)
         # A crossing target under Rule 9(d) is not a channel user: it must start
         # in open basin water outside the corridor, or it is not crossing.
         in_basin = (0.0 <= solved["x"] <= cfg.MAP_WIDTH
@@ -469,6 +534,12 @@ class ScenarioGenerator:
         # it and that rule would reject every crossing draw.  A crossing target
         # then starts anywhere in the basin and stays unconfined -- it crosses
         # the fairway rather than entering it from outside.
+        # Basin mode: the navigable polygon is the whole basin, so a crossing
+        # target starts anywhere in it -- and, 06 T15, its hull stays in the
+        # water up to CPA rather than crossing through a wall to get there.
+        if channel.mode == "basin":
+            envelope = br.rectangle(cfg.MAP_WIDTH, cfg.MAP_HEIGHT)
+            return bool(in_basin and self._track_inside(cls, solved, channel, envelope))
         spans_basin = channel.nominal_width >= cfg.MAP_WIDTH - 1e-6
         return bool(in_basin and (spans_basin or not inside))
 
@@ -509,6 +580,12 @@ def own_start_s(encounter_class: str, channel) -> float:
     perception rather than policy reasons, so losing it to a metre of geometry
     would be an expensive accident.
     """
+    if getattr(channel, "mode", "channel") == "basin":
+        # 06: the leg starts at Paper 2's start y, already clear of the wall.
+        # Being overtaken starts further along it, for water astern.
+        if encounter_class != "being_overtaken":
+            return 0.0
+        return float(min(cfg.BASIN_BEING_OVERTAKEN_START_S, 0.5 * channel.length))
     # F35: never closer to the corridor's end edge than `SPAWN_INSET_M`, or the
     # stern starts inside the boundary penalty band.
     if encounter_class != "being_overtaken":
@@ -523,6 +600,41 @@ def own_start_s(encounter_class: str, channel) -> float:
     spare = max(0.0, channel.length - cfg.REF_PATH_LENGTH_M - cfg.GOAL_END_INSET_M)
     return float(max(cfg.SPAWN_INSET_M,
                      min(spare, cfg.class_spawn_range("being_overtaken")[1])))
+
+
+def confinement_geometry(encounter_class: str, channel):
+    """The water a confined target keeps to (06 §3.5, as amended in F74).
+
+    Channel mode: the channel.  Basin mode: **the whole navigable basin**, which
+    at 10 m is already narrow water -- except head-on traffic, which keeps the
+    path band, because Rule 9(a) with Rule 14 is about each vessel keeping to
+    its own side of the fairway the leg defines.  06 §3.5 banded every confined
+    class; on a 2-3 m band null traffic could not be placed at all (37 of 40
+    draws capped out) and overtaking traffic had nowhere to pass.
+    """
+    if getattr(channel, "mode", "channel") == "basin" and str(encounter_class) != "head_on":
+        return channel
+    return channel.band()
+
+
+def _ledger_key(channel):
+    """Rejection-ledger stratum: a width for a channel, "basin" for a basin."""
+    return "basin" if getattr(channel, "mode", "channel") == "basin" else channel.nominal_width
+
+
+def _record_geometry(scenario: Scenario, channel, start_s: float) -> None:
+    """06 §6's record fields, and 06 M-8's field-replicable flag."""
+    scenario.geometry_mode = getattr(channel, "mode", "channel")
+    if scenario.geometry_mode == "basin":
+        scenario.slant_requested_deg = float(channel.slant_requested_deg)
+        scenario.slant_realised_deg = float(channel.slant_realised_deg)
+        mid = 0.5 * (channel.centre[0] + channel.centre[-1])
+        scenario.path_midpoint = (float(mid[0]), float(mid[1]))
+        scenario.clearance_profile = channel.clearance_profile()
+        scenario.field_replicable = True
+    else:
+        scenario.field_replicable = bool(channel.fits_basin(0.0))
+    scenario.w_eff_at_cpa = float(channel.width_at_s(start_s))
 
 
 def _unit(heading_deg: float) -> np.ndarray:
@@ -602,8 +714,10 @@ def crossing_escape_feasible(own, own_heading: float, solved: dict, channel) -> 
     import boundary_raycast as br
     full = channel.polygon()
     # The wall test runs every physics step; a straight corridor's outline at
-    # every 8th station (0.4 m) is exact to well under a centimetre.
-    poly = list(full[::8]) + ([full[-1]] if (len(full) - 1) % 8 else [])
+    # every 8th station (0.4 m) is exact to well under a centimetre.  Basin
+    # mode's `P_nav` has four corners and is used as it is.
+    poly = (list(full[::8]) + ([full[-1]] if (len(full) - 1) % 8 else [])
+            if len(full) > 16 else list(full))
     sense = -1.0 if float(solved["ct"]) < 180.0 else +1.0
     horizon = max(float(solved.get("tcpa", 0.0)), 0.0) + float(cfg.CROSSING_ESCAPE_TAIL_S)
     dt = float(cfg.CROSSING_ESCAPE_DT_S)
@@ -662,14 +776,22 @@ def crossing_escape_feasible(own, own_heading: float, solved: dict, channel) -> 
     return False
 
 
-def _sample_ct(rng, cls: str) -> float:
+def _sample_ct(rng, cls: str, side: Optional[str] = None,
+               port_share: Optional[float] = None) -> float:
     if cls in cfg.CONFINED_CT_CLASSES:
         # A21: channel users run near-parallel to a straight fairway.
         half = float(cfg.CONFINED_CT_HALF_DEG)
         return float(rng.uniform(-half, half))
     band = cfg.CLASS_CT_DEG[cls]
     if cls == "crossing":
-        chosen = band[int(rng.integers(0, 2))]
+        # The first band (CT < 180) crosses from port, the second from starboard.
+        # A27 option 2: training draws port at `port_share`; every other
+        # namespace keeps the even integer draw, so its scenarios are unchanged.
+        index = (int(rng.integers(0, 2)) if port_share is None
+                 else (0 if rng.uniform() < float(port_share) else 1))
+        if side in ("port", "starboard"):
+            index = 0 if side == "port" else 1
+        chosen = band[index]
         return float(rng.uniform(*chosen))
     return float(rng.uniform(*band))
 

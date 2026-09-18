@@ -979,3 +979,29 @@ def test_the_step_limit_leaves_room_for_a_detour():
     # horizon tight enough to turn compliant slowing into a timeout would put
     # the horizon in direct conflict with the reward design.
     assert cfg.MAX_EPISODE_STEPS * cfg.UPDATE_RATE > 2.0 * traversal_s
+
+
+def test_a27_a_held_wrong_way_heading_costs_more_than_doing_nothing():
+    """A27 option 1 (F81).  The yaw-rate form charged only the seconds of
+    turning, so a starboard heading held in a port crossing cost exactly what no
+    action cost (F78).  The heading form charges it for as long as it is held."""
+    ctx = ctx_for(enc.CROSSING, rng=6.0, alpha=-45.0, ct=90.0, speed_ts=cfg.U_REF,
+                  dcpa=0.3, a_req=1.0, dy_req=1.0, psi_engage=0.0, u_engage=cfg.U_REF,
+                  tcpa=4.0, compliant_turn_sense=-1)
+    nothing = state_for(heading_deg=0.0, u=cfg.U_REF)
+    compliant = state_for(heading_deg=-30.0, u=cfg.U_REF)
+    small = state_for(heading_deg=4.0, u=cfg.U_REF)           # inside the 5 deg deadband
+    wrong = state_for(heading_deg=30.0, u=cfg.U_REF)
+    assert T.v_port(nothing, ctx, CFG) == 0.0
+    assert T.v_port(compliant, ctx, CFG) == 0.0
+    assert T.v_port(small, ctx, CFG) == 0.0
+    assert T.v_port(wrong, ctx, CFG) == pytest.approx(float(ctx.rho))
+    total = lambda st: T.v_port(st, ctx, CFG) + T.v_r8(st, ctx, CFG)
+    assert total(wrong) > total(nothing) > total(compliant)
+
+
+def test_a27_returning_after_the_encounter_is_not_charged():
+    """ENGAGED only: once the target is past (CLEARING), heading back is free."""
+    ctx = ctx_for(enc.CROSSING, rng=6.0, alpha=-45.0, ct=90.0, speed_ts=cfg.U_REF,
+                  psi_engage=0.0, compliant_turn_sense=-1, engaged=False)
+    assert T.v_port(state_for(heading_deg=30.0, u=cfg.U_REF), ctx, CFG) == 0.0

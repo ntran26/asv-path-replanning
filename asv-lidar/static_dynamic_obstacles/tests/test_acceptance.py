@@ -367,13 +367,21 @@ def test_seed_namespaces_are_disjoint():
 
 
 def test_the_suite_structure_matches_the_specification():
-    """04a §4.2 and §5, as counts."""
-    # 34 in 04a §5; 32 with the two bend cases withdrawn (F59).
-    n_tier_a = 34 if cfg.CORRIDOR_BENDS else 32
+    """04a §4.2 and §5 as amended by 06 §5, as counts."""
+    # 06 M-7: 38 -- the 34 of 04a §5, minus the two bend cases, plus six basin.
+    n_tier_a = 40 if cfg.CORRIDOR_BENDS else 38
     assert len(ste.tier_a()) == n_tier_a
     assert len({c.case_id for c in ste.tier_a()}) == n_tier_a
-    assert len(ste.tier_b_cells()) == 39
-    assert sum(c["episodes"] for c in ste.tier_b_cells()) == 975
+    assert sum(c.is_basin for c in ste.tier_a()) == 6
+    # 06 M-6: 48 cells x 20 = 960.
+    cells = ste.tier_b_cells()
+    assert len(cells) == 48
+    assert sum(c["episodes"] for c in cells) == 960
+    by_stratum = {}
+    for c in cells:
+        by_stratum[c["stratum"]] = by_stratum.get(c["stratum"], 0) + 1
+    assert by_stratum == {"basin": 13, "channel-wide": 13, "channel-intermediate": 13,
+                          "channel-narrow": 9}
     assert len(ste.around_the_clock(open_water=True)) == 24
 
 
