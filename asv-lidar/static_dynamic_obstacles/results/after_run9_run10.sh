@@ -4,6 +4,11 @@ cd "$(dirname "$0")/.."
 F9="C:/Users/hntran/AppData/Local/Temp/claude/C--Users-hntran-OneDrive---University-of-Tasmania-Documents-PhD-asv-path-replanning-asv-lidar/d009229f-c16f-485d-a74a-0d08e9ebc0f5/tasks/bqmecqwqh.output"
 until grep -qxE "== ANALYSIS DONE|RUN9 FAILED" "$F9"; do sleep 120; done
 grep -qx "RUN9 FAILED" "$F9" && { echo "RUN9 FAILED -- run 10 not started"; exit 1; }
+# Run 9's stand-on diagnosis, for the run 8 comparison -- before the switch, so
+# run 9 is scored with the reward it trained on.
+python tools/diagnostics/standon_speed.py --model runs/ppo_formulation_seed0_v9/final_model.zip --tag run9 > results/standon_speed_run9.log 2>&1
+echo "== standon run9 exit $?"
+echo "== RUN9 ANALYSIS COMPLETE"
 python - <<'PY'
 p = "src/constants.py"
 s = open(p, encoding="utf-8", newline="").read()
