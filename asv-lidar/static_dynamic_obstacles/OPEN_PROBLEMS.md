@@ -4,7 +4,8 @@
 count. This file records only what is *not settled*, ordered so the
 highest-leverage item is first.
 
-**Last updated:** 2026-09-19, revision 25 — A29 decided and built behind a switch; run 10 queued after run 9 (F85).
+**Last updated:** 2026-09-19, revision 26 — run 9 analysed against run 8 (F84); run 10 = 60/40 + A29, training.
+Revision 25: 2026-09-19 — A29 decided and built behind a switch; run 10 queued after run 9 (F85).
 Revision 24: 2026-09-19 — A28 options 1 + 3 (run 9 training; stand-on diagnosed, F83); A29 opened.
 Revision 23: run 8 analysed (F82); A28 opened.
 Revision 22: 2026-09-19 — A27 options 1 + 2 built, run 8 training (F81); run 7 analysed (F79); all five learners timed (F80).
@@ -68,7 +69,7 @@ Recommendation: 1 and 2 together in run 8. **Run 7 confirmed the pattern on the 
 
 **06 deviations to confirm:** basin null traffic keeps `P_nav` not the band; slant cap 14.0 deg (Paper 2's endpoint box) not 18.1; Tier A basin leg 14.0 deg not 15.
 
-**A28 — after run 8 (F82) — decided 2026-09-19: options 1 and 3 (F83); run 9 trains on option 1.** Port crossings fixed (6-8 of 12, first alteration compliant 0.70-0.90). Two things left:
+**A28 — after run 8 (F82) — decided 2026-09-19: options 1 and 3 (F83). Run 9 tested option 1 and it failed (F84): port crossings fell to 2 of 12 and the starboard swerve stayed, so run 10 returns to 0.60 (your call). Option 2 is the open candidate for the swerve.** Port crossings fixed (6-8 of 12, first alteration compliant 0.70-0.90). Two things left:
 
 | Option | Change | Targets |
 |---|---|---|

@@ -9,7 +9,7 @@ currently blocking a full training run and a full evaluation.**
 | **Revision** | 8 — 0.55 m/s; virtual corridors back; generator wired in; e-stop reward; noise and randomisation on; scale audit; first PPO formulation run; see `OPEN_PROBLEMS.md` |
 | **Last updated** | 2026-09-15 |
 | **Tests** | **485 passing, none expected to fail** (T1 passes since F24 was decided) |
-| **Blocking a headline training run** | **run 9 is training** (A28 option 1, F83); run 10 follows automatically with A29 (F85); the training budget for the five learners (A26, TODO(04-4)); your sign-off and commit for the freeze (F75); B5 (`OPEN_PROBLEMS.md`) |
+| **Blocking a headline training run** | **run 10 is training** (60/40 + A29, F84); starboard-crossing swerve (A28 option 2, open); the training budget for the five learners (A26, TODO(04-4)); your sign-off and commit for the freeze (F75); B5 (`OPEN_PROBLEMS.md`) |
 | **Blocking a full evaluation** | **7 more** — B2, B5–B10 (§2) |
 | **Open `TODO(decision)`** | 1 (`D_SAFE`) |
 | **Open measurements** | 05 part 1 done from logs; basin sessions pending — `OPEN_PROBLEMS.md` Part B |
@@ -2227,6 +2227,47 @@ scored with the reward it trained on; `results/after_run9_run10.sh` then
 switches it on, re-runs the reward tests and the scale audit
 (`results/scale_audit_a29.json`), launches run 10 (run 9's setup plus A29) and
 analyses it, including `standon_speed.py`.
+
+**F84 — run 9 (port share 0.50, A28 option 1) loses the port-crossing fix and
+keeps the starboard swerve: the share drove the fix, and did not cause the
+swerve. Run 10 goes back to 0.60 and adds A29 (your call).**
+
+*Run 9* (`runs/ppo_formulation_seed0_v9/`, 5.0 h): in-run 0.82 final. Tier 1
+and the diagnoses on the development set, supervisor off, against run 8:
+
+| | run 8 (0.60) | run 9 (0.50) |
+|---|---|---|
+| goal | 0.850 | 0.817 |
+| crossing / head-on / overtaking | 0.55 / 0.85 / 0.95 | 0.40 / 0.90 / **0.80** |
+| being overtaken / null / no target | 0.90 / 0.90 / 0.95 | 0.85 / 0.95 / 1.00 |
+| port crossings | **6 / 12** | **2 / 12** |
+| first alteration compliant, port | 0.70 | 0.56 |
+| speed at closest approach, port (m/s) | 0.45 | 0.74 |
+| starboard crossings / first alteration compliant | 5 / 8, 0.14 | 6 / 8, **0.12** |
+| mean COLREGs integral | −18.2 | −19.0 |
+| stand-on (engaged): speed, above tolerance, `v_hold` fires | 0.69, 0.54, 0.65 | 0.65, 0.38, 0.60 |
+| head-on width set, target collision at 5 m | 0.05 | 0.18 |
+
+*Reading it.* A27's attribution comes out the other way from the working
+guess: the heading term alone (run 9) moves the first alteration toward
+compliance (0.22 in run 7, 0.56 here) but does not fix the outcomes -- the
+policy neither completes the port turn nor slows (0.74 m/s at closest
+approach). The 60/40 share is what made port crossings succeed. The port swerve
+at the start of starboard crossings survives the 50/50 share (0.12 compliant),
+so the share did not cause it; A28 option 2 (charge the wrong-way heading from
+detection, not engagement) remains the candidate. Stand-on speed is unchanged,
+as expected before A29. One seed each: run-to-run spread is unmeasured, and
+4 of 12 port crossings is within what a seed could move.
+
+*Run 10* (`runs/ppo_formulation_seed0_v10/`): `CROSSING_PORT_SHARE_TRAINING`
+back to 0.60 plus A29 (`V_HOLD_GROWS` on). A29's audit
+(`results/scale_audit_a29.json`): orderings unchanged (169 / 95 / −323); the
+random policy's COLREGs integral −23.8 → −24.7. The range test now allows
+`v_hold` its 3x cap. **Process note:** a queue copy believed stopped was still
+running, flipped the switch early and started a second audit; it was killed,
+and a first run-10 launch on the 0.50 share was aborted within minutes
+(`runs/ppo_formulation_seed0_v10_aborted_share050/`, not used). Outcomes
+unaffected; run 9 was scored with the reward it trained on.
 
 ### 3.13 Earlier findings, still standing
 

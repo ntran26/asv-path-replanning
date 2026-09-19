@@ -1,0 +1,23 @@
+Development crossings (20), run9 vs reference, supervisor off (183 s)
+
+== summary (medians)
+           goal  tcpa_engage  tcpa_first_turn  turned  compliant_first  peak_turn  wrong_turn  min_speed  speed_at_cpa  min_range
+policy                                                                                                                           
+reference   0.6         6.99             3.05    0.75             0.79      29.97       22.67       0.31          0.40       1.75
+run9        0.4         6.87             6.34    0.60             0.35      29.27       25.67       0.51          0.72       2.05
+
+== paired outcome (goal?)
+reference  run9 
+False      False    6
+True       False    6
+           True     6
+False      True     2
+Name: scenarios, dtype: int64
+
+== by outcome
+                  n  tcpa_first_turn  peak_turn  speed_at_cpa  compliant_first
+policy    goal                                                                
+reference False   8             4.22      30.83          0.41             0.40
+          True   12             2.20      28.68          0.35             1.00
+run9      False  12             6.34      12.61          0.73             0.44
+          True    8             5.93      42.35          0.72             0.25

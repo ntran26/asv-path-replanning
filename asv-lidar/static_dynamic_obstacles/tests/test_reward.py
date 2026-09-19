@@ -123,7 +123,10 @@ def test_1_every_term_stays_in_range_across_random_states():
 
         for name, fn in T.COLREGS_TERMS.items():
             value = fn(state, ctx, CFG)
-            assert 0.0 <= value <= 1.0 + 1e-9, f"v_{name} = {value} at draw {i}"
+            # A29 (F85): v_hold's speed part may rise to V_HOLD_CAP; the group
+            # still clips at 1 (test_a29_fleeing_an_overtaker_keeps_costing_more).
+            top = cfg.V_HOLD_CAP if (name == "hold" and cfg.V_HOLD_GROWS) else 1.0
+            assert 0.0 <= value <= top + 1e-9, f"v_{name} = {value} at draw {i}"
 
 
 # ---------------------------------------------------------------------------
