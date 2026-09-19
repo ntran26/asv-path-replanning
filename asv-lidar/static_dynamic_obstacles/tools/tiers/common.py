@@ -96,6 +96,24 @@ def colregs_action(env, sense_sign: int, alteration_deg: float = 30.0) -> np.nda
     return follower_action(env)
 
 
+# The classical comparators (B8) and the CODEX reference controller: onboard
+# controllers that read the environment's perception, one instance per episode.
+CONTROLLERS = ("los_dwa", "encounter_vo", "reference")
+
+
+def make_controller(policy: str):
+    if policy == "los_dwa":
+        from classical.los_dwa import LosDwaController
+        return LosDwaController()
+    if policy == "encounter_vo":
+        from classical.encounter_vo import EncounterVOController
+        return EncounterVOController()
+    if policy == "reference":
+        from reference_controller import ReferenceController
+        return ReferenceController()
+    return None
+
+
 # ---------------------------------------------------------------------------
 # One episode, with everything any tier reads
 # ---------------------------------------------------------------------------
@@ -103,7 +121,7 @@ def run_episode(env, built, seed: int, policy: str, model=None, obstacles: Optio
     if obstacles is not None:
         env.forced_num_obs = int(obstacles)
     obs, _ = env.reset(seed=seed, options={"generated": built})
-    total, col, speeds, steps = 0.0, 0.0, [], 0
+    total, col, speeds, steps, ctes = 0.0, 0.0, [], 0, []
     frames = Counter()
     integrals = Counter()
     first_engaged_cls, port_sense_frames, engaged_frames = None, 0, 0
@@ -111,9 +129,12 @@ def run_episode(env, built, seed: int, policy: str, model=None, obstacles: Optio
     min_range = float("inf")
     last_events = 0
     actor = tf.EpisodeActor(model) if policy == "model" else None
+    controller = make_controller(policy)
     while True:
         if policy == "model":
             action = actor(obs)
+        elif controller is not None:
+            action = controller.action(env, obs)
         elif policy == "follower":
             action = follower_action(env)
         elif policy == "compliant":
@@ -127,6 +148,7 @@ def run_episode(env, built, seed: int, policy: str, model=None, obstacles: Optio
         total += float(reward)
         col += float(info["reward/weighted/col"])
         speeds.append(float(info["speed_mps"]))
+        ctes.append(float(env.cross_track_error))
         r_path_max = max(r_path_max, abs(float(info["r_path_radps"])))
         for part in COLREGS_PARTS:
             value = float(info.get(f"colregs/v_{part}", 0.0))
@@ -161,6 +183,7 @@ def run_episode(env, built, seed: int, policy: str, model=None, obstacles: Optio
         **{f"integral_v_{p}": integrals[p] for p in COLREGS_PARTS},
         "mean_speed": float(np.mean(speeds)), "max_speed": float(np.max(speeds)),
         "min_target_range": min_range,
+        "rms_cte": float(np.sqrt(np.mean(np.square(ctes)))),
         "estops": len(stops), "estop_reasons": " | ".join(stops),
         "estop_then_target_collision": bool(stops) and info["collision_kind"] == "target",
         "first_engaged_cls": first_engaged_cls or "never",

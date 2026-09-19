@@ -1117,6 +1117,16 @@ V_PORT_HEADING_DEAD_DEG = 5.0            # deg, TODO(05): from measured heading 
 BETA_BOW_DEG = 67.5                      # bow arc for the crossing-ahead severity
 R_HOLD = 0.05                            # rad/s, yaw tolerance while standing on
 DU_HOLD = 0.10                           # m/s, speed tolerance, TODO(05)
+# A29 (your call, F85): the speed part of `v_hold` keeps rising past `DU_HOLD`
+# instead of saturating there -- +1 per `V_HOLD_EXCESS_SPAN` of further speed
+# change, to `V_HOLD_CAP` x full severity (3.0 at 0.30 m/s).  Unchanged up to
+# 0.10 m/s, so nothing gets cheaper; fleeing faster now costs more.  The COLREGs
+# group still clips at 1, so being overtaken can cost up to ~2.2x what it did.
+# `V_HOLD_GROWS` is switched on for run 10, after run 9 is scored on the reward
+# it trained with.
+V_HOLD_GROWS = False
+V_HOLD_EXCESS_SPAN = 0.10                # m/s of speed change per extra unit of severity
+V_HOLD_CAP = 3.0                         # x full severity, reached at DU_HOLD + 2 * span
 T_EXTREMIS = 5.0                         # s, 17(b) release of the hold penalty
 
 # Rule 8 deficit accounting.  `DU_MIN` is 30% of cruise, expressed as a multiple
@@ -1476,7 +1486,10 @@ CURRICULUM_STAGES = {
 # A27 option 2 (F81): training crossings come from port this often (0.5 before).
 # Training namespace only -- the development and frozen sets keep the even draw,
 # so runs stay comparable on the same scenarios.
-CROSSING_PORT_SHARE_TRAINING = 0.60
+# A28 option 1 (F83): back to 0.5 -- run 8's 60/40 taught "crossing -> port" and
+# starboard crossings began with a port swerve (F82).  Kept as a constant so the
+# training draw stays the uniform-share form A27 introduced.
+CROSSING_PORT_SHARE_TRAINING = 0.50
 
 # F74 (your call): **basin is the default geometry.**  06 §4 put channel mode
 # at 50 % of stages 4-5; it now carries only the classes whose rule the width

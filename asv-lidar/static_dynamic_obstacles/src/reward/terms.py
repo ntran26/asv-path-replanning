@@ -507,7 +507,8 @@ def v_side(state: RewardState, ctx, cfg) -> float:
 
 
 def v_hold(state: RewardState, ctx, cfg) -> float:
-    """Failing to hold course and speed while being overtaken, `[0, 1]` (17(a)(i)).
+    """Failing to hold course and speed while being overtaken, `[0, 1]` (17(a)(i)),
+    or `[0, V_HOLD_CAP]` with A29's growing speed part (F85).
 
     ```
     v_hold = rho_t * clip( ((r - r_path)/r_hold)^2 + ((u - u_engage)/Du_hold)^2, 0, 1 )
@@ -537,8 +538,16 @@ def v_hold(state: RewardState, ctx, cfg) -> float:
         return 0.0
     yaw = (float(state.r) - float(ctx.r_path)) / max(float(cfg.r_hold), 1e-9)
     perceived_u = state.u if state.perceived_u is None else state.perceived_u
-    surge = (float(perceived_u) - float(ctx.u_engage)) / max(float(cfg.du_hold), 1e-9)
-    return float(ctx.rho) * float(np.clip(yaw * yaw + surge * surge, 0.0, 1.0))
+    du = float(perceived_u) - float(ctx.u_engage)
+    surge = du / max(float(cfg.du_hold), 1e-9)
+    value = float(np.clip(yaw * yaw + surge * surge, 0.0, 1.0))
+    # A29 (F85): past `du_hold` the speed part keeps rising, to `v_hold_cap`.
+    # Saturating at 0.10 m/s made every further metre per second of fleeing an
+    # overtaker free (F83).  Read at call time, so run 9 is scored as trained.
+    if cfg_mod.V_HOLD_GROWS:
+        excess = (abs(du) - float(cfg.du_hold)) / max(float(cfg.v_hold_excess_span), 1e-9)
+        value += float(np.clip(excess, 0.0, float(cfg.v_hold_cap) - 1.0))
+    return float(ctx.rho) * value
 
 
 def v_r8(state: RewardState, ctx, cfg) -> float:

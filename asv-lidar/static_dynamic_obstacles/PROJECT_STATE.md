@@ -8,8 +8,8 @@ currently blocking a full training run and a full evaluation.**
 |---|---|
 | **Revision** | 8 — 0.55 m/s; virtual corridors back; generator wired in; e-stop reward; noise and randomisation on; scale audit; first PPO formulation run; see `OPEN_PROBLEMS.md` |
 | **Last updated** | 2026-09-15 |
-| **Tests** | **481 passing, none expected to fail** (T1 passes since F24 was decided) |
-| **Blocking a headline training run** | **port crossings** (A27: run 7 solves 2 of 12, F79); the training budget for the five learners (A26, TODO(04-4)); your sign-off and commit for the freeze (F75); B5 (`OPEN_PROBLEMS.md`) |
+| **Tests** | **485 passing, none expected to fail** (T1 passes since F24 was decided) |
+| **Blocking a headline training run** | **run 9 is training** (A28 option 1, F83); run 10 follows automatically with A29 (F85); the training budget for the five learners (A26, TODO(04-4)); your sign-off and commit for the freeze (F75); B5 (`OPEN_PROBLEMS.md`) |
 | **Blocking a full evaluation** | **7 more** — B2, B5–B10 (§2) |
 | **Open `TODO(decision)`** | 1 (`D_SAFE`) |
 | **Open measurements** | 05 part 1 done from logs; basin sessions pending — `OPEN_PROBLEMS.md` Part B |
@@ -42,6 +42,7 @@ currently blocking a full training run and a full evaluation.**
 | `env.py` | the Gymnasium environment — **2 Hz decisions, 0.1 s physics and collision sub-steps, optional pose staleness** | 03a §4 |
 | `render.py` | field view + seven-block telemetry panel | RENDER_PANEL_SPEC |
 | `play.py` | manual and random harness | — |
+| `classical/` | **LOS-PID + DWA and encounter-specific VO** (B8), perception-only; shared LOS, PID, model rollout, clearances | 04 §5, F83 |
 | `train_formulation.py` | **single-seed PPO test of the formulation** — generator curriculum, per-class evaluation | rev 8 |
 | `tools/scale_audit.py` | 02a §8.2's reward scale audit over the generator | rev 8 |
 
@@ -82,7 +83,7 @@ moves almost everything else.**
 | **B5** | Curriculum steps per stage and total budget (`TODO(04-3)`, `TODO(04-4)`) | 04 | cannot size the campaign |
 | **B6** | Claim ledger and empty result tables not written | you | 04a §9.3 freeze checklist |
 | **B7** | `T-RE` reactive target is a placeholder, not the VO comparator | 03 | Tier B's `re` behaviour stratum |
-| **B8** | Classical comparators (LOS-PID+DWA, COLREGs-VO, encounter VO) do not exist | 04 | every comparison in the paper |
+| **B8** | Classical comparators: **LOS-PID+DWA and encounter-specific VO built and on Tier 1 (F83)**; COLREGs-VO (Kuwata) not built; `T-RE` not yet swapped onto the VO | 04 | COLREGs-VO row of R1; B7 |
 | **B9** | `metrics.py` does not read the reward keys | 04 | 04a §10's metric set |
 | ~~B10~~ | ~~the scenario generator is not wired into `env.py`~~ — **wired** (F44) | — | — |
 
@@ -2036,6 +2037,196 @@ RecurrentPPO 61, TD3 18 / 53, SAC 12 / 38, TQC 13 / 32. Per 2 M-step seed:
 ~6, ~9, ~31 / ~10.5, ~46 / ~15, ~43 / ~17 h. One seed of all five is ~135 h at
 1.0 and ~58 h at 0.2; five seeds one at a time are ~28 or ~12 days, before
 ablations. A26 carries the decision.
+
+**F81 — A27 options 1 and 2 built (your call); run 8 trains on them.**
+
+1. **`v_port` charges a held wrong-way heading.** Besides the wrong-way yaw
+   rate, it now reads the heading displaced against the compliant sense since
+   engagement, `(held - 5 deg) / DPSI_MIN`, clipped to [0, 1]; the larger form is
+   charged, ENGAGED only, on the perceived heading the latch recorded. Port
+   crossing, TCPA 4 s: no action `v_port` 0, compliant 30 deg port 0, 4 deg
+   starboard 0 (deadband), 10 deg starboard held 0.25, 30 deg held 1.00. Held
+   wrong-way now costs more than doing nothing, which costs more than complying.
+   `V_PORT_HEADING_DEAD_DEG` = 5.0 (TODO(05), heading noise).
+2. **Port crossings earlier and more.** Stage 3 now draws crossings from both
+   sides alongside head-on and null (stage-3 crossing yield 59 of 60).
+   Training crossings come from port at `CROSSING_PORT_SHARE_TRAINING` = 0.60
+   (measured 0.58 over 297 draws). The development and frozen namespaces keep
+   the even integer draw: the development set is identical to run 7's (classes
+   and crossing angles checked), so runs 7 and 8 compare on the same scenarios.
+
+*Reward-scale audit* (`results/scale_audit_a27.json`, 240 episodes per
+policy): the orderings hold -- clean success 169, success with COLREGs
+penalties 97, any collision −323 (before: 172 / 101 / −337). The COLREGs term's
+episode integral rises by about 5 (random policy −18.7 → −23.8, follower
+−16.4 → −21.1). The earlier audit predates basin mode, so other terms moved
+with the geometry too.
+
+Tests: `test_a27_a_held_wrong_way_heading_costs_more_than_doing_nothing`,
+`test_a27_returning_after_the_encounter_is_not_charged`,
+`test_a27_training_crossings_favour_port_and_other_namespaces_do_not`,
+`test_a27_stage_3_teaches_crossings`.
+
+*Run 8* (`runs/ppo_formulation_seed0_v8/`): run 7's setup plus both changes.
+Compare with run 7 on the same development set; the port-crossing diagnosis
+and the being-overtaken speed (F79) are the things to read.
+
+**F83 — B8: LOS-PID + DWA and encounter-specific VO built, on Tier 1.**
+
+`src/classical/` (`common.py`, `los_dwa.py`, `encounter_vo.py`). Both read only
+what the policies and the reference controller read -- held pose and ego, the
+gated scan, tracks and their contexts, path and map -- and a test runs them
+against an environment with the truth attributes removed
+(`tests/test_classical.py`, 12 tests; suite 497 passing). Both plan on the
+nominal identified hull; the episode's hull is randomised, as for the policies.
+
+* **LOS-PID + DWA.** LOS (2.5 m lookahead) and a heading PID follow the path;
+  DWA searches yaw-rate x speed set-points plus the LOS-PID command, each
+  predicted closed-loop on the identified hull (the dynamic window, since a
+  one-step `(u, r)` window admits arcs this hull cannot fly), held 3 or 6 s then
+  handed back to LOS-PID. Fox's heading/dist/velocity objective, plus path
+  deviation and smoothness. No COLREGs.
+* **Encounter-specific VO** (our reading of Thyri & Breivik 2022, not a port):
+  hard hull VO; soft own-ship domain scaled per class; passing-side constraint
+  for give-way classes (head-on port-to-port, crossing astern from either side
+  per A17, overtaking on `compliant_turn_sense`), released in extremis; Rule 17
+  stand-on for being overtaken, released 12 s before a hard violation. Each
+  candidate velocity is swept along a turn-lag / turn-rate / surge-lag model and
+  flown by a cascaded course autopilot at that rate. `select_velocity` is
+  environment-free so `T-RE` can call it (03a §5.3) -- **not yet wired**.
+
+*What the hull forced* (each found on a tuning set disjoint from Tier 1 --
+development namespace, indices 600,000+, 8 per class): a textbook VO's
+instantaneous velocity change procrastinates into obstacles on a hull that
+needs ~5 s to build its yaw rate; a fixed time horizon rewards slowing (DWA now
+judges static obstacles over equal travelled distance); "slowest" fallbacks
+are wrong on a hull that coasts ~60 s; the reference controller's 10 s scan
+memory smears an unconfirmed target into a phantom wall (2 s here); the VO
+needed a soft static margin (no-target goal 0.40 -> 0.95 on Tier 1; the
+hard-margin run is kept as `tier1_encounter_vo_supervisor_off_hardstatic`).
+Tuning set, final: DWA 0.92, VO 0.83.
+
+*Tier 1* (`results/classical_comparison/`, `tools/tiers/compare_tier1.py`;
+paired exact McNemar against run 7):
+
+| development set (120), supervisor off | goal | target coll. | crossing goal (port / stbd) | McNemar p vs run 7 |
+|---|---|---|---|---|
+| PPO run 7 | 0.842 | 0.133 | 0.17 / 0.50 | — |
+| LOS-PID + DWA | 0.883 | 0.100 | 0.42 / 0.62 | 0.30 |
+| encounter-specific VO | 0.842 | 0.108 | 0.25 / 0.50 | 1.00 |
+| reference (CODEX, F74 replay) | 0.892 | 0.075 | — | 0.24 |
+
+Head-on width set (100, obstacles off): run 7 0.85, DWA 0.96 (p = 0.013), VO
+0.99 (p = 0.0001). Supervisor on changes one VO episode and nothing else.
+**Crossing is the hard class for every method**, classical included; neither
+comparator beats run 7 significantly on the development set. The classical
+methods succeed as often but pay more in the COLREGs term in head-on (DWA −35,
+VO −33 vs run 7 −18) and overtaking (VO −54); DWA overtakes slowly (0.35 m/s).
+
+**F82 — run 8 (A27 options 1 + 2) fixes port crossings; starboard crossings
+now start with a port swerve, and the stand-on speeding persists.**
+
+*Run 8* (`runs/ppo_formulation_seed0_v8/`, 6.3 h): in-run 0.85 final, peak 0.91
+at 1.8 M (`best_model`). Tier 1 and the crossing diagnosis on the same
+development set as run 7 (F79), supervisor off:
+
+| | run 7 | run 8 final | run 8 best (1.8 M) | reference |
+|---|---|---|---|---|
+| goal | 0.842 | 0.850 | 0.908 | -- |
+| crossing goal | 0.30 | 0.55 | **0.75** | 0.60 |
+| port crossings | 2 / 12 | **6 / 12** | **8 / 12** | 6 / 12 |
+| starboard crossings | 4 / 8 | 5 / 8 | 7 / 8 | 6 / 8 |
+| first alteration compliant, port | 0.22 | **0.70** | **0.90** | -- |
+| first alteration compliant, starboard | 0.14 | 0.14 | 0.00 | -- |
+| speed at closest approach, port (m/s) | 0.72 | 0.45 | 0.44 | 0.40 (all) |
+| mean COLREGs integral | −19.8 | −18.2 | −22.3 | -- |
+| being overtaken: max speed / `v_hold` integral | 0.94 / 8.7 | 0.80 / 10.3 | -- / -- | -- |
+
+Head-on width set, run 8 final: target collisions 0.05 / 0 / 0 / 0 / 0.05 at
+5 / 6 / 7 / 8 / 10 m (run 7: up to 0.15). Supervisor: 2 stops in 220 episodes,
+none then hit.
+
+*Reading it.*
+* **Port crossings fixed.** 6 of 12 (final) and 8 of 12 (best) against run 7's
+  2; the first alteration is now the A17 port turn in 0.70-0.90 of them, and
+  the ship slows (0.45 m/s at closest approach against 0.72). The best
+  checkpoint's crossings (0.75) beat the reference controller's (0.60).
+* **New: starboard crossings start with a port swerve.** The first >10 deg
+  alteration is compliant in 0.14 (final) and 0.00 (best) of starboard
+  crossings, with a 30-50 deg wrong-way peak; the policy recovers and reaches
+  the goal in 5-7 of 8, but the swerve is a Rule 8 violation in the log. In
+  several of them it starts before the encounter engages, where the new
+  heading form does not charge. The 60/40 port share is the likely cause:
+  crossings now mostly want a port turn, and the policy learned "crossing ->
+  port" before it learned the side.
+* **Stand-on speeding persists** (being-overtaken max 0.80 m/s, `v_hold`
+  integral 10.3 against run 7's 8.7). Not addressed by A27.
+* The best checkpoint was selected on this development set, so its 0.908 is
+  optimistic; the final model's 0.850 is the fair number. One seed.
+
+**F83 — A28 (your call: options 1 and 3). Run 9 trains with the port share
+back at 0.5; the stand-on speeding is diagnosed; the development set has a
+gallery.**
+
+*Option 1 -> run 9* (`runs/ppo_formulation_seed0_v9/`): run 8's setup with
+`CROSSING_PORT_SHARE_TRAINING` back to 0.50; the wrong-way heading term and
+stage-3 crossings stay. It also attributes A27: if port crossings hold, the
+heading term did the work.
+
+*Option 3 -- why the policy outruns an overtaker*
+(`tools/diagnostics/standon_speed.py`, the 20 development being-overtaken
+episodes, supervisor off; per-step means while the being-overtaken context is
+ENGAGED):
+
+| | run 8 | run 6 |
+|---|---|---|
+| engaged steps per episode | 26.6 | 16.9 |
+| speed (m/s) / throttle | 0.69 / +0.31 | 0.48 / −0.28 |
+| steps above the overspeed tolerance | 0.54 | 0.00 |
+| steps `v_hold` fires | 0.65 | 0.41 |
+| COLREGs term / path term / progress term | −1.43 / −0.58 / +1.48 | −0.93 / −0.46 / +1.49 |
+| target collisions (of 20) / median closest range | 1 / 2.30 m | 3 / 1.72 m |
+
+Speeding does not pay in progress (the progress term is the same per step) and
+it lengthens the encounter (the overtaker takes longer to pass). What it buys
+is distance from a target that never gives way: the training overtaker is
+constant-velocity (D1), so holding course is only as safe as the A15 floor
+makes it, and 20 % of draws are labelled below it. And it is almost free:
+**`v_hold` saturates** -- its surge part reaches full severity at
+`DU_HOLD` = 0.10 m/s off the engagement speed, so once the policy deviates at
+all, deviating further costs nothing more. Run 6 slowed instead, which is also a
+`v_hold` violation, and was rear-ended 3 times. Options: A29.
+
+*Gallery* (`tools/diagnostics/devset_gallery.py` -> `results/devset_gallery/`):
+one figure per development scenario (geometry, realised panels, the leg, the
+target's track to CPA, outcomes of run 7, run 8 final and best, and the
+reference controller), a contact sheet per class, `index.csv` and a README.
+The set is **104 basin + 16 channel**; basin legs have mean |slant| 5.2 deg,
+max 12.6 deg (43 % above 5 deg, 13 % above 10 deg), because two independent x
+draws in [2.5, 7.5] m over a 20 m leg rarely differ by much.
+
+**F85 — A29 (your call): `v_hold`'s speed part keeps rising past 0.10 m/s.
+Built behind `V_HOLD_GROWS`; run 10 switches it on after run 9 is scored.**
+
+The option as first written (a linear ramp to full severity at 0.30 m/s) would
+have *cut* the penalty at the speeds run 8 flees at: 0.13 m/s over its
+engagement speed costs 1.00 today and 0.43 on that ramp. Built instead:
+unchanged up to `DU_HOLD` = 0.10 m/s (full severity there, as before), then +1
+per further 0.10 m/s, capped at 3x (`V_HOLD_EXCESS_SPAN`, `V_HOLD_CAP`):
+
+| speed change (m/s) | 0.05 | 0.10 | 0.13 | 0.25 | 0.30+ |
+|---|---|---|---|---|---|
+| before | 0.25 | 1.00 | 1.00 | 1.00 | 1.00 |
+| now | 0.25 | 1.00 | 1.30 | 2.50 | 3.00 |
+
+The COLREGs group still clips at 1, so being overtaken can cost up to ~2.2x what
+it did (0.45 x 3 = 1.35, clipped). Test
+`test_a29_fleeing_an_overtaker_keeps_costing_more`; the reward suite passes
+(59). `V_HOLD_GROWS` stays False until run 9's analysis has run, so run 9 is
+scored with the reward it trained on; `results/after_run9_run10.sh` then
+switches it on, re-runs the reward tests and the scale audit
+(`results/scale_audit_a29.json`), launches run 10 (run 9's setup plus A29) and
+analyses it, including `standon_speed.py`.
 
 ### 3.13 Earlier findings, still standing
 

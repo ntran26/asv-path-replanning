@@ -1,7 +1,7 @@
 Tier 1 (run7_supervisor_on) — model runs\ppo_formulation_seed0_v7\final_model.zip
 220 episodes, 179 s
 
-== development set, per class (own_* = the model's last in-training evaluation, before today's code)
+== development set, per class
                   n  goal  collision  target  speed  colregs  estops  intervention  port_sense  own_goal  own_collision
 class                                                                                                                  
 being_overtaken  20  0.90       0.10    0.10   0.82   -35.41     0.0           0.0        0.00      0.90           0.10

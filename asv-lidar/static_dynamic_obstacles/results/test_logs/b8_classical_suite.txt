@@ -1,0 +1,14 @@
+........................................................................ [ 14%]
+........................................................................ [ 28%]
+........................................................................ [ 43%]
+........................................................................ [ 57%]
+........................................................................ [ 72%]
+........................................................................ [ 86%]
+.................................................................        [100%]
+============================== warnings summary ===============================
+..\..\..\..\..\..\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\tensorboard\compat\tensorflow_stub\dtypes.py:326
+  C:\Users\hntran\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\tensorboard\compat\tensorflow_stub\dtypes.py:326: DeprecationWarning: `np.bool8` is a deprecated alias for `np.bool_`.  (Deprecated NumPy 1.24)
+    np.bool8: (False, True),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+497 passed, 1 warning in 1370.44s (0:22:50)

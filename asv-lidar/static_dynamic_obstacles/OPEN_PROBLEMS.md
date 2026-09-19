@@ -4,7 +4,11 @@
 count. This file records only what is *not settled*, ordered so the
 highest-leverage item is first.
 
-**Last updated:** 2026-09-18, revision 21 — basin mode as default (F74); crossings diagnosed, SAC built, suite 3.0 (F75); TQC replaces SAC-IQN (F77); A26, A27 opened.
+**Last updated:** 2026-09-19, revision 25 — A29 decided and built behind a switch; run 10 queued after run 9 (F85).
+Revision 24: 2026-09-19 — A28 options 1 + 3 (run 9 training; stand-on diagnosed, F83); A29 opened.
+Revision 23: run 8 analysed (F82); A28 opened.
+Revision 22: 2026-09-19 — A27 options 1 + 2 built, run 8 training (F81); run 7 analysed (F79); all five learners timed (F80).
+Revision 21: 2026-09-18 — basin mode as default (F74); crossings diagnosed, SAC built, suite 3.0 (F75); TQC replaces SAC-IQN (F77); A26, A27 opened.
 Revision 20: run 6 finished: goal 0.83, best compliance, crossings 0.40 (F73).
 Revision 19: your option-1 call on A25 (and A24 with it) built (F72).
 Revision 18: CODEX reviewed; A25 opened (F71).
@@ -26,7 +30,7 @@ generator, the scale audit, noise and randomisation.
 
 | Part | Kind | Needs |
 |---|---|---|
-| **A** | Decisions | a call from you — 5 items (A26, A27, A10, A3/A4/A6), plus the freeze sign-off |
+| **A** | Decisions | a call from you — 4 items (A26, A10, A3/A4/A6), plus the freeze sign-off |
 | **B** | Measurements | basin time — `PART2_BASIN_PLAN.md`, with one addition proposed |
 | **C** | Build work | my time — 8 items |
 
@@ -49,7 +53,7 @@ generator, the scale audit, noise and randomisation.
 | **1. Move the headline runs to GPU/HPC (recommended)** | SAC at 1.0 gradient step per transition, 2 M steps, 5 seeds; the machine here keeps doing development runs | needs access; the code is device-agnostic apart from `device="cpu"` |
 | 2. This machine, off-policy at 0.2, 2 M steps | ~12 days for five learners × five seeds, ablations extra | a lower update ratio than SAC is usually run at; state it |
 
-**A27 — port crossings (F75, F78).** Port crossings are solvable (the best scripted response reaches the goal in 0.81 of engaged crossings, on both sides), and A17's port turn beats the starboard turn (0.67 against 0.56). Run 6 turns starboard first in 8 of 12 port crossings anyway. The reward charges a wrong-way *turn* but not a wrong-way *heading*: holding 30 deg to starboard scores exactly like doing nothing.
+**A27 — port crossings (F75, F78) — decided 2026-09-19: options 1 and 2, built (F81); run 8 trains on them.** Port crossings are solvable (the best scripted response reaches the goal in 0.81 of engaged crossings, on both sides), and A17's port turn beats the starboard turn (0.67 against 0.56). Run 6 turns starboard first in 8 of 12 port crossings anyway. The reward charges a wrong-way *turn* but not a wrong-way *heading*: holding 30 deg to starboard scores exactly like doing nothing.
 
 | Option | Change | Why | Cost |
 |---|---|---|---|
@@ -63,6 +67,26 @@ Recommendation: 1 and 2 together in run 8. **Run 7 confirmed the pattern on the 
 **Freeze sign-off.** `planning/CLAIM_LEDGER.md` and `planning/RESULT_TABLES.md` are drafts for you to sign off; then a commit, so the generator has a SHA and the manifest can be finalised.
 
 **06 deviations to confirm:** basin null traffic keeps `P_nav` not the band; slant cap 14.0 deg (Paper 2's endpoint box) not 18.1; Tier A basin leg 14.0 deg not 15.
+
+**A28 — after run 8 (F82) — decided 2026-09-19: options 1 and 3 (F83); run 9 trains on option 1.** Port crossings fixed (6-8 of 12, first alteration compliant 0.70-0.90). Two things left:
+
+| Option | Change | Targets |
+|---|---|---|
+| **1. Side share back to 0.5, keep the heading term and stage-3 crossings (recommended)** | `CROSSING_PORT_SHARE_TRAINING` 0.60 → 0.50 | the port swerve in starboard crossings (first alteration compliant 0.00-0.14), likely from the 60/40 share; also attributes the fix -- if port crossings hold, option 1 of A27 did the work |
+| 2. Charge wrong-way heading from detection, not engagement | `v_port`'s heading form while the target is tracked and classified as give-way, not only while ENGAGED | the swerve starting before engagement |
+| **3. Stand-on speed (recommended, with 1)** | investigate why the policy outruns overtakers (being-overtaken max speed 0.80-0.94 m/s, `v_hold` integral 8.7-10.3): the overspeed gate, `v_hold`'s weight 0.45, or progress reward outpacing it -- diagnose first, then change one | the Rule 17(a)(i) stand-on violation |
+
+Recommendation: 1 now as run 9 (one change, and it attributes A27), with a Tier 1-cheap diagnosis of 3 alongside; 2 only if the swerve survives 1.
+
+**A29 — stand-on speeding (F83) — decided 2026-09-19: option 1 as amended, the speed part keeps rising past 0.10 m/s to 3x at 0.30 (F85); run 10, after run 9.** Engaged and being overtaken, run 8 averages 0.69 m/s (above the overspeed tolerance in 54 % of steps) against run 6's 0.48; `v_hold` fires on 65 % of those steps. Speeding keeps the non-yielding overtaker further off (closest range 2.30 m against 1.72 m), and it costs almost nothing extra because `v_hold` saturates at 0.10 m/s of speed change.
+
+| Option | Change | Effect | Cost |
+|---|---|---|---|
+| **1. Grade `v_hold`'s speed part (recommended)** | the surge deviation rises linearly to full severity at a larger span (e.g. 0.30 m/s) instead of squaring to saturation at 0.10, so fleeing faster costs more than a small correction | removes the "violate once, then free" gap, the same shape as A27's | a reward change: audit and tests; one PPO run |
+| 2. Some reactive overtakers in training | a share of being-overtaken targets keep clear under Rule 13 (the Tier B `re` behaviour), so holding course is safe in those and the policy can learn stand-on | trains the behaviour the rule assumes | relaxes D1 (constant-velocity training targets); a formulation change |
+| 3. Leave it | fleeing is a Rule 17(b) response when the give-way vessel does not act, and goals hold at 0.90 | none | the stand-on compliance claim weakens; `v_hold` stays high |
+
+Recommendation: 1 after run 9 reports, as run 10, so run 9 stays a single-change run.
 
 ### Under test in revision 15 — the supervisor as a runtime layer (`PROJECT_STATE.md` F68)
 

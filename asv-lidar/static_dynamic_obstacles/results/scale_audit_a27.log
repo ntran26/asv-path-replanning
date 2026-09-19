@@ -1,0 +1,390 @@
+{
+ "follower": {
+  "episodes": 240,
+  "outcome_rates": {
+   "collision:obstacle": 0.30833333333333335,
+   "collision:target": 0.30416666666666664,
+   "goal": 0.3875
+  },
+  "mean_return": -129.47674600301696,
+  "mean_steps": 41.2125,
+  "estops_per_episode": 0.004166666666666667,
+  "term_integrals_mean": {
+   "pf": -0.2394598073504452,
+   "prog": 61.097352389047806,
+   "exist": -10.197916666666666,
+   "smooth": -0.09767550516338011,
+   "obs": -12.15872101628031,
+   "bnd": 0.0,
+   "dom": -1.6732147473658499,
+   "col": -21.123777315904782
+  },
+  "by_outcome": {
+   "collision:obstacle": {
+    "n": 74,
+    "mean_return": -303.11202355568156,
+    "term_integrals_mean": {
+     "pf": -0.5364464143088833,
+     "prog": 45.085608599115425,
+     "exist": -7.706081081081081,
+     "smooth": -0.09060100523027845,
+     "obs": -33.90322102604357,
+     "bnd": 0.0,
+     "dom": -0.1788427949602777,
+     "col": -5.51216956290267
+    }
+   },
+   "collision:target": {
+    "n": 73,
+    "mean_return": -304.19955653697843,
+    "term_integrals_mean": {
+     "pf": -0.03585268299763991,
+     "prog": 36.43384226661295,
+     "exist": -6.041095890410959,
+     "smooth": -0.06532585906157497,
+     "obs": -0.05966756386156043,
+     "bnd": 0.0,
+     "dom": -3.924902640686082,
+     "col": -30.506554166573608
+    }
+   },
+   "goal": {
+    "n": 93,
+    "mean_return": 145.83267021070748,
+    "term_integrals_mean": {
+     "pf": -0.16296852953141694,
+     "prog": 93.19740915671167,
+     "exist": -15.443548387096774,
+     "smooth": -0.1286974101147919,
+     "obs": -4.353752213098456,
+     "bnd": 0.0,
+     "dom": -1.0948309652759083,
+     "col": -26.180941440886848
+    }
+   }
+  },
+  "by_class": {
+   "being_overtaken": {
+    "n": 29,
+    "goal_rate": 0.7241379310344828,
+    "collision_rate": 0.27586206896551724,
+    "mean_return": 16.53175352037796,
+    "mean_col_integral": -12.946124485988795
+   },
+   "crossing": {
+    "n": 47,
+    "goal_rate": 0.0851063829787234,
+    "collision_rate": 0.9148936170212766,
+    "mean_return": -265.816664997808,
+    "mean_col_integral": -20.353676551843616
+   },
+   "head_on": {
+    "n": 51,
+    "goal_rate": 0.47058823529411764,
+    "collision_rate": 0.5294117647058824,
+    "mean_return": -106.16138414203269,
+    "mean_col_integral": -43.35053599887817
+   },
+   "no_target": {
+    "n": 49,
+    "goal_rate": 0.2857142857142857,
+    "collision_rate": 0.7142857142857143,
+    "mean_return": -166.01716583924937,
+    "mean_col_integral": 0.0
+   },
+   "null": {
+    "n": 22,
+    "goal_rate": 0.2727272727272727,
+    "collision_rate": 0.7272727272727273,
+    "mean_return": -165.1324110787123,
+    "mean_col_integral": 0.0
+   },
+   "overtaking": {
+    "n": 42,
+    "goal_rate": 0.5714285714285714,
+    "collision_rate": 0.42857142857142855,
+    "mean_return": -44.725520876654684,
+    "mean_col_integral": -36.35163837723896
+   }
+  }
+ },
+ "random": {
+  "episodes": 240,
+  "outcome_rates": {
+   "collision:boundary": 0.26666666666666666,
+   "collision:obstacle": 0.2375,
+   "collision:target": 0.2875,
+   "goal": 0.20833333333333334
+  },
+  "mean_return": -255.48378481370355,
+  "mean_steps": 39.583333333333336,
+  "estops_per_episode": 0.0125,
+  "term_integrals_mean": {
+   "pf": -18.907970112421935,
+   "prog": 56.83963740848633,
+   "exist": -9.748958333333333,
+   "smooth": -18.096819630675515,
+   "obs": -12.230525070655254,
+   "bnd": -11.456676434435138,
+   "dom": -1.2090525578328948,
+   "col": -23.756753416169154
+  },
+  "by_outcome": {
+   "collision:boundary": {
+    "n": 64,
+    "mean_return": -381.3121787928186,
+    "term_integrals_mean": {
+     "pf": -48.208833135728746,
+     "prog": 79.16220518338774,
+     "exist": -13.953125,
+     "smooth": -26.54667390449547,
+     "obs": -8.328664929343274,
+     "bnd": -42.8034421114124,
+     "dom": -0.26752342488150405,
+     "col": -19.741121470344908
+    }
+   },
+   "collision:obstacle": {
+    "n": 57,
+    "mean_return": -326.581302844949,
+    "term_integrals_mean": {
+     "pf": -5.33849772360625,
+     "prog": 37.37844758332175,
+     "exist": -6.4298245614035086,
+     "smooth": -12.152529469797388,
+     "obs": -36.66079502811401,
+     "bnd": 0.0,
+     "dom": -0.019431418817161848,
+     "col": -3.3586722265323905
+    }
+   },
+   "collision:target": {
+    "n": 69,
+    "mean_return": -327.38352269064524,
+    "term_integrals_mean": {
+     "pf": -5.713664142204948,
+     "prog": 34.44312849053448,
+     "exist": -5.757246376811594,
+     "smooth": -10.090120221636004,
+     "obs": -0.00602960863040992,
+     "bnd": 0.0,
+     "dom": -3.200875904186955,
+     "col": -36.76885985524602
+    }
+   },
+   "goal": {
+    "n": 50,
+    "mean_return": 85.84936830536293,
+    "term_integrals_mean": {
+     "pf": -15.080206204738527,
+     "prog": 81.35968936407374,
+     "exist": -13.66,
+     "smooth": -25.10674212806158,
+     "obs": -6.244202037625879,
+     "bnd": -0.20364098268079378,
+     "dom": -1.0216617285200074,
+     "col": -34.193867977084025
+    }
+   }
+  },
+  "by_class": {
+   "being_overtaken": {
+    "n": 35,
+    "goal_rate": 0.42857142857142855,
+    "collision_rate": 0.5714285714285714,
+    "mean_return": -151.61377400049457,
+    "mean_col_integral": -29.37100638742966
+   },
+   "crossing": {
+    "n": 40,
+    "goal_rate": 0.1,
+    "collision_rate": 0.9,
+    "mean_return": -293.37358495329227,
+    "mean_col_integral": -21.5214455791157
+   },
+   "head_on": {
+    "n": 38,
+    "goal_rate": 0.18421052631578946,
+    "collision_rate": 0.8157894736842105,
+    "mean_return": -278.6161726105981,
+    "mean_col_integral": -39.04011311087794
+   },
+   "no_target": {
+    "n": 56,
+    "goal_rate": 0.05357142857142857,
+    "collision_rate": 0.9464285714285714,
+    "mean_return": -314.7494169234763,
+    "mean_col_integral": 0.0
+   },
+   "null": {
+    "n": 28,
+    "goal_rate": 0.2857142857142857,
+    "collision_rate": 0.7142857142857143,
+    "mean_return": -209.2953428716208,
+    "mean_col_integral": -1.3332355878444775
+   },
+   "overtaking": {
+    "n": 43,
+    "goal_rate": 0.3023255813953488,
+    "collision_rate": 0.6976744186046512,
+    "mean_return": -237.2332874376063,
+    "mean_col_integral": -53.300532057742416
+   }
+  }
+ },
+ "slowdown": {
+  "episodes": 240,
+  "outcome_rates": {
+   "collision:obstacle": 0.3333333333333333,
+   "collision:target": 0.2375,
+   "goal": 0.42916666666666664
+  },
+  "mean_return": -136.32336312679882,
+  "mean_steps": 52.8125,
+  "estops_per_episode": 0.008333333333333333,
+  "term_integrals_mean": {
+   "pf": -30.904484702544746,
+   "prog": 64.02392153417613,
+   "exist": -13.029166666666667,
+   "smooth": -2.7442364295977115,
+   "obs": -13.29146515233881,
+   "bnd": 0.0,
+   "dom": -1.2003268170633143,
+   "col": -10.677604892763698
+  },
+  "by_outcome": {
+   "collision:obstacle": {
+    "n": 80,
+    "mean_return": -308.792959724555,
+    "term_integrals_mean": {
+     "pf": -8.195902670984843,
+     "prog": 44.27147829466238,
+     "exist": -8.18125,
+     "smooth": -0.4339865028549298,
+     "obs": -32.770785174859284,
+     "bnd": 0.0,
+     "dom": -0.48463379163701753,
+     "col": -2.497879878881267
+    }
+   },
+   "collision:target": {
+    "n": 57,
+    "mean_return": -314.458951931346,
+    "term_integrals_mean": {
+     "pf": -21.581552520688895,
+     "prog": 32.38034777738165,
+     "exist": -7.184210526315789,
+     "smooth": -1.2387615797269012,
+     "obs": -0.2727040000112067,
+     "bnd": 0.0,
+     "dom": -3.6764135034738556,
+     "col": -12.885657578511008
+    }
+   },
+   "goal": {
+    "n": 103,
+    "mean_return": 96.21349405455729,
+    "term_integrals_mean": {
+     "pf": -53.70151088594839,
+     "prog": 96.87711729435463,
+     "exist": -20.02912621359223,
+     "smooth": -5.371732163404104,
+     "obs": -5.366453345358577,
+     "bnd": 0.0,
+     "dom": -0.38594333074004167,
+     "col": -15.808857300753973
+    }
+   }
+  },
+  "by_class": {
+   "being_overtaken": {
+    "n": 29,
+    "goal_rate": 0.6551724137931034,
+    "collision_rate": 0.3448275862068966,
+    "mean_return": -26.48390674590997,
+    "mean_col_integral": -9.496287976860726
+   },
+   "crossing": {
+    "n": 60,
+    "goal_rate": 0.13333333333333333,
+    "collision_rate": 0.8666666666666667,
+    "mean_return": -251.22515018784858,
+    "mean_col_integral": -7.4080062857763584
+   },
+   "head_on": {
+    "n": 37,
+    "goal_rate": 0.43243243243243246,
+    "collision_rate": 0.5675675675675675,
+    "mean_return": -137.31380817068498,
+    "mean_col_integral": -19.477113024165863
+   },
+   "no_target": {
+    "n": 39,
+    "goal_rate": 0.3076923076923077,
+    "collision_rate": 0.6923076923076923,
+    "mean_return": -154.1424011436048,
+    "mean_col_integral": 0.0
+   },
+   "null": {
+    "n": 34,
+    "goal_rate": 0.4411764705882353,
+    "collision_rate": 0.5588235294117647,
+    "mean_return": -88.91014964753816,
+    "mean_col_integral": -0.0822197889474013
+   },
+   "overtaking": {
+    "n": 41,
+    "goal_rate": 0.8048780487804879,
+    "collision_rate": 0.1951219512195122,
+    "mean_return": -67.3403709413947,
+    "mean_col_integral": -27.300092465107234
+   }
+  }
+ },
+ "design_point": {
+  "episodes": 14,
+  "realised": {
+   "pf": -0.238873931740444,
+   "prog": 101.47519512330533,
+   "exist": -16.982142857142858,
+   "smooth": -0.1621075601900823,
+   "obs": -15.229691347745698,
+   "bnd": 0.0,
+   "dom": 0.0,
+   "col": 0.0
+  },
+  "predicted": {
+   "prog": 107.5,
+   "pf": -27.0,
+   "obs": -26.0,
+   "exist": -15.0,
+   "smooth": -1.5,
+   "bnd": 0.0,
+   "dom": 0.0,
+   "col": 0.0
+  },
+  "problems": [
+   "pf: -0.2 is 0.0x the predicted -27.0",
+   "smooth: -0.2 is 0.1x the predicted -1.5"
+  ],
+  "mean_return": 168.86237942648626
+ },
+ "orderings": {
+  "nominal_success_no_target": [
+   168.86237942648626,
+   14
+  ],
+  "success_with_colregs_penalty": [
+   96.57647200952655,
+   187
+  ],
+  "collision_any_policy": [
+   -322.5169434154599,
+   474
+  ],
+  "timeout_any_policy": [
+   null,
+   0
+  ]
+ }
+}

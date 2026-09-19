@@ -244,7 +244,7 @@ def test_a27_training_crossings_favour_port_and_other_namespaces_do_not(monkeypa
     sides = [b.ct_deg < 180.0 for b in
              (train.sample(scn.seed_for("training", 61_000 + i), encounter_class="crossing")
               for i in range(160)) if b is not None]
-    assert 0.50 < np.mean(sides) < 0.72
+    assert abs(np.mean(sides) - cfg.CROSSING_PORT_SHARE_TRAINING) < 0.12
     dev = scn.ScenarioGenerator(stage=5, seed_namespace="development")
     seed = scn.seed_for("development", 10_000 * 2 + 3)
     before = dev.sample(seed, encounter_class="crossing")

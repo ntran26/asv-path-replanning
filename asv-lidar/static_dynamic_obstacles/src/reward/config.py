@@ -95,6 +95,8 @@ class RewardConfig:
     beta_bow_deg: float = cfg.BETA_BOW_DEG
     r_hold: float = cfg.R_HOLD
     du_hold: float = cfg.DU_HOLD
+    v_hold_excess_span: float = cfg.V_HOLD_EXCESS_SPAN
+    v_hold_cap: float = cfg.V_HOLD_CAP
     t_extremis: float = cfg.T_EXTREMIS
     dpsi_min_deg: float = cfg.DPSI_MIN_DEG
     du_min: float = cfg.DU_MIN

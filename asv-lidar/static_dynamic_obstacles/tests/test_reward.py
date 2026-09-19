@@ -1000,6 +1000,25 @@ def test_a27_a_held_wrong_way_heading_costs_more_than_doing_nothing():
     assert total(wrong) > total(nothing) > total(compliant)
 
 
+def test_a29_fleeing_an_overtaker_keeps_costing_more(monkeypatch):
+    """A29 (F85).  The speed part saturated at DU_HOLD, so fleeing at 0.13 m/s
+    over the engagement speed cost exactly what 0.40 did.  With the switch on it
+    keeps rising to V_HOLD_CAP; below DU_HOLD nothing changes."""
+    ctx = ctx_for(enc.BEING_OVERTAKEN, u_engage=cfg.U_REF, r_path=0.0, in_extremis=False)
+    at = lambda du: T.v_hold(state_for(u=cfg.U_REF + du, r=0.0), ctx, CFG)
+    monkeypatch.setattr(cfg, "V_HOLD_GROWS", False)
+    before = [at(d) for d in (0.05, 0.10, 0.13, 0.25, 0.40)]
+    assert all(v == pytest.approx(float(ctx.rho)) for v in (before[1], before[2], before[4]))
+    monkeypatch.setattr(cfg, "V_HOLD_GROWS", True)
+    after = [at(d) for d in (0.05, 0.10, 0.13, 0.25, 0.40)]
+    assert after[0] == pytest.approx(before[0])            # small corrections unchanged
+    assert after[1] == pytest.approx(before[1])            # full severity at DU_HOLD, as before
+    assert after[1] < after[2] < after[3] < after[4]       # and rising past it
+    assert after[4] == pytest.approx(float(ctx.rho) * cfg.V_HOLD_CAP)
+    group = T.colregs_group(state_for(u=cfg.U_REF + 0.40, r=0.0), {1: ctx}, CFG)
+    assert group["v_col"] <= 1.0                           # the group clip still holds
+
+
 def test_a27_returning_after_the_encounter_is_not_charged():
     """ENGAGED only: once the target is past (CLEARING), heading back is free."""
     ctx = ctx_for(enc.CROSSING, rng=6.0, alpha=-45.0, ct=90.0, speed_ts=cfg.U_REF,
