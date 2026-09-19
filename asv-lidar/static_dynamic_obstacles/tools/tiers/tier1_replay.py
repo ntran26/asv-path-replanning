@@ -15,6 +15,11 @@ head-on by width; supervisor stops, their reasons, and how often a target
 collision follows one (the F58 5 m stop check); port-sense latching.
 
     python tools/tiers/tier1_replay.py --model runs/ppo_formulation_seed0_v3/final_model.zip --tag run3
+
+`--policy los_dwa|encounter_vo|reference` replays an onboard controller instead
+of a model (B8's classical comparators), on the same sets and seeds:
+
+    python tools/tiers/tier1_replay.py --policy los_dwa --tag los_dwa_supervisor_off --supervisor off
 """
 from __future__ import annotations
 
@@ -25,7 +30,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from common import RESULTS, ROOT, development_set, head_on_width_set, run_pool, width_bin
+from common import CONTROLLERS, RESULTS, ROOT, development_set, head_on_width_set, run_pool, width_bin
 
 
 def _own_eval(model_path: Path) -> pd.DataFrame:
@@ -49,16 +54,20 @@ def main() -> None:
                     help="override STOP_TEST_USES_HULL_FIT in the workers (F66 A/B)")
     ap.add_argument("--supervisor", choices=("on", "off"), default=None,
                     help="F68: run the replay with the stop latch on or off")
+    ap.add_argument("--policy", choices=("model",) + CONTROLLERS, default="model",
+                    help="replay a saved model (default) or an onboard controller")
     args = ap.parse_args()
     model = args.model if args.model.is_absolute() else ROOT / args.model
+    if args.policy != "model":
+        model = None
 
     out = RESULTS / f"tier1_{args.tag}"
     out.mkdir(parents=True, exist_ok=True)
     started = time.time()
     dev = development_set(args.per_class)
     ho = head_on_width_set()
-    jobs = [(b, 900_000 + i, "model", None, {"set": "development", "scenario": i}) for i, b in enumerate(dev)]
-    jobs += [(b, 700_000 + i, "model", 0, {"set": "head_on_width", "scenario": i}) for i, b in enumerate(ho)]
+    jobs = [(b, 900_000 + i, args.policy, None, {"set": "development", "scenario": i}) for i, b in enumerate(dev)]
+    jobs += [(b, 700_000 + i, args.policy, 0, {"set": "head_on_width", "scenario": i}) for i, b in enumerate(ho)]
     overrides = {}
     if args.stop_test_fit is not None:
         overrides["STOP_TEST_USES_HULL_FIT"] = args.stop_test_fit == "on"
@@ -76,8 +85,9 @@ def main() -> None:
         collision=("collided", "mean"), target=("collided_target", "mean"),
         speed=("mean_speed", "mean"), colregs=("colregs_integral", "mean"),
         estops=("estops", "mean"), intervention=("estops", lambda x: float((x > 0).mean())),
-        port_sense=("ever_port_sense_non_overtaking", "mean")).round(2)
-    per_class = per_class.join(_own_eval(model))
+        port_sense=("ever_port_sense_non_overtaking", "mean"), rms_cte=("rms_cte", "mean")).round(2)
+    if model is not None:
+        per_class = per_class.join(_own_eval(model))
 
     cr = dv[dv["class"] == "crossing"].copy()
     cr["dcpa_bin"] = pd.cut(cr.dcpa_m, [-0.01, 0.7, 1.4, 2.6])
@@ -107,9 +117,12 @@ def main() -> None:
     reasons = (stopped.estop_reasons.str.split(" | ", regex=False).explode()
                .str.extract(r"^(8\(e\) in extremis: \w+)")[0].value_counts())
 
-    lines = [f"Tier 1 ({args.tag}) — model {model.relative_to(ROOT) if model.is_relative_to(ROOT) else model}",
+    what = (f"controller {args.policy}" if model is None else
+            f"model {model.relative_to(ROOT) if model.is_relative_to(ROOT) else model}")
+    lines = [f"Tier 1 ({args.tag}) — {what}",
              f"{len(d)} episodes, {time.time() - started:.0f} s", "",
-             "== development set, per class (own_* = the model's last in-training evaluation, before today's code)",
+             "== development set, per class" + ("" if model is None else
+                 " (own_* = the model's last in-training evaluation, before today's code)"),
              per_class.to_string(), "",
              "== crossing collision by side x drawn DCPA", crossing if isinstance(crossing, str) else crossing.to_string(), "",
              "== being overtaken, A15 floor", overtaken.to_string(), "",

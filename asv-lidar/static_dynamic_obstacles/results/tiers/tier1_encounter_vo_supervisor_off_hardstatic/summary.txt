@@ -1,0 +1,42 @@
+Tier 1 (encounter_vo_supervisor_off) — controller encounter_vo
+220 episodes, 776 s
+
+== development set, per class
+                  n  goal  collision  target  speed  colregs  estops  intervention  port_sense  rms_cte
+class                                                                                                  
+being_overtaken  20  0.85       0.15    0.10   0.53   -23.22     0.0           0.0        0.00     0.25
+crossing         20  0.20       0.80    0.45   0.53   -21.77     0.0           0.0        0.50     0.22
+head_on          20  0.90       0.10    0.05   0.54   -34.26     0.0           0.0        0.05     0.47
+no_target        20  0.40       0.60    0.00   0.55     0.00     0.0           0.0        0.00     0.28
+null             20  0.70       0.30    0.00   0.55     0.00     0.0           0.0        0.00     0.24
+overtaking       20  0.95       0.05    0.05   0.53   -52.71     0.0           0.0        0.00     0.81
+
+== crossing collision by side x drawn DCPA
+                      mean                               size                      
+dcpa_bin      (-0.01, 0.7] (0.7, 1.4] (1.4, 2.6] (-0.01, 0.7] (0.7, 1.4] (1.4, 2.6]
+crossing_side                                                                      
+port                   1.0        1.0       0.60          4.0        3.0        5.0
+starboard              1.0        NaN       0.67          2.0        NaN        6.0
+
+-- by A22 label (escapable by a lawful response)
+                     n  collision  target
+crossing_escapable                       
+True                20        0.8    0.45
+
+== being overtaken, A15 floor
+                 n  collision  target  speed  v_hold
+floor                                               
+at/above floor  17        0.0    0.00   0.54   11.06
+below floor      3        1.0    0.67   0.51   12.00
+
+== head-on width set (obstacles off)
+            n  target_collision  estops  stopped_then_hit  min_speed_mean  port_sense
+width_bin                                                                            
+5          22              0.09     0.0                 0            0.54        0.05
+6          20              0.00     0.0                 0            0.54        0.00
+7          20              0.00     0.0                 0            0.54        0.00
+8          19              0.00     0.0                 0            0.54        0.05
+10         19              0.00     0.0                 0            0.54        0.00
+
+== supervisor stops: 0 in 0 episodes; followed by a target collision in 0
+(none)
