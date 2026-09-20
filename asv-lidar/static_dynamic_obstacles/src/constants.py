@@ -1114,6 +1114,11 @@ R_DEAD = 0.02                            # rad/s, below which a turn is not a tu
 # engagement, at full severity `DPSI_MIN_DEG` past this deadband.  5 deg is 25x
 # the nominal heading noise (0.2 deg) and a quarter of the alteration that counts.
 V_PORT_HEADING_DEAD_DEG = 5.0            # deg, TODO(05): from measured heading noise
+# F88 (run 11): `v_port` weighs a wrong-way manoeuvre by the risk at its peak since
+# engagement, not the current `rho`.  `rho` falls as DCPA opens, and a swerve in
+# either direction opens it, so the wrong-way swerve discounted its own penalty
+# (median rho 0.52 while swerving; `v_port` ~ a third of full, run 10).
+V_PORT_LATCHED_RHO = True
 BETA_BOW_DEG = 67.5                      # bow arc for the crossing-ahead severity
 R_HOLD = 0.05                            # rad/s, yaw tolerance while standing on
 DU_HOLD = 0.10                           # m/s, speed tolerance, TODO(05)

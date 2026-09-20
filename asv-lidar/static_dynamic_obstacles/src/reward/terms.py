@@ -445,7 +445,11 @@ def v_port(state: RewardState, ctx, cfg) -> float:
     held = max(0.0, -s_c * _wrap180(float(heading) - float(ctx.psi_engage)))
     held_severity = ((held - float(cfg.v_port_heading_dead_deg))
                      / max(float(cfg.dpsi_min_deg), 1e-9))
-    return float(ctx.rho) * float(np.clip(max(severity, held_severity), 0.0, 1.0))
+    # F88: weighted by the peak risk since engagement -- the wrong-way swerve
+    # opens DCPA, and the current `rho` would discount the swerve's own penalty.
+    weight = (max(float(ctx.rho), float(getattr(ctx, "rho_latched", ctx.rho)))
+              if cfg_mod.V_PORT_LATCHED_RHO else float(ctx.rho))
+    return weight * float(np.clip(max(severity, held_severity), 0.0, 1.0))
 
 
 def v_bow(state: RewardState, ctx, cfg) -> float:

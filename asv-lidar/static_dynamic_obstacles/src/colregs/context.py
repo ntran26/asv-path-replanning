@@ -141,6 +141,7 @@ class EncounterContext:
 
     # --- gates ------------------------------------------------------------
     rho: float = 0.0                   # proximity gate, [0, 1]
+    rho_latched: float = 0.0           # F88: the largest rho since engagement
     engaged: bool = False
     in_extremis: bool = False
 
@@ -574,4 +575,12 @@ class ContextManager:
         # is zero there, so nothing accrues at the geometry the agent is being
         # asked to produce.
         ctx.rho = float(np.clip(1.0 - ctx.dcpa / (self.kappa_eng * d_required), 0.0, 1.0))
+        # F88: remember the risk the encounter reached, so a manoeuvre that opens
+        # DCPA cannot lower the weight of its own violation.  Reset with the latch.
+        latch = self._latch.get(ctx.track_id) if ctx.engaged else None
+        if latch is not None:
+            latch["rho_max"] = max(float(latch.get("rho_max", 0.0)), ctx.rho)
+            ctx.rho_latched = latch["rho_max"]
+        else:
+            ctx.rho_latched = ctx.rho
         ctx.in_extremis = bool(ctx.dcpa < d_required and 0.0 <= ctx.tcpa < self.t_extremis)

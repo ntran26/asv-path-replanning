@@ -9,7 +9,7 @@ currently blocking a full training run and a full evaluation.**
 | **Revision** | 8 — 0.55 m/s; virtual corridors back; generator wired in; e-stop reward; noise and randomisation on; scale audit; first PPO formulation run; see `OPEN_PROBLEMS.md` |
 | **Last updated** | 2026-09-15 |
 | **Tests** | **485 passing, none expected to fail** (T1 passes since F24 was decided) |
-| **Blocking a headline training run** | **run 10 is training** (60/40 + A29, F84); starboard-crossing swerve (A28 option 2, open); the training budget for the five learners (A26, TODO(04-4)); your sign-off and commit for the freeze (F75); B5 (`OPEN_PROBLEMS.md`) |
+| **Blocking a headline training run** | run 11 done: best yet (0.925), but crossings open with one direction regardless of side (F89); A30 held; starboard-crossing swerve (A28 option 2, open); the training budget for the five learners (A26, TODO(04-4)); your sign-off and commit for the freeze (F75); B5 (`OPEN_PROBLEMS.md`) |
 | **Blocking a full evaluation** | **7 more** — B2, B5–B10 (§2) |
 | **Open `TODO(decision)`** | 1 (`D_SAFE`) |
 | **Open measurements** | 05 part 1 done from logs; basin sessions pending — `OPEN_PROBLEMS.md` Part B |
@@ -2268,6 +2268,156 @@ running, flipped the switch early and started a second audit; it was killed,
 and a first run-10 launch on the 0.50 share was aborted within minutes
 (`runs/ppo_formulation_seed0_v10_aborted_share050/`, not used). Outcomes
 unaffected; run 9 was scored with the reward it trained on.
+
+**F86 — run 10 paused at 1.40 M of 2 M steps (your call, 2026-09-19 20:08),
+with two ways to continue.**
+
+* **In place (no loss):** its learner and 10 workers are suspended
+  (`tools/pause_run.ps1 -Tag v10 -Action pause`). Continue with
+  `powershell -ExecutionPolicy Bypass -File tools\pause_run.ps1 -Tag v10 -Action resume`;
+  `results/run10.sh` is still waiting on it and runs the analysis at the end.
+  Suspension does not survive a reboot or sign-out.
+* **After a reboot:** `bash results/run10_resume_after_reboot.sh` continues from
+  the latest checkpoint (1.25 M steps; 0.15 M re-trained) and then analyses.
+  Use one route, never both.
+
+`train_formulation.py --resume RUN_DIR` (new): reads the learner, budget and
+flags from the run's `config.json`, loads the latest checkpoint and its reward
+normaliser, continues the step count (curriculum and checkpoints follow it),
+trains only the remaining budget, keeps the evaluation history and best score up
+to the checkpoint (later rows are dropped and redone), writes a separate
+`resume_<steps>.monitor.csv`, and records the resume in `config.json`. It
+**refuses to resume** if the formulation switches (`R2_SLOWDOWN_TEST`, the port
+share, `V_HOLD_GROWS`, the heading deadband, the geometry default, the
+observation schema) differ from the run's; runs now record them, and run 10's
+config was stamped with the values its launch script asserted. Off-policy
+checkpoints now also save the replay buffer, so a resumed TD3, SAC or TQC run
+keeps its data. `--checkpoint-every` sets the interval. Tested end to end on a
+smoke run (resumed at 4,096 of 8,192 steps; evaluation and curriculum
+continued). The environment episode stream after a resume is not the one an
+uninterrupted run would have seen.
+
+**F87 — run 10 (60/40 + A29) is the best final policy so far; A29 stops the
+stand-on speeding; the starboard-crossing swerve remains.**
+
+*Run 10* (`runs/ppo_formulation_seed0_v10/`, 5.3 h of training, paused once at
+1.40 M and resumed in place, F86): in-run 0.88 final. Tier 1 and the diagnoses
+on the development set, supervisor off:
+
+| | run 8 | run 9 | **run 10** |
+|---|---|---|---|
+| goal | 0.850 | 0.817 | **0.875** |
+| mean COLREGs integral | −18.2 | −19.0 | **−16.5** |
+| crossing / head-on / overtaking | 0.55 / 0.85 / 0.95 | 0.40 / 0.90 / 0.80 | **0.65** / 0.90 / **1.00** |
+| being overtaken / null / no target | **0.90** / 0.90 / 0.95 | 0.85 / 0.95 / 1.00 | 0.75 / 0.95 / 1.00 |
+| port crossings (first alteration compliant) | 6 / 12 (0.70) | 2 / 12 (0.56) | **8 / 12** (0.67) |
+| starboard crossings (first alteration compliant) | 5 / 8 (0.14) | 6 / 8 (0.12) | 5 / 8 (**0.00**) |
+| stand-on, engaged: speed / above tolerance / `v_hold` fires | 0.69 / 0.54 / 0.65 | 0.65 / 0.38 / 0.60 | **0.55 / 0.05 / 0.46** |
+| stand-on, engaged: throttle | +0.31 | +0.29 | −0.07 |
+
+Head-on width set: target collisions 0.14 / 0.10 / 0 / 0.05 / 0.05 at
+5 / 6 / 7 / 8 / 10 m. Supervisor: 8 stops in 6 of 220 episodes, none then hit.
+
+*Reading it.*
+* **A29 works.** Engaged and being overtaken, the ship now holds cruise
+  (0.55 m/s against 0.56 nominal; above the overspeed tolerance in 5 % of steps
+  against 54 %), and `v_hold` fires on fewer steps.
+* **Holding course costs being-overtaken goals** (0.75 against 0.90): 2 of the 5
+  failures are the development set's below-floor draws (A15's labelled 20 %,
+  where the overtaker's track reaches the hull and holding cannot be safe), 1 an
+  above-floor target collision after slowing, and 2 boundary collisions. That is
+  the price of a non-yielding overtaker (A29 option 2 would have addressed it
+  by making some overtakers keep clear).
+* **Port crossings best yet** (8 of 12) with the 60/40 share restored;
+  crossings overall 0.65, above the reference controller's 0.60.
+* **The starboard-crossing port swerve persists** (first alteration compliant
+  0.00): A28 option 2 is still open.
+* One seed per configuration: run-to-run spread is unmeasured.
+
+**F88 — the starboard-crossing swerve discounts its own penalty; run 11 weighs
+`v_port` by the peak risk since engagement. Being overtaken, laid out (A30).**
+
+*When the swerve starts* (`tools/diagnostics/swerve_timing.py`, run 10, the 8
+development starboard crossings): every first alteration is to port, 2.0-4.5 s
+into the episode. In 3 the target is not yet tracked (tracked at 2.5-5.5 s); in
+5 the encounter is already ENGAGED (engaged at 1.5-2.0 s). The "detected but not
+engaged" window that A28 option 2 would have charged never occurs at the turn,
+so option 2 would change nothing and was not built.
+
+*Why the engaged swerves are cheap.* The COLREGs group is not saturated while
+swerving (pre-clip 0.30 on average, never above 1). `v_port` averages 0.35 there
+although the heading is held 25-50 deg the wrong way, because every COLREGs
+severity is multiplied by `rho = clip(1 - DCPA / (kappa * d_req))`, and a swerve
+in **either** direction opens DCPA: median `rho` 0.52 while swerving. The
+wrong-way manoeuvre lowers the weight of its own violation.
+
+*Fix (run 11).* `v_port` is weighted by the largest `rho` since engagement
+(`EncounterContext.rho_latched`, kept in the latch and reset with it;
+`V_PORT_LATCHED_RHO`). Every other term keeps the current `rho`. Head-on and
+overtaking wrong-way turns are weighted the same way. The 3 swerves that begin
+before tracking cannot be charged by a COLREGs term -- no vessel is perceived --
+but once the encounter engages, holding the swerve now costs at the encounter's
+peak risk. Tests: `test_f88_a_swerve_cannot_discount_its_own_penalty`,
+`test_f88_the_latched_risk_is_the_peak_since_engagement`; the reward suite
+passes (61). Run 11 = run 10's setup + this; `results/run11.sh` audits the
+reward first (`results/scale_audit_f88.json`) and analyses after, including
+the swerve timing.
+
+*Being overtaken, by stratum* (development set: 17 draws at or above A15's
+floor, 3 below it):
+
+| run | above floor | below floor | max speed (m/s) | `v_hold` integral | behaviour |
+|---|---|---|---|---|---|
+| 6 | **17 / 17** | 0 / 3 | 0.68 | 4.3 | slows |
+| 7 | 15 / 17 | **3 / 3** | 0.94 | 8.7 | flees |
+| 8 | 16 / 17 | 2 / 3 | 0.80 | 10.3 | flees |
+| 9 | 16 / 17 | 1 / 3 | 0.82 | 10.1 | flees |
+| 10 (A29) | 14 / 17 | 1 / 3 | 0.79 | 6.3 | holds cruise |
+
+Fleeing is what rescues the below-floor draws, where the overtaker's track
+reaches the hull and holding course cannot be safe; A29 now charges it, so run
+10 holds and loses them. Above the floor, holding should always work, yet run 10
+loses 3 (1 target collision after slowing, 2 boundary collisions after late
+evasions). A30 has the options.
+
+**F89 — run 11 (latched `v_port` weight) is the best policy yet and fixes the
+starboard-crossing swerve -- but port crossings now start with a starboard turn.**
+
+*Run 11* (`runs/ppo_formulation_seed0_v11/`, 5.0 h): in-run 0.93 final. Reward
+audit (`results/scale_audit_f88.json`): orderings unchanged (169 / 94 / −324);
+the random policy's COLREGs integral −24.7 -> −26.9. Tier 1 and the diagnoses,
+development set, supervisor off:
+
+| | run 8 | run 10 | **run 11** |
+|---|---|---|---|
+| goal | 0.850 | 0.875 | **0.925** |
+| head-on / crossing / overtaking | 0.85 / 0.55 / 0.95 | 0.90 / 0.65 / 1.00 | **1.00 / 0.75** / 0.95 |
+| being overtaken (above / below floor) | 16 / 17, 2 / 3 | 14 / 17, 1 / 3 | **17 / 17, 2 / 3** |
+| null / no target | 0.90 / 0.95 | 0.95 / 1.00 | 0.95 / 0.95 |
+| port crossings, goal (first alteration compliant) | 6 / 12 (0.70) | 8 / 12 (0.67) | 8 / 12 (**0.10**) |
+| starboard crossings, goal (first alteration compliant) | 5 / 8 (0.14) | 5 / 8 (0.00) | **7 / 8 (1.00)** |
+| speed at closest approach, port / starboard (m/s) | 0.45 / 0.33 | 0.47 / 0.41 | 0.68 / 0.64 |
+| stand-on engaged speed / above tolerance | 0.69 / 0.54 | 0.55 / 0.05 | 0.57 / 0.02 |
+| mean COLREGs integral (crossing) | −18.2 | −16.5 (−21.6) | −17.4 (−28.6) |
+| head-on width set, target collision 5 / 6 / 7 / 8 / 10 m | 0.05 / 0 / 0 / 0 / 0.05 | 0.14 / 0.10 / 0 / 0.05 / 0.05 | 0 / 0.25 / 0.20 / 0.16 / 0.05 |
+
+Supervisor: 7 stops in 6 of 220 episodes, none then hit.
+
+*Reading it.*
+* **The starboard swerve is gone:** every starboard crossing now starts with the
+  compliant starboard turn (1.00, against 0.00 in run 10), and 7 of 8 reach the
+  goal. Swerve timing: the first alteration now comes 2.5-8.0 s in, mostly
+  after engagement, and is starboard in 6 of 8.
+* **Port crossings mirror it:** the first alteration is compliant in only 0.10
+  of them -- the policy now opens *every* crossing with a starboard turn. Goals
+  hold (8 of 12), and the crossing COLREGs integral worsens (−28.6).
+* Across runs 8-11 the policy has picked one opening direction for all crossings
+  (port in runs 8-10, starboard in run 11) instead of conditioning it on the
+  side the target comes from. Whether that is the formulation or the seed is
+  unknown with one seed per configuration.
+* Being overtaken recovers to 0.95 while holding cruise (A29 kept): all 17
+  above-floor draws, and 2 of the 3 below-floor ones. A30 is held.
+* The head-on width set regressed at 6-8 m (0.16-0.25 target collisions).
 
 ### 3.13 Earlier findings, still standing
 
