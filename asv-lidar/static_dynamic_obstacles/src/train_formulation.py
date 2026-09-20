@@ -45,7 +45,7 @@ import sys
 import time
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import numpy as np
 import torch.nn as nn
@@ -195,6 +195,18 @@ EVAL_CLASSES = ("head_on", "crossing", "overtaking", "being_overtaken", "null", 
 COLREGS_PARTS = ("port", "bow", "side", "hold", "r8")
 
 
+def _formulation_switches() -> Dict:
+    """The settings a run's reward and scenario draw depend on (F86): recorded in
+    `config.json` so a resume can refuse code that has changed underneath it."""
+    return {"R2_SLOWDOWN_TEST": cfg.R2_SLOWDOWN_TEST,
+            "CROSSING_PORT_SHARE_TRAINING": cfg.CROSSING_PORT_SHARE_TRAINING,
+            "V_HOLD_GROWS": cfg.V_HOLD_GROWS,
+            "V_PORT_HEADING_DEAD_DEG": cfg.V_PORT_HEADING_DEAD_DEG,
+            "V_PORT_LATCHED_RHO": cfg.V_PORT_LATCHED_RHO,
+            "DEFAULT_GEOMETRY_MODE": cfg.DEFAULT_GEOMETRY_MODE,
+            "OBSERVATION_SCHEMA_VERSION": cfg.OBSERVATION_SCHEMA_VERSION}
+
+
 def stage_at(fraction: float) -> int:
     stage = STAGE_SCHEDULE[0][1]
     for start, value in STAGE_SCHEDULE:
@@ -226,12 +238,15 @@ def make_env(rank: int, seed: int, stage: int, randomisation, torch_threads: int
 
 
 class ScenarioStageCallback(BaseCallback):
-    def __init__(self, total: int, log_path: str):
+    def __init__(self, total: int, log_path: str, resume: bool = False):
         super().__init__(0)
         self.total = int(total)
         self.log_path = log_path
         self.stage = None
         self.transitions: List[Dict] = []
+        if resume and Path(log_path).exists():
+            with open(log_path) as fh:
+                self.transitions = json.load(fh)
 
     def _apply(self) -> None:
         wanted = stage_at(self.num_timesteps / max(self.total, 1))
@@ -320,7 +335,7 @@ class FormulationEvalCallback(BaseCallback):
     """
 
     def __init__(self, run_dir: Path, eval_freq: int, per_class: int,
-                 supervisor_modes=("on",)):
+                 supervisor_modes=("on",), resume_from: Optional[int] = None):
         super().__init__(0)
         self.run_dir = Path(run_dir)
         self.eval_freq = int(eval_freq)
@@ -331,6 +346,34 @@ class FormulationEvalCallback(BaseCallback):
         self.best = -np.inf
         self.next_eval = self.eval_freq
         self.history: List[Dict] = []
+        self.resume_from = resume_from
+        if resume_from is not None:
+            self._restore(int(resume_from))
+
+    def _restore(self, steps: int) -> None:
+        """Resume (F86): keep what was evaluated up to the checkpoint, drop what
+        the resumed run will redo, and carry the best-model score forward."""
+        summary = self.run_dir / "eval_summary.json"
+        if summary.exists():
+            with open(summary) as fh:
+                self.history = [h for h in json.load(fh) if int(h["timesteps"]) <= steps]
+            with open(summary, "w") as fh:
+                json.dump(self.history, fh, indent=1)
+        select_on = "off" if "off" in self.supervisor_modes else self.supervisor_modes[0]
+        scores = [h["goal_rate"] - 2.0 * h["collision_rate"] for h in self.history
+                  if h.get("supervisor", select_on) == select_on]
+        self.best = max(scores) if scores else -np.inf
+        detail = self.run_dir / "eval_episodes.csv"
+        if detail.exists():
+            with open(detail, newline="") as fh:
+                rows = list(csv.DictReader(fh))
+            kept = [r for r in rows if int(float(r["timesteps"])) <= steps]
+            if rows:
+                with open(detail, "w", newline="") as fh:
+                    writer = csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
+                    writer.writeheader()
+                    writer.writerows(kept)
+        self.next_eval = (steps // self.eval_freq + 1) * self.eval_freq
 
     def _evaluate(self) -> None:
         select_on = "off" if "off" in self.supervisor_modes else self.supervisor_modes[0]
@@ -427,6 +470,11 @@ def main() -> None:
                     help="F68: share of training episodes starting slow or at rest")
     ap.add_argument("--r2-slowdown-test", choices=("coast", "stop"), default=None,
                     help="F70: R-2's slowing test (default: constants.R2_SLOWDOWN_TEST)")
+    ap.add_argument("--checkpoint-every", type=int, default=250_000,
+                    help="environment steps between checkpoints")
+    ap.add_argument("--resume", type=Path, default=None,
+                    help="F86: continue this run directory from its latest checkpoint "
+                         "(learner, budget and switches are read from its config.json)")
     ap.add_argument("--algo", choices=tuple(ALGORITHMS), default="ppo",
                     help="learner: PPO, RecurrentPPO, TD3, SAC, TQC (the five baselines)")
     ap.add_argument("--gradient-steps", type=int, default=0,
@@ -444,9 +492,40 @@ def main() -> None:
     if args.r2_slowdown_test:
         cfg.R2_SLOWDOWN_TEST = args.r2_slowdown_test      # the evaluation process too
 
-    run_dir = args.runs_dir / (f"{args.algo}_formulation_seed{args.seed}"
-                               + (f"_{args.tag}" if args.tag else "")
-                               + ("_smoke" if args.smoke else ""))
+    resume_steps, resume_ckpt, resume_vecnorm, previous = None, None, None, None
+    if args.resume:
+        # F86: the run's own config decides what it is; the CLI cannot change it.
+        run_dir = args.resume if args.resume.is_absolute() else Path.cwd() / args.resume
+        with open(run_dir / "config.json") as fh:
+            previous = json.load(fh)
+        for key in ("algo", "seed", "timesteps", "num_envs", "train_supervisor",
+                    "eval_supervisor", "low_speed_start_frac", "eval_freq", "eval_per_class"):
+            if key in previous:
+                setattr(args, key, previous[key])
+        mismatched = [f"{k}: run {previous[k]!r}, code {v!r}"
+                      for k, v in _formulation_switches().items()
+                      if k in previous.get("switches", {}) and previous["switches"][k] != v]
+        if previous.get("observation_schema") not in (None, cfg.OBSERVATION_SCHEMA_VERSION):
+            mismatched.append(f"observation_schema: run {previous['observation_schema']!r}")
+        if mismatched:
+            raise SystemExit("cannot resume -- the code no longer matches the run: " + "; ".join(mismatched))
+        if "switches" not in previous:
+            print("[RESUME] this run predates recorded switches; check them by hand: "
+                  f"{_formulation_switches()}", flush=True)
+        prefix = f"{args.algo}_"
+        steps = sorted(int(p.name[len(prefix):-len("_steps.zip")])
+                       for p in run_dir.glob(f"{prefix}*_steps.zip")
+                       if p.name[len(prefix):-len("_steps.zip")].isdigit())
+        if not steps:
+            raise SystemExit(f"no {prefix}*_steps.zip checkpoint in {run_dir}")
+        resume_steps = steps[-1]
+        resume_ckpt = run_dir / f"{prefix}{resume_steps}_steps.zip"
+        resume_vecnorm = run_dir / f"{prefix}vecnormalize_{resume_steps}_steps.pkl"
+        print(f"[RESUME] {run_dir.name} from {resume_steps:,} of {args.timesteps:,} steps", flush=True)
+    else:
+        run_dir = args.runs_dir / (f"{args.algo}_formulation_seed{args.seed}"
+                                   + (f"_{args.tag}" if args.tag else "")
+                                   + ("_smoke" if args.smoke else ""))
     if args.algo in ("ppo", "recurrent_ppo"):
         hyperparameters = dict(PPO_HYPERPARAMS)
     elif args.algo == "td3":
@@ -469,7 +548,10 @@ def main() -> None:
         "torch_threads": args.torch_threads, "fixed_stage": args.fixed_stage,
         "train_supervisor": args.train_supervisor, "eval_supervisor": args.eval_supervisor,
         "low_speed_start_frac": args.low_speed_start_frac,
+        "eval_freq": args.eval_freq, "eval_per_class": args.eval_per_class,
         "r2_slowdown_test": cfg.R2_SLOWDOWN_TEST,
+        # F86: the formulation switches, so a resume can refuse changed code.
+        "switches": _formulation_switches(),
         # A25: 70-value schema with the encounter-context branch.  A checkpoint
         # from an earlier schema cannot be resumed; the run records its own.
         "observation_schema": cfg.OBSERVATION_SCHEMA_VERSION,
@@ -492,6 +574,12 @@ def main() -> None:
                       "PF_OVERSPEED_TOL": cfg.PF_OVERSPEED_TOL,
                       "PF_OVERSPEED_SPAN": cfg.PF_OVERSPEED_SPAN},
     }
+    if previous is not None:
+        config = dict(previous)
+        config.setdefault("resumes", []).append(
+            {"from_steps": resume_steps, "at": time.strftime("%Y-%m-%d %H:%M:%S"),
+             "replay_buffer": "restored" if args.algo in OFF_POLICY and
+             (run_dir / f"{args.algo}_replay_buffer_{resume_steps}_steps.pkl").exists() else "n/a"})
     with open(run_dir / "config.json", "w") as fh:
         json.dump(config, fh, indent=1, default=str)
 
@@ -502,9 +590,14 @@ def main() -> None:
                                   low_speed_start_frac=args.low_speed_start_frac,
                                   r2_slowdown_test=args.r2_slowdown_test)
                          for i in range(args.num_envs)])
-    vec = RetryingVecMonitor(vec, filename=str(run_dir / "monitor.csv"),
+    # SB3 appends ".monitor.csv" unless the name already ends that way.
+    monitor = "monitor.csv" if resume_steps is None else f"resume_{resume_steps}.monitor.csv"
+    vec = RetryingVecMonitor(vec, filename=str(run_dir / monitor),
                      info_keywords=("reached_goal", "collided", "scenario_class"))
-    if args.init_vecnormalize:
+    if resume_vecnorm is not None:
+        vec = VecNormalize.load(str(resume_vecnorm), vec)
+        vec.training, vec.norm_reward = True, True
+    elif args.init_vecnormalize:
         vec = VecNormalize.load(str(args.init_vecnormalize), vec)
         vec.training, vec.norm_reward = True, True
     else:
@@ -513,7 +606,13 @@ def main() -> None:
 
     if args.algo != "ppo" and args.init_model:
         raise SystemExit("--init-model is PPO-only (Tier 2)")
-    if args.algo in OFF_POLICY:
+    if resume_ckpt is not None:
+        model = ALGORITHMS[args.algo].load(str(resume_ckpt), env=vec, device="cpu",
+                                           tensorboard_log=str(args.runs_dir / "tensorboard"))
+        buffer = run_dir / f"{args.algo}_replay_buffer_{resume_steps}_steps.pkl"
+        if args.algo in OFF_POLICY and buffer.exists():
+            model.load_replay_buffer(str(buffer))
+    elif args.algo in OFF_POLICY:
         extra = {}
         if args.algo == "td3":
             extra["action_noise"] = NormalActionNoise(
@@ -554,16 +653,25 @@ def main() -> None:
                     **PPO_HYPERPARAMS)
 
     callbacks = CallbackList([
-        ScenarioStageCallback(args.timesteps, str(run_dir / "curriculum.json")),
-        CheckpointCallback(save_freq=max(250_000 // args.num_envs, 1), save_path=str(run_dir),
-                           name_prefix=args.algo, save_vecnormalize=True),
+        ScenarioStageCallback(args.timesteps, str(run_dir / "curriculum.json"),
+                              resume=resume_steps is not None),
+        # Off-policy checkpoints keep the replay buffer, so a resume continues
+        # learning from the same data rather than from an empty buffer.
+        CheckpointCallback(save_freq=max(args.checkpoint_every // args.num_envs, 1), save_path=str(run_dir),
+                           name_prefix=args.algo, save_vecnormalize=True,
+                           save_replay_buffer=args.algo in OFF_POLICY),
         FormulationEvalCallback(run_dir, args.eval_freq, args.eval_per_class,
                                 supervisor_modes=(("off", "on") if args.eval_supervisor == "both"
-                                                  else (args.eval_supervisor,))),
+                                                  else (args.eval_supervisor,)),
+                                resume_from=resume_steps),
     ])
 
     started = time.time()
-    model.learn(total_timesteps=args.timesteps, callback=callbacks,
+    # A resume continues the step count (the curriculum and checkpoints read it)
+    # and trains only the remainder of the original budget.
+    model.learn(total_timesteps=(args.timesteps if resume_steps is None
+                                 else args.timesteps - resume_steps),
+                reset_num_timesteps=resume_steps is None, callback=callbacks,
                 tb_log_name=run_dir.name, progress_bar=False)
     model.save(run_dir / "final_model.zip")
     vec.save(str(run_dir / "final_vecnormalize.pkl"))

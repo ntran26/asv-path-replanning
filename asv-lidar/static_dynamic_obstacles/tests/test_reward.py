@@ -1022,6 +1022,35 @@ def test_a29_fleeing_an_overtaker_keeps_costing_more(monkeypatch):
     assert group["v_col"] <= 1.0                           # the group clip still holds
 
 
+def test_f88_a_swerve_cannot_discount_its_own_penalty(monkeypatch):
+    """F88.  `rho` falls as DCPA opens, and the wrong-way swerve opens it; with
+    the latched weight the penalty keeps the risk the encounter reached."""
+    ctx = ctx_for(enc.CROSSING, rng=6.0, alpha=45.0, ct=270.0, speed_ts=cfg.U_REF,
+                  psi_engage=0.0, compliant_turn_sense=+1, rho=0.30, rho_latched=0.80)
+    swerved = state_for(heading_deg=-30.0, u=cfg.U_REF)     # held 30 deg to port
+    monkeypatch.setattr(cfg, "V_PORT_LATCHED_RHO", False)
+    assert T.v_port(swerved, ctx, CFG) == pytest.approx(0.30)
+    monkeypatch.setattr(cfg, "V_PORT_LATCHED_RHO", True)
+    assert T.v_port(swerved, ctx, CFG) == pytest.approx(0.80)
+
+
+def test_f88_the_latched_risk_is_the_peak_since_engagement():
+    manager = ContextManager()
+    close = FakeTrack(5.0, 14.0, 180.0, cfg.U_REF)
+    ctx = manager.update(tracks=[close], p_os=(5.0, 4.0), v_os=(0.0, cfg.U_REF),
+                         heading_os_deg=0.0, u_os=cfg.U_REF)[close.id]
+    assert ctx.engaged
+    peak = ctx.rho_latched
+    assert peak == pytest.approx(ctx.rho)
+    # The same target, now far off the own ship's track: DCPA opens, rho falls,
+    # the latched weight does not.
+    wide = FakeTrack(6.5, 13.5, 180.0, cfg.U_REF)                # DCPA 1.5 m, still engaged
+    ctx = manager.update(tracks=[wide], p_os=(5.0, 4.0), v_os=(0.0, cfg.U_REF),
+                         heading_os_deg=0.0, u_os=cfg.U_REF)[wide.id]
+    assert ctx.engaged
+    assert ctx.rho < peak and ctx.rho_latched == pytest.approx(peak)
+
+
 def test_a27_returning_after_the_encounter_is_not_charged():
     """ENGAGED only: once the target is past (CLEARING), heading back is free."""
     ctx = ctx_for(enc.CROSSING, rng=6.0, alpha=-45.0, ct=90.0, speed_ts=cfg.U_REF,

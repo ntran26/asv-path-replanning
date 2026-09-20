@@ -4,7 +4,10 @@
 count. This file records only what is *not settled*, ordered so the
 highest-leverage item is first.
 
-**Last updated:** 2026-09-19, revision 26 — run 9 analysed against run 8 (F84); run 10 = 60/40 + A29, training.
+**Last updated:** 2026-09-20, revision 29 — run 11 analysed: best yet, crossing opening direction not side-conditioned (F89); A30 on hold.
+Revision 28: 2026-09-19 — swerve root cause, run 11 training (F88); A30 opened.
+Revision 27: 2026-09-19 — run 10 analysed: best so far, A29 holds stand-on speed, starboard swerve open (F87).
+Revision 26: 2026-09-19 — run 9 analysed against run 8 (F84); run 10 = 60/40 + A29, training.
 Revision 25: 2026-09-19 — A29 decided and built behind a switch; run 10 queued after run 9 (F85).
 Revision 24: 2026-09-19 — A28 options 1 + 3 (run 9 training; stand-on diagnosed, F83); A29 opened.
 Revision 23: run 8 analysed (F82); A28 opened.
@@ -31,7 +34,7 @@ generator, the scale audit, noise and randomisation.
 
 | Part | Kind | Needs |
 |---|---|---|
-| **A** | Decisions | a call from you — 4 items (A26, A10, A3/A4/A6), plus the freeze sign-off |
+| **A** | Decisions | a call from you — 5 items (A30, A26, A10, A3/A4/A6), plus the freeze sign-off |
 | **B** | Measurements | basin time — `PART2_BASIN_PLAN.md`, with one addition proposed |
 | **C** | Build work | my time — 8 items |
 
@@ -88,6 +91,21 @@ Recommendation: 1 now as run 9 (one change, and it attributes A27), with a Tier 
 | 3. Leave it | fleeing is a Rule 17(b) response when the give-way vessel does not act, and goals hold at 0.90 | none | the stand-on compliance claim weakens; `v_hold` stays high |
 
 Recommendation: 1 after run 9 reports, as run 10, so run 9 stays a single-change run.
+
+**A30 — being overtaken by a vessel that never gives way (F87, F88) — on hold (your call, 2026-09-20).**
+
+*The situation.* Under Rule 13 the overtaking vessel keeps clear; under Rule 17(a)(i) the own ship, as stand-on, keeps course and speed. Training overtakers are constant-velocity (D1) at 1.5-2.2x the own ship's speed, so they never keep clear. A15 places 80 % of draws at or above a floor where holding course is safe (hull clearance + D_SAFE), and 20 % below it, labelled, where the overtaker's track reaches the hull and only the own ship's own action (Rule 17(a)(ii)/(b)) avoids contact. The reward's only release is `in_extremis`: DCPA < d_req **and** TCPA < 5 s, which is too late to evade a faster vessel from astern.
+
+*What the runs did* (above floor / below floor, of 17 / 3): run 6 slowed, 17 / 0; runs 7-9 fled, 15-16 / 1-3; run 10, with A29 charging speed change, held cruise, 14 / 1. Fleeing buys the below-floor draws and costs the stand-on rule on every draw; holding keeps the rule and loses the below-floor draws. Run 10 also lost 3 above-floor draws it should win by holding.
+
+| Option | Change | What it teaches | Cost / risk |
+|---|---|---|---|
+| **1. An earlier Rule 17(a)(ii) release (recommended)** | release `v_hold` (not the other terms) when the perceived overtaker is on a contact course -- its predicted DCPA below A15's contact-free floor -- and TCPA is within the time a stand-on evasion needs (derived from the turning and speed-change response, ~10 s rather than 5); keep charging otherwise | hold when holding is safe; act, without penalty, when the give-way vessel is visibly not keeping clear -- what 17(a)(ii) permits and 17(b) requires | a reward change; the release threshold rests on the perceived DCPA, so tracker error matters (C15); keeps D1 |
+| 2. Some overtakers keep clear in training | a share (e.g. 30 %) of being-overtaken targets use `T-RE`, the compliant reactive model, and pass wide | stand-on is learnable where the other vessel co-operates | relaxes **D1**, whose rationale is exactly that a policy trained on co-operating targets learns to rely on them; `T-RE` is a simple starboard-turn placeholder, not a Rule 13 model |
+| 3. Train without the below-floor draws | keep them labelled for evaluation (a stress stratum), drop them from training | removes the one case where the rule and survival conflict | the policy never practises 17(b); the evaluation stratum becomes out of distribution |
+| 4. Accept and report by stratum | none | -- | the headline being-overtaken rate stays ~0.75-0.85; report above / below floor separately |
+
+Recommendation: 1, with 4's stratum split reported whatever is chosen. Option 1 targets the conflict directly and keeps D1; 2 changes what the policy may assume about other vessels, which the paper would have to defend.
 
 ### Under test in revision 15 — the supervisor as a runtime layer (`PROJECT_STATE.md` F68)
 

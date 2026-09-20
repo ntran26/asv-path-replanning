@@ -1,0 +1,17 @@
+Being-overtaken development episodes, run11, supervisor off (38 s)
+outcomes {'goal': 19, 'collision:target': 1}; max speed mean 0.72 m/s; min range to overtaker median 1.88 m
+
+== per-step means by phase (weighted reward terms)
+              engaged   other
+steps          22.000  18.400
+u               0.572   0.620
+throttle        0.037   0.169
+over_gate       0.021   0.244
+v_hold_fires    0.480   0.074
+v_hold_mean     0.290   0.045
+col            -1.176  -0.183
+pf             -0.119  -0.310
+prog            1.500   1.495
+exist          -0.250  -0.250
+reward         -0.242   1.910
+
