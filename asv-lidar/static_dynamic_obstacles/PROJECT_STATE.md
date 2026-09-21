@@ -9,7 +9,7 @@ currently blocking a full training run and a full evaluation.**
 | **Revision** | 8 — 0.55 m/s; virtual corridors back; generator wired in; e-stop reward; noise and randomisation on; scale audit; first PPO formulation run; see `OPEN_PROBLEMS.md` |
 | **Last updated** | 2026-09-15 |
 | **Tests** | **485 passing, none expected to fail** (T1 passes since F24 was decided) |
-| **Blocking a headline training run** | run 11 done: best yet (0.925), but crossings open with one direction regardless of side (F89); A30 held; starboard-crossing swerve (A28 option 2, open); the training budget for the five learners (A26, TODO(04-4)); your sign-off and commit for the freeze (F75); B5 (`OPEN_PROBLEMS.md`) |
+| **Blocking a headline training run** | A31 (crossings do not read the side; seed spread 0.05 headline / 0.20 crossing, F90); A30 held; starboard-crossing swerve (A28 option 2, open); the training budget for the five learners (A26, TODO(04-4)); your sign-off and commit for the freeze (F75); B5 (`OPEN_PROBLEMS.md`) |
 | **Blocking a full evaluation** | **7 more** — B2, B5–B10 (§2) |
 | **Open `TODO(decision)`** | 1 (`D_SAFE`) |
 | **Open measurements** | 05 part 1 done from logs; basin sessions pending — `OPEN_PROBLEMS.md` Part B |
@@ -2418,6 +2418,41 @@ Supervisor: 7 stops in 6 of 220 episodes, none then hit.
 * Being overtaken recovers to 0.95 while holding cruise (A29 kept): all 17
   above-floor draws, and 2 of the 3 below-floor ones. A30 is held.
 * The head-on width set regressed at 6-8 m (0.16-0.25 target collisions).
+
+**F90 — the seed replicate: run 11 scores 0.925 and 0.875 on the same
+formulation, and the crossing opening direction is a seed accident, not a bias.
+Single-seed differences below ~0.05 mean nothing.**
+
+*Run 11, seed 1* (`runs/ppo_formulation_seed1_v11/`, same settings as seed 0;
+paused overnight, the suspended processes did not survive it, so it finished
+from its 1.75 M checkpoint, F86):
+
+| development set, supervisor off | run 11 seed 0 | run 11 seed 1 | run 10 (seed 0) |
+|---|---|---|---|
+| goal | 0.925 | 0.875 | 0.875 |
+| head-on | 1.00 | 1.00 | 0.90 |
+| crossing | 0.75 | 0.55 | 0.65 |
+| overtaking / null / no target | 0.95 / 0.95 / 0.95 | 0.90 / 0.95 / 0.95 | 1.00 / 0.95 / 1.00 |
+| being overtaken (above / below floor) | 0.95 (17/17, 2/3) | 0.90 (16/17, 2/3) | 0.75 (14/17, 1/3) |
+| mean COLREGs integral | −17.4 | −19.7 | −16.5 |
+| port crossings: goal, first alteration compliant | 8/12, 0.10 | 6/12, 0.30 | 8/12, 0.67 |
+| starboard crossings: goal, first alteration compliant | 7/8, **1.00** | 5/8, **0.43** | 5/8, 0.00 |
+
+*Reading it.*
+* **Seed spread is about 0.05 on the headline** (0.925 against 0.875) and **0.20
+  in the crossing class** (0.75 against 0.55). Every formulation comparison so
+  far has been one seed against one seed: run 8 -> run 10 (+0.025) and run 10 ->
+  run 11 (+0.05) are inside that spread, so only the large, mechanism-backed
+  movements are safe to read -- port crossings under A27 (2/12 -> 8/12), the
+  stand-on speed under A29 (0.69 -> 0.55 m/s), the starboard first alteration
+  under F88 (0.00 -> 1.00 at seed 0).
+* **The opening direction is not systematic.** Seed 0 opens every crossing to
+  starboard (port compliant 0.10, starboard 1.00); seed 1 is mixed (0.30 /
+  0.43). Neither reads the side reliably, and the bias differs by seed, so this
+  is a formulation gap rather than the latched weight pushing one way: A31.
+* **What holds across both seeds:** head-on 1.00, being overtaken 0.90-0.95 with
+  all-but-one above-floor draws and 2 of 3 below-floor ones, the supervisor
+  intervening in 1-2 % of episodes, and no stop followed by a collision.
 
 ### 3.13 Earlier findings, still standing
 
