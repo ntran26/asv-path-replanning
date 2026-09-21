@@ -4,7 +4,8 @@
 count. This file records only what is *not settled*, ordered so the
 highest-leverage item is first.
 
-**Last updated:** 2026-09-20, revision 29 — run 11 analysed: best yet, crossing opening direction not side-conditioned (F89); A30 on hold.
+**Last updated:** 2026-09-21, revision 30 — seed replicate: spread 0.05 headline, 0.20 crossing; opening direction is seed-dependent (F90); A31 opened.
+Revision 29: 2026-09-20 — run 11 analysed: best yet, crossing opening direction not side-conditioned (F89); A30 on hold.
 Revision 28: 2026-09-19 — swerve root cause, run 11 training (F88); A30 opened.
 Revision 27: 2026-09-19 — run 10 analysed: best so far, A29 holds stand-on speed, starboard swerve open (F87).
 Revision 26: 2026-09-19 — run 9 analysed against run 8 (F84); run 10 = 60/40 + A29, training.
@@ -34,7 +35,7 @@ generator, the scale audit, noise and randomisation.
 
 | Part | Kind | Needs |
 |---|---|---|
-| **A** | Decisions | a call from you — 5 items (A30, A26, A10, A3/A4/A6), plus the freeze sign-off |
+| **A** | Decisions | a call from you — 6 items (A31, A30, A26, A10, A3/A4/A6), plus the freeze sign-off |
 | **B** | Measurements | basin time — `PART2_BASIN_PLAN.md`, with one addition proposed |
 | **C** | Build work | my time — 8 items |
 
@@ -91,6 +92,16 @@ Recommendation: 1 now as run 9 (one change, and it attributes A27), with a Tier 
 | 3. Leave it | fleeing is a Rule 17(b) response when the give-way vessel does not act, and goals hold at 0.90 | none | the stand-on compliance claim weakens; `v_hold` stays high |
 
 Recommendation: 1 after run 9 reports, as run 10, so run 9 stays a single-change run.
+
+**A31 (new) — crossings do not read which side the target comes from (F89, F90).** Run 11's two seeds open crossings differently (seed 0 starboard in every crossing; seed 1 mixed), and neither aligns the first alteration with the side. The compliant sense is in the observation only once the encounter is **latched**; before that the context branch carries 0, and the first alteration is usually made 2-6 s in, often at or just after engagement.
+
+| Option | Change | Why it should help | Cost |
+|---|---|---|---|
+| **1. Show the sense as soon as the class is known (recommended)** | the context branch carries `compliant_turn_sense(cls, crossing_side)` whenever the classifier has a class, not only while latched; the latch still fixes it at engagement (A20) | the policy can align its opening alteration with the side before the latch, which is when it commits | observation meaning changes (no new values); retrain; the pre-latch sense can flip with classifier noise, which is what A20 exists to stop -- the latched value must still govern once engaged |
+| 2. A crossing-only curriculum stage | a stage of crossings alternating sides before the full mixture | forces the distinction early, as stage 3 did for head-on | another stage; longer curriculum |
+| 3. Leave it, report by side | none | -- | the paper reports crossing compliance by side, with the opening direction wrong in one of them |
+
+Recommendation: 1, then a two-seed check, since one seed cannot resolve a 0.05 difference (F90).
 
 **A30 — being overtaken by a vessel that never gives way (F87, F88) — on hold (your call, 2026-09-20).**
 

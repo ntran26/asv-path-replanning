@@ -95,5 +95,13 @@
   "MOTION_CLASSIFIER": "free_space",
   "PF_OVERSPEED_TOL": 0.2,
   "PF_OVERSPEED_SPAN": 0.5
- }
+ },
+ "resumes": [
+  {
+   "from_steps": 1750000,
+   "at": "2026-09-21 08:33:26",
+   "replay_buffer": "n/a"
+  }
+ ],
+ "wall_clock_s": 3419.575510263443
 }
