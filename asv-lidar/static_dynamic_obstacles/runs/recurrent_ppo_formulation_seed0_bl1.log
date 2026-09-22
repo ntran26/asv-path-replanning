@@ -2745,3 +2745,540 @@ Early stopping at step 2 due to reaching max kl: 0.05
 |    std                  | 0.654      |
 |    value_loss           | 0.617      |
 ----------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 55          |
+|    ep_rew_mean          | -22.5       |
+| time/                   |             |
+|    fps                  | 73          |
+|    iterations           | 116         |
+|    time_elapsed         | 8050        |
+|    total_timesteps      | 593920      |
+| train/                  |             |
+|    approx_kl            | 0.025190031 |
+|    clip_fraction        | 0.215       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.98       |
+|    explained_variance   | 0.883       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.0969      |
+|    n_updates            | 1150        |
+|    policy_gradient_loss | -0.0167     |
+|    std                  | 0.647       |
+|    value_loss           | 0.593       |
+-----------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 55.7        |
+|    ep_rew_mean          | -11.8       |
+| time/                   |             |
+|    fps                  | 73          |
+|    iterations           | 117         |
+|    time_elapsed         | 8151        |
+|    total_timesteps      | 599040      |
+| train/                  |             |
+|    approx_kl            | 0.029959533 |
+|    clip_fraction        | 0.232       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.96       |
+|    explained_variance   | 0.86        |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.18        |
+|    n_updates            | 1160        |
+|    policy_gradient_loss | -0.0139     |
+|    std                  | 0.64        |
+|    value_loss           | 0.627       |
+-----------------------------------------
+Early stopping at step 5 due to reaching max kl: 0.05
+[EVAL] t=600,000 supervisor off goal 0.74 collision 0.26 timeout 0.00 return -56.1 colregs -38.2 intervention 0.00 (123.2 s)
+[EVAL] t=600,000 supervisor on goal 0.74 collision 0.26 timeout 0.00 return -56.1 colregs -38.2 intervention 0.00 (101.0 s)
+------------------------------------------------
+| eval_supervisor_off/            |            |
+|    being_overtaken/collision    | 0.45       |
+|    being_overtaken/colregs      | -34        |
+|    being_overtaken/goal         | 0.55       |
+|    being_overtaken/intervention | 0          |
+|    collision_boundary           | 0.0417     |
+|    collision_obstacle           | 0.0167     |
+|    collision_rate               | 0.258      |
+|    collision_target             | 0.2        |
+|    crossing/collision           | 0.55       |
+|    crossing/colregs             | -50.9      |
+|    crossing/goal                | 0.45       |
+|    crossing/intervention        | 0          |
+|    episodes                     | 120        |
+|    estops_per_episode           | 0          |
+|    eval_wall_s                  | 123        |
+|    goal_rate                    | 0.742      |
+|    head_on/collision            | 0.15       |
+|    head_on/colregs              | -23.6      |
+|    head_on/goal                 | 0.85       |
+|    head_on/intervention         | 0          |
+|    intervention_rate            | 0          |
+|    mean_colregs_integral        | -38.2      |
+|    mean_return                  | -56.1      |
+|    no_target/collision          | 0.1        |
+|    no_target/colregs            | 0          |
+|    no_target/goal               | 0.9        |
+|    no_target/intervention       | 0          |
+|    null/collision               | 0.1        |
+|    null/colregs                 | 0          |
+|    null/goal                    | 0.9        |
+|    null/intervention            | 0          |
+|    overtaking/collision         | 0.2        |
+|    overtaking/colregs           | -121       |
+|    overtaking/goal              | 0.8        |
+|    overtaking/intervention      | 0          |
+|    timeout_rate                 | 0          |
+|    timesteps                    | 600000     |
+| eval_supervisor_on/             |            |
+|    being_overtaken/collision    | 0.45       |
+|    being_overtaken/colregs      | -34        |
+|    being_overtaken/goal         | 0.55       |
+|    being_overtaken/intervention | 0          |
+|    collision_boundary           | 0.0417     |
+|    collision_obstacle           | 0.0167     |
+|    collision_rate               | 0.258      |
+|    collision_target             | 0.2        |
+|    crossing/collision           | 0.55       |
+|    crossing/colregs             | -50.9      |
+|    crossing/goal                | 0.45       |
+|    crossing/intervention        | 0          |
+|    episodes                     | 120        |
+|    estops_per_episode           | 0          |
+|    eval_wall_s                  | 101        |
+|    goal_rate                    | 0.742      |
+|    head_on/collision            | 0.15       |
+|    head_on/colregs              | -23.6      |
+|    head_on/goal                 | 0.85       |
+|    head_on/intervention         | 0          |
+|    intervention_rate            | 0          |
+|    mean_colregs_integral        | -38.2      |
+|    mean_return                  | -56.1      |
+|    no_target/collision          | 0.1        |
+|    no_target/colregs            | 0          |
+|    no_target/goal               | 0.9        |
+|    no_target/intervention       | 0          |
+|    null/collision               | 0.1        |
+|    null/colregs                 | 0          |
+|    null/goal                    | 0.9        |
+|    null/intervention            | 0          |
+|    overtaking/collision         | 0.2        |
+|    overtaking/colregs           | -121       |
+|    overtaking/goal              | 0.8        |
+|    overtaking/intervention      | 0          |
+|    timeout_rate                 | 0          |
+|    timesteps                    | 600000     |
+| rollout/                        |            |
+|    ep_len_mean                  | 54.1       |
+|    ep_rew_mean                  | -34.8      |
+| time/                           |            |
+|    fps                          | 71         |
+|    iterations                   | 118        |
+|    time_elapsed                 | 8452       |
+|    total_timesteps              | 604160     |
+| train/                          |            |
+|    approx_kl                    | 0.02747887 |
+|    clip_fraction                | 0.203      |
+|    clip_range                   | 0.2        |
+|    entropy_loss                 | -1.94      |
+|    explained_variance           | 0.887      |
+|    learning_rate                | 0.0003     |
+|    loss                         | 0.158      |
+|    n_updates                    | 1170       |
+|    policy_gradient_loss         | -0.00848   |
+|    std                          | 0.641      |
+|    value_loss                   | 0.518      |
+------------------------------------------------
+Early stopping at step 3 due to reaching max kl: 0.06
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 57          |
+|    ep_rew_mean          | -5.68       |
+| time/                   |             |
+|    fps                  | 71          |
+|    iterations           | 119         |
+|    time_elapsed         | 8508        |
+|    total_timesteps      | 609280      |
+| train/                  |             |
+|    approx_kl            | 0.026118534 |
+|    clip_fraction        | 0.175       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.95       |
+|    explained_variance   | 0.853       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.235       |
+|    n_updates            | 1180        |
+|    policy_gradient_loss | -0.00141    |
+|    std                  | 0.642       |
+|    value_loss           | 0.968       |
+-----------------------------------------
+Early stopping at step 4 due to reaching max kl: 0.05
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 55.1        |
+|    ep_rew_mean          | -30.6       |
+| time/                   |             |
+|    fps                  | 71          |
+|    iterations           | 120         |
+|    time_elapsed         | 8568        |
+|    total_timesteps      | 614400      |
+| train/                  |             |
+|    approx_kl            | 0.047797333 |
+|    clip_fraction        | 0.16        |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.95       |
+|    explained_variance   | 0.8         |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.146       |
+|    n_updates            | 1190        |
+|    policy_gradient_loss | -0.00702    |
+|    std                  | 0.642       |
+|    value_loss           | 0.783       |
+-----------------------------------------
+Early stopping at step 0 due to reaching max kl: 0.05
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 55          |
+|    ep_rew_mean          | -36.4       |
+| time/                   |             |
+|    fps                  | 71          |
+|    iterations           | 121         |
+|    time_elapsed         | 8611        |
+|    total_timesteps      | 619520      |
+| train/                  |             |
+|    approx_kl            | 0.020121936 |
+|    clip_fraction        | 0.182       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.95       |
+|    explained_variance   | 0.859       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.265       |
+|    n_updates            | 1200        |
+|    policy_gradient_loss | 0.0118      |
+|    std                  | 0.642       |
+|    value_loss           | 1.03        |
+-----------------------------------------
+Early stopping at step 2 due to reaching max kl: 0.05
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 60.3        |
+|    ep_rew_mean          | -8.71       |
+| time/                   |             |
+|    fps                  | 72          |
+|    iterations           | 122         |
+|    time_elapsed         | 8662        |
+|    total_timesteps      | 624640      |
+| train/                  |             |
+|    approx_kl            | 0.026044872 |
+|    clip_fraction        | 0.156       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.95       |
+|    explained_variance   | 0.838       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.361       |
+|    n_updates            | 1210        |
+|    policy_gradient_loss | -0.000106   |
+|    std                  | 0.642       |
+|    value_loss           | 0.942       |
+-----------------------------------------
+Early stopping at step 5 due to reaching max kl: 0.05
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 60.3        |
+|    ep_rew_mean          | 18.3        |
+| time/                   |             |
+|    fps                  | 72          |
+|    iterations           | 123         |
+|    time_elapsed         | 8726        |
+|    total_timesteps      | 629760      |
+| train/                  |             |
+|    approx_kl            | 0.030780679 |
+|    clip_fraction        | 0.16        |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.95       |
+|    explained_variance   | 0.841       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.216       |
+|    n_updates            | 1220        |
+|    policy_gradient_loss | -0.00762    |
+|    std                  | 0.64        |
+|    value_loss           | 0.674       |
+-----------------------------------------
+Early stopping at step 4 due to reaching max kl: 0.07
+----------------------------------------
+| rollout/                |            |
+|    ep_len_mean          | 56         |
+|    ep_rew_mean          | -35.5      |
+| time/                   |            |
+|    fps                  | 72         |
+|    iterations           | 124        |
+|    time_elapsed         | 8785       |
+|    total_timesteps      | 634880     |
+| train/                  |            |
+|    approx_kl            | 0.03905398 |
+|    clip_fraction        | 0.239      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -1.94      |
+|    explained_variance   | 0.878      |
+|    learning_rate        | 0.0003     |
+|    loss                 | 0.101      |
+|    n_updates            | 1230       |
+|    policy_gradient_loss | -0.00529   |
+|    std                  | 0.638      |
+|    value_loss           | 0.478      |
+----------------------------------------
+Early stopping at step 3 due to reaching max kl: 0.05
+[CURRICULUM] t=640,000 -> scenario stage 4
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 55.3        |
+|    ep_rew_mean          | -20.5       |
+| time/                   |             |
+|    fps                  | 72          |
+|    iterations           | 125         |
+|    time_elapsed         | 8842        |
+|    total_timesteps      | 640000      |
+| train/                  |             |
+|    approx_kl            | 0.045096286 |
+|    clip_fraction        | 0.199       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.94       |
+|    explained_variance   | 0.877       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.583       |
+|    n_updates            | 1240        |
+|    policy_gradient_loss | 0.00158     |
+|    std                  | 0.638       |
+|    value_loss           | 0.78        |
+-----------------------------------------
+Early stopping at step 1 due to reaching max kl: 0.05
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 56.3        |
+|    ep_rew_mean          | -61.8       |
+| time/                   |             |
+|    fps                  | 72          |
+|    iterations           | 126         |
+|    time_elapsed         | 8889        |
+|    total_timesteps      | 645120      |
+| train/                  |             |
+|    approx_kl            | 0.041565973 |
+|    clip_fraction        | 0.155       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.94       |
+|    explained_variance   | 0.882       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.198       |
+|    n_updates            | 1250        |
+|    policy_gradient_loss | 0.00918     |
+|    std                  | 0.638       |
+|    value_loss           | 0.973       |
+-----------------------------------------
+Early stopping at step 1 due to reaching max kl: 0.07
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 55.7        |
+|    ep_rew_mean          | -46.5       |
+| time/                   |             |
+|    fps                  | 72          |
+|    iterations           | 127         |
+|    time_elapsed         | 8937        |
+|    total_timesteps      | 650240      |
+| train/                  |             |
+|    approx_kl            | 0.035738632 |
+|    clip_fraction        | 0.2         |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.94       |
+|    explained_variance   | 0.743       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.861       |
+|    n_updates            | 1260        |
+|    policy_gradient_loss | 0.00267     |
+|    std                  | 0.637       |
+|    value_loss           | 1.5         |
+-----------------------------------------
+Early stopping at step 3 due to reaching max kl: 0.05
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 56.4        |
+|    ep_rew_mean          | -39.8       |
+| time/                   |             |
+|    fps                  | 72          |
+|    iterations           | 128         |
+|    time_elapsed         | 8991        |
+|    total_timesteps      | 655360      |
+| train/                  |             |
+|    approx_kl            | 0.023719583 |
+|    clip_fraction        | 0.151       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.93       |
+|    explained_variance   | 0.739       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.342       |
+|    n_updates            | 1270        |
+|    policy_gradient_loss | -0.00571    |
+|    std                  | 0.636       |
+|    value_loss           | 1.28        |
+-----------------------------------------
+Early stopping at step 3 due to reaching max kl: 0.05
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 54.3        |
+|    ep_rew_mean          | -56         |
+| time/                   |             |
+|    fps                  | 72          |
+|    iterations           | 129         |
+|    time_elapsed         | 9049        |
+|    total_timesteps      | 660480      |
+| train/                  |             |
+|    approx_kl            | 0.034538858 |
+|    clip_fraction        | 0.199       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.93       |
+|    explained_variance   | 0.84        |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.0753      |
+|    n_updates            | 1280        |
+|    policy_gradient_loss | -0.00414    |
+|    std                  | 0.635       |
+|    value_loss           | 0.806       |
+-----------------------------------------
+Early stopping at step 5 due to reaching max kl: 0.05
+----------------------------------------
+| rollout/                |            |
+|    ep_len_mean          | 53.9       |
+|    ep_rew_mean          | -75        |
+| time/                   |            |
+|    fps                  | 73         |
+|    iterations           | 130        |
+|    time_elapsed         | 9113       |
+|    total_timesteps      | 665600     |
+| train/                  |            |
+|    approx_kl            | 0.03834585 |
+|    clip_fraction        | 0.269      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -1.93      |
+|    explained_variance   | 0.796      |
+|    learning_rate        | 0.0003     |
+|    loss                 | 0.0999     |
+|    n_updates            | 1290       |
+|    policy_gradient_loss | -0.00461   |
+|    std                  | 0.634      |
+|    value_loss           | 1.19       |
+----------------------------------------
+Early stopping at step 2 due to reaching max kl: 0.05
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 57.2        |
+|    ep_rew_mean          | -50.5       |
+| time/                   |             |
+|    fps                  | 73          |
+|    iterations           | 131         |
+|    time_elapsed         | 9161        |
+|    total_timesteps      | 670720      |
+| train/                  |             |
+|    approx_kl            | 0.030060027 |
+|    clip_fraction        | 0.216       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.93       |
+|    explained_variance   | 0.754       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.462       |
+|    n_updates            | 1300        |
+|    policy_gradient_loss | 0.00319     |
+|    std                  | 0.633       |
+|    value_loss           | 1.47        |
+-----------------------------------------
+Early stopping at step 5 due to reaching max kl: 0.05
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 55.4        |
+|    ep_rew_mean          | -46         |
+| time/                   |             |
+|    fps                  | 73          |
+|    iterations           | 132         |
+|    time_elapsed         | 9221        |
+|    total_timesteps      | 675840      |
+| train/                  |             |
+|    approx_kl            | 0.049999416 |
+|    clip_fraction        | 0.226       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.92       |
+|    explained_variance   | 0.773       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.118       |
+|    n_updates            | 1310        |
+|    policy_gradient_loss | -0.00702    |
+|    std                  | 0.63        |
+|    value_loss           | 0.975       |
+-----------------------------------------
+Early stopping at step 2 due to reaching max kl: 0.05
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 53.8        |
+|    ep_rew_mean          | -24.8       |
+| time/                   |             |
+|    fps                  | 73          |
+|    iterations           | 133         |
+|    time_elapsed         | 9266        |
+|    total_timesteps      | 680960      |
+| train/                  |             |
+|    approx_kl            | 0.041758865 |
+|    clip_fraction        | 0.206       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.91       |
+|    explained_variance   | 0.785       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.966       |
+|    n_updates            | 1320        |
+|    policy_gradient_loss | 0.00245     |
+|    std                  | 0.63        |
+|    value_loss           | 1.44        |
+-----------------------------------------
+Early stopping at step 4 due to reaching max kl: 0.05
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 51.5        |
+|    ep_rew_mean          | -62.1       |
+| time/                   |             |
+|    fps                  | 73          |
+|    iterations           | 134         |
+|    time_elapsed         | 9326        |
+|    total_timesteps      | 686080      |
+| train/                  |             |
+|    approx_kl            | 0.035915386 |
+|    clip_fraction        | 0.202       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.91       |
+|    explained_variance   | 0.747       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.723       |
+|    n_updates            | 1330        |
+|    policy_gradient_loss | -0.00215    |
+|    std                  | 0.628       |
+|    value_loss           | 1.15        |
+-----------------------------------------
+Early stopping at step 4 due to reaching max kl: 0.05
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 51.8        |
+|    ep_rew_mean          | -113        |
+| time/                   |             |
+|    fps                  | 73          |
+|    iterations           | 135         |
+|    time_elapsed         | 9384        |
+|    total_timesteps      | 691200      |
+| train/                  |             |
+|    approx_kl            | 0.044686757 |
+|    clip_fraction        | 0.217       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.91       |
+|    explained_variance   | 0.755       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 1.16        |
+|    n_updates            | 1340        |
+|    policy_gradient_loss | -0.00412    |
+|    std                  | 0.629       |
+|    value_loss           | 1.56        |
+-----------------------------------------
