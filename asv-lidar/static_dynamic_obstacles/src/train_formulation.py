@@ -165,6 +165,17 @@ ALGORITHMS = {"ppo": PPO, "recurrent_ppo": RecurrentPPO, "td3": TD3,
               "sac": SAC, "tqc": TQC}
 OFF_POLICY = ("td3", "sac", "tqc")
 
+# Replay buffers stay out of the repository (your calls, 2026-09-22): at 1 M
+# transitions each is ~0.58 GB, past GitHub's file limit.  They go next to the
+# repository -- here `PhD/asv_replay_buffers` in OneDrive; on a cluster clone,
+# beside the clone.  Only the latest per run is kept and it is deleted when the
+# run finishes: it exists only so a resume continues on the same data.  (Never
+# under AppData: the Microsoft Store Python silently redirects writes there.)
+REPO_ROOT = Path(__file__).resolve().parents[3]
+REPLAY_BUFFER_DIR = Path(os.environ.get("ASV_REPLAY_BUFFER_DIR",
+                                        str(REPO_ROOT.parent / "asv_replay_buffers")))
+REPLAY_BUFFER_MIN_FREE_GB = 3.0
+
 
 class EpisodeActor:
     """Deterministic actions for one episode, for any learner.
@@ -206,7 +217,22 @@ def _platform() -> Dict:
             "stable_baselines3": stable_baselines3.__version__,
             "sb3_contrib": sb3_contrib.__version__, "numpy": np.__version__,
             "os": platform.platform(), "machine": platform.node(),
-            "cpu_count": os.cpu_count()}
+            "cpu_count": os.cpu_count(), "git": _git_state()}
+
+
+def _git_state() -> Dict:
+    """The commit a run trained from, and whether `src/` had uncommitted changes
+    (tracked bytecode excluded: every Python run rewrites it)."""
+    import subprocess
+    here = str(Path(__file__).resolve().parent)
+    try:
+        head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=here, capture_output=True,
+                              text=True, check=True).stdout.strip()
+        status = subprocess.run(["git", "status", "--porcelain", "--", "."], cwd=here,
+                                capture_output=True, text=True, check=True).stdout.splitlines()
+        return {"head": head, "src_dirty": any("__pycache__" not in s for s in status)}
+    except Exception:
+        return {"head": "unknown", "src_dirty": None}
 
 
 def _formulation_switches() -> Dict:
@@ -251,6 +277,55 @@ def make_env(rank: int, seed: int, stage: int, randomisation, torch_threads: int
         env.reset(seed=seed + rank)
         return env
     return _init
+
+
+def _retry(action, attempts: int = 30, wait_s: float = 2.0) -> bool:
+    """OneDrive can hold a file open while it syncs (as it did `monitor.csv`)."""
+    for i in range(attempts):
+        try:
+            action()
+            return True
+        except PermissionError:
+            time.sleep(wait_s)
+    print("[BUFFER] a replay-buffer file stayed locked; left in place", flush=True)
+    return False
+
+
+def replay_buffer_path(run_dir: Path, algo: str, steps: int, base: Optional[Path] = None) -> Path:
+    return Path(base or REPLAY_BUFFER_DIR) / Path(run_dir).name / f"{algo}_replay_buffer_{int(steps)}_steps.pkl"
+
+
+class ReplayBufferCheckpoint(BaseCallback):
+    """Saves the off-policy replay buffer at the model checkpoints, outside the
+    repository, keeping only the latest (see `REPLAY_BUFFER_DIR`)."""
+
+    def __init__(self, run_dir: Path, algo: str, save_freq: int, base: Optional[Path] = None):
+        super().__init__(0)
+        self.run_dir, self.algo = Path(run_dir), algo
+        self.save_freq, self.base = int(save_freq), base
+
+    def _on_step(self) -> bool:
+        if self.n_calls % self.save_freq == 0:
+            self.save()
+        return True
+
+    def save(self) -> Optional[Path]:
+        import shutil
+        steps = int(self.model.num_timesteps)
+        target = replay_buffer_path(self.run_dir, self.algo, steps, self.base)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        free_gb = shutil.disk_usage(target.parent).free / 1e9
+        if free_gb < REPLAY_BUFFER_MIN_FREE_GB:
+            print(f"[BUFFER] {free_gb:.1f} GB free -- replay buffer NOT saved at "
+                  f"{steps:,}; a resume from here would refill it", flush=True)
+            return None
+        partial = target.with_name(target.stem + ".partial.pkl")
+        self.model.save_replay_buffer(str(partial))
+        _retry(lambda: os.replace(partial, target))
+        for old in target.parent.glob(f"{self.algo}_replay_buffer_*_steps.pkl"):
+            if old != target:
+                _retry(lambda old=old: old.unlink(missing_ok=True))
+        return target
 
 
 class ScenarioStageCallback(BaseCallback):
@@ -625,8 +700,7 @@ def main() -> None:
         config = dict(previous)
         config.setdefault("resumes", []).append(
             {"from_steps": resume_steps, "at": time.strftime("%Y-%m-%d %H:%M:%S"),
-             "replay_buffer": "restored" if args.algo in OFF_POLICY and
-             (run_dir / f"{args.algo}_replay_buffer_{resume_steps}_steps.pkl").exists() else "n/a"})
+             "replay_buffer": "pending"})
     with open(run_dir / "config.json", "w") as fh:
         json.dump(config, fh, indent=1, default=str)
 
@@ -656,9 +730,24 @@ def main() -> None:
     if resume_ckpt is not None:
         model = ALGORITHMS[args.algo].load(str(resume_ckpt), env=vec, device="cpu",
                                            tensorboard_log=str(args.runs_dir / "tensorboard"))
-        buffer = run_dir / f"{args.algo}_replay_buffer_{resume_steps}_steps.pkl"
-        if args.algo in OFF_POLICY and buffer.exists():
-            model.load_replay_buffer(str(buffer))
+        if args.algo in OFF_POLICY:
+            found = [b for b in (replay_buffer_path(run_dir, args.algo, resume_steps),
+                                 run_dir / f"{args.algo}_replay_buffer_{resume_steps}_steps.pkl")
+                     if b.exists()]
+            if found:
+                model.load_replay_buffer(str(found[0]))
+                status = f"restored ({found[0]})"
+            else:
+                # No buffer for this checkpoint: refill before updating again, rather
+                # than training on a nearly empty buffer.
+                model.learning_starts = model.num_timesteps + int(hyperparameters["learning_starts"])
+                status = f"missing -- refilled {int(hyperparameters['learning_starts']):,} steps before updating"
+            print(f"[RESUME] replay buffer {status}", flush=True)
+        else:
+            status = "n/a"
+        config["resumes"][-1]["replay_buffer"] = status
+        with open(run_dir / "config.json", "w") as fh:
+            json.dump(config, fh, indent=1, default=str)
     elif args.algo in OFF_POLICY:
         extra = {}
         if args.algo == "td3":
@@ -702,11 +791,12 @@ def main() -> None:
     callbacks = CallbackList([
         ScenarioStageCallback(args.timesteps, str(run_dir / "curriculum.json"),
                               resume=resume_steps is not None),
-        # Off-policy checkpoints keep the replay buffer, so a resume continues
-        # learning from the same data rather than from an empty buffer.
         CheckpointCallback(save_freq=max(args.checkpoint_every // args.num_envs, 1), save_path=str(run_dir),
-                           name_prefix=args.algo, save_vecnormalize=True,
-                           save_replay_buffer=args.algo in OFF_POLICY),
+                           name_prefix=args.algo, save_vecnormalize=True),
+        # Off-policy: the replay buffer at the same checkpoints, outside the
+        # repository, so a resume continues on the same data.
+        *([ReplayBufferCheckpoint(run_dir, args.algo, max(args.checkpoint_every // args.num_envs, 1))]
+          if args.algo in OFF_POLICY else []),
         FormulationEvalCallback(run_dir, args.eval_freq, args.eval_per_class,
                                 supervisor_modes=(("off", "on") if args.eval_supervisor == "both"
                                                   else (args.eval_supervisor,)),
@@ -723,6 +813,14 @@ def main() -> None:
     model.save(run_dir / "final_model.zip")
     vec.save(str(run_dir / "final_vecnormalize.pkl"))
     vec.close()
+    if args.algo in OFF_POLICY:          # only a resume needs it; free the disk
+        folder = REPLAY_BUFFER_DIR / run_dir.name
+        for f in folder.glob("*.pkl") if folder.exists() else ():
+            _retry(lambda f=f: f.unlink(missing_ok=True))
+        try:                             # the empty folder: best effort (OneDrive may
+            folder.rmdir()               # hold it while it syncs the deletion)
+        except OSError:
+            pass
     config["wall_clock_s"] = time.time() - started
     with open(run_dir / "config.json", "w") as fh:
         json.dump(config, fh, indent=1, default=str)

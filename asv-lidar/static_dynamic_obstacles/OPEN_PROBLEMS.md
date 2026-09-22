@@ -4,7 +4,8 @@
 count. This file records only what is *not settled*, ordered so the
 highest-leverage item is first.
 
-**Last updated:** 2026-09-22, revision 34 — A32 measured: the reward prefers the compliant crossing turn by +61 (discounted) from either side, in every clean pair; option 2 ruled out, the side bias is a learner property (F94).
+**Last updated:** 2026-09-22, revision 35 — A26 decided: ratio 1.0, 5 seeds, best-on-dev, this machine until a cluster is set up; campaign launched; replay buffers kept outside the repository (F95).
+Revision 34: 2026-09-22 — A32 measured: the reward prefers the compliant crossing turn by +61 (discounted) from either side, in every clean pair; option 2 ruled out, the side bias is a learner property (F94).
 Revision 33: 2026-09-22 — baseline-v1 saved: the run 11 formulation, frozen in `configs/baseline_v1.json` and gated by `train_formulation.py --config`; F91 and A31 switched off; A32/A33 stay open as known limits (F93).
 Revision 32: 2026-09-21 — run 12 scored on two seeds: F91 halves the narrow-channel collisions but the seeds solve it oppositely, A31 falsified; A32 and A33 opened, freeze withheld (F92).
 Revision 31: 2026-09-21 — head-on regression diagnosed and fixed, A31 by training exposure; run 12 on two seeds (F91).
@@ -45,7 +46,7 @@ generator, the scale audit, noise and randomisation.
 
 ### Open in revision 21 (`PROJECT_STATE.md` F74, F75)
 
-**A26 — training budget and the off-policy update ratio (TODO(04-4)) — three of four parts decided (your calls, 2026-09-22):** off-policy update ratio **1.0** gradient step per transition; **5 seeds** per learner (PPO seeds 0-1 are run 11); each seed represented by its **best-on-dev checkpoint** (`best_model.zip`, the callback's goal − 2 × collision score, supervisor off, same rule for every learner; Tier B held out). **Open: where it runs** (this machine ~28 days back to back, or a cluster, ~2 days wall time in parallel). Budget 2 M steps each, as recorded in baseline-v1.
+**A26 — training budget and the off-policy update ratio (TODO(04-4)) — decided (your calls, 2026-09-22):** off-policy update ratio **1.0** gradient step per transition; **5 seeds** per learner (PPO seeds 0-1 are run 11); each seed represented by its **best-on-dev checkpoint** (`best_model.zip`, the callback's goal − 2 × collision score, supervisor off, same rule for every learner; Tier B held out). **Where: this machine** (~28 days back to back) until you have cluster access; the campaign script stops cleanly (`runs/CAMPAIGN_STOP`) and every run resumes, so the rest can move (F95). Budget 2 M steps each, as recorded in baseline-v1.
 
 *Original entry:* **A26 — training budget and the off-policy update ratio (TODO(04-4)).** PPO is the development vehicle for testing and adjusting the reward now (your call, 2026-09-18). **Baseline learner set: PPO, RecurrentPPO, TD3, SAC and TQC (your correction: TQC, not SAC-IQN), multiple seeds, trained once everything is decided and the suite is frozen.** All five are built in the shared trainer (F76, F77); `sb3-contrib` 2.3.0 supplies RecurrentPPO and TQC. All five go through the A26 budget. Measured on this machine (10 workers, 12 cores; steps/s, and hours per 2 M-step seed), at 1.0 / 0.2 gradient steps per transition for the off-policy learners:
 
