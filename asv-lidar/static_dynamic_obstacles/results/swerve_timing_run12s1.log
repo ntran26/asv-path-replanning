@@ -1,0 +1,9 @@
+ scenario          outcome  first_turn_t first_turn_dir  tracked_at_turn state_at_turn cls_at_turn  range_at_turn  bearing_at_turn  panels_within_3m  first_tracked_t  first_engaged_t  peak_port_deg
+       20             goal           3.0           port                1       engaged    crossing           5.29             21.3                 0              2.0              2.0           26.7
+       21 collision:target           2.5           port                1       engaged    crossing           5.92             41.8                 0              1.5              1.5           19.3
+       24             goal           5.5           port                1          idle        none           4.09             13.4                 0              5.0              NaN           26.1
+       25             goal           4.0           stbd                1       engaged    crossing           5.56              3.9                 0              1.5              1.5           46.3
+       29             goal           7.5           stbd                1       engaged    crossing           3.14            -23.6                 0              2.5              2.5           52.4
+       35             goal           3.5           port                1       engaged    crossing           4.89             22.2                 0              3.0              3.0           48.6
+       36             goal           2.5           port                1       engaged    crossing           5.50             20.4                 0              1.5              1.5           46.1
+       38             goal           7.5           stbd                1       engaged    crossing           2.25             92.4                 0              2.0              2.0           45.5

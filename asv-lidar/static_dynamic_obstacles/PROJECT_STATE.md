@@ -8,8 +8,8 @@ currently blocking a full training run and a full evaluation.**
 |---|---|
 | **Revision** | 8 — 0.55 m/s; virtual corridors back; generator wired in; e-stop reward; noise and randomisation on; scale audit; first PPO formulation run; see `OPEN_PROBLEMS.md` |
 | **Last updated** | 2026-09-15 |
-| **Tests** | **485 passing, none expected to fail** (T1 passes since F24 was decided) |
-| **Blocking a headline training run** | A31 (crossings do not read the side; seed spread 0.05 headline / 0.20 crossing, F90); A30 held; starboard-crossing swerve (A28 option 2, open); the training budget for the five learners (A26, TODO(04-4)); your sign-off and commit for the freeze (F75); B5 (`OPEN_PROBLEMS.md`) |
+| **Tests** | **508 passing, none expected to fail** (T1 passes since F24 was decided) |
+| **Blocking a headline training run** | **baseline-v1 saved (F93); the campaign waits on A26 (budget, seeds)**, with A32/A33 as known limits of v1 (a fix means baseline-v2); then the freeze, A26's budget and A30; starboard-crossing swerve (A28 option 2, open); the training budget for the five learners (A26, TODO(04-4)); your sign-off and commit for the freeze (F75); B5 (`OPEN_PROBLEMS.md`) |
 | **Blocking a full evaluation** | **7 more** — B2, B5–B10 (§2) |
 | **Open `TODO(decision)`** | 1 (`D_SAFE`) |
 | **Open measurements** | 05 part 1 done from logs; basin sessions pending — `OPEN_PROBLEMS.md` Part B |
@@ -2453,6 +2453,193 @@ from its 1.75 M checkpoint, F86):
 * **What holds across both seeds:** head-on 1.00, being overtaken 0.90-0.95 with
   all-but-one above-floor draws and 2 of 3 below-floor ones, the supervisor
   intervening in 1-2 % of episodes, and no stop followed by a collision.
+
+**F91 — the head-on regression: run 11 alters to starboard even where there is
+no starboard room. Fixed for run 12, with A31's stage-3 crossing share.**
+
+*Diagnosis* (`tools/diagnostics/channel_headon.py`, the head-on width set,
+obstacles off). Narrow channels (5-6 m), split by whether the compliant
+starboard alteration was admissible when the encounter engaged:
+
+| narrow head-ons | run 8 | run 11 seed 0 | run 11 seed 1 |
+|---|---|---|---|
+| starboard **inadmissible**: altered to starboard first | 0.27 | **1.00** | **1.00** |
+| starboard inadmissible: target collision | 0.05 | 0.16 | 0.33 |
+| starboard admissible: target collision | 0.00 | 0.06 | 0.05 |
+| first alteration to starboard, all widths | 0.21-0.32 | 0.95-1.00 | 1.00 |
+
+Run 11 is *more* compliant in the head-on sense and *worse* in a channel: A27's
+held-heading charge, weighted at peak risk by F88, prices any port heading, so
+where the starboard turn does not fit the policy turns into the squeeze instead
+of slackening speed. 02 §4.4 says the answer there is 8(e), and R-2 already pays
+for it.
+
+*Fix (F91).* The held-heading form of `v_port` applies only where the compliant
+alteration is admissible (`V_PORT_HEADING_NEEDS_ADMISSIBLE`); the yaw-rate form
+still charges a wrong-way *turn* everywhere. Test
+`test_f91_no_held_heading_charge_where_the_compliant_turn_has_no_room`.
+
+*A31, revised by measurement.* The planned fix -- exposing the compliant sense
+before the latch -- was falsified: the sense is already in the observation
+pre-latch, and the policy **does** read it. Probing the two run 11 seeds at
+engagement, flipping that one input moves the rudder by 0.49-1.03 (seed 0) and
+0.15-0.20 (seed 1). Seed 0 commands +0.79 rudder (starboard) for a target from
+starboard and +0.21 for one from port: it responds to the input, but on top of a
+standing starboard bias the response cannot overturn. So the fix is training
+exposure, not observability: **stage 3 now draws crossings as often as head-ons**
+(`weights` per stage; stage 3 is 0.35 head-on / 0.35 crossing / 0.15 null /
+0.15 no-target), so the side distinction is learned where head-on's starboard
+answer is learned. Test
+`test_a31_stage_3_draws_crossings_as_often_as_head_ons`.
+
+*Run 12* (`results/run12.sh`): both changes, **two seeds**, each with Tier 1,
+the crossing diagnosis, the stand-on and swerve checks, then a channel head-on
+comparison against runs 8 and 11. **502 tests pass.**
+
+**F92 -- run 12 scored: F91 halves the narrow-channel collisions but the two
+seeds solve it by opposite means, and A31 does not remove the crossing side
+bias. The formulation is not ready to freeze.**
+
+*Headline* (development set, supervisor off, final checkpoint). Run 12 seed 0
+0.83, seed 1 0.88, against run 11's 0.92 / 0.88 and run 8's 0.85 -- inside the
+0.05 seed spread of F90, and neither change was aimed at it.
+
+| class | run 8 s0 | run 11 s0 | run 11 s1 | run 12 s0 | run 12 s1 |
+|---|---|---|---|---|---|
+| all | 0.85 | 0.92 | 0.88 | 0.83 | 0.88 |
+| head-on | 0.85 | 1.00 | 1.00 | 0.90 | 0.95 |
+| crossing | 0.55 | 0.75 | 0.55 | **0.40** | **0.60** |
+| being overtaken | 0.90 | 0.95 | 0.90 | 0.90 | **0.80** |
+
+*F91 worked where it was aimed, and over-shot* (`results/channel_headon/`, the
+head-on width set, grouped by whether the starboard alteration was admissible at
+engagement):
+
+| group | | run 8 | run 11 s0 | run 12 s0 | run 12 s1 |
+|---|---|---|---|---|---|
+| narrow (5-6 m), starboard **inadmissible** | altered starboard first | 0.27 | **1.00** | **0.00** | 0.64 |
+| | any collision | 0.05 | **0.36** | 0.15 | 0.18 |
+| wide (8-10 m), starboard **admissible** | altered starboard first | 0.22 | 1.00 | **0.06** | 0.68 |
+| | any collision | 0.03 | 0.11 | 0.00 | 0.05 |
+| | speed at closest point (m/s) | 0.84 | 0.81 | 0.91 | **0.56** |
+
+Removing the held-heading charge where the compliant turn has no room did stop
+the squeeze: run 11's 0.36 collision rate in inadmissible narrow head-ons falls
+to 0.15-0.18. But the charge was the only thing pricing a held course there, and
+the two seeds replaced it differently. **Seed 0 abandoned the starboard
+alteration altogether** -- 0.06 starboard-first in wide channels where starboard
+is admissible in 100 % of draws, turning port at t = 2.0 s at 0.91 m/s. That is
+a Rule 14 failure bought at the price of a Rule 8(e) one. **Seed 1 found the
+intended answer** -- 0.68 starboard-first in wide channels, altering late
+(t = 8.5 s) at 0.56 m/s, i.e. slackening speed and still turning the right way.
+F91 is therefore necessary but under-determined: it removes a wrong pressure
+without supplying the right one, and which behaviour fills the gap is left to
+the seed. Run 8 remains the best on collisions (0.05 narrow, 0.03 wide) while
+altering starboard in only 0.22-0.27 of head-ons -- it avoids collisions by not
+committing to a sense at all.
+
+*A31 failed: exposure changes which way the bias points, not that there is one.*
+First alteration compliant with 02 §4.3's turn sense, by the side the target
+came from (development crossings, `results/crossing_diagnosis/`):
+
+| run | target from port | target from starboard | crossing goal |
+|---|---|---|---|
+| run 8 s0 | 0.58 | 0.12 | 0.55 |
+| run 10 | 0.50 | 0.00 | 0.65 |
+| run 11 s0 | 0.08 | 0.75 | 0.75 |
+| run 11 s1 | 0.25 | 0.38 | 0.55 |
+| run 12 s0 | **0.42** | **0.12** | 0.40 |
+| run 12 s1 | **0.08** | **0.38** | 0.60 |
+
+Drawing crossings as often as head-ons in stage 3 did not teach the side. Run 12
+seed 0 came out port-biased (42 deg the compliant way for a port-side target,
+7.8 deg for a starboard-side one while swinging 40 deg the wrong way); seed 1
+came out starboard-biased. Six policies across four runs, each picking one
+direction and applying it to both sides. With the run 11 probe already showing
+that the policy **reads** the compliant sense, neither observability (A31 option
+1, falsified in F91) nor exposure (option 2, falsified here) is the cause. The
+remaining candidate is that the reward does not pay enough for the distinction
+to survive the variance of the progress and path-following terms: **A32**.
+
+*The seed-0 speed jump was seed, not F91.* Seed 0's crossing speed at CPA was
+0.81 m/s (0.93 against starboard-side targets); seed 1's is 0.63, inside the
+run 8-11 range of 0.38-0.66. The run-12 change is not what raised it.
+
+*Stand-on regressed on seed 1* -- 16 of 20 goals with 3 target collisions
+against run 11's 19/1 and 18/1, at a lower maximum speed (0.60 vs 0.70-0.72).
+A29's growing `v_hold` is holding the speed down, but holding course into an
+overtaker that does not give way is now costing contacts: folded into A30.
+
+*Verdict.* Do not freeze. F91 stays (it removes a real wrong pressure and halves
+the narrow-channel collisions) but needs its complement, and the crossing side
+bias is now the blocking formulation gap. Both are A32.
+
+**F93 -- baseline-v1: the run 11 formulation, saved for the multi-learner
+campaign (your call to prepare it, 2026-09-22).**
+
+*Why run 11.* Development set, supervisor off, final checkpoint:
+
+| run | all | head-on | crossing | being overtaken | overtaking | no target |
+|---|---|---|---|---|---|---|
+| run 8 | 0.85 | 0.85 | 0.55 | 0.90 | 0.95 | 0.95 |
+| run 10 | 0.88 | 0.90 | 0.65 | 0.75 | 1.00 | 1.00 |
+| **run 11 s0** | **0.92** | **1.00** | **0.75** | **0.95** | 0.95 | 0.95 |
+| **run 11 s1** | **0.88** | **1.00** | 0.55 | 0.90 | 0.90 | 0.95 |
+| run 12 s0 | 0.83 | 0.90 | 0.40 | 0.90 | 0.90 | 0.95 |
+| run 12 s1 | 0.88 | 0.95 | 0.60 | 0.80 | 0.95 | 1.00 |
+
+Run 11 has the best headline (0.90 over two seeds against run 12's 0.855), the
+only head-on 1.00 on both seeds, the best being-overtaken rate, and -- what
+matters most for a campaign in which five learners each draw their own seeds --
+the **same qualitative behaviour on both seeds** (Rule 14 starboard alteration in
+open water on 1.00 of head-ons). Run 12's narrow-channel gain is real but its
+seed 0 abandoned the starboard alteration in open water (F92), so a learner's
+Rule 14 result would depend on its seed. Run 8 is single-seed, alters to
+starboard in only 0.22-0.27 of head-ons, and predates A29 and F88. Run 10 lost
+the stand-on (0.75).
+
+*What was done.*
+1. **F91 and A31 switched off**, their code kept: `V_PORT_HEADING_NEEDS_ADMISSIBLE
+   = False` (A33 builds on it) and `A31_STAGE3_WEIGHTS = False` (stage 3's
+   `weights` is `None`, so the global class shares apply, as in run 11). No other
+   formulation file changed after run 11 launched.
+2. **`configs/baseline_v1.json`** records the formulation (every upper-case
+   constant, the formulation switches, observation schema, curriculum), run 11's
+   run arguments (2 M steps, 10 workers, supervisor off in training and both in
+   evaluation, low-speed starts 0.15, 20 per class every 200 k) and each
+   learner's hyperparameters and network. Formulation digest `02e853268828a32a`.
+3. **`src/baseline_config.py`** -- `--check` (code against the file),
+   `--verify-run` (a finished run against it), `--write` (a new version).
+   Verified: **run 11 seeds 0 and 1 match baseline-v1**; run 12 differs by
+   exactly the two switches; run 8 predates recorded switches.
+4. **`train_formulation.py --config`** applies the file's run arguments (only
+   `--algo`, `--seed` and `--tag` come from the CLI) and refuses to start if the
+   code no longer matches. The CLI defaults differ from run 11's arguments
+   (supervisor on in training, 6 per class), so a campaign launched on defaults
+   would have silently trained a different formulation; with `--config` it cannot.
+   `config.json` records the baseline id and digest.
+5. **Fixed:** `config.json` recorded `"algorithm": "PPO"` for every learner; it
+   now records the learner's class.
+6. **`results/baseline_campaign.sh`** (not launched): check, then each learner x
+   seed with `--config`, then Tier 1 off/on. PPO seeds 0 and 1 are run 11 and
+   are skipped unless `RERUN_PPO_01=1` (run 11 seed 1 was resumed from 1.75 M
+   after a pause, F86 -- identical formulation, a fresh rollout at the resume).
+7. Tests `tests/test_baseline_config.py`: code matches the file, run 12's
+   switches off, a changed constant is caught, every learner has settings,
+   run 11 verifies. **508 tests pass.**
+8. **Launch check** (4,096 steps each, `--smoke` under `--config`): PPO,
+   RecurrentPPO, TD3, SAC and TQC all start, train, evaluate and save under
+   baseline-v1, each recording its own learner class, the baseline id and
+   digest, and run 11's arguments; the Tier 1 loader opens all four new model
+   types. The smoke runs were deleted.
+
+*Carried into the paper as known limits of baseline-v1:* the crossing opening
+direction is not side-conditioned (A32); narrow head-ons where starboard has no
+room collide in 0.36 (F91, A33); being overtaken by a vessel that never gives
+way (A30). Fixing any of them changes the formulation, which means baseline-v2
+and rerunning every learner. Still A26's: the seed count and budget -- the file
+records 2 M steps and 1.0 gradient steps per transition, ~135 h for one seed of
+all five (F80).
 
 ### 3.13 Earlier findings, still standing
 

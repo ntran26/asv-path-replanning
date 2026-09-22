@@ -1119,6 +1119,16 @@ V_PORT_HEADING_DEAD_DEG = 5.0            # deg, TODO(05): from measured heading 
 # either direction opens it, so the wrong-way swerve discounted its own penalty
 # (median rho 0.52 while swerving; `v_port` ~ a third of full, run 10).
 V_PORT_LATCHED_RHO = True
+# F91: the held-heading charge applies only where the compliant alteration is
+# admissible.  Where it is not, 02 §4.4's answer is to slacken speed (R-2), and
+# the lateral room that remains is on the "wrong" side -- charging a held heading
+# there turned narrow head-ons into a squeeze: run 11 altered to starboard in
+# 100 % of inadmissible narrow head-ons (run 8: 0.27) and hit the target in
+# 0.16-0.33 of them (run 8: 0.05).  The yaw-rate form still charges the turn.
+# OFF in baseline-v1 (F93): run 12 showed it removes a wrong pressure without
+# supplying the right one -- one seed abandoned the Rule 14 alteration even in
+# open water (F92).  Kept for A33, which pairs it with an 8(e) speed charge.
+V_PORT_HEADING_NEEDS_ADMISSIBLE = False
 BETA_BOW_DEG = 67.5                      # bow arc for the crossing-ahead severity
 R_HOLD = 0.05                            # rad/s, yaw tolerance while standing on
 DU_HOLD = 0.10                           # m/s, speed tolerance, TODO(05)
@@ -1469,6 +1479,12 @@ OCCLUSION_DURATIONS_S = (1.0, 2.0, 4.0)
 # manoeuvre is inadmissible.
 # 06 §4: `p_basin` is the share of episodes on basin geometry; `slant_max` caps
 # the basin leg's slant (None = the full range the endpoint box allows).
+# A31 option 2 (F91): stage 3 draws crossings as often as head-ons.  OFF in
+# baseline-v1 (F93) -- falsified by run 12, which only flipped the direction of
+# the crossing side bias (F92).
+A31_STAGE3_WEIGHTS = False
+STAGE3_CROSSING_WEIGHTS = {"head_on": 0.35, "crossing": 0.35, "null": 0.15, "no_target": 0.15}
+
 CURRICULUM_STAGES = {
     1: {"width": (8.0, 10.0), "vary": False, "bend": False,
         "classes": ("no_target",), "clutter": (0, 1), "tcpa": "full",
@@ -1478,9 +1494,11 @@ CURRICULUM_STAGES = {
         "p_basin": 1.00, "slant_max": None},
     # A27 option 2 (F81): stage 3 teaches crossings from both sides alongside
     # head-on, so "give way" is not learned as "turn starboard" first.
+    # A31 (switch above): stage 3 may draw crossings as often as head-ons.
     3: {"width": (7.0, 10.0), "vary": True, "bend": CORRIDOR_BENDS,
         "classes": ("head_on", "crossing", "null", "no_target"), "clutter": (0, 1),
-        "tcpa": "upper", "p_basin": 0.85, "slant_max": None},
+        "tcpa": "upper", "p_basin": 0.85, "slant_max": None,
+        "weights": STAGE3_CROSSING_WEIGHTS if A31_STAGE3_WEIGHTS else None},
     4: {"width": (4.5, 10.0), "vary": True, "bend": CORRIDOR_BENDS,
         "classes": ENCOUNTER_SAMPLE_CLASSES, "clutter": (0, 2), "tcpa": "full",
         "p_basin": 0.75, "slant_max": None},

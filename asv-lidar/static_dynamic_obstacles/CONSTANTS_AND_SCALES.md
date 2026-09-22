@@ -767,6 +767,10 @@ tracker.
 | port share (F84) | `CROSSING_PORT_SHARE_TRAINING` **0.60** (run 9 tried 0.50) | your call, 2026-09-19 |
 | A29 (F85) | `V_HOLD_GROWS` (off for run 9, on from run 10), `V_HOLD_EXCESS_SPAN` **0.10 m/s**, `V_HOLD_CAP` **3.0** | your call, 2026-09-19 |
 | A27 (F81) | `V_PORT_HEADING_DEAD_DEG` **5.0** (TODO(05)); `CROSSING_PORT_SHARE_TRAINING` **0.60** (training namespace only); stage 3 classes gain crossing | your call, 2026-09-19 |
+| F88 | `V_PORT_LATCHED_RHO` **True** | run 11: `v_port` weighted by the peak risk since engagement |
+| F91 / A33 | `V_PORT_HEADING_NEEDS_ADMISSIBLE` **False** in baseline-v1 | on for run 12 only; one seed abandoned the Rule 14 alteration (F92) |
+| A31 | `A31_STAGE3_WEIGHTS` **False** in baseline-v1 (`STAGE3_CROSSING_WEIGHTS` 0.35/0.35/0.15/0.15) | on for run 12 only; falsified (F92) |
+| **baseline-v1** | **`configs/baseline_v1.json`**, the run 11 formulation; checked by `src/baseline_config.py`, applied by `train_formulation.py --config` | F93 |
 | geometry | **basin default** (`DEFAULT_GEOMETRY_MODE`); `BASIN_START_Y` 2.0, `BASIN_GOAL_Y` 22.0, `BASIN_X_RANGE` (2.5, 7.5) m, `BASIN_NAV_INSET_M` 0.40, `BASIN_H_SIDE_CLIP` (0.60, 5.00); `p_basin` 1 / 1 / 0.85 / 0.75 / 0.75 by stage, channel only for `CHANNEL_CLASSES` | F74 (06, your calls) |
 | feasibility | A* grid 0.25 m, walls 0.40 m, panels 0.45 m, route ≤ 2.25 × leg, 20 redraws then thin | F74 (Paper 2's filter) |
 | off-policy learners | TD3 / SAC / TQC: lr 3e-4, buffer 1 M, batch 256, tau 0.005, learning starts 10 k; TD3 policy delay 2, target noise 0.2 (clip 0.5), exploration 0.1; TQC 2 critics × 25 quantiles, top 2 dropped per critic | F76, F77 |

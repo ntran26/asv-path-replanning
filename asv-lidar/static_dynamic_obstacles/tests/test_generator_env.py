@@ -257,3 +257,15 @@ def test_a27_training_crossings_favour_port_and_other_namespaces_do_not(monkeypa
 def test_a27_stage_3_teaches_crossings():
     import constants as cfg
     assert "crossing" in cfg.CURRICULUM_STAGES[3]["classes"]
+
+
+def test_a31_stage_3_draws_crossings_as_often_as_head_ons():
+    """A31: a stage's own `weights` govern its class draw (off in baseline-v1)."""
+    import constants as cfg
+    generator = scn.ScenarioGenerator(stage=3, seed_namespace="training")
+    stage = dict(cfg.CURRICULUM_STAGES[3], weights=cfg.STAGE3_CROSSING_WEIGHTS)
+    classes = [generator._sample_class(np.random.default_rng(s), stage)
+               for s in range(400)]
+    share = {c: classes.count(c) / len(classes) for c in set(classes)}
+    assert abs(share.get("crossing", 0) - share.get("head_on", 0)) < 0.08
+    assert share.get("crossing", 0) > 0.25

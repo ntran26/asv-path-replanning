@@ -445,6 +445,10 @@ def v_port(state: RewardState, ctx, cfg) -> float:
     held = max(0.0, -s_c * _wrap180(float(heading) - float(ctx.psi_engage)))
     held_severity = ((held - float(cfg.v_port_heading_dead_deg))
                      / max(float(cfg.dpsi_min_deg), 1e-9))
+    # F91: where the compliant alteration does not fit, the priced answer is the
+    # 8(e) slowdown (R-2), and the only lateral room is on the other side.
+    if cfg_mod.V_PORT_HEADING_NEEDS_ADMISSIBLE and not ctx.turn_admissible:
+        held_severity = 0.0
     # F88: weighted by the peak risk since engagement -- the wrong-way swerve
     # opens DCPA, and the current `rho` would discount the swerve's own penalty.
     weight = (max(float(ctx.rho), float(getattr(ctx, "rho_latched", ctx.rho)))
