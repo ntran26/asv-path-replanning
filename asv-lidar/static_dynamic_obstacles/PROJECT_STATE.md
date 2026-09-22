@@ -2641,6 +2641,56 @@ and rerunning every learner. Still A26's: the seed count and budget -- the file
 records 2 M steps and 1.0 gradient steps per transition, ~135 h for one seed of
 all five (F80).
 
+**F94 -- A32 measured: the reward already pays for the compliant crossing turn,
+strongly and symmetrically. The side bias is not a reward problem.**
+
+`tools/diagnostics/a32_reward_gap.py` (`results/a32_reward_gap/`): 102 crossings
+(20 development + training-namespace draws with the side forced; 57 from port,
+45 from starboard; basin, obstacles off, supervisor off) branched at the step
+the encounter engages into scripted responses -- a 30 or 60 deg alteration in
+the latched compliant sense, the same alteration the other way, or stand-on --
+held until the latch clears, then the path resumed. Same seed and follower up to
+the branch. The latched sense agreed with A17's side rule in all 102.
+
+| compliant minus wrong, 30 deg, discounted at PPO's gamma from the branch | from port | from starboard |
+|---|---|---|
+| COLREGs term | +34.2 | +31.9 |
+| terminal (goal / collision) | +25.7 | +27.8 |
+| path following + progress + boundary | +2.2 | +2.0 |
+| **total** | **+61.3** | **+61.6** |
+| pairs where both reach the goal: total (COLREGs alone) | +25.3 (+16.6) | +18.3 (+16.6) |
+| share of those pairs where the reward prefers compliance | **1.00** (n = 6) | **1.00** (n = 8) |
+| gap / across-crossing std of the discounted return | 0.64 | 0.68 |
+
+The 60 deg alteration gives the same picture (+57.9 / +67.4). Complying is also
+safer: target collisions 0.46 against 0.70 (from port) and 0.36 against 0.60
+(from starboard) at 30 deg.
+
+*What this settles.* The reward prefers the compliant opening in every clean
+pair, by the same margin from either side, and the compliant turn costs nothing
+on the path terms (it is slightly *cheaper*). So the gap is neither small nor
+side-dependent: **A32 option 2 (raise the wrong-sense price) is ruled out** --
+it would scale a signal that is already large and symmetric. With observability
+(F91) and exposure (F92) also ruled out, what remains is how PPO turns a clear
+signal into a side-conditioned action: six policies read the side input (F91's
+probe) yet settle on one direction.
+
+*Checked and set aside:* the opening turn made **before** the encounter engages,
+which `v_port` does not judge. It happens in only 1-3 of 13-17 turned crossings
+per policy (all six runs), always the wrong way, but after-engagement first
+turns are still only 0.27-0.67 compliant, so it is a minor contributor.
+
+*Caveats.* Scripted fixed-heading alterations, not the policy's continuous
+actions; obstacles off; only 14 (30 deg) and 6 (60 deg) pairs reach the goal
+both ways, so the clean-pair margin rests on few pairs, though the sign agrees in
+all of them. Magnitudes are before `VecNormalize`; the ratios are unaffected.
+
+*Consequence for baseline-v1.* The formulation prices crossing compliance
+correctly, so whether a learner opens the right way is a property of the
+**learner**, which is exactly what the five-learner comparison measures. The side
+bias is a PPO result to report and compare, not a defect of baseline-v1 that
+forces a v2.
+
 ### 3.13 Earlier findings, still standing
 
 | # | Finding | Status |

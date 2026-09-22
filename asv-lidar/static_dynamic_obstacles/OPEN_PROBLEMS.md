@@ -4,7 +4,8 @@
 count. This file records only what is *not settled*, ordered so the
 highest-leverage item is first.
 
-**Last updated:** 2026-09-22, revision 33 — baseline-v1 saved: the run 11 formulation, frozen in `configs/baseline_v1.json` and gated by `train_formulation.py --config`; F91 and A31 switched off; A32/A33 stay open as known limits (F93).
+**Last updated:** 2026-09-22, revision 34 — A32 measured: the reward prefers the compliant crossing turn by +61 (discounted) from either side, in every clean pair; option 2 ruled out, the side bias is a learner property (F94).
+Revision 33: 2026-09-22 — baseline-v1 saved: the run 11 formulation, frozen in `configs/baseline_v1.json` and gated by `train_formulation.py --config`; F91 and A31 switched off; A32/A33 stay open as known limits (F93).
 Revision 32: 2026-09-21 — run 12 scored on two seeds: F91 halves the narrow-channel collisions but the seeds solve it oppositely, A31 falsified; A32 and A33 opened, freeze withheld (F92).
 Revision 31: 2026-09-21 — head-on regression diagnosed and fixed, A31 by training exposure; run 12 on two seeds (F91).
 Revision 30: 2026-09-21 — seed replicate: spread 0.05 headline, 0.20 crossing; opening direction is seed-dependent (F90); A31 opened.
@@ -44,7 +45,9 @@ generator, the scale audit, noise and randomisation.
 
 ### Open in revision 21 (`PROJECT_STATE.md` F74, F75)
 
-**A26 — training budget and the off-policy update ratio (TODO(04-4)).** PPO is the development vehicle for testing and adjusting the reward now (your call, 2026-09-18). **Baseline learner set: PPO, RecurrentPPO, TD3, SAC and TQC (your correction: TQC, not SAC-IQN), multiple seeds, trained once everything is decided and the suite is frozen.** All five are built in the shared trainer (F76, F77); `sb3-contrib` 2.3.0 supplies RecurrentPPO and TQC. All five go through the A26 budget. Measured on this machine (10 workers, 12 cores; steps/s, and hours per 2 M-step seed), at 1.0 / 0.2 gradient steps per transition for the off-policy learners:
+**A26 — training budget and the off-policy update ratio (TODO(04-4)) — three of four parts decided (your calls, 2026-09-22):** off-policy update ratio **1.0** gradient step per transition; **5 seeds** per learner (PPO seeds 0-1 are run 11); each seed represented by its **best-on-dev checkpoint** (`best_model.zip`, the callback's goal − 2 × collision score, supervisor off, same rule for every learner; Tier B held out). **Open: where it runs** (this machine ~28 days back to back, or a cluster, ~2 days wall time in parallel). Budget 2 M steps each, as recorded in baseline-v1.
+
+*Original entry:* **A26 — training budget and the off-policy update ratio (TODO(04-4)).** PPO is the development vehicle for testing and adjusting the reward now (your call, 2026-09-18). **Baseline learner set: PPO, RecurrentPPO, TD3, SAC and TQC (your correction: TQC, not SAC-IQN), multiple seeds, trained once everything is decided and the suite is frozen.** All five are built in the shared trainer (F76, F77); `sb3-contrib` 2.3.0 supplies RecurrentPPO and TQC. All five go through the A26 budget. Measured on this machine (10 workers, 12 cores; steps/s, and hours per 2 M-step seed), at 1.0 / 0.2 gradient steps per transition for the off-policy learners:
 
 | Learner | steps/s | h per seed |
 |---|---|---|
@@ -98,7 +101,9 @@ Recommendation: 1 after run 9 reports, as run 10, so run 9 stays a single-change
 
 > **Revision 33 (F93, your call to prepare the campaign):** the baseline formulation is saved as **baseline-v1** (`configs/baseline_v1.json`) — run 11's, with F91 and A31 switched off. A32 and A33 below are **not** resolved by it; they are carried into the paper as known limits. Fixing either later changes the formulation, which means **baseline-v2 and rerunning every learner** — so the cheap A32 measurement (option 1, ~1 h) is still worth doing before the long off-policy runs start.
 
-**A32 — the crossing side bias: two fixes have failed, so measure before building a third (F92). Blocking the freeze.**
+**A32 — the crossing side bias (F92) — option 1 measured (F94): the reward is not the cause.** From the same engagement state, turning the compliant way is worth **+61** (discounted, 30 deg) over the wrong way from port **and** from starboard; the reward prefers compliance in every pair that reaches the goal both ways, and the compliant turn costs nothing on the path terms. Option 2 is ruled out (it would scale a signal already large and symmetric). What remains is how the learner turns a clear signal into a side-conditioned action, which is what the five-learner comparison measures: **recommendation now option 4 — keep baseline-v1, report crossing compliance by side for every learner**, with option 3 (symmetric, mirrored crossing draws) as the fix to try only if all five learners show the bias.
+
+*Original entry:*
 
 Six policies across four runs each pick **one** opening direction and apply it to both sides. Exposure changed which direction, not that there is one:
 
@@ -787,7 +792,7 @@ settled.
 | ~~A22~~ | crossings must be escapable, 20 % labelled | **decided** (option 1) | — | built, F63 |
 | ~~C16~~ | class share lost on generator cap-outs | **fixed** (mine) | — | F62 |
 | ~~A21~~ | confined targets keep the channel; hull-clearance floor | **decided** (option 1) | — | built, F61 |
-| **A32** | **crossing side bias — measure the reward gap before a third fix** | **decision + measurement** | a baseline-v2 (a known limit of v1) | **~1 h, no training** |
+| **A32** | crossing side bias — **measured (F94): the reward pays +61 for compliance, both sides; a learner property** | decision | nothing (report by side) | recommend option 4 |
 | **A33** | **F91's complement: price the 8(e) slowdown where the turn does not fit** | **decision** | a baseline-v2 (a known limit of v1) | **one run with A32** |
 | ~~A31~~ | crossing side, by observation or exposure | **closed, both falsified** (F91, F92) | — | superseded by A32 |
 | A10 | keep v3 | decision | model provenance | confirm (recommended) |

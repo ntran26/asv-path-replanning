@@ -33,7 +33,10 @@ RUN_ARGS = {"timesteps": 2_000_000, "num_envs": 10, "eval_freq": 200_000,
             "eval_per_class": 20, "train_supervisor": "off", "eval_supervisor": "both",
             "low_speed_start_frac": 0.15, "checkpoint_every": 250_000}
 ALGOS = ["ppo", "recurrent_ppo", "td3", "sac", "tqc"]
-SEEDS = [0, 1, 2, 3, 4]            # TODO(A26): seed count and budget per learner
+SEEDS = [0, 1, 2, 3, 4]            # A26 (your call, 2026-09-22): 5 seeds per learner
+# A26: each seed is represented by its best development-set checkpoint (the eval
+# callback's goal - 2 x collision score, supervisor off); Tier B stays held out.
+CHECKPOINT = "best_model.zip"
 
 
 def _plain(value):
@@ -80,7 +83,8 @@ def snapshot(cfg: ModuleType, tf: ModuleType) -> Dict:
     """Everything the code decides; `--check` compares exactly this."""
     return {"formulation": formulation(cfg, tf), "run_args": _plain(RUN_ARGS),
             "learners": learners(tf, RUN_ARGS["num_envs"]),
-            "campaign": {"algos": ALGOS, "seeds": SEEDS}}
+            "campaign": {"algos": ALGOS, "seeds": SEEDS, "checkpoint": CHECKPOINT,
+                         "off_policy_gradient_steps_per_transition": 1.0}}
 
 
 def _git(*cmd) -> str:
@@ -167,7 +171,6 @@ def write(cfg: ModuleType, tf: ModuleType) -> Dict:
                 "crossing opening direction is not side-conditioned (A32)",
                 "narrow-channel head-ons where starboard has no room: 0.36 collisions (F91, A33)",
                 "being overtaken by a vessel that never gives way (A30, on hold)",
-                "training budget and seed count per learner not yet decided (A26)",
             ],
         },
         "formulation_digest": digest(body["formulation"]),

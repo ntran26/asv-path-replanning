@@ -195,6 +195,20 @@ EVAL_CLASSES = ("head_on", "crossing", "overtaking", "being_overtaken", "null", 
 COLREGS_PARTS = ("port", "bow", "side", "hold", "r8")
 
 
+def _platform() -> Dict:
+    """Software and machine a run trained on (A26): the campaign may split between
+    this machine and a cluster, and the versions are what must match."""
+    import platform
+    import sb3_contrib
+    import stable_baselines3
+    import torch
+    return {"python": platform.python_version(), "torch": torch.__version__,
+            "stable_baselines3": stable_baselines3.__version__,
+            "sb3_contrib": sb3_contrib.__version__, "numpy": np.__version__,
+            "os": platform.platform(), "machine": platform.node(),
+            "cpu_count": os.cpu_count()}
+
+
 def _formulation_switches() -> Dict:
     """The settings a run's reward and scenario draw depend on (F86): recorded in
     `config.json` so a resume can refuse code that has changed underneath it."""
@@ -581,6 +595,7 @@ def main() -> None:
         "r2_slowdown_test": cfg.R2_SLOWDOWN_TEST,
         # F86: the formulation switches, so a resume can refuse changed code.
         "switches": _formulation_switches(),
+        "platform": _platform(),
         "baseline_config": (None if baseline is None else
                             {"id": baseline["id"], "path": str(args.config),
                              "formulation_digest": baseline["formulation_digest"]}),
