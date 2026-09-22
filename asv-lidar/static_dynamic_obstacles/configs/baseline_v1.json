@@ -1,9 +1,9 @@
 {
  "id": "baseline-v1",
- "frozen_at": "2026-09-22 17:07:45",
+ "frozen_at": "2026-09-22 18:05:27",
  "git": {
-  "head": "73c75be744074684ffbc1ab00b3afd91e2eb4089",
-  "dirty": false
+  "head": "90055599220886424198bab305a1af93b37ca785",
+  "dirty": true
  },
  "provenance": {
   "formulation_of": "run 11 (runs/ppo_formulation_seed{0,1}_v11)",
@@ -15,8 +15,7 @@
   "known_limits": [
    "crossing opening direction is not side-conditioned (A32)",
    "narrow-channel head-ons where starboard has no room: 0.36 collisions (F91, A33)",
-   "being overtaken by a vessel that never gives way (A30, on hold)",
-   "training budget and seed count per learner not yet decided (A26)"
+   "being overtaken by a vessel that never gives way (A30, on hold)"
   ]
  },
  "formulation_digest": "02e853268828a32a",
@@ -1008,6 +1007,8 @@
    2,
    3,
    4
-  ]
+  ],
+  "checkpoint": "best_model.zip",
+  "off_policy_gradient_steps_per_transition": 1.0
  }
 }
