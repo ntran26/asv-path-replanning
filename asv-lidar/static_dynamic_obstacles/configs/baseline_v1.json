@@ -1,9 +1,9 @@
 {
  "id": "baseline-v1",
- "frozen_at": "2026-09-22 18:05:27",
+ "frozen_at": "2026-09-22 18:05:38",
  "git": {
-  "head": "90055599220886424198bab305a1af93b37ca785",
-  "dirty": true
+  "head": "7bed1c3e9cd6d22a2d5c1ebb2629c61a5b7fd43b",
+  "dirty": false
  },
  "provenance": {
   "formulation_of": "run 11 (runs/ppo_formulation_seed{0,1}_v11)",
