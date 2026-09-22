@@ -1022,6 +1022,25 @@ def test_a29_fleeing_an_overtaker_keeps_costing_more(monkeypatch):
     assert group["v_col"] <= 1.0                           # the group clip still holds
 
 
+def test_f91_no_held_heading_charge_where_the_compliant_turn_has_no_room(monkeypatch):
+    """F91.  With no starboard room in a head-on, 02 §4.4's answer is to slacken
+    speed and the only lateral room is to port; charging the held heading there
+    pushed the policy into the squeeze.  The yaw-rate form still charges a
+    wrong-way *turn*."""
+    def ctx(admissible):
+        return ctx_for(enc.HEAD_ON, psi_engage=0.0, u_engage=cfg.U_REF, rho=1.0,
+                       a_stbd=admissible, r_stbd=5.0 if admissible else -0.4)
+    held = state_for(heading_deg=-30.0, u=cfg.U_REF, r=0.0)          # 30 deg to port, held
+    turning = state_for(heading_deg=-30.0, u=cfg.U_REF, r=-0.2)      # and still turning
+    monkeypatch.setattr(cfg, "V_PORT_HEADING_NEEDS_ADMISSIBLE", True)
+    assert ctx(True).turn_admissible and not ctx(False).turn_admissible
+    assert T.v_port(held, ctx(True), CFG) == pytest.approx(1.0)
+    assert T.v_port(held, ctx(False), CFG) == 0.0
+    assert T.v_port(turning, ctx(False), CFG) > 0.0                  # the turn still costs
+    monkeypatch.setattr(cfg, "V_PORT_HEADING_NEEDS_ADMISSIBLE", False)
+    assert T.v_port(held, ctx(False), CFG) == pytest.approx(1.0)
+
+
 def test_f88_a_swerve_cannot_discount_its_own_penalty(monkeypatch):
     """F88.  `rho` falls as DCPA opens, and the wrong-way swerve opens it; with
     the latched weight the penalty keeps the risk the encounter reached."""

@@ -203,6 +203,8 @@ def _formulation_switches() -> Dict:
             "V_HOLD_GROWS": cfg.V_HOLD_GROWS,
             "V_PORT_HEADING_DEAD_DEG": cfg.V_PORT_HEADING_DEAD_DEG,
             "V_PORT_LATCHED_RHO": cfg.V_PORT_LATCHED_RHO,
+            "V_PORT_HEADING_NEEDS_ADMISSIBLE": cfg.V_PORT_HEADING_NEEDS_ADMISSIBLE,
+            "STAGE3_WEIGHTS": cfg.CURRICULUM_STAGES[3].get("weights"),
             "DEFAULT_GEOMETRY_MODE": cfg.DEFAULT_GEOMETRY_MODE,
             "OBSERVATION_SCHEMA_VERSION": cfg.OBSERVATION_SCHEMA_VERSION}
 
@@ -481,7 +483,34 @@ def main() -> None:
                     help="TD3/SAC/TQC gradient steps per vectorised step (0 = num_envs)")
     ap.add_argument("--fixed-stage", type=int, default=0,
                     help="train on one scenario stage throughout instead of the curriculum")
+    ap.add_argument("--config", type=Path, default=None,
+                    help="F93: a frozen baseline (configs/baseline_v1.json) -- applies its run "
+                         "arguments and refuses to start if the code no longer matches it")
     args = ap.parse_args()
+
+    baseline = None
+    if args.config:
+        # F93: the campaign's learners differ in the learner and nothing else.  The
+        # file sets every run argument; only --algo, --seed and --tag come from the CLI.
+        import baseline_config
+        with open(args.config) as fh:
+            baseline = json.load(fh)
+        if args.algo not in baseline["learners"]:
+            raise SystemExit(f"{args.algo} is not a learner in {baseline['id']}")
+        if args.fixed_stage or args.init_model or args.r2_slowdown_test:
+            raise SystemExit("--config runs the frozen formulation; drop --fixed-stage, "
+                             "--init-model and --r2-slowdown-test")
+        problems = baseline_config.check(cfg, sys.modules[__name__], baseline)
+        if problems:
+            raise SystemExit(f"code does not match {baseline['id']}: " + "; ".join(problems))
+        for key, value in baseline["run_args"].items():
+            setattr(args, key, value)
+        args.gradient_steps = 0              # num_envs, as recorded in the file
+        if args.smoke:                       # a launch check, not a result: "_smoke" run dir
+            args.timesteps, args.eval_freq, args.checkpoint_every = 4_096, 10**9, 10**9
+            args.eval_per_class = 1
+        print(f"[CONFIG] {baseline['id']} (formulation {baseline['formulation_digest']}): "
+              f"{args.algo} seed {args.seed}", flush=True)
 
     global STAGE_SCHEDULE
     if args.fixed_stage:
@@ -543,7 +572,7 @@ def main() -> None:
     run_dir.mkdir(parents=True, exist_ok=True)
 
     config = {
-        "algorithm": "PPO", "seed": args.seed, "timesteps": args.timesteps,
+        "algorithm": ALGORITHMS[args.algo].__name__, "seed": args.seed, "timesteps": args.timesteps,
         "algo": args.algo, "num_envs": args.num_envs, "hyperparameters": hyperparameters,
         "torch_threads": args.torch_threads, "fixed_stage": args.fixed_stage,
         "train_supervisor": args.train_supervisor, "eval_supervisor": args.eval_supervisor,
@@ -552,6 +581,9 @@ def main() -> None:
         "r2_slowdown_test": cfg.R2_SLOWDOWN_TEST,
         # F86: the formulation switches, so a resume can refuse changed code.
         "switches": _formulation_switches(),
+        "baseline_config": (None if baseline is None else
+                            {"id": baseline["id"], "path": str(args.config),
+                             "formulation_digest": baseline["formulation_digest"]}),
         # A25: 70-value schema with the encounter-context branch.  A checkpoint
         # from an earlier schema cannot be resumed; the run records its own.
         "observation_schema": cfg.OBSERVATION_SCHEMA_VERSION,

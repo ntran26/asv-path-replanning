@@ -1,0 +1,9 @@
+scenario,outcome,first_turn_t,first_turn_dir,tracked_at_turn,state_at_turn,cls_at_turn,range_at_turn,bearing_at_turn,panels_within_3m,first_tracked_t,first_engaged_t,peak_port_deg
+20,collision:target,2.0,port,1,engaged,crossing,5.46,32.9,0,2.0,2.0,38.0
+21,goal,2.0,port,1,engaged,crossing,6.01,44.5,0,1.5,1.5,39.5
+24,collision:target,2.0,port,0,none,,7.3,32.7,0,5.5,5.5,26.7
+25,goal,2.0,port,1,engaged,crossing,7.48,34.1,0,1.5,1.5,34.2
+29,collision:target,2.0,port,0,none,,5.53,33.1,0,2.5,2.5,43.3
+35,collision:target,2.0,port,0,none,,5.38,33.7,0,,,43.8
+36,collision:target,2.0,port,1,engaged,crossing,5.59,26.5,0,1.5,1.5,53.0
+38,goal,2.5,stbd,1,engaged,crossing,3.97,58.6,0,2.0,2.0,40.3

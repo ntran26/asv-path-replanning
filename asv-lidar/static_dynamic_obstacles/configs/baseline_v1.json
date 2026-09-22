@@ -1,0 +1,1013 @@
+{
+ "id": "baseline-v1",
+ "frozen_at": "2026-09-22 15:30:52",
+ "git": {
+  "head": "cef5f86eae8f3f05eec4e4dec996d2e6a86171a7",
+  "dirty": true
+ },
+ "provenance": {
+  "formulation_of": "run 11 (runs/ppo_formulation_seed{0,1}_v11)",
+  "why": "PROJECT_STATE.md F92/F93: best on every development-set class and consistent across two seeds; run 12's F91 and A31 are switched off",
+  "reproduces": [
+   "runs/ppo_formulation_seed0_v11",
+   "runs/ppo_formulation_seed1_v11"
+  ],
+  "known_limits": [
+   "crossing opening direction is not side-conditioned (A32)",
+   "narrow-channel head-ons where starboard has no room: 0.36 collisions (F91, A33)",
+   "being overtaken by a vessel that never gives way (A30, on hold)",
+   "training budget and seed count per learner not yet decided (A26)"
+  ]
+ },
+ "formulation_digest": "02e853268828a32a",
+ "formulation": {
+  "constants": {
+   "A31_STAGE3_WEIGHTS": false,
+   "AROUND_THE_CLOCK_SPOKES": 24,
+   "AROUND_THE_CLOCK_WIDTHS_M": [
+    10.0,
+    6.0,
+    4.26
+   ],
+   "BASIN_BEING_OVERTAKEN_START_S": 6.8625,
+   "BASIN_GOAL_Y": 22.0,
+   "BASIN_H_SIDE_CLIP": [
+    0.6,
+    5.0
+   ],
+   "BASIN_NAV_INSET_M": 0.39999999999999997,
+   "BASIN_START_Y": 2.0,
+   "BASIN_X_RANGE": [
+    2.5,
+    7.5
+   ],
+   "BEING_OVERTAKEN_ABOVE_FLOOR_SPAN": 0.5,
+   "BEING_OVERTAKEN_BEARING_MAX_DEG": 247.5,
+   "BEING_OVERTAKEN_BEARING_MIN_DEG": 112.5,
+   "BEING_OVERTAKEN_BELOW_FLOOR_FRAC": 0.2,
+   "BEING_OVERTAKEN_FLOOR_MARGIN": 0.35,
+   "BEING_OVERTAKEN_SPEED_MARGIN": 0.08372864271283698,
+   "BETA_BOW_DEG": 67.5,
+   "BOUNDARY_BEARINGS_DEG": [
+    -90.0,
+    -60.0,
+    -30.0,
+    0.0,
+    30.0,
+    60.0,
+    90.0
+   ],
+   "BOUNDARY_DECORRELATION_MAX": 0.9,
+   "BOUNDARY_GATE_MARGIN": 0.3,
+   "BOUNDARY_MAX_RANGE": 16.0,
+   "BOUNDARY_POSE_NOISE_HEADING_DEG": 0.2,
+   "BOUNDARY_POSE_NOISE_WALK": 0.0,
+   "BOUNDARY_POSE_NOISE_XY": 0.03,
+   "BOUNDARY_RAYS": 7,
+   "BREADTH": 0.5,
+   "CHANNEL_CLASSES": [
+    "head_on",
+    "crossing",
+    "overtaking"
+   ],
+   "CHANNEL_MIN_WIDTH_BY_CLASS": {
+    "being_overtaken": 4.26,
+    "null": 4.26
+   },
+   "CHANNEL_NARROW_EDGE_M": 4.26,
+   "CLASS_CT_DEG": {
+    "being_overtaken": [
+     -67.5,
+     67.5
+    ],
+    "crossing": [
+     [
+      67.5,
+      175.0
+     ],
+     [
+      185.0,
+      292.5
+     ]
+    ],
+    "head_on": [
+     170.0,
+     190.0
+    ],
+    "null": [
+     -20.0,
+     20.0
+    ],
+    "overtaking": [
+     -67.5,
+     67.5
+    ]
+   },
+   "CLASS_DCPA_MAX": {
+    "being_overtaken": 2.0,
+    "crossing": 2.5,
+    "head_on": 2.0,
+    "null": null,
+    "overtaking": 2.0
+   },
+   "CLASS_SAMPLE_WEIGHTS": {
+    "being_overtaken": 0.14,
+    "crossing": 0.22,
+    "head_on": 0.2,
+    "no_target": 0.17,
+    "null": 0.11,
+    "overtaking": 0.16
+   },
+   "CLASS_SPEED_RATIO": {
+    "being_overtaken": [
+     1.5,
+     2.2
+    ],
+    "crossing": [
+     0.6,
+     1.4
+    ],
+    "head_on": [
+     0.7,
+     1.3
+    ],
+    "null": [
+     0.85,
+     1.15
+    ],
+    "overtaking": [
+     0.4,
+     0.55
+    ]
+   },
+   "CLUSTER_EPS": 0.35,
+   "CLUSTER_MIN_POINTS": 4,
+   "CONFINED_CT_CLASSES": [
+    "overtaking",
+    "being_overtaken",
+    "null"
+   ],
+   "CONFINED_CT_HALF_DEG": 10.0,
+   "CONFINED_TRACK_CHECK_DT_S": 0.5,
+   "CORRIDOR_BASIN_MARGIN": 0.25,
+   "CORRIDOR_BENDS": false,
+   "CORRIDOR_BEND_CENTRE_FRAC": [
+    0.3,
+    0.7
+   ],
+   "CORRIDOR_BEND_FRACTION": 0.0,
+   "CORRIDOR_BEND_MIN_DEG": 20.0,
+   "CORRIDOR_BEND_RANGE_DEG": [
+    0.0,
+    60.0
+   ],
+   "CORRIDOR_BEND_SPAN_FRAC": 0.4,
+   "CORRIDOR_LENGTH_M": 25.0,
+   "CORRIDOR_WIDTHS_M": [
+    10.0,
+    8.0,
+    7.0,
+    6.0,
+    5.0,
+    4.0,
+    3.5
+   ],
+   "CORRIDOR_WIDTH_CONTROL_POINTS": [
+    2,
+    4
+   ],
+   "CORRIDOR_WIDTH_RANGE": [
+    3.5,
+    10.0
+   ],
+   "CORRIDOR_WIDTH_VARIATION": [
+    1.0,
+    1.8
+   ],
+   "CRI_BOW_CROSSING_GAIN": 1.3,
+   "CRI_BOW_CROSSING_HALF_DEG": 45.0,
+   "CRI_DCPA_SCALE": 4.0,
+   "CRI_ED_SCALE": 5.0,
+   "CRI_TCPA_SCALE_AFTER": 6.0,
+   "CRI_TCPA_SCALE_BEFORE": 20.0,
+   "CROSSING_ESCAPE_DELAY_S": 1.5,
+   "CROSSING_ESCAPE_DT_S": 0.1,
+   "CROSSING_ESCAPE_STOP_RPM": 0.0,
+   "CROSSING_ESCAPE_TAIL_S": 6.0,
+   "CROSSING_ESCAPE_TURN_DEG": 60.0,
+   "CROSSING_PORT_MIN_DEG": 247.5,
+   "CROSSING_PORT_SHARE_TRAINING": 0.6,
+   "CROSSING_STBD_MAX_DEG": 112.5,
+   "CROSSING_UNESCAPABLE_FRAC": 0.2,
+   "CRUISE_RPM": 6.0,
+   "CURRICULUM_STAGES": {
+    "1": {
+     "bend": false,
+     "classes": [
+      "no_target"
+     ],
+     "clutter": [
+      0,
+      1
+     ],
+     "p_basin": 1.0,
+     "slant_max": 6.0,
+     "tcpa": "full",
+     "vary": false,
+     "width": [
+      8.0,
+      10.0
+     ]
+    },
+    "2": {
+     "bend": false,
+     "classes": [
+      "no_target"
+     ],
+     "clutter": [
+      0,
+      3
+     ],
+     "p_basin": 1.0,
+     "slant_max": null,
+     "tcpa": "full",
+     "vary": true,
+     "width": [
+      5.0,
+      10.0
+     ]
+    },
+    "3": {
+     "bend": false,
+     "classes": [
+      "head_on",
+      "crossing",
+      "null",
+      "no_target"
+     ],
+     "clutter": [
+      0,
+      1
+     ],
+     "p_basin": 0.85,
+     "slant_max": null,
+     "tcpa": "upper",
+     "vary": true,
+     "weights": null,
+     "width": [
+      7.0,
+      10.0
+     ]
+    },
+    "4": {
+     "bend": false,
+     "classes": [
+      "head_on",
+      "crossing",
+      "overtaking",
+      "being_overtaken",
+      "null",
+      "no_target"
+     ],
+     "clutter": [
+      0,
+      2
+     ],
+     "p_basin": 0.75,
+     "slant_max": null,
+     "tcpa": "full",
+     "vary": true,
+     "width": [
+      4.5,
+      10.0
+     ]
+    },
+    "5": {
+     "bend": false,
+     "classes": [
+      "head_on",
+      "crossing",
+      "overtaking",
+      "being_overtaken",
+      "null",
+      "no_target"
+     ],
+     "clutter": [
+      0,
+      3
+     ],
+     "p_basin": 0.75,
+     "slant_max": null,
+     "tcpa": "full",
+     "vary": true,
+     "width": [
+      3.5,
+      10.0
+     ]
+    }
+   },
+   "CURRICULUM_STAGE_FRACTIONS": [
+    [
+     0.0,
+     1
+    ],
+    [
+     0.08,
+     2
+    ],
+    [
+     0.18,
+     3
+    ],
+    [
+     0.32,
+     4
+    ],
+    [
+     0.5,
+     5
+    ]
+   ],
+   "CURRICULUM_STAGE_STEPS": [
+    [
+     0.0,
+     1
+    ],
+    [
+     0.08,
+     2
+    ],
+    [
+     0.18,
+     3
+    ],
+    [
+     0.32,
+     4
+    ],
+    [
+     0.5,
+     5
+    ]
+   ],
+   "CURVATURE_EPS": 0.0001,
+   "CURVE_PROB": 0.0,
+   "DCPA_CLIP_DOMAINS": 12.8,
+   "DEFAULT_GEOMETRY_MODE": "basin",
+   "DEFERRED_TODOS": {
+    "04-1": "w_wall from measured pose drift -- basin session 1 (B4); nominal 0.65 m",
+    "04-2": "D_max effective, black-wall side -- basin session 1; nominal 12.0 m"
+   },
+   "DEPLOYED_DECISION_DT": 0.5,
+   "DESIGN_DT": 0.1,
+   "DETECTION_DROPOUT_P": 0.0,
+   "DOMAIN_ABEAM_FLOOR": 1.25,
+   "DOMAIN_AFT": 1.57,
+   "DOMAIN_FORE": 3.14,
+   "DOMAIN_LATERAL": 1.25,
+   "DOMAIN_RADIUS_DCPA": 1.25,
+   "DPSI_MIN_DEG": 20.0,
+   "DU_HOLD": 0.1,
+   "DU_MIN": 0.16745728542567395,
+   "DYNAMIC_DEMOTE_STEPS": 4,
+   "DYNAMIC_HOLD_STEPS": 2,
+   "DYNAMIC_PROMOTE_STEPS": 2,
+   "DYNAMIC_SPEED_OFF": 0.08,
+   "DYNAMIC_SPEED_ON": 0.15,
+   "D_CUT": 2.0,
+   "D_OA": 0.6,
+   "D_SAFE": 0.35,
+   "D_SCALE": 16.0,
+   "EGO_SPEED_NOISE": 0.05,
+   "EGO_YAW_RATE_NOISE_DPS": 1.0,
+   "EMERGENCY_STOP_ENABLED": true,
+   "ENCOUNTER_BEARING_HYSTERESIS_DEG": 3.0,
+   "ENCOUNTER_CLASSES": [
+    "none",
+    "head_on",
+    "crossing",
+    "overtaking",
+    "being_overtaken"
+   ],
+   "ENCOUNTER_HOLD_STEPS": 2,
+   "ENCOUNTER_SAMPLE_CLASSES": [
+    "head_on",
+    "crossing",
+    "overtaking",
+    "being_overtaken",
+    "null",
+    "no_target"
+   ],
+   "ESTOP_CLEAR_DCPA_M": 1.7625000000000002,
+   "ESTOP_MAX_BRAKE_S": 8.0,
+   "ESTOP_MAX_HOLD_S": 10.0,
+   "ESTOP_MIN_HOLD_S": 2.0,
+   "ESTOP_STOP_SPEED": 0.05,
+   "ESTOP_TRIGGER": "supervisor",
+   "FACILITY_WALL_MARGIN": 1.5,
+   "FEASIBILITY_GRID_M": 0.25,
+   "FEASIBILITY_MAX_ROUTE_RATIO": 2.25,
+   "FEASIBILITY_OBSTACLE_INFLATION_M": 0.45,
+   "FEASIBILITY_REDRAWS": 20,
+   "FEASIBILITY_SAFE_WIDTH_MARGIN": 0.15,
+   "FEASIBILITY_WALL_INFLATION_M": 0.4,
+   "FIELD_REPAIR_FRAC_JITTER": 0.035,
+   "FIELD_REPAIR_LATERALS": [
+    0.0,
+    1.95,
+    -1.95
+   ],
+   "FIELD_REPAIR_LAT_JITTER": 0.25,
+   "FIELD_REPAIR_PATH_FRACS": [
+    0.43,
+    0.66,
+    0.66
+   ],
+   "FIXED_RPM": false,
+   "GATE_CENTER_JITTER_ALONG": 0.45,
+   "GATE_CENTER_JITTER_LATERAL": 0.2,
+   "GATE_GAP_RANGE": [
+    1.35,
+    2.25
+   ],
+   "GATE_LATERAL_EXTRA": [
+    0.05,
+    0.3
+   ],
+   "GATE_PATH_FRAC_RANGE": [
+    0.35,
+    0.7
+   ],
+   "GENERATOR_MAX_ATTEMPTS": 200,
+   "GEOMETRY_MODES": [
+    "basin",
+    "channel"
+   ],
+   "GOAL_ALONG_DIST": 1.25,
+   "GOAL_CTE_RADIUS": 1.6,
+   "GOAL_END_INSET_M": 0.3706909514189131,
+   "GOAL_RADIUS": 0.5,
+   "GOAL_Y_MARGIN": 3.0,
+   "GRAVITY": 9.81,
+   "HEAD_ON_BEARING_HALF_DEG": 10.0,
+   "HEAD_ON_CT_HALF_DEG": 10.0,
+   "HEAD_ON_WALL_CLEARANCE": 0.65,
+   "KAPPA_DELTA": 0.25,
+   "KAPPA_ENG": 1.5,
+   "KAPPA_N": 0.3,
+   "KAPPA_REL": 2.5,
+   "KF_INIT_VEL_VAR": 0.5,
+   "KF_MEAS_NOISE_POS": 0.05,
+   "KF_PROCESS_NOISE_ACCEL": 0.1,
+   "LBP": 1.57,
+   "LIDAR_AFT_MASK_HALF_DEG": 0.0,
+   "LIDAR_BEAMS": 720,
+   "LIDAR_BEAM_RES_DEG": 0.5,
+   "LIDAR_DROPOUT_P": 0.0,
+   "LIDAR_MIN_RANGE": 1.0,
+   "LIDAR_NO_RETURN_GRAZING_DEG": 0.0,
+   "LIDAR_RANGE": 16.0,
+   "LIDAR_RANGE_EFFECTIVE": 12.0,
+   "LIDAR_SECTORS": 27,
+   "LIDAR_SWATH": 360.0,
+   "LOA": 1.725,
+   "LOOKAHEAD_FRACTION": 0.25,
+   "LOW_SPEED_START_ZERO_SHARE": 0.5,
+   "L_REF_PATH": 20.0,
+   "MAP_HEIGHT": 25.0,
+   "MAP_WIDTH": 10.0,
+   "MAX_ENCOUNTER_STEPS": 20,
+   "MAX_EPISODE_STEPS": 180,
+   "MAX_OBS": 3,
+   "MAX_RUD_ANGLE": 40.0,
+   "MAX_RUD_RATE_DPS": 20.0,
+   "MEASURED_POSE_STALE_PROB": 0.408,
+   "MOTION_CLASSIFIER": "free_space",
+   "MOTION_EXPLAIN_M": 0.3,
+   "MOTION_MIN_FRAC": 0.1,
+   "MOTION_MIN_POINTS": 3,
+   "MOTION_PASS_TOL_M": 0.25,
+   "MOTION_WINDOW_S": 2.0,
+   "MOTION_WINDOW_STEPS": 4,
+   "NO_TARGET_EPISODE_PROB": 0.25,
+   "NO_TARGET_TRAINING_FRACTION": [
+    0.15,
+    0.2
+   ],
+   "NULL_MIN_DCPA": 4.0,
+   "NULL_TRACK_CHECK_S": 15.0,
+   "N_CLEAR_STEPS": 6,
+   "N_ENCOUNTER_CLASSES": 5,
+   "N_FREE_STEPS": 4,
+   "N_MAX_TARGETS": 1,
+   "N_REF_PROG": 71.66006524885542,
+   "N_SWITCH_STEPS": 2,
+   "OBSERVATION_SCHEMA_VERSION": "a25-v3-context",
+   "OBSTACLE_CENTER_PROB": 0.3,
+   "OBSTACLE_CPA_GUARD_FRAC": 0.4,
+   "OBSTACLE_LATERAL_OFFSET_MAX": 0.95,
+   "OBSTACLE_LATERAL_OFFSET_MIN": 0.25,
+   "OBSTACLE_PATH_END_FRAC": 0.7,
+   "OBSTACLE_PATH_START_FRAC": 0.25,
+   "OBSTACLE_SIZE": 1.0,
+   "OBS_SWATH_HALF_DEG": 135.0,
+   "OCCLUSION_DURATIONS_S": [
+    1.0,
+    2.0,
+    4.0
+   ],
+   "OFFPATH_LATERAL_MAX": 3.2,
+   "OFFPATH_LATERAL_MIN": 1.4,
+   "OVERTAKING_CT_HALF_DEG": 67.5,
+   "OVERTAKING_PRUDENCE": 1.15,
+   "PATH_MODE": "straight",
+   "PATH_OFFSET_FRAC_RANGE": [
+    -0.3,
+    0.3
+   ],
+   "PATH_OFFSET_MEAN_FRAC": 0.12,
+   "PF_GAMMA_E": 4.0,
+   "PF_OMEGA_LA": 0.25,
+   "PF_OVERSPEED_SPAN": 0.5,
+   "PF_OVERSPEED_TOL": 0.2,
+   "PF_W_E": 0.7,
+   "PHYSICS_DT": 0.1,
+   "POLICY_SLOWDOWN_RPM": 0.0,
+   "POOL_BANDS": [
+    [
+     -135.0,
+     -90.0,
+     22.5
+    ],
+    [
+     -90.0,
+     -45.0,
+     11.25
+    ],
+    [
+     -45.0,
+     45.0,
+     6.0
+    ],
+    [
+     45.0,
+     90.0,
+     11.25
+    ],
+    [
+     90.0,
+     135.0,
+     22.5
+    ]
+   ],
+   "POOL_SWATH_HALF_DEG": 135.0,
+   "POSE_STALE_PROB": 0.0,
+   "PREDICTED_THRESHOLDS_M": {
+    "crossing": 6.8,
+    "head_on_centreline_target": 6.3,
+    "head_on_compliant_target": 3.8,
+    "overtaking": 4.944999999999999
+   },
+   "R2_SLOWDOWN_TEST": "stop",
+   "REF_PATH_LENGTH_M": 20.0,
+   "RENDER_FPS": 2,
+   "RENDER_SCALE": 25,
+   "REVERSE_AVAILABLE": false,
+   "REWARD_DT_SCALE": 5.0,
+   "RHO_POSE_DRIFT": 0.0101,
+   "RPM_CEIL": 7.5,
+   "RPM_DELTA": 1.5,
+   "RPM_FLOOR": 4.5,
+   "RPM_STAGE": 1,
+   "RPM_STAGES": {
+    "1": [
+     1.5,
+     4.5,
+     7.5
+    ],
+    "2": [
+     2.0,
+     4.0,
+     8.0
+    ],
+    "3": [
+     3.0,
+     3.0,
+     9.0
+    ],
+    "4": [
+     6.0,
+     0.0,
+     12.0
+    ]
+   },
+   "RUDDER_COMMAND_LIMIT": false,
+   "R_COLLISION": -300.0,
+   "R_DEAD": 0.02,
+   "R_ESTOP": -20.0,
+   "R_GOAL": 100.0,
+   "R_HOLD": 0.05,
+   "R_REF": 0.2,
+   "R_TIMEOUT": 0.0,
+   "SCENE_ENCODER_HIDDEN": 128,
+   "SEED_NAMESPACES": {
+    "development": [
+     200000,
+     209999
+    ],
+    "frozen_eval": [
+     300000,
+     309999
+    ],
+    "study1": [
+     400000,
+     409999
+    ],
+    "study2": [
+     500000,
+     509999
+    ],
+    "training": [
+     0,
+     99999
+    ]
+   },
+   "SIGMA_ENC": 0.25,
+   "SIMULATE_FACILITY_WALLS": true,
+   "SLOT_EMBED_DIM": 32,
+   "SLOT_ENCODER_HIDDEN": [
+    64,
+    64
+   ],
+   "SLOWDOWN_TEST_MAX_S": 20.0,
+   "SMOOTH_W_N": 0.5,
+   "SPAWN_INSET_M": 1.4124999999999999,
+   "SPAWN_SPAN_M": 21.0,
+   "SPEED_SCALE": 1.1163819028378263,
+   "STAGE3_CROSSING_WEIGHTS": {
+    "crossing": 0.35,
+    "head_on": 0.35,
+    "no_target": 0.15,
+    "null": 0.15
+   },
+   "START_X_MARGIN_FRAC": 0.25,
+   "START_X_MARGIN_MIN": 2.0,
+   "START_Y": 2.0,
+   "STOP_TEST_DT_S": 0.05,
+   "STOP_TEST_FIT_RANGE_M": 4.0,
+   "STOP_TEST_USES_HULL_FIT": false,
+   "STRAIGHT_REFERENCE_PATH": true,
+   "STUDY1_BASE_CONSTELLATIONS": 12,
+   "STUDY1_WIDTHS_M": [
+    10.0,
+    8.0,
+    7.0,
+    6.0,
+    5.0,
+    4.5,
+    4.0,
+    3.5
+   ],
+   "STUDY2_AXES": [
+    "pose_drift",
+    "dropout_rate",
+    "occlusion_duration",
+    "velocity_noise"
+   ],
+   "STUDY2_MULTIPLIERS": [
+    0.0,
+    0.5,
+    1.0,
+    2.0,
+    4.0
+   ],
+   "SUITE_VERSION": "3.0",
+   "TARGET_COMPLIANT_SPAWN_PROB": 0.5,
+   "TARGET_FEATURES": 16,
+   "TARGET_MATCH_RADIUS": 1.725,
+   "TARGET_SIDE_ALONG_JITTER": 0.45,
+   "TARGET_SIDE_BLOCKED_OFFSET_RANGE": [
+    1.4,
+    2.3
+   ],
+   "TARGET_SIDE_CORRIDOR_OFFSET_RANGE": [
+    0.65,
+    1.05
+   ],
+   "TARGET_SIDE_LATERAL_JITTER": 0.2,
+   "TARGET_SIDE_PATH_FRAC_RANGE": [
+    0.38,
+    0.68
+   ],
+   "TARGET_SIDE_RIGHT_PROB": 0.5,
+   "TARGET_SPAWN_BEYOND_RANGE": true,
+   "TARGET_SPAWN_MARGIN": 1.0,
+   "TARGET_SPEED_RANGE": [
+    0.1953668329966196,
+    0.7535577844155328
+   ],
+   "TCPA_CLIP": 40.0,
+   "TIER_A_ROLLOUTS": 10,
+   "TIER_B_BEHAVIOURS": [
+    "cv",
+    "re",
+    "nc"
+   ],
+   "TIER_B_EPISODES_PER_CELL": 20,
+   "TRACK_FIT_AMBIGUOUS_M": 0.15,
+   "TRACK_FIT_DEAD_ZONE_TOL_M": 0.1,
+   "TRACK_FIT_FULL_EXTENT_TOL_M": 0.15,
+   "TRACK_FIT_MIN_POINTS": 8,
+   "TRACK_FIT_OFFSET_GAIN": 0.5,
+   "TRACK_FIT_PRIOR_SPEED": 0.15,
+   "TRACK_FIT_STEP_DEG": 2.0,
+   "TRACK_GATE_DIST": 0.6977386892736415,
+   "TRACK_MAX_MISSES": 3,
+   "TRACK_MEASUREMENT": "centroid",
+   "TRACK_MIN_HITS": 2,
+   "TRACK_VELOCITY_NOISE": 0.0,
+   "TRAIN_OBS_COUNTS": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "TRAIN_OBS_PROBS": [
+    0.2,
+    0.25,
+    0.35,
+    0.2
+   ],
+   "TRAIN_SCENARIO_MODES": [
+    "normal",
+    "target_side",
+    "field_repair",
+    "gate",
+    "offpath"
+   ],
+   "TRAIN_SCENARIO_PROBS": [
+    0.4,
+    0.35,
+    0.15,
+    0.05,
+    0.05
+   ],
+   "T_ACT": 15.0,
+   "T_ENGAGE": 25.0,
+   "T_EXTREMIS": 5.0,
+   "UPDATE_RATE": 0.5,
+   "USE_RECURRENCE": false,
+   "U_CRUISE": 0.5581909514189132,
+   "U_MIN_REACHABLE": 0.2,
+   "U_NOM": 0.5581909514189132,
+   "U_REF": 0.5581909514189132,
+   "U_REF_LOG_MEDIAN": 1.14,
+   "U_REF_SLOW_FACTOR": 0.4,
+   "VERTICAL_PATH_PROB": 0.7,
+   "VESSEL_LENGTH": 1.725,
+   "VESSEL_RANDOMISATION_SCALE": 1.0,
+   "VESSEL_WIDTH": 0.5,
+   "V_BOW_W": 0.55,
+   "V_HOLD_CAP": 3.0,
+   "V_HOLD_EXCESS_SPAN": 0.1,
+   "V_HOLD_GROWS": true,
+   "V_HOLD_W": 0.45,
+   "V_PORT_HEADING_DEAD_DEG": 5.0,
+   "V_PORT_HEADING_NEEDS_ADMISSIBLE": false,
+   "V_PORT_LATCHED_RHO": true,
+   "V_PORT_W": 0.55,
+   "V_R8_W": 0.5,
+   "V_SIDE_W": 0.4,
+   "W_BND": 15.0,
+   "W_COL": 9.0,
+   "W_DOM": 12.5,
+   "W_EXIST": 0.25,
+   "W_OBS": 11.0,
+   "W_PF": 3.0,
+   "W_PROG": 1.5,
+   "W_REF_OPEN_WATER": 10.0,
+   "W_SMOOTH": 0.5,
+   "W_WALL": 0.65,
+   "_EDGES": "[-135.   -112.5   -90.    -78.75  -67.5   -56.25  -45.    -39.    -33.\n  -27.    -21.    -15.     -9.     -3.      3.      9.     15.     21.\n   27.     33.     39.     45.     56.25   67.5    78.75   90.    112.5\n  135.  ]",
+   "_RPM_STAGES_AT_12": {
+    "1": [
+     3.0,
+     9.0,
+     15.0
+    ],
+    "2": [
+     4.0,
+     8.0,
+     16.0
+    ],
+    "3": [
+     6.0,
+     6.0,
+     18.0
+    ],
+    "4": [
+     12.0,
+     0.0,
+     24.0
+    ]
+   },
+   "_TCPA_REF_SPEED": 0.55
+  },
+  "curriculum_schedule": [
+   [
+    0.0,
+    1
+   ],
+   [
+    0.08,
+    2
+   ],
+   [
+    0.18,
+    3
+   ],
+   [
+    0.32,
+    4
+   ],
+   [
+    0.5,
+    5
+   ]
+  ],
+  "observation_schema": "a25-v3-context",
+  "propulsion_stage": 4,
+  "switches": {
+   "CROSSING_PORT_SHARE_TRAINING": 0.6,
+   "DEFAULT_GEOMETRY_MODE": "basin",
+   "OBSERVATION_SCHEMA_VERSION": "a25-v3-context",
+   "R2_SLOWDOWN_TEST": "stop",
+   "STAGE3_WEIGHTS": null,
+   "V_HOLD_GROWS": true,
+   "V_PORT_HEADING_DEAD_DEG": 5.0,
+   "V_PORT_HEADING_NEEDS_ADMISSIBLE": false,
+   "V_PORT_LATCHED_RHO": true
+  }
+ },
+ "run_args": {
+  "checkpoint_every": 250000,
+  "eval_freq": 200000,
+  "eval_per_class": 20,
+  "eval_supervisor": "both",
+  "low_speed_start_frac": 0.15,
+  "num_envs": 10,
+  "timesteps": 2000000,
+  "train_supervisor": "off"
+ },
+ "learners": {
+  "ppo": {
+   "hyperparameters": {
+    "batch_size": 512,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "gae_lambda": 0.95,
+    "gamma": 0.9509900498999999,
+    "learning_rate": 0.0003,
+    "max_grad_norm": 0.5,
+    "n_epochs": 10,
+    "n_steps": 512,
+    "target_kl": 0.03,
+    "vf_coef": 0.5
+   },
+   "net_arch": {
+    "pi": [
+     256,
+     256
+    ],
+    "vf": [
+     256,
+     256
+    ]
+   }
+  },
+  "recurrent_ppo": {
+   "hyperparameters": {
+    "batch_size": 512,
+    "clip_range": 0.2,
+    "ent_coef": 0.0,
+    "gae_lambda": 0.95,
+    "gamma": 0.9509900498999999,
+    "learning_rate": 0.0003,
+    "max_grad_norm": 0.5,
+    "n_epochs": 10,
+    "n_steps": 512,
+    "target_kl": 0.03,
+    "vf_coef": 0.5
+   },
+   "net_arch": {
+    "pi": [
+     256,
+     256
+    ],
+    "vf": [
+     256,
+     256
+    ]
+   },
+   "policy": {
+    "enable_critic_lstm": true,
+    "lstm_hidden_size": 256,
+    "n_lstm_layers": 1,
+    "shared_lstm": false
+   }
+  },
+  "sac": {
+   "hyperparameters": {
+    "batch_size": 256,
+    "buffer_size": 1000000,
+    "ent_coef": "auto",
+    "gamma": 0.9509900498999999,
+    "gradient_steps": 10,
+    "learning_rate": 0.0003,
+    "learning_starts": 10000,
+    "tau": 0.005,
+    "train_freq": 1
+   },
+   "net_arch": {
+    "pi": [
+     256,
+     256
+    ],
+    "qf": [
+     256,
+     256
+    ]
+   }
+  },
+  "td3": {
+   "action_noise_sigma": 0.1,
+   "hyperparameters": {
+    "batch_size": 256,
+    "buffer_size": 1000000,
+    "gamma": 0.9509900498999999,
+    "gradient_steps": 10,
+    "learning_rate": 0.0003,
+    "learning_starts": 10000,
+    "policy_delay": 2,
+    "target_noise_clip": 0.5,
+    "target_policy_noise": 0.2,
+    "tau": 0.005,
+    "train_freq": 1
+   },
+   "net_arch": {
+    "pi": [
+     256,
+     256
+    ],
+    "qf": [
+     256,
+     256
+    ]
+   }
+  },
+  "tqc": {
+   "hyperparameters": {
+    "batch_size": 256,
+    "buffer_size": 1000000,
+    "ent_coef": "auto",
+    "gamma": 0.9509900498999999,
+    "gradient_steps": 10,
+    "learning_rate": 0.0003,
+    "learning_starts": 10000,
+    "tau": 0.005,
+    "top_quantiles_to_drop_per_net": 2,
+    "train_freq": 1
+   },
+   "net_arch": {
+    "pi": [
+     256,
+     256
+    ],
+    "qf": [
+     256,
+     256
+    ]
+   },
+   "policy": {
+    "n_critics": 2,
+    "n_quantiles": 25
+   }
+  }
+ },
+ "campaign": {
+  "algos": [
+   "ppo",
+   "recurrent_ppo",
+   "td3",
+   "sac",
+   "tqc"
+  ],
+  "seeds": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ]
+ }
+}

@@ -515,7 +515,8 @@ class ASVLidarEnv(gym.Env):
             # about half its draws and trained at 4.3 % against an intended 11 %.
             stage_spec = cfg.CURRICULUM_STAGES[stage]
             classes = stage_spec["classes"]
-            weights = np.array([cfg.CLASS_SAMPLE_WEIGHTS[c] for c in classes], dtype=float)
+            table = stage_spec.get("weights") or cfg.CLASS_SAMPLE_WEIGHTS   # A31
+            weights = np.array([table[c] for c in classes], dtype=float)
             cls = str(self._rng.choice(classes, p=weights / weights.sum()))
             for _ in range(20):
                 index = int(self._rng.integers(0, 10 ** 9))

@@ -280,8 +280,10 @@ class ScenarioGenerator:
     # ------------------------------------------------------------------
     def _sample_class(self, rng, stage) -> str:
         allowed = stage["classes"]
-        weights = np.array([cfg.CLASS_SAMPLE_WEIGHTS[c] for c in allowed],
-                           dtype=float)
+        # A31: a stage may weight its classes itself (stage 3 draws crossings as
+        # often as head-ons); otherwise the global shares apply.
+        table = stage.get("weights") or cfg.CLASS_SAMPLE_WEIGHTS
+        weights = np.array([table[c] for c in allowed], dtype=float)
         return str(rng.choice(allowed, p=weights / weights.sum()))
 
     def _sample_corridor(self, rng, stage, width):

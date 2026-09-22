@@ -4,7 +4,10 @@
 count. This file records only what is *not settled*, ordered so the
 highest-leverage item is first.
 
-**Last updated:** 2026-09-21, revision 30 — seed replicate: spread 0.05 headline, 0.20 crossing; opening direction is seed-dependent (F90); A31 opened.
+**Last updated:** 2026-09-22, revision 33 — baseline-v1 saved: the run 11 formulation, frozen in `configs/baseline_v1.json` and gated by `train_formulation.py --config`; F91 and A31 switched off; A32/A33 stay open as known limits (F93).
+Revision 32: 2026-09-21 — run 12 scored on two seeds: F91 halves the narrow-channel collisions but the seeds solve it oppositely, A31 falsified; A32 and A33 opened, freeze withheld (F92).
+Revision 31: 2026-09-21 — head-on regression diagnosed and fixed, A31 by training exposure; run 12 on two seeds (F91).
+Revision 30: 2026-09-21 — seed replicate: spread 0.05 headline, 0.20 crossing; opening direction is seed-dependent (F90); A31 opened.
 Revision 29: 2026-09-20 — run 11 analysed: best yet, crossing opening direction not side-conditioned (F89); A30 on hold.
 Revision 28: 2026-09-19 — swerve root cause, run 11 training (F88); A30 opened.
 Revision 27: 2026-09-19 — run 10 analysed: best so far, A29 holds stand-on speed, starboard swerve open (F87).
@@ -35,7 +38,7 @@ generator, the scale audit, noise and randomisation.
 
 | Part | Kind | Needs |
 |---|---|---|
-| **A** | Decisions | a call from you — 6 items (A31, A30, A26, A10, A3/A4/A6), plus the freeze sign-off |
+| **A** | Decisions | a call from you — 7 items (A32, A33, A30, A26, A10, A3/A4/A6), plus the freeze sign-off |
 | **B** | Measurements | basin time — `PART2_BASIN_PLAN.md`, with one addition proposed |
 | **C** | Build work | my time — 8 items |
 
@@ -93,7 +96,45 @@ Recommendation: 1 now as run 9 (one change, and it attributes A27), with a Tier 
 
 Recommendation: 1 after run 9 reports, as run 10, so run 9 stays a single-change run.
 
-**A31 (new) — crossings do not read which side the target comes from (F89, F90).** Run 11's two seeds open crossings differently (seed 0 starboard in every crossing; seed 1 mixed), and neither aligns the first alteration with the side. The compliant sense is in the observation only once the encounter is **latched**; before that the context branch carries 0, and the first alteration is usually made 2-6 s in, often at or just after engagement.
+> **Revision 33 (F93, your call to prepare the campaign):** the baseline formulation is saved as **baseline-v1** (`configs/baseline_v1.json`) — run 11's, with F91 and A31 switched off. A32 and A33 below are **not** resolved by it; they are carried into the paper as known limits. Fixing either later changes the formulation, which means **baseline-v2 and rerunning every learner** — so the cheap A32 measurement (option 1, ~1 h) is still worth doing before the long off-policy runs start.
+
+**A32 — the crossing side bias: two fixes have failed, so measure before building a third (F92). Blocking the freeze.**
+
+Six policies across four runs each pick **one** opening direction and apply it to both sides. Exposure changed which direction, not that there is one:
+
+| run | target from port | target from starboard | crossing goal |
+|---|---|---|---|
+| run 8 s0 | 0.58 | 0.12 | 0.55 |
+| run 10 | 0.50 | 0.00 | 0.65 |
+| run 11 s0 | 0.08 | 0.75 | 0.75 |
+| run 11 s1 | 0.25 | 0.38 | 0.55 |
+| run 12 s0 | 0.42 | 0.12 | 0.40 |
+| run 12 s1 | 0.08 | 0.38 | 0.60 |
+
+What is already ruled out: **observability** — the compliant sense is in the observation pre-latch and flipping it moves the rudder by 0.15–1.03 (A31 option 1, F91); **exposure** — stage 3 drawing crossings as often as head-ons (A31 option 2, F92). Both were built on a plausible mechanism and both were wrong, which is the argument for option 1 below.
+
+| Option | Change | Why it should help | Cost |
+|---|---|---|---|
+| **1. Measure the reward gap first (recommended)** | a counterfactual diagnostic: on the development crossings, force the compliant alteration and then the wrong one from the same state, and compare the **actual returns** — COLREGs group, progress, path-following and collision terms separately | if the return difference is small against the run-to-run variance of the progress and path terms, the policy is indifferent by construction and no curriculum or observation change can fix it; this says which term to change and by how much, instead of guessing a third time | ~1 h of mine, no training; delays the next run by that much |
+| 2. Raise the wrong-sense price directly | increase `v_port`'s weight, or its severity scale `dpsi_min_deg`, so a wrong-sense alteration costs more than the path deviation a compliant one buys | if option 1's answer is "too cheap", this is the fix | guessing the size without option 1; risks over-pricing and reviving the F91 squeeze |
+| 3. Symmetric crossing draws plus mirror augmentation | `CROSSING_PORT_SHARE_TRAINING` 0.60 → 0.50, and each crossing episode also trained mirrored | removes any residual data asymmetry that could seed a standing bias | the 0.60 share exists for A27's port-crossing fix; mirroring needs an observation-level reflection, which is real work |
+| 4. Accept and report by side | none | — | the paper reports crossing compliance split by side, with one side near zero; a reviewer will ask why, and the answer is that the reward did not require it |
+
+Recommendation: **1**, then whichever of 2/3 it points to, on two seeds. The two failed fixes cost a run each (~11 h); the measurement costs an hour.
+
+**A33 — F91 removed a wrong pressure without supplying the right one (F92).**
+
+Where the compliant alteration does not fit, F91 stops charging the held heading, and narrow-channel collisions fall from 0.36 to 0.15–0.18. But nothing then prices *what the vessel should do instead* — 02 §4.4's answer is the Rule 8(e) slowdown — and the two seeds filled the gap differently: seed 0 stopped altering to starboard at all (0.06 starboard-first in wide channels where starboard is admissible in 100 % of draws, at 0.91 m/s), seed 1 slackened to 0.56 m/s and kept altering starboard (0.68). Only seed 1's behaviour is the rule.
+
+| Option | Change | Why it should help | Cost |
+|---|---|---|---|
+| **1. Move the severity from heading to speed (recommended)** | where the compliant turn is inadmissible, `v_port`'s held-heading term is replaced by a charge for *not slackening* — severity on the speed held above what the 8(e) test says clears | the priced answer becomes the one 02 §4.4 names, rather than no answer at all | a reward change and a run; interacts with `v_r8`, so the two must not double-charge |
+| 2. Leave F91 as built, report the seed spread | none | — | half the seeds will abandon Rule 14 in open water, which is worse than the squeeze it fixed |
+| 3. Revert F91 | back to run 11's behaviour | — | restores 0.36 collisions in narrow head-ons |
+
+Recommendation: **1**, folded into the same run as A32's outcome so one run tests both.
+
+**~~A31~~ — crossings do not read which side the target comes from (F89, F90) — *closed, both options falsified*: option 1 by the run 11 probe (F91), option 2 by run 12's two seeds (F92). Superseded by A32.** Run 11's two seeds open crossings differently (seed 0 starboard in every crossing; seed 1 mixed), and neither aligns the first alteration with the side. The compliant sense is in the observation only once the encounter is **latched**; before that the context branch carries 0, and the first alteration is usually made 2-6 s in, often at or just after engagement.
 
 | Option | Change | Why it should help | Cost |
 |---|---|---|---|
@@ -746,6 +787,9 @@ settled.
 | ~~A22~~ | crossings must be escapable, 20 % labelled | **decided** (option 1) | — | built, F63 |
 | ~~C16~~ | class share lost on generator cap-outs | **fixed** (mine) | — | F62 |
 | ~~A21~~ | confined targets keep the channel; hull-clearance floor | **decided** (option 1) | — | built, F61 |
+| **A32** | **crossing side bias — measure the reward gap before a third fix** | **decision + measurement** | a baseline-v2 (a known limit of v1) | **~1 h, no training** |
+| **A33** | **F91's complement: price the 8(e) slowdown where the turn does not fit** | **decision** | a baseline-v2 (a known limit of v1) | **one run with A32** |
+| ~~A31~~ | crossing side, by observation or exposure | **closed, both falsified** (F91, F92) | — | superseded by A32 |
 | A10 | keep v3 | decision | model provenance | confirm (recommended) |
 | A3, A4, A6 | carried | decision | various | one call each |
 | **B5** | manoeuvring at 0.55 m/s is extrapolated | measurement | sim-to-real at the operating point | plan edit |
