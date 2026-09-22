@@ -1,0 +1,4 @@
+# Off-policy replay buffers (~0.58 GB each) live outside the repository
+# (train_formulation.REPLAY_BUFFER_DIR); never commit one by accident.
+*_replay_buffer_*.pkl
+*.partial.pkl

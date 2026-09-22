@@ -60,3 +60,22 @@ def test_recurrent_evaluation_carries_the_lstm_state_through_the_episode():
     assert any(not np.allclose(a, b) for a, b in zip(first, actor.state))
     actor.reset()
     assert actor.state is None and actor.start[0]
+
+
+def test_replay_buffers_live_outside_the_repository_and_only_the_latest_is_kept(tmp_path):
+    """Your call (2026-09-22): ~0.5 GB buffers never enter the repository."""
+    from pathlib import Path
+    import gymnasium as gym
+    from stable_baselines3 import SAC
+    import train_formulation as tf
+    repo = Path(__file__).resolve().parents[1]
+    default = tf.REPLAY_BUFFER_DIR.resolve()
+    assert repo not in default.parents and tf.REPO_ROOT.resolve() not in default.parents
+    model = SAC("MlpPolicy", gym.make("Pendulum-v1"), buffer_size=64, learning_starts=0, device="cpu")
+    cb = tf.ReplayBufferCheckpoint(tmp_path / "runs" / "sac_x", "sac", save_freq=1, base=tmp_path / "buf")
+    cb.init_callback(model)
+    for steps in (250, 500):
+        model.num_timesteps = steps
+        cb.save()
+    kept = sorted(p.name for p in (tmp_path / "buf" / "sac_x").iterdir())
+    assert kept == ["sac_replay_buffer_500_steps.pkl"]

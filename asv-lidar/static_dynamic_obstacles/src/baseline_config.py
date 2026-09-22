@@ -46,9 +46,16 @@ def _plain(value):
 
 def _constants(cfg: ModuleType) -> Dict:
     """Every upper-case setting in `constants.py`: a changed number anywhere in the
-    formulation is a mismatch; a changed comment is not."""
+    formulation is a mismatch; a changed comment is not.  Read from a fresh load
+    of the file, not the live module: `curriculum.apply_stage` rewrites the RPM
+    settings in memory (propulsion stage 4, recorded separately), so a check made
+    after staging would otherwise report a drift the source does not have."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("_constants_as_written", cfg.__file__)
+    fresh = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(fresh)
     out = {}
-    for name, value in vars(cfg).items():
+    for name, value in vars(fresh).items():
         if not name.isupper() or callable(value) or isinstance(value, ModuleType):
             continue
         out[name] = value

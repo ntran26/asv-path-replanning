@@ -8,8 +8,8 @@ currently blocking a full training run and a full evaluation.**
 |---|---|
 | **Revision** | 8 — 0.55 m/s; virtual corridors back; generator wired in; e-stop reward; noise and randomisation on; scale audit; first PPO formulation run; see `OPEN_PROBLEMS.md` |
 | **Last updated** | 2026-09-15 |
-| **Tests** | **508 passing, none expected to fail** (T1 passes since F24 was decided) |
-| **Blocking a headline training run** | **baseline-v1 saved (F93); the campaign waits on A26 (budget, seeds)**, with A32/A33 as known limits of v1 (a fix means baseline-v2); then the freeze, A26's budget and A30; starboard-crossing swerve (A28 option 2, open); the training budget for the five learners (A26, TODO(04-4)); your sign-off and commit for the freeze (F75); B5 (`OPEN_PROBLEMS.md`) |
+| **Tests** | **510 passing, none expected to fail** (T1 passes since F24 was decided) |
+| **Blocking a headline training run** | **none -- the baseline-v1 campaign runs on this machine (F95)** until a cluster is set up; A33 remains a known limit of v1 (a fix means baseline-v2); then the freeze, A26's budget and A30; starboard-crossing swerve (A28 option 2, open); the training budget for the five learners (A26, TODO(04-4)); your sign-off and commit for the freeze (F75); B5 (`OPEN_PROBLEMS.md`) |
 | **Blocking a full evaluation** | **7 more** — B2, B5–B10 (§2) |
 | **Open `TODO(decision)`** | 1 (`D_SAFE`) |
 | **Open measurements** | 05 part 1 done from logs; basin sessions pending — `OPEN_PROBLEMS.md` Part B |
@@ -2690,6 +2690,51 @@ correctly, so whether a learner opens the right way is a property of the
 **learner**, which is exactly what the five-learner comparison measures. The side
 bias is a PPO result to report and compare, not a defect of baseline-v1 that
 forces a v2.
+
+**F95 -- A26 decided; the baseline campaign runs on this machine until a cluster
+is set up (your calls, 2026-09-22).**
+
+*Decided:* off-policy **1.0** gradient step per transition; **5 seeds** per
+learner; each seed represented by its **best-on-dev checkpoint** (`best_model.zip`);
+2 M steps; **this machine** for now (~28 days back to back), moving to a cluster
+once access is granted. Recorded in `configs/baseline_v1.json`'s campaign block
+(formulation digest unchanged, `02e853268828a32a`).
+
+*Built for a month-long unattended run:*
+1. **`results/baseline_campaign.sh`** -- 23 jobs (PPO seeds 0-1 are run 11) in
+   order: PPO seeds 2-4 and RecurrentPPO 0-4 first (~2.5 days), then seed 0 of
+   TD3, SAC and TQC (a first look at every learner, ~5 days), then seeds 1-4 seed
+   by seed, so the campaign can move to a cluster at any point with every learner
+   partly done. Re-runnable: finished runs are skipped, a run with a checkpoint
+   `--resume`s, a run that died before its first checkpoint is set aside and
+   restarted; `runs/CAMPAIGN_STOP` stops it cleanly between runs. Tier 1 (off/on)
+   on the best-on-dev model after each run, and on run 11's.
+2. **Replay buffers outside the repository (your calls):** ~0.58 GB each at 1 M
+   transitions -- past GitHub's 100 MB limit, and C: has 17.5 GB free. They were
+   saved at every checkpoint inside the run folder (~8 per run, ~4.6 GB); now
+   `ReplayBufferCheckpoint` writes only the latest to
+   **`PhD/asv_replay_buffers/<run>/`** in OneDrive, beside the repository (on a
+   cluster clone, beside the clone; `ASV_REPLAY_BUFFER_DIR` overrides), skips the
+   save below 3 GB free, retries while OneDrive holds a file, and empties the
+   folder when the run finishes. (Never under AppData: the Microsoft Store Python
+   silently redirects writes there into its package folder -- found in testing.)
+   A resume without its buffer refills `learning_starts` steps before updating
+   instead of training on an empty buffer. `.gitignore` blocks
+   `*_replay_buffer_*.pkl`. **Verified** in the OneDrive folder by killing a SAC
+   run after its second checkpoint (the first buffer had been replaced by the
+   second) and resuming: restored from `PhD/asv_replay_buffers`, finished, buffer
+   deleted, none in the run directory. OneDrive held the emptied folder for a
+   moment, so removing it is best-effort.
+   *Cost to know:* OneDrive uploads each new buffer -- ~0.58 GB about every 6 h
+   during SAC -- and syncs its deletion.
+5. **Fixed:** the baseline check read constants from the live module, so a check
+   made after `curriculum.apply_stage` (which rewrites the RPM settings in memory)
+   reported a drift the source did not have. It now reads `constants.py` as
+   written; test `test_runtime_staging_is_not_a_drift`.
+3. Each run's `config.json` records its **platform** (Python, torch, SB3,
+   sb3-contrib, numpy, OS, machine) and **git commit**, so runs split between this
+   machine and a cluster can be shown to share software.
+4. **`tools/campaign_status.py`** -- one line per learner x seed. **510 tests pass.**
 
 ### 3.13 Earlier findings, still standing
 

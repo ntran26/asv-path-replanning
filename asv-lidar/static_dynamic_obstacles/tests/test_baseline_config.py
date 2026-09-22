@@ -26,9 +26,26 @@ def test_run_12_switches_are_off_in_the_baseline():
     assert switches["V_PORT_LATCHED_RHO"] and switches["V_HOLD_GROWS"]
 
 
-def test_a_changed_constant_is_caught(monkeypatch):
-    monkeypatch.setattr(cfg, "V_HOLD_CAP", cfg.V_HOLD_CAP + 1.0)
-    assert any("V_HOLD_CAP" in p for p in bc.check(cfg, tf))
+def test_a_changed_constant_is_caught(tmp_path):
+    """An edit to `constants.py` is a mismatch (checked on a copy of the file)."""
+    import types
+    source = Path(cfg.__file__).read_text(encoding="utf-8")
+    assert "V_HOLD_CAP = 3.0" in source
+    edited = tmp_path / "constants.py"
+    edited.write_text(source.replace("V_HOLD_CAP = 3.0", "V_HOLD_CAP = 4.0"), encoding="utf-8")
+    fake = types.SimpleNamespace(**vars(cfg))
+    fake.__file__ = str(edited)
+    assert any("V_HOLD_CAP" in p for p in bc.check(fake, tf))
+
+
+def test_runtime_staging_is_not_a_drift():
+    """`curriculum.apply_stage` rewrites RPM settings in memory; the source is unchanged."""
+    import curriculum
+    curriculum.apply_stage(0)
+    try:
+        assert bc.check(cfg, tf) == []
+    finally:
+        curriculum.apply_stage(tf.PROPULSION_STAGE)
 
 
 def test_every_campaign_learner_has_its_settings():
