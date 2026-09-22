@@ -2702,10 +2702,10 @@ once access is granted. Recorded in `configs/baseline_v1.json`'s campaign block
 
 *Built for a month-long unattended run:*
 1. **`results/baseline_campaign.sh`** -- 23 jobs (PPO seeds 0-1 are run 11) in
-   order: PPO seeds 2-4 and RecurrentPPO 0-4 first (~2.5 days), then seed 0 of
-   TD3, SAC and TQC (a first look at every learner, ~5 days), then seeds 1-4 seed
-   by seed, so the campaign can move to a cluster at any point with every learner
-   partly done. Re-runnable: finished runs are skipped, a run with a checkpoint
+   order (your call): **seed 0 of RecurrentPPO, TD3, SAC and TQC first** (a first
+   look at every learner, ~5.5 days), then PPO seeds 2-4 and RecurrentPPO 1-4,
+   then the off-policy seeds 1-4 seed by seed, so the campaign can move to a
+   cluster at any point with every learner partly done. Re-runnable: finished runs are skipped, a run with a checkpoint
    `--resume`s, a run that died before its first checkpoint is set aside and
    restarted; `runs/CAMPAIGN_STOP` stops it cleanly between runs. Tier 1 (off/on)
    on the best-on-dev model after each run, and on run 11's.
