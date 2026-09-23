@@ -1,5 +1,15 @@
 # PROJECT BRIEF — Paste at thread start
 
+> **Status note (2026-09-22).** Parts of this document are superseded by the implementation, which is frozen as **baseline-v1** (`configs/baseline_v1.json`, git tag `baseline-v1`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here:
+>
+> - "SAC primary; PPO, RecurrentPPO, TQC as …": the baseline set is PPO, RecurrentPPO, TD3, SAC and TQC on one frozen formulation (F76, F77, F93); the framing is open (`METHODS_BRIEF.md` §9).
+>
+> - S6: the observation is **70** values (F72), not ≈56.
+>
+> - Control and decisions run at **2 Hz** (F38); the LiDAR's 10 Hz scan rate is unchanged.
+>
+> The rationale below still stands where it is not listed. `F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`.
+
 > Update the two fields below each time. Everything else is stable until a decision changes.
 > **Revision 2** — repositioned to two-vessel encounters. Supersedes the multi-vessel version.
 

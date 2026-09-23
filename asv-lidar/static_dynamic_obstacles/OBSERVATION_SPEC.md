@@ -1,20 +1,23 @@
 # OBSERVATION SPEC — Paper 3
 
-**Version:** `obs-v2` — two-vessel repositioning. Supersedes `obs-v1` (91 dims,
-three slots, six encounter classes), which was never trained against.
+**Version:** `a25-v3-context` (observation revision 3; `OBSERVATION_SCHEMA_VERSION`
+in `constants.py`). Supersedes `obs-v2` (56 dims, five branches) and `obs-v1`
+(91 dims, three slots, six encounter classes). Revision 3 keeps every v2
+feature in its original order and appends a sixth branch, `context` (F72).
 
-**Status:** frozen. Every checkpoint and every evaluation case depends on this
-ordering. Changing any index is a version bump, not an edit.
+**Status:** frozen in baseline-v1 (`configs/baseline_v1.json`, git tag
+`baseline-v1`). Every checkpoint and every evaluation case depends on this
+ordering. Changing any index is a version bump, not an edit; a checkpoint from
+an earlier schema cannot be loaded or resumed against this one.
 
-**Index order is unchanged since v2 was frozen.** Revision 2.2 changed one
-*normaliser* (`SPEED_SCALE`, §3) and the head-on band feeding the class one-hot.
-Neither moves an index, but both change what a trained checkpoint means, so
-anything trained before this point would not be comparable. Nothing has been
-trained.
+**Updated 2026-09-22** to match the code: this file described v2 until then.
+Also changed since v2 without moving an index: the speed normaliser (§3), the
+cross-track normaliser (§4), and nominal sensor noise, now on (§2, §3).
 
-Total **56** dims across **5** branches, as a `gymnasium.spaces.Dict`.
-The machine-readable copy of this layout is `src/observation.py`; the two must
-agree, and `tests/test_observation.py` enforces the dimensions.
+Total **70** dims across **6** branches, as a `gymnasium.spaces.Dict`. The
+machine-readable copy of this layout is `src/observation.py`; the two must
+agree, and `tests/test_observation.py` enforces the dimensions, the branch count
+and the feature names.
 
 | Branch | Contents | Dims | Range |
 |---|---|---|---|
@@ -23,7 +26,8 @@ agree, and `tests/test_observation.py` enforces the dimensions.
 | `ego` | u, v, r | 3 | [-1, 1] |
 | `path` | e_y, χ̃, χ̃_LA | 3 | [-1, 1] |
 | `target` | 15 features + 1 presence bit | 16 | [-1, 1] |
-| | **Total** | **56** | |
+| `context` | 12 encounter-state features + 2 previous-action values | 14 | [-1, 1] |
+| | **Total** | **70** | |
 
 All arrays are `float32`.
 
@@ -39,19 +43,33 @@ opposite branches keyed on the sign of the lateral offset, so carrying a
 non-standard sign through them invites exactly the class of error the paper is
 about. **Anything comparing numbers across the two papers must account for it.**
 
-### What changed from v1, and why
+**Only perceived state enters the policy.** Target features come from the
+tracker, the boundary from the map at the *estimated* pose, ego motion from
+noisy sensors. Ground-truth target fields never enter any branch
+(`test_context_inputs_do_not_depend_on_target_truth`); they are attached to the
+encounter context for diagnostics only.
 
-| | v1 | v2 |
-|---|---|---|
-| Target slots | 3 + a 3-bit mask vector | **1 + a presence bit** |
-| Encounter classes | 6 (crossing split give-way / stand-on) | **5 (crossing collapsed)** |
-| Total dims | 91 | **56** |
-| Architecture | shared encoder + DeepSets/attention flag | **plain concatenation** |
+### Revisions
 
-Driven by decisions S1, S3, S4 and S6: two-vessel encounters are the unit of
-analysis, because Rules 13–16 are formulated pairwise, confined geometry
-precludes simultaneous close-quarters conflicts so encounters are sequential,
+| | v1 | v2 | **v3 (current)** |
+|---|---|---|---|
+| Target slots | 3 + a 3-bit mask vector | 1 + a presence bit | 1 + a presence bit |
+| Encounter classes | 6 (crossing split give-way / stand-on) | 5 (crossing collapsed) | 5, plus the latched **compliant turn sense** in `context` |
+| Branches | 5 | 5 | **6** (`context` added) |
+| Total dims | 91 | 56 | **70** |
+| Cross-track normaliser | — | map size (25 m) | **local channel half-width on the vessel's side** |
+| Architecture | shared encoder + DeepSets/attention flag | plain concatenation | plain concatenation; context joins the slot encoder |
+
+v2 was driven by decisions S1, S3, S4 and S6: two-vessel encounters are the unit
+of analysis, because Rules 13–16 are formulated pairwise; confined geometry
+precludes simultaneous close-quarters conflicts, so encounters are sequential;
 and every reported behaviour becomes physically reproducible in the basin.
+
+v3 (A25, F72, ported from CODEX) addresses two measured problems: the reward
+judged an encounter state — engaged or not, the compliant turn direction,
+heading and speed change since engagement — that the policy could not see in a
+single frame; and the cross-track error, scaled by 25 m, used about a tenth of
+its range in a 5–10 m channel.
 
 `N_MAX_TARGETS` remains a config parameter and the slot machinery is still
 indexed, so multi-vessel extension costs a retrain rather than a redesign.
@@ -63,10 +81,13 @@ that path so it cannot rot.
 ## 1. `lidar` — 27 dims
 
 Pooled sector closeness, `1 - range / 16.0`, clipped to [0, 1]. **1 = touching,
-0 = clear to max range.**
+0 = clear to max range.** The LiDAR is 720 beams at 0.5°, 16 m range, 1.0 m
+minimum range.
 
-Carries **static obstacles only**. The channel boundary is gated out and reaches
-the policy through `boundary`; the dynamic target goes through `target`.
+Carries **static obstacles only**. Returns classified as moving by the
+free-space consistency test (F37) go to the tracker and reach the policy through
+`target`; the channel boundary is gated out and reaches the policy through
+`boundary`.
 
 Sectors run **port to starboard**, index 0 outboard on the port quarter.
 Non-uniform allocation, ±135° swath, 540 of the 720 raw beams. The aft 90°
@@ -111,8 +132,9 @@ alternating pattern rather than a constant count.
 
 ## 2. `boundary` — 7 dims
 
-Virtual range scan against the known channel polygon, from the **estimated**
-pose, normalised by the identical `closeness_from_ranges` used for `c_t`.
+Virtual range scan against the known channel or basin polygon, from the
+**estimated** pose, normalised by the identical `closeness_from_ranges` used
+for `c_t` (16 m).
 
 | Idx | Body-frame bearing |
 |---|---|
@@ -132,40 +154,46 @@ the pool edge and registers the facility walls 1–2 m beyond it, so the boundar
 the vessel must respect is invisible to the sensor while what the sensor sees is
 not the boundary.
 
-Pose noise is injected before the raycast so the branch inherits localisation
-error, as it will in the field. Magnitudes are `TODO(05)` and currently 0.0.
+Pose noise is injected before the raycast, so the branch inherits localisation
+error as it will in the field: **0.03 m and 0.2°**, nominal (F46). Measured
+magnitudes from 05 remain `TODO(05)` (B4).
 
 ## 3. `ego` — 3 dims
 
 | Idx | Symbol | Quantity | Normaliser |
 |---|---|---|---|
-| 0 | u | surge velocity | `SPEED_SCALE` = `2 × U_REF` (2.28 m/s) |
+| 0 | u | surge velocity | `SPEED_SCALE` = `2 × U_REF` = **1.116 m/s** |
 | 1 | v | sway velocity | `SPEED_SCALE` |
 | 2 | r | yaw rate, deg/s | 180 |
 
-> **Normaliser settled in Revision 2.3.** It was briefly `2 × U_CRUISE` with
-> `U_CRUISE = 0.55`, i.e. 1.10 m/s — *below* the simulator's whole operating
-> range, so index 0 sat pinned at 1.0 for ~45% of a straight run and carried no
-> gradient. The factor was never the problem; the speed was. With the thrust map
-> calibrated to the measured `U_REF = 1.14 m/s` (02b T1), `2 × U_REF` = 2.28 m/s
-> covers the widest curriculum stage's 2.16 m/s at 0.95 of scale, so nothing
-> clips and nothing is dead.
+`U_REF` is 0.558 m/s, the identified plant at `CRUISE_RPM = 6` (F24). The
+throttle range is 0–12 RPM, whose top speed is about `2 × U_REF`, so the
+normaliser covers the operating range without clipping or dead range.
+
+> Normaliser history: `2 × U_CRUISE` = 1.10 m/s in an early revision, then
+> `2 × U_REF` = 2.28 m/s while `U_REF` was the 1.14 m/s log median at 12 RPM
+> (02b T1). The factor has been `2 × U_REF` throughout; `U_REF` changed with F24.
 
 **An IMU is confirmed** (05 §4.7). `r` is measured by the gyro rather than
 differentiated, so its residual is the sensor noise floor; `u` and `v` are
-largely rescued by the accelerometer but remain fused rather than measured. The
-branch still carries field error Paper 2's simulator did not model — a
-sim-to-real gap in the *observation*, not just the dynamics (05 §6) — but a
-smaller one than before. `EGO_SPEED_NOISE` and `EGO_YAW_RATE_NOISE_DPS` are the
-hooks; both are `TODO(05)` and currently 0.0.
+largely rescued by the accelerometer but remain fused rather than measured.
+Nominal noise is on: **0.05 m/s on speed, 1.0 °/s on yaw rate** (F46), measured
+values `TODO(05)`. The branch carries field error Paper 2's simulator did not
+model — a sim-to-real gap in the *observation*, not just the dynamics (05 §6).
 
 ## 4. `path` — 3 dims
 
 | Idx | Symbol | Quantity | Normaliser |
 |---|---|---|---|
-| 0 | e_y | cross-track error, signed, **+ = starboard** | `max(MAP_WIDTH, MAP_HEIGHT)` |
+| 0 | e_y | cross-track error, signed, **+ = starboard** | **local channel half-width on the side the vessel is on** |
 | 1 | χ̃ | course error, deg | 180 |
 | 2 | χ̃_LA | look-ahead course error, deg | 180 |
+
+Computed from the **perceived** pose. e_y is divided by the distance from the
+path to the boundary on the vessel's side at its along-path position (in basin
+mode the two sides differ, because paths are slanted), so ±1 means "at the
+navigable edge" whatever the width. Until v3 it was divided by 25 m, and in a
+5–10 m channel it used about a tenth of its range (F72).
 
 Path-relative, not global. There is deliberately **no (x, y, ψ)** anywhere in
 the observation: the path-relative framing is part of why Paper 2's transfer
@@ -181,15 +209,15 @@ Use `observation.split_target()` rather than re-deriving offsets. At
 
 | Idx | Feature | Encoding | Range |
 |---|---|---|---|
-| 0 | Distance to ship domain | `/ D_SCALE`, clipped | [0, 1] |
+| 0 | Distance to ship domain | `/ D_SCALE` (16 m), clipped | [0, 1] |
 | 1 | Relative bearing α | sin | [−1, 1] |
 | 2 | Relative bearing α | cos | [−1, 1] |
 | 3 | Heading intersection CT | sin | [−1, 1] |
 | 4 | Heading intersection CT | cos | [−1, 1] |
-| 5 | Target speed | `/ SPEED_SCALE` (3.2 m/s), clipped | [0, 1] |
+| 5 | Target speed | `/ SPEED_SCALE` (1.116 m/s), clipped | [0, 1] |
 | 6 | Relative speed | `/ SPEED_SCALE`, clipped | [0, 1] |
-| 7 | DCPA | `/ DOMAIN_RADIUS_DCPA`, clipped at `DCPA_CLIP_DOMAINS`, rescaled | [0, 1] |
-| 8 | TCPA | clipped to ±`TCPA_CLIP`, `/ TCPA_CLIP` | [−1, 1] |
+| 7 | DCPA | `/ DOMAIN_RADIUS_DCPA` (1.25 m), clipped at `DCPA_CLIP_DOMAINS` (12.8), rescaled | [0, 1] |
+| 8 | TCPA | clipped to ±`TCPA_CLIP` (40 s), `/ TCPA_CLIP` | [−1, 1] |
 | 9 | CRI | already in [0, 1] | [0, 1] |
 | 10 | class: none | one-hot | {0, 1} |
 | 11 | class: head-on | one-hot | {0, 1} |
@@ -207,35 +235,47 @@ DCPA is normalised in domain radii, not metres.
 TCPA keeps its sign: **positive means the CPA is ahead**, negative means it is
 already passed and the range is opening.
 
+Every value is a read of the shared `EncounterContext`, the same object the
+reward reads, so observation and reward cannot derive the same encounter by
+different routes (01 §5.3).
+
 ### 5.1 The five encounter classes
 
-The one-hot order is frozen and matches `constants.ENCOUNTER_CLASSES`.
+The one-hot order is frozen and matches `constants.ENCOUNTER_CLASSES`. The
+class is decided against the **path tangent** at the own ship, not the
+instantaneous heading (A19), with 3° bearing hysteresis and a 0.8 s (2-step)
+persistence requirement.
 
-| Class | Governing rule | Own-ship obligation |
-|---|---|---|
-| none | — | Follow path |
-| head-on | 14 | Alter to starboard, subject to channel width |
-| crossing | 15, 16, 9(b) | Give way **regardless of approach side** |
-| overtaking | 13, 16, 9(e) | Keep clear of the vessel being overtaken |
-| being overtaken | 13, 17(a)(i) | Hold course and speed |
+| Class | Governing rule | Own-ship obligation | Compliant turn sense (A17) |
+|---|---|---|---|
+| none | — | Follow path | — |
+| head-on | 14 | Alter to starboard, subject to channel width | starboard (+1) |
+| crossing | 15, 16, 9(b) | Give way **regardless of approach side** | toward the target's side: starboard from starboard (+1), port from port (−1) |
+| overtaking | 13, 16, 9(e) | Keep clear of the vessel being overtaken | port (−1) |
+| being overtaken | 13, 17(a)(i) | Hold course and speed | — |
 
-**Port and starboard crossing are one class.** Rule 9(b) — a vessel under 20 m
-shall not impede a vessel that can safely navigate only within a narrow channel
-— makes the own ship give way from either side, so the side is not a different
-obligation and the observation does not carry it. This deliberately replaces the
-Rule 18 route used by Meyer et al., whose premise (own ship much smaller than
-the vessels it meets) fails here: own ship and target are similarly sized model
-vessels, and claiming that asymmetry in simulation and then validating against
-an identical vessel is an inconsistency a reviewer will find.
+**Port and starboard crossing are one class**, and the side is not a separate
+one-hot entry. Rule 9(b) — a vessel under 20 m shall not impede a vessel that
+can safely navigate only within a narrow channel — makes the own ship give way
+from either side, so the side is not a different obligation. This deliberately
+replaces the Rule 18 route used by Meyer et al., whose premise (own ship much
+smaller than the vessels it meets) fails here: own ship and target are
+similarly sized model vessels, and claiming that asymmetry in simulation and
+then validating against an identical vessel is an inconsistency a reviewer will
+find.
 
-The geometric side **is** still computed, and is available as
-`ObservationBuilder.crossing_sides` / `encounter.crossing_side()`, because 02's
-passing-side reward term needs it. It is simply not observed.
+**What changed in v3:** the side still decides the *direction* of the
+give-way turn (A17), and the reward charges a turn against it (`v_port`). Since
+v3 that direction is observable: the `context` branch carries the latched
+**compliant turn sense** (§6), so the policy is shown which way it is being
+judged (`test_crossing_class_keeps_an_observable_turn_direction`). The
+geometric side itself remains available as `ObservationBuilder.crossing_sides`
+for the passing-side term.
 
 **Being overtaken** has no equivalent in the source table — Waltz & Okhrin
 assume linear deterministic targets and cover only give-way cases. Only Rule
-17(a)(i) passive course-keeping is in scope; active release under 17(a)(ii) is
-future work (S5).
+17(a)(i) course-keeping is rewarded; an earlier release under 17(a)(ii) is open
+(A30).
 
 ### 5.2 Presence-bit semantics
 
@@ -251,9 +291,9 @@ terms contribute. `tests/test_observation.py` asserts that an absent slot filled
 with arbitrary garbage produces byte-identical extractor output, and that the
 whole target half of the feature vector is exactly zero when no target is held.
 
-**No-target coverage.** A meaningful fraction of training episodes must carry no
-target at all, or the static-only configuration is out of distribution.
-`NO_TARGET_EPISODE_PROB` is the hook; the distribution itself is 03/04's.
+**No-target coverage.** A meaningful fraction of training episodes carries no
+target at all, so the static-only configuration is in distribution (no-target
+class share 0.17).
 
 ### 5.3 Slot assignment
 
@@ -269,32 +309,79 @@ The encounter classifier's history for a track is dropped at the same time its
 slot is released, so a re-used slot cannot inherit the previous occupant's held
 class.
 
+## 6. `context` — 14 dims (new in v3)
+
+Observable memory of the obligation the reward is judging (A25, F72). Indices
+0–11 are per slot (`12 · N` at `N_MAX_TARGETS = N`, following the target slots);
+the last two are the previous executed action. An empty slot is all zeros.
+
+The encounter **engages** when the class is not none, 0 < TCPA ≤ 25 s and
+DCPA < 1.5 · `d_req` (`d_req` = 2.5 m); class, compliant sense, heading and speed
+at engagement are then **latched** (A20) until the target is past and opening.
+"Latched" below means engaged or clearing.
+
+| Idx | Feature | Encoding | Range |
+|---|---|---|---|
+| 0 | engaged | 1 while the encounter is engaged | {0, 1} |
+| 1 | clearing | 1 while the target is passing clear | {0, 1} |
+| 2 | **compliant turn sense** | +1 starboard, −1 port, 0 none (§5.1) | {−1, 0, 1} |
+| 3 | heading change since engagement | wrapped deg / 180; 0 unless latched | [−1, 1] |
+| 4 | speed change since engagement | `(u − u_engage) / SPEED_SCALE`; 0 unless latched | [−1, 1] |
+| 5 | turn admissible | 1 if the compliant alteration fits the channel | {0, 1} |
+| 6 | slowdown clears | 1 if stopping would clear the target (A18/A23 stop test) | {0, 1} |
+| 7 | admissibility known | 1 if the map geometry was available for 5–6 | {0, 1} |
+| 8 | action required | the alteration still owed, `A_req` (as in `v_r8`) | [0, 1] |
+| 9 | proximity gate | `ρ = clip(1 − DCPA / (1.5 · d_req), 0, 1)` | [0, 1] |
+| 10 | in extremis | 1 when DCPA < `d_req` and TCPA < 5 s | {0, 1} |
+| 11 | engagement age | seconds since engagement / 25 s; 0 unless latched | [0, 1] |
+| 12 | previous rudder | executed rudder command / 100 % | [−1, 1] |
+| 13 | previous throttle | `(RPM − 6) / 6` as executed | [−1, 1] |
+
+The previous action is the **executed** command (after any supervisor override),
+so the policy sees what the vessel actually did.
+
+**Measured use** (F91): probing trained PPO policies at engagement, flipping
+index 2 alone moves the commanded rudder by 0.15–1.03, so the policy does read
+the turn sense. That it still opens crossings in one fixed direction is a
+learning result, not an observability gap (F92–F94).
+
 ---
 
-## 6. Architecture
+## 7. Architecture
 
-Plain concatenation of the five branches into the SAC `MultiInputPolicy`
-(01 §6.3). The shared-encoder-plus-DeepSets comparison from v1 is **not built** —
+The six branches feed a custom `ASVFeaturesExtractor` inside SB3's
+`MultiInputPolicy`, identical for all five learners (PPO, RecurrentPPO, TD3,
+SAC, TQC):
+
+- **Scene MLP:** `lidar` + `boundary` + `ego` + `path` + previous action
+  (42 values) → 128.
+- **Slot encoder:** each slot's 16 target values + its 12 context values
+  (28) → 64 → 64 → 32, input gated by the presence bit, weights shared across
+  slots.
+- Features (128 + 32 = 160) → actor and critic heads of 256 × 256 ReLU;
+  RecurrentPPO adds a 256-unit LSTM, separately for actor and critic.
+
+The shared-encoder-plus-DeepSets comparison from v1 is **not built** —
 superseded decision D3. Permutation invariance is meaningless at one target, and
 the measured advantages of attention in the literature come from high-density
 regimes this scope deliberately does not enter.
 
-A custom extractor is still used, for two reasons only: the presence bit has to
-gate the slot before encoding, and the target branch keeps a small shared-weight
+A custom extractor is used for two reasons only: the presence bit has to gate
+the slot before encoding, and the target branch keeps a small shared-weight
 encoder so the multi-vessel extension path exists.
 
 **Pre-empt the scaling question by scope**, not by principle: restricted
 waterway, sequential encounters, single target in deployment, `N_MAX_TARGETS`
 configurable.
 
-**Open:** whether recurrence is added for occlusion. The explicit tracker already
-carries memory (`max_coast` measures how long it survives one). Quantify
-occlusion frequency in the scenario distribution before adding it — and note
-that if recurrence is added, RecurrentPPO stops being a clean comparator.
+**Recurrence.** Resolved by construction rather than left open: the explicit
+tracker carries target memory, and the `context` branch carries the encounter
+memory the reward depends on. RecurrentPPO is one of the five baselines, so the
+paper measures whether a learned memory adds anything on top.
 
 ---
 
-## 7. What is deliberately absent
+## 8. What is deliberately absent
 
 Three fields present in the Paper 2 observation are **dropped**, confirmed as a
 decision rather than an oversight: `front_clearance`, `side_clearance_diff` and

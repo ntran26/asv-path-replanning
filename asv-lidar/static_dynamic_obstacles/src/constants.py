@@ -526,7 +526,7 @@ CLUSTER_MIN_POINTS = 4                   # >= 3 to clear a rope; approved 02b §
 # Track association.  Nearest-neighbour is sufficient at one target (01 §4).
 # Tied to the maximum plausible inter-frame displacement, so it rescales with
 # the speed calibration instead of drifting out of step with it (02b §2).
-TRACK_GATE_DIST = max(2.5 * U_REF * UPDATE_RATE, 0.30)   # m, 1.40 at 2 Hz
+TRACK_GATE_DIST = max(2.5 * U_REF * UPDATE_RATE, 0.30)   # m, 0.70 at 2 Hz
 TRACK_MAX_MISSES = steps_for(1.5)        # missed updates before a drop: 3
 # Two updates: the fewest that carry a velocity.  0.5 s after first sight.
 TRACK_MIN_HITS = 2
@@ -1065,7 +1065,7 @@ OBS_SWATH_HALF_DEG = POOL_SWATH_HALF_DEG  # +/-135 deg, matching the c_t swath
 # against -242 and -297), and the compliance-cost ratio is untouched, because
 # progress contributes zero to it by telescoping.
 L_REF_PATH = 20.0                        # m, the 02a §8.1 design-point path
-N_REF_PROG = L_REF_PATH / (U_REF * UPDATE_RATE)          # 35.8 steps at 2 Hz
+N_REF_PROG = L_REF_PATH / (U_REF * UPDATE_RATE)          # 71.7 steps at 2 Hz
 
 # --- 13.5 Smoothness, r_smooth (02a §5.6) ----------------------------------
 # `kappa_delta` is the actuator's per-step rate limit in normalised action
@@ -1424,8 +1424,13 @@ NULL_MIN_DCPA = 4.0
 # a collision -- and with 04a's uniform 0-2 m draw the policy could not tell
 # which draws those were, so run 2 abandoned the stand-on role in all of them.
 # Most draws now pass at >= the floor, where Rule 17(a)(i) holding course is
-# safe; a labelled fraction stays below it as the Rule 17(b) last-moment case.
-BEING_OVERTAKEN_BELOW_FLOOR_FRAC = 0.20
+# safe.  **0.0 since baseline-v2 (your call, 2026-09-23):** the labelled fraction
+# below the floor was the Rule 17(b) last-moment case, which S5 put out of scope
+# -- keeping it in training and in the suite produced collisions with no claim
+# behind them (A30).  Every being-overtaken draw is now at or above the
+# contact-free floor; `dcpa_below_floor` stays in the record (always False) so
+# runs made before this remain readable.
+BEING_OVERTAKEN_BELOW_FLOOR_FRAC = 0.0
 # A21 (decided, option 1): the floor is **hull clearance**, not a centre
 # distance.  Two hulls pass without contact at 0.66 m only when parallel; at a
 # 15 deg crossing angle they need 1.2-1.4 m, from 30 deg 1.5-1.7 m.  The floor

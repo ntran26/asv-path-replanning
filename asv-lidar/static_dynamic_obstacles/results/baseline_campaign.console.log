@@ -1,2 +1,6 @@
-2026-09-22 19:03:08 == campaign start (02e853268828a32a)
-2026-09-22 19:03:08 == recurrent_ppo seed 0: training
+2026-09-23 04:04:11 == campaign start (3d697858e95e5adf)
+2026-09-23 04:04:12 == ppo seed 0: training
+2026-09-23 08:43:04 == ppo seed 0 exit 0
+2026-09-23 08:47:13    tier 1 ppos0_bl2 supervisor off exit 0
+2026-09-23 08:51:49    tier 1 ppos0_bl2 supervisor on exit 0
+2026-09-23 08:51:49 == recurrent_ppo seed 0: training

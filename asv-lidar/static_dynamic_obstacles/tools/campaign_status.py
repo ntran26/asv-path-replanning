@@ -9,13 +9,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RUNS = ROOT / "runs"
-CONFIG = ROOT / "configs" / "baseline_v1.json"
+CONFIG = ROOT / "configs" / "baseline_v2.json"
 
 
-def _run_dir(algo: str, seed: int) -> Path:
-    if algo == "ppo" and seed <= 1:
-        return RUNS / f"ppo_formulation_seed{seed}_v11"      # run 11 is PPO seeds 0-1
-    return RUNS / f"{algo}_formulation_seed{seed}_bl1"
+def _run_dir(algo: str, seed: int, tag: str) -> Path:
+    return RUNS / f"{algo}_formulation_seed{seed}_{tag}"
 
 
 def _steps(run: Path, algo: str) -> int:
@@ -35,7 +33,7 @@ def main() -> int:
     rows, done = [], 0
     for algo in config["campaign"]["algos"]:
         for seed in config["campaign"]["seeds"]:
-            run = _run_dir(algo, seed)
+            run = _run_dir(algo, seed, config["campaign"].get("tag", "bl2"))
             best = ""
             summary = run / "eval_summary.json"
             if summary.exists():
@@ -52,7 +50,7 @@ def main() -> int:
             rows.append(f"  {algo:<14} seed {seed}  {state:<16} {best}")
     stop = " (stop file present: the campaign halts after the current run)" \
         if (RUNS / "CAMPAIGN_STOP").exists() else ""
-    print(f"baseline-v1 campaign: {done} of {len(rows)} runs done{stop}")
+    print(f"{config['id']} campaign: {done} of {len(rows)} runs done{stop}")
     print("\n".join(rows))
     log = ROOT / "results" / "baseline_campaign.log"
     if log.exists():

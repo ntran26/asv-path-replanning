@@ -1,5 +1,21 @@
 # 02a — Paper 3 Reward Function Specification
 
+> **Status note (2026-09-22).** Parts of this document are superseded by the implementation, which is frozen as **baseline-v1** (`configs/baseline_v1.json`, git tag `baseline-v1`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here:
+>
+> - **R-2** (8(e) slow-down) applies only when stopping would clear the target (A18), tested along the braking path (A23) with the stop test (A24).
+>
+> - Classification against the **path tangent** (A19); class, sense, heading and speed **latched** at engagement (A20).
+>
+> - `v_port` also charges a **held** wrong-way heading beyond a 5° dead band (A27), weighted by the **peak** proximity since engagement (F88).
+>
+> - `v_hold`'s speed part keeps rising past `Du_hold` to 3× (A29).
+>
+> - Dense weights are per 2 Hz step (`REWARD_DT_SCALE` = 5, `CONSTANTS_AND_SCALES.md` rev 2.6). F91's admissibility gate on the held-heading charge exists but is **off** in baseline-v1 (F92).
+>
+> - Current values: `configs/baseline_v1.json`, `CONSTANTS_AND_SCALES.md` §12 and §14.1, `METHODS_BRIEF.md` §5.
+>
+> The rationale below still stands where it is not listed. `F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`.
+
 **Status:** design output of `02_REWARD_AND_COLREGS.md`. Implementation handover to Claude Code.
 **Supersedes:** the six-term `REWARD_REDESIGN.md` spec (re-derived, not patched — D10).
 **Revision 2.2** — reconciled against the full doc set including a live read of `04`, 2026-09-07.

@@ -23,16 +23,19 @@ from types import ModuleType
 from typing import Dict, List
 
 ROOT = Path(__file__).resolve().parents[1]
-CONFIG_PATH = ROOT / "configs" / "baseline_v1.json"
-CONFIG_ID = "baseline-v1"
+CONFIG_PATH = ROOT / "configs" / "baseline_v2.json"
+CONFIG_ID = "baseline-v2"
+# baseline-v1 (`configs/baseline_v1.json`) is kept for the record: it is run 11's
+# formulation, and runs made before 2026-09-23 verify against it.
 
-# The run arguments of run 11, the formulation this freezes (F92, F93).  The CLI
-# defaults differ (supervisor on in training, 6 episodes per class), which is
-# why the campaign reads these from the file rather than from the defaults.
+# The run arguments this freezes (F93).  The CLI defaults differ (supervisor on
+# in training, 6 episodes per class), which is why the campaign reads these from
+# the file rather than from the defaults.
 RUN_ARGS = {"timesteps": 2_000_000, "num_envs": 10, "eval_freq": 200_000,
             "eval_per_class": 20, "train_supervisor": "off", "eval_supervisor": "both",
             "low_speed_start_frac": 0.15, "checkpoint_every": 250_000}
 ALGOS = ["ppo", "recurrent_ppo", "td3", "sac", "tqc"]
+TAG = "bl2"                        # run-directory suffix for this formulation
 SEEDS = [0, 1, 2, 3, 4]            # A26 (your call, 2026-09-22): 5 seeds per learner
 # A26: each seed is represented by its best development-set checkpoint (the eval
 # callback's goal - 2 x collision score, supervisor off); Tier B stays held out.
@@ -91,6 +94,7 @@ def snapshot(cfg: ModuleType, tf: ModuleType) -> Dict:
     return {"formulation": formulation(cfg, tf), "run_args": _plain(RUN_ARGS),
             "learners": learners(tf, RUN_ARGS["num_envs"]),
             "campaign": {"algos": ALGOS, "seeds": SEEDS, "checkpoint": CHECKPOINT,
+                         "tag": TAG,
                          "off_policy_gradient_steps_per_transition": 1.0}}
 
 
@@ -170,14 +174,15 @@ def write(cfg: ModuleType, tf: ModuleType) -> Dict:
         "git": {"head": _git("rev-parse", "HEAD"),
                 "dirty": _code_dirty()},
         "provenance": {
-            "formulation_of": "run 11 (runs/ppo_formulation_seed{0,1}_v11)",
-            "why": "PROJECT_STATE.md F92/F93: best on every development-set class and "
-                   "consistent across two seeds; run 12's F91 and A31 are switched off",
-            "reproduces": ["runs/ppo_formulation_seed0_v11", "runs/ppo_formulation_seed1_v11"],
+            "formulation_of": "baseline-v1 (run 11) with A15's below-floor "
+                              "being-overtaken draws removed (S5, your call 2026-09-23)",
+            "why": "PROJECT_STATE.md F92/F93/F96: run 11 was best on every development-set "
+                   "class and consistent across two seeds (run 12's F91 and A31 are off); "
+                   "the Rule 17(b) draws S5 put out of scope left training and the suite",
+            "reproduces": [],
             "known_limits": [
                 "crossing opening direction is not side-conditioned (A32)",
                 "narrow-channel head-ons where starboard has no room: 0.36 collisions (F91, A33)",
-                "being overtaken by a vessel that never gives way (A30, on hold)",
             ],
         },
         "formulation_digest": digest(body["formulation"]),

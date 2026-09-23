@@ -1,5 +1,17 @@
 # 04a — Scenario Generation and Evaluation Suite: Specification
 
+> **Status note (2026-09-22).** Parts of this document are superseded by the implementation, which is frozen as **baseline-v1** (`configs/baseline_v1.json`, git tag `baseline-v1`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here:
+>
+> - Suite 3.0 per spec 06 §5 (Tier A 38, Tier B 48 × 20), built in `src/suite.py` (F75); spec 06 §7 lists the edits this document still needs.
+>
+> - Curriculum: five stages at 0 / 8 / 18 / 32 / 50 % of the budget (F75); stage 3 adds crossings from both sides (A27).
+>
+> - Scenario rules added since: A15 (being-overtaken floor), A21 (confined targets keep the channel), A22 (escapable crossings), F84 (60 % port crossings in training).
+>
+> - Budget: 2 M steps × 5 seeds per learner, off-policy at 1.0 gradient step per transition, best-on-dev checkpoint (A26, F95).
+>
+> The rationale below still stands where it is not listed. `F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`.
+
 **Revision 2.0** — first full specification. Expands `04_SCENARIOS_AND_EVALUATION.md` into an
 implementable spec and closes its six open items.
 **Handover target:** Claude Code (§3, §4, §9), Claude chat (§2 findings need your sign-off first)

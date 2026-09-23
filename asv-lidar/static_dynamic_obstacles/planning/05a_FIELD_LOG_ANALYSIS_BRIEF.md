@@ -1,5 +1,7 @@
 # 05a — Field Log Analysis Brief
 
+> **Status note (2026-09-22).** Historical: this brief was delivered (T1 and the extractions; 05 part 1 validated, F30–F36). Kept as a record; the current method is `planning/METHODS_BRIEF.md` and `configs/baseline_v1.json` (baseline-v1).
+
 **For:** Claude Code, working on `field_deployment/` (30 logs, 5597 pooled scans, 130 KB–2 MB each).
 **Delivers:** T1 in `02b_DECISIONS_AND_TASK_ORDER.md §4`, plus five extractions beyond it.
 **No basin time required.** Everything here comes from logs already on disk.

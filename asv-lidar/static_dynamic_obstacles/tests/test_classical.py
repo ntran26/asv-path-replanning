@@ -189,3 +189,77 @@ def test_vo_stand_on_releases_when_holding_would_collide():
     choice = select_velocity(np.zeros(2), 0.0, U, 0.0, U, [ob])
     assert not choice.stand_on
     assert choice.feasible
+
+
+def test_comparator_settings_come_from_the_staging_constants():
+    """The comparators' parameters live in `constant_temp.py` (your call,
+    2026-09-23), staged there rather than in `constants.py` so that tuning one
+    cannot change the frozen formulation's digest or halt a campaign.  This
+    holds the modules to that single source instead of literals drifting back."""
+    import constant_temp as ct
+    from classical import common as cc, encounter_vo as vo, los_dwa as dwa
+    assert cc.LOS_LOOKAHEAD_M == ct.CLASSICAL_LOS_LOOKAHEAD_M
+    assert cc.PID_KP == ct.CLASSICAL_PID_KP and cc.PID_KD == ct.CLASSICAL_PID_KD
+    assert cc.MAX_RUDDER_RAD == ct.CLASSICAL_MAX_RUDDER_RAD
+    assert dwa.SAFE_GAP_M == ct.CLASSICAL_DWA_SAFE_GAP_M
+    assert dwa.TARGET_HORIZON_S == ct.CLASSICAL_DWA_TARGET_HORIZON_S
+    assert tuple(dwa.SPEED_FRACTIONS) == tuple(ct.CLASSICAL_DWA_SPEED_FRACTIONS)
+    assert vo.TAU_S == ct.CLASSICAL_VO_TAU_S and vo.W_DOMAIN == ct.CLASSICAL_VO_W_DOMAIN
+    assert vo.DOMAIN_SCALE == ct.CLASSICAL_VO_DOMAIN_SCALE
+    # And none of them reached `constants.py`, where they would enter the digest.
+    import constants as cfg
+    assert not [n for n in dir(cfg) if n.startswith("CLASSICAL_")]
+
+
+def test_kuwata_classifies_by_the_open_water_roles_not_this_papers_convention():
+    """COLREGs-VO is the published comparator: a crossing target to **port**
+    makes the own ship stand on (Rule 17), where this paper's own convention
+    (A17) gives way from either side.  That difference is the measurement the
+    Rule 9 precedence claim rests on, so it must not be quietly harmonised."""
+    import numpy as np
+    from classical.colregs_vo import (BEING_OVERTAKEN, CROSSING_GIVE, CROSSING_STAND,
+                                      HEAD_ON, OVERTAKING, classify)
+    u, own = 0.558, np.array([5.0, 5.0])
+    vec = lambda h, s=u: s * np.array([np.sin(np.radians(h)), np.cos(np.radians(h))])
+    assert classify(own, 0.0, u, own + np.array([0.0, 6.0]), vec(180), np.pi) == HEAD_ON
+    assert classify(own, 0.0, u, own + np.array([5.0, 3.0]), vec(270),
+                    np.radians(270)) == CROSSING_GIVE
+    assert classify(own, 0.0, u, own + np.array([-5.0, 3.0]), vec(90),
+                    np.radians(90)) == CROSSING_STAND
+    assert classify(own, 0.0, u, own + np.array([0.0, 4.0]), vec(0, 0.3), 0.0) == OVERTAKING
+    assert classify(own, 0.0, u, own + np.array([0.0, -4.0]), vec(0, 1.5 * u), 0.0) == BEING_OVERTAKEN
+
+
+def test_kuwata_give_way_constraint_allows_starboard_and_forbids_port():
+    """The paper's contribution in one sign test: as give-way, the relative
+    velocity must sit to starboard of the bearing line.  A target that is
+    opening, or passing wide, is not constrained at all."""
+    import numpy as np
+    from classical.colregs_vo import Target, _colregs_ok
+    u, own = 0.558, np.array([5.0, 5.0])
+    vec = lambda h: u * np.array([np.sin(np.radians(h)), np.cos(np.radians(h))])
+    cand = np.stack([vec(-30), vec(0), vec(30)])          # port, ahead, starboard
+    head_on = Target(own + np.array([0.0, 6.0]), vec(180), np.pi, "head_on")
+    assert list(_colregs_ok(head_on, own, cand)) == [False, False, True]
+    crossing = Target(own + np.array([4.0, 4.0]), vec(270), np.radians(270), "crossing_give_way")
+    assert list(_colregs_ok(crossing, own, cand)) == [False, False, True]
+    opening = Target(own + np.array([0.0, -6.0]), vec(180), np.pi, "head_on")
+    assert all(_colregs_ok(opening, own, cand))
+
+
+def test_kuwata_drops_the_constraint_rather_than_accept_a_collision():
+    """Kuwata's own fallback, and the behaviour the narrow-channel claim is
+    about: where no lawful velocity is clear, a clear one is taken and the run
+    is marked `released`."""
+    import numpy as np
+    from classical.colregs_vo import Target, select_velocity
+    u = 0.558
+    own, heading = np.array([5.0, 2.0]), 0.0
+    # Reciprocal target dead ahead, and a wall of static returns to starboard:
+    # the lawful alteration has nowhere to go.
+    target = Target(np.array([5.0, 8.0]), np.array([0.0, -u]), np.pi, "head_on")
+    def static(pos, hdg):
+        return np.where(pos[..., 0] > 5.2, 0.0, 5.0)      # anything to starboard is blocked
+    choice = select_velocity(own, heading, u, 0.0, u, [target],
+                             static_clearance=static)
+    assert choice.released and choice.course <= 0.0

@@ -4,7 +4,8 @@
 count. This file records only what is *not settled*, ordered so the
 highest-leverage item is first.
 
-**Last updated:** 2026-09-22, revision 35 — A26 decided: ratio 1.0, 5 seeds, best-on-dev, this machine until a cluster is set up; campaign launched; replay buffers kept outside the repository (F95).
+**Last updated:** 2026-09-23, revision 36 — Rev 2 review answered: A30 **closed** by removing the Rule 17(b) draws from training and the suite (baseline-v2, F96); field work delayed within this paper; paper framed as formulation + five-learner comparison.
+Revision 35: 2026-09-22 — A26 decided: ratio 1.0, 5 seeds, best-on-dev, this machine until a cluster is set up; campaign launched; replay buffers kept outside the repository (F95).
 Revision 34: 2026-09-22 — A32 measured: the reward prefers the compliant crossing turn by +61 (discounted) from either side, in every clean pair; option 2 ruled out, the side bias is a learner property (F94).
 Revision 33: 2026-09-22 — baseline-v1 saved: the run 11 formulation, frozen in `configs/baseline_v1.json` and gated by `train_formulation.py --config`; F91 and A31 switched off; A32/A33 stay open as known limits (F93).
 Revision 32: 2026-09-21 — run 12 scored on two seeds: F91 halves the narrow-channel collisions but the seeds solve it oppositely, A31 falsified; A32 and A33 opened, freeze withheld (F92).
@@ -150,7 +151,9 @@ Recommendation: **1**, folded into the same run as A32's outcome so one run test
 
 Recommendation: 1, then a two-seed check, since one seed cannot resolve a 0.05 difference (F90).
 
-**A30 — being overtaken by a vessel that never gives way (F87, F88) — on hold (your call, 2026-09-20).**
+**~~A30~~ — being overtaken by a vessel that never gives way (F87, F88) — *closed 2026-09-23 (your call)*: the below-floor draws leave **training and the suite**, so the 17(a)(i) / 17(b) conflict no longer arises. S5 put active release out of scope in Rev 2; A15 had reintroduced it as a labelled 20 % stratum. `BEING_OVERTAKEN_BELOW_FLOOR_FRAC` = 0.0 in baseline-v2 (F96). A waterway where an overtaker does not keep clear at close quarters is outside what the paper claims.**
+
+*Original entry:* **A30 — being overtaken by a vessel that never gives way (F87, F88) — on hold (your call, 2026-09-20).**
 
 *The situation.* Under Rule 13 the overtaking vessel keeps clear; under Rule 17(a)(i) the own ship, as stand-on, keeps course and speed. Training overtakers are constant-velocity (D1) at 1.5-2.2x the own ship's speed, so they never keep clear. A15 places 80 % of draws at or above a floor where holding course is safe (hull clearance + D_SAFE), and 20 % below it, labelled, where the overtaker's track reaches the hull and only the own ship's own action (Rule 17(a)(ii)/(b)) avoids contact. The reward's only release is `in_extremis`: DCPA < d_req **and** TCPA < 5 s, which is too late to evade a faster vessel from astern.
 
@@ -797,10 +800,13 @@ settled.
 | **A33** | **F91's complement: price the 8(e) slowdown where the turn does not fit** | **decision** | a baseline-v2 (a known limit of v1) | **one run with A32** |
 | ~~A31~~ | crossing side, by observation or exposure | **closed, both falsified** (F91, F92) | — | superseded by A32 |
 | A10 | keep v3 | decision | model provenance | confirm (recommended) |
+| ~~A30~~ | being overtaken by a non-yielding vessel | **closed** (your call): draws removed, baseline-v2 | — | F96 |
+| **B6** | claim ledger and result tables: restate for the five-learner framing, and C-4 as three rungs | decision + edit | the freeze | your sign-off |
 | A3, A4, A6 | carried | decision | various | one call each |
 | **B5** | manoeuvring at 0.55 m/s is extrapolated | measurement | sim-to-real at the operating point | plan edit |
 | C2 | throughput | build | campaign size | mine |
 | C3–C6 | comparators, occlusion placement, metrics | build | evaluation | mine |
+| **C3a** | **comparator tuning**: parameters ported to `src/constant_temp.py` (single source, digest-safe); **tune on the development set after the campaign**, same score as the RL checkpoints (goal − 2 × collision), search reported, tuned values pinned with each result | build | a fair classical baseline (N2) | mine, ~2 h compute |
 | ~~A20~~ | freeze class and sense per engagement | **decided** (option 1) | — | built, F58 |
 | ~~A19~~ | classify against the path tangent | **decided** (option 1) | — | built, F56 (residual → A20) |
 | ~~A18~~ | stop only when stopping clears | **decided** (option 1) | — | built, F56 |

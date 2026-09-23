@@ -1,5 +1,15 @@
 # 04 — Scenario Generation and Evaluation Suite
 
+> **Status note (2026-09-22).** Parts of this document are superseded by the implementation, which is frozen as **baseline-v1** (`configs/baseline_v1.json`, git tag `baseline-v1`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here:
+>
+> - Suite 3.0: dev set 120, Tier A 38 named (35 realised), Tier B 48 cells × 20, basin and channel strata (F75, spec 06 §5).
+>
+> - Being overtaken: 80 % above a safe DCPA floor, 20 % below, labelled (A15). Crossings: 20 % labelled unescapable (A22); training draws 60 % from port (F84).
+>
+> - Learners and selection: five learners, 5 seeds, best-on-dev checkpoint (A26, F95).
+>
+> The rationale below still stands where it is not listed. `F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`.
+
 **Revision 2** — single target, "Around the Clock" adopted, width sweep added.
 **Handover target:** Claude chat (design), then Claude Code
 **Depends on:** 03 (target behaviours, corridor geometry), 02 (precedence thresholds)

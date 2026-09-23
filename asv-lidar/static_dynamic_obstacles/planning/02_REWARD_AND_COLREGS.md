@@ -1,5 +1,15 @@
 # 02 — Reward Function and COLREGs Encoding
 
+> **Status note (2026-09-22).** Parts of this document are superseded by the implementation, which is frozen as **baseline-v1** (`configs/baseline_v1.json`, git tag `baseline-v1`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here:
+>
+> - Turn sense: the own ship gives way to a crossing target from either side and turns toward its side (A17); head-on starboard, overtaking port.
+>
+> - Rule 17: only 17(a)(i) course-keeping is rewarded; an earlier 17(a)(ii) release is open (A30).
+>
+> - Term definitions and weights: see `02a` as amended below, and `METHODS_BRIEF.md` §5.
+>
+> The rationale below still stands where it is not listed. `F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`.
+
 **Revision 2** — Rules 13–16 with Rule 9 precedence; Rule 17 active release removed.
 **Handover target:** Claude chat (design), then Claude Code
 **Depends on:** nothing — **start here.** The precedence table produced in §3 gates the

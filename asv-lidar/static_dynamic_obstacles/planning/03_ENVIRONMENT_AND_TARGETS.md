@@ -1,5 +1,15 @@
 # 03 — Environment and Dynamic Target
 
+> **Status note (2026-09-22).** Parts of this document are superseded by the implementation, which is frozen as **baseline-v1** (`configs/baseline_v1.json`, git tag `baseline-v1`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here:
+>
+> - Basin mode is the default geometry; channels only for head-on, crossing and overtaking at 15–25 % of their draws (F74, spec 06).
+>
+> - Decisions at 2 Hz with 0.1 s physics (F38); static/dynamic split by free-space consistency (F37).
+>
+> - Training targets are constant-velocity and never give way (D1).
+>
+> The rationale below still stands where it is not listed. `F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`.
+
 **Revision 2** — one dynamic target, `N_max` configurable.
 **Handover target:** Claude Code
 **Depends on:** 01 (tracker and LiDAR interface), 02 (precedence table for width thresholds)

@@ -1,5 +1,17 @@
 # Paper 3 — Index and Experiment Protocol
 
+> **Status note (2026-09-22).** Parts of this document are superseded by the implementation, which is frozen as **baseline-v1** (`configs/baseline_v1.json`, git tag `baseline-v1`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here:
+>
+> - S6: the observation is **70** values in six branches (`a25-v3-context`, F72), not ≈56 — see `OBSERVATION_SPEC.md`.
+>
+> - Learners: five on one frozen formulation — PPO, RecurrentPPO, TD3, SAC, TQC (TQC replaced SAC-IQN, F77). Whether the paper presents a proposed learner or a five-learner comparison is open (`METHODS_BRIEF.md` §9).
+>
+> - Decisions at **2 Hz** with 0.1 s physics (F38); basin mode is the default geometry (F74, spec 06).
+>
+> - Crossings: the own ship gives way from either side and turns toward the target's side (A17), a narrow-channel convention.
+>
+> The rationale below still stands where it is not listed. `F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`.
+
 **Revision 2** — repositioned to two-vessel encounters with static obstacles.
 Supersedes the multi-vessel version of this document set.
 
