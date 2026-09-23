@@ -1,5 +1,15 @@
 # 06 — Basin Mode: Navigable Geometry, Straight Legs, and Suite Restructure
 
+> **Status note (2026-09-22).** Parts of this document are superseded by the implementation, which is frozen as **baseline-v1** (`configs/baseline_v1.json`, git tag `baseline-v1`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here:
+>
+> - §3.5, as amended by your calls (F74): inside the basin **only head-on traffic keeps the path band**; other confined targets use the whole basin (a 2–3 m band left null and overtaking traffic nowhere to go).
+>
+> - Tier A has 38 named cases, 35 realised; three are reported infeasible (F75).
+>
+> - §7's edits to `01`, `02a`, `03a`, `04a` are not yet made in those documents; each carries a status note instead.
+>
+> The rationale below still stands where it is not listed. `F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`.
+
 **Revision 1.0** — introduces a second navigable-geometry mode and makes it the primary training
 and evaluation geometry. Supersedes the single-corridor assumption in 03a §3 and 04a §3.2.
 **Handover target:** Claude Code (§3–§7, §9), Claude chat (§2 decisions are signed off)

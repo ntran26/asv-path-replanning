@@ -1,5 +1,15 @@
 # CONSTANTS AND SCALES — Paper 3
 
+**Revision 2.9 (2026-09-22) — baseline-v1 frozen.** Every value training uses
+is recorded in `configs/baseline_v1.json` (git tag `baseline-v1`), which a run
+checks against before it starts; **where this document and the config differ,
+the config is right.** The paper-ready statement of the formulation is
+`planning/METHODS_BRIEF.md`. This revision corrects the rows below that still
+quoted values from the 1.116 m/s plant or from 10 Hz as current (pose noise,
+track gate, DCPA/TCPA clips, being-overtaken speed margin, encounter hold, the
+R-2 speed reference); earlier revision notes are kept as history. New rows since
+2.8 are at the end of §14.1 (A24-A31, F88, F91, baseline-v1).
+
 **Revision 2.7** — F24 decided: **`CRUISE_RPM = 6`, `U_REF` = 0.558 m/s**. The
 virtual corridor sweep is **restored**. Nominal pose and ego noise and hull
 randomisation (1.0) are on for training, and the emergency stop has its own
@@ -250,14 +260,14 @@ constant across that band and the tests assert the alternation.
 | `BOUNDARY_BEARINGS_DEG` | −90, −60, −30, 0, +30, +60, +90 | |
 | `BOUNDARY_MAX_RANGE` | 16.0 m | same normaliser as `c_t`, deliberately |
 | `BOUNDARY_GATE_MARGIN` | 0.30 m | `TODO(05)` |
-| `BOUNDARY_POSE_NOISE_XY` | 0.0 m | `TODO(05)`, Study 2 axis |
-| `BOUNDARY_POSE_NOISE_HEADING_DEG` | 0.0° | `TODO(05)` |
+| `BOUNDARY_POSE_NOISE_XY` | **0.03 m** (nominal) | `TODO(05)`, Study 2 axis |
+| `BOUNDARY_POSE_NOISE_HEADING_DEG` | **0.2°** (nominal) | `TODO(05)` |
 | `BOUNDARY_POSE_NOISE_WALK` | 0.0 m/step | `TODO(05)` |
 
-> **The pose-noise magnitudes are all 0.0, so the sim-to-real gap 01 §3.3 warns
-> about is currently wide open.** The hook is on the execution path and tested,
-> but a headline training run must not start until 05 supplies the rf2o drift
-> figures. This remains the single most consequential outstanding number here.
+> **Pose noise is on at nominal magnitudes (F46), not measured ones.** Until
+> revision 2.7 all three were 0.0 and this note warned that the sim-to-real gap
+> 01 §3.3 describes was wide open. The nominal values close it in kind; the
+> measured rf2o drift figures from 05 remain outstanding (B4, `TODO(05)`).
 
 **O5 resolved: software gating, not a physical barrier.** The facility walls
 carry the fixed geometric features — recessed doorways, protruding benches —
@@ -276,7 +286,7 @@ the deck sit at scan height and move.
 |---|---|---|
 | `CLUSTER_EPS` | 0.35 m | approved 02b §2 |
 | `CLUSTER_MIN_POINTS` | 4 | approved 02b §2 |
-| `TRACK_GATE_DIST` | 1.40 m | derived, `max(2.5·U_REF·Δt, 0.30)` at Δt = 0.5 s |
+| `TRACK_GATE_DIST` | **0.70 m** | derived, `max(2.5·U_REF·Δt, 0.30)` at Δt = 0.5 s and `U_REF` 0.558 m/s (was 1.40 m at 1.116 m/s) |
 | `TRACK_MAX_MISSES` / `TRACK_MIN_HITS` | 3 / 2 updates | 1.5 s of coasting; published 0.5 s after first sight |
 | `KF_PROCESS_NOISE_ACCEL` | 0.10 m/s² | `TODO(05)` |
 | `KF_MEAS_NOISE_POS` | 0.05 m | `TODO(05)` |
@@ -456,8 +466,8 @@ way would mean scoring intrusions the vessel cannot detect in the basin either.
 | `CRI_TCPA_SCALE_BEFORE` / `_AFTER` | 20.0 / 6.0 s | `TODO(decision)` |
 | `CRI_ED_SCALE` | 5.0 m | `TODO(decision)` |
 | `CRI_BOW_CROSSING_GAIN` / `_HALF_DEG` | 1.3 / 45° | `TODO(decision)` |
-| `DCPA_CLIP_DOMAINS` | 10.0 | `TODO(decision)` |
-| `TCPA_CLIP` | 60.0 s | `TODO(decision)` |
+| `DCPA_CLIP_DOMAINS` | **12.8** | derived, `LIDAR_RANGE / DOMAIN_RADIUS_DCPA` = 16 / 1.25 (was 10.0) |
+| `TCPA_CLIP` | **40.0 s** | symmetric clip (was 60.0 s) |
 
 **The decay rates could not be re-derived in ship lengths, and the reason should
 be on the record.** Waltz & Okhrin scale their decay to 2 NM = 3704 m for a
@@ -488,8 +498,8 @@ the normal case rather than the exception.
 | `CROSSING_PORT_MIN_DEG` | 247.5° | source table |
 | `OVERTAKING_CT_HALF_DEG` | 67.5° | source table |
 | `BEING_OVERTAKEN_BEARING_MIN/MAX_DEG` | 112.5° / 247.5° | **new class** |
-| `BEING_OVERTAKEN_SPEED_MARGIN` | 0.10 m/s | `TODO(decision)` |
-| `ENCOUNTER_HOLD_STEPS` | 8 steps | |
+| `BEING_OVERTAKEN_SPEED_MARGIN` | **0.084 m/s** | derived, `0.15 · U_REF` (was 0.10 m/s) |
+| `ENCOUNTER_HOLD_STEPS` | **2 steps** | 0.8 s at 2 Hz, `steps_for(0.8)` (was 8 steps at 10 Hz) |
 | `ENCOUNTER_BEARING_HYSTERESIS_DEG` | 3.0° | |
 
 Three modifications to Waltz & Okhrin Table 1 (01 §5.3):
@@ -534,12 +544,12 @@ placeholder.
 | 5 | `LIDAR_NO_RETURN_GRAZING_DEG` | 0.0 | `TODO(05)` |
 | 6 | `LIDAR_AFT_MASK_HALF_DEG` | 0.0 | `TODO(05)` |
 | 7 | `BOUNDARY_GATE_MARGIN` | 0.30 m | `TODO(05)` |
-| 8–10 | `BOUNDARY_POSE_NOISE_XY` / `_HEADING_DEG` / `_WALK` | 0.0 | `TODO(05)` |
+| 8–10 | `BOUNDARY_POSE_NOISE_XY` / `_HEADING_DEG` / `_WALK` | 0.03 m / 0.2° / 0.0 (nominal, F46) | `TODO(05)` |
 | 11–12 | `KF_PROCESS_NOISE_ACCEL` / `KF_MEAS_NOISE_POS` | 0.10 / 0.05 | `TODO(05)` |
 | 13–14 | `DYNAMIC_SPEED_ON` / `_OFF` | 0.15 / 0.08 m/s | `TODO(05)` |
 | 15 | `DETECTION_DROPOUT_P` | 0.0 | `TODO(05)` |
 | 16 | `TRACK_VELOCITY_NOISE` | 0.0 | `TODO(05)` |
-| 17–18 | `EGO_SPEED_NOISE` / `EGO_YAW_RATE_NOISE_DPS` | 0.0 | `TODO(05)` |
+| 17–18 | `EGO_SPEED_NOISE` / `EGO_YAW_RATE_NOISE_DPS` | 0.05 m/s / 1.0 °/s (nominal, F46) | `TODO(05)` |
 | 19–20 | `DOMAIN_FORE` / `_AFT` | 3.14 / 1.57 m | `TODO(05)` |
 | 21 | `DOMAIN_LATERAL` | **1.25 m, floored** (§8.1) | `TODO(05)` |
 | 22 | `TARGET_COMPLIANT_SPAWN_PROB` | 0.5, report realised | `TODO(04)` |
@@ -673,7 +683,7 @@ PPO's — the 10 Hz numbers, by construction.
 | | Value | When |
 |---|---|---|
 | `U_REF` | 0.558 m/s | nominal, identified plant at `CRUISE_RPM = 6` |
-| `U_ref_eff`, `R-2` | 0.456 m/s | give-way, compliant alteration inadmissible |
+| `U_ref_eff`, `R-2` | **0.223 m/s** (`0.4 · U_REF`; was 0.456 at 1.14 m/s) | give-way, compliant alteration inadmissible, and slowing clears (A18, A24) |
 | `U_ref_eff`, `R-5` | `max(u_TS, 0.20)` | overtaking, port pass does not fit |
 
 `R-5` also zeroes the existence cost. It is the **one** place that happens, and
@@ -770,7 +780,9 @@ tracker.
 | F88 | `V_PORT_LATCHED_RHO` **True** | run 11: `v_port` weighted by the peak risk since engagement |
 | F91 / A33 | `V_PORT_HEADING_NEEDS_ADMISSIBLE` **False** in baseline-v1 | on for run 12 only; one seed abandoned the Rule 14 alteration (F92) |
 | A31 | `A31_STAGE3_WEIGHTS` **False** in baseline-v1 (`STAGE3_CROSSING_WEIGHTS` 0.35/0.35/0.15/0.15) | on for run 12 only; falsified (F92) |
-| **baseline-v1** | **`configs/baseline_v1.json`**, the run 11 formulation; checked by `src/baseline_config.py`, applied by `train_formulation.py --config` | F93 |
+| **baseline-v1** | `configs/baseline_v1.json`, the run 11 formulation; superseded | F93 |
+| **baseline-v2** | **`configs/baseline_v2.json`**, the current frozen formulation: baseline-v1 with `BEING_OVERTAKEN_BELOW_FLOOR_FRAC` **0.20 -> 0.0** (S5, your call); checked by `src/baseline_config.py`, applied by `train_formulation.py --config` | F96 |
+| `BEING_OVERTAKEN_BELOW_FLOOR_FRAC` | **0.0** (was 0.20) | F96, S5: the Rule 17(b) last-moment case is out of scope, so no draw sits below the contact-free floor in training or in the suite |
 | geometry | **basin default** (`DEFAULT_GEOMETRY_MODE`); `BASIN_START_Y` 2.0, `BASIN_GOAL_Y` 22.0, `BASIN_X_RANGE` (2.5, 7.5) m, `BASIN_NAV_INSET_M` 0.40, `BASIN_H_SIDE_CLIP` (0.60, 5.00); `p_basin` 1 / 1 / 0.85 / 0.75 / 0.75 by stage, channel only for `CHANNEL_CLASSES` | F74 (06, your calls) |
 | feasibility | A* grid 0.25 m, walls 0.40 m, panels 0.45 m, route ≤ 2.25 × leg, 20 redraws then thin | F74 (Paper 2's filter) |
 | off-policy learners | TD3 / SAC / TQC: lr 3e-4, buffer 1 M, batch 256, tau 0.005, learning starts 10 k; TD3 policy delay 2, target noise 0.2 (clip 0.5), exploration 0.1; TQC 2 critics × 25 quantiles, top 2 dropped per critic | F76, F77 |

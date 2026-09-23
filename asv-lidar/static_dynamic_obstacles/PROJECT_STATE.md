@@ -6,11 +6,11 @@ currently blocking a full training run and a full evaluation.**
 
 | | |
 |---|---|
-| **Revision** | 8 — 0.55 m/s; virtual corridors back; generator wired in; e-stop reward; noise and randomisation on; scale audit; first PPO formulation run; see `OPEN_PROBLEMS.md` |
-| **Last updated** | 2026-09-15 |
-| **Tests** | **510 passing, none expected to fail** (T1 passes since F24 was decided) |
-| **Blocking a headline training run** | **none -- the baseline-v1 campaign runs on this machine (F95)** until a cluster is set up; A33 remains a known limit of v1 (a fix means baseline-v2); then the freeze, A26's budget and A30; starboard-crossing swerve (A28 option 2, open); the training budget for the five learners (A26, TODO(04-4)); your sign-off and commit for the freeze (F75); B5 (`OPEN_PROBLEMS.md`) |
-| **Blocking a full evaluation** | **7 more** — B2, B5–B10 (§2) |
+| **Revision** | 10 — **baseline-v2** (F96): Rule 17(b) draws out of training and the suite; field work delayed not deferred; formulation + five-learner framing; campaign to restart on `configs/baseline_v2.json`; method in `planning/METHODS_BRIEF.md` |
+| **Last updated** | 2026-09-23 |
+| **Tests** | **511 passing, none expected to fail** (T1 passes since F24 was decided) |
+| **Blocking a headline training run** | **none -- the baseline-v1 campaign runs on this machine (F95)** until a cluster is set up. Known limits of v1, where a fix would mean baseline-v2 and retraining: crossing side bias under PPO (A32, a learner property per F94), narrow head-ons without starboard room (A33), being overtaken by a non-yielding vessel (A30, on hold) |
+| **Blocking a full evaluation** | the Tier B runner and the COLREGs-VO comparator (B8, C3–C6); your sign-off of the suite freeze, claim ledger and result tables (B6), after the framing decision in `METHODS_BRIEF.md` §9; then B2, B7, B9 (§2) |
 | **Open `TODO(decision)`** | 1 (`D_SAFE`) |
 | **Open measurements** | 05 part 1 done from logs; basin sessions pending — `OPEN_PROBLEMS.md` Part B |
 
@@ -27,7 +27,8 @@ currently blocking a full training run and a full evaluation.**
 | `ship_v2.py` | the Paper 2 hull, kept for comparison only | — |
 | `emergency_stop.py` | Rule 8(e) stop latch and trigger predicates — simulator-free; **the bridge imports it** | user spec |
 | `path.py` | reference path, arclength, signed curvature, `r_path` | 02b T3 |
-| `corridor.py` | **channel generator** — centreline, width profile, bends, polygon | 03a §3 |
+| `corridor.py` | **channel and basin geometry** — channel centreline, width profile, polygon; `Basin` (slanted legs, side-specific half-widths, head-on band) | 03a §3, 06 (F74) |
+| `feasibility.py` | A* route check and obstacle thinning — every layout admits a route | 06 (F74) |
 | `targets.py` | **oriented hull, five behaviour models, confinement** | 03a §5 |
 | `scenario.py` | **generator, backward solve, rejection ledger** | 04a §3 |
 | `suite.py` | **Tier A/B, Around the Clock, Study 2, freeze manifest** | 04a §4–§9 |
@@ -36,15 +37,21 @@ currently blocking a full training run and a full evaluation.**
 | `tracking.py` | cluster → associate → Kalman → **free-space static/dynamic test** (F37) | 01 §4, replaces 03a §6.3 |
 | `cpa_cri.py` | CPA, ship domain, collision risk index | 01 §5 |
 | `encounter.py` | five-class classifier + hysteresis — **one definition** | 01 §5.3 |
-| `colregs/` | `EncounterContext`, engagement machine, admissibility | 02a §10.1 |
+| `colregs/` | `EncounterContext`, engagement latch (A20), admissibility, peak risk (F88) | 02a §10.1 |
+| `stopping.py` | braking-path stop test ("would stopping clear?", A23) | F67 |
 | `reward/` | eight dense terms, group clipping, audit | 02a |
-| `observation.py` | five branches, 56 dims, frozen index order | 01 §6 |
+| `observation.py` | **six branches, 70 dims** (`a25-v3-context`), frozen index order | `OBSERVATION_SPEC.md`, F72 |
+| `features_extractor.py` | scene MLP + presence-gated shared slot encoder, all five learners | `OBSERVATION_SPEC.md` §7 |
 | `env.py` | the Gymnasium environment — **2 Hz decisions, 0.1 s physics and collision sub-steps, optional pose staleness** | 03a §4 |
 | `render.py` | field view + seven-block telemetry panel | RENDER_PANEL_SPEC |
 | `play.py` | manual and random harness | — |
 | `classical/` | **LOS-PID + DWA and encounter-specific VO** (B8), perception-only; shared LOS, PID, model rollout, clearances | 04 §5, F83 |
-| `train_formulation.py` | **single-seed PPO test of the formulation** — generator curriculum, per-class evaluation | rev 8 |
+| `reference_controller.py` | CODEX classical reference controller (supplementary comparator) | F71 |
+| `train_formulation.py` | **the shared trainer for all five learners** — curriculum, dev-set evaluation, checkpoints, `--resume`, `--config` baseline gate, replay buffers outside the repository | F76–F77, F86, F93, F95 |
+| `baseline_config.py` | freeze, check and verify runs against `configs/baseline_v2.json` | F93, F96 |
+| `constant_temp.py` | **the classical comparators' parameters**, staged out of `constants.py` so tuning one cannot change the formulation digest; merged in after the campaign | your call, 2026-09-23 |
 | `tools/scale_audit.py` | 02a §8.2's reward scale audit over the generator | rev 8 |
+| `results/baseline_campaign.sh`, `tools/campaign_status.py` | the resumable five-learner campaign and its status view (`TRAINING_GUIDE.md`) | F95 |
 
 ### 1.2 Task status
 
@@ -55,7 +62,7 @@ currently blocking a full training run and a full evaluation.**
 | 03a environment and target | **done** — §1.2, §3, §4, §5, §7, §10; **§6.3 replaced** by the free-space classifier (F37); §4.1's 0.1 s step replaced by 2 Hz (F38) |
 | 04a scenario and evaluation | modules done — §3, §4, §5, §6, §7, §9 — and the generator drives training (F44) |
 | 05 vessel model and sim2real | **part 1 validated and integrated**; refit v4 run, **not adopted** (F40); crash-stop block added to part 2; basin sessions pending |
-| Training campaign | **blocked** — §2 |
+| Training campaign | **running** — baseline-v1, five learners × five seeds (F95); formulation frozen (F93) |
 
 ---
 
@@ -70,7 +77,7 @@ moves almost everything else.**
 |---|---|---|---|
 | ~~B1~~ | ~~F24, the operating speed~~ — **decided: 0.55 m/s, `CRUISE_RPM = 6`** (F42) | — | — |
 | **B2** | **F28 — Rule 8(e): resolved in simulation by the emergency stop; unverified on the water** | 05 | the field claim of 8(e) — moved to evaluation |
-| **B3** | **Throughput** — 38 steps/s at 2 Hz (19 simulated s per s); one policy-seed suite ~2.3 h against 04a's 50 min (§4) | 04 | the comparator list length |
+| ~~B3~~ | ~~Throughput~~ — **measured for all five learners** (F80) and budgeted (A26, F95): PPO ~108 steps/s, RecurrentPPO ~61, TD3/SAC/TQC 12-18 at 1.0 gradient step per transition | — | — |
 | B4 | Pose noise is **nominal**, not measured (F46) | 05 | the N1 sim-to-real claim, until S1-A |
 | ~~B11~~ | ~~Phantom dynamic tracks~~ — **fixed** (F37); confirm as §6.3's replacement (`OPEN_PROBLEMS.md` A7) | — | — |
 | ~~B12~~ | ~~Spawn boundary penalty~~ — **fixed** (F35) | — | — |
@@ -80,8 +87,8 @@ moves almost everything else.**
 
 | # | Blocker | Owner | Effect |
 |---|---|---|---|
-| **B5** | Curriculum steps per stage and total budget (`TODO(04-3)`, `TODO(04-4)`) | 04 | cannot size the campaign |
-| **B6** | Claim ledger and empty result tables not written | you | 04a §9.3 freeze checklist |
+| ~~B5~~ | ~~Curriculum steps per stage and total budget~~ — **decided**: stage fractions (F75), 2 M steps × 5 seeds, ratio 1.0 (A26, F95) | — | — |
+| **B6** | Claim ledger and result tables **drafted, unsigned** (`planning/`); they still name a single proposed SAC method — framing decision first (`METHODS_BRIEF.md` §9) | you | 04a §9.3 freeze checklist |
 | **B7** | `T-RE` reactive target is a placeholder, not the VO comparator | 03 | Tier B's `re` behaviour stratum |
 | **B8** | Classical comparators: **LOS-PID+DWA and encounter-specific VO built and on Tier 1 (F83)**; COLREGs-VO (Kuwata) not built; `T-RE` not yet swapped onto the VO | 04 | COLREGs-VO row of R1; B7 |
 | **B9** | `metrics.py` does not read the reward keys | 04 | 04a §10's metric set |
@@ -2727,14 +2734,64 @@ once access is granted. Recorded in `configs/baseline_v1.json`'s campaign block
    moment, so removing it is best-effort.
    *Cost to know:* OneDrive uploads each new buffer -- ~0.58 GB about every 6 h
    during SAC -- and syncs its deletion.
-5. **Fixed:** the baseline check read constants from the live module, so a check
-   made after `curriculum.apply_stage` (which rewrites the RPM settings in memory)
-   reported a drift the source did not have. It now reads `constants.py` as
-   written; test `test_runtime_staging_is_not_a_drift`.
 3. Each run's `config.json` records its **platform** (Python, torch, SB3,
    sb3-contrib, numpy, OS, machine) and **git commit**, so runs split between this
    machine and a cluster can be shown to share software.
 4. **`tools/campaign_status.py`** -- one line per learner x seed. **510 tests pass.**
+5. **`TRAINING_GUIDE.md`** -- how to start, check, hold, pause, resume and move
+   the campaign, with troubleshooting.
+6. **Fixed:** the baseline check read constants from the live module, so a check
+   made after `curriculum.apply_stage` (which rewrites the RPM settings in memory)
+   reported a drift the source did not have. It now reads `constants.py` as
+   written; test `test_runtime_staging_is_not_a_drift`.
+
+**F96 -- baseline-v2: the Rule 17(b) below-floor draws leave training and the
+suite; field work delayed, not deferred; the paper is a formulation plus a
+five-learner comparison (your three calls, 2026-09-23, after the Rev 2 review).**
+
+*What changed in the formulation.* `BEING_OVERTAKEN_BELOW_FLOOR_FRAC` 0.20 ->
+**0.0**. Every being-overtaken draw now passes at or above the contact-free floor
+(A15, A21), in training and in the frozen suite alike, so Rule 17(a)(i) holding
+course is always the lawful answer and the policy is never asked to choose
+between 17(a)(i) and 17(b). S5 put active release out of scope in Rev 2; A15
+later put a labelled 20 % below the floor into the distribution, which is the
+drift the review caught. `dcpa_below_floor` stays in the record (always False)
+so earlier runs remain readable. **This is the only difference from
+baseline-v1** (`baseline_config.diff` reports exactly that one constant).
+
+| | baseline-v1 | **baseline-v2** |
+|---|---|---|
+| formulation digest | `02e853268828a32a` | **`3d697858e95e5adf`** |
+| below-floor being-overtaken draws | 0.20, labelled | **0.0** |
+| development set | 120, 20 per class | unchanged, 0 below floor |
+| Tier A | 38 named, 35 realised (A-BO-N, A-NU-I, A-NU-N infeasible) | unchanged |
+| runs | run 11 (PPO seeds 0-1), RecurrentPPO seed 0 | none yet |
+
+*Cost.* The three finished runs were trained on baseline-v1 and **do not carry
+over**: run 11's two PPO seeds and RecurrentPPO seed 0 (~17 h). The campaign is
+25 runs again, tagged `bl2`, ordered seed 0 of all five learners first (~6 days),
+then seeds 1-4. Taken now rather than after the off-policy runs, the change
+costs hours instead of weeks.
+
+*The other two calls.* **Field work is delayed within this paper**, so N3, RQ4
+and the "physically reproducible" clause that justified the two-vessel scope all
+stand, and the basin sessions (`PART2_BASIN_PLAN.md`) remain on the critical
+path. **The paper is a formulation plus a five-learner comparison**, so
+`RESULT_TABLES.md`'s "Proposed (SAC, full)" row and the ablation rows need
+restating before sign-off, and the classical comparators (C3-C6) become
+essential rather than optional -- they carry N2.
+
+*Also from the review, fixed in `planning/METHODS_BRIEF.md`:* the crossing
+convention now leads with **Rule 9(b)** and reports the 0.32 stand-on figure as
+corroboration rather than as the basis (the earlier ordering let the target
+model decide the rule interpretation); **Around the Clock** is named in the
+evaluation section (it was always built -- `suite.around_the_clock`, 24 open
+water + 24 channel x 10 seeds, table R8 -- and only missing from the brief); the
+runtime safety layer is recorded as a **deliberate change to D2**; C-4's 2 x 2
+ablation is flagged as needing a **third rung** (no feature / class one-hot /
+full context branch) since the observation gained the context branch; and the
+0.55 m/s speed caveat moved into the model section, where the sim-to-real claim
+lives.
 
 ### 3.13 Earlier findings, still standing
 
@@ -2865,3 +2922,5 @@ Machine-checked in `suite.freeze_checklist()`.
 | **6** | **2026-09-13** | **05 part 1 validated (`bluefin/REVIEW.md`) and integrated; emergency stop; deployment timing wrapper; F30–F36; §6.3 and throughput overstatements corrected** |
 | **7** | **2026-09-14** | **2 Hz everywhere; corridor fixed at 10 m; free-space static/dynamic classifier and sensor-origin fix; bridge e-stop latch; crash-stop block in the basin plan; refit v4 (not adopted) and v4b; F35, F36 fixed; F37–F41; then the pose race fixed (0 of 1,085 stale on replay) and the rudder limiter made a true rate limit, off by default in bridge and simulator** |
 | **8** | **2026-09-14** | **F24 decided (0.55 m/s); virtual corridors restored; scenario generator wired into the environment; e-stop reward (A8); nominal pose/ego noise; hull randomisation 1.0; reward scale audit; single-seed PPO formulation run; F42–F48** |
+| **10** | **2026-09-23** | **baseline-v2 (F96): below-floor being-overtaken draws removed from training and the suite (S5); Rev 2 review answered — Rule 9(b) leads the crossing convention, Around the Clock named, D2 change recorded, C-4 needs a third rung; field work delayed within this paper; formulation + five-learner framing** |
+| **9** | **2026-09-22** | **Formulation work F49–F95 (runs 1–12, basin mode, five learners) recorded in §3; baseline-v1 frozen (F93); A26 decided and the campaign launched (F95); `OBSERVATION_SPEC.md`, `CONSTANTS_AND_SCALES.md` and this header brought up to date; stale planning specs carry dated status notes; `planning/METHODS_BRIEF.md` added** |

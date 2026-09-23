@@ -91,7 +91,7 @@ def test_the_being_overtaken_goal_is_clear_of_the_corridor_end():
     assert checked == 5
 
 
-def test_the_being_overtaken_dcpa_is_floored_with_a_labelled_fraction_below():
+def test_the_being_overtaken_dcpa_is_floored_with_no_draws_below():
     """A15: most draws pass at or above the floor; about a fifth are labelled
     below it, and the label agrees with the drawn DCPA."""
     generator = scn.ScenarioGenerator(stage=5, seed_namespace="development")
@@ -111,7 +111,9 @@ def test_the_being_overtaken_dcpa_is_floored_with_a_labelled_fraction_below():
         else:
             assert built.dcpa_m >= built.dcpa_floor_m
     assert n >= 100
-    assert 0.08 <= below / n <= 0.35
+    # baseline-v2 (your call, 2026-09-23): nothing below the floor, so the Rule
+    # 17(b) case S5 put out of scope is in neither training nor the suite.
+    assert below == 0
 
 
 def test_contact_free_dcpa_matches_the_hull_geometry():

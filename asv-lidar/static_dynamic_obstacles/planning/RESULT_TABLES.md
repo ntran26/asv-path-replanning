@@ -4,6 +4,8 @@
 first headline evaluation. Rows and columns are fixed now; values are filled only from
 frozen-namespace runs. Every cell reports the mean over 5 seeds with a 95 % CI.
 
+> **Status note (2026-09-23).** Three decisions are now made and this draft needs restating before sign-off (B6). **Framing:** the paper is a **formulation plus a five-learner comparison**, so there is no "Proposed (SAC, full)" method — the five learners are the comparison, and the classical comparators carry N2. **Formulation:** baseline-v2 (F96) — the Rule 17(b) below-floor being-overtaken draws are out of training and the suite, so any row or claim resting on them goes. **Field work** is delayed within this paper, so N3, RQ4 and C-6 stand. Still to settle: which learner carries the ablations, and C-4's comparison, which needs a **third rung** (no encounter feature / class one-hot / full context branch) now that the observation has a context branch.
+
 Learners (your call, 2026-09-18): PPO, RecurrentPPO, TD3, SAC and TQC, each over multiple seeds. TQC is the distributional arm (04a §8.2). PPO is also the development vehicle for the reward; only its frozen-suite runs are reported.
 The CODEX reference controller is a supplementary comparator, not one of the pre-registered three.
 

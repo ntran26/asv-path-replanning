@@ -60,54 +60,49 @@ from typing import Optional, Sequence
 
 import numpy as np
 
+import constant_temp as ct
 import constants as cfg
 from classical import common as cc
 from reference_controller import hull_separation
 from ship import HULL_MARGIN
 
-COURSE_OFFSETS_DEG = np.arange(-90.0, 90.01, 5.0)   # about the present heading
-SPEED_FRACTIONS = (1.0, 0.75, 0.5, 0.25, 0.0)
-TAU_S = 20.0                     # VO horizon for targets
-TAU_STATIC_S = 10.0              # and for scan points and the map polygon
-VO_DT = 0.25
-HARD_GAP_M = 0.20
-STATIC_GAP_M = 0.15
-BOUNDARY_GAP_M = 0.05
-SIDE_FREE_DCPA_M = 2.0 * cfg.DOMAIN_LATERAL          # 2.5 m: the pass is clear either side
+COURSE_OFFSETS_DEG = np.asarray(ct.CLASSICAL_VO_COURSE_OFFSETS_DEG)   # about the present heading
+SPEED_FRACTIONS = ct.CLASSICAL_VO_SPEED_FRACTIONS
+TAU_S = ct.CLASSICAL_VO_TAU_S    # VO horizon for targets
+TAU_STATIC_S = ct.CLASSICAL_VO_TAU_STATIC_S   # and for scan points and the map polygon
+VO_DT = ct.CLASSICAL_VO_DT
+HARD_GAP_M = ct.CLASSICAL_VO_HARD_GAP_M
+STATIC_GAP_M = ct.CLASSICAL_VO_STATIC_GAP_M
+BOUNDARY_GAP_M = ct.CLASSICAL_VO_BOUNDARY_GAP_M
+SIDE_FREE_DCPA_M = ct.CLASSICAL_VO_SIDE_FREE_DCPA_M  # 2.5 m: the pass is clear either side
 # Rule 17(a)(ii)/(b): stand on until a hard violation is this close.  8 s was
 # too late for this hull to sidestep a faster overtaker coming up its track
 # (no clear velocity left by the time it released); 12 s leaves one.
-STAND_ON_RELEASE_S = 12.0
+STAND_ON_RELEASE_S = ct.CLASSICAL_VO_STAND_ON_RELEASE_S
 # Manoeuvre model for the reachability sweep, from the identified hull at
 # cruise (probed in simulation): ~1 s of rudder delay, servo and yaw lag
 # before a turn is under way, ~6 deg/s at full rudder; on the propulsion
 # floor it coasts 0.55 -> 0.41 m/s in 20 s (an effective time constant near
 # 60 s), and at double thrust gains 0.55 -> 1.0 m/s in 20 s (~20 s).
-TURN_LAG_S = 1.0
-TURN_RATE_DPS = 6.0
-SPEED_TAU_DOWN_S = 60.0
-SPEED_TAU_UP_S = 20.0
+TURN_LAG_S = ct.CLASSICAL_VO_TURN_LAG_S
+TURN_RATE_DPS = ct.CLASSICAL_VO_TURN_RATE_DPS
+SPEED_TAU_DOWN_S = ct.CLASSICAL_VO_SPEED_TAU_DOWN_S
+SPEED_TAU_UP_S = ct.CLASSICAL_VO_SPEED_TAU_UP_S
 
 # Domain scaling per encounter, (fore, aft, lateral).  Give-way crossing keeps
 # the target further off the own bow (a clear pass astern); head-on and
 # overtaking widen abeam, where those passes happen.
-DOMAIN_SCALE = {
-    "head_on": (1.0, 1.0, 1.2),
-    "crossing": (1.5, 1.0, 1.0),
-    "overtaking": (1.0, 1.0, 1.2),
-    "being_overtaken": (1.0, 1.0, 1.0),
-    "none": (1.0, 1.0, 1.0),
-}
+DOMAIN_SCALE = ct.CLASSICAL_VO_DOMAIN_SCALE
 
-W_COURSE = 1.0                   # per pi rad from the preferred course
-W_SPEED = 0.5                    # per cruise speed below preferred
-W_CHANGE = 0.3                   # per pi rad from the previous course
-W_DOMAIN = 3.0                   # per unit of domain penetration
+W_COURSE = ct.CLASSICAL_VO_W_COURSE   # per pi rad from the preferred course
+W_SPEED = ct.CLASSICAL_VO_W_SPEED     # per cruise speed below preferred
+W_CHANGE = ct.CLASSICAL_VO_W_CHANGE   # per pi rad from the previous course
+W_DOMAIN = ct.CLASSICAL_VO_W_DOMAIN   # per unit of domain penetration
 # Static returns: the hard gap plus a soft margin, the static counterpart of the
 # domain.  With the hard gap alone the VO scraped past obstacles on the margin
 # and flipped back to the LOS course the moment it looked clear again.
-STATIC_SOFT_M = 0.6
-W_STATIC = 1.0                   # at the hard gap; zero at STATIC_SOFT_M
+STATIC_SOFT_M = ct.CLASSICAL_VO_STATIC_SOFT_M
+W_STATIC = ct.CLASSICAL_VO_W_STATIC   # at the hard gap; zero at STATIC_SOFT_M
 
 
 @dataclass

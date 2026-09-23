@@ -41,25 +41,26 @@ import math
 
 import numpy as np
 
+import constant_temp as ct
 import constants as cfg
 from classical import common as cc
 
-TRAVEL_M = 5.5                   # static obstacles: judged over this much track (10 s at cruise)
-TARGET_HORIZON_S = 10.0          # tracked targets: over this much time
-MAX_HORIZON_S = 16.0             # rollout length, enough for the slowest candidate
-YAW_RATES_DPS = np.linspace(-9.0, 9.0, 9)         # inside the ~10.4 deg/s full-rudder turn
-SPEED_FRACTIONS = (1.0, 0.5, 0.0)                  # of U_NOM; 0 = propulsion floor
-COMMIT_S = (3.0, 6.0)
-LOS_SPEED_FRACTIONS = (1.0, 0.5)
-SAFE_GAP_M = 0.20                # hull-to-hull or hull-to-point, beyond HULL_MARGIN
-BOUNDARY_GAP_M = 0.05            # the map polygon is exact, the scan is not
-DIST_CAP_M = 1.5                 # clearance beyond this earns nothing more
+TRAVEL_M = ct.CLASSICAL_DWA_TRAVEL_M          # static obstacles, over this much track
+TARGET_HORIZON_S = ct.CLASSICAL_DWA_TARGET_HORIZON_S   # tracked targets, over this much time
+MAX_HORIZON_S = ct.CLASSICAL_DWA_MAX_HORIZON_S         # rollout length for the slowest candidate
+YAW_RATES_DPS = np.asarray(ct.CLASSICAL_DWA_YAW_RATES_DPS)   # inside the full-rudder turn
+SPEED_FRACTIONS = ct.CLASSICAL_DWA_SPEED_FRACTIONS     # of U_NOM; 0 = propulsion floor
+COMMIT_S = ct.CLASSICAL_DWA_COMMIT_S
+LOS_SPEED_FRACTIONS = ct.CLASSICAL_DWA_LOS_SPEED_FRACTIONS
+SAFE_GAP_M = ct.CLASSICAL_DWA_SAFE_GAP_M      # hull-to-hull or hull-to-point, beyond HULL_MARGIN
+BOUNDARY_GAP_M = ct.CLASSICAL_DWA_BOUNDARY_GAP_M   # the map polygon is exact, the scan is not
+DIST_CAP_M = ct.CLASSICAL_DWA_DIST_CAP_M      # clearance beyond this earns nothing more
 # Clearance is judged over equal travelled distance (below), so it no longer
 # rewards slowing down, and can carry real weight against the path term.
 ALPHA, BETA, GAMMA, DELTA, SMOOTH = 1.0, 1.0, 0.5, 0.6, 0.25
-PATH_SCALE_M = 2.0              # mean cross-track error scoring zero on DELTA
+PATH_SCALE_M = ct.CLASSICAL_DWA_PATH_SCALE_M  # mean cross-track error scoring zero on DELTA
 # DWA runs when anything is this close; otherwise LOS-PID alone.
-ENGAGE_RANGE_M = 9.0
+ENGAGE_RANGE_M = ct.CLASSICAL_DWA_ENGAGE_RANGE_M
 
 
 class LosDwaController:

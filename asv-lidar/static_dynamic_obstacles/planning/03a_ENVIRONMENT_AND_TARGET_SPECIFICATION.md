@@ -1,5 +1,19 @@
 # 03a — Environment and Dynamic Target: Specification
 
+> **Status note (2026-09-22).** Parts of this document are superseded by the implementation, which is frozen as **baseline-v1** (`configs/baseline_v1.json`, git tag `baseline-v1`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here:
+>
+> - §4.1: 0.1 s is the physics step; decisions are at **2 Hz** (F38).
+>
+> - §6.3: replaced by the free-space static/dynamic classifier (F37).
+>
+> - Observation table: **70** values (F72), not 56 — `OBSERVATION_SPEC.md`.
+>
+> - Geometry: basin mode default; inside the basin only head-on traffic keeps a path band (F74, spec 06 as amended). Every layout passes an A* feasibility check (F74).
+>
+> - The LiDAR's 10 Hz scan rate is a hardware fact and unchanged.
+>
+> The rationale below still stands where it is not listed. `F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`.
+
 **Revision 2.0** — first full specification. Expands `03_ENVIRONMENT_AND_TARGETS.md` into an
 implementable spec, closes its five open items, and absorbs the three changes 04a requires of it.
 **Handover target:** Claude Code (§4–§8), Claude chat (§1 needs your sign-off first)

@@ -98,13 +98,16 @@ def colregs_action(env, sense_sign: int, alteration_deg: float = 30.0) -> np.nda
 
 # The classical comparators (B8) and the CODEX reference controller: onboard
 # controllers that read the environment's perception, one instance per episode.
-CONTROLLERS = ("los_dwa", "encounter_vo", "reference")
+CONTROLLERS = ("los_dwa", "colregs_vo", "encounter_vo", "reference")
 
 
 def make_controller(policy: str):
     if policy == "los_dwa":
         from classical.los_dwa import LosDwaController
         return LosDwaController()
+    if policy == "colregs_vo":
+        from classical.colregs_vo import ColregsVOController
+        return ColregsVOController()
     if policy == "encounter_vo":
         from classical.encounter_vo import EncounterVOController
         return EncounterVOController()

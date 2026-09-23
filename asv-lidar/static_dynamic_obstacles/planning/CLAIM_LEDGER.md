@@ -4,6 +4,8 @@
 It becomes binding when you sign it off and it is committed with the frozen suite.
 After that, a claim may be weakened or withdrawn, but not added or moved to fit a result.
 
+> **Status note (2026-09-23).** Three decisions are now made and this draft needs restating before sign-off (B6). **Framing:** the paper is a **formulation plus a five-learner comparison**, so there is no "Proposed (SAC, full)" method — the five learners are the comparison, and the classical comparators carry N2. **Formulation:** baseline-v2 (F96) — the Rule 17(b) below-floor being-overtaken draws are out of training and the suite, so any row or claim resting on them goes. **Field work** is delayed within this paper, so N3, RQ4 and C-6 stand. Still to settle: which learner carries the ablations, and C-4's comparison, which needs a **third rung** (no encounter feature / class one-hot / full context branch) now that the observation has a context branch.
+
 Every claim in the abstract and conclusion must map to a row here. **Evidence** names
 the table or figure that decides it. **Prediction** is written before the run that
 tests it. **Status** is `pending` until that evidence exists.

@@ -1,0 +1,87 @@
+Frozen suite (ppos0_bl2) — model runs\ppo_formulation_seed0_bl2\best_model.zip
+1990 episodes, suite manifest 54723b71aa809250, 2490 s
+
+== Tier A: 35 of 38 named cases realised; not realisable: A-BO-N, A-NU-I, A-NU-N
+
+-- by supervisor
+             n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+supervisor                                                                           
+off         35    0.543        0.286       0.171    1.031      1.870  -28.357   0.000
+on          35    0.514        0.286       0.200    1.068      1.904  -27.778   0.057
+
+-- by class (supervisor off)
+                  n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+class                                                                                     
+being_overtaken   3    0.667        0.000       0.333    0.794      1.432  -38.906     0.0
+crossing         15    0.267        0.600       0.133    0.799      1.577  -12.195     0.0
+head_on           9    0.778        0.000       0.222    0.942      1.904  -22.665     0.0
+null              1    1.000        0.000       0.000    1.315      8.409    0.000     0.0
+overtaking        7    0.714        0.143       0.143    1.701      3.083  -69.841     0.0
+
+-- per case (supervisor off)
+                         class  width             outcome  min_target_range  rms_cte
+case_id                                                                             
+A-HO-W                 head_on  10.00                goal              2.06     1.08
+A-HO-I                 head_on   6.00                goal              3.54     1.31
+A-HO-N                 head_on   4.07                goal              1.87     0.59
+A-CRS-W               crossing   9.94                goal              2.95     0.66
+A-CRS-I               crossing   6.00    collision:target              1.58     0.46
+A-CRS-N               crossing   3.98  collision:boundary              2.08     1.04
+A-CRP-W               crossing  10.28                goal              4.00     2.29
+A-CRP-I               crossing   6.00    collision:target              1.28     0.21
+A-CRP-N               crossing   4.15                goal              3.30     0.92
+A-OT-W              overtaking  10.01                goal              3.89     2.28
+A-OT-I              overtaking   6.00                goal              3.08     1.59
+A-OT-N              overtaking   4.01    collision:target              1.08     1.08
+A-BO-W         being_overtaken   9.26                goal              2.94     1.27
+A-BO-I         being_overtaken   6.00  collision:boundary              1.43     0.66
+A-NU-W                    null  10.00                goal              8.41     1.31
+A-CLT-HO-I             head_on   6.00                goal              1.58     0.91
+A-CLT-CRS-I           crossing   6.00    collision:target              1.72     0.83
+A-CLT-OT-I          overtaking   5.89                goal              1.12     1.85
+A-CLT-HO-N             head_on   4.37  collision:boundary              1.90     1.23
+A-CLT-CRS-N           crossing   4.00    collision:target              1.27     0.60
+A-CLT-OT-N          overtaking   4.19  collision:boundary              4.98     1.35
+A-OCC-HO-I             head_on   6.22                goal              2.98     0.85
+A-OCC-CRS-I           crossing   6.00    collision:target              1.54     0.26
+A-8E-HO-N              head_on   3.99  collision:boundary              1.41     0.52
+A-8E-CRS-N            crossing   4.03  collision:boundary              3.39     0.90
+A-OFF-CRP-I           crossing   6.04    collision:target              1.40     0.13
+A-OFF-OT-I          overtaking   6.34                goal              1.66     1.88
+A-FAIL-CRS-X          crossing   3.48    collision:target              1.57     0.44
+A-FAIL-HO-X            head_on   3.54                goal              2.42     0.78
+A-BSN-HO               head_on   9.48                goal              1.59     1.22
+A-BSN-CRS             crossing   9.48    collision:target              1.29     0.49
+A-BSN-CRP             crossing   9.48                goal              2.30     2.03
+A-BSN-OT            overtaking   9.48                goal              4.30     1.88
+A-BSN-BO       being_overtaken   9.48                goal              1.14     0.45
+A-BSN-CLT-CRS         crossing   9.48    collision:target              1.43     0.72
+
+== Tier B (headline, R1)
+-- by supervisor
+              n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+supervisor                                                                            
+off         960    0.727        0.153       0.120    1.053      2.191  -35.385   0.000
+on          960    0.712        0.154       0.133    1.065      2.215  -35.055   0.105
+
+-- by class (supervisor off)
+                   n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+class                                                                                      
+being_overtaken  180    0.878        0.017       0.106    0.835      1.952  -24.637     0.0
+crossing         240    0.417        0.454       0.129    0.906      1.791  -17.982     0.0
+head_on          240    0.796        0.104       0.100    0.939      1.979  -33.605     0.0
+null              60    0.900        0.000       0.100    1.195      8.305   -1.379     0.0
+overtaking       240    0.812        0.042       0.146    1.443      2.712  -71.131     0.0
+
+-- by stratum (supervisor off)
+           n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+stratum                                                                            
+         960    0.727        0.153        0.12    1.053      2.191  -35.385     0.0
+
+-- crossings by side (supervisor off), the A32 split
+                 n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+crossing_side                                                                            
+port           128    0.414        0.453       0.133    0.967      1.810  -11.459     0.0
+starboard      112    0.420        0.455       0.125    0.836      1.775  -25.437     0.0
+
+

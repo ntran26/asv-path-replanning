@@ -1,5 +1,15 @@
 # 05 — Vessel Model Recalibration and Sim-to-Real
 
+> **Status note (2026-09-22).** Parts of this document are superseded by the implementation, which is frozen as **baseline-v1** (`configs/baseline_v1.json`, git tag `baseline-v1`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here:
+>
+> - Operating speed decided: **0.558 m/s** at `CRUISE_RPM` 6, from the identified plant (F24, F42); part 1 validated and integrated from `bluefin/` (F30–F36).
+>
+> - Decisions at 2 Hz (F38); nominal pose and ego noise and hull randomisation (scale 1.0) on in training (F46).
+>
+> - Basin sessions (part 2, `PART2_BASIN_PLAN.md`) and deployment (C13) are pending; manoeuvring at 0.55 m/s is extrapolated (B5).
+>
+> The rationale below still stands where it is not listed. `F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`.
+
 **Revision 2** — O3 resolved: sim-to-real is retained **in this paper as RQ4**, delivered
 as a domain-randomisation ablation evaluated in the field (Study 3). This document is
 otherwise unchanged by the two-vessel repositioning; the identification work is

@@ -26,49 +26,50 @@ from typing import Callable, List, Optional, Tuple
 
 import numpy as np
 
+import constant_temp as ct
 import constants as cfg
 from reference_controller import hull_separation
 from ship import HULL_MARGIN, IDENTIFIED, LIDAR_OFFSET_M, VESSEL_LENGTH, VESSEL_WIDTH, dyn, steady_speed
 
 HALF_L = 0.5 * VESSEL_LENGTH + HULL_MARGIN
 HALF_W = 0.5 * VESSEL_WIDTH + HULL_MARGIN
-MAX_RUDDER_RAD = math.radians(40.0)
+MAX_RUDDER_RAD = ct.CLASSICAL_MAX_RUDDER_RAD
 
 # LOS lookahead.  1.6 Lpp, inside the 1.5-2.5 L band LOS papers use, and the
 # value the reference controller settled on in the same channels.
-LOS_LOOKAHEAD_M = 2.5
-MAX_SIDESLIP_RAD = math.radians(20.0)
+LOS_LOOKAHEAD_M = ct.CLASSICAL_LOS_LOOKAHEAD_M
+MAX_SIDESLIP_RAD = ct.CLASSICAL_MAX_SIDESLIP_RAD
 
 # Heading PID, in rudder-units (full rudder = 1) per degree.  P and D are the
 # reference controller's tuning on this hull; the integral is slow and gated to
 # small errors so it trims a steady offset without winding up in an avoidance.
-PID_KP = 1.0 / 35.0
-PID_KD = 1.0 / 18.0              # on measured yaw rate, deg/s
-PID_KI = 1.0 / 600.0             # per deg.s
-PID_I_GATE_DEG = 10.0
-PID_I_LIMIT = 0.15               # rudder units
+PID_KP = ct.CLASSICAL_PID_KP
+PID_KD = ct.CLASSICAL_PID_KD   # on measured yaw rate, deg/s
+PID_KI = ct.CLASSICAL_PID_KI   # per deg.s
+PID_I_GATE_DEG = ct.CLASSICAL_PID_I_GATE_DEG
+PID_I_LIMIT = ct.CLASSICAL_PID_I_LIMIT   # rudder units
 
 # Identified steady turn: ~10.4 deg/s per unit rudder at cruise (probed on the
 # simulator, linear in rudder to full deflection).  Used as the feed-forward of
 # the yaw-rate loop.
-YAW_RATE_GAIN_DPS = 10.4
-YAW_RATE_KP = 0.08               # rudder units per deg/s of yaw-rate error
+YAW_RATE_GAIN_DPS = ct.CLASSICAL_YAW_RATE_GAIN_DPS
+YAW_RATE_KP = ct.CLASSICAL_YAW_RATE_KP   # rudder units per deg/s of yaw-rate error
 
 U_PER_RPM = steady_speed(12.0) / 12.0     # 0.093 m/s per rpm-unit, linear
-SPEED_KP_RPM = 6.0                        # rpm-units per m/s of speed error
+SPEED_KP_RPM = ct.CLASSICAL_SPEED_KP_RPM  # rpm-units per m/s of speed error
 
 # Prediction step.  The rudder servo is solved exactly and the body dynamics
 # evolve over seconds, so 0.125 s holds the collision checks at ~0.14 m of
 # closing per sample at the fastest head-on closing speed.
-PRED_DT = 0.125
+PRED_DT = ct.CLASSICAL_PRED_DT
 SUBSTEPS = int(round(cfg.UPDATE_RATE / PRED_DT))
 DELAY_STEPS = max(0, int(round(IDENTIFIED["rud_delay"] / PRED_DT)))
 
 # Scan memory: 4 decisions = 2 s, enough to carry a passed obstacle through
 # the aft mask.  The reference controller's 10 s smeared a target's returns
 # into a phantom wall along its track before the tracker confirmed it dynamic.
-SCAN_MEMORY_FRAMES = 4
-TRACK_EXCLUSION_M = 1.8          # returns this close to a track are the target's own
+SCAN_MEMORY_FRAMES = ct.CLASSICAL_SCAN_MEMORY_FRAMES
+TRACK_EXCLUSION_M = ct.CLASSICAL_TRACK_EXCLUSION_M  # returns this close to a track are the target's own
 
 
 def wrap_pi(a):

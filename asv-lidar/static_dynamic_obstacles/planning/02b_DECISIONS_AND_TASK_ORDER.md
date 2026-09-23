@@ -1,5 +1,7 @@
 # 02b — Decisions and Task Order
 
+> **Status note (2026-09-22).** Historical: the T1–T4 / C1–C4 task order and decisions of 8 Sep, all delivered. `U_REF` = 1.14 m/s (T1) was later superseded by the identified plant, 0.558 m/s at `CRUISE_RPM` 6 (F24). Kept as a record; the current method is `planning/METHODS_BRIEF.md` and `configs/baseline_v1.json` (baseline-v1).
+
 **Input:** `CONSTANTS_AND_SCALES.md` Rev 2.2 (42 unresolved constants),
 `PORTING_MANIFEST.md` §5.7 F17, §6.3 F18, §6.4 F19, §6.7.
 **Output:** every open item either decided, converted to a measurement, or explicitly deferred

@@ -1,5 +1,15 @@
 # 01 — Perception and Observation Space
 
+> **Status note (2026-09-22).** Parts of this document are superseded by the implementation, which is frozen as **baseline-v1** (`configs/baseline_v1.json`, git tag `baseline-v1`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here:
+>
+> - The observation: **70** values in six branches (`a25-v3-context`, F72) — a sixth `context` branch (encounter state + previous action) and cross-track error scaled by the local channel half-width. `OBSERVATION_SPEC.md` is current.
+>
+> - "the SAC multi-input policy": the same extractor serves all five learners (`OBSERVATION_SPEC.md` §7).
+>
+> - Pose and ego noise are on at nominal magnitudes (F46); decisions at 2 Hz (F38). Hardware facts (RPLidar C1, 720 beams, 10 Hz scans) are unchanged.
+>
+> The rationale below still stands where it is not listed. `F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`.
+
 **Revision 2** — single dynamic target. Supersedes the three-slot version.
 **Handover target:** Claude Code (implementation-heavy)
 **Depends on:** 02 for the encounter classifier definition and the precedence table
