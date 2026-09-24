@@ -72,6 +72,8 @@ TURN_RATE_DPS = ct.CLASSICAL_KVO_TURN_RATE_DPS
 W_COURSE = ct.CLASSICAL_KVO_W_COURSE
 W_SPEED = ct.CLASSICAL_KVO_W_SPEED
 W_CHANGE = ct.CLASSICAL_KVO_W_CHANGE
+STATIC_SOFT_M = ct.CLASSICAL_KVO_STATIC_SOFT_M
+W_STATIC = ct.CLASSICAL_KVO_W_STATIC
 
 HEAD_ON, CROSSING_GIVE, CROSSING_STAND, OVERTAKING, BEING_OVERTAKEN, NONE = (
     "head_on", "crossing_give_way", "crossing_stand_on", "overtaking",
@@ -168,14 +170,21 @@ def select_velocity(position, heading, speed, chi_pref, u_pref, targets: Sequenc
             stand_on = True
 
     static_t = np.full(n, np.inf)
+    static_pen = np.zeros(n)
     if static_clearance is not None:
         ks = times <= TAU_STATIC_S + 1e-9
         clear = static_clearance(own[ks], own_h[ks])
         bad = clear < STATIC_GAP_M
         static_t = np.where(bad.any(axis=0), times[ks][np.argmax(bad, axis=0)], np.inf)
+        # The same soft margin the other comparators keep: rejecting only hard
+        # violations leaves the choice indifferent between grazing an obstacle
+        # and clearing it, and the controller takes the grazing one whenever it
+        # is closer to the LOS course.
+        static_pen = np.maximum(0.0, STATIC_SOFT_M - clear.min(axis=0)) / (STATIC_SOFT_M - STATIC_GAP_M)
 
     cost = (W_COURSE * np.abs(cc.wrap_pi(courses - chi_pref)) / np.pi
-            + W_SPEED * np.maximum(0.0, u_pref - speeds) / max(u_pref, 1e-6))
+            + W_SPEED * np.maximum(0.0, u_pref - speeds) / max(u_pref, 1e-6)
+            + W_STATIC * static_pen)
     if prev_course is not None:
         cost = cost + W_CHANGE * np.abs(cc.wrap_pi(courses - prev_course)) / np.pi
 

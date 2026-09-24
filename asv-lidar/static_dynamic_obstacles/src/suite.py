@@ -146,27 +146,40 @@ def tier_a() -> List[Case]:
 # ---------------------------------------------------------------------------
 # Tier B — 39 stratified cells (04a §4.3)
 # ---------------------------------------------------------------------------
-def width_strata() -> Dict[str, Tuple[float, float]]:
-    """Three strata cut at the derived thresholds, not at round numbers.
+# Suite 3.1 (your call, 2026-09-23): Tier B channels stop at 7.5 m.  The 10 m
+# basin is already narrow water for a 1.7 m vessel, and below ~7.5 m a channel
+# leaves a two-vessel encounter no room that a lawful manoeuvre can use: PPO's
+# 3.5-4.25 m stratum failed 0.57 of the time and a third of those were wall
+# contacts, which measures the geometry rather than the policy.
+#
+# **What this costs, and it is not small.**  The 3.8 m head-on and 4.25 m
+# overtaking thresholds now lie outside the sampled range, and the 7.6 m
+# crossing threshold sits just inside the lower stratum, so Tier B on its own no
+# longer partitions the widths by governing rule.  Claims C-2 and C-3 therefore
+# rest on the Study 1 width sweep (R4), which keeps `CORRIDOR_WIDTHS_M` down to
+# 3.5 m, and Tier B becomes the headline in water where a lawful manoeuvre
+# exists.  The narrow behaviour is still measured -- it is reported from R4 and
+# from Tier A's `A-*-N` and `A-FAIL-*` cases, not from Tier B.
+TIER_B_MIN_WIDTH_M = 7.5
+SUITE_REVISION = "3.1"
 
-    Each stratum then has a *distinct predicted governing rule*: wide means the
-    alteration is admissible for every class; intermediate means crossing
-    give-way resolves under 8(e) while head-on and overtaking still alter;
-    narrow means only head-on channel-keeping and 8(e) remain.  If the measured
-    behaviour matches that partition, the precedence table is validated by the
-    data rather than asserted.
+
+def width_strata() -> Dict[str, Tuple[float, float]]:
+    """Channel strata for Tier B, floored at `TIER_B_MIN_WIDTH_M`.
+
+    Suite 3.0 cut three strata at the derived thresholds (crossing 7.60 m,
+    overtaking 4.26 m), so each had a distinct predicted governing rule.  With
+    the floor at 7.5 m only the crossing threshold remains inside the range, so
+    the two strata below are a span split rather than a rule split.  `R4` keeps
+    the rule-by-width test.
     """
-    t = scn.width_thresholds()
-    specified = {
-        "wide": (t["crossing"], 10.0),
-        "intermediate": (t["overtaking"], t["crossing"]),
-        "narrow": (3.5, t["overtaking"]),
-    }
-    # Only strata the configured corridor range can realise -- all three at
-    # 04a's 3.5-10 m.
-    lo, hi = cfg.CORRIDOR_WIDTH_RANGE
+    hi = 10.0
+    lo = TIER_B_MIN_WIDTH_M
+    mid = round(0.5 * (lo + hi), 3)
+    specified = {"wide": (mid, hi), "intermediate": (lo, mid)}
+    lo_cfg, hi_cfg = cfg.CORRIDOR_WIDTH_RANGE
     return {name: (a, b) for name, (a, b) in specified.items()
-            if a <= hi + 1e-9 and b >= lo - 1e-9}
+            if a <= hi_cfg + 1e-9 and b >= lo_cfg - 1e-9}
 
 
 # Narrow x null and narrow x being-overtaken are infeasible (06 M-6): at
@@ -176,10 +189,12 @@ NARROW_EXCLUDED = ("null", "being_overtaken")
 
 
 def tier_b_cells() -> List[dict]:
-    """06 §5.1: 48 cells x 20 = 960 episodes per policy seed.
+    """06 §5.1, as amended for suite 3.1: 39 cells x 20 = 780 episodes per seed.
 
-    Basin 13 (4 classes x 3 behaviours + null), channel wide 13, intermediate
-    13, narrow 9.  Null takes constant velocity only.
+    Basin 13 (4 classes x 3 behaviours + null), channel wide 13, channel
+    intermediate 13.  Null takes constant velocity only.  Suite 3.0 had a fourth
+    stratum (3.5-4.26 m, 9 cells, no null or being-overtaken); it is gone with
+    the 7.5 m floor -- see `width_strata`.
     """
     cells = []
     strata = [("basin", None)] + [(f"channel-{k}", v) for k, v in width_strata().items()]
@@ -344,7 +359,7 @@ def manifest(scenarios: Sequence[scn.Scenario], *, generator_sha: str = "",
     digests = {s.case_id: s.digest() for s in scenarios}
     blob = json.dumps(digests, sort_keys=True, separators=(",", ":"))
     return {
-        "suite_version": version or cfg.SUITE_VERSION,
+        "suite_version": version or SUITE_REVISION,
         "generator_git_sha": generator_sha,
         "n_cases": len(scenarios),
         "case_digests": digests,

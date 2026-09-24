@@ -373,15 +373,15 @@ def test_the_suite_structure_matches_the_specification():
     assert len(ste.tier_a()) == n_tier_a
     assert len({c.case_id for c in ste.tier_a()}) == n_tier_a
     assert sum(c.is_basin for c in ste.tier_a()) == 6
-    # 06 M-6: 48 cells x 20 = 960.
+    # 06 M-6 as amended by suite 3.1 (F97, your call 2026-09-23): the 3.5-4.26 m
+    # stratum is gone with the 7.5 m floor, so 39 cells x 20 = 780.
     cells = ste.tier_b_cells()
-    assert len(cells) == 48
-    assert sum(c["episodes"] for c in cells) == 960
+    assert len(cells) == 39
+    assert sum(c["episodes"] for c in cells) == 780
     by_stratum = {}
     for c in cells:
         by_stratum[c["stratum"]] = by_stratum.get(c["stratum"], 0) + 1
-    assert by_stratum == {"basin": 13, "channel-wide": 13, "channel-intermediate": 13,
-                          "channel-narrow": 9}
+    assert by_stratum == {"basin": 13, "channel-wide": 13, "channel-intermediate": 13}
     assert len(ste.around_the_clock(open_water=True)) == 24
 
 

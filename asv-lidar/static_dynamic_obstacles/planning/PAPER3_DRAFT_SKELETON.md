@@ -2,6 +2,30 @@
 
 *Repositioned to two-vessel encounters with static obstacles · Revision 2*
 
+> **Status note (2026-09-24).** Decisions taken since this draft was written, all
+> recorded in `planning/METHODS_BRIEF.md` (the current statement of the method)
+> and `PROJECT_STATE.md` F92-F98. The sections below are edited where they state
+> a fact that changed; the argument is untouched.
+>
+> - **Framing:** a **formulation plus a four-learner comparison** (PPO,
+>   RecurrentPPO, SAC, TQC), not "SAC, the proposed method". TD3 was dropped.
+> - **Budget:** 2 M steps, **3 seeds** per learner (12 runs). The best checkpoint
+>   lands at 1.8-2.0 M in five of six on-policy runs, so 2 M may be the binding
+>   constraint -- state it, or raise the budget (A26).
+> - **Evaluation:** **Tier B is the default frozen suite** (suite 3.1: 39 cells
+>   x 20 = **780 episodes**, channels floored at **7.5 m**). **Tier A is out of
+>   this paper** (2026-09-24): it stays in the suite and can be reported later.
+>   Around the Clock is defined but **not built**, so R8 has no content yet.
+> - **Rule 9 precedence (C-2, C-3)** can no longer be read from Tier B, whose
+>   widths no longer span the thresholds: it rests on the **R4 width sweep**.
+> - **Crossing convention** leads with **Rule 9(b)**, with the measured
+>   stand-on figure as corroboration, not as the basis.
+> - **Comparators:** COLREGs-VO (Kuwata) is built; the encounter-specific VO is
+>   kept as the convention-matched comparator; both tuned on the development set
+>   and pinned in `configs/comparators_v1.json`.
+> - **Observation:** **six** branches, 70 values (a `context` branch was added).
+> - **Field work is delayed within this paper**, not deferred, so RQ4 stands.
+
 **Working title:** Sensor-Realistic COLREGs-Compliant Path Following and Collision Avoidance for Autonomous Surface Vessels in Narrow Waterways using Deep Reinforcement Learning
 
 **Alternative title:** COLREGs-Compliant Collision Avoidance in Confined Waters from Onboard LiDAR: A Deep Reinforcement Learning Approach with Field Validation
@@ -232,7 +256,7 @@ Six task terms carried from the prior redesign — exponential clearance-based a
 
 4.5 Policy architecture
 
-Soft Actor-Critic with a multi-input policy over the five observation branches. Trained from scratch — no warm start from the prior policy, whose observation and reward semantics have both changed on every channel. The prior policy is retained as a frozen zero-shot comparator, which is stronger for being genuinely independent rather than an ancestor of the new agent.
+One multi-input policy over the **six** observation branches (70 values), identical for every learner: PPO, RecurrentPPO, SAC and TQC, which differ in the algorithm alone. Trained from scratch — no warm start from the prior policy, whose observation and reward semantics have both changed on every channel. The prior policy is retained as a frozen zero-shot comparator, which is stronger for being genuinely independent rather than an ancestor of the new agent.
 
 \[TBC — whether any recurrence is added. The explicit tracker carries some memory already; occlusion of the target behind a static obstacle is the case that would justify more. Quantify the occlusion frequency in the scenario distribution before adding it.\]
 
@@ -266,7 +290,7 @@ Constant-velocity targets during training; reactive and non-compliant behaviours
 | 4         | Single dynamic target, reduced TCPA, narrowed corridor    |
 | 5         | Full difficulty range with static clutter                 |
 
-Five seeds per reported configuration. Hyperparameters in Appendix B.
+**Three** seeds per reported configuration (2026-09-24; was five). Hyperparameters in Appendix B.
 
 5\. Scenario generation and evaluation design
 
@@ -278,11 +302,11 @@ The same generator produces training scenarios and the evaluation suite, with di
 
 5.2 Evaluation suite
 
-Two tiers, frozen, versioned and hashed before the first training run.
+One frozen tier, versioned and hashed before the first training run.
 
-- **Tier A —** \[30–40\] deterministic named cases: one per encounter class and channel-width condition, plus static-clutter variants. These carry the trajectory figures.
+\[Tier A, the 38 named deterministic cases, is **out of this paper** (2026-09-24). It exists in the suite and can be reported later; the argument here rests on Tier B and the width sweep.\]
 
-- **Tier B —** stratified randomised holdout. Encounter class (5) × target behaviour (3: constant velocity, compliant reactive, non-compliant) × channel width (3) × static clutter (0–3). Approximately \[800–900\] cases.
+- **Tier B (the default frozen suite, suite 3.1) —** stratified randomised holdout, 39 cells × 20 = 780 episodes per seed: encounter class (5) × target behaviour (3: constant velocity, compliant reactive, non-compliant) × geometry stratum (basin, channel 8.75–10 m, channel 7.5–8.75 m). Channels are floored at 7.5 m, below which a two-vessel encounter has no room a lawful manoeuvre can use; the 10 m basin is the narrow-water case. Static clutter is 0–3 obstacles per episode, dropped where they would decide the encounter.
 
 - **External benchmark —** the "Around the Clock" set of 24 single-ship encounters at equally spaced target headings. The reduction to two-vessel scope makes this an exact fit rather than an adaptation, and it sweeps every classification boundary systematically, including the astern sector. Adopting it is the principal defence against the criticism that the benchmark was constructed by the authors.
 
@@ -309,7 +333,7 @@ Geometric only: channel width in ship breadths, spawn TCPA, static clutter count
 | Classical  | Encounter-specific velocity obstacles (Thyri & Breivik) — also serves as the reactive target model |
 | Classical  | \[Optional\] NMPC with COLREGs constraints                                                         |
 | Learned    | Prior-paper SAC, unmodified, zero-shot (frozen)                                                    |
-| Learned    | PPO, RecurrentPPO, TQC retrained on the same environment                                           |
+| Learned    | PPO, RecurrentPPO, SAC, TQC on the identical formulation (the comparison itself)                   |
 | Learned    | COLREGs-ablated policy (avoidance only)                                                            |
 
 Classical baselines are run against reactive targets as well, or the comparison is not like-for-like. \[TBC — final list after the compute estimate.\]
@@ -329,12 +353,12 @@ This answers the question a sceptical reviewer will actually ask: is compliance 
 
 6.1 Overall performance
 
-Table R1 — Tier B holdout. \[RESULT\]
+Table R1 — Tier B holdout (suite 3.1: 39 cells × 20 = 780 episodes per seed, 3 seeds). \[RESULT\]
 
 | **Method**            | **Success** | **Static coll.** | **Boundary coll.** | **Target coll.** | **RMS CTE (m)** | **Path ratio** |
 |-----------------------|-------------|------------------|--------------------|------------------|-----------------|----------------|
-| Proposed (SAC, full)  |             |                  |                    |                  |                 |                |
-| SAC, no COLREGs terms |             |                  |                    |                  |                 |                |
+| SAC                   |             |                  |                    |                  |                 |                |
+| SAC, no COLREGs terms (ablation, budget TBC) |             |                  |                    |                  |                 |                |
 | Prior SAC (frozen)    |             |                  |                    |                  |                 |                |
 | Encounter-specific VO |             |                  |                    |                  |                 |                |
 | COLREGs-VO            |             |                  |                    |                  |                 |                |
@@ -382,15 +406,17 @@ Table R6 — the 2 × 2 plus leave-one-out. \[RESULT\]
 
 Table R7 — per-term episode-integrated contribution under a random policy and under the trained policy, with the empirical ordering checked against the intended hierarchy. \[RESULT\]
 
-6.8 Named cases and external benchmark
+6.8 External benchmark
 
-Table R8 — Tier A cases and the 24-case Around the Clock set. \[RESULT\]
+Table R8 — the 24-case Around the Clock set. \[RESULT\]
+
+\[BLOCKED — Around the Clock has no scenario builder yet (C3–C6). Until it is built this section has no content, and the paper's only externally defined scenario set is missing: either build it or drop the external-benchmark claim and lean on releasing the generator.\]
 
 6.9 Figures
 
 - Learning curves with seed spread
 
-- Trajectory overlays for selected Tier A cases, one per encounter class
+- Trajectory overlays for selected Tier B cases, one per encounter class
 
 - Minimum-CPA cumulative distribution
 
@@ -460,7 +486,7 @@ Place this in the problem formulation rather than the limitations section. It is
 
 - Calm water with no generated waves or current
 
-- Five seeds is a limited estimate of training variability
+- Three seeds is a limited estimate of training variability: a headline difference of ~0.05 is at the edge of separability and the measured 0.20 crossing spread is not separable, so crossing behaviour is reported descriptively per seed
 
 - The encounter classifier supplies the rule regime, so compliance is partly given rather than fully learned — quantified by the ablation in Section 6.6, not merely acknowledged
 
@@ -485,7 +511,6 @@ Appendices
 | C   | Complete reward specification with coefficients and normalisation ranges                                                           |
 | D   | Encounter classification thresholds and hysteresis parameters                                                                      |
 | E   | Evaluation suite composition and hash                                                                                              |
-| F   | Tier A case list                                                                                                                   |
 
 **Data and code availability.** Scenario generator source and seed; frozen evaluation suite; system identification dataset; trained policy checkpoints. \[Repository DOI TBC\]
 

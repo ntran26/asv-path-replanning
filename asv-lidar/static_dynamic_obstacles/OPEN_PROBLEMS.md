@@ -4,7 +4,9 @@
 count. This file records only what is *not settled*, ordered so the
 highest-leverage item is first.
 
-**Last updated:** 2026-09-23, revision 36 — Rev 2 review answered: A30 **closed** by removing the Rule 17(b) draws from training and the suite (baseline-v2, F96); field work delayed within this paper; paper framed as formulation + five-learner comparison.
+**Last updated:** 2026-09-24, revision 39 — documentation brought in line with the recent decisions (skeleton, ledger, tables, specs). Revision 38: TD3 dropped and 5 seeds → 3 (four learners × 3 seeds = 12 runs); final replay buffer kept so runs can be continued; evidence that 2 M may be short (F98).
+Revision 37: 2026-09-23 — suite 3.1: Tier B floored at 7.5 m and made the default frozen suite, Tier A the extended set; C3a done (comparators tuned, COLREGs-VO built); C-2/C-3 evidence moves to R4 (F97).
+Revision 36: 2026-09-23 — Rev 2 review answered: A30 **closed** by removing the Rule 17(b) draws from training and the suite (baseline-v2, F96); field work delayed within this paper; paper framed as formulation + five-learner comparison.
 Revision 35: 2026-09-22 — A26 decided: ratio 1.0, 5 seeds, best-on-dev, this machine until a cluster is set up; campaign launched; replay buffers kept outside the repository (F95).
 Revision 34: 2026-09-22 — A32 measured: the reward prefers the compliant crossing turn by +61 (discounted) from either side, in every clean pair; option 2 ruled out, the side bias is a learner property (F94).
 Revision 33: 2026-09-22 — baseline-v1 saved: the run 11 formulation, frozen in `configs/baseline_v1.json` and gated by `train_formulation.py --config`; F91 and A31 switched off; A32/A33 stay open as known limits (F93).
@@ -47,7 +49,7 @@ generator, the scale audit, noise and randomisation.
 
 ### Open in revision 21 (`PROJECT_STATE.md` F74, F75)
 
-**A26 — training budget and the off-policy update ratio (TODO(04-4)) — decided (your calls, 2026-09-22):** off-policy update ratio **1.0** gradient step per transition; **5 seeds** per learner (PPO seeds 0-1 are run 11); each seed represented by its **best-on-dev checkpoint** (`best_model.zip`, the callback's goal − 2 × collision score, supervisor off, same rule for every learner; Tier B held out). **Where: this machine** (~28 days back to back) until you have cluster access; the campaign script stops cleanly (`runs/CAMPAIGN_STOP`) and every run resumes, so the rest can move (F95). Budget 2 M steps each, as recorded in baseline-v1.
+**A26 — training budget and the off-policy update ratio (TODO(04-4)) — decided (your calls, 2026-09-22), with the budget reopened by F98.** **Learner set: PPO, RecurrentPPO, SAC, TQC at 3 seeds each** (TD3 dropped and 5 seeds -> 3 on 2026-09-24; **12 runs, ~10 days**). *Cost of 3 seeds:* a 0.05 headline difference is at the edge of separability and the 0.20 crossing spread is not separable at all, so learner comparisons hold on the headline only; `RESULT_TABLES.md` still says 5 seeds and needs restating (B6). **Open again: is 2 M enough?** The best checkpoint landed at 2.0 M in three of six on-policy runs and 1.8 M in two more, so the budget may bind. Either raise it to 3 M (~5 extra days) or report the mean of the last three evaluations rather than the maximum.  off-policy update ratio **1.0** gradient step per transition; **5 seeds** per learner (PPO seeds 0-1 are run 11); each seed represented by its **best-on-dev checkpoint** (`best_model.zip`, the callback's goal − 2 × collision score, supervisor off, same rule for every learner; Tier B held out). **Where: this machine** (~28 days back to back) until you have cluster access; the campaign script stops cleanly (`runs/CAMPAIGN_STOP`) and every run resumes, so the rest can move (F95). Budget 2 M steps each, as recorded in baseline-v1.
 
 *Original entry:* **A26 — training budget and the off-policy update ratio (TODO(04-4)).** PPO is the development vehicle for testing and adjusting the reward now (your call, 2026-09-18). **Baseline learner set: PPO, RecurrentPPO, TD3, SAC and TQC (your correction: TQC, not SAC-IQN), multiple seeds, trained once everything is decided and the suite is frozen.** All five are built in the shared trainer (F76, F77); `sb3-contrib` 2.3.0 supplies RecurrentPPO and TQC. All five go through the A26 budget. Measured on this machine (10 workers, 12 cores; steps/s, and hours per 2 M-step seed), at 1.0 / 0.2 gradient steps per transition for the off-policy learners:
 
@@ -806,7 +808,9 @@ settled.
 | **B5** | manoeuvring at 0.55 m/s is extrapolated | measurement | sim-to-real at the operating point | plan edit |
 | C2 | throughput | build | campaign size | mine |
 | C3–C6 | comparators, occlusion placement, metrics | build | evaluation | mine |
-| **C3a** | **comparator tuning**: parameters ported to `src/constant_temp.py` (single source, digest-safe); **tune on the development set after the campaign**, same score as the RL checkpoints (goal − 2 × collision), search reported, tuned values pinned with each result | build | a fair classical baseline (N2) | mine, ~2 h compute |
+| ~~C3a~~ | comparator tuning and COLREGs-VO | **done** (F97): tuned on the dev set, validated on all 120, pinned in `configs/comparators_v1.json` | — | COLREGs-VO built |
+| **B6a** | **claim ledger: C-2/C-3 evidence moves from Tier B to R4** (suite 3.1 no longer partitions widths by rule) | edit | the freeze | your sign-off |
+| ~~C3a-old~~ | **comparator tuning**: parameters ported to `src/constant_temp.py` (single source, digest-safe); **tune on the development set after the campaign**, same score as the RL checkpoints (goal − 2 × collision), search reported, tuned values pinned with each result | build | a fair classical baseline (N2) | mine, ~2 h compute |
 | ~~A20~~ | freeze class and sense per engagement | **decided** (option 1) | — | built, F58 |
 | ~~A19~~ | classify against the path tangent | **decided** (option 1) | — | built, F56 (residual → A20) |
 | ~~A18~~ | stop only when stopping clears | **decided** (option 1) | — | built, F56 |

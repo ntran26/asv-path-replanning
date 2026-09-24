@@ -4,10 +4,12 @@ Unlike Tier 0-3, which replay the *development* namespace and exist to debug the
 formulation, this runs the **frozen namespace**: cases no model has been
 selected on.
 
-* **Tier A** — the named cases (38 defined, 35 realised; the three that cannot
-  be built are reported, not hidden). Per-case behaviour, table R8.
-* **Tier B** — the stratified holdout, 48 cells x 20 = 960 episodes. The
-  headline, tables R1-R2.
+* **Tier B is the default frozen suite** (your call, 2026-09-23): the stratified
+  holdout, 39 cells x 20 = 780 episodes in suite 3.1. The headline, tables
+  R1-R2. Every evaluation runs this and only this unless asked otherwise.
+* **Tier A is the extended set** — the named cases (38 defined, 35 realised; the
+  three that cannot be built are reported, not hidden), table R8. It runs
+  **only when explicitly requested**, with `--tiers a` or `--tiers a,b`.
 
 Both supervisor modes: compliance is reported with it **off**, and with it
 **on** the intervention rate is its own column (claim C-7).
@@ -36,9 +38,12 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "tools" / "tiers"))
 
 import suite  # noqa: E402
-from common import RESULTS, run_pool  # noqa: E402
+from common import run_pool  # noqa: E402
 
-OUT = RESULTS / "frozen_suite"
+# `common.RESULTS` is `results/tiers`, which is where the *tier* replays belong;
+# the frozen suite is the paper's evaluation, so it sits at `results/frozen_suite`
+# -- the path the campaign script and TRAINING_GUIDE.md name.
+OUT = ROOT / "results" / "frozen_suite"
 TIER_A_SEED = 300_000
 TIER_B_SEED = 400_000
 
@@ -67,7 +72,8 @@ def main() -> int:
     ap.add_argument("--model", type=Path, required=True)
     ap.add_argument("--tag", required=True)
     ap.add_argument("--supervisor", choices=("off", "on", "both"), default="both")
-    ap.add_argument("--tiers", default="a,b", help="which tiers to run: a, b, or a,b")
+    ap.add_argument("--tiers", default="b",
+                    help="b (default, the frozen suite), a (the extended named cases), or a,b")
     ap.add_argument("--processes", type=int, default=None)
     args = ap.parse_args()
 
@@ -90,10 +96,15 @@ def main() -> int:
     if "b" in tiers:
         tier_b, shortfall_b = suite.build_tier_b()
         scenarios += tier_b
+        # The stratum belongs to the cell, not to the built scenario:
+        # `getattr(b, "stratum", "")` was blank on every row, which left the
+        # headline unable to split by geometry at all.
+        cells = suite.tier_b_cells()
+        by_cell = [cells[int(b.case_id.split("-")[1])] for b in tier_b]
         jobs += [(b, TIER_B_SEED + i, "model", None,
                   {"set": "tier_b", "case_id": b.case_id, "scenario": i,
-                   "stratum": getattr(b, "stratum", "")})
-                 for i, b in enumerate(tier_b)]
+                   "stratum": cell["stratum"], "behaviour": cell["behaviour"]})
+                 for i, (b, cell) in enumerate(zip(tier_b, by_cell))]
 
     with open(out / "manifest.json", "w") as fh:
         json.dump(suite.manifest(scenarios), fh, indent=1, default=str)
@@ -133,6 +144,8 @@ def main() -> int:
                  _md(_summarise(b[b.supervisor == "off"], "class")), "",
                  "-- by stratum (supervisor off)",
                  _md(_summarise(b[b.supervisor == "off"], "stratum")), "",
+                 "-- by target behaviour (supervisor off)",
+                 _md(_summarise(b[b.supervisor == "off"], "behaviour")), "",
                  "-- crossings by side (supervisor off), the A32 split",
                  _md(_summarise(b[(b.supervisor == "off") & (b["class"] == "crossing")],
                                 "crossing_side")), ""]

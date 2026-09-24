@@ -1,0 +1,13 @@
+{
+ "controller": "colregs_vo",
+ "score": 0.55,
+ "episodes": 60,
+ "per_class": 10,
+ "values": {
+  "CLASSICAL_KVO_TAU_S": 20.0,
+  "CLASSICAL_KVO_HARD_GAP_M": 0.2,
+  "CLASSICAL_KVO_SIDE_FREE_DCPA_M": 2.5,
+  "CLASSICAL_KVO_STAND_ON_RELEASE_S": 12.0,
+  "CLASSICAL_KVO_W_CHANGE": 0.8
+ }
+}

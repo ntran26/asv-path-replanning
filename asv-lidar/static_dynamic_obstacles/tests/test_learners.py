@@ -79,3 +79,30 @@ def test_replay_buffers_live_outside_the_repository_and_only_the_latest_is_kept(
         cb.save()
     kept = sorted(p.name for p in (tmp_path / "buf" / "sac_x").iterdir())
     assert kept == ["sac_replay_buffer_500_steps.pkl"]
+
+
+def test_off_policy_keeps_exactly_two_buffers_best_and_latest(tmp_path):
+    """Your call (2026-09-23): SAC and TQC keep the buffer of the most recent
+    checkpoint, so a resume continues on the same data, and the buffer of the
+    best development-set model, so it can be fine-tuned from the state it was
+    in.  Nothing else -- at ~0.58 GB each, a buffer per checkpoint would fill
+    the disk.  The best one has no step number, so checkpoint pruning skips it."""
+    from pathlib import Path
+    import gymnasium as gym
+    from stable_baselines3 import SAC
+    import train_formulation as tf
+    model = SAC("MlpPolicy", gym.make("Pendulum-v1"), buffer_size=64, learning_starts=0, device="cpu")
+    run = tmp_path / "runs" / "sac_x"
+    base = tmp_path / "buf"
+    cb = tf.ReplayBufferCheckpoint(run, "sac", save_freq=1, base=base)
+    cb.init_callback(model)
+    for steps in (250, 500):
+        model.num_timesteps = steps
+        cb.save()
+    # The best-model buffer is written by the evaluation callback's path helper.
+    best = tf.best_replay_buffer_path(run, "sac", base=base)
+    assert tf.save_replay_buffer(model, best)
+    model.num_timesteps = 750
+    cb.save()                                   # prunes the 500 one, not the best
+    kept = sorted(p.name for p in (base / "sac_x").iterdir())
+    assert kept == ["sac_replay_buffer_750_steps.pkl", "sac_replay_buffer_best.pkl"]

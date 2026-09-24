@@ -1,7 +1,7 @@
 # Training guide — running the baseline campaign
 
 How to start, check, hold, pause, resume and move the five-learner campaign
-(PPO, RecurrentPPO, TD3, SAC, TQC × 5 seeds) on the frozen formulation
+(PPO, RecurrentPPO, SAC, TQC × 3 seeds; TD3 dropped and 5 seeds → 3 on 2026-09-24) on the frozen formulation
 **baseline-v2** (`configs/baseline_v2.json`). Runs on the previous formulation
 -- run 11 and the `_bl1` folders -- are not part of this campaign (F96).
 
@@ -23,9 +23,9 @@ safeguards), F96 (baseline-v2); `OPEN_PROBLEMS.md` A26 (the budget decisions).
 | Training output of a run | `runs/<learner>_formulation_seed<N>_bl2.log` |
 | Campaign event log | `results/baseline_campaign.log` |
 | Tier 1 of a finished run (development set, a diagnostic) | `results/tiers/tier1_<learner>s<N>_bl2_supervisor_{off,on}/summary.txt` |
-| **Frozen suite of a finished run (what the paper reports)** | `results/frozen_suite/<learner>s<N>_bl2/summary.txt` — Tier A named cases and the Tier B holdout, supervisor off and on |
+| **Frozen suite of a finished run (what the paper reports)** | `results/frozen_suite/<learner>s<N>_bl2/summary.txt` — **Tier B** (39 cells x 20 = 780 episodes, suite 3.1), supervisor off and on. Tier A is the **extended** set and runs only on request (`--tiers a,b`) |
 | TensorBoard curves | `runs/tensorboard/` |
-| Off-policy replay buffers (TD3/SAC/TQC only) | `PhD/asv_replay_buffers/<run>/` — **outside the repository**, latest only, deleted when the run finishes |
+| Off-policy replay buffers (SAC/TQC only) | `PhD/asv_replay_buffers/<run>/` — **outside the repository**, latest only, deleted when the run finishes |
 
 Inside a run folder:
 
@@ -39,9 +39,12 @@ Inside a run folder:
 | `eval_summary.json`, `eval_episodes.csv` | development-set evaluations every 200 k steps |
 | `monitor.csv`, `curriculum.json` | per-episode training log, curriculum stage changes |
 
-**Campaign order:** seed 0 of all five learners, then seeds 1–4 seed by seed.
-Approximate hours per run on this machine: PPO 6, RecurrentPPO 7–9, TD3 31,
-SAC 46, TQC 43.
+**Campaign order:** seed 0 of all four learners, then seeds 1–2 seed by seed.
+**The frozen suite runs separately** (your call, 2026-09-23): the campaign does
+Tier 1 after each run, and `bash results/frozen_seed0.sh` evaluates Tier B on
+every seed-0 model once the four trainings are done.
+Approximate hours per run on this machine: PPO 6, RecurrentPPO 7–9, SAC 33,
+TQC 31 (SAC measured at 16.8 steps/s on an otherwise idle machine).
 
 ---
 
@@ -90,14 +93,14 @@ learners, TD3 excluded:
 JOBS="ppo:0 recurrent_ppo:0 sac:0 tqc:0" bash results/baseline_campaign.sh
 ```
 
-Each job is `learner:seed`. To add TD3 seed 0 later, or any other subset:
+Each job is `learner:seed`. To run any other subset later:
 
 ```bash
-JOBS="td3:0" bash results/baseline_campaign.sh
+JOBS="sac:1 tqc:1" bash results/baseline_campaign.sh
 ```
 
-With no `JOBS`, the full 25-run plan runs in the order in the script: seed 0 of
-all five learners, then seeds 1-4. Finished runs are skipped either way, so a
+With no `JOBS`, the full 12-run plan runs in the order in the script: seed 0 of
+all four learners, then seeds 1-2. Finished runs are skipped either way, so a
 full launch after a partial one simply continues.
 
 **Only one campaign at a time.** Starting it twice runs two trainings on the
@@ -117,7 +120,7 @@ checkpoint is moved to `<run>_incomplete_<date>` and restarted.
 python tools/campaign_status.py
 ```
 
-Shows done / training x % / pending for all 25 runs, each run's best
+Shows done / training x % / pending for all 12 runs, each run's best
 development-set goal rate so far, whether a hold is set, and the last campaign
 log lines.
 
@@ -233,10 +236,11 @@ and restarted; that folder can be deleted.
 One run outside the campaign order (same settings, same checks):
 
 ```bash
-python src/train_formulation.py --config configs/baseline_v2.json --algo td3 --seed 0 --tag bl2
+python src/train_formulation.py --config configs/baseline_v2.json --algo sac --seed 0 --tag bl2
 ```
 
-`--algo` is one of `ppo`, `recurrent_ppo`, `td3`, `sac`, `tqc`. With
+`--algo` is one of `ppo`, `recurrent_ppo`, `sac`, `tqc` (`td3` still works but is
+not part of the baseline). With
 `--config`, only `--algo`, `--seed` and `--tag` come from the command line;
 everything else comes from the file.
 
@@ -246,9 +250,9 @@ Resume a stopped run by hand:
 python src/train_formulation.py --config configs/baseline_v2.json --resume runs/td3_formulation_seed0_bl2
 ```
 
-The frozen suite of a finished run — Tier A and Tier B, both supervisor modes,
-which is the evaluation the paper reports (the campaign does this automatically
-after each run):
+The frozen suite of a finished run — **Tier B**, both supervisor modes, which is
+the evaluation the paper reports (the campaign does this automatically after
+each run). Add `--tiers a,b` only when the extended named cases are wanted:
 
 ```bash
 python tools/tiers/frozen_suite.py --model runs/td3_formulation_seed0_bl2/best_model.zip --tag td3s0_bl2 --supervisor both

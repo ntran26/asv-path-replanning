@@ -350,8 +350,8 @@ learning result, not an observability gap (F92–F94).
 ## 7. Architecture
 
 The six branches feed a custom `ASVFeaturesExtractor` inside SB3's
-`MultiInputPolicy`, identical for all five learners (PPO, RecurrentPPO, TD3,
-SAC, TQC):
+`MultiInputPolicy`, identical for every learner (PPO, RecurrentPPO, SAC, TQC;
+TD3 is implemented but not in the baseline):
 
 - **Scene MLP:** `lidar` + `boundary` + `ego` + `path` + previous action
   (42 values) → 128.

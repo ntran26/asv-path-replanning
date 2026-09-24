@@ -265,22 +265,23 @@ stops. Only the first is a learned-compliance claim.
 
 ## 7. Learners and training protocol
 
-Five learners on the identical formulation, differing only in the algorithm
-and its original paper's default hyperparameters (Stable-Baselines3 2.3.2,
+**Four** learners on the identical formulation, differing only in the algorithm
+and its original paper's default hyperparameters (TD3 was dropped from the
+baseline on 2026-09-24; it remains implemented but is not compared) (Stable-Baselines3 2.3.2,
 sb3-contrib 2.3.0):
 
 | Learner | Key settings |
 |---|---|
 | PPO | lr 3e-4, 512 steps × 10 workers per update, batch 512, 10 epochs, GAE λ 0.95, clip 0.2, **target KL 0.03** (early-stops an update, F51) |
 | RecurrentPPO | PPO settings + 256-unit LSTM (actor and critic separate) |
-| TD3 | lr 3e-4, buffer 1 M, batch 256, τ 0.005, 10 k learning starts, policy delay 2, target noise 0.2 (clip 0.5), exploration noise 0.1 |
 | SAC | lr 3e-4, buffer 1 M, batch 256, τ 0.005, 10 k learning starts, automatic entropy |
 | TQC | SAC settings, 2 critics × 25 quantiles, top 2 per critic dropped |
 
 **Common:** discount 0.951 per 0.5 s step (0.99 per 0.1 s physics step, a
 ~10 s horizon); reward normalisation only (VecNormalize, clip 10); 10 parallel
 environments; **2 × 10⁶ environment steps**; off-policy learners at **1.0
-gradient step per transition**; **5 seeds** per learner; development-set
+gradient step per transition**; **3 seeds** per learner (your call, 2026-09-24;
+was 5); development-set
 evaluation every 2 × 10⁵ steps; each seed represented by its **best
 development-set checkpoint** (score = goal rate − 2 × collision rate,
 supervisor off). The frozen evaluation suite is never used for selection (A26).
@@ -291,25 +292,48 @@ the formulation references an algorithm. They were **iterated with PPO as the
 development learner** over twelve runs (your decision that PPO is the debug
 vehicle), and several of the checks that drove those iterations are
 learner-free — the scripted-response studies and the A32 reward-gap measurement
-branch scripted manoeuvres with no policy involved (F94). All five learners then
+branch scripted manoeuvres with no policy involved (F94). All four learners then
 train on the frozen formulation with their original papers' default
 hyperparameters and no further tuning. The paper should say this plainly: no
 learner is privileged by the design, and the iteration loop that used PPO is
 reported.
+
+## 7.1 Classical comparators (C3a)
+
+| Comparator | What it is | Status |
+|---|---|---|
+| **COLREGs-VO** (Kuwata et al., 2014) | velocity obstacles plus the give-way constraint that the relative velocity stays to starboard of the bearing line; **open-water** roles, so a crossing target to port makes the own ship stand on | built 2026-09-23 |
+| **Encounter-specific VO** | the same machinery under *this paper's* narrow-channel convention (A17: give way from either side) | built; the pair is what makes the Rule 9 argument measurable |
+| **LOS-PID + DWA** | path following with a dynamic window over yaw rate and speed | built |
+| Reference controller | CODEX predictive LOS | supplementary, not pre-registered |
+
+All are **perception-only**: same LiDAR, tracker and noise as the policy, so a
+row differs in the avoidance logic and nothing else. Parameters live in
+`src/constant_temp.py` and are pinned with a digest in
+`configs/comparators_v1.json`.
+
+**Tuning (the fairness argument).** Each was fitted on the **development set** by
+coordinate descent over a declared grid, scored by the rule RL checkpoints are
+selected by (goal − 2 × collision), then the winner was re-scored on all 120
+development episodes. COLREGs-VO improved (+0.525 → +0.575, a stronger
+course-change penalty); DWA's 60-episode gain (+0.700 → +0.850) **did not
+replicate** on 120 (+0.650 either way), so its defaults were kept. Report that:
+it is why a search is validated rather than trusted.
 
 ## 8. Evaluation protocol
 
 | Set | Size | Use |
 |---|---|---|
 | Development set | 120 episodes (20 per class × 6), development namespace | checkpoint selection, diagnostics |
-| Tier A — named cases | 38 defined (35 realised), incl. basin cases and pre-committed expected failures | per-case behaviour |
-| Tier B — stratified holdout | 48 cells × 20 = 960 episodes per seed | headline results, touched once per policy |
+| **Tier B — the frozen suite (default)** | **39 cells × 20 = 780 episodes** per seed, suite 3.1: basin, channel-wide (8.75–10 m), channel-intermediate (7.5–8.75 m) × 5 classes × 3 target behaviours | headline results, touched once per policy |
+| Tier A — **out of this paper** (your call, 2026-09-24) | 38 defined (35 realised), incl. basin cases and pre-committed expected failures | kept in the suite, runnable with `--tiers a`; no claim depends on it |
 | **Around the Clock** (O1) | 24 open-water + 24 channel cases × 10 seeds (`suite.around_the_clock`), reported as R8 | the one **externally defined** scenario set in the paper, after Imazu was dropped |
 
 Tier B strata are described by geometry only (basin, channel wide /
 intermediate / narrow), never as "hard for classical methods". Every result
-reports the seed spread: the pre-registered tables give the mean over 5 seeds
-with a 95 % CI (`RESULT_TABLES.md`). Pre-registered metrics: success;
+reports the seed spread. `RESULT_TABLES.md` still says "mean over 5 seeds with
+a 95 % CI" and needs restating for **3 seeds** (B6), with the wider interval
+that implies. Pre-registered metrics: success;
 collisions by type (static, boundary, target); RMS cross-track error; path
 ratio; intervention rate with the supervisor on (R1); violation rate per class,
 with crossings split by side (R2); results by target behaviour (R3), channel
@@ -317,8 +341,11 @@ width (R4), perception degradation (R5), ablation (R6), Tier A (R8) and field
 (R9). First-alteration compliance by side is a diagnostic added since (F92).
 
 **Measured seed spread** (PPO, two seeds): 0.05 on the development-set goal
-rate, 0.20 on crossings (F90). Five seeds separate headline differences, not
-crossing-level ones.
+rate, 0.20 on crossings (F90). With **3 seeds** a headline difference of about
+0.05 is at the edge of what can be separated, and crossing-level differences
+(spread 0.20) cannot be. The paper should compare learners on the headline and
+report crossing behaviour descriptively, per seed, rather than claim a
+difference between learners there.
 
 ## 9. Status: fixed versus pending
 
