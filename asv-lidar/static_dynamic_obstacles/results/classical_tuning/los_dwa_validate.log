@@ -1,0 +1,5 @@
+los_dwa: 60 development episodes per configuration, 10 workers
+  defaults (120 episodes)                      score +0.650  goal 0.88
+  tuned (120 episodes)                         score +0.650  goal 0.88
+Validation on 120 development episodes: defaults +0.650, tuned +0.650 -> keep defaults
+

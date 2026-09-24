@@ -9,6 +9,14 @@
 > - Learners and selection: five learners, 5 seeds, best-on-dev checkpoint (A26, F95).
 >
 > The rationale below still stands where it is not listed. `F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`.
+>
+> **Added 2026-09-24.** The baseline is **four learners (PPO, RecurrentPPO, SAC,
+> TQC) x 3 seeds = 12 runs** -- TD3 dropped, 5 seeds -> 3. **Tier B is the default
+> frozen suite** (suite 3.1: 39 cells x 20 = 780 episodes, channels floored at
+> 7.5 m) and **Tier A the extended set**, run only on request. C-2/C-3 rest on the
+> R4 width sweep, since Tier B no longer spans the rule thresholds. COLREGs-VO
+> (Kuwata) is built; both VO comparators are tuned on the development set and
+> pinned in `configs/comparators_v1.json` (F97, F98).
 
 **Revision 2** — single target, "Around the Clock" adopted, width sweep added.
 **Handover target:** Claude chat (design), then Claude Code

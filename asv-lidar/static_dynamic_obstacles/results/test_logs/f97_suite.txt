@@ -1,0 +1,34 @@
+..............F......................................................... [ 13%]
+........................................................................ [ 27%]
+........................................................................ [ 41%]
+........................................................................ [ 55%]
+........................................................................ [ 69%]
+........................................................................ [ 83%]
+........................................................................ [ 97%]
+...........                                                              [100%]
+================================== FAILURES ===================================
+_____________ test_the_suite_structure_matches_the_specification ______________
+
+    def test_the_suite_structure_matches_the_specification():
+        """04a §4.2 and §5 as amended by 06 §5, as counts."""
+        # 06 M-7: 38 -- the 34 of 04a §5, minus the two bend cases, plus six basin.
+        n_tier_a = 40 if cfg.CORRIDOR_BENDS else 38
+        assert len(ste.tier_a()) == n_tier_a
+        assert len({c.case_id for c in ste.tier_a()}) == n_tier_a
+        assert sum(c.is_basin for c in ste.tier_a()) == 6
+        # 06 M-6: 48 cells x 20 = 960.
+        cells = ste.tier_b_cells()
+>       assert len(cells) == 48
+E       AssertionError: assert 39 == 48
+E        +  where 39 = len([{'class': 'head_on', 'behaviour': 'cv', 'stratum': 'basin', 'geometry_mode': 'basin', ...}, {'class': 'head_on', 'beh...mode': 'basin', ...}, {'class': 'crossing', 'behaviour': 'nc', 'stratum': 'basin', 'geometry_mode': 'basin', ...}, ...])
+
+tests\test_acceptance.py:378: AssertionError
+============================== warnings summary ===============================
+..\..\..\..\..\..\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\tensorboard\compat\tensorflow_stub\dtypes.py:326
+  C:\Users\hntran\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\tensorboard\compat\tensorflow_stub\dtypes.py:326: DeprecationWarning: `np.bool8` is a deprecated alias for `np.bool_`.  (Deprecated NumPy 1.24)
+    np.bool8: (False, True),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_acceptance.py::test_the_suite_structure_matches_the_specification
+1 failed, 514 passed, 1 warning in 671.52s (0:11:11)

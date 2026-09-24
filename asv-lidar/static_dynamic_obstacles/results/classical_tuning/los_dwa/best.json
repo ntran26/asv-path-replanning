@@ -1,0 +1,16 @@
+{
+ "controller": "los_dwa",
+ "score": 0.85,
+ "episodes": 60,
+ "per_class": 10,
+ "values": {
+  "CLASSICAL_DWA_SAFE_GAP_M": 0.2,
+  "CLASSICAL_DWA_TARGET_HORIZON_S": 14.0,
+  "CLASSICAL_DWA_DIST_CAP_M": 1.0,
+  "CLASSICAL_DWA_PATH_SCALE_M": 2.0,
+  "CLASSICAL_DWA_COMMIT_S": [
+   3.0,
+   6.0
+  ]
+ }
+}

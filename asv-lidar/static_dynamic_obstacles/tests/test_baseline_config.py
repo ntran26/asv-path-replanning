@@ -49,8 +49,11 @@ def test_runtime_staging_is_not_a_drift():
 
 
 def test_every_campaign_learner_has_its_settings():
+    """TD3 was dropped from the baseline (your call, 2026-09-24) but is still
+    implemented, so the campaign set is a subset of what the trainer supports."""
     learners = bc.load()["learners"]
-    assert set(learners) == set(tf.ALGORITHMS) == set(bc.ALGOS)
+    assert set(learners) == set(bc.ALGOS) <= set(tf.ALGORITHMS)
+    assert "td3" not in learners
     for spec in learners.values():
         assert spec["hyperparameters"]["gamma"] == pytest.approx(tf.PPO_HYPERPARAMS["gamma"])
 

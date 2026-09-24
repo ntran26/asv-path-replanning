@@ -2,23 +2,27 @@
 
 **Status:** DRAFT, empty by design (04a §9.3). Committed with the frozen suite before the
 first headline evaluation. Rows and columns are fixed now; values are filled only from
-frozen-namespace runs. Every cell reports the mean over 5 seeds with a 95 % CI.
+frozen-namespace runs. Every cell reports the mean over **3 seeds** with a 95 % CI
+(registered as 5 on 2026-09-18; **changed to 3 on 2026-09-24, your call**, with the
+campaign at 4 learners x 3 seeds = 12 runs). At 3 seeds a headline difference of
+about 0.05 is at the edge of separability and the measured 0.20 crossing spread is
+not separable, so learner comparisons are made on the headline and crossing
+behaviour is reported descriptively, per seed.
 
 > **Status note (2026-09-23).** Three decisions are now made and this draft needs restating before sign-off (B6). **Framing:** the paper is a **formulation plus a five-learner comparison**, so there is no "Proposed (SAC, full)" method — the five learners are the comparison, and the classical comparators carry N2. **Formulation:** baseline-v2 (F96) — the Rule 17(b) below-floor being-overtaken draws are out of training and the suite, so any row or claim resting on them goes. **Field work** is delayed within this paper, so N3, RQ4 and C-6 stand. Still to settle: which learner carries the ablations, and C-4's comparison, which needs a **third rung** (no encounter feature / class one-hot / full context branch) now that the observation has a context branch.
 
-Learners (your call, 2026-09-18): PPO, RecurrentPPO, TD3, SAC and TQC, each over multiple seeds. TQC is the distributional arm (04a §8.2). PPO is also the development vehicle for the reward; only its frozen-suite runs are reported.
+Learners: PPO, RecurrentPPO, SAC and TQC, 3 seeds each (**TD3 dropped 2026-09-24**). TQC is the distributional arm (04a §8.2). PPO is also the development vehicle for the reward; only its frozen-suite runs are reported.
 The CODEX reference controller is a supplementary comparator, not one of the pre-registered three.
 
-## R1 — Tier B holdout (48 cells × 20 = 960 episodes per seed)
+## R1 — Tier B holdout (39 cells × 20 = **780 episodes per seed**, suite 3.1)
 
 | Method | Success | Static coll. | Boundary coll. | Target coll. | RMS CTE (m) | Path ratio | Intervention rate (supervisor on) |
 |---|---|---|---|---|---|---|---|
-| Proposed (SAC, full) | | | | | | | |
-| SAC, no COLREGs terms | | | | | | | |
+| SAC | | | | | | | |
 | TQC (distributional) | | | | | | | |
-| TD3 | | | | | | | |
 | RecurrentPPO | | | | | | | |
 | PPO | | | | | | | |
+| SAC, no COLREGs terms (ablation) | | | | | | | |
 | Prior SAC (Paper 2, frozen) | | | | | | | |
 | Encounter-specific VO | | | | | | | |
 | COLREGs-VO | | | | | | | |
@@ -77,7 +81,11 @@ Leave-one-out rows (3 seeds, stated): −v_port, −v_bow, −v_side, −v_hold,
 
 Per-term episode-integrated contribution, random policy and trained policy, both geometry modes, with the 02a §8.1 ordering checked.
 
-## R8 — Tier A (38 named; 35 realised, 3 reported infeasible) and Around the Clock (24 + 24 × 3 widths)
+## R8 — Around the Clock (24 + 24 × 3 widths)
+
+**Tier A is out of this paper (2026-09-24, your call).** The 38 named cases stay in the
+suite and can be reported later; nothing in the paper depends on them. Around the Clock
+has no scenario builder yet (C3–C6), so this table currently has no content.
 
 One row per case: success over 10 rollouts, min CPA, compliant, first-alteration sense.
 

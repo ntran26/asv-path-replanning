@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Baseline campaign on the frozen formulation baseline-v2 (F96, A26): five
-# learners x five seeds, 2 M steps each, off-policy at 1.0 gradient step per
+# Baseline campaign on the frozen formulation baseline-v2 (F96, A26): four
+# learners x three seeds, 2 M steps each, off-policy at 1.0 gradient step per
 # transition, each seed represented by its best development-set checkpoint.
 #
 #   bash results/baseline_campaign.sh          # start, or continue after a reboot
@@ -11,7 +11,7 @@
 # first checkpoint is set aside and restarted.  **Every run is retrained on
 # baseline-v2**: run 11 and the `_bl1` runs were trained on baseline-v1, whose
 # being-overtaken draws differ (F96).  Order: seed 0 of all five learners first
-# (a first look at each, ~6 days), then seeds 1-4 seed by seed, so the campaign
+# (a first look at each, ~6 days), then seeds 1-2 seed by seed, so the campaign
 # can move to a cluster at any point with every learner partly done.
 cd "$(dirname "$0")/.."
 CONFIG=configs/baseline_v2.json
@@ -44,11 +44,9 @@ tier1() {   # $1 run dir, $2 tag -- development-set diagnostic, not reported
 
 # JOBS may be overridden for a partial run, e.g.
 #   JOBS="ppo:0 recurrent_ppo:0 sac:0 tqc:0" bash results/baseline_campaign.sh
-JOBS=${JOBS:-"ppo:0 recurrent_ppo:0 td3:0 sac:0 tqc:0
-      ppo:1 recurrent_ppo:1 td3:1 sac:1 tqc:1
-      ppo:2 recurrent_ppo:2 td3:2 sac:2 tqc:2
-      ppo:3 recurrent_ppo:3 td3:3 sac:3 tqc:3
-      ppo:4 recurrent_ppo:4 td3:4 sac:4 tqc:4"}
+JOBS=${JOBS:-"ppo:0 recurrent_ppo:0 sac:0 tqc:0
+      ppo:1 recurrent_ppo:1 sac:1 tqc:1
+      ppo:2 recurrent_ppo:2 sac:2 tqc:2"}
 for job in $JOBS; do
   A=${job%%:*}; S=${job##*:}
   RUN=runs/${A}_formulation_seed${S}_${TAG}

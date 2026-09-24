@@ -15,8 +15,20 @@ comparators (04a §5):
 * **Encounter-specific VO** — velocity-obstacle horizons, candidate sampling,
   the ship-domain scaling and the cost weights.
 
-**Values are ported unchanged** from `src/classical/` as of 2026-09-23, so
-behaviour is identical; the port only moves where they are written down.
+**Values are ported unchanged** from `src/classical/` as of 2026-09-23, except
+`CLASSICAL_KVO_W_CHANGE`, tuned that day (C3a).
+
+*Tuning outcome (C3a, `results/classical_tuning/`).* Both comparators were
+fitted on the development set by coordinate descent over a declared grid, scored
+by goal rate − 2 × collision rate — the rule RL checkpoints are selected by — and
+the winners were then **confirmed on all 120 development episodes**:
+
+* **COLREGs-VO**: +0.525 → **+0.575**, from `W_CHANGE` 0.3 → 0.8. Kept.
+* **LOS-PID + DWA**: the 60-episode search preferred a 14 s target horizon and a
+  1.0 m clearance cap (+0.700 → +0.850), but on all 120 episodes that scored
+  **+0.650, exactly the defaults**. The gain was noise in a 60-episode subset.
+  **Defaults kept**, and the episode is worth reporting: it is the reason the
+  search is validated rather than trusted.
 
 **Still to do (C3-C6, after the campaign):**
 1. tune on the **development set** against the same score the RL checkpoints use
@@ -135,7 +147,16 @@ CLASSICAL_KVO_STAND_ON_RELEASE_S = 12.0  # Rule 17: hold while the preferred vel
 CLASSICAL_KVO_TURN_RATE_DPS = 6.0        # the turn rate the candidate sweep assumes
 CLASSICAL_KVO_W_COURSE = 1.0             # per pi rad from the preferred course
 CLASSICAL_KVO_W_SPEED = 0.5              # per cruise speed below preferred
-CLASSICAL_KVO_W_CHANGE = 0.3             # per pi rad from the previous course
+# Tuned on the development set, 2026-09-23 (C3a): 0.3 -> 0.8, confirmed on all
+# 120 episodes (+0.525 -> +0.575).  A stronger change penalty stops the
+# candidate course dithering between equally cheap options frame to frame.
+CLASSICAL_KVO_W_CHANGE = 0.8             # per pi rad from the previous course
+# Static returns get the same soft margin the other comparators use: with the
+# hard gap alone the controller skims obstacles and scored 0.30-0.50 on episodes
+# with no encounter at all, which would have made Kuwata look weak for a reason
+# that has nothing to do with COLREGs.
+CLASSICAL_KVO_STATIC_SOFT_M = 0.6
+CLASSICAL_KVO_W_STATIC = 1.0
 
 # Radians, for the code that wants them.
 CLASSICAL_MAX_RUDDER_RAD = math.radians(CLASSICAL_MAX_RUDDER_DEG)

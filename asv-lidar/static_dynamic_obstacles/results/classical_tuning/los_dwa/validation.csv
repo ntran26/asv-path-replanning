@@ -1,0 +1,3 @@
+label,score,goal,collision,target_coll,goal_being_overtaken,goal_crossing,goal_head_on,goal_no_target,goal_null,goal_overtaking,CLASSICAL_DWA_SAFE_GAP_M,CLASSICAL_DWA_TARGET_HORIZON_S,CLASSICAL_DWA_DIST_CAP_M,CLASSICAL_DWA_PATH_SCALE_M,CLASSICAL_DWA_COMMIT_S
+defaults (120 episodes),0.65,0.883,0.117,0.092,0.95,0.5,0.9,0.95,1.0,1.0,0.2,10.0,1.5,2.0,"(3.0, 6.0)"
+tuned (120 episodes),0.65,0.883,0.117,0.083,0.95,0.45,0.95,1.0,0.95,1.0,0.2,14.0,1.0,2.0,"(3.0, 6.0)"

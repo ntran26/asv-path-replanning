@@ -175,6 +175,16 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 REPLAY_BUFFER_DIR = Path(os.environ.get("ASV_REPLAY_BUFFER_DIR",
                                         str(REPO_ROOT.parent / "asv_replay_buffers")))
 REPLAY_BUFFER_MIN_FREE_GB = 3.0
+# What survives a finished off-policy run, at ~0.58 GB per file.
+# `KEEP_FINAL_BUFFER`: the buffer at the last checkpoint, so **training can be
+# continued past the budget** (A26's 2 M may be short -- the best checkpoint
+# lands at 1.8-2.0 M in five of six on-policy runs).  Without it a continuation
+# starts from an empty buffer, which is a different experiment.
+# `KEEP_BEST_BUFFER`: the buffer of the best development-set model, for
+# fine-tuning from that state.  Off by default: it doubles the cost and the
+# final buffer is what a continuation needs.
+KEEP_FINAL_BUFFER = True
+KEEP_BEST_BUFFER = False
 
 
 class EpisodeActor:
@@ -295,6 +305,32 @@ def replay_buffer_path(run_dir: Path, algo: str, steps: int, base: Optional[Path
     return Path(base or REPLAY_BUFFER_DIR) / Path(run_dir).name / f"{algo}_replay_buffer_{int(steps)}_steps.pkl"
 
 
+def best_replay_buffer_path(run_dir: Path, algo: str, base: Optional[Path] = None) -> Path:
+    """The buffer that goes with `best_model.zip` (your call, 2026-09-23).
+
+    Off-policy runs keep **two** buffers and no more: the most recent checkpoint,
+    so a resume continues on the same data, and the best development-set model,
+    so it can be fine-tuned later from the state it was actually in.  The name
+    has no step number, so the checkpoint pruning (which globs `*_steps.pkl`)
+    leaves it alone.
+    """
+    return Path(base or REPLAY_BUFFER_DIR) / Path(run_dir).name / f"{algo}_replay_buffer_best.pkl"
+
+
+def save_replay_buffer(model, target: Path) -> bool:
+    """Write a buffer atomically, skipping it when the disk is nearly full."""
+    import shutil
+    target.parent.mkdir(parents=True, exist_ok=True)
+    free_gb = shutil.disk_usage(target.parent).free / 1e9
+    if free_gb < REPLAY_BUFFER_MIN_FREE_GB:
+        print(f"[BUFFER] {free_gb:.1f} GB free -- {target.name} NOT saved", flush=True)
+        return False
+    partial = target.with_name(target.stem + ".partial.pkl")
+    model.save_replay_buffer(str(partial))
+    _retry(lambda: os.replace(partial, target))
+    return True
+
+
 class ReplayBufferCheckpoint(BaseCallback):
     """Saves the off-policy replay buffer at the model checkpoints, outside the
     repository, keeping only the latest (see `REPLAY_BUFFER_DIR`)."""
@@ -310,18 +346,11 @@ class ReplayBufferCheckpoint(BaseCallback):
         return True
 
     def save(self) -> Optional[Path]:
-        import shutil
         steps = int(self.model.num_timesteps)
         target = replay_buffer_path(self.run_dir, self.algo, steps, self.base)
-        target.parent.mkdir(parents=True, exist_ok=True)
-        free_gb = shutil.disk_usage(target.parent).free / 1e9
-        if free_gb < REPLAY_BUFFER_MIN_FREE_GB:
-            print(f"[BUFFER] {free_gb:.1f} GB free -- replay buffer NOT saved at "
-                  f"{steps:,}; a resume from here would refill it", flush=True)
+        if not save_replay_buffer(self.model, target):
+            print(f"   a resume from {steps:,} would refill the buffer", flush=True)
             return None
-        partial = target.with_name(target.stem + ".partial.pkl")
-        self.model.save_replay_buffer(str(partial))
-        _retry(lambda: os.replace(partial, target))
         for old in target.parent.glob(f"{self.algo}_replay_buffer_*_steps.pkl"):
             if old != target:
                 _retry(lambda old=old: old.unlink(missing_ok=True))
@@ -426,9 +455,11 @@ class FormulationEvalCallback(BaseCallback):
     """
 
     def __init__(self, run_dir: Path, eval_freq: int, per_class: int,
-                 supervisor_modes=("on",), resume_from: Optional[int] = None):
+                 supervisor_modes=("on",), resume_from: Optional[int] = None,
+                 algo: str = "ppo"):
         super().__init__(0)
         self.run_dir = Path(run_dir)
+        self.algo = str(algo)
         self.eval_freq = int(eval_freq)
         self.scenarios = development_set(per_class)
         self.supervisor_modes = tuple(supervisor_modes)
@@ -518,6 +549,10 @@ class FormulationEvalCallback(BaseCallback):
             self.best = score
             self.model.save(self.run_dir / "best_model.zip")
             self.training_env.save(str(self.run_dir / "best_vecnormalize.pkl"))
+            # Off-policy only: the buffer that belongs to this best model, so it
+            # can be resumed or fine-tuned from the state it was in.
+            if getattr(self.model, "replay_buffer", None) is not None:
+                save_replay_buffer(self.model, best_replay_buffer_path(self.run_dir, self.algo))
         print(f"[EVAL] t={self.num_timesteps:,} supervisor {mode} goal {summary['goal_rate']:.2f} "
               f"collision {summary['collision_rate']:.2f} timeout {summary['timeout_rate']:.2f} "
               f"return {summary['mean_return']:.1f} colregs {summary['mean_colregs_integral']:.1f} "
@@ -800,7 +835,7 @@ def main() -> None:
         FormulationEvalCallback(run_dir, args.eval_freq, args.eval_per_class,
                                 supervisor_modes=(("off", "on") if args.eval_supervisor == "both"
                                                   else (args.eval_supervisor,)),
-                                resume_from=resume_steps),
+                                resume_from=resume_steps, algo=args.algo),
     ])
 
     started = time.time()
@@ -813,9 +848,20 @@ def main() -> None:
     model.save(run_dir / "final_model.zip")
     vec.save(str(run_dir / "final_vecnormalize.pkl"))
     vec.close()
-    if args.algo in OFF_POLICY:          # only a resume needs it; free the disk
+    if args.algo in OFF_POLICY:
         folder = REPLAY_BUFFER_DIR / run_dir.name
+        keep = set()
+        if KEEP_BEST_BUFFER:
+            keep.add(best_replay_buffer_path(run_dir, args.algo))
+        if KEEP_FINAL_BUFFER:
+            steps = sorted(folder.glob(f"{args.algo}_replay_buffer_*_steps.pkl"),
+                           key=lambda p: p.stat().st_mtime) if folder.exists() else []
+            if steps:
+                keep.add(steps[-1])
+                print(f"[BUFFER] kept {steps[-1].name} so training can be continued", flush=True)
         for f in folder.glob("*.pkl") if folder.exists() else ():
+            if f in keep:
+                continue
             _retry(lambda f=f: f.unlink(missing_ok=True))
         try:                             # the empty folder: best effort (OneDrive may
             folder.rmdir()               # hold it while it syncs the deletion)

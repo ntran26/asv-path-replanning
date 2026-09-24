@@ -1,0 +1,25 @@
+Tuning colregs_vo on 60 development episodes (10 per class), 1103 s
+score = goal rate - 2 x collision rate, the rule RL checkpoints are selected by
+
+== search (coordinate descent over the declared grid)
+                        label  score  goal  collision  target_coll  goal_being_overtaken  goal_crossing  goal_head_on  goal_no_target  goal_null  goal_overtaking  CLASSICAL_KVO_TAU_S  CLASSICAL_KVO_HARD_GAP_M  CLASSICAL_KVO_SIDE_FREE_DCPA_M  CLASSICAL_KVO_STAND_ON_RELEASE_S  CLASSICAL_KVO_W_CHANGE
+                     defaults   0.50 0.833      0.167        0.083                   1.0            0.3           1.0             0.9        0.8              1.0                 20.0                      0.20                            2.50                              12.0                     0.3
+             pass1 TAU_S=12.0   0.45 0.817      0.183        0.100                   1.0            0.3           1.0             0.9        0.8              0.9                 12.0                      0.20                            2.50                              12.0                     0.3
+             pass1 TAU_S=30.0   0.50 0.833      0.167        0.083                   1.0            0.3           1.0             0.9        0.8              1.0                 30.0                      0.20                            2.50                              12.0                     0.3
+        pass1 HARD_GAP_M=0.35   0.50 0.833      0.167        0.083                   1.0            0.4           1.0             0.9        0.8              0.9                 20.0                      0.35                            2.50                              12.0                     0.3
+         pass1 HARD_GAP_M=0.5   0.25 0.750      0.250        0.133                   0.9            0.2           1.0             0.9        0.8              0.7                 20.0                      0.50                            2.50                              12.0                     0.3
+  pass1 SIDE_FREE_DCPA_M=1.75   0.50 0.833      0.167        0.083                   1.0            0.3           1.0             0.9        0.8              1.0                 20.0                      0.20                            1.75                              12.0                     0.3
+   pass1 SIDE_FREE_DCPA_M=3.5   0.35 0.783      0.217        0.117                   1.0            0.3           0.9             0.9        0.8              0.8                 20.0                      0.20                            3.50                              12.0                     0.3
+ pass1 STAND_ON_RELEASE_S=8.0   0.45 0.817      0.183        0.083                   0.9            0.3           1.0             0.9        0.8              1.0                 20.0                      0.20                            2.50                               8.0                     0.3
+pass1 STAND_ON_RELEASE_S=18.0   0.50 0.833      0.167        0.083                   1.0            0.3           1.0             0.9        0.8              1.0                 20.0                      0.20                            2.50                              18.0                     0.3
+           pass1 W_CHANGE=0.0   0.45 0.817      0.183        0.100                   1.0            0.3           1.0             1.0        0.8              0.8                 20.0                      0.20                            2.50                              12.0                     0.0
+           pass1 W_CHANGE=0.8   0.55 0.850      0.150        0.083                   1.0            0.3           1.0             1.0        0.8              1.0                 20.0                      0.20                            2.50                              12.0                     0.8
+
+== chosen
+  CLASSICAL_KVO_TAU_S = 20.0
+  CLASSICAL_KVO_HARD_GAP_M = 0.2
+  CLASSICAL_KVO_SIDE_FREE_DCPA_M = 2.5
+  CLASSICAL_KVO_STAND_ON_RELEASE_S = 12.0
+  CLASSICAL_KVO_W_CHANGE = 0.8
+
+defaults scored +0.500; chosen +0.550

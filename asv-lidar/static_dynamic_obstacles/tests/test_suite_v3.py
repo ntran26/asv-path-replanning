@@ -68,3 +68,22 @@ def test_tier_a_and_tier_b_seeds_are_disjoint():
     top = ste.TIER_A_SEED_BASE + len(ste.tier_a()) * (ste.TIER_A_SEED_RETRIES + 1)
     lo, hi = cfg.SEED_NAMESPACES["frozen_eval"]
     assert top <= hi - lo + 1
+
+
+def test_suite_31_floors_tier_b_channels_at_seven_and_a_half_metres():
+    """Suite 3.1 (your call, 2026-09-23).  Below ~7.5 m a channel leaves a
+    two-vessel encounter no room a lawful manoeuvre can use, so Tier B stops
+    there and the 10 m basin carries the narrow-water case.  Pinned because the
+    change moves claims C-2/C-3 onto R4, and because the counts feed every
+    headline table."""
+    import suite as ste
+    assert ste.TIER_B_MIN_WIDTH_M == 7.5 and ste.SUITE_REVISION == "3.1"
+    strata = ste.width_strata()
+    assert set(strata) == {"wide", "intermediate"}
+    assert min(lo for lo, _ in strata.values()) == 7.5
+    assert max(hi for _, hi in strata.values()) == 10.0
+    cells = ste.tier_b_cells()
+    assert len(cells) == 39 and sum(c["episodes"] for c in cells) == 780
+    assert {c["stratum"] for c in cells} == {"basin", "channel-wide", "channel-intermediate"}
+    # Tier A is unchanged: it is the extended set, not the default.
+    assert len(ste.tier_a()) == 38

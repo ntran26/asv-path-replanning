@@ -1,0 +1,5 @@
+colregs_vo: 60 development episodes per configuration, 10 workers
+  defaults (120 episodes)                      score +0.525  goal 0.84
+  tuned (120 episodes)                         score +0.575  goal 0.86
+Validation on 120 development episodes: defaults +0.525, tuned +0.575 -> keep tuned
+

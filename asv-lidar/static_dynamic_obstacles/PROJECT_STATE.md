@@ -6,9 +6,9 @@ currently blocking a full training run and a full evaluation.**
 
 | | |
 |---|---|
-| **Revision** | 10 — **baseline-v2** (F96): Rule 17(b) draws out of training and the suite; field work delayed not deferred; formulation + five-learner framing; campaign to restart on `configs/baseline_v2.json`; method in `planning/METHODS_BRIEF.md` |
-| **Last updated** | 2026-09-23 |
-| **Tests** | **511 passing, none expected to fail** (T1 passes since F24 was decided) |
+| **Revision** | 12 — **TD3 out of the baseline; four learners x 3 seeds = 12 runs; final replay buffer kept for continuation** (F98); suite **3.1** (F97): Tier B floored at 7.5 m and the default frozen suite, Tier A extended; comparators tuned and COLREGs-VO built; **baseline-v2** (F96): Rule 17(b) draws out of training and the suite; field work delayed not deferred; formulation + five-learner framing; campaign to restart on `configs/baseline_v2.json`; method in `planning/METHODS_BRIEF.md` |
+| **Last updated** | 2026-09-24 |
+| **Tests** | **515 passing, none expected to fail** (T1 passes since F24 was decided) |
 | **Blocking a headline training run** | **none -- the baseline-v1 campaign runs on this machine (F95)** until a cluster is set up. Known limits of v1, where a fix would mean baseline-v2 and retraining: crossing side bias under PPO (A32, a learner property per F94), narrow head-ons without starboard room (A33), being overtaken by a non-yielding vessel (A30, on hold) |
 | **Blocking a full evaluation** | the Tier B runner and the COLREGs-VO comparator (B8, C3–C6); your sign-off of the suite freeze, claim ledger and result tables (B6), after the framing decision in `METHODS_BRIEF.md` §9; then B2, B7, B9 (§2) |
 | **Open `TODO(decision)`** | 1 (`D_SAFE`) |
@@ -41,13 +41,13 @@ currently blocking a full training run and a full evaluation.**
 | `stopping.py` | braking-path stop test ("would stopping clear?", A23) | F67 |
 | `reward/` | eight dense terms, group clipping, audit | 02a |
 | `observation.py` | **six branches, 70 dims** (`a25-v3-context`), frozen index order | `OBSERVATION_SPEC.md`, F72 |
-| `features_extractor.py` | scene MLP + presence-gated shared slot encoder, all five learners | `OBSERVATION_SPEC.md` §7 |
+| `features_extractor.py` | scene MLP + presence-gated shared slot encoder, every learner | `OBSERVATION_SPEC.md` §7 |
 | `env.py` | the Gymnasium environment — **2 Hz decisions, 0.1 s physics and collision sub-steps, optional pose staleness** | 03a §4 |
 | `render.py` | field view + seven-block telemetry panel | RENDER_PANEL_SPEC |
 | `play.py` | manual and random harness | — |
-| `classical/` | **LOS-PID + DWA and encounter-specific VO** (B8), perception-only; shared LOS, PID, model rollout, clearances | 04 §5, F83 |
+| `classical/` | **LOS-PID + DWA, encounter-specific VO and COLREGs-VO (Kuwata)** (B8), perception-only; shared LOS, PID, model rollout, clearances; parameters in `constant_temp.py`, tuned and pinned in `configs/comparators_v1.json` | 04 §5, F83, F97 |
 | `reference_controller.py` | CODEX classical reference controller (supplementary comparator) | F71 |
-| `train_formulation.py` | **the shared trainer for all five learners** — curriculum, dev-set evaluation, checkpoints, `--resume`, `--config` baseline gate, replay buffers outside the repository | F76–F77, F86, F93, F95 |
+| `train_formulation.py` | **the shared trainer for every learner** (baseline: PPO, RecurrentPPO, SAC, TQC; TD3 still runnable) — curriculum, dev-set evaluation, checkpoints, `--resume`, `--config` baseline gate, replay buffers outside the repository | F76–F77, F86, F93, F95 |
 | `baseline_config.py` | freeze, check and verify runs against `configs/baseline_v2.json` | F93, F96 |
 | `constant_temp.py` | **the classical comparators' parameters**, staged out of `constants.py` so tuning one cannot change the formulation digest; merged in after the campaign | your call, 2026-09-23 |
 | `tools/scale_audit.py` | 02a §8.2's reward scale audit over the generator | rev 8 |
@@ -62,7 +62,7 @@ currently blocking a full training run and a full evaluation.**
 | 03a environment and target | **done** — §1.2, §3, §4, §5, §7, §10; **§6.3 replaced** by the free-space classifier (F37); §4.1's 0.1 s step replaced by 2 Hz (F38) |
 | 04a scenario and evaluation | modules done — §3, §4, §5, §6, §7, §9 — and the generator drives training (F44) |
 | 05 vessel model and sim2real | **part 1 validated and integrated**; refit v4 run, **not adopted** (F40); crash-stop block added to part 2; basin sessions pending |
-| Training campaign | **running** — baseline-v1, five learners × five seeds (F95); formulation frozen (F93) |
+| Training campaign | **running** — baseline-v2, four learners × 3 seeds = 12 runs (F95, F98); formulation frozen (F93, F96) |
 
 ---
 
@@ -77,7 +77,7 @@ moves almost everything else.**
 |---|---|---|---|
 | ~~B1~~ | ~~F24, the operating speed~~ — **decided: 0.55 m/s, `CRUISE_RPM = 6`** (F42) | — | — |
 | **B2** | **F28 — Rule 8(e): resolved in simulation by the emergency stop; unverified on the water** | 05 | the field claim of 8(e) — moved to evaluation |
-| ~~B3~~ | ~~Throughput~~ — **measured for all five learners** (F80) and budgeted (A26, F95): PPO ~108 steps/s, RecurrentPPO ~61, TD3/SAC/TQC 12-18 at 1.0 gradient step per transition | — | — |
+| ~~B3~~ | ~~Throughput~~ — **measured for every learner** (F80) and budgeted (A26, F95): PPO ~108 steps/s, RecurrentPPO ~61, TD3/SAC/TQC 12-18 at 1.0 gradient step per transition | — | — |
 | B4 | Pose noise is **nominal**, not measured (F46) | 05 | the N1 sim-to-real claim, until S1-A |
 | ~~B11~~ | ~~Phantom dynamic tracks~~ — **fixed** (F37); confirm as §6.3's replacement (`OPEN_PROBLEMS.md` A7) | — | — |
 | ~~B12~~ | ~~Spawn boundary penalty~~ — **fixed** (F35) | — | — |
@@ -2792,6 +2792,95 @@ ablation is flagged as needing a **third rung** (no feature / class one-hot /
 full context branch) since the observation gained the context branch; and the
 0.55 m/s speed caveat moved into the model section, where the sim-to-real claim
 lives.
+
+**F97 -- suite 3.1: Tier B channels floored at 7.5 m, Tier B is the default
+frozen suite and Tier A the extended set (your calls, 2026-09-23). Comparators
+tuned (C3a) and COLREGs-VO built.**
+
+*The suite change.* Tier B sampled channels down to 3.5 m. PPO seed 0's first
+frozen-suite run measured what that costs: the 3.5-4.26 m stratum succeeded in
+0.43 of episodes and **a third of those failures were wall contacts**, which
+reads the geometry rather than the policy. The floor is now 7.5 m -- the 10 m
+basin is already narrow water for a 1.7 m vessel -- and the strata become basin,
+channel-wide 8.75-10 m and channel-intermediate 7.5-8.75 m: **39 cells x 20 =
+780 episodes**. The floor lives in `suite.py` (`TIER_B_MIN_WIDTH_M`), not in
+`constants.py`, because the formulation digest covers every constant there and a
+campaign was running.
+
+*What it costs, and where the claim moves.* The derived head-on (3.80 m) and
+overtaking (4.26 m) thresholds now lie outside the sampled range, and the
+crossing threshold (7.60 m) sits just inside the lower stratum, so **Tier B no
+longer partitions widths by governing rule**. Claims C-2 and C-3 rest on the
+Study 1 width sweep (R4), which keeps widths to 3.5 m, and on Tier A's `A-*-N`
+and `A-FAIL-*` cases. The claim ledger's evidence column needs that edit (B6).
+
+*Default and extended.* Every frozen-suite evaluation now runs **Tier B only**;
+Tier A runs when asked (`--tiers a,b`). PPO seed 0's suite-3.0 result (Tier B
+0.727) is superseded and set aside as `ppos0_bl2_suite30_superseded`; it will be
+rerun on 3.1 after the campaign.
+
+*Two defects found and fixed in the runner.* It wrote to `results/tiers/frozen_suite/`
+while the campaign's "already evaluated" guard looked at `results/frozen_suite/`,
+so the 2,000-episode suite would have rerun after every learner; and the
+`stratum` column was blank on every row, because the stratum belongs to the cell
+rather than to the built scenario -- the headline could not be split by geometry
+at all, which is the one axis C-2 needs. Both corrected; the summary now also
+splits by target behaviour (R3).
+
+*Comparators (C3a).* `src/classical/colregs_vo.py` implements **COLREGs-VO
+(Kuwata et al., 2014)** -- candidate velocities, velocity-obstacle rejection, and
+the give-way constraint that the relative velocity stays to starboard of the
+bearing line -- classified by the **open-water** roles, so a crossing target to
+port makes the own ship stand on. `encounter_vo` is kept: it follows this
+paper's A17 channel convention, and the difference between them is what the
+Rule 9 precedence claim measures. A defect found in testing: with only hard
+static rejection it grazed obstacles and scored 0.30-0.50 on episodes with **no
+encounter at all**; with the soft clearance margin the other comparators use,
+0.63 -> 0.86 overall.
+
+*Tuning, and a false positive caught.* Both comparators were fitted on the
+development set by coordinate descent over a declared grid, scored by the rule
+RL checkpoints are selected by (goal - 2 x collision), then the winners were
+re-scored on all 120 development episodes:
+
+| | 60-episode search | full 120 | kept |
+|---|---|---|---|
+| COLREGs-VO | 0.500 -> 0.550 | 0.525 -> **0.575** | tuned (`W_CHANGE` 0.3 -> 0.8) |
+| LOS-PID + DWA | 0.700 -> **0.850** | 0.650 -> 0.650 | **defaults** -- the gain was noise |
+
+Pinned in `configs/comparators_v1.json` (digest `0dd8eab26bbf954f`, 67 values)
+with the method, the score rule and both validation results. The DWA episode is
+worth a sentence in the paper: it is why a search is validated rather than
+trusted.
+
+**F98 -- TD3 dropped from the baseline; the final replay buffer is kept so a run
+can be continued (your calls, 2026-09-24).**
+
+*The baseline set is now four learners:* PPO, RecurrentPPO, SAC, TQC, at **3
+seeds each** (your call, 2026-09-24; was 5) -- **12 runs**, about 10 days at
+current rates. TD3 stays
+implemented in `train_formulation.py` and can be run by hand; it is out of the
+campaign, `configs/baseline_v2.json`'s campaign block and the paper's
+comparison. The campaign is **20 runs**, not 25. The formulation digest is
+unchanged (`3d697858e95e5adf`) -- the learner set lives in the campaign block,
+not the formulation -- so the config was re-frozen and the running campaign will
+still start TQC without a mismatch.
+
+*Replay buffers.* Off-policy runs now keep two files at most while training --
+the latest checkpoint's buffer, and (optionally) the best model's -- and
+`KEEP_FINAL_BUFFER` now leaves the **final** buffer in place when a run ends, so
+training can be continued past the budget. That matters because 2 M may be
+short: across six on-policy runs the best checkpoint fell at **2.0 M three
+times and 1.8 M twice**, so the budget, not the learner, may be the binding
+constraint (A26). SAC seed 0 predates the switch, so a watcher copies its
+1.75 M and 2.0 M buffers aside before its own cleanup deletes them.
+
+*Learning curves, for A26.* PPO rises steeply to ~1.2 M (0.53 -> 0.83) then
+drifts on a noisy plateau, +-0.04 between evaluations; RecurrentPPO starts high
+(0.80 at 200 k), dips, and recovers to 0.86 by 1.6 M. Reporting the maximum over
+a noisy plateau slightly favours whichever learner spikes late, so either the
+budget rises to 3 M (~5 extra days over the campaign) or the tables report the
+mean of the last three evaluations instead of the best.
 
 ### 3.13 Earlier findings, still standing
 

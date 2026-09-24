@@ -34,9 +34,13 @@ CONFIG_ID = "baseline-v2"
 RUN_ARGS = {"timesteps": 2_000_000, "num_envs": 10, "eval_freq": 200_000,
             "eval_per_class": 20, "train_supervisor": "off", "eval_supervisor": "both",
             "low_speed_start_frac": 0.15, "checkpoint_every": 250_000}
-ALGOS = ["ppo", "recurrent_ppo", "td3", "sac", "tqc"]
+# TD3 dropped from the baseline set (your call, 2026-09-24).  The learner is
+# still implemented in `train_formulation.py` and can be run by hand; it is no
+# longer part of the campaign or the paper's comparison.
+ALGOS = ["ppo", "recurrent_ppo", "sac", "tqc"]
 TAG = "bl2"                        # run-directory suffix for this formulation
-SEEDS = [0, 1, 2, 3, 4]            # A26 (your call, 2026-09-22): 5 seeds per learner
+SEEDS = [0, 1, 2]                  # A26: 3 seeds per learner (your call, 2026-09-24;
+                                   # was 5).  4 learners x 3 seeds = 12 runs, ~10 days.
 # A26: each seed is represented by its best development-set checkpoint (the eval
 # callback's goal - 2 x collision score, supervisor off); Tier B stays held out.
 CHECKPOINT = "best_model.zip"
@@ -81,8 +85,6 @@ def learners(tf: ModuleType, num_envs: int) -> Dict:
         "ppo": {"hyperparameters": tf.PPO_HYPERPARAMS, "net_arch": on_policy_arch},
         "recurrent_ppo": {"hyperparameters": tf.PPO_HYPERPARAMS, "net_arch": on_policy_arch,
                           "policy": tf.RECURRENT_PPO_POLICY},
-        "td3": {"hyperparameters": dict(tf.TD3_HYPERPARAMS, **grad), "net_arch": off_policy_arch,
-                "action_noise_sigma": tf.TD3_ACTION_NOISE_SIGMA},
         "sac": {"hyperparameters": dict(tf.SAC_HYPERPARAMS, **grad), "net_arch": off_policy_arch},
         "tqc": {"hyperparameters": dict(tf.SAC_HYPERPARAMS, **grad, **tf.TQC_HYPERPARAMS),
                 "net_arch": off_policy_arch, "policy": tf.TQC_POLICY},

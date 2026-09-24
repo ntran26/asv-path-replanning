@@ -785,7 +785,7 @@ tracker.
 | `BEING_OVERTAKEN_BELOW_FLOOR_FRAC` | **0.0** (was 0.20) | F96, S5: the Rule 17(b) last-moment case is out of scope, so no draw sits below the contact-free floor in training or in the suite |
 | geometry | **basin default** (`DEFAULT_GEOMETRY_MODE`); `BASIN_START_Y` 2.0, `BASIN_GOAL_Y` 22.0, `BASIN_X_RANGE` (2.5, 7.5) m, `BASIN_NAV_INSET_M` 0.40, `BASIN_H_SIDE_CLIP` (0.60, 5.00); `p_basin` 1 / 1 / 0.85 / 0.75 / 0.75 by stage, channel only for `CHANNEL_CLASSES` | F74 (06, your calls) |
 | feasibility | A* grid 0.25 m, walls 0.40 m, panels 0.45 m, route ≤ 2.25 × leg, 20 redraws then thin | F74 (Paper 2's filter) |
-| off-policy learners | TD3 / SAC / TQC: lr 3e-4, buffer 1 M, batch 256, tau 0.005, learning starts 10 k; TD3 policy delay 2, target noise 0.2 (clip 0.5), exploration 0.1; TQC 2 critics × 25 quantiles, top 2 dropped per critic | F76, F77 |
+| off-policy learners | SAC / TQC (TD3 implemented, dropped from the baseline 2026-09-24): lr 3e-4, buffer 1 M, batch 256, tau 0.005, learning starts 10 k; TD3 policy delay 2, target noise 0.2 (clip 0.5), exploration 0.1; TQC 2 critics × 25 quantiles, top 2 dropped per critic | F76, F77 |
 | suite | 3.0: Tier A 38 (35 realised), Tier B 48 × 20; `TIER_B_EPISODES_PER_CELL` 20; curriculum `CURRICULUM_STAGE_FRACTIONS` | F75 |
 | observation | **70 values, 6 branches** (`OBSERVATION_SCHEMA_VERSION` "a25-v3-context") | F72: adds `context` (12 per slot + 2 previous-action values); cross-track error scaled by the local channel half-width, not 25 m |
 | `STOP_TEST_USES_HULL_FIT` | **False** | F66–F67: the C15 hull-fitted close-range view (within `STOP_TEST_FIT_RANGE_M` 4 m) is built but off — it doubles stops in Tier 1 |

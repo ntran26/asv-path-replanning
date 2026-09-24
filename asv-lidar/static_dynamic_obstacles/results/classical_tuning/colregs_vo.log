@@ -1,0 +1,21 @@
+colregs_vo: 60 development episodes per configuration, 10 workers
+  defaults                                     score +0.500  goal 0.83
+  pass1 TAU_S=12.0                             score +0.450  goal 0.82
+  pass1 TAU_S=30.0                             score +0.500  goal 0.83
+  pass1 HARD_GAP_M=0.35                        score +0.500  goal 0.83
+  pass1 HARD_GAP_M=0.5                         score +0.250  goal 0.75
+  pass1 SIDE_FREE_DCPA_M=1.75                  score +0.500  goal 0.83
+  pass1 SIDE_FREE_DCPA_M=3.5                   score +0.350  goal 0.78
+  pass1 STAND_ON_RELEASE_S=8.0                 score +0.450  goal 0.82
+  pass1 STAND_ON_RELEASE_S=18.0                score +0.500  goal 0.83
+  pass1 W_CHANGE=0.0                           score +0.450  goal 0.82
+  pass1 W_CHANGE=0.8                           score +0.550  goal 0.85
+
+== chosen
+  CLASSICAL_KVO_TAU_S = 20.0
+  CLASSICAL_KVO_HARD_GAP_M = 0.2
+  CLASSICAL_KVO_SIDE_FREE_DCPA_M = 2.5
+  CLASSICAL_KVO_STAND_ON_RELEASE_S = 12.0
+  CLASSICAL_KVO_W_CHANGE = 0.8
+
+defaults scored +0.500; chosen +0.550

@@ -1,0 +1,22 @@
+los_dwa: 60 development episodes per configuration, 10 workers
+  defaults                                     score +0.700  goal 0.90
+  pass1 SAFE_GAP_M=0.15                        score +0.600  goal 0.87
+  pass1 SAFE_GAP_M=0.35                        score +0.500  goal 0.83
+  pass1 TARGET_HORIZON_S=8.0                   score +0.700  goal 0.90
+  pass1 TARGET_HORIZON_S=14.0                  score +0.750  goal 0.92
+  pass1 DIST_CAP_M=1.0                         score +0.850  goal 0.95
+  pass1 DIST_CAP_M=1.5                         score +0.750  goal 0.92
+  pass1 DIST_CAP_M=2.5                         score +0.850  goal 0.95
+  pass1 PATH_SCALE_M=1.0                       score +0.750  goal 0.92
+  pass1 PATH_SCALE_M=3.5                       score +0.550  goal 0.85
+  pass1 COMMIT_S=(2.0, 4.0)                    score +0.583  goal 0.85
+  pass1 COMMIT_S=(4.0, 8.0)                    score +0.750  goal 0.92
+
+== chosen
+  CLASSICAL_DWA_SAFE_GAP_M = 0.2
+  CLASSICAL_DWA_TARGET_HORIZON_S = 14.0
+  CLASSICAL_DWA_DIST_CAP_M = 1.0
+  CLASSICAL_DWA_PATH_SCALE_M = 2.0
+  CLASSICAL_DWA_COMMIT_S = (3.0, 6.0)
+
+defaults scored +0.700; chosen +0.850

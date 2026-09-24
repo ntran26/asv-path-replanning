@@ -1,0 +1,26 @@
+Tuning los_dwa on 60 development episodes (10 per class), 2363 s
+score = goal rate - 2 x collision rate, the rule RL checkpoints are selected by
+
+== search (coordinate descent over the declared grid)
+                      label  score  goal  collision  target_coll  goal_being_overtaken  goal_crossing  goal_head_on  goal_no_target  goal_null  goal_overtaking  CLASSICAL_DWA_SAFE_GAP_M  CLASSICAL_DWA_TARGET_HORIZON_S  CLASSICAL_DWA_DIST_CAP_M  CLASSICAL_DWA_PATH_SCALE_M CLASSICAL_DWA_COMMIT_S
+                   defaults 0.7000 0.900      0.100        0.033                   1.0            0.7           1.0             0.8        1.0              0.9                      0.20                            10.0                       1.5                         2.0             (3.0, 6.0)
+      pass1 SAFE_GAP_M=0.15 0.6000 0.867      0.133        0.033                   1.0            0.6           1.0             0.8        1.0              0.8                      0.15                            10.0                       1.5                         2.0             (3.0, 6.0)
+      pass1 SAFE_GAP_M=0.35 0.5000 0.833      0.167        0.067                   1.0            0.5           1.0             0.8        0.9              0.8                      0.35                            10.0                       1.5                         2.0             (3.0, 6.0)
+ pass1 TARGET_HORIZON_S=8.0 0.7000 0.900      0.100        0.033                   1.0            0.7           1.0             0.8        1.0              0.9                      0.20                             8.0                       1.5                         2.0             (3.0, 6.0)
+pass1 TARGET_HORIZON_S=14.0 0.7500 0.917      0.083        0.033                   1.0            0.7           1.0             0.8        1.0              1.0                      0.20                            14.0                       1.5                         2.0             (3.0, 6.0)
+       pass1 DIST_CAP_M=1.0 0.8500 0.950      0.050        0.033                   1.0            0.7           1.0             1.0        1.0              1.0                      0.20                            14.0                       1.0                         2.0             (3.0, 6.0)
+       pass1 DIST_CAP_M=1.5 0.7500 0.917      0.083        0.033                   1.0            0.7           1.0             0.8        1.0              1.0                      0.20                            14.0                       1.5                         2.0             (3.0, 6.0)
+       pass1 DIST_CAP_M=2.5 0.8500 0.950      0.050        0.033                   1.0            0.8           1.0             1.0        1.0              0.9                      0.20                            14.0                       2.5                         2.0             (3.0, 6.0)
+     pass1 PATH_SCALE_M=1.0 0.7500 0.917      0.083        0.050                   1.0            0.6           1.0             1.0        0.9              1.0                      0.20                            14.0                       1.0                         1.0             (3.0, 6.0)
+     pass1 PATH_SCALE_M=3.5 0.5500 0.850      0.150        0.050                   1.0            0.6           1.0             0.8        1.0              0.7                      0.20                            14.0                       1.0                         3.5             (3.0, 6.0)
+  pass1 COMMIT_S=(2.0, 4.0) 0.5833 0.850      0.133        0.050                   1.0            0.6           1.0             0.8        1.0              0.7                      0.20                            14.0                       1.0                         2.0             (2.0, 4.0)
+  pass1 COMMIT_S=(4.0, 8.0) 0.7500 0.917      0.083        0.033                   1.0            0.7           1.0             0.8        1.0              1.0                      0.20                            14.0                       1.0                         2.0             (4.0, 8.0)
+
+== chosen
+  CLASSICAL_DWA_SAFE_GAP_M = 0.2
+  CLASSICAL_DWA_TARGET_HORIZON_S = 14.0
+  CLASSICAL_DWA_DIST_CAP_M = 1.0
+  CLASSICAL_DWA_PATH_SCALE_M = 2.0
+  CLASSICAL_DWA_COMMIT_S = (3.0, 6.0)
+
+defaults scored +0.700; chosen +0.850
