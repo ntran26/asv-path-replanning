@@ -1,0 +1,43 @@
+Tier 1 (sacs0_bl2_supervisor_on) — model runs\sac_formulation_seed0_bl2\best_model.zip
+220 episodes, 176 s
+
+== development set, per class (own_* = the model's last in-training evaluation, before today's code)
+                  n  goal  collision  target  speed  colregs  estops  intervention  port_sense  rms_cte  own_goal  own_collision
+class                                                                                                                           
+being_overtaken  20  0.90       0.10    0.00   0.69   -34.80     0.0           0.0        0.00     0.79      0.90           0.10
+crossing         20  0.80       0.20    0.05   0.67    -8.93     0.0           0.0        0.50     1.12      0.70           0.30
+head_on          20  0.95       0.05    0.00   0.69   -26.84     0.0           0.0        0.05     0.95      0.95           0.05
+no_target        20  0.95       0.05    0.00   0.69     0.00     0.0           0.0        0.00     1.48      0.98           0.02
+null             20  0.90       0.10    0.00   0.65   -11.58     0.0           0.0        0.00     0.94      0.90           0.10
+overtaking       20  0.95       0.05    0.05   0.68   -29.08     0.2           0.1        0.00     1.23      0.96           0.04
+
+== crossing collision by side x drawn DCPA
+                      mean                               size                      
+dcpa_bin      (-0.01, 0.7] (0.7, 1.4] (1.4, 2.6] (-0.01, 0.7] (0.7, 1.4] (1.4, 2.6]
+crossing_side                                                                      
+port                  0.25       0.33       0.20          4.0        3.0        5.0
+starboard             0.00        NaN       0.17          2.0        NaN        6.0
+
+-- by A22 label (escapable by a lawful response)
+                     n  collision  target
+crossing_escapable                       
+True                20        0.2    0.05
+
+== being overtaken, A15 floor
+                 n  collision  target  speed  v_hold
+floor                                               
+at/above floor  20        0.1     0.0   0.69   16.25
+
+== head-on width set (obstacles off)
+            n  target_collision  estops  stopped_then_hit  min_speed_mean  port_sense
+width_bin                                                                            
+5          22              0.09    0.05                 0            0.74        0.05
+6          20              0.20    0.05                 0            0.71        0.00
+7          20              0.10    0.00                 0            0.70        0.00
+8          19              0.00    0.00                 0            0.68        0.00
+10         19              0.00    0.05                 0            0.66        0.00
+
+== supervisor stops: 7 in 5 episodes; followed by a target collision in 1
+0
+8(e) in extremis: overtaking    4
+8(e) in extremis: head_on       3
