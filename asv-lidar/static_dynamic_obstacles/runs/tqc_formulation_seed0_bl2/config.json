@@ -1,8 +1,8 @@
 {
- "algorithm": "SAC",
+ "algorithm": "TQC",
  "seed": 0,
  "timesteps": 2000000,
- "algo": "sac",
+ "algo": "tqc",
  "num_envs": 10,
  "hyperparameters": {
   "learning_rate": 0.0003,
@@ -13,7 +13,8 @@
   "learning_starts": 10000,
   "train_freq": 1,
   "ent_coef": "auto",
-  "gradient_steps": 10
+  "gradient_steps": 10,
+  "top_quantiles_to_drop_per_net": 2
  },
  "torch_threads": 0,
  "fixed_stage": 0,
@@ -44,8 +45,8 @@
   "machine": "JL2VSV3",
   "cpu_count": 12,
   "git": {
-   "head": "a39d0010eea56516921d6f457f1e754c3ec0f9f9",
-   "src_dirty": true
+   "head": "e1c573509c4d10e3dcd19dc24c68c67bf3977187",
+   "src_dirty": false
   }
  },
  "baseline_config": {
@@ -114,6 +115,5 @@
   "MOTION_CLASSIFIER": "free_space",
   "PF_OVERSPEED_TOL": 0.2,
   "PF_OVERSPEED_SPAN": 0.5
- },
- "wall_clock_s": 127067.30963468552
+ }
 }
