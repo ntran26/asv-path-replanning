@@ -141,6 +141,14 @@ CLASSICAL_KVO_TAU_STATIC_S = 10.0        # and for scan points and the map polyg
 CLASSICAL_KVO_DT = 0.25                  # s, sampling step along the horizon
 CLASSICAL_KVO_HARD_GAP_M = 0.20          # hull-to-hull clearance treated as a hard limit
 CLASSICAL_KVO_STATIC_GAP_M = 0.15
+# The reactive target (`targets.T_RE`, A34) runs the COLREGs-VO rule from the
+# other vessel's side, but keeps clear by more than the comparator's 0.20 m: a
+# compliant vessel stays out of the own ship's lateral domain, so hull-to-hull
+# DOMAIN_LATERAL less one beam (1.25 - 0.50 m; side by side the centres are then
+# DOMAIN_LATERAL apart).  With 0.20 m a reactive overtaker cut back 0.6 m
+# (centres) ahead of the own ship.  Not a comparator parameter: outside
+# configs/comparators_v1.json.  TODO(A34): confirm with the basin traffic model.
+TARGET_RE_HARD_GAP_M = cfg.DOMAIN_LATERAL - 0.50
 CLASSICAL_KVO_BOUNDARY_GAP_M = 0.05
 CLASSICAL_KVO_SIDE_FREE_DCPA_M = 2.0 * cfg.DOMAIN_LATERAL   # wider passes are unconstrained
 CLASSICAL_KVO_STAND_ON_RELEASE_S = 12.0  # Rule 17: hold while the preferred velocity stays clear

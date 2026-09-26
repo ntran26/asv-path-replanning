@@ -339,8 +339,11 @@ folder).
 | `BASELINE CHECK FAILED` (campaign log) | the code differs from baseline-v2 | run `python src/baseline_config.py --check` to see what changed; undo it (§9) |
 | `<learner> SEED <N> FAILED (see ...log)` | a run crashed | read the end of that run's log; start the campaign again — it resumes from the last checkpoint |
 | `stop file found, stopping before ...` | a hold is set (§5) | delete `runs/CAMPAIGN_STOP` and start again, when wanted |
+| `frozen suite <tag> held (runs/FROZEN_HOLD)` | the frozen suite is paused until A34 fixes its target behaviours (F99); training and tier 1 carry on | after the fix, delete `runs/FROZEN_HOLD` and run the frozen suite on every finished run |
 | `[BUFFER] ... GB free -- replay buffer NOT saved` | C: is nearly full | free disk space; training continues, but a resume from that checkpoint refills the buffer |
 | `[BUFFER] a replay-buffer file stayed locked` | OneDrive held a file | harmless; an older buffer may be left in `PhD/asv_replay_buffers/` — delete it once that run is finished |
 | `<run>_incomplete_<date>` folder | a run died before its first checkpoint and was restarted | delete it |
 | log quiet for a few minutes | a development-set evaluation (every 200 k steps) | wait; `[EVAL]` lines follow |
 | nothing in the log for much longer, no CPU use | the processes are stuck or paused | `pause_run.ps1 ... -Action status`; if paused, resume (§6a); otherwise stop and restart (§6b) |
+| steps/s falls to a third (e.g. TQC 14 → 4) with the learner on CPUs 4–11 and CPUs 0–3 idle | Windows moved the hidden process to the efficiency cores (EcoQoS), not heat; `CurrentClockSpeed` 1600 MHz is only the base clock and always reads that | new runs opt out at start (`_no_efficiency_mode`, 2026-09-26); a run started before that can be opted out in place, as was done for TQC seed 0 |
+| `Get-Process python` finds nothing | the Store Python's processes are named `python3.10` | use `Get-Process python3.10`, or `pause_run.ps1 ... -Action status` |

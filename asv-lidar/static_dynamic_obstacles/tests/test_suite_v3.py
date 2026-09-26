@@ -77,7 +77,8 @@ def test_suite_31_floors_tier_b_channels_at_seven_and_a_half_metres():
     change moves claims C-2/C-3 onto R4, and because the counts feed every
     headline table."""
     import suite as ste
-    assert ste.TIER_B_MIN_WIDTH_M == 7.5 and ste.SUITE_REVISION == "3.1"
+    # 3.2 (A34) changed only the target models, not the cells.
+    assert ste.TIER_B_MIN_WIDTH_M == 7.5 and ste.SUITE_REVISION == "3.2"
     strata = ste.width_strata()
     assert set(strata) == {"wide", "intermediate"}
     assert min(lo for lo, _ in strata.values()) == 7.5
@@ -87,3 +88,30 @@ def test_suite_31_floors_tier_b_channels_at_seven_and_a_half_metres():
     assert {c["stratum"] for c in cells} == {"basin", "channel-wide", "channel-intermediate"}
     # Tier A is unchanged: it is the extended set, not the default.
     assert len(ste.tier_a()) == 38
+
+
+def test_every_tier_b_test_has_a_unique_id_that_resolves_back():
+    """Test IDs (2026-09-26) name a scenario for `run_test.py`.  All 780 must be
+    distinct, and the ID, the case id and the index must all resolve to the
+    same (cell, episode), or a replay would run a different test from the one
+    asked for."""
+    import suite as ste
+    cells = ste.tier_b_cells()
+    ids, index = set(), 0
+    for c_index, cell in enumerate(cells):
+        for n in range(cell["episodes"]):
+            case_id = f"B-{c_index:02d}-{n:02d}"
+            tid = ste.test_id(case_id)
+            assert tid not in ids
+            ids.add(tid)
+            assert ste.resolve_test(tid) == (c_index, n)
+            assert ste.resolve_test(case_id) == (c_index, n)
+            assert ste.resolve_test(str(index)) == (c_index, n)
+            assert ste.tier_b_index(c_index, n) == index
+            index += 1
+    assert len(ids) == 780
+    assert ste.test_id("B-00-00") == "BAS-HO-CV-01"
+    with pytest.raises(ValueError):
+        ste.resolve_test("BAS-HO-CV-21")
+    with pytest.raises(ValueError):
+        ste.resolve_test("780")

@@ -161,7 +161,11 @@ def tier_a() -> List[Case]:
 # exists.  The narrow behaviour is still measured -- it is reported from R4 and
 # from Tier A's `A-*-N` and `A-FAIL-*` cases, not from Tier B.
 TIER_B_MIN_WIDTH_M = 7.5
-SUITE_REVISION = "3.1"
+# Revision 3.2 (A34, 2026-09-26): the behaviour cells realise their target
+# models (`target_model`); 3.1 passed the cell label, which no model knew, so
+# every Tier B target ran at constant velocity (F99).  Same scenarios, same
+# seeds -- only the target model field and so the manifest change.
+SUITE_REVISION = "3.2"
 
 
 def width_strata() -> Dict[str, Tuple[float, float]]:
@@ -186,6 +190,27 @@ def width_strata() -> Dict[str, Tuple[float, float]]:
 # 3.50-4.26 m a null encounter is not an encounter, and an overtaker has nowhere
 # to pass.  They are reported through the rejection ledger, not sampled.
 NARROW_EXCLUDED = ("null", "being_overtaken")
+
+
+def target_model(behaviour: str, encounter_class: str) -> str:
+    """The target model that realises a Tier B behaviour cell (A34, option a).
+
+    * `cv` -- `T-CV`, constant velocity, the training model;
+    * `re` -- `T-RE`, compliant and reactive (the COLREGs-VO rule);
+    * `nc` -- the violation the class admits: in a head-on the target alters to
+      **port** (`T-NC2`); in every other class a give-way target **stands on**
+      (`T-NC1`).  `T-NC1` never manoeuvres, so it moves exactly like `T-CV`;
+      it differs where the target is the give-way vessel (crossing from the own
+      ship's port side, being overtaken), and in how compliance is scored
+      (04a §11.4 conditions passing side on target compliance).
+    """
+    if behaviour == "cv":
+        return tgt.T_CV
+    if behaviour == "re":
+        return tgt.T_RE
+    if behaviour == "nc":
+        return tgt.T_NC2 if encounter_class == "head_on" else tgt.T_NC1
+    raise ValueError(f"unknown Tier B behaviour {behaviour!r}")
 
 
 def tier_b_cells() -> List[dict]:
@@ -322,11 +347,19 @@ def _build_case(generator, namespace, index, case):
 
 
 def build_tier_b(generator: Optional[scn.ScenarioGenerator] = None,
-                 namespace: str = "frozen_eval") -> Tuple[List[scn.Scenario], List[dict]]:
-    """Realise the 48 Tier B cells (06 §5.1).  Returns (scenarios, shortfalls)."""
+                 namespace: str = "frozen_eval",
+                 cells: Optional[Sequence[int]] = None) -> Tuple[List[scn.Scenario], List[dict]]:
+    """Realise the Tier B cells (06 §5.1).  Returns (scenarios, shortfalls).
+
+    `cells` realises only those cell indices, for replaying one test: each cell
+    draws from its own seed block, so a cell comes out identical alone or in the
+    full build.
+    """
     generator = generator or scn.ScenarioGenerator(stage=5, seed_namespace=namespace)
     out, short = [], []
     for c_index, cell in enumerate(tier_b_cells()):
+        if cells is not None and c_index not in cells:
+            continue
         rng = np.random.default_rng(scn.seed_for(namespace, c_index * TIER_B_SEEDS_PER_CELL))
         got, tries = 0, 0
         while got < cell["episodes"] and tries < TIER_B_SEEDS_PER_CELL:
@@ -336,7 +369,7 @@ def build_tier_b(generator: Optional[scn.ScenarioGenerator] = None,
                      else float(rng.uniform(*cell["width_range"])))
             built = generator.sample(seed, case_id=f"B-{c_index:02d}-{got:02d}",
                                      encounter_class=cell["class"], width=width,
-                                     behaviour=cell["behaviour"],
+                                     behaviour=target_model(cell["behaviour"], cell["class"]),
                                      geometry_mode=cell["geometry_mode"],
                                      flags={"stratum": cell["stratum"]})
             if built is not None:
@@ -345,6 +378,63 @@ def build_tier_b(generator: Optional[scn.ScenarioGenerator] = None,
         if got < cell["episodes"]:
             short.append({**cell, "realised": got})
     return out, short
+
+
+# ---------------------------------------------------------------------------
+# Test IDs (2026-09-26): a readable name for every Tier B scenario, so one can be
+# picked and replayed alone (`tools/tiers/run_test.py`).
+# ---------------------------------------------------------------------------
+# <stratum>-<class>-<behaviour>-<nn>, nn = 01-20 within the cell, e.g.
+# CHW-CR-RE-07 is the 7th reactive crossing in a wide channel.  The case id
+# `B-cc-nn` says the same by cell number (and counts from 00).
+STRATUM_CODES = {"basin": "BAS", "channel-wide": "CHW", "channel-intermediate": "CHI"}
+CLASS_CODES = {"head_on": "HO", "crossing": "CR", "overtaking": "OT",
+               "being_overtaken": "BO", "null": "NU"}
+
+
+def test_id(case_id: str) -> str:
+    """The test ID of a Tier B case id (`B-07-13` -> e.g. `BAS-OT-NC-14`)."""
+    c_index, n = (int(v) for v in case_id.split("-")[1:3])
+    cell = tier_b_cells()[c_index]
+    return (f"{STRATUM_CODES[cell['stratum']]}-{CLASS_CODES[cell['class']]}-"
+            f"{cell['behaviour'].upper()}-{n + 1:02d}")
+
+
+def tier_b_index(c_index: int, n: int) -> int:
+    """Position in the full Tier B list, which sets the episode seed
+    (`frozen_suite.TIER_B_SEED + index`).  Valid while every cell realises its
+    full count, which suite 3.1 does (no shortfall); the gallery checks it."""
+    return sum(c["episodes"] for c in tier_b_cells()[:c_index]) + n
+
+
+def resolve_test(ref: str) -> Tuple[int, int]:
+    """(cell index, episode within cell) for a test ID (`CHW-CR-RE-07`), a case
+    id (`B-19-06`) or a Tier B index (`386`)."""
+    cells = tier_b_cells()
+    ref = ref.strip().upper()
+    if ref.isdigit():
+        i = int(ref)
+        for c_index, cell in enumerate(cells):
+            if i < cell["episodes"]:
+                return c_index, i
+            i -= cell["episodes"]
+        raise ValueError(f"index {ref} is beyond Tier B ({tier_b_index(len(cells), 0)} scenarios)")
+    parts = ref.split("-")
+    if parts[0] == "B" and len(parts) == 3:
+        c_index, n = int(parts[1]), int(parts[2])
+    elif len(parts) == 4:
+        codes = {v: k for k, v in STRATUM_CODES.items()}, {v: k for k, v in CLASS_CODES.items()}
+        stratum, cls = codes[0].get(parts[0]), codes[1].get(parts[1])
+        match = [k for k, c in enumerate(cells) if c["stratum"] == stratum and c["class"] == cls
+                 and c["behaviour"].upper() == parts[2]]
+        if not match:
+            raise ValueError(f"no Tier B cell {'-'.join(parts[:3])}")
+        c_index, n = match[0], int(parts[3]) - 1
+    else:
+        raise ValueError(f"not a test ID, case id or index: {ref}")
+    if not (0 <= c_index < len(cells) and 0 <= n < cells[c_index]["episodes"]):
+        raise ValueError(f"{ref} is outside Tier B")
+    return c_index, n
 
 
 def manifest(scenarios: Sequence[scn.Scenario], *, generator_sha: str = "",

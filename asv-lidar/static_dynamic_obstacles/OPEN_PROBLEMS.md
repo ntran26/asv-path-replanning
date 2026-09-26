@@ -4,7 +4,9 @@
 count. This file records only what is *not settled*, ordered so the
 highest-leverage item is first.
 
-**Last updated:** 2026-09-24, revision 39 — documentation brought in line with the recent decisions (skeleton, ledger, tables, specs). Revision 38: TD3 dropped and 5 seeds → 3 (four learners × 3 seeds = 12 runs); final replay buffer kept so runs can be continued; evidence that 2 M may be short (F98).
+**Last updated:** 2026-09-26, revision 41 — your calls: A34 option (a), built (suite 3.2, `T-RE` on the COLREGs-VO rule, F100); A26 stays at 2 M; the recommended action on the rest (A32 option 4, A33 carried as a known limit, A10, A3/A4/A6 confirmed, freeze signed off). A35 opened: the COLREGs-VO comparator judges its side rule per candidate.
+Revision 40: 2026-09-26 — the frozen suite's reactive and non-compliant targets never react (F99); A34 opened; campaign held after TQC seed 0 for the fix; test IDs and a gallery for every frozen test.
+Revision 39: 2026-09-24 — documentation brought in line with the recent decisions (skeleton, ledger, tables, specs). Revision 38: TD3 dropped and 5 seeds → 3 (four learners × 3 seeds = 12 runs); final replay buffer kept so runs can be continued; evidence that 2 M may be short (F98).
 Revision 37: 2026-09-23 — suite 3.1: Tier B floored at 7.5 m and made the default frozen suite, Tier A the extended set; C3a done (comparators tuned, COLREGs-VO built); C-2/C-3 evidence moves to R4 (F97).
 Revision 36: 2026-09-23 — Rev 2 review answered: A30 **closed** by removing the Rule 17(b) draws from training and the suite (baseline-v2, F96); field work delayed within this paper; paper framed as formulation + five-learner comparison.
 Revision 35: 2026-09-22 — A26 decided: ratio 1.0, 5 seeds, best-on-dev, this machine until a cluster is set up; campaign launched; replay buffers kept outside the repository (F95).
@@ -43,13 +45,13 @@ generator, the scale audit, noise and randomisation.
 
 | Part | Kind | Needs |
 |---|---|---|
-| **A** | Decisions | a call from you — 7 items (A32, A33, A30, A26, A10, A3/A4/A6), plus the freeze sign-off |
+| **A** | Decisions | a call from you — **1 item (A35)**; A34, A32, A33, A26, A10, A3/A4/A6 and the freeze sign-off decided 2026-09-26 |
 | **B** | Measurements | basin time — `PART2_BASIN_PLAN.md`, with one addition proposed |
 | **C** | Build work | my time — 8 items |
 
 ### Open in revision 21 (`PROJECT_STATE.md` F74, F75)
 
-**A26 — training budget and the off-policy update ratio (TODO(04-4)) — decided (your calls, 2026-09-22), with the budget reopened by F98.** **Learner set: PPO, RecurrentPPO, SAC, TQC at 3 seeds each** (TD3 dropped and 5 seeds -> 3 on 2026-09-24; **12 runs, ~10 days**). *Cost of 3 seeds:* a 0.05 headline difference is at the edge of separability and the 0.20 crossing spread is not separable at all, so learner comparisons hold on the headline only; `RESULT_TABLES.md` still says 5 seeds and needs restating (B6). **Open again: is 2 M enough?** The best checkpoint landed at 2.0 M in three of six on-policy runs and 1.8 M in two more, so the budget may bind. Either raise it to 3 M (~5 extra days) or report the mean of the last three evaluations rather than the maximum.  off-policy update ratio **1.0** gradient step per transition; **5 seeds** per learner (PPO seeds 0-1 are run 11); each seed represented by its **best-on-dev checkpoint** (`best_model.zip`, the callback's goal − 2 × collision score, supervisor off, same rule for every learner; Tier B held out). **Where: this machine** (~28 days back to back) until you have cluster access; the campaign script stops cleanly (`runs/CAMPAIGN_STOP`) and every run resumes, so the rest can move (F95). Budget 2 M steps each, as recorded in baseline-v1.
+**A26 — training budget and the off-policy update ratio (TODO(04-4)) — decided (your calls, 2026-09-22), with the budget reopened by F98.** **Learner set: PPO, RecurrentPPO, SAC, TQC at 3 seeds each** (TD3 dropped and 5 seeds -> 3 on 2026-09-24; **12 runs, ~10 days**). *Cost of 3 seeds:* a 0.05 headline difference is at the edge of separability and the 0.20 crossing spread is not separable at all, so learner comparisons hold on the headline only; `RESULT_TABLES.md` still says 5 seeds and needs restating (B6). **Open again: is 2 M enough?** The best checkpoint landed at 2.0 M in three of six on-policy runs and 1.8 M in two more, so the budget may bind. Either raise it to 3 M (~5 extra days) or report the mean of the last three evaluations rather than the maximum.  off-policy update ratio **1.0** gradient step per transition; **5 seeds** per learner (PPO seeds 0-1 are run 11); each seed represented by its **best-on-dev checkpoint** (`best_model.zip`, the callback's goal − 2 × collision score, supervisor off, same rule for every learner; Tier B held out). **Where: this machine** (~28 days back to back) until you have cluster access; the campaign script stops cleanly (`runs/CAMPAIGN_STOP`) and every run resumes, so the rest can move (F95). Budget 2 M steps each, as recorded in baseline-v1. **2026-09-26 (your call): stays at 2 M for now**; tables report the best-on-dev checkpoint as decided, and the final replay buffers are kept, so the off-policy runs can still be extended if you raise it.
 
 *Original entry:* **A26 — training budget and the off-policy update ratio (TODO(04-4)).** PPO is the development vehicle for testing and adjusting the reward now (your call, 2026-09-18). **Baseline learner set: PPO, RecurrentPPO, TD3, SAC and TQC (your correction: TQC, not SAC-IQN), multiple seeds, trained once everything is decided and the suite is frozen.** All five are built in the shared trainer (F76, F77); `sb3-contrib` 2.3.0 supplies RecurrentPPO and TQC. All five go through the A26 budget. Measured on this machine (10 workers, 12 cores; steps/s, and hours per 2 M-step seed), at 1.0 / 0.2 gradient steps per transition for the off-policy learners:
 
@@ -79,7 +81,7 @@ generator, the scale audit, noise and randomisation.
 
 Recommendation: 1 and 2 together in run 8. **Run 7 confirmed the pattern on the basin geometry (F79): 2 of 12 port crossings, first alteration compliant in 0.22, 0.72 m/s at closest approach.** Both aim at the same learned failure from two sides; this is PPO's debugging phase, so fewer runs outweighs clean attribution. If run 8 fixes it, a one-off run with 2 alone attributes it.
 
-**Freeze sign-off.** `planning/CLAIM_LEDGER.md` and `planning/RESULT_TABLES.md` are drafts for you to sign off; then a commit, so the generator has a SHA and the manifest can be finalised.
+**Freeze sign-off — signed off 2026-09-26 (your call: take the recommended actions).** `planning/CLAIM_LEDGER.md` and `planning/RESULT_TABLES.md` as they stand (four learners × 3 seeds, 780 episodes, C-2/C-3 on R4), and the 06 deviations below confirmed; committed, so the generator has a SHA and the manifest is final.
 
 **06 deviations to confirm:** basin null traffic keeps `P_nav` not the band; slant cap 14.0 deg (Paper 2's endpoint box) not 18.1; Tier A basin leg 14.0 deg not 15.
 
@@ -105,7 +107,28 @@ Recommendation: 1 after run 9 reports, as run 10, so run 9 stays a single-change
 
 > **Revision 33 (F93, your call to prepare the campaign):** the baseline formulation is saved as **baseline-v1** (`configs/baseline_v1.json`) — run 11's, with F91 and A31 switched off. A32 and A33 below are **not** resolved by it; they are carried into the paper as known limits. Fixing either later changes the formulation, which means **baseline-v2 and rerunning every learner** — so the cheap A32 measurement (option 1, ~1 h) is still worth doing before the long off-policy runs start.
 
-**A32 — the crossing side bias (F92) — option 1 measured (F94): the reward is not the cause.** From the same engagement state, turning the compliant way is worth **+61** (discounted, 30 deg) over the wrong way from port **and** from starboard; the reward prefers compliance in every pair that reaches the goal both ways, and the compliant turn costs nothing on the path terms. Option 2 is ruled out (it would scale a signal already large and symmetric). What remains is how the learner turns a clear signal into a side-conditioned action, which is what the five-learner comparison measures: **recommendation now option 4 — keep baseline-v1, report crossing compliance by side for every learner**, with option 3 (symmetric, mirrored crossing draws) as the fix to try only if all five learners show the bias.
+**A34 — fix the frozen suite's target behaviours (F99) — decided (your call, 2026-09-26: option a) and built (F100).** Suite 3.2: `re` → `T-RE`, `nc` → `T-NC2` in head-on and `T-NC1` elsewhere; `T-RE` now runs the COLREGs-VO rule from the target's side; a manoeuvre stopped by the fairway edge holds its heading. Note that `T-NC1` moves exactly like `T-CV`, so outside head-on the `nc` cells differ from `cv` only in the role the target should have taken. The original statement follows.
+
+ All 780 Tier B targets move at constant velocity because the suite's `re`/`nc` codes are not names the target model knows. The fix has three parts; only the third needs a call.
+
+| Part | What | Note |
+|---|---|---|
+| 1. Wire the names (needed) | map `re` → `T-RE` and `nc` → a `T-NC*` model where Tier B builds the scenario (`suite.build_tier_b`), not in `constants.py` | `TIER_B_BEHAVIOURS` sits in the formulation digest, so editing it would stop the campaign's gate; mapping in `suite.py` leaves baseline-v2 untouched. Suite revision → 3.2 (the manifest changes) |
+| 2. Make `T-RE` alter cleanly (recommended) | drive `T-RE` from the COLREGs-VO comparator now that it exists (03a §5.3 asks for one implementation), or at least stop the placeholder turn fighting the corridor clamp | without it the reactive head-on target saw-tooths along the band edge |
+| 3. What `nc` means per class (your call) | **(a, recommended)** class-appropriate: head-on `T-NC2` (alters to port), and `T-NC1` (stands on when give-way) for crossing and being-overtaken, where the target is give-way at least from one side; overtaking has no give-way target, so `nc` there is constant velocity in effect. **(b)** `T-NC1` everywhere (simplest, but a stand-on `T-NC1` is compliant, so many `nc` cells equal `cv`). **(c)** add `T-NC3` (wrong side of the fairway at spawn) for channel head-on | the generator places no target on the wrong side today, so (c) is build work |
+
+Cost: none to training (D1 keeps training on `T-CV`); the frozen suite has not run on baseline-v2, so nothing is lost. After the fix: redraw the gallery, then `results/frozen_seed0.sh`, then the campaign's seeds 1–2.
+
+**A35 — the COLREGs-VO comparator applies its side rule per candidate (found building A34, F100).** `colregs_vo._colregs_ok` decides whether the encounter is "live" (closing, DCPA < `SIDE_FREE_DCPA_M` = 2.5 m) **separately for each candidate velocity**. Any candidate that itself opens the pass beyond 2.5 m is exempt from "pass to starboard", so a quick turn to **port** in a head-on counts as compliant. Measured on a head-on 0.3 m off the reciprocal: the comparator as tuned picks 160° (port); judged on the encounter it picks 200° (starboard). Kuwata et al. apply the COLREGS constraint to an obstacle once the encounter is judged dangerous on the present velocities, then to every candidate — which is what `T-RE` now does (`side_live`).
+
+| Option | Change | Cost |
+|---|---|---|
+| **1. Judge on the encounter, as published (recommended)** | the comparator passes `side_live` from its present velocity (latched until it stops closing, as `T-RE` does); re-validate on the 120 development episodes and re-tune `W_CHANGE` only if the score falls | ~1 h of evaluation, run in a gap between trainings; `comparators_v1.json` → v2 |
+| 2. Keep it as tuned | report the deviation from the paper in the methods | a reviewer can call the COLREGs-VO row a weakened Kuwata |
+
+No comparator result has been reported, so either is free now.
+
+**A32 — the crossing side bias (F92) — decided 2026-09-26 (recommended action): option 4, keep the formulation and report crossing compliance by side for every learner.** Option 1 measured (F94): the reward is not the cause. From the same engagement state, turning the compliant way is worth **+61** (discounted, 30 deg) over the wrong way from port **and** from starboard; the reward prefers compliance in every pair that reaches the goal both ways, and the compliant turn costs nothing on the path terms. Option 2 is ruled out (it would scale a signal already large and symmetric). What remains is how the learner turns a clear signal into a side-conditioned action, which is what the five-learner comparison measures: **recommendation now option 4 — keep baseline-v1, report crossing compliance by side for every learner**, with option 3 (symmetric, mirrored crossing draws) as the fix to try only if all five learners show the bias.
 
 *Original entry:*
 
@@ -131,7 +154,7 @@ What is already ruled out: **observability** — the compliant sense is in the o
 
 Recommendation: **1**, then whichever of 2/3 it points to, on two seeds. The two failed fixes cost a run each (~11 h); the measurement costs an hour.
 
-**A33 — F91 removed a wrong pressure without supplying the right one (F92).**
+**A33 — F91 removed a wrong pressure without supplying the right one (F92) — decided 2026-09-26 (the recommended action since the freeze, revision 33): carried into the paper as a known limit.** baseline-v2 keeps F91 off; the tables report the narrow-channel behaviour per seed (starboard-first share and speed at CPA), and option 1 (price the 8(e) slowdown) is the first change for a future formulation — adopting it now would mean retraining every learner.
 
 Where the compliant alteration does not fit, F91 stops charging the held heading, and narrow-channel collisions fall from 0.36 to 0.15–0.18. But nothing then prices *what the vessel should do instead* — 02 §4.4's answer is the Rule 8(e) slowdown — and the two seeds filled the gap differently: seed 0 stopped altering to starboard at all (0.06 starboard-first in wide channels where starboard is admissible in 100 % of draws, at 0.91 m/s), seed 1 slackened to 0.56 m/s and kept altering starboard (0.68). Only seed 1's behaviour is the rule.
 
@@ -679,9 +702,9 @@ and run 4 should wait for it.
 
 Unchanged from revision 3. Both refits failed the pre-registered rule, so the
 simulator keeps v3; v4b's structure (`N_rr` fixed) should go into the basin
-session-1 fit. **To resolve:** confirm.
+session-1 fit. **Confirmed 2026-09-26** (recommended action).
 
-## A3, A4, A6. Carried over
+## A3, A4, A6. Carried over — all three confirmed as recommended, 2026-09-26
 
 | # | Item | Recommendation |
 |---|---|---|
@@ -798,18 +821,20 @@ settled.
 | ~~A22~~ | crossings must be escapable, 20 % labelled | **decided** (option 1) | — | built, F63 |
 | ~~C16~~ | class share lost on generator cap-outs | **fixed** (mine) | — | F62 |
 | ~~A21~~ | confined targets keep the channel; hull-clearance floor | **decided** (option 1) | — | built, F61 |
-| **A32** | crossing side bias — **measured (F94): the reward pays +61 for compliance, both sides; a learner property** | decision | nothing (report by side) | recommend option 4 |
-| **A33** | **F91's complement: price the 8(e) slowdown where the turn does not fit** | **decision** | a baseline-v2 (a known limit of v1) | **one run with A32** |
+| ~~A32~~ | crossing side bias — a learner property (F94) | **decided** (option 4): report by side | — | 2026-09-26 |
+| ~~A33~~ | F91's complement: price the 8(e) slowdown | **decided**: a known limit; option 1 for a future formulation | — | 2026-09-26 |
 | ~~A31~~ | crossing side, by observation or exposure | **closed, both falsified** (F91, F92) | — | superseded by A32 |
-| A10 | keep v3 | decision | model provenance | confirm (recommended) |
+| ~~A10~~ | keep v3 | **confirmed** | — | 2026-09-26 |
 | ~~A30~~ | being overtaken by a non-yielding vessel | **closed** (your call): draws removed, baseline-v2 | — | F96 |
-| **B6** | claim ledger and result tables: restate for the five-learner framing, and C-4 as three rungs | decision + edit | the freeze | your sign-off |
-| A3, A4, A6 | carried | decision | various | one call each |
+| ~~B6~~ | claim ledger and result tables | **signed off** | — | 2026-09-26 |
+| ~~A3, A4, A6~~ | carried | **confirmed** as recommended | — | 2026-09-26 |
 | **B5** | manoeuvring at 0.55 m/s is extrapolated | measurement | sim-to-real at the operating point | plan edit |
 | C2 | throughput | build | campaign size | mine |
 | C3–C6 | comparators, occlusion placement, metrics | build | evaluation | mine |
 | ~~C3a~~ | comparator tuning and COLREGs-VO | **done** (F97): tuned on the dev set, validated on all 120, pinned in `configs/comparators_v1.json` | — | COLREGs-VO built |
-| **B6a** | **claim ledger: C-2/C-3 evidence moves from Tier B to R4** (suite 3.1 no longer partitions widths by rule) | edit | the freeze | your sign-off |
+| ~~B6a~~ | claim ledger: C-2/C-3 evidence moves from Tier B to R4 | **signed off** | — | 2026-09-26 |
+| **A34** | frozen suite target behaviours | **decided** (option a), built: suite 3.2 | — | F99, F100 |
+| **A35** | COLREGs-VO comparator judges its side rule per candidate | **decision** | the COLREGs-VO row | recommend option 1 |
 | ~~C3a-old~~ | **comparator tuning**: parameters ported to `src/constant_temp.py` (single source, digest-safe); **tune on the development set after the campaign**, same score as the RL checkpoints (goal − 2 × collision), search reported, tuned values pinned with each result | build | a fair classical baseline (N2) | mine, ~2 h compute |
 | ~~A20~~ | freeze class and sense per engagement | **decided** (option 1) | — | built, F58 |
 | ~~A19~~ | classify against the path tangent | **decided** (option 1) | — | built, F56 (residual → A20) |

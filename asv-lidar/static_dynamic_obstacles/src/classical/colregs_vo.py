@@ -113,7 +113,8 @@ def classify(p_own: np.ndarray, heading: float, u_own: float,
     return CROSSING_GIVE if alpha > 0.0 else CROSSING_STAND
 
 
-def _colregs_ok(target: Target, p_own: np.ndarray, vel: np.ndarray) -> np.ndarray:
+def _colregs_ok(target: Target, p_own: np.ndarray, vel: np.ndarray,
+                live_now: Optional[bool] = None) -> np.ndarray:
     """Kuwata's constraint: as give-way, keep the relative velocity to starboard
     of the line of sight, which is "alter to starboard and pass astern".
 
@@ -130,10 +131,28 @@ def _colregs_ok(target: Target, p_own: np.ndarray, vel: np.ndarray) -> np.ndarra
     t_cpa = np.clip((v_rel @ los) / vv, 0.0, TAU_S)
     dcpa = np.linalg.norm(los - t_cpa[:, None] * v_rel, axis=1)
     live = closing & (dcpa < SIDE_FREE_DCPA_M)
+    if live_now is not None:
+        # The caller judged the encounter once (`side_live`), so every candidate
+        # must keep the starboard side -- a turn to port that opens the pass
+        # beyond `SIDE_FREE_DCPA_M` is no longer exempt (F99, A35).
+        live = np.full(len(vel), bool(live_now))
     # cross(los, v_rel) < 0 puts the relative velocity to starboard of the
     # bearing line (x east, y north, heading clockwise from north).
     cross = los[0] * v_rel[:, 1] - los[1] * v_rel[:, 0]
     return ~live | (cross < 0.0)
+
+
+def encounter_state(target: Target, p_own: np.ndarray, vel: np.ndarray):
+    """(closing, live) at velocity `vel`: live is closing with the CPA inside
+    `SIDE_FREE_DCPA_M` within the horizon -- the test `_colregs_ok` applies per
+    candidate, here on one velocity."""
+    los = target.position - p_own
+    v_rel = np.asarray(vel, dtype=float) - target.velocity
+    vv = max(float(v_rel @ v_rel), 1e-9)
+    if float(v_rel @ los) <= 0.0:
+        return False, False
+    t_cpa = min(float(v_rel @ los) / vv, TAU_S)
+    return True, float(np.linalg.norm(los - t_cpa * v_rel)) < SIDE_FREE_DCPA_M
 
 
 @dataclass
@@ -147,9 +166,19 @@ class Choice:
 
 
 def select_velocity(position, heading, speed, chi_pref, u_pref, targets: Sequence[Target], *,
-                    prev_course: Optional[float] = None, static_clearance=None) -> Choice:
+                    prev_course: Optional[float] = None, static_clearance=None,
+                    speed_fractions: Optional[Sequence[float]] = None,
+                    side_live: Optional[bool] = None,
+                    hard_gap: Optional[float] = None) -> Choice:
+    # Three options for the reactive target (`targets.T_RE`, A34); the comparator
+    # passes none of them and behaves exactly as tuned.  `speed_fractions`
+    # narrows the candidate speeds (the target alters course only); `side_live`
+    # judges the side rule on the encounter instead of per candidate (A35);
+    # `hard_gap` sets the clearance treated as a hard limit.
+    hard_gap = HARD_GAP_M if hard_gap is None else hard_gap
+    fractions = SPEED_FRACTIONS if speed_fractions is None else speed_fractions
     courses = np.concatenate([heading + np.radians(COURSE_OFFSETS_DEG), [chi_pref]])
-    courses, speeds = np.meshgrid(courses, np.asarray(SPEED_FRACTIONS) * u_pref)
+    courses, speeds = np.meshgrid(courses, np.asarray(fractions) * u_pref)
     courses, speeds = cc.wrap_pi(courses.ravel()), speeds.ravel()
     n = len(courses)
     vel = speeds[:, None] * np.stack([np.sin(courses), np.cos(courses)], axis=1)
@@ -162,10 +191,10 @@ def select_velocity(position, heading, speed, chi_pref, u_pref, targets: Sequenc
     for tgt in targets:
         future = tgt.position + times[:, None] * tgt.velocity
         gap = hull_separation(own, own_h, future[:, None, :], tgt.heading, margin=HULL_MARGIN)
-        hit = gap < HARD_GAP_M
+        hit = gap < hard_gap
         hard_t = np.minimum(hard_t, np.where(hit.any(axis=0), times[np.argmax(hit, axis=0)], np.inf))
         if tgt.cls in GIVE_WAY:
-            forbidden |= ~_colregs_ok(tgt, position, vel)
+            forbidden |= ~_colregs_ok(tgt, position, vel, side_live)
         if tgt.cls in (CROSSING_STAND, BEING_OVERTAKEN):
             stand_on = True
 

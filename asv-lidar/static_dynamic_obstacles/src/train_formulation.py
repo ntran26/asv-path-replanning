@@ -569,6 +569,27 @@ class FormulationEvalCallback(BaseCallback):
         self._evaluate()
 
 
+def _no_efficiency_mode() -> None:
+    """Opt this process out of Windows EcoQoS.  A hidden background process on a
+    hybrid CPU (here 2 P-cores + 8 E-cores) is moved to the E-cores, which cut
+    TQC from 14 to 4-5 steps/s on 2026-09-26; opting out restored 14.  A no-op
+    elsewhere, and a failure only costs speed."""
+    if sys.platform != "win32":
+        return
+    import ctypes
+
+    class _State(ctypes.Structure):
+        _fields_ = [("Version", ctypes.c_ulong), ("ControlMask", ctypes.c_ulong),
+                    ("StateMask", ctypes.c_ulong)]
+    state = _State(1, 1, 0)   # execution-speed throttling: explicitly off
+    try:
+        ctypes.windll.kernel32.SetProcessInformation(
+            ctypes.windll.kernel32.GetCurrentProcess(), 4, ctypes.byref(state),
+            ctypes.sizeof(state))   # 4 = ProcessPowerThrottling
+    except (AttributeError, OSError):
+        pass
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--timesteps", type=int, default=2_000_000)
@@ -611,6 +632,7 @@ def main() -> None:
                     help="F93: a frozen baseline (configs/baseline_v1.json) -- applies its run "
                          "arguments and refuses to start if the code no longer matches it")
     args = ap.parse_args()
+    _no_efficiency_mode()
 
     baseline = None
     if args.config:

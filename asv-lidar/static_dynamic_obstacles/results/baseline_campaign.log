@@ -24,3 +24,10 @@ code matches baseline-v2
 2026-09-25 08:21:46    tier 1 sacs0_bl2 supervisor off exit 0
 2026-09-25 08:24:47    tier 1 sacs0_bl2 supervisor on exit 0
 2026-09-25 08:24:48 == tqc seed 0: training
+code matches baseline-v2
+2026-09-26 08:44:22 == campaign start (3d697858e95e5adf)
+2026-09-26 08:52:28 (duplicate campaign started 08:43 by mistake while the original was suspended; killed, partial ppos0 frozen output removed)
+2026-09-26 12:46:05 hold set (runs/CAMPAIGN_STOP): stop after TQC seed 0; frozen suite to be fixed before seeds 1-2 and before frozen_seed0.sh (user)
+2026-09-26 13:13:37 frozen gallery (PID 5152, 360/780) suspended: it slowed TQC 14 -> 6-8 steps/s; resumes when TQC seed 0 exits
+2026-09-26 14:49:15 == hand-over armed: waiting for TQC seed 0 (PID 29780)
+2026-09-26 15:12:50 == hand-over armed (suite 3.2): waiting for TQC seed 0 (PID 29780)

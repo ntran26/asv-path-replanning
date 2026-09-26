@@ -14,7 +14,7 @@ behaviour is reported descriptively, per seed.
 Learners: PPO, RecurrentPPO, SAC and TQC, 3 seeds each (**TD3 dropped 2026-09-24**). TQC is the distributional arm (04a §8.2). PPO is also the development vehicle for the reward; only its frozen-suite runs are reported.
 The CODEX reference controller is a supplementary comparator, not one of the pre-registered three.
 
-## R1 — Tier B holdout (39 cells × 20 = **780 episodes per seed**, suite 3.1)
+## R1 — Tier B holdout (39 cells × 20 = **780 episodes per seed**, suite 3.2)
 
 | Method | Success | Static coll. | Boundary coll. | Target coll. | RMS CTE (m) | Path ratio | Intervention rate (supervisor on) |
 |---|---|---|---|---|---|---|---|
@@ -37,6 +37,8 @@ The CODEX reference controller is a supplementary comparator, not one of the pre
 |---|---|---|---|---|---|
 
 ## R3 — by target behaviour
+
+Behaviours as realised in suite 3.2 (A34): `cv` constant velocity (`T-CV`), `re` compliant reactive (`T-RE`, the COLREGs-VO rule from the target's side), `nc` non-compliant (`T-NC2`, alters to port, in head-on; `T-NC1`, stands on when give-way, elsewhere). `T-NC1` moves like `T-CV`; outside head-on the `nc` rows measure the case where the target should have given way and did not.
 
 | Method | Constant velocity | Compliant reactive | Non-compliant |
 |---|---|---|---|

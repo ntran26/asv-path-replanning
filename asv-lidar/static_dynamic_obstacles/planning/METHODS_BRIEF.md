@@ -325,7 +325,7 @@ it is why a search is validated rather than trusted.
 | Set | Size | Use |
 |---|---|---|
 | Development set | 120 episodes (20 per class × 6), development namespace | checkpoint selection, diagnostics |
-| **Tier B — the frozen suite (default)** | **39 cells × 20 = 780 episodes** per seed, suite 3.1: basin, channel-wide (8.75–10 m), channel-intermediate (7.5–8.75 m) × 5 classes × 3 target behaviours | headline results, touched once per policy |
+| **Tier B — the frozen suite (default)** | **39 cells × 20 = 780 episodes** per seed, suite 3.2: basin, channel-wide (8.75–10 m), channel-intermediate (7.5–8.75 m) × 5 classes × 3 target behaviours | headline results, touched once per policy |
 | Tier A — **out of this paper** (your call, 2026-09-24) | 38 defined (35 realised), incl. basin cases and pre-committed expected failures | kept in the suite, runnable with `--tiers a`; no claim depends on it |
 | **Around the Clock** (O1) | 24 open-water + 24 channel cases × 10 seeds (`suite.around_the_clock`), reported as R8 | the one **externally defined** scenario set in the paper, after Imazu was dropped |
 
@@ -336,7 +336,7 @@ a 95 % CI" and needs restating for **3 seeds** (B6), with the wider interval
 that implies. Pre-registered metrics: success;
 collisions by type (static, boundary, target); RMS cross-track error; path
 ratio; intervention rate with the supervisor on (R1); violation rate per class,
-with crossings split by side (R2); results by target behaviour (R3), channel
+with crossings split by side (R2); results by target behaviour (R3; `cv` constant velocity (`T-CV`), `re` compliant reactive (`T-RE`, the COLREGs-VO rule from the target's side), `nc` non-compliant (`T-NC2`, alters to port, in head-on; `T-NC1`, stands on when give-way, elsewhere)), channel
 width (R4), perception degradation (R5), ablation (R6), Tier A (R8) and field
 (R9). First-alteration compliance by side is a diagnostic added since (F92).
 

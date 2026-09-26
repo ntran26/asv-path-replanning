@@ -12,7 +12,7 @@
 > - **Budget:** 2 M steps, **3 seeds** per learner (12 runs). The best checkpoint
 >   lands at 1.8-2.0 M in five of six on-policy runs, so 2 M may be the binding
 >   constraint -- state it, or raise the budget (A26).
-> - **Evaluation:** **Tier B is the default frozen suite** (suite 3.1: 39 cells
+> - **Evaluation:** **Tier B is the default frozen suite** (suite 3.2: 39 cells
 >   x 20 = **780 episodes**, channels floored at **7.5 m**). **Tier A is out of
 >   this paper** (2026-09-24): it stays in the suite and can be reported later.
 >   Around the Clock is defined but **not built**, so R8 has no content yet.
@@ -306,7 +306,7 @@ One frozen tier, versioned and hashed before the first training run.
 
 \[Tier A, the 38 named deterministic cases, is **out of this paper** (2026-09-24). It exists in the suite and can be reported later; the argument here rests on Tier B and the width sweep.\]
 
-- **Tier B (the default frozen suite, suite 3.1) —** stratified randomised holdout, 39 cells × 20 = 780 episodes per seed: encounter class (5) × target behaviour (3: constant velocity, compliant reactive, non-compliant) × geometry stratum (basin, channel 8.75–10 m, channel 7.5–8.75 m). Channels are floored at 7.5 m, below which a two-vessel encounter has no room a lawful manoeuvre can use; the 10 m basin is the narrow-water case. Static clutter is 0–3 obstacles per episode, dropped where they would decide the encounter.
+- **Tier B (the default frozen suite, suite 3.2) —** stratified randomised holdout, 39 cells × 20 = 780 episodes per seed: encounter class (5) × target behaviour (3: constant velocity, compliant reactive, non-compliant) × geometry stratum (basin, channel 8.75–10 m, channel 7.5–8.75 m). Channels are floored at 7.5 m, below which a two-vessel encounter has no room a lawful manoeuvre can use; the 10 m basin is the narrow-water case. Static clutter is 0–3 obstacles per episode, dropped where they would decide the encounter.
 
 - **External benchmark —** the "Around the Clock" set of 24 single-ship encounters at equally spaced target headings. The reduction to two-vessel scope makes this an exact fit rather than an adaptation, and it sweeps every classification boundary systematically, including the astern sector. Adopting it is the principal defence against the criticism that the benchmark was constructed by the authors.
 
@@ -353,7 +353,7 @@ This answers the question a sceptical reviewer will actually ask: is compliance 
 
 6.1 Overall performance
 
-Table R1 — Tier B holdout (suite 3.1: 39 cells × 20 = 780 episodes per seed, 3 seeds). \[RESULT\]
+Table R1 — Tier B holdout (suite 3.2: 39 cells × 20 = 780 episodes per seed, 3 seeds). \[RESULT\]
 
 | **Method**            | **Success** | **Static coll.** | **Boundary coll.** | **Target coll.** | **RMS CTE (m)** | **Path ratio** |
 |-----------------------|-------------|------------------|--------------------|------------------|-----------------|----------------|
