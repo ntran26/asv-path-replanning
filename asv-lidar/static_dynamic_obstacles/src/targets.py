@@ -8,7 +8,7 @@ assumption COLREGs exists because you cannot make.
 | ID | Model | Used in |
 |---|---|---|
 | `T-CV` | Constant velocity, constant heading | Training and evaluation |
-| `T-RE` | Compliant reactive — encounter-specific VO | Evaluation only |
+| `T-RE` | Compliant reactive — the COLREGs-VO rule, from the target's side | Evaluation only |
 | `T-NC1` | Stands on when it is the give-way vessel | Evaluation only |
 | `T-NC2` | Alters to **port** in a head-on | Evaluation only |
 | `T-NC3` | Positionally non-compliant — holds the wrong side of the fairway | Evaluation only |
@@ -112,6 +112,13 @@ class Target:
     # Latched on first engagement, for the reactive and non-compliant models.
     _reacted: bool = field(default=False, repr=False)
     _t: float = field(default=0.0, repr=False)
+    # A34: set by `clamp_to_corridor` when the fairway edge stops a target that
+    # has manoeuvred; the manoeuvring models then hold the edge heading.
+    _edge_hold: bool = field(default=False, repr=False)
+    _course0: Optional[float] = field(default=None, repr=False)
+    _plan_course: Optional[float] = field(default=None, repr=False)
+    _next_plan: float = field(default=0.0, repr=False)
+    _side_latched: bool = field(default=False, repr=False)
 
     # ------------------------------------------------------------------
     @property
@@ -153,6 +160,9 @@ class Target:
         """
         if self.behaviour in (T_NC1, T_NC3):
             return                        # stands on; the violation is the point
+        if self.behaviour == T_RE:
+            self._react_vo(dt, own)
+            return
 
         import cpa_cri as cc
         p_os = (float(own["x"]), float(own["y"]))
@@ -168,21 +178,69 @@ class Target:
             # and the reason 04a §11.4 requires passing-side correctness to be
             # reported conditioned on target compliance.  Scored against the own
             # ship it would otherwise read as a policy failure.
-            if self.encounter_class == "head_on":
+            if self.encounter_class == "head_on" and not self._edge_hold:
                 self._turn(-TURN_RATE_DPS * dt)
+                self._reacted = True
             return
 
-        if self.behaviour == T_RE:
-            # Compliant reactive: alter to starboard, which satisfies Rule 14
-            # and Rule 15 alike in this domain.  Deliberately simple -- 03a §5.3
-            # requires `T-RE` and the C3 velocity-obstacle comparator to be one
-            # implementation, so the full VO lives with the comparator and this
-            # is the interface it will be swapped into.
-            self._turn(+TURN_RATE_DPS * dt)
-            self._reacted = True
+    def _react_vo(self, dt: float, own) -> None:
+        """`T-RE`: the COLREGs-VO comparator's rule, applied from the target's side
+        (03a §5.3 asks for one implementation, A34).
+
+        Every decision interval the target classifies the encounter by the
+        open-water roles, with the own ship as *its* traffic, and takes the
+        course `colregs_vo.select_velocity` picks at its own speed: altering to
+        starboard and passing astern when it gives way, standing on under Rule 17
+        when it does not, and returning to its course once the pass is clear.
+        It turns at `TURN_RATE_DPS`.  Two departures from the comparator's
+        settings, both because this is the *other* vessel behaving well: the side
+        rule is judged on the encounter and held until the target stops closing
+        (per candidate, a turn to port that opens the pass counts as compliant,
+        A35), and the hard clearance is `TARGET_RE_HARD_GAP_M`, not the
+        comparator's 0.20 m (with it the target cut back 0.6 m ahead of the own
+        ship).  Static panels are not its concern, and a
+        confined target that meets the fairway edge stops
+        manoeuvring (`_edge_hold`) and keeps the edge heading the clamp gave it --
+        the placeholder's continuous turn fought `clamp_to_corridor` and
+        saw-toothed along the edge (F99), and so did turning back to its course.
+        """
+        import constant_temp as ct
+        from classical import colregs_vo as kvo
+        if self._course0 is None:
+            self._course0 = float(self.heading)
+        if self._plan_course is None or self._t + 1e-9 >= self._next_plan:
+            self._next_plan = self._t + cfg.UPDATE_RATE
+            p = np.array([self.x, self.y])
+            h = math.radians(self.heading)
+            p_own = np.array([float(own["x"]), float(own["y"])])
+            v_own = np.asarray(own["velocity"], dtype=float)
+            h_own = math.radians(float(own["heading"]))
+            cls = kvo.classify(p, h, self.speed, p_own, v_own, h_own)
+            other = kvo.Target(p_own, v_own, h_own, cls)
+            # The side rule holds from the moment the encounter is live until
+            # the target stops closing -- Rule 8(d)/16: keep clear until finally
+            # past, not until the pass merely looks wide enough.
+            closing, live = kvo.encounter_state(other, p, self.velocity)
+            self._side_latched = closing and (live or self._side_latched)
+            prev = None if self._plan_course is None else math.radians(self._plan_course)
+            choice = kvo.select_velocity(p, h, self.speed, math.radians(self._course0), self.speed,
+                                         [other], prev_course=prev, speed_fractions=(1.0,),
+                                         side_live=self._side_latched,
+                                         hard_gap=ct.TARGET_RE_HARD_GAP_M)
+            self._plan_course = math.degrees(choice.course) % 360.0
+            if abs(_wrap(self._plan_course - self._course0)) > 1.0:
+                self._reacted = True
+        if self._edge_hold:
+            return                        # the fairway edge ended the manoeuvre
+        delta = _wrap(self._plan_course - self.heading)
+        self._turn(max(-TURN_RATE_DPS * dt, min(TURN_RATE_DPS * dt, delta)))
 
     def _turn(self, delta_deg: float) -> None:
         self.heading = (self.heading + float(delta_deg)) % 360.0
+
+
+def _wrap(deg: float) -> float:
+    return (float(deg) + 180.0) % 360.0 - 180.0
 
 
 # Reactive-target turn rate.  A model vessel's sustained rate of turn, not a
@@ -240,6 +298,8 @@ def clamp_to_corridor(target: Target, corridor, polygon=None) -> None:
 
     # Nearest centreline station, then adopt its tangent direction.
     violation = confinement_violation(target, corridor, polygon)
+    if target._reacted:
+        target._edge_hold = True         # A34: the manoeuvre has used the room
     deltas = corridor.centre - np.array([target.x, target.y])
     index = int(np.argmin(np.einsum("ij,ij->i", deltas, deltas)))
     tangent = corridor.tangent(index)

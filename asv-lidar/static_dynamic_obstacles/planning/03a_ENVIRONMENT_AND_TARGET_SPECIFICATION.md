@@ -305,7 +305,7 @@ polygon inside a 10 m basin.
 | ID | Model | Used in |
 |---|---|---|
 | `T-CV` | Constant velocity, constant heading | Training (D1) and evaluation |
-| `T-RE` | Compliant reactive — encounter-specific VO, Thyri & Breivik (2022) | Evaluation only |
+| `T-RE` | Compliant reactive — the COLREGs-VO rule (Kuwata et al., 2014), applied from the target's side (A34, F100; the encounter-specific VO comparator was replaced) | Evaluation only |
 | `T-NC1` | Stands on when it is the give-way vessel | Evaluation only |
 | `T-NC2` | Alters to **port** in a head-on | Evaluation only |
 | `T-NC3` | Positionally non-compliant — holds the wrong side of the fairway, violating 9(a) | Evaluation only; required by Tier A case `A-8E-HO-N` |

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# The frozen suite (Tier B, suite 3.1) on seed 0 of every learner, run once the
+# The frozen suite (Tier B, suite 3.2) on seed 0 of every learner, run once the
 # four seed-0 trainings have finished (your call, 2026-09-23).
 #
 #   bash results/frozen_seed0.sh

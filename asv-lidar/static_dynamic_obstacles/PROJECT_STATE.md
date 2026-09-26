@@ -7,7 +7,7 @@ currently blocking a full training run and a full evaluation.**
 | | |
 |---|---|
 | **Revision** | 12 — **TD3 out of the baseline; four learners x 3 seeds = 12 runs; final replay buffer kept for continuation** (F98); suite **3.1** (F97): Tier B floored at 7.5 m and the default frozen suite, Tier A extended; comparators tuned and COLREGs-VO built; **baseline-v2** (F96): Rule 17(b) draws out of training and the suite; field work delayed not deferred; formulation + five-learner framing; campaign to restart on `configs/baseline_v2.json`; method in `planning/METHODS_BRIEF.md` |
-| **Last updated** | 2026-09-24 |
+| **Last updated** | 2026-09-26 |
 | **Tests** | **515 passing, none expected to fail** (T1 passes since F24 was decided) |
 | **Blocking a headline training run** | **none -- the baseline-v1 campaign runs on this machine (F95)** until a cluster is set up. Known limits of v1, where a fix would mean baseline-v2 and retraining: crossing side bias under PPO (A32, a learner property per F94), narrow head-ons without starboard room (A33), being overtaken by a non-yielding vessel (A30, on hold) |
 | **Blocking a full evaluation** | the Tier B runner and the COLREGs-VO comparator (B8, C3–C6); your sign-off of the suite freeze, claim ledger and result tables (B6), after the framing decision in `METHODS_BRIEF.md` §9; then B2, B7, B9 (§2) |
@@ -88,9 +88,9 @@ moves almost everything else.**
 | # | Blocker | Owner | Effect |
 |---|---|---|---|
 | ~~B5~~ | ~~Curriculum steps per stage and total budget~~ — **decided**: stage fractions (F75), 2 M steps × 5 seeds, ratio 1.0 (A26, F95) | — | — |
-| **B6** | Claim ledger and result tables **drafted, unsigned** (`planning/`); they still name a single proposed SAC method — framing decision first (`METHODS_BRIEF.md` §9) | you | 04a §9.3 freeze checklist |
-| **B7** | `T-RE` reactive target is a placeholder, not the VO comparator | 03 | Tier B's `re` behaviour stratum |
-| **B8** | Classical comparators: **LOS-PID+DWA and encounter-specific VO built and on Tier 1 (F83)**; COLREGs-VO (Kuwata) not built; `T-RE` not yet swapped onto the VO | 04 | COLREGs-VO row of R1; B7 |
+| ~~B6~~ | ~~Claim ledger and result tables unsigned~~ — **signed off** 2026-09-26 | — | — |
+| ~~B7~~ | ~~`T-RE` a placeholder~~ — **on the COLREGs-VO rule** (F100) | — | — |
+| **B8** | Classical comparators built and tuned (F83, F97); `T-RE` runs the COLREGs-VO rule (F100); **open: the comparator's per-candidate side rule (A35)** | you | COLREGs-VO row of R1 |
 | **B9** | `metrics.py` does not read the reward keys | 04 | 04a §10's metric set |
 | ~~B10~~ | ~~the scenario generator is not wired into `env.py`~~ — **wired** (F44) | — | — |
 
@@ -2881,6 +2881,89 @@ drifts on a noisy plateau, +-0.04 between evaluations; RecurrentPPO starts high
 a noisy plateau slightly favours whichever learner spikes late, so either the
 budget rises to 3 M (~5 extra days over the campaign) or the tables report the
 mean of the last three evaluations instead of the best.
+
+**F99 -- the frozen suite's reactive and non-compliant targets never react;
+test IDs and a gallery for every frozen test (2026-09-26).**
+
+*Found while drawing the target trajectories.* Tier B stores the target
+behaviour as `cv` / `re` / `nc` (`constants.TIER_B_BEHAVIOURS`), and
+`targets.Target.step` recognises only `T-CV`, `T-RE`, `T-NC1`, `T-NC2`, `T-NC3`.
+`re` and `nc` fall through every branch of `_react`, so **all 780 Tier B targets
+move at constant velocity** -- the 240 "reactive" and 240 "non-compliant"
+episodes test nothing the constant-velocity ones do not. Checked directly: a
+head-on target labelled `re` holds 180.0 deg over 4 s engaged; labelled `T-RE`
+it turns to 212 deg; `nc` holds, `T-NC2` turns to 148 deg. Training is
+unaffected (it uses `T-CV` only, D1), and no frozen-suite result on baseline-v2
+exists yet -- the campaign is held after TQC seed 0 for the fix (A34).
+
+*A second, smaller defect shows once `T-RE` is active.* The placeholder starboard
+turn (B7) fights `clamp_to_corridor` in confined classes: the drawn head-on track
+saw-tooths along the band edge instead of altering cleanly.
+
+*Test IDs.* Every Tier B scenario now has a readable ID,
+`<stratum>-<class>-<behaviour>-<nn>` (`BAS`/`CHW`/`CHI`, `HO`/`CR`/`OT`/`BO`/`NU`,
+`CV`/`RE`/`NC`, 01-20), from `suite.test_id`; `suite.resolve_test` accepts an ID,
+a case id or an index, and `frozen_suite.py` writes it on every row.
+`tools/tiers/run_test.py` replays chosen tests with a model or a comparator --
+same scenario and episode seed as the suite -- in seconds, with a trajectory
+figure (`results/test_runs/`). Test:
+`test_every_tier_b_test_has_a_unique_id_that_resolves_back`.
+
+*Gallery.* `tools/diagnostics/frozen_gallery.py` draws all 780
+(`results/frozen_gallery/`: one figure per test, one sheet per cell, `index.csv`),
+with the target's trajectory simulated against an own ship holding the leg at
+cruise, so a behaviour model's manoeuvre shows where it happens. Rendering beside
+TQC cut its rate from 14 to 6-8 steps/s even on the efficiency cores (partly
+OneDrive uploading the images), so it was suspended at 431 of 780 and resumes
+when TQC seed 0 finishes. It will have to be redrawn after the A34 fix anyway.
+
+*Throughput note (same day).* TQC's fall from 14 to 4-5 steps/s was Windows
+moving the hidden learner onto the E-cores (EcoQoS), not heat; opting the process
+out restored 14, and `train_formulation.py` now opts out at start
+(`_no_efficiency_mode`).
+
+**F100 -- A34 built: suite 3.2, the frozen suite's targets now behave as labelled
+(your call, option a, 2026-09-26).**
+
+*Mapping.* `suite.target_model`: `cv` -> `T-CV`, `re` -> `T-RE`, `nc` -> `T-NC2` in
+head-on (alters to port) and `T-NC1` elsewhere (stands on when give-way). Done in
+`suite.build_tier_b`, not in `constants.TIER_B_BEHAVIOURS`, which the baseline
+digest covers -- `baseline_config.py --check` still reads "code matches
+baseline-v2". Same cells, scenarios and seeds; only the target-model field, and so
+the manifest, changes: `SUITE_REVISION` 3.2. **`T-NC1` moves exactly like `T-CV`**
+(neither manoeuvres), so outside head-on the `nc` cells differ from `cv` only in
+the role the target should have taken; the frozen suite reports it that way.
+
+*`T-RE` on the COLREGs-VO rule (03a §5.3: one implementation with the C3
+comparator).* Every 0.5 s the target classifies the encounter by the open-water
+roles with the own ship as its traffic and takes the course
+`colregs_vo.select_velocity` picks at its own speed: gives way to starboard and
+passes astern, stands on under Rule 17, resumes its course once past. Two
+departures from the comparator's settings, both because this is the other vessel
+behaving well: the side rule is judged on the encounter and held until it stops
+closing (per candidate, a port turn that opens the pass counts as compliant --
+A35), and its hard clearance is `constant_temp.TARGET_RE_HARD_GAP_M` = 0.75 m
+hull-to-hull (DOMAIN_LATERAL less one beam) rather than 0.20 m, after which a
+reactive overtaker stopped cutting back 0.6 m ahead of the own ship. Against a
+stand-on own ship: head-on alters to 200 deg and passes at 1.50 m (constant
+velocity: 0.30 m); give-way crossing alters 36 deg and passes astern at 2.42 m;
+on six rendered Tier B cases the nominal CPA is 1.56-2.07 m. `select_velocity`'s
+three new options default to the tuned behaviour, so the comparator is unchanged.
+
+*Edge hold.* `clamp_to_corridor` marks a target that has manoeuvred when the
+fairway edge stops it (`_edge_hold`); `T-RE` and `T-NC2` then keep the edge
+heading. This removes the saw-tooth. The small stair-steps a clamped target still
+leaves along a wall are the clamp's inward nudge (A21) and occur for constant
+velocity targets too.
+
+*Tests.* `tests/test_target_behaviours.py` (8): mapping, recognised models in built
+cells, CV/NC1 never turn, T-RE head-on starboard and resumes, give-way crossing to
+starboard and clear, NC2 to port, the encounter side rule, the edge hold. With the
+suite, classical, generator, basin, acceptance and baseline tests: 110 passed.
+
+*Runs.* The campaign keeps training; after TQC seed 0 a detached hand-over
+(`results/continue_after_tqc.sh`) redraws the gallery, lifts `runs/FROZEN_HOLD`,
+runs the frozen suite on the four seed-0 models, then continues with seeds 1-2.
 
 ### 3.13 Earlier findings, still standing
 

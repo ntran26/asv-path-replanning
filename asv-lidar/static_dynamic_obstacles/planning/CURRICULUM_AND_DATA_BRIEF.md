@@ -207,7 +207,7 @@ ignored.
 
 ### 5.2 Frozen suite — the evidence
 
-**Tier B, suite 3.1**: 39 cells × 20 episodes = 780 per seed. A cell is
+**Tier B, suite 3.2**: 39 cells × 20 episodes = 780 per seed. A cell is
 
 $$\text{cell} = (\text{geometry stratum}) \times (\text{encounter class}) \times (\text{target behaviour})$$
 
@@ -215,7 +215,7 @@ $$\text{cell} = (\text{geometry stratum}) \times (\text{encounter class}) \times
   Channels stop at 7.5 m because below that a two-vessel encounter has no room a
   lawful manoeuvre can use.
 - **Classes (5):** head-on, crossing, overtaking, being overtaken, null.
-- **Behaviours (3):** `cv` constant velocity, `re` reactive, `nc` non-compliant.
+- **Behaviours (3):** `cv` constant velocity (`T-CV`), `re` compliant reactive (`T-RE`, the COLREGs-VO rule from the target's side), `nc` non-compliant (`T-NC2`, alters to port, in head-on; `T-NC1`, stands on when give-way, elsewhere). Suite 3.2 (A34) is the first in which `re` and `nc` targets actually manoeuvre; `T-NC1` moves like `T-CV`, so outside head-on `nc` differs only in the role the target should have taken.
 
 Each run records a **manifest digest** — a hash over every case together with
 the constants that generated them — so a table can be traced to the exact

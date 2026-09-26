@@ -14,6 +14,9 @@ selected on.
 Both supervisor modes: compliance is reported with it **off**, and with it
 **on** the intervention rate is its own column (claim C-7).
 
+Every Tier B row carries its test ID (`suite.test_id`, e.g. `CHW-CR-RE-07`); one
+test replays alone, with a trajectory figure, through `tools/tiers/run_test.py`.
+
     python tools/tiers/frozen_suite.py --model runs/ppo_formulation_seed0_bl2/best_model.zip \
         --tag ppos0_bl2 --supervisor both
 
@@ -102,7 +105,8 @@ def main() -> int:
         cells = suite.tier_b_cells()
         by_cell = [cells[int(b.case_id.split("-")[1])] for b in tier_b]
         jobs += [(b, TIER_B_SEED + i, "model", None,
-                  {"set": "tier_b", "case_id": b.case_id, "scenario": i,
+                  {"set": "tier_b", "case_id": b.case_id, "test_id": suite.test_id(b.case_id),
+                   "scenario": i,
                    "stratum": cell["stratum"], "behaviour": cell["behaviour"]})
                  for i, (b, cell) in enumerate(zip(tier_b, by_cell))]
 

@@ -5,6 +5,7 @@
 #
 #   bash results/baseline_campaign.sh          # start, or continue after a reboot
 #   touch runs/CAMPAIGN_STOP                   # stop cleanly after the current run
+#   touch runs/FROZEN_HOLD                     # train and run tier 1, but skip the frozen suite
 #
 # Safe to re-run at any time: a finished run (final_model.zip) is skipped, a run
 # with a checkpoint continues from it (--resume), and a run that died before its
@@ -17,6 +18,7 @@ cd "$(dirname "$0")/.."
 CONFIG=configs/baseline_v2.json
 LOG=results/baseline_campaign.log
 STOP=runs/CAMPAIGN_STOP
+FROZEN_HOLD=runs/FROZEN_HOLD
 CKPT=$(python -c "import json; print(json.load(open('$CONFIG'))['campaign']['checkpoint'])")
 TAG=$(python -c "import json; print(json.load(open('$CONFIG'))['campaign']['tag'])")
 mkdir -p results/tiers
@@ -25,8 +27,11 @@ note() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" | tee -a "$LOG"; }
 python src/baseline_config.py --check >> "$LOG" 2>&1 || { note "BASELINE CHECK FAILED"; exit 1; }
 note "== campaign start ($(python -c "import json; print(json.load(open('$CONFIG'))['formulation_digest'])"))"
 
-frozen() {  # $1 run dir, $2 tag -- the evaluation the paper reports (Tier A + Tier B)
+frozen() {  # $1 run dir, $2 tag -- the evaluation the paper reports (Tier B)
   local out=results/frozen_suite/$2
+  # A34 (F99): while runs/FROZEN_HOLD exists the frozen suite is skipped -- its
+  # reactive and non-compliant targets do not react yet.  Run it afterwards.
+  if [ -f "$FROZEN_HOLD" ]; then note "   frozen suite $2 held ($FROZEN_HOLD)"; return 0; fi
   [ -f "$out/summary.txt" ] && grep -q "^Frozen suite" "$out/summary.txt" 2>/dev/null && return 0
   python tools/tiers/frozen_suite.py --model "$1/$CKPT" --tag $2 --supervisor both     > "$out.log" 2>&1
   note "   frozen suite $2 exit $?"
