@@ -325,7 +325,7 @@ it is why a search is validated rather than trusted.
 | Set | Size | Use |
 |---|---|---|
 | Development set | 120 episodes (20 per class × 6), development namespace | checkpoint selection, diagnostics |
-| **Tier B — the frozen suite (default)** | **39 cells × 20 = 780 episodes** per seed, suite 3.2: basin, channel-wide (8.75–10 m), channel-intermediate (7.5–8.75 m) × 5 classes × 3 target behaviours | headline results, touched once per policy |
+| **Tier B — the frozen suite (default)** | **800 episodes** per seed, suite 3.4: 8 cells × 100 = 800 constant-velocity episodes, drawn like the development set (only positions differ) — every class in the basin, head-on / crossing / overtaking in 7.5–10 m channels — plus a robustness set of the same scenarios with reactive (700) and, in head-ons, non-compliant (200) targets | headline results, touched once per policy |
 | Tier A — **out of this paper** (your call, 2026-09-24) | 38 defined (35 realised), incl. basin cases and pre-committed expected failures | kept in the suite, runnable with `--tiers a`; no claim depends on it |
 | **Around the Clock** (O1) | 24 open-water + 24 channel cases × 10 seeds (`suite.around_the_clock`), reported as R8 | the one **externally defined** scenario set in the paper, after Imazu was dropped |
 

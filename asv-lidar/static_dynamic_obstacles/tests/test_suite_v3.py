@@ -63,35 +63,51 @@ def test_flagged_panels_are_placed_and_leave_a_route(tier_a, case_id):
 
 
 def test_tier_a_and_tier_b_seeds_are_disjoint():
-    b_hi = 48 * ste.TIER_B_SEEDS_PER_CELL
+    b_hi = len(ste.tier_b_cells()) * ste.TIER_B_SEEDS_PER_CELL
     assert ste.TIER_A_SEED_BASE >= b_hi
     top = ste.TIER_A_SEED_BASE + len(ste.tier_a()) * (ste.TIER_A_SEED_RETRIES + 1)
     lo, hi = cfg.SEED_NAMESPACES["frozen_eval"]
     assert top <= hi - lo + 1
 
 
-def test_suite_31_floors_tier_b_channels_at_seven_and_a_half_metres():
-    """Suite 3.1 (your call, 2026-09-23).  Below ~7.5 m a channel leaves a
-    two-vessel encounter no room a lawful manoeuvre can use, so Tier B stops
-    there and the 10 m basin carries the narrow-water case.  Pinned because the
-    change moves claims C-2/C-3 onto R4, and because the counts feed every
-    headline table."""
+def test_suite_34_holds_only_what_training_draws():
+    """Suite 3.4 (your call, 2026-09-27): the headline is the development set's
+    kind of scenario, drawn in the frozen namespace -- constant-velocity targets,
+    and class x geometry only where training draws it (every class in the basin,
+    `CHANNEL_CLASSES` in a channel), channels 7.5-10 m, 8 balanced cells of 100.
+    Pinned because the counts feed every headline table."""
     import suite as ste
-    # 3.2 (A34) changed only the target models, not the cells.
-    assert ste.TIER_B_MIN_WIDTH_M == 7.5 and ste.SUITE_REVISION == "3.2"
-    strata = ste.width_strata()
-    assert set(strata) == {"wide", "intermediate"}
-    assert min(lo for lo, _ in strata.values()) == 7.5
-    assert max(hi for _, hi in strata.values()) == 10.0
+    assert ste.SUITE_REVISION == "3.4" and ste.TIER_B_EPISODES == 100
+    assert ste.width_strata() == {"channel": (7.5, 10.0)}
     cells = ste.tier_b_cells()
-    assert len(cells) == 39 and sum(c["episodes"] for c in cells) == 780
-    assert {c["stratum"] for c in cells} == {"basin", "channel-wide", "channel-intermediate"}
-    # Tier A is unchanged: it is the extended set, not the default.
-    assert len(ste.tier_a()) == 38
+    assert len(cells) == 8 and sum(c["episodes"] for c in cells) == 800
+    assert {c["behaviour"] for c in cells} == {"cv"}
+    assert {c["class"] for c in cells if c["stratum"] == "basin"} == {
+        "head_on", "crossing", "overtaking", "being_overtaken", "null"}
+    assert {c["class"] for c in cells if c["stratum"] == "channel"} == set(cfg.CHANNEL_CLASSES)
+
+
+def test_robustness_variants_change_only_the_target_model():
+    """The robustness set reruns headline scenarios: reactive for every encounter
+    class, non-compliant only in head-on (T-NC1 would duplicate the headline)."""
+    import suite as ste
+    import targets as tgt
+    built, short = ste.build_tier_b(cells=[0, 3, 4])      # basin head-on, being overtaken, null
+    assert not short
+    variants = ste.robustness_variants(built)
+    kinds = {(v.encounter_class, b) for v, _, b in variants}
+    assert kinds == {("head_on", "re"), ("head_on", "nc"), ("being_overtaken", "re")}
+    for v, twin, b in variants:
+        base = built[twin]
+        assert v.target_behaviour == ste.target_model(b, base.encounter_class)
+        assert base.target_behaviour == tgt.T_CV
+        assert v.target_spawn == base.target_spawn and v.target_heading == base.target_heading
+        assert v.case_id == f"{base.case_id}-{b.upper()}"
+        assert ste.test_id(v.case_id) == ste.test_id(base.case_id).replace("-CV-", f"-{b.upper()}-")
 
 
 def test_every_tier_b_test_has_a_unique_id_that_resolves_back():
-    """Test IDs (2026-09-26) name a scenario for `run_test.py`.  All 780 must be
+    """Test IDs (2026-09-26) name a scenario for `run_test.py`.  All 800 must be
     distinct, and the ID, the case id and the index must all resolve to the
     same (cell, episode), or a replay would run a different test from the one
     asked for."""
@@ -100,18 +116,20 @@ def test_every_tier_b_test_has_a_unique_id_that_resolves_back():
     ids, index = set(), 0
     for c_index, cell in enumerate(cells):
         for n in range(cell["episodes"]):
-            case_id = f"B-{c_index:02d}-{n:02d}"
+            case_id = f"B-{c_index:02d}-{n:03d}"
             tid = ste.test_id(case_id)
             assert tid not in ids
             ids.add(tid)
-            assert ste.resolve_test(tid) == (c_index, n)
-            assert ste.resolve_test(case_id) == (c_index, n)
-            assert ste.resolve_test(str(index)) == (c_index, n)
+            assert ste.resolve_test(tid) == (c_index, n, "cv")
+            assert ste.resolve_test(case_id) == (c_index, n, "cv")
+            assert ste.resolve_test(str(index)) == (c_index, n, "cv")
             assert ste.tier_b_index(c_index, n) == index
             index += 1
-    assert len(ids) == 780
-    assert ste.test_id("B-00-00") == "BAS-HO-CV-01"
-    with pytest.raises(ValueError):
-        ste.resolve_test("BAS-HO-CV-21")
-    with pytest.raises(ValueError):
-        ste.resolve_test("780")
+    assert len(ids) == 800
+    assert ste.test_id("B-00-000") == "BAS-HO-CV-001"
+    assert ste.resolve_test("BAS-HO-NC-001") == (0, 0, "nc")
+    assert ste.resolve_test("CH-CR-RE-007") == (6, 6, "re")
+    assert ste.resolve_test("B-06-006-RE") == (6, 6, "re")
+    for bad in ("BAS-HO-CV-101", "800", "BAS-CR-NC-001", "BAS-NU-RE-001"):
+        with pytest.raises(ValueError):
+            ste.resolve_test(bad)

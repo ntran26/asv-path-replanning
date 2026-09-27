@@ -1,0 +1,10 @@
+code matches baseline-v2
+2026-09-27 06:30:53 == ppos0_bl2: frozen suite (Tier B, both supervisor modes)
+2026-09-27 06:51:52    exit 0
+2026-09-27 06:51:52 == recurrent_ppos0_bl2: frozen suite (Tier B, both supervisor modes)
+2026-09-27 07:14:10    exit 0
+2026-09-27 07:14:11 == sacs0_bl2: frozen suite (Tier B, both supervisor modes)
+2026-09-27 07:33:56    exit 0
+2026-09-27 07:33:57 == tqcs0_bl2: frozen suite (Tier B, both supervisor modes)
+2026-09-27 07:53:14    exit 0
+2026-09-27 07:53:14 == FROZEN SUITE DONE

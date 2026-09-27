@@ -23,7 +23,7 @@ safeguards), F96 (baseline-v2); `OPEN_PROBLEMS.md` A26 (the budget decisions).
 | Training output of a run | `runs/<learner>_formulation_seed<N>_bl2.log` |
 | Campaign event log | `results/baseline_campaign.log` |
 | Tier 1 of a finished run (development set, a diagnostic) | `results/tiers/tier1_<learner>s<N>_bl2_supervisor_{off,on}/summary.txt` |
-| **Frozen suite of a finished run (what the paper reports)** | `results/frozen_suite/<learner>s<N>_bl2/summary.txt` — **Tier B** (39 cells x 20 = 780 episodes, suite 3.1), supervisor off and on. Tier A is the **extended** set and runs only on request (`--tiers a,b`) |
+| **Frozen suite of a finished run (what the paper reports)** | `results/frozen_suite/<learner>s<N>_bl2/summary.txt` — **Tier B** (suite 3.4: 800-episode headline + 900-episode robustness set), supervisor off and on. Tier A is the **extended** set and runs only on request (`--tiers a,b`) |
 | TensorBoard curves | `runs/tensorboard/` |
 | Off-policy replay buffers (SAC/TQC only) | `PhD/asv_replay_buffers/<run>/` — **outside the repository**, latest only, deleted when the run finishes |
 

@@ -44,11 +44,12 @@ def test_tier_b_behaviour_cells_map_to_target_models():
         suite.target_model("re-x", "head_on")
 
 
-def test_suite_cells_are_built_with_recognised_models():
-    built, short = suite.build_tier_b(cells=[1, 2])        # basin head-on: re, nc
+def test_suite_scenarios_and_variants_use_recognised_models():
+    built, short = suite.build_tier_b(cells=[0])            # basin head-on
     assert not short
-    assert {b.target_behaviour for b in built} == {tgt.T_RE, tgt.T_NC2}
-    assert all(b.target_behaviour in tgt.BEHAVIOURS for b in built)
+    assert {b.target_behaviour for b in built} == {tgt.T_CV}
+    variants = suite.robustness_variants(built)
+    assert {v.target_behaviour for v, _, _ in variants} == {tgt.T_RE, tgt.T_NC2}
 
 
 def test_constant_velocity_and_stand_on_targets_never_turn():
