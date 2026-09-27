@@ -4,7 +4,9 @@
 count. This file records only what is *not settled*, ordered so the
 highest-leverage item is first.
 
-**Last updated:** 2026-09-26, revision 41 — your calls: A34 option (a), built (suite 3.2, `T-RE` on the COLREGs-VO rule, F100); A26 stays at 2 M; the recommended action on the rest (A32 option 4, A33 carried as a known limit, A10, A3/A4/A6 confirmed, freeze signed off). A35 opened: the COLREGs-VO comparator judges its side rule per candidate.
+**Last updated:** 2026-09-27, revision 43 — suite 3.4 (your calls): the frozen headline is the development set's kind of scenario (800 constant-velocity episodes, trained class x geometry only, channels 7.5–10 m), reactive and non-compliant targets in a separate robustness set; A36 closed (F102).
+Revision 42: 2026-09-27 — suite 3.3: every Tier B channel 10 m (your call), seed-0 frozen suite rerun; the channel being-overtaken failure is unchanged, so A36 opened (train being-overtaken and null in channels, or report them as untrained geometry) (F101).
+Revision 41: 2026-09-26 — your calls: A34 option (a), built (suite 3.2, `T-RE` on the COLREGs-VO rule, F100); A26 stays at 2 M; the recommended action on the rest (A32 option 4, A33 carried as a known limit, A10, A3/A4/A6 confirmed, freeze signed off). A35 opened: the COLREGs-VO comparator judges its side rule per candidate.
 Revision 40: 2026-09-26 — the frozen suite's reactive and non-compliant targets never react (F99); A34 opened; campaign held after TQC seed 0 for the fix; test IDs and a gallery for every frozen test.
 Revision 39: 2026-09-24 — documentation brought in line with the recent decisions (skeleton, ledger, tables, specs). Revision 38: TD3 dropped and 5 seeds → 3 (four learners × 3 seeds = 12 runs); final replay buffer kept so runs can be continued; evidence that 2 M may be short (F98).
 Revision 37: 2026-09-23 — suite 3.1: Tier B floored at 7.5 m and made the default frozen suite, Tier A the extended set; C3a done (comparators tuned, COLREGs-VO built); C-2/C-3 evidence moves to R4 (F97).
@@ -45,7 +47,7 @@ generator, the scale audit, noise and randomisation.
 
 | Part | Kind | Needs |
 |---|---|---|
-| **A** | Decisions | a call from you — **1 item (A35)**; A34, A32, A33, A26, A10, A3/A4/A6 and the freeze sign-off decided 2026-09-26 |
+| **A** | Decisions | a call from you — **1 item (A35)**; A36 closed by suite 3.4; A34, A32, A33, A26, A10, A3/A4/A6 and the freeze sign-off decided 2026-09-26 |
 | **B** | Measurements | basin time — `PART2_BASIN_PLAN.md`, with one addition proposed |
 | **C** | Build work | my time — 8 items |
 
@@ -118,6 +120,13 @@ Recommendation: 1 after run 9 reports, as run 10, so run 9 stays a single-change
 | 3. What `nc` means per class (your call) | **(a, recommended)** class-appropriate: head-on `T-NC2` (alters to port), and `T-NC1` (stands on when give-way) for crossing and being-overtaken, where the target is give-way at least from one side; overtaking has no give-way target, so `nc` there is constant velocity in effect. **(b)** `T-NC1` everywhere (simplest, but a stand-on `T-NC1` is compliant, so many `nc` cells equal `cv`). **(c)** add `T-NC3` (wrong side of the fairway at spawn) for channel head-on | the generator places no target on the wrong side today, so (c) is build work |
 
 Cost: none to training (D1 keeps training on `T-CV`); the frozen suite has not run on baseline-v2, so nothing is lost. After the fix: redraw the gallery, then `results/frozen_seed0.sh`, then the campaign's seeds 1–2.
+
+**A36 — being overtaken (and null) in a channel is untrained geometry (F101) — closed 2026-09-27 by suite 3.4 (your call): the frozen headline now holds only the class × geometry combinations training draws, so channel being-overtaken and null are no longer evaluated (F102).** The original statement follows. Training draws channels only for head-on, crossing and overtaking (`CHANNEL_CLASSES`, F74); being-overtaken and null are always basin, in training and in the development set. Tier B puts them in channels, and every learner but PPO drops there: goal rate in channel being-overtaken + null is PPO 0.89, TQC 0.74, RecurrentPPO 0.71, SAC 0.60, against 0.81–0.92 in the trained channel classes. Suite 3.3 (all channels 10 m) left it unchanged, so it is the training distribution, not width. The failures are mostly wall and obstacle contacts, not target hits.
+
+| Option | Change | Cost |
+|---|---|---|
+| **1. Report as untrained geometry (recommended for this paper)** | R1 split three ways: basin / channel, trained classes / channel being-overtaken + null, flagged as a generalisation result | none; it becomes a finding (off-policy learners generalise worse to an untrained layout) |
+| 2. Train it | add being-overtaken and null to `CHANNEL_CLASSES` in training and the development set | a formulation change: baseline-v3, all four learners retrained (~2 weeks here for seed 0, ~6 for three seeds) |
 
 **A35 — the COLREGs-VO comparator applies its side rule per candidate (found building A34, F100).** `colregs_vo._colregs_ok` decides whether the encounter is "live" (closing, DCPA < `SIDE_FREE_DCPA_M` = 2.5 m) **separately for each candidate velocity**. Any candidate that itself opens the pass beyond 2.5 m is exempt from "pass to starboard", so a quick turn to **port** in a head-on counts as compliant. Measured on a head-on 0.3 m off the reciprocal: the comparator as tuned picks 160° (port); judged on the encounter it picks 200° (starboard). Kuwata et al. apply the COLREGS constraint to an obstacle once the encounter is judged dangerous on the present velocities, then to every candidate — which is what `T-RE` now does (`side_live`).
 
@@ -835,6 +844,7 @@ settled.
 | ~~B6a~~ | claim ledger: C-2/C-3 evidence moves from Tier B to R4 | **signed off** | — | 2026-09-26 |
 | **A34** | frozen suite target behaviours | **decided** (option a), built: suite 3.2 | — | F99, F100 |
 | **A35** | COLREGs-VO comparator judges its side rule per candidate | **decision** | the COLREGs-VO row | recommend option 1 |
+| ~~A36~~ | being overtaken / null in a channel is untrained geometry | **closed**: suite 3.4 evaluates only trained combinations | — | F102 |
 | ~~C3a-old~~ | **comparator tuning**: parameters ported to `src/constant_temp.py` (single source, digest-safe); **tune on the development set after the campaign**, same score as the RL checkpoints (goal − 2 × collision), search reported, tuned values pinned with each result | build | a fair classical baseline (N2) | mine, ~2 h compute |
 | ~~A20~~ | freeze class and sense per engagement | **decided** (option 1) | — | built, F58 |
 | ~~A19~~ | classify against the path tangent | **decided** (option 1) | — | built, F56 (residual → A20) |

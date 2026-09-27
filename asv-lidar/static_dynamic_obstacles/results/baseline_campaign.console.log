@@ -1,1 +1,17 @@
 2026-09-26 15:12:50 == hand-over armed (suite 3.2): waiting for TQC seed 0 (PID 29780)
+2026-09-27 04:39:21 == tqc seed 0 finished (final_model.zip)
+2026-09-27 04:39:21    frozen gallery (suite 3.2)
+2026-09-27 04:48:51    frozen gallery exit 0 (780 figures)
+2026-09-27 04:48:52 == frozen suite on the seed-0 models (hold lifted)
+2026-09-27 04:49:56 == ppos0_bl2: frozen suite (Tier B, both supervisor modes)
+2026-09-27 05:09:45    exit 0
+2026-09-27 05:09:45 == recurrent_ppos0_bl2: frozen suite (Tier B, both supervisor modes)
+2026-09-27 05:31:36    exit 0
+2026-09-27 05:31:36 == sacs0_bl2: frozen suite (Tier B, both supervisor modes)
+2026-09-27 05:49:15    exit 0
+2026-09-27 05:49:15 == tqcs0_bl2: frozen suite (Tier B, both supervisor modes)
+2026-09-27 06:07:32    exit 0
+2026-09-27 06:07:32 == FROZEN SUITE DONE
+2026-09-27 06:07:32 == continuing the campaign: seeds 1-2
+2026-09-27 06:07:41 == campaign start (3d697858e95e5adf)
+2026-09-27 06:07:42 == stop file found, stopping before ppo seed 0

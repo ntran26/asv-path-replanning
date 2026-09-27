@@ -2965,6 +2965,78 @@ suite, classical, generator, basin, acceptance and baseline tests: 110 passed.
 (`results/continue_after_tqc.sh`) redraws the gallery, lifts `runs/FROZEN_HOLD`,
 runs the frozen suite on the four seed-0 models, then continues with seeds 1-2.
 
+**F101 -- suite 3.3: every Tier B channel is 10 m (your call, 2026-09-27); the
+seed-0 frozen suite rerun on it.**
+
+*The change.* One channel stratum at `TIER_B_CHANNEL_WIDTH_M` = 10 m replaces
+channel-wide (8.75-10 m) and channel-intermediate (7.5-8.75 m). Each channel cell
+carries 40 episodes, so Tier B stays **780 per seed** (basin 13 x 20, channel 13 x
+40) with the basin:channel share 1:2. Basin cells are untouched. Test IDs for the
+channel become `CH-<class>-<behaviour>-01..40`. **Decided after the seed-0 results
+on suite 3.2** (the stated reason: the 10 m basin is already narrow water for a
+1.7 m vessel); those results are kept in
+`results/frozen_suite/<tag>_suite32_superseded/`, so the change is on record. The
+channel builder's width profile still varies the recorded width (8.8-11.7 m,
+median 10.0) around the requested 10 m.
+
+*Reproducibility.* The 2,080 basin episodes (4 learners x 2 supervisor modes x
+260) are identical to suite 3.2's, outcome and step count -- same scenarios, same
+seeds, deterministic policies.
+
+*Headline, supervisor off (suite 3.3 | 3.2):* PPO 0.851 | 0.842, RecurrentPPO
+0.782 | 0.785, SAC 0.853 | 0.854, TQC 0.853 | 0.842. Supervisor on: 0.847, 0.782,
+0.854, 0.844. **Widening the channels to 10 m changes almost nothing** -- channel
+goal rates move by at most 0.015.
+
+*The channel being-overtaken failure is unchanged, so it was never the width.*
+Channel being-overtaken collision rate: SAC 0.533 (3.2: 0.525), RecurrentPPO 0.367
+(0.350), TQC 0.308 (0.442), PPO 0.117 (0.133) -- mostly boundary (0.15) and
+obstacle (0.11) contacts, not target hits (0.08). Goal rate in channel
+being-overtaken + null, the combinations training never draws (`CHANNEL_CLASSES`,
+F74): PPO 0.894, TQC 0.744, RecurrentPPO 0.712, SAC 0.600; in the trained channel
+classes: SAC 0.917, TQC 0.881, PPO 0.828, RecurrentPPO 0.808. The gap is the
+training distribution, not the geometry's width (A36).
+
+*Crossings* stay the main shared failure (channel collision 0.18-0.33), reactive
+targets cutting them from 0.42 (cv) to 0.10 (re).
+
+**F102 -- suite 3.4: the frozen headline is the development set's kind of scenario;
+reactive and non-compliant targets move to a robustness set (your calls, 2026-09-27).**
+
+*The change.* The headline is now a held-out draw of what the policies were trained
+and selected on -- only positions differ: constant-velocity targets (as in training,
+D1, and the development set); class x geometry only where training draws it (every
+class in the basin; head-on, crossing, overtaking in channels, `CHANNEL_CLASSES`);
+channel widths drawn as the development set draws them but floored at 7.5 m; 8
+balanced cells x 100 = **800 episodes per seed**. The **robustness set** (R3) reruns
+the same scenarios on the same episode seeds with a reactive target (every encounter
+class, 700) and a non-compliant one in head-ons (`T-NC2`, 200); `T-NC1` is not rerun
+because it moves exactly like `T-CV` and would duplicate the headline. Test IDs are
+3-digit (`CH-CR-CV-007`; its reactive twin `CH-CR-RE-007`). Tier B seed blocks
+widened to 1,000 a cell; `TIER_A_SEED_BASE` kept at 9,600 so Tier A is unchanged.
+Both suite 3.3 and 3.4 were decided after seeing seed-0 results; the 3.2 and 3.3
+results are kept (`results/frozen_suite/<tag>_suite3{2,3}_superseded/`). Closes A36.
+
+*Headline, seed 0, supervisor off (95% interval, n = 800) | on:*
+SAC **0.892** [0.869, 0.912] | 0.876; TQC **0.873** [0.848, 0.894] | 0.862;
+PPO 0.808 [0.779, 0.833] | 0.796; RecurrentPPO 0.736 [0.705, 0.766] | 0.736. The
+supervisor costs 0-0.016 and intervenes 0-0.05 times an episode. **Against the
+development set** (best checkpoint, the same five classes): SAC 0.89 vs 0.892, TQC
+0.90 vs 0.873, PPO 0.84 vs 0.808, RecurrentPPO 0.84 vs 0.736 -- the off-policy
+learners hold their development score; the on-policy ones fall 0.03 and 0.10 (the
+development set has 20 episodes a class, so its own spread is about +-0.08).
+
+*Where it fails.* **Crossings** carry most of it: goal 0.53 (PPO), 0.54
+(RecurrentPPO), 0.74 (SAC), 0.78 (TQC), target hits 0.30 pooled; on-policy learners
+also lose channels (PPO 0.74 channel vs 0.85 basin) and RecurrentPPO head-ons (0.68).
+Every other class is 0.78-0.98.
+
+*Robustness set.* A reactive target lifts crossings to 0.77-0.87 for every learner
+(24 % of crossings flip to a goal, 6 % the other way): the other vessel's alteration
+covers much of what the policies miss. Reactive head-ons 0.90-0.92; non-compliant
+head-ons (target alters to port) 0.87-0.98, no worse than constant velocity;
+being overtaken and overtaking barely change.
+
 ### 3.13 Earlier findings, still standing
 
 | # | Finding | Status |

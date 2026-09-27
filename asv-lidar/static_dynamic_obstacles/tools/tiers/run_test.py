@@ -1,20 +1,23 @@
 """Replay chosen frozen-suite (Tier B) tests, one episode each, with a figure.
 
-A test is named by its test ID (`CHW-CR-RE-07`), its case id (`B-17-06`) or its
-Tier B index (`346`); `results/frozen_gallery/index.csv` lists all 780 with a
-picture of each.  The episode is the one the frozen suite runs -- same scenario,
-same episode seed -- so a result here matches that test's row in
+A test is named by its test ID (`CH-CR-CV-007`; `CH-CR-RE-007` is the same
+scenario with a reactive target, from the robustness set), its case id
+(`B-06-006`, `B-06-006-RE`) or its headline index (`346`);
+`results/frozen_gallery/index.csv` lists every scenario with a picture of each.
+The episode is the one the frozen suite runs -- same scenario, same episode
+seed -- so a result here matches that test's row in
 `results/frozen_suite/<tag>/episodes.csv`.
 
-    python tools/tiers/run_test.py --model runs/sac_formulation_seed0_bl2/best_model.zip CHW-CR-RE-07
-    python tools/tiers/run_test.py --model runs/tqc_formulation_seed0_bl2/best_model.zip BAS-HO-NC-03 B-17-06 --supervisor on
-    python tools/tiers/run_test.py --policy colregs_vo CHI-CR-CV-11
+    python tools/tiers/run_test.py --model runs/sac_formulation_seed0_bl2/best_model.zip CH-CR-CV-007
+    python tools/tiers/run_test.py --model runs/tqc_formulation_seed0_bl2/best_model.zip BAS-HO-NC-003 B-06-006-RE --supervisor on
+    python tools/tiers/run_test.py --policy colregs_vo CH-CR-CV-031
 
 Writes `results/test_runs/<tag>/<test ID>_supervisor_<mode>.png` and appends
 the outcome to `results/test_runs/<tag>/runs.csv`.  Only the named tests'
 cells are generated, so a replay takes seconds, not the full build.
 """
 import argparse
+import copy
 import math
 import sys
 from pathlib import Path
@@ -86,7 +89,7 @@ def main() -> int:
 
     wanted = [(ref, *suite.resolve_test(ref)) for ref in args.tests]
     built_cells = {}
-    for c_index in sorted({c for _, c, _ in wanted}):
+    for c_index in sorted({c for _, c, _, _ in wanted}):
         scenarios, short = suite.build_tier_b(cells=[c_index])
         if short:
             raise SystemExit(f"cell {c_index} is short of its count -- indices would not match the suite")
@@ -107,11 +110,17 @@ def main() -> int:
     modes = ("off", "on") if args.supervisor == "both" else (args.supervisor,)
 
     rows = []
-    for _ref, c_index, n in wanted:
+    for _ref, c_index, n, behaviour in wanted:
         built = built_cells[c_index][n]
+        if behaviour != "cv":
+            # A robustness variant: the headline scenario, another target model,
+            # the same episode seed (`suite.robustness_variants`).
+            built = copy.deepcopy(built)
+            built.target_behaviour = suite.target_model(behaviour, built.encounter_class)
+            built.case_id = f"{built.case_id}-{behaviour.upper()}"
         tid = suite.test_id(built.case_id)
         index = suite.tier_b_index(c_index, n)
-        cell = suite.tier_b_cells()[c_index]
+        cell = dict(suite.tier_b_cells()[c_index], behaviour=behaviour)
         for mode in modes:
             env.estop_enabled = mode == "on"
             controller = make_controller(args.policy) if args.policy else None

@@ -1,0 +1,40 @@
+Frozen suite (ppos0_bl2) — model runs\ppo_formulation_seed0_bl2\best_model.zip
+1560 episodes, suite manifest 620e4682a69ca163, 1183 s
+
+== Tier B (headline, R1)
+-- by supervisor
+              n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+supervisor                                                                            
+off         780    0.842        0.094       0.064    1.249      2.676  -28.211    0.00
+on          780    0.832        0.095       0.073    1.257      2.678  -28.310    0.04
+
+-- by class (supervisor off)
+                   n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+class                                                                                      
+being_overtaken  180    0.883        0.017       0.100    0.960      2.297  -21.421     0.0
+crossing         180    0.628        0.328       0.044    1.137      2.213  -21.387     0.0
+head_on          180    0.950        0.033       0.017    1.142      2.606  -19.225     0.0
+null              60    0.883        0.000       0.117    1.236      8.568   -0.418     0.0
+overtaking       180    0.894        0.028       0.078    1.762      3.076  -60.075     0.0
+
+-- by stratum (supervisor off)
+                        n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+stratum                                                                                         
+basin                 260    0.858        0.108       0.035    1.099      2.454  -28.095     0.0
+channel-intermediate  260    0.800        0.100       0.100    1.238      2.661  -26.781     0.0
+channel-wide          260    0.869        0.073       0.058    1.411      2.841  -29.757     0.0
+
+-- by target behaviour (supervisor off)
+             n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+behaviour                                                                            
+cv         300    0.820        0.117       0.063    1.237      2.784  -27.533     0.0
+nc         240    0.808        0.133       0.058    1.263      2.785  -27.232     0.0
+re         240    0.904        0.025       0.071    1.250      2.598  -30.037     0.0
+
+-- crossings by side (supervisor off), the A32 split
+                n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+crossing_side                                                                           
+port           99    0.636        0.333       0.030    1.191      2.147  -10.477     0.0
+starboard      81    0.617        0.321       0.062    1.070      2.336  -34.721     0.0
+
+

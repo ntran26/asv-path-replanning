@@ -9,7 +9,7 @@ The frozen-suite counterpart of `devset_gallery.py`.  Writes `results/frozen_gal
   holds the leg at cruise, so a reactive or non-compliant target's manoeuvre
   shows up where its model makes it (time marks every 5 s on both tracks, both
   hulls at the nominal CPA);
-* `sheets/<cell>_<test-ID prefix>.png` -- the 20 tests of each cell on one page;
+* `sheets/<cell>_<test-ID prefix>.png` -- the tests of each cell (20 basin, 40 channel);
 * `index.csv` -- one row per test: test ID, case id, index, episode seed, cell,
   geometry, encounter parameters, and the nominal CPA;
 * `README.md` -- the composition, the ID scheme, and how to read a figure.
@@ -46,7 +46,8 @@ from frozen_suite import TIER_B_SEED  # noqa: E402
 
 OUT = ROOT / "results" / "frozen_gallery"
 COLOURS = {"nav": "#dfe9f5", "band": "#b9d3ee", "wall": "#555555", "panel": "#8c6d46",
-           "path": "#2b6cb0", "own": "#1f7a3f", "target": "#c0392b"}
+           "path": "#2b6cb0", "own": "#1f7a3f", "target": "#c0392b",
+           "re": "#e67e22", "nc": "#8e44ad"}
 MARK_EVERY_S = 5.0
 
 
@@ -101,7 +102,7 @@ def nominal_encounter(env) -> dict:
     return out
 
 
-def _draw(ax, tid, built, cell, env, nom, compact=False):
+def _draw(ax, tid, built, cell, env, nom, compact=False, variants=None):
     w, h = cfg.MAP_WIDTH, cfg.MAP_HEIGHT
     ax.add_patch(MplPolygon([(0, 0), (w, 0), (w, h), (0, h)], closed=True, fill=False,
                             ec=COLOURS["wall"], lw=1.2))
@@ -123,14 +124,14 @@ def _draw(ax, tid, built, cell, env, nom, compact=False):
             alpha=0.8, zorder=5)
     trk = nom["target"]
     if len(trk):
-        # The constant-velocity line first, faint: where a reactive or
-        # non-compliant target leaves it is its manoeuvre.
-        if cell["behaviour"] != "cv":
-            v = float(built.target_speed) * np.array([math.sin(math.radians(built.target_heading)),
-                                                      math.cos(math.radians(built.target_heading))])
-            end = np.array(trk[0, :2]) + v * nom["dt"] * (len(trk) - 1)
-            ax.plot([trk[0, 0], end[0]], [trk[0, 1], end[1]], color=COLOURS["target"],
-                    lw=0.8, ls=":", alpha=0.5)
+        # Suite 3.4's robustness variants of this scenario: the same target
+        # with the reactive (orange) and, in head-ons, the non-compliant
+        # (purple) model, against the same stand-on own ship.
+        for behaviour, vnom in (variants or {}).items():
+            vt = vnom["target"]
+            ax.plot(vt[:, 0], vt[:, 1], color=COLOURS[behaviour], lw=1.1, ls="--", zorder=4)
+            ax.plot(vt[::every, 0], vt[::every, 1], "o", color=COLOURS[behaviour],
+                    ms=1.8 if compact else 2.4, zorder=5)
         ax.plot(trk[:, 0], trk[:, 1], color=COLOURS["target"], lw=1.3, zorder=4)
         ax.plot(trk[::every, 0], trk[::every, 1], "o", color=COLOURS["target"],
                 ms=2.2 if compact else 3, zorder=5)
@@ -157,10 +158,25 @@ def _draw(ax, tid, built, cell, env, nom, compact=False):
     if compact:
         ax.set_title(f"{tid}\n{geo}, {len(env.obstacles)}p{enc}", fontsize=6.5, loc="left")
         return
-    turned = f", target turns {nom['turned_deg']:.0f} deg" if nom["turned_deg"] > 1.0 else ""
+    turned = "".join(f"\n{b.upper()}: turns {v['turned_deg']:.0f} deg, CPA {v['cpa_range']:.1f} m"
+                     for b, v in (variants or {}).items())
     ax.set_title(f"{tid} ({built.case_id}, #{suite.tier_b_index(*_cell_n(built.case_id))})\n"
                  f"{cell['class']} | {cell['behaviour']} | {geo} | {len(env.obstacles)} panels{enc}{turned}",
                  fontsize=8, loc="left")
+
+
+def _variant_tracks(env, built, index):
+    """Nominal tracks of this scenario's robustness variants (suite 3.4), each on
+    the headline's episode seed, so only the target model differs."""
+    out = {}
+    for behaviour, classes in suite.ROBUST_BEHAVIOURS.items():
+        if built.encounter_class not in classes:
+            continue
+        variant = copy.deepcopy(built)
+        variant.target_behaviour = suite.target_model(behaviour, built.encounter_class)
+        env.reset(seed=TIER_B_SEED + index, options={"generated": variant})
+        out[behaviour] = nominal_encounter(env)
+    return out
 
 
 def _cell_n(case_id):
@@ -182,10 +198,11 @@ def main():
             raise SystemExit(f"{built.case_id}: index {i} != tier_b_index -- a cell fell short")
         cell = cells[c_index]
         tid = suite.test_id(built.case_id)
+        variants = _variant_tracks(env, built, i)
         env.reset(seed=TIER_B_SEED + i, options={"generated": built})
         nom = nominal_encounter(env)
         fig, ax = plt.subplots(figsize=(4.2, 9.0))
-        _draw(ax, tid, built, cell, env, nom)
+        _draw(ax, tid, built, cell, env, nom, variants=variants)
         fig.tight_layout()
         fig.savefig(OUT / "scenarios" / f"{tid}.png", dpi=110)
         plt.close(fig)
@@ -204,19 +221,23 @@ def main():
                      "target_behaviour_field": built.target_behaviour,
                      "nominal_cpa_m": round(nom["cpa_range"], 2),
                      "nominal_cpa_t_s": round(nom.get("cpa_t", float("nan")), 1),
-                     "target_turned_deg": round(nom["turned_deg"], 1)})
+                     "target_turned_deg": round(nom["turned_deg"], 1),
+                     **{f"{b}_{k}": round(v[key], 2) for b, v in variants.items()
+                        for k, key in (("cpa_m", "cpa_range"), ("turned_deg", "turned_deg"))}})
         if (i + 1) % 60 == 0:
             print(f"{i + 1}/{len(tier_b)}", flush=True)
 
     for c_index, items in by_cell.items():
         cell = cells[c_index]
-        fig, axes = plt.subplots(2, 10, figsize=(22, 13))
+        n_rows = -(-len(items) // 10)
+        fig, axes = plt.subplots(n_rows, 10, figsize=(22, 6.5 * n_rows))
         for ax in axes.ravel():
             ax.axis("off")
         for ax, (tid, built, i) in zip(axes.ravel(), items):
             ax.axis("on")
+            variants = _variant_tracks(env, built, i)
             env.reset(seed=TIER_B_SEED + i, options={"generated": built})
-            _draw(ax, tid, built, cell, env, nominal_encounter(env), compact=True)
+            _draw(ax, tid, built, cell, env, nominal_encounter(env), compact=True, variants=variants)
         prefix = items[0][0].rsplit("-", 1)[0]
         fig.suptitle(f"Frozen suite, Tier B cell {c_index:02d} ({prefix}): {cell['stratum']}, "
                      f"{cell['class']}, target behaviour {cell['behaviour']}.   Title: test ID; geometry, "
@@ -229,9 +250,8 @@ def main():
     d = pd.DataFrame(rows)
     d.to_csv(OUT / "index.csv", index=False)
     comp = d.groupby(["stratum", "class"]).size().unstack(fill_value=0)
-    behav = d.groupby(["class", "behaviour"]).size().unstack(fill_value=0)
-    turned = d[d.behaviour != "cv"].groupby("behaviour").target_turned_deg.apply(lambda x: (x > 1).mean())
-    unknown = {b for b in d.target_behaviour_field.unique() if b not in tgt.BEHAVIOURS and b != "cv"}
+    turned = {b: float((d[f"{b}_turned_deg"].dropna() > 1.0).mean())
+              for b in suite.ROBUST_BEHAVIOURS if f"{b}_turned_deg" in d}
     readme = f"""# Frozen suite gallery (Tier B, suite {suite.SUITE_REVISION})
 
 The {len(d)} scenarios of the default frozen suite, each under its test ID.  The static
@@ -240,17 +260,17 @@ panels are the ones the environment realises for that test's episode seed
 
 ## Test IDs
 
-`<stratum>-<class>-<behaviour>-<nn>`, nn = 01-20 within the cell.
+`<stratum>-<class>-<behaviour>-<nn>`, nn counted from 01 within the cell.
 
 | Part | Codes |
 |---|---|
-| stratum | BAS basin, CHW channel 8.75-10 m, CHI channel 7.5-8.75 m |
+| stratum | BAS basin (01-20), CH channel 10 m (01-40) |
 | class | HO head-on, CR crossing, OT overtaking, BO being overtaken, NU null |
 | behaviour | CV constant velocity, RE reactive, NC non-compliant (null: CV only) |
 
 Replay one or more with a policy (seconds each):
 
-    python tools/tiers/run_test.py --model runs/sac_formulation_seed0_bl2/best_model.zip CHW-CR-RE-07
+    python tools/tiers/run_test.py --model runs/sac_formulation_seed0_bl2/best_model.zip CH-CR-RE-07
     python tools/tiers/run_test.py --policy colregs_vo BAS-HO-NC-03 --supervisor both
 
 The case id (`B-cc-nn`, cell and episode from 00) and the index (0-{len(d) - 1}) are accepted too.
@@ -259,14 +279,15 @@ The case id (`B-cc-nn`, cell and episode from 00) and the index (0-{len(d) - 1})
 
 {_md(comp)}
 
-{_md(behav)}
+The headline is constant-velocity only, like the development set; the robustness set
+reruns the same scenarios with a reactive target (every encounter class) and, in head-ons,
+a non-compliant one (`CH-CR-RE-007` is `CH-CR-CV-007` with a reactive target).
 
-## Target behaviour as realised
+## Robustness variants as realised
 
-Share of reactive / non-compliant tests whose target heading changes by more than 1 deg
-against a stand-on own ship: {', '.join(f'{k} {v:.0%}' for k, v in turned.items())} (the corridor
-clamp alone can turn a confined target a few degrees).
-{'**The behaviour models are not active.** The suite stores the behaviour as `' + "`, `".join(sorted(unknown)) + '`, which the target model does not recognise (it reacts only to `T-RE` / `T-NC1..3`), so those targets move at constant velocity. See the frozen-suite fix.' if unknown else 'Every stored behaviour is one the target model recognises.'}
+Share of variants whose target heading changes by more than 1 deg against a stand-on own
+ship: {', '.join(f'{k} {v:.0%}' for k, v in turned.items())} (a reactive target that is the
+stand-on vessel, or already passing clear, holds its course).
 
 ## Reading a figure
 
@@ -274,13 +295,14 @@ clamp alone can turn a confined target a few degrees).
 - Darker blue strip (basin head-on only): the band head-on traffic keeps to.
 - Dashed blue: reference leg; green dot: start; gold star: goal; green hull: own ship at spawn.
 - Green dots: the own ship holding the leg at cruise ({cfg.U_NOM:g} m/s), every {MARK_EVERY_S:g} s.
-- Red hull and line: the target at spawn and its track against that own ship, dots every
-  {MARK_EVERY_S:g} s (same instants as the green dots). Faint dotted red (RE/NC only): the
-  constant-velocity line, so a manoeuvre shows as the track leaving it.
+- Red hull and line: the target at spawn and its constant-velocity track against that own
+  ship (the headline), dots every {MARK_EVERY_S:g} s (same instants as the green dots).
+- Orange dashed: the same target with the reactive model (robustness set); purple dashed
+  (head-on only): with the non-compliant model, which alters to port.
 - Dashed outlines joined by a black line: both hulls at the nominal CPA.
 - Brown squares: static panels.
-- Title: test ID (case id, index); class | behaviour | geometry | panels; crossing side, drawn
-  DCPA / TCPA / speed ratio; nominal CPA range.
+- Title: test ID (case id, index); class | geometry | panels; crossing side, drawn
+  DCPA / TCPA / speed ratio; nominal CPA range; the variants' turn and CPA.
 
 Sheets (`sheets/`) show one cell each.  Regenerate with `python tools/diagnostics/frozen_gallery.py`.
 """

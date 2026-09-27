@@ -14,7 +14,7 @@ behaviour is reported descriptively, per seed.
 Learners: PPO, RecurrentPPO, SAC and TQC, 3 seeds each (**TD3 dropped 2026-09-24**). TQC is the distributional arm (04a §8.2). PPO is also the development vehicle for the reward; only its frozen-suite runs are reported.
 The CODEX reference controller is a supplementary comparator, not one of the pre-registered three.
 
-## R1 — Tier B holdout (39 cells × 20 = **780 episodes per seed**, suite 3.2)
+## R1 — Tier B holdout (**800 constant-velocity episodes per seed**, suite 3.4: 8 cells × 100, drawn like the development set)
 
 | Method | Success | Static coll. | Boundary coll. | Target coll. | RMS CTE (m) | Path ratio | Intervention rate (supervisor on) |
 |---|---|---|---|---|---|---|---|
@@ -36,9 +36,11 @@ The CODEX reference controller is a supplementary comparator, not one of the pre
 | Method | Head-on | Crossing (stbd) | Crossing (port) | Overtaking | Being overtaken |
 |---|---|---|---|---|---|
 
-## R3 — by target behaviour
+## R3 — by target behaviour (the robustness set, suite 3.4)
 
-Behaviours as realised in suite 3.2 (A34): `cv` constant velocity (`T-CV`), `re` compliant reactive (`T-RE`, the COLREGs-VO rule from the target's side), `nc` non-compliant (`T-NC2`, alters to port, in head-on; `T-NC1`, stands on when give-way, elsewhere). `T-NC1` moves like `T-CV`; outside head-on the `nc` rows measure the case where the target should have given way and did not.
+The headline's scenarios and seeds again with a reactive target (every encounter class, 700) and a non-compliant one (head-on, 200), each paired with its constant-velocity twin.
+
+Behaviours as realised since suite 3.2 (A34): `cv` constant velocity (`T-CV`), `re` compliant reactive (`T-RE`, the COLREGs-VO rule from the target's side), `nc` non-compliant (`T-NC2`, alters to port, in head-on; `T-NC1`, stands on when give-way, elsewhere). `T-NC1` moves like `T-CV`; outside head-on the `nc` rows measure the case where the target should have given way and did not.
 
 | Method | Constant velocity | Compliant reactive | Non-compliant |
 |---|---|---|---|

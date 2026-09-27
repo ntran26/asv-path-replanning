@@ -184,7 +184,7 @@ target and obstacle costs raycasting and collision work.
 | | Training | Development ("validation") | Frozen suite ("test") |
 |---|---|---|---|
 | Seeds | `training` | `development` | `frozen_eval` |
-| Size | unbounded — a fresh draw every episode | **120** (20 per class × 6) | **780** (39 cells × 20) |
+| Size | unbounded — a fresh draw every episode | **120** (20 per class × 6) | **800** (8 cells × 100) + robustness set 900 |
 | Sampling | curriculum stage of the moment | stage 5, fixed list | stratified cells |
 | Used for | gradient updates | **checkpoint selection** and all diagnostics | the paper's tables |
 | Seen how often | continuously | every 200 k steps | **once per policy** |
@@ -207,11 +207,11 @@ ignored.
 
 ### 5.2 Frozen suite — the evidence
 
-**Tier B, suite 3.2**: 39 cells × 20 episodes = 780 per seed. A cell is
+**Tier B, suite 3.4**: the development set's kind of scenario in the frozen namespace — 8 cells × 100 = 800 constant-velocity episodes per seed — plus a robustness set (the same scenarios with reactive and, in head-ons, non-compliant targets). A cell is
 
 $$\text{cell} = (\text{geometry stratum}) \times (\text{encounter class}) \times (\text{target behaviour})$$
 
-- **Strata (3):** basin; channel-wide 8.75–10 m; channel-intermediate 7.5–8.75 m.
+- **Strata (2):** basin (all five classes); channel, 7.5–10 m, for head-on, crossing and overtaking only — the combinations training draws (suite 3.4).
   Channels stop at 7.5 m because below that a two-vessel encounter has no room a
   lawful manoeuvre can use.
 - **Classes (5):** head-on, crossing, overtaking, being overtaken, null.
