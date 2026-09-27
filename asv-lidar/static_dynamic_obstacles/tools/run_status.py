@@ -1,6 +1,11 @@
-"""Where the baseline campaign stands (A26): one line per learner x seed.
+"""Where the baseline runs stand: one line per planned learner x seed (A26).
 
-    python tools/campaign_status.py
+    python tools/run_status.py
+
+Runs are trained on demand, one at a time (`bash results/train_seed.sh <algo>
+<seed>`); this lists which are done, which were started and stopped part-way
+(with the last checkpoint), which are not started, each run's best
+development-set score, and whether its frozen suite has been run.
 """
 import json
 import re
@@ -44,15 +49,18 @@ def main() -> int:
             if (run / "final_model.zip").exists():
                 state, done = "done", done + 1
             elif run.exists():
-                state = f"training {_steps(run, algo) / total:5.1%}"
+                # Started: either training now or stopped; the log's last
+                # step count says how far it got either way.
+                state = f"started {_steps(run, algo) / total:5.1%}"
             else:
-                state = "pending"
-            rows.append(f"  {algo:<14} seed {seed}  {state:<16} {best}")
-    stop = " (stop file present: the campaign halts after the current run)" \
-        if (RUNS / "CAMPAIGN_STOP").exists() else ""
-    print(f"{config['id']} campaign: {done} of {len(rows)} runs done{stop}")
+                state = "not started"
+            tag = config["campaign"].get("tag", "bl2")
+            frozen = ROOT / "results" / "frozen_suite" / f"{algo}s{seed}_{tag}" / "summary.txt"
+            evaluated = "frozen suite done" if frozen.exists() else ""
+            rows.append(f"  {algo:<14} seed {seed}  {state:<16} {best:<28} {evaluated}")
+    print(f"{config['id']}: {done} of {len(rows)} planned runs done")
     print("\n".join(rows))
-    log = ROOT / "results" / "baseline_campaign.log"
+    log = ROOT / "results" / "train_seed.log"
     if log.exists():
         print("\nlast log lines:\n  " + "\n  ".join(log.read_text().splitlines()[-4:]))
     return 0

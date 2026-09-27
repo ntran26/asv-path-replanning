@@ -3021,9 +3021,10 @@ results are kept (`results/frozen_suite/<tag>_suite3{2,3}_superseded/`). Closes 
 SAC **0.892** [0.869, 0.912] | 0.876; TQC **0.873** [0.848, 0.894] | 0.862;
 PPO 0.808 [0.779, 0.833] | 0.796; RecurrentPPO 0.736 [0.705, 0.766] | 0.736. The
 supervisor costs 0-0.016 and intervenes 0-0.05 times an episode. **Against the
-development set** (best checkpoint, the same five classes): SAC 0.89 vs 0.892, TQC
+development set** (best checkpoint, the same five classes): SAC 0.91 vs 0.892, TQC
 0.90 vs 0.873, PPO 0.84 vs 0.808, RecurrentPPO 0.84 vs 0.736 -- the off-policy
-learners hold their development score; the on-policy ones fall 0.03 and 0.10 (the
+learners stay within 0.02-0.03 of their development score (SAC's log holds two
+evaluations at 2.0 M, 0.88 and 0.92; `best_model.zip` is the second); the on-policy ones fall 0.03 and 0.10 (the
 development set has 20 episodes a class, so its own spread is about +-0.08).
 
 *Where it fails.* **Crossings** carry most of it: goal 0.53 (PPO), 0.54
@@ -3036,6 +3037,24 @@ Every other class is 0.78-0.98.
 covers much of what the policies miss. Reactive head-ons 0.90-0.92; non-compliant
 head-ons (target alters to port) 0.87-0.98, no worse than constant velocity;
 being overtaken and overtaking barely change.
+
+**F103 -- the campaign mechanism is removed; runs are trained on demand (your call,
+2026-09-27).**
+
+`results/baseline_campaign.sh` (which chained the twelve runs), the one-off
+hand-over `results/continue_after_tqc.sh`, the SAC buffer watcher
+`results/keep_sac_buffer.sh` and the `runs/CAMPAIGN_STOP` / `runs/FROZEN_HOLD`
+hold files are gone. **`bash results/train_seed.sh <learner> <seed>`** trains one
+run (or resumes it, or skips a finished one), then runs its Tier 1 and frozen
+suite -- what the campaign did per run -- logging to `results/train_seed.log`.
+`tools/campaign_status.py` is now `tools/run_status.py` (planned runs: done /
+started / not started, best development score, frozen suite done).
+`configs/baseline_v2.json` keeps its `campaign` block: it is the study plan (four
+learners x seeds 0-2, tag, checkpoint rule), which the gate, the status tool and
+the script read, not a scheduler. All results are kept, and
+`results/baseline_campaign.log` stays as the seed-0 record. Done: seed 0 of all
+four learners; to do: seeds 1-2 (8 runs), plus TQC seed 0's Tier 1
+(`bash results/train_seed.sh tqc 0`).
 
 ### 3.13 Earlier findings, still standing
 
