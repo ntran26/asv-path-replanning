@@ -3056,6 +3056,182 @@ the script read, not a scheduler. All results are kept, and
 four learners; to do: seeds 1-2 (8 runs), plus TQC seed 0's Tier 1
 (`bash results/train_seed.sh tqc 0`).
 
+**F104 -- the Paper 2 deployment-layout set: a separate evaluation set (your call,
+2026-09-27).**
+
+*Layouts.* The three static-obstacle layouts of the published Paper 2 field
+trials (Tran et al., *Drones* 10(9), 680, Fig. 8), measured from the
+full-resolution figure (calibrated on each panel's 10 x 25 m boundary, +-0.02 m):
+L1 straight (5,2)->(5,22), panels (5.0, 8.0), (7.2, 15.7), (2.0, 16.5); L2
+(3,2)->(8,22), panels (2.0, 8.5), (7.2, 9.3), (6.0, 17.0); L3 (7,2)->(2,22),
+panels (1.5, 8.5), (6.5, 8.5), (5.0, 17.0); 1 m squares. **Neither code copy of
+Paper 2's `test_run.py` matches the published figure for scenarios 2 and 3**
+(`field_deployment/test_run.py` holds an earlier set; `static_obstacles/test_run.py`
+has case 2's left panel at x = 1.5 and case 3's at (6.0, 9.3), (5.5, 17.0)); the
+published figure is taken as the record, and the read-only Paper 2 folder is
+left as it is. L2 and L3's goals (x = 8, x = 2) are 0.5 m nearer the walls than
+training's basin legs, at the same 14 deg slant.
+
+*Composition* (`src/paper2_set.py`, revision 1.0): no target, each layout as
+flown on 10 episode seeds (30); with a target, head-on, crossing from port and
+from starboard, overtaking, being overtaken, 20 scenarios per layout (300), each
+run as **FIX** (constant velocity) and **VAR** (the same target on the same seed,
+one speed change on the approach: `targets.T_VS`, new, evaluation only, to
+0.5-0.8x or 1.25-1.5x at 0.05 m/s^2, `constant_temp.TARGET_VS_*`) -- 630 episodes
+per supervisor mode. A target whose nominal track would pass within 0.3 m of a
+panel is redrawn (targets are not steered around panels); cells need 35-72 of
+their 500 seeds. Generator seeds from 310,000 (a gap no namespace uses), episode
+seeds from 470,000.
+
+*Hooks, none of which touches the formulation* (`baseline_config.py --check`:
+code matches baseline-v2): a generated scenario's `fixed_obstacles` flag replaces
+the drawn panels in `env._load_generated`; a `speed_profile` flag reaches the
+target as `Target.speed_profile`; `nominal_encounter` moved to `src/nominal.py`.
+Training sets neither flag.
+
+*Tools.* `tools/tiers/paper2_suite.py --model ... --tag ...` runs the set
+(`results/paper2_set/<tag>/`, with a VAR-against-FIX paired table);
+`tools/tiers/run_test.py` replays set IDs (`P2-L2-CRP-VAR-07`, `P2-L1-NT-01`);
+`tools/diagnostics/paper2_gallery.py` draws it (`results/paper2_gallery/`, FIX
+and VAR tracks on one figure). Tests: `tests/test_paper2_set.py` (8). Not yet run
+on any policy.
+
+*Revision 2.0 -- field feasible (your call, same day).* Every target scenario is
+now one a second, Bluefin-class vessel can sail in the basin
+(`constant_temp.FIELD_*`): the target's hull starts at least 0.5 m inside the
+walls; it holds one heading (a nominal track the lane clamp would bend by more
+than 1 deg is redrawn), so the operator only holds course and, for VAR, changes
+speed once at a stated time; it **stops short of the wall**
+(`targets.Target.stop_box`, passed as the `target_stop_box` flag), as the boat
+would be stopped in the field, and the encounter must be over 3 s before it does;
+its speed and the VAR final speed lie in 0.20-1.10 m/s (the Bluefin cruises at
+1.116 m/s at 12 rpm-units; TODO(field): confirm for the vessel used). All 15
+cells still realise their 20 scenarios, needing 43-214 of 2,000 seeds a cell
+(target speeds 0.22-1.08 m/s). `paper2_set.field_sheet()` -- written as
+`field_sheet.csv` by the runner and the gallery -- gives each run's set-up: target
+start, heading to hold, speed, and when to change speed and to what (seconds after
+the own ship passes its t = 0 point at cruise). Tests: 11. *Field protocol:* the
+simulated own ship starts at cruise, so in the field it runs up and the target is
+released as it passes `own_at_t0` -- the published start, except being overtaken,
+where the generator starts the own ship further along the leg (e.g. (4.67, 8.7) on
+L2) to leave the faster target room astern.
+
+**F105 -- the Paper 2 deployment-layout set on the four seed-0 models (2026-09-27).**
+
+630 episodes per supervisor mode per model (`results/paper2_set/<learner>s0_bl2/`,
+manifest 67311d20). Goal rate, supervisor off (on within 0.015 of it):
+
+| | overall | no target (30) | with a target (600) | frozen headline, same checkpoint |
+|---|---|---|---|---|
+| PPO | 0.522 | 1.00 | 0.50 | 0.808 |
+| RecurrentPPO | 0.429 | 0.97 | 0.40 | 0.736 |
+| SAC | 0.451 | 0.93 | 0.43 | 0.892 |
+| TQC | 0.337 | 0.77 | 0.32 | 0.872 |
+
+*Without a target* the published layouts are solved (PPO 30/30), except TQC on L2
+(4/10, six panel contacts) and one to two contacts for SAC and RecurrentPPO on L1.
+*With a target* every learner falls to 0.32-0.50, the failures split between
+panels (0.20-0.44 by encounter) and the target (0.08-0.39); head-on is worst
+(0.20-0.40), overtaking best (0.50-0.65). **The cause is the geometry training
+avoids**: the generator keeps +-0.4 T_0 of own travel around the CPA clear of
+panels (`OBSTACLE_CPA_GUARD_FRAC`, 04a Sec. 3.6), while in these layouts 90 % of
+nominal CPAs fall within 3 m of a panel -- goal 0.39 there against 0.60 at 3-5 m.
+The set tests a static-plus-dynamic squeeze the policies were never trained on.
+*Varying speed* makes no difference (FIX 0.410, VAR 0.411 pooled; 6 % of pairs lost,
+6 % gained). The learner ranking inverts relative to the frozen headline: PPO
+best, TQC worst.
+
+**F106 -- the field fine-tune: 2 M -> 3 M with Paper 2-style layouts mixed in (your
+call, 2026-09-27; SAC seed 0 first).**
+
+*Goal.* The deployed policy should pass the Paper 2 deployment-layout set -- at
+least every no-target run and every constant-velocity target -- without
+retraining from scratch. F105 traced its failures to encounters beside panels,
+which training never produces (the CPA guard).
+
+*Method* (`src/finetune_field.py`, spec `configs/finetune_field_v1.json`). Load
+the run's 2 M `final_model.zip`, `final_vecnormalize.pkl` and (SAC/TQC) 2 M replay
+buffer -- so the old distribution keeps being rehearsed -- and train 1 M more steps
+on stage-5 scenarios, **half of them field layouts** (`src/field_training.py`,
+revision 1.0): a Paper 2 leg (x in [2, 8], at most 14.1 deg) with three 1 m panels
+arranged as the published scenarios are (gate+onpath / slalom / side+onpath,
+jittered, A*-feasible), no target 20 %, otherwise HO/CRP/CRS/OT/BO **with the
+panels fixed -- no CPA guard** -- under the deployment set's field rules, and a
+quarter of targets varying speed once. Into a new run folder
+(`runs/<run>_ftfield1/`); the source run is untouched. The base code must still
+match baseline-v2 (checked at start; the hook `env.set_field_mix` is 0 in every
+baseline run).
+
+*Fairness.* Training and validation draw from the same family, from disjoint
+seeds (training namespace; validation 350,000+); any layout within 0.75 m of a
+deployment layout (both leg ends and all three panels) is redrawn, so the test
+set stays unseen. Selection: best goal - 2 x collision over the development set
+(120) plus a field validation set (155: 30 no-target, 25 each of HO, CRP, CRS, OT,
+BO at constant velocity), supervisor off; the 2 M model is evaluated first and
+kept if nothing beats it -- so a regression on the development set costs the
+fine-tune its selection. Evaluations every 100 k.
+
+*Test.* `results/finetune_field.sh <algo> <seed>` runs the fine-tune, then the
+Paper 2 set and the frozen suite (suite 3.4) on the new best model. Tests:
+`tests/test_field_training.py` (4). SAC seed 0 launched 2026-09-27 17:56;
+~21 h expected at SAC's rate.
+
+**F107 -- the field fine-tune switched to v2; baseline-v3 prepared; every Paper 2
+test case is solvable (2026-09-28).**
+
+*v1 plateaued, v2 took over (your rule).* v1's field validation score went 0.48
+(2 M) -> 0.54 (2.1 M) -> 0.54 / 0.52 / 0.52 (2.2-2.4 M), dev 0.91-0.94; SAC's
+entropy coefficient had decayed to 0.0025. At 2.4 M (field 0.52, not above 0.54)
+the watcher stopped v1 (04:12) and started **finetune-field-v2**
+(`configs/finetune_field_v2.json`) from v1's best checkpoint (2.1 M) and its
+replay buffer, to 3 M: field share 0.8, encounters weighted by failure rate (HO,
+BO, CRS most; no-target kept ~15 %), an entropy boost for 200 k steps
+(coefficient 0.01, target -1 instead of -2), and field scenarios generated in a
+background thread per worker, removing the ~2 s reset stall that cost v1 a
+quarter of its speed.
+
+*Every Paper 2 test case is solvable.* A space-time reachability check
+(`src/feasibility_st.py`: the own ship at up to 1.1 m/s, waiting allowed, on
+F74's inflated grid, kept 1.3 m from the target's centre at every 0.5 s) finds
+all 630 deployment-set cases solvable (`results/paper2_set/solvability.csv`), so
+every failure there is the policy's, and "pass them all" is attainable.
+
+*baseline-v3, prepared, not trained* (`src/formulation_v3.py`,
+`configs/baseline_v3.json`, formulation c0f6d1e806144f09). An overlay on
+baseline-v2 -- reward, observation, vessel model, learners and stages 1-4
+unchanged, `constants.py` untouched, so baseline-v2's digest and check hold
+(both configs check in their own processes). Budget 2.5 M, so stages 1-5 keep
+v2's step counts: stage 5 (1.0 M) weights clutter toward 3 panels; **stage 6**
+(1.5 M) halves the CPA guard and draws 25 % field layouts with constant-velocity
+targets; **stage 7** (2.0 M) turns the guard off, 45 % field layouts, 30 % of
+their targets varying speed. From stage 6 **every target episode must pass the
+space-time check** (drawn episodes and field layouts alike are redrawn until
+they do), on top of F74's A* route, so no training episode is impossible.
+Selection uses v2's development set plus a v3 field development set (150: 20
+no-target, and per encounter 20 constant-velocity + 6 varying-speed, all
+solvable; seeds 360,000+). Train with `python src/train_formulation.py --config
+configs/baseline_v3.json --algo sac --seed 0 --tag bl3`. The frozen suite would
+need restating for v3 (its field squeezes are then trained); not done.
+
+*Revision 3.1 -- near-deployment layouts* (your call: three-panel cases should
+include settings unlike the field and some similar to it).  The field family
+rarely lands near a deployment layout (0.4 % of 3,000 draws within 1.5 m; median
+4.1 m), and the generator's clutter supplies the unlike settings.  So 30 % of
+v3's field layouts in stages 6-7 are now *near-deployment* layouts
+(`field_training.sample_near_layout`): one of the three deployment layouts with
+every panel moved 0.4-1.5 m and each leg end up to 0.75 m, 1-1.5 m from it
+overall and never a near-duplicate, so the tested layouts stay unseen.  The v3
+field development set takes 3 in 10 of each block as near layouts (45 of 150)
+from its own seeds, so they differ from training's.  Off by default: v1/v2's
+draws and random streams are unchanged.  Formulation 03a9c0c22f53ee0b
+(`configs/baseline_v3.json` rewritten; both configs check).
+
+*Hooks* (all inert under baseline-v2): stage keys `cpa_guard`, `field_share`,
+`field_weights`, `field_varying_share`, `st_feasibility`, `clutter_weights` read
+by `env.py` and `scenario.py`; `baseline_config.py --write-v3` / `--check
+--config`; `train_formulation.py` installs the overlay in the learner and every
+worker. Tests: `tests/test_baseline_v3.py` (6); with the related suites, 48 pass.
+
 ### 3.13 Earlier findings, still standing
 
 | # | Finding | Status |

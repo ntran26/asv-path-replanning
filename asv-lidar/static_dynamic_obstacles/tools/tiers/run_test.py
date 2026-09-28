@@ -11,6 +11,7 @@ seed -- so a result here matches that test's row in
     python tools/tiers/run_test.py --model runs/sac_formulation_seed0_bl2/best_model.zip CH-CR-CV-007
     python tools/tiers/run_test.py --model runs/tqc_formulation_seed0_bl2/best_model.zip BAS-HO-NC-003 B-06-006-RE --supervisor on
     python tools/tiers/run_test.py --policy colregs_vo CH-CR-CV-031
+    python tools/tiers/run_test.py --model runs/sac_formulation_seed0_bl2/best_model.zip P2-L2-CRP-VAR-07 P2-L1-NT-01
 
 Writes `results/test_runs/<tag>/<test ID>_supervisor_<mode>.png` and appends
 the outcome to `results/test_runs/<tag>/runs.csv`.  Only the named tests'
@@ -77,7 +78,8 @@ def replay(env, built, seed, actor=None, controller=None) -> dict:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("tests", nargs="+", help="test IDs, case ids or Tier B indices")
+    ap.add_argument("tests", nargs="+",
+                    help="test IDs, case ids or Tier B indices; Paper 2 set IDs (P2-...) too")
     ap.add_argument("--model", type=Path, help="a trained policy (.zip)")
     ap.add_argument("--policy", choices=("los_dwa", "colregs_vo", "encounter_vo", "reference"),
                     help="a classical comparator instead of a model")
@@ -86,14 +88,6 @@ def main() -> int:
     args = ap.parse_args()
     if bool(args.model) == bool(args.policy):
         ap.error("give exactly one of --model or --policy")
-
-    wanted = [(ref, *suite.resolve_test(ref)) for ref in args.tests]
-    built_cells = {}
-    for c_index in sorted({c for _, c, _, _ in wanted}):
-        scenarios, short = suite.build_tier_b(cells=[c_index])
-        if short:
-            raise SystemExit(f"cell {c_index} is short of its count -- indices would not match the suite")
-        built_cells[c_index] = scenarios
 
     if args.model:
         model_path = args.model if args.model.is_absolute() else ROOT / args.model
@@ -106,10 +100,17 @@ def main() -> int:
     curriculum.apply_stage(tf.PROPULSION_STAGE)
     from env import ASVLidarEnv
     env = ASVLidarEnv(render_mode=None)
-    actor = tf.EpisodeActor(load_model(str(model_path))) if args.model else None
-    modes = ("off", "on") if args.supervisor == "both" else (args.supervisor,)
 
-    rows = []
+    # Each item: (scenario, episode seed, test ID, description columns).
+    items = []
+    tier_b = [ref for ref in args.tests if not ref.strip().upper().startswith("P2-")]
+    wanted = [(ref, *suite.resolve_test(ref)) for ref in tier_b]
+    built_cells = {}
+    for c_index in sorted({c for _, c, _, _ in wanted}):
+        scenarios, short = suite.build_tier_b(cells=[c_index])
+        if short:
+            raise SystemExit(f"cell {c_index} is short of its count -- indices would not match the suite")
+        built_cells[c_index] = scenarios
     for _ref, c_index, n, behaviour in wanted:
         built = built_cells[c_index][n]
         if behaviour != "cv":
@@ -118,16 +119,31 @@ def main() -> int:
             built = copy.deepcopy(built)
             built.target_behaviour = suite.target_model(behaviour, built.encounter_class)
             built.case_id = f"{built.case_id}-{behaviour.upper()}"
-        tid = suite.test_id(built.case_id)
+        cell = suite.tier_b_cells()[c_index]
         index = suite.tier_b_index(c_index, n)
-        cell = dict(suite.tier_b_cells()[c_index], behaviour=behaviour)
+        items.append((built, TIER_B_SEED + index, suite.test_id(built.case_id),
+                      {"set": "tier_b", "case_id": built.case_id, "stratum": cell["stratum"],
+                       "class": cell["class"], "behaviour": behaviour}))
+    for ref in args.tests:
+        if ref.strip().upper().startswith("P2-"):
+            # The Paper 2 deployment-layout set (`src/paper2_set.py`).
+            import paper2_set as p2
+            env.estop_enabled = False
+            rec = p2.find(env, ref)
+            items.append((rec["built"], rec["episode_seed"], rec["test_id"],
+                          {"set": "paper2", "case_id": rec["test_id"], "stratum": rec["layout"],
+                           "class": rec["built"].encounter_class,
+                           "behaviour": rec["built"].target_behaviour}))
+
+    actor = tf.EpisodeActor(load_model(str(model_path))) if args.model else None
+    modes = ("off", "on") if args.supervisor == "both" else (args.supervisor,)
+    rows = []
+    for built, seed, tid, meta in items:
         for mode in modes:
             env.estop_enabled = mode == "on"
             controller = make_controller(args.policy) if args.policy else None
-            ep = replay(env, built, TIER_B_SEED + index, actor, controller)
-            rows.append({"test_id": tid, "case_id": built.case_id, "index": index,
-                         "stratum": cell["stratum"], "class": cell["class"],
-                         "behaviour": cell["behaviour"], "supervisor": mode,
+            ep = replay(env, built, seed, actor, controller)
+            rows.append({"test_id": tid, **meta, "episode_seed": seed, "supervisor": mode,
                          "outcome": ep["outcome"], "steps": ep["steps"],
                          "min_target_range": round(ep["min_range"], 3), "estops": ep["estops"]})
             fig, ax = plt.subplots(figsize=(3.6, 7.8))
@@ -136,7 +152,7 @@ def main() -> int:
                    else f"channel {built.nominal_width:.2f} m")
             close = ("no target" if not np.isfinite(ep["min_range"])
                      else f"min range {ep['min_range']:.2f} m")
-            ax.set_title(f"{tid} ({built.case_id}) - {tag}\n{cell['class']}, {cell['behaviour']}, {geo}"
+            ax.set_title(f"{tid} ({meta['case_id']}) - {tag}\n{meta['class']}, {meta['behaviour']}, {geo}"
                          f"\nsupervisor {mode}: {ep['outcome']}, {close}", fontsize=7.5, loc="left")
             cb = fig.colorbar(lc, ax=ax, fraction=0.035, pad=0.02)
             cb.set_label("speed (m/s)", fontsize=8)

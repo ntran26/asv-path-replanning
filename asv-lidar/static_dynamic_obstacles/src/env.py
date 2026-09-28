@@ -181,6 +181,10 @@ class ASVLidarEnv(gym.Env):
 
         self.forced_num_obs: Optional[int] = None
         self.forced_targets: Optional[List[TargetShip]] = None
+        # Share of generated episodes drawn from the field-layout family instead
+        # (`field_training.py`, the 2 M -> 3 M fine-tune only).  0 in every
+        # baseline run.
+        self.field_mix: float = 0.0
         self.observation_space = observation_space(self.n_max_targets)
         self.action_space = gym.spaces.Box(-1.0, 1.0, shape=(2,), dtype=np.float32)
 
@@ -495,16 +499,70 @@ class ASVLidarEnv(gym.Env):
     # 04a's scenario generator (C1)
     # ------------------------------------------------------------------
     def set_scenario_stage(self, stage: Optional[int]) -> None:
-        """Switch the curriculum stage; takes effect at the next reset."""
+        """Switch the curriculum stage; takes effect at the next reset.  A stage
+        that names a `field_share` (baseline-v3 stages 6-7) sets the field-layout
+        mix with it; baseline-v2's stages name none and leave the mix alone."""
         self.scenario_stage = None if stage is None else int(stage)
         self._generator = None
+        st = self._stage_dict()
+        if st is not None and "field_share" in st:
+            self.set_field_mix(st["field_share"], st.get("field_weights"),
+                               prefetch=int(getattr(cfg, "FIELD_PREFETCH", 6)),
+                               varying_share=st.get("field_varying_share"),
+                               solvable_only=bool(st.get("st_feasibility")),
+                               near_share=float(st.get("field_near_share", 0.0)))
 
-    def _load_generated(self, built=None) -> None:
+    def _stage_dict(self):
+        if self.scenario_stage is None:
+            return None
+        return cfg.CURRICULUM_STAGES.get(int(self.scenario_stage))
+
+    def _stage_param(self, key, default):
+        st = self._stage_dict()
+        return st.get(key, default) if st else default
+
+    def set_field_mix(self, share: float, weights=None, prefetch: int = 0,
+                      varying_share=None, solvable_only: bool = False, near_share: float = 0.0) -> None:
+        """Draw `share` of generated episodes from the field-layout family,
+        encounters drawn by `weights` when given.  `prefetch > 0` generates them
+        ahead in a background thread (a queue of that size) from its own seeded
+        stream, so a reset never waits the ~2 s a field scenario takes to draw --
+        the worker is otherwise idle while an off-policy learner updates."""
+        self.field_mix = float(share)
+        self._field_weights = dict(weights) if weights else None
+        self._field_varying = varying_share
+        self._field_solvable = bool(solvable_only)
+        self._field_near = float(near_share)
+        if prefetch and getattr(self, "_field_queue", None) is None:
+            import queue
+            import threading
+            import field_training
+            self._field_queue = queue.Queue(maxsize=int(prefetch))
+            field_rng = np.random.default_rng(int(self._rng.integers(2**31)))
+
+            def _produce():
+                while True:
+                    self._field_queue.put(field_training.sample(
+                        field_rng, weights=self._field_weights, varying_share=self._field_varying,
+                        solvable_only=self._field_solvable, near_share=self._field_near))
+            threading.Thread(target=_produce, daemon=True).start()
+
+    def _load_generated(self, built=None, _depth: int = 0) -> None:
         """One episode from `scenario.ScenarioGenerator`, or the one supplied.
 
         Seeds are drawn inside the episode's namespace (04a §9.2) from the
         environment's own stream, so a seeded reset reproduces the episode.
         """
+        drawn = built is None
+        if built is None and self.field_mix > 0.0 and self._rng.uniform() < self.field_mix:
+            if getattr(self, "_field_queue", None) is not None:
+                built = self._field_queue.get()
+            else:
+                import field_training
+                built = field_training.sample(self._rng, weights=getattr(self, "_field_weights", None),
+                                              varying_share=getattr(self, "_field_varying", None),
+                                              solvable_only=getattr(self, "_field_solvable", False),
+                                              near_share=getattr(self, "_field_near", 0.0))
         if built is None:
             stage = self.scenario_stage if self.scenario_stage is not None else 5
             if self._generator is None or self._generator.stage != stage:
@@ -549,10 +607,31 @@ class ASVLidarEnv(gym.Env):
             float(built.target_spawn[0]), float(built.target_spawn[1]),
             float(built.target_heading), float(built.target_speed),
             behaviour=built.target_behaviour, encounter_class=built.encounter_class,
-            confined=bool(built.target_confined))]
+            confined=bool(built.target_confined),
+            # `T-VS` only (Paper 2 layout set); None everywhere else, training included.
+            speed_profile=(tuple(built.flags["speed_profile"])
+                           if (built.flags or {}).get("speed_profile") else None),
+            # Field-feasible scenarios only (Paper 2 layout set): stop short of the wall.
+            stop_box=(tuple(built.flags["target_stop_box"])
+                      if (built.flags or {}).get("target_stop_box") else None))]
 
         count = int(self.forced_num_obs) if self.forced_num_obs is not None else int(built.n_obstacles)
-        self.obstacles = self._obstacles_clear_of_encounter(count, built)
+        fixed = (built.flags or {}).get("fixed_obstacles")
+        # A fixed layout (the Paper 2 deployment set, `paper2_set.py`) replaces the
+        # drawn panels; training and the frozen suite never set it.
+        self.obstacles = ([[tuple(map(float, p)) for p in poly] for poly in fixed] if fixed
+                          else self._obstacles_clear_of_encounter(count, built))
+        # baseline-v3 stages 6-7: a drawn target episode must be space-time
+        # solvable (`feasibility_st.py`); otherwise draw another.  Field layouts
+        # were checked when sampled; supplied scenarios are never redrawn.
+        if (drawn and not fixed and built.encounter_class != "no_target"
+                and self._stage_param("st_feasibility", False)):
+            import feasibility_st
+            ok = feasibility_st.solvable((self.start_x, self.start_y), (self.goal_x, self.goal_y),
+                                         self.obstacles, built)["solvable"]
+            if not ok and _depth < int(getattr(cfg, "ST_MAX_REDRAWS", 30)):
+                self.st_redraws = getattr(self, "st_redraws", 0) + 1
+                return self._load_generated(None, _depth=_depth + 1)
 
     def _obstacles_clear_of_encounter(self, count: int, built) -> List[List[Tuple[float, float]]]:
         """Static clutter that does not decide the encounter for the policy.
@@ -568,7 +647,9 @@ class ASVLidarEnv(gym.Env):
         flagged = self._flagged_panels(built, layout)
         if not layout or built.encounter_class == "no_target":
             return layout + flagged
-        guard = cfg.OBSTACLE_CPA_GUARD_FRAC * max(float(built.tcpa_s), 0.0) * cfg.U_NOM
+        # baseline-v3 relaxes the guard by stage (0.2 in stage 6, off in 7).
+        guard = (float(self._stage_param("cpa_guard", cfg.OBSTACLE_CPA_GUARD_FRAC))
+                 * max(float(built.tcpa_s), 0.0) * cfg.U_NOM)
         s_cpa = max(float(built.tcpa_s), 0.0) * cfg.U_NOM
         tx, ty = float(built.target_spawn[0]), float(built.target_spawn[1])
         kept = []

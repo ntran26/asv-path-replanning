@@ -1,0 +1,18 @@
+{
+ "id": "finetune-field-v1",
+ "created": "2026-09-27",
+ "purpose": "Continue a baseline-v2 run from its 2 M checkpoint to 3 M with Paper 2-style field layouts mixed into training, so the policy passes the Paper 2 deployment-layout set (F104-F106). The base formulation (reward, observation, dynamics, learner hyperparameters) is baseline-v2, checked at start.",
+ "base_config": "configs/baseline_v2.json",
+ "from_checkpoint": "final_model.zip at 2,000,000 steps, with final_vecnormalize.pkl and, for SAC/TQC, the 2,000,000-step replay buffer",
+ "extra_timesteps": 1000000,
+ "tag": "ftfield1",
+ "field_share": 0.5,
+ "scenario_stage": 5,
+ "eval_freq": 100000,
+ "checkpoint_every": 250000,
+ "reset_seed_offset": 77777,
+ "selection": "best on goal - 2 x collision over the development set (120) plus the field validation set (155), supervisor off; the 2 M model is evaluated first and kept if nothing beats it",
+ "field_training": "src/field_training.py revision 1.0: legs x in [2, 8] at most 14.1 deg; three 1 m panels as gate+onpath (0.4), slalom (0.3), side+onpath (0.3); no target 0.20, else HO/CRP/CRS/OT/BO evenly, no CPA guard, field rules (inside the basin, stop at the wall, 0.20-1.10 m/s, 0.3 m panel clearance), 0.25 of targets vary speed once; layouts within 0.75 m of a deployment layout redrawn",
+ "validation": "field_training.validation_set(): 30 no-target + 25 each of HO, CRP, CRS, OT, BO (constant velocity), seeds 350,000+",
+ "test": "the Paper 2 deployment-layout set (paper2_set.py revision 2.0) and the frozen suite (suite 3.4), neither seen in training or selection"
+}

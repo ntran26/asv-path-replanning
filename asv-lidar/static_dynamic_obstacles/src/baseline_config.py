@@ -91,13 +91,27 @@ def learners(tf: ModuleType, num_envs: int) -> Dict:
     })
 
 
-def snapshot(cfg: ModuleType, tf: ModuleType) -> Dict:
-    """Everything the code decides; `--check` compares exactly this."""
-    return {"formulation": formulation(cfg, tf), "run_args": _plain(RUN_ARGS),
-            "learners": learners(tf, RUN_ARGS["num_envs"]),
+def snapshot(cfg: ModuleType, tf: ModuleType, overlay: bool = False) -> Dict:
+    """Everything the code decides; `--check` compares exactly this.
+
+    `overlay` (baseline-v3): install `formulation_v3` first, so the curriculum
+    schedule is v3's, and record the overlay in the formulation block.  The
+    constants block is read from `constants.py` as written, so it is v2's either
+    way -- v3 changes what training sees, not a constant."""
+    run_args, tag = dict(RUN_ARGS), TAG
+    if overlay:
+        import formulation_v3 as fv
+        fv.apply(cfg)
+        tf.STAGE_SCHEDULE = cfg.CURRICULUM_STAGE_FRACTIONS
+        run_args["timesteps"], tag = fv.TIMESTEPS, "bl3"
+    body = {"formulation": formulation(cfg, tf), "run_args": _plain(run_args),
+            "learners": learners(tf, run_args["num_envs"]),
             "campaign": {"algos": ALGOS, "seeds": SEEDS, "checkpoint": CHECKPOINT,
-                         "tag": TAG,
+                         "tag": tag,
                          "off_policy_gradient_steps_per_transition": 1.0}}
+    if overlay:
+        body["formulation"]["overlay"] = _plain(fv.snapshot())
+    return body
 
 
 def _git(*cmd) -> str:
@@ -137,7 +151,7 @@ def load() -> Dict:
 
 def check(cfg: ModuleType, tf: ModuleType, saved: Dict | None = None) -> List[str]:
     saved = saved if saved is not None else load()
-    now = snapshot(cfg, tf)
+    now = snapshot(cfg, tf, overlay="overlay" in saved.get("formulation", {}))
     return diff({k: saved[k] for k in now}, now)
 
 
@@ -166,6 +180,37 @@ def verify_run(run_dir: Path, saved: Dict) -> List[str]:
     if _plain(run.get("scenario_schedule")) != saved["formulation"]["curriculum_schedule"]:
         problems.append("curriculum schedule differs")
     return problems
+
+
+V3_PATH = ROOT / "configs" / "baseline_v3.json"
+
+
+def write_v3(cfg: ModuleType, tf: ModuleType) -> Dict:
+    """configs/baseline_v3.json: baseline-v2 plus the `formulation_v3` overlay
+    (prepared 2026-09-28, not trained)."""
+    import formulation_v3 as fv
+    body = snapshot(cfg, tf, overlay=True)
+    config = {
+        "id": fv.ID,
+        "frozen_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "git": {"head": _git("rev-parse", "HEAD"), "dirty": _code_dirty()},
+        "provenance": {
+            "formulation_of": "baseline-v2 plus field-layout curriculum stages 6-7, a relaxed "
+                              "CPA guard, weighted 3-panel clutter, varying-speed targets in "
+                              "stage 7, space-time solvability of every stage 6-7 target "
+                              "episode, and a v3 field development set (src/formulation_v3.py)",
+            "why": "PROJECT_STATE.md F105-F107: the v2 policies fail encounters beside "
+                   "static panels, which v2 never trains; a 2 M fine-tune learned them slowly",
+            "base": "baseline-v2 (formulation 3d697858e95e5adf): reward, observation, vessel "
+                    "model, learners and stages 1-4 unchanged",
+        },
+        "formulation_digest": digest(body["formulation"]),
+        **body,
+    }
+    with open(V3_PATH, "w", newline="\n") as fh:
+        json.dump(config, fh, indent=1, sort_keys=False)
+        fh.write("\n")
+    return config
 
 
 def write(cfg: ModuleType, tf: ModuleType) -> Dict:
@@ -206,7 +251,21 @@ def main() -> int:
     group.add_argument("--write", action="store_true")
     group.add_argument("--check", action="store_true")
     group.add_argument("--verify-run", type=Path, nargs="+")
+    group.add_argument("--write-v3", action="store_true",
+                       help="write configs/baseline_v3.json (the v3 overlay on baseline-v2)")
+    ap.add_argument("--config", type=Path, default=None,
+                    help="check against this config instead of baseline-v2 (e.g. configs/baseline_v3.json)")
     args = ap.parse_args()
+    if args.write_v3:
+        config = write_v3(cfg, tf)
+        print(f"wrote {V3_PATH.relative_to(ROOT)} ({config['id']}, "
+              f"formulation {config['formulation_digest']})")
+        return 0
+    if args.check and args.config:
+        saved = json.loads(args.config.read_text())
+        problems = check(cfg, tf, saved)
+        print("code matches " + saved["id"] if not problems else "\n".join(problems))
+        return 1 if problems else 0
     if args.write:
         config = write(cfg, tf)
         print(f"wrote {CONFIG_PATH.relative_to(ROOT)} ({config['id']}, "

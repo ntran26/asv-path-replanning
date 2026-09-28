@@ -4,6 +4,7 @@
 # 2026-09-27: the campaign mechanism is gone).
 #
 #   bash results/train_seed.sh sac 1
+#   bash results/train_seed.sh sac 0 configs/baseline_v3.json   # another frozen config
 #
 # * A finished run (final_model.zip) is not retrained; its evaluations still run
 #   if they are missing.
@@ -14,13 +15,16 @@
 # * Then Tier 1 (development set, a diagnostic, supervisor off and on) and the
 #   frozen suite (headline + robustness set, supervisor off and on) on the run's
 #   best development-set checkpoint -- each skipped if already done.
+# * baseline-v3 (or any config other than baseline-v2) also runs the Paper 2
+#   deployment-layout set, the field set its stages 6-7 train for.
 #
 # Events go to results/train_seed.log; training output to runs/<run>.log.
 set -u
 cd "$(dirname "$0")/.."
-if [ $# -ne 2 ]; then echo "usage: bash results/train_seed.sh <ppo|recurrent_ppo|sac|tqc> <seed>"; exit 2; fi
+if [ $# -lt 2 ] || [ $# -gt 3 ]; then
+  echo "usage: bash results/train_seed.sh <ppo|recurrent_ppo|sac|tqc> <seed> [config, default configs/baseline_v2.json]"; exit 2; fi
 A=$1; S=$2
-CONFIG=configs/baseline_v2.json
+CONFIG=${3:-configs/baseline_v2.json}
 LOG=results/train_seed.log
 read -r TAG CKPT PLANNED <<< "$(python -c "
 import json; c = json.load(open('$CONFIG'))['campaign']
@@ -29,7 +33,7 @@ RUN=runs/${A}_formulation_seed${S}_${TAG}
 ID=${A}s${S}_${TAG}
 note() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" | tee -a "$LOG"; }
 
-python src/baseline_config.py --check >> "$LOG" 2>&1 || { note "BASELINE CHECK FAILED ($A seed $S)"; exit 1; }
+python src/baseline_config.py --check --config $CONFIG >> "$LOG" 2>&1 || { note "BASELINE CHECK FAILED ($A seed $S, $CONFIG)"; exit 1; }
 [ "$PLANNED" = 1 ] || note "   note: $A seed $S is outside the planned learners x seeds in $CONFIG"
 
 if [ -f "$RUN/final_model.zip" ]; then
@@ -68,5 +72,15 @@ else
   mkdir -p results/frozen_suite
   python tools/tiers/frozen_suite.py --model "$RUN/$CKPT" --tag $ID --supervisor both > "$out.log" 2>&1
   note "   frozen suite $ID exit $?"
+fi
+if [ "$CONFIG" != configs/baseline_v2.json ]; then
+  out=results/paper2_set/$ID
+  if [ -f "$out/summary.txt" ]; then
+    note "   Paper 2 set $ID: already evaluated"
+  else
+    mkdir -p results/paper2_set
+    python tools/tiers/paper2_suite.py --model "$RUN/$CKPT" --tag $ID > results/paper2_set_$ID.log 2>&1
+    note "   Paper 2 set $ID exit $?"
+  fi
 fi
 note "== $A seed $S done"

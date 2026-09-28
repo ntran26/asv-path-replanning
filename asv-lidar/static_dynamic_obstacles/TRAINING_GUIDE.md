@@ -230,11 +230,35 @@ Tier 1, the development-set diagnostic, supervisor `off` and `on`:
 python tools/tiers/tier1_replay.py --model runs/sac_formulation_seed1_bl2/best_model.zip --tag sacs1_bl2_supervisor_off --supervisor off
 ```
 
-One frozen-suite test, with a trajectory figure (test IDs are in
-`results/frozen_gallery/index.csv`):
+The Paper 2 deployment-layout set -- a separate set, not part of the frozen
+suite (F104): the three published field layouts with and without a target ship,
+630 episodes per supervisor mode, into `results/paper2_set/<tag>/`:
 
 ```bash
-python tools/tiers/run_test.py --model runs/sac_formulation_seed1_bl2/best_model.zip CH-CR-CV-007
+python tools/tiers/paper2_suite.py --model runs/sac_formulation_seed1_bl2/best_model.zip --tag sacs1_bl2
+```
+
+One frozen-suite or Paper 2 set test, with a trajectory figure (test IDs are in
+`results/frozen_gallery/index.csv` and `results/paper2_gallery/index.csv`):
+
+```bash
+python tools/tiers/run_test.py --model runs/sac_formulation_seed1_bl2/best_model.zip CH-CR-CV-007 P2-L2-CRP-VAR-07
+```
+
+The field fine-tune (F106): continue a finished run from 2 M to 3 M with Paper
+2-style field layouts mixed in, then test it on the Paper 2 set and the frozen
+suite. It writes a new `runs/<run>_ftfield1/` folder; the source run is untouched:
+
+```bash
+bash results/finetune_field.sh sac 0
+```
+
+baseline-v3 (F107; prepared, not the paper's formulation): baseline-v2 plus
+field-layout stages 6-7, 2.5 M steps, run folders tagged `bl3`. Check, then train:
+
+```bash
+python src/baseline_config.py --check --config configs/baseline_v3.json
+python src/train_formulation.py --config configs/baseline_v3.json --algo sac --seed 0 --tag bl3
 ```
 
 A quick launch check that trains 4,096 steps into a `_smoke` folder (delete it

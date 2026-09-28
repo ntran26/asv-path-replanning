@@ -1,0 +1,74 @@
+{
+ "finetune": {
+  "id": "finetune-field-v1",
+  "created": "2026-09-27",
+  "purpose": "Continue a baseline-v2 run from its 2 M checkpoint to 3 M with Paper 2-style field layouts mixed into training, so the policy passes the Paper 2 deployment-layout set (F104-F106). The base formulation (reward, observation, dynamics, learner hyperparameters) is baseline-v2, checked at start.",
+  "base_config": "configs/baseline_v2.json",
+  "from_checkpoint": "final_model.zip at 2,000,000 steps, with final_vecnormalize.pkl and, for SAC/TQC, the 2,000,000-step replay buffer",
+  "extra_timesteps": 1000000,
+  "tag": "ftfield1",
+  "field_share": 0.5,
+  "scenario_stage": 5,
+  "eval_freq": 100000,
+  "checkpoint_every": 250000,
+  "reset_seed_offset": 77777,
+  "selection": "best on goal - 2 x collision over the development set (120) plus the field validation set (155), supervisor off; the 2 M model is evaluated first and kept if nothing beats it",
+  "field_training": "src/field_training.py revision 1.0: legs x in [2, 8] at most 14.1 deg; three 1 m panels as gate+onpath (0.4), slalom (0.3), side+onpath (0.3); no target 0.20, else HO/CRP/CRS/OT/BO evenly, no CPA guard, field rules (inside the basin, stop at the wall, 0.20-1.10 m/s, 0.3 m panel clearance), 0.25 of targets vary speed once; layouts within 0.75 m of a deployment layout redrawn",
+  "validation": "field_training.validation_set(): 30 no-target + 25 each of HO, CRP, CRS, OT, BO (constant velocity), seeds 350,000+",
+  "test": "the Paper 2 deployment-layout set (paper2_set.py revision 2.0) and the frozen suite (suite 3.4), neither seen in training or selection"
+ },
+ "spec_path": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\configs\\finetune_field_v1.json",
+ "source_run": "sac_formulation_seed0_bl2",
+ "algo": "sac",
+ "seed": 0,
+ "start_steps": 2000000,
+ "extra_timesteps": 1000000,
+ "timesteps": 3000000,
+ "num_envs": 10,
+ "hyperparameters": {
+  "learning_rate": 0.0003,
+  "buffer_size": 1000000,
+  "batch_size": 256,
+  "tau": 0.005,
+  "gamma": 0.9509900498999999,
+  "learning_starts": 10000,
+  "train_freq": 1,
+  "ent_coef": "auto",
+  "gradient_steps": 10
+ },
+ "train_supervisor": "off",
+ "eval_supervisor": "both",
+ "low_speed_start_frac": 0.15,
+ "baseline_config": {
+  "id": "baseline-v2",
+  "formulation_digest": "3d697858e95e5adf"
+ },
+ "field_training_revision": "1.0",
+ "replay_buffer": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv_replay_buffers\\sac_formulation_seed0_bl2_kept\\sac_replay_buffer_2000000_steps.pkl",
+ "switches": {
+  "R2_SLOWDOWN_TEST": "stop",
+  "CROSSING_PORT_SHARE_TRAINING": 0.6,
+  "V_HOLD_GROWS": true,
+  "V_PORT_HEADING_DEAD_DEG": 5.0,
+  "V_PORT_LATCHED_RHO": true,
+  "V_PORT_HEADING_NEEDS_ADMISSIBLE": false,
+  "STAGE3_WEIGHTS": null,
+  "DEFAULT_GEOMETRY_MODE": "basin",
+  "OBSERVATION_SCHEMA_VERSION": "a25-v3-context"
+ },
+ "platform": {
+  "python": "3.10.11",
+  "torch": "2.2.1+cpu",
+  "stable_baselines3": "2.3.2",
+  "sb3_contrib": "2.3.0",
+  "numpy": "1.26.4",
+  "os": "Windows-10-10.0.26200-SP0",
+  "machine": "JL2VSV3",
+  "cpu_count": 12,
+  "git": {
+   "head": "a5b0ffb9514fc3bd1b2d8c05c551932ad06d4f51",
+   "src_dirty": true
+  }
+ },
+ "observation_schema": "a25-v3-context"
+}
