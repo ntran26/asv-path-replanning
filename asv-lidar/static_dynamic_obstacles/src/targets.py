@@ -12,6 +12,7 @@ assumption COLREGs exists because you cannot make.
 | `T-NC1` | Stands on when it is the give-way vessel | Evaluation only |
 | `T-NC2` | Alters to **port** in a head-on | Evaluation only |
 | `T-NC3` | Positionally non-compliant — holds the wrong side of the fairway | Evaluation only |
+| `T-VS` | Constant heading, **varying speed** — one speed change on the approach | Evaluation only (Paper 2 layout set) |
 
 **`T-NC3` is new in 03a §5.3 and it is not optional.**  The head-on precedence
 argument (02 §3.2) is that Rule 9(a) channel-keeping satisfies Rule 14 *without*
@@ -48,8 +49,9 @@ T_RE = "T-RE"
 T_NC1 = "T-NC1"
 T_NC2 = "T-NC2"
 T_NC3 = "T-NC3"
+T_VS = "T-VS"
 
-BEHAVIOURS = (T_CV, T_RE, T_NC1, T_NC2, T_NC3)
+BEHAVIOURS = (T_CV, T_RE, T_NC1, T_NC2, T_NC3, T_VS)
 TRAINING_BEHAVIOURS = (T_CV,)                      # D1
 NON_COMPLIANT = (T_NC1, T_NC2, T_NC3)
 
@@ -108,6 +110,15 @@ class Target:
     encounter_class: str = "null"
     confined: bool = True
     corridor: object = None              # set for confined targets
+    # `T-VS`: (t_change_s, final_speed_mps, accel_mps2) -- holds `speed` until
+    # t_change, then ramps to final_speed at accel.  None for every other model.
+    speed_profile: Optional[Tuple[float, float, float]] = None
+    # Field-feasible scenarios (Paper 2 layout set): (xmin, xmax, ymin, ymax) the
+    # hull must stay inside -- the basin less a wall margin.  A target about to
+    # leave it stops for the rest of the episode, as the boat in the field would
+    # be stopped short of the wall.  None everywhere else.
+    stop_box: Optional[Tuple[float, float, float, float]] = None
+    _stopped: bool = field(default=False, repr=False)
 
     # Latched on first engagement, for the reactive and non-compliant models.
     _reacted: bool = field(default=False, repr=False)
@@ -142,12 +153,22 @@ class Target:
         environment never has to supply it.
         """
         self._t += float(dt)
+        if self._stopped:
+            return
+        if self.speed_profile is not None:
+            self._vary_speed(dt)
         if self.behaviour != T_CV and own is not None:
             self._react(dt, own)
 
         v = self.velocity
-        self.x += float(v[0]) * dt
-        self.y += float(v[1]) * dt
+        nx, ny = self.x + float(v[0]) * dt, self.y + float(v[1]) * dt
+        if self.stop_box is not None:
+            x0, x1, y0, y1 = self.stop_box
+            xs, ys = zip(*hull_polygon(nx, ny, self.heading))
+            if min(xs) < x0 or max(xs) > x1 or min(ys) < y0 or max(ys) > y1:
+                self.speed, self._stopped = 0.0, True
+                return
+        self.x, self.y = nx, ny
 
     # ------------------------------------------------------------------
     def _react(self, dt: float, own) -> None:
@@ -158,8 +179,8 @@ class Target:
         holds course from there.  Encoding it as a manoeuvre would make it a
         behavioural violation and it would stop testing what it exists to test.
         """
-        if self.behaviour in (T_NC1, T_NC3):
-            return                        # stands on; the violation is the point
+        if self.behaviour in (T_NC1, T_NC3, T_VS):
+            return                        # holds course; T-VS varies speed only
         if self.behaviour == T_RE:
             self._react_vo(dt, own)
             return
@@ -182,6 +203,17 @@ class Target:
                 self._turn(-TURN_RATE_DPS * dt)
                 self._reacted = True
             return
+
+    def _vary_speed(self, dt: float) -> None:
+        """`T-VS`: hold the spawn speed until `t_change`, then ramp toward the
+        final speed at `accel` -- a vessel that slows or speeds up on the
+        approach without altering course.  Evaluation only (Paper 2 layout set)."""
+        t_change, v_final, accel = (float(v) for v in self.speed_profile)
+        if self._t < t_change:
+            return
+        step = float(accel) * float(dt)
+        gap = v_final - self.speed
+        self.speed = v_final if abs(gap) <= step else self.speed + math.copysign(step, gap)
 
     def _react_vo(self, dt: float, own) -> None:
         """`T-RE`: the COLREGs-VO comparator's rule, applied from the target's side

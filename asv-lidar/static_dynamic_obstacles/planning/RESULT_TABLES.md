@@ -9,6 +9,8 @@ about 0.05 is at the edge of separability and the measured 0.20 crossing spread 
 not separable, so learner comparisons are made on the headline and crossing
 behaviour is reported descriptively, per seed.
 
+> **Status note (2026-09-28).** The Introduction is now your draft 4 (`planning/Paper3_Introduction_draft4.docx`), with the literature review moved into §1.2 and the paper renumbered to six sections (`PAPER3_DRAFT_SKELETON.md` revision 4). Contributions are now **C1-C4** (C1 formulation; C2 geometric framework for constrained encounter responses, absorbing the old width-sweep C4; C3 four-learner comparison with classical references; C4 evaluation design, absorbing the old perception C5 and protocol C6); the old field C7 and **RQ4 / C-6 are open (S13)** because draft 4 calls physical transfer "planned". Draft 4 adds **RQ6** (how the response changes as maneuvering room decreases), which C-2 and C-3 now serve. Paper sections cited below use the revision-4 numbers.
+>
 > **Status note (2026-09-23).** Three decisions are now made and this draft needs restating before sign-off (B6). **Framing:** the paper is a **formulation plus a five-learner comparison**, so there is no "Proposed (SAC, full)" method — the five learners are the comparison, and the classical comparators carry N2. **Formulation:** baseline-v2 (F96) — the Rule 17(b) below-floor being-overtaken draws are out of training and the suite, so any row or claim resting on them goes. **Field work** is delayed within this paper, so N3, RQ4 and C-6 stand. Still to settle: which learner carries the ablations, and C-4's comparison, which needs a **third rung** (no encounter feature / class one-hot / full context branch) now that the observation has a context branch.
 
 Learners: PPO, RecurrentPPO, SAC and TQC, 3 seeds each (**TD3 dropped 2026-09-24**). TQC is the distributional arm (04a §8.2). PPO is also the development vehicle for the reward; only its frozen-suite runs are reported.
@@ -93,7 +95,7 @@ has no scenario builder yet (C3–C6), so this table currently has no content.
 
 One row per case: success over 10 rollouts, min CPA, compliant, first-alteration sense.
 
-## R9 — domain randomisation in the field (RQ4)
+## R9 — domain randomisation in the field (RQ4; open, S13)
 
 | Policy | Field success | Field min CPA | Sim success | Gap |
 |---|---|---|---|---|

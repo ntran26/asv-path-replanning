@@ -149,6 +149,28 @@ CLASSICAL_KVO_STATIC_GAP_M = 0.15
 # (centres) ahead of the own ship.  Not a comparator parameter: outside
 # configs/comparators_v1.json.  TODO(A34): confirm with the basin traffic model.
 TARGET_RE_HARD_GAP_M = cfg.DOMAIN_LATERAL - 0.50
+# The varying-speed target (`targets.T_VS`, Paper 2 layout set, 2026-09-27): one
+# speed change on the approach, at a random fraction of the drawn TCPA, to a
+# slower or faster speed (even odds), ramped at a model vessel's acceleration.
+# Evaluation only.  TODO(05): the ramp should come from the identified surge
+# response, as TURN_RATE_DPS should from the turning circle.
+TARGET_VS_CHANGE_FRAC = (0.25, 0.75)      # of the drawn TCPA
+TARGET_VS_SLOW_FACTOR = (0.50, 0.80)      # final / initial speed
+TARGET_VS_FAST_FACTOR = (1.25, 1.50)
+TARGET_VS_ACCEL_MPS2 = 0.05
+# A target whose nominal track passes within this of a static panel (hull to
+# panel) is redrawn: targets are not steered around panels, so one sailing
+# through a panel would be unphysical.
+TARGET_PANEL_CLEARANCE_M = 0.30
+# Field feasibility of the Paper 2 layout set (2026-09-27): every target scenario
+# must be one a second model vessel can actually sail in the 10 x 25 m basin.
+# The target is assumed Bluefin-class: it cruises at 1.116 m/s at 12 rpm-units
+# (the July logs, `U_REF_LOG_MEDIAN`) and holds steerage down to ~0.2 m/s.
+# TODO(field): confirm against the vessel used as the target.
+FIELD_TARGET_SPEED_RANGE = (0.20, 1.10)   # m/s, the VAR twin's final speed included
+FIELD_WALL_MARGIN_M = 0.50                # target hull to basin wall, at spawn and when it stops
+FIELD_MAX_TURN_DEG = 1.0                  # a straight track: the operator holds one heading
+FIELD_POST_CPA_S = 3.0                    # the encounter is over before the target reaches a wall
 CLASSICAL_KVO_BOUNDARY_GAP_M = 0.05
 CLASSICAL_KVO_SIDE_FREE_DCPA_M = 2.0 * cfg.DOMAIN_LATERAL   # wider passes are unconstrained
 CLASSICAL_KVO_STAND_ON_RELEASE_S = 12.0  # Rule 17: hold while the preferred velocity stays clear

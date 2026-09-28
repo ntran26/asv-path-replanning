@@ -1,0 +1,50 @@
+# Paper 2 deployment-layout set (revision 2.0)
+
+A **separate** evaluation set, not part of the frozen suite: the three static-obstacle
+layouts of the published Paper 2 field trials (Tran et al., *Drones* 10(9), 680, Fig. 8),
+with and without a target ship. 630 episodes per supervisor mode. Shortfall: none.
+
+## Layouts (1 m square panels, measured from the published Fig. 8)
+
+| Layout | Scenario | Leg | Panel centres (m) |
+|---|---|---|---|
+| L1 | Scenario 1 (straight) | (5.0, 2.0) -> (5.0, 22.0) | (5, 8), (7.2, 15.7), (2, 16.5) |
+| L2 | Scenario 2 (slanted, left to right) | (3.0, 2.0) -> (8.0, 22.0) | (2, 8.5), (7.2, 9.3), (6, 17) |
+| L3 | Scenario 3 (slanted, right to left) | (7.0, 2.0) -> (2.0, 22.0) | (1.5, 8.5), (6.5, 8.5), (5, 17) |
+
+## Composition (episodes)
+
+encounter  BO  CRP  CRS  HO  NT  OT
+layout                             
+L1         40   40   40  40  10  40
+L2         40   40   40  40  10  40
+L3         40   40   40  40  10  40
+
+- **NT**: no target, each layout as flown, 10 episode seeds (sensor-noise realisations).
+- **HO / CRP / CRS / OT / BO**: head-on, crossing from port, crossing from starboard, overtaking,
+  being overtaken; 20 scenarios per layout, each run twice: **FIX** (constant velocity, as in
+  training) and **VAR** (the same target on the same seed, changing speed once on the approach --
+  slower to 0.5-0.8x or faster to 1.25-1.5x, ramped at 0.05 m/s^2; `targets.T_VS`).
+- **Field feasible** (revision 2.0): every target is one a second, Bluefin-class vessel can sail in
+  the basin -- it starts at least 0.5 m inside the walls, holds one heading
+  (a track the lane clamp would bend is redrawn), stops short of the wall as the boat would in the
+  field (the encounter is over 3 s before), keeps 0.2-1.1 m/s
+  (the VAR final speed too), and clears every panel by 0.3 m.
+- `field_sheet.csv` gives each run's set-up: target start (x, y), heading to hold, speed, and for
+  VAR when (seconds after the own ship leaves its start at cruise) to change speed and to what.
+
+## Test IDs
+
+`P2-<layout>-<encounter>-<FIX|VAR>-<nn>` and `P2-<layout>-NT-<nn>`. Replay any:
+
+    python tools/tiers/run_test.py --model runs/sac_formulation_seed0_bl2/best_model.zip P2-L2-CRP-VAR-07
+
+Run the whole set: `python tools/tiers/paper2_suite.py --model ... --tag ...`.
+
+## Reading a figure
+
+As the frozen-suite gallery: grey basin outline, pale blue navigable area, dashed blue leg,
+green start, gold goal, brown panels; green dots the own ship holding the leg at cruise
+(0.558191 m/s); red the constant-velocity target and its track; **green dashed the VAR
+twin's track** (same line, different timing); dashed hulls at the nominal CPA.
+

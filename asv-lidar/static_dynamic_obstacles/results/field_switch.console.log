@@ -1,0 +1,4 @@
+2026-09-28 02:45:09 == switch watcher armed: v1's field goal at 2.4 M must exceed 0.54
+2026-09-28 04:12:55    v1 at 2.4 M: [EVAL] t=2,400,000 supervisor off goal 0.70 collision 0.30 | dev goal 0.93 | field goal 0.52 (NT 0.80 HO 0.32 CRP 0.64 CRS 0.40 OT 0.56 BO 0.36) (210.9 s)
+2026-09-28 04:12:56 == v1 did not improve (field 0.52 <= 0.54): stopping v1, starting v2 from its best checkpoint
+2026-09-28 04:13:19 == sacs0_bl2_ftfield2: fine-tuning (configs/finetune_field_v2.json, from runs/sac_formulation_seed0_bl2_ftfield1)

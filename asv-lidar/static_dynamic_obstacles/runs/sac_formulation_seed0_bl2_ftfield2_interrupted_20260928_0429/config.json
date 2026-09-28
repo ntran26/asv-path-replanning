@@ -1,0 +1,90 @@
+{
+ "finetune": {
+  "id": "finetune-field-v2",
+  "created": "2026-09-28",
+  "purpose": "The stronger field fine-tune, started if v1 does not improve on the field validation set by 2.4 M (your call, 2026-09-28). v1 lifted the field score 0.48 -> 0.54 by 2.1 M and then held at 0.54 / 0.54 / 0.52 (2.2 M, 2.3 M) with SAC's entropy coefficient at 0.0025. v2 starts from v1's best checkpoint and pushes harder on the field layouts, on the cases that fail most, with more exploration.",
+  "base_config": "configs/baseline_v2.json",
+  "start_from": "best",
+  "total_timesteps": 3000000,
+  "tag": "ftfield2",
+  "field_share": 0.8,
+  "encounter_weights": {
+   "NT": 0.45,
+   "HO": 0.65,
+   "CRP": 0.36,
+   "CRS": 0.59,
+   "OT": 0.39,
+   "BO": 0.64
+  },
+  "encounter_weights_basis": "each case's mean failure rate on the field validation set at 2.1, 2.2 and 2.3 M (supervisor off): HO 0.65, BO 0.64, CRS 0.59, OT 0.39, CRP 0.36, NT 0.22 -- NT raised to 0.45 so no-target layouts stay ~15 % of field episodes (passing every no-target run is a hard requirement)",
+  "entropy_boost": {
+   "initial_ent_coef": 0.01,
+   "target_entropy": -1.0,
+   "steps": 200000
+  },
+  "prefetch": 6,
+  "scenario_stage": 5,
+  "eval_freq": 100000,
+  "checkpoint_every": 250000,
+  "reset_seed_offset": 88888,
+  "selection": "as v1: best goal - 2 x collision over the development set (120) plus the field validation set (155), supervisor off; v1's best model is evaluated first and kept if nothing beats it",
+  "field_training": "src/field_training.py revision 1.0, encounters drawn by encounter_weights; generated ahead in a background thread (prefetch) so a reset never waits",
+  "validation": "unchanged from v1 (field_training.validation_set())",
+  "test": "unchanged: the Paper 2 deployment-layout set and the frozen suite, neither seen in training or selection"
+ },
+ "spec_path": "configs\\finetune_field_v2.json",
+ "source_run": "sac_formulation_seed0_bl2",
+ "started_from": "sac_formulation_seed0_bl2_ftfield1/best_model.zip",
+ "algo": "sac",
+ "seed": 0,
+ "start_steps": 2100000,
+ "extra_timesteps": 900000,
+ "timesteps": 3000000,
+ "num_envs": 10,
+ "hyperparameters": {
+  "learning_rate": 0.0003,
+  "buffer_size": 1000000,
+  "batch_size": 256,
+  "tau": 0.005,
+  "gamma": 0.9509900498999999,
+  "learning_starts": 10000,
+  "train_freq": 1,
+  "ent_coef": "auto",
+  "gradient_steps": 10
+ },
+ "train_supervisor": "off",
+ "eval_supervisor": "both",
+ "low_speed_start_frac": 0.15,
+ "baseline_config": {
+  "id": "baseline-v2",
+  "formulation_digest": "3d697858e95e5adf"
+ },
+ "field_training_revision": "1.0",
+ "replay_buffer": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv_replay_buffers\\sac_formulation_seed0_bl2_ftfield1\\sac_replay_buffer_best.pkl",
+ "switches": {
+  "R2_SLOWDOWN_TEST": "stop",
+  "CROSSING_PORT_SHARE_TRAINING": 0.6,
+  "V_HOLD_GROWS": true,
+  "V_PORT_HEADING_DEAD_DEG": 5.0,
+  "V_PORT_LATCHED_RHO": true,
+  "V_PORT_HEADING_NEEDS_ADMISSIBLE": false,
+  "STAGE3_WEIGHTS": null,
+  "DEFAULT_GEOMETRY_MODE": "basin",
+  "OBSERVATION_SCHEMA_VERSION": "a25-v3-context"
+ },
+ "platform": {
+  "python": "3.10.11",
+  "torch": "2.2.1+cpu",
+  "stable_baselines3": "2.3.2",
+  "sb3_contrib": "2.3.0",
+  "numpy": "1.26.4",
+  "os": "Windows-10-10.0.26200-SP0",
+  "machine": "JL2VSV3",
+  "cpu_count": 12,
+  "git": {
+   "head": "a5b0ffb9514fc3bd1b2d8c05c551932ad06d4f51",
+   "src_dirty": true
+  }
+ },
+ "observation_schema": "a25-v3-context"
+}

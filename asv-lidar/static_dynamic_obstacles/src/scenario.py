@@ -559,7 +559,13 @@ class ScenarioGenerator:
         return True
 
     def _sample_obstacle_count(self, rng) -> int:
-        lo, hi = cfg.CURRICULUM_STAGES[self.stage]["clutter"]
+        stage = cfg.CURRICULUM_STAGES[self.stage]
+        lo, hi = stage["clutter"]
+        weights = stage.get("clutter_weights")      # baseline-v3 only; v2 draws evenly
+        if weights:
+            counts = [int(k) for k in sorted(weights, key=int) if lo <= int(k) <= hi]
+            p = np.array([float(weights[k]) for k in sorted(weights, key=int) if lo <= int(k) <= hi])
+            return int(rng.choice(counts, p=p / p.sum()))
         return int(rng.integers(lo, hi + 1))
 
 

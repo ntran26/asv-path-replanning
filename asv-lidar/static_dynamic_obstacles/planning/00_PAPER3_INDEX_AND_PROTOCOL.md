@@ -43,7 +43,8 @@ self-contained handovers intended to be opened in **separate threads**.
 | 03 | `03_ENVIRONMENT_AND_TARGETS.md` | Claude Code | 01 (tracker interface) |
 | 04 | `04_SCENARIOS_AND_EVALUATION.md` | Claude chat, then Code | 03 (target behaviours) |
 | 05 | `05_VESSEL_MODEL_AND_SIM2REAL.md` | Claude chat + field work | — (parallel track) |
-| — | `PAPER3_DRAFT_SKELETON.md` | Cowork | all |
+| — | `PAPER3_DRAFT_SKELETON.md` | Cowork | all (revision 4, 2026-09-28: six sections; literature review in §1.2) |
+| — | `Paper3_Introduction_draft4.docx` | author | Section 1, authoritative text (2026-09-28) |
 
 Also carry `PROJECT_BRIEF.md` into every thread — file contents do not persist across
 Claude conversations.
@@ -93,7 +94,7 @@ width-sweep design. Then `05` in parallel (basin booking lead time), then `01 �
 |---|---|---|
 | O1 | External named benchmark | **Adopted** — Waltz & Okhrin "Around the Clock", 24 single-ship cases. The two-vessel scope makes it an exact fit rather than an adaptation |
 | O2 | Give-way only vs reciprocity | **Give-way only**, via Rule 9(b) |
-| O3 | Sim-to-real as RQ4 or separate paper | **Retained as RQ4** — domain randomisation ablation evaluated in the field |
+| O3 | Sim-to-real as RQ4 or separate paper | **Retained as RQ4** — domain randomisation ablation evaluated in the field. **Reopened 2026-09-28** (skeleton S13): Introduction draft 4 calls physical transfer "planned" and has no field section |
 
 | O4 | Corridor dimensions | **Resolved** — simulation matches basin, max width 10 m (20 B). The open-water "Around the Clock" variant supplies the unconfined reference case, so the sweep covers degrees of confinement only |
 | O5 | Barrier vs software gating | **Resolved — software gating**, geometric against the pool polygon. A physical barrier would occlude the facility-wall features that are the only localisation reference. Gating is also mandatory rather than optional because operators standing on the deck sit at scan height and would otherwise be tracked as targets |

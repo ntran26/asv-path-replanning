@@ -65,7 +65,7 @@ No change to any term, formula or coefficient. Reconciling against `04 §2–4` 
 | The six sweep widths bracket all three predicted transitions, but 6.02 m and 6.52 m fall in adjacent brackets | Recommend one extra level at 7 m (14 B) to separate them (§11.3) |
 | `04 §4.1` "Around the Clock" places both vessels meeting at the origin, so `DCPA = 0` and the geometry is unbounded | The benchmark exercises the *alteration-required* branch and the confined sweep exercises the *channel-keeping-suffices* branch. Complementary by construction — worth saying in the paper |
 | The non-compliant evaluation stratum includes a target that alters to port in a head-on | Side-of-passing correctness will record an OS violation caused by the target. Must be reported conditioned on target compliance (§11.4) |
-| `SKELETON §5.4`'s metric list omits the speed-reduction metric that `02 §4.4` introduced | Gap between 02 and 04. Keys already emitted (§10.3); the metric list needs updating |
+| `SKELETON §5.4` (revision 4: §3.4.4, where the metric is now listed)'s metric list omits the speed-reduction metric that `02 §4.4` introduced | Gap between 02 and 04. Keys already emitted (§10.3); the metric list needs updating |
 
 *(Superseded by Revision 2.2 above — the live document confirms every item.)*
 
@@ -1002,7 +1002,7 @@ turning-circle identification and before freezing the suite.
   starboard-to-starboard pass. `v_side` will score that as an OS violation, and the reported
   metric would conflate the target's fault with the policy's. Report the metric split by
   target behaviour, or the non-compliant stratum reads as a policy failure.
-- **`SKELETON §5.4` omits the speed-reduction metric** that `02 §4.4` introduces. The keys
+- **`SKELETON §5.4` (revision 4: §3.4.4, where the metric is now listed) omits the speed-reduction metric** that `02 §4.4` introduces. The keys
   are already emitted (§10.3); the metric list needs the entry.
 
 #### 11.5 Two framing points, free
@@ -1012,7 +1012,7 @@ turning-circle identification and before freezing the suite.
   exercises the *alteration-required* branch exclusively. The confined sweep exercises the
   *channel-keeping-suffices* branch. Together they cover both sides of the precedence table,
   and one of them is a published benchmark. Worth stating rather than leaving implicit.
-- **Narrow-channel overtaking is a natural candidate for `SKELETON §5.3`'s deliberate
+- **Narrow-channel overtaking is a natural candidate for `SKELETON §5.3` (revision 4: §3.4.3)'s deliberate
   failure stratum** — the one where no method passes cleanly. It is better than a merely
   hard case, because the correct answer (hold astern, do not overtake, §10.6) is a
   *behaviour* rather than a success rate, so failures there are interpretable.

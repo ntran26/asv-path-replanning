@@ -269,8 +269,11 @@ def stage_at(fraction: float) -> int:
 
 def make_env(rank: int, seed: int, stage: int, randomisation, torch_threads: int = 0,
              supervisor: bool = True, low_speed_start_frac: float = 0.0,
-             r2_slowdown_test: str = None):
+             r2_slowdown_test: str = None, overlay: bool = False):
     def _init():
+        if overlay:                  # baseline-v3: every worker installs the overlay too
+            import formulation_v3
+            formulation_v3.apply(cfg)
         if torch_threads:
             import torch
             torch.set_num_threads(torch_threads)
@@ -590,6 +593,20 @@ def _no_efficiency_mode() -> None:
         pass
 
 
+def _eval_callback(args, run_dir, resume_steps, baseline):
+    """The development-set evaluation.  baseline-v3 adds its field development
+    set (`formulation_v3.field_development_set`) and reports it apart."""
+    modes = ("off", "on") if args.eval_supervisor == "both" else (args.eval_supervisor,)
+    if baseline and "overlay" in baseline.get("formulation", {}):
+        import formulation_v3
+        from finetune_field import FieldEvalCallback
+        return FieldEvalCallback(run_dir, args.eval_freq, args.eval_freq, modes, args.algo,
+                                 args.eval_per_class, extra=formulation_v3.field_development_set,
+                                 resume_from=resume_steps)
+    return FormulationEvalCallback(run_dir, args.eval_freq, args.eval_per_class,
+                                   supervisor_modes=modes, resume_from=resume_steps, algo=args.algo)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--timesteps", type=int, default=2_000_000)
@@ -646,6 +663,11 @@ def main() -> None:
         if args.fixed_stage or args.init_model or args.r2_slowdown_test:
             raise SystemExit("--config runs the frozen formulation; drop --fixed-stage, "
                              "--init-model and --r2-slowdown-test")
+        if "overlay" in baseline.get("formulation", {}):
+            # baseline-v3: install the overlay (v3 stages, schedule) before the check.
+            import formulation_v3
+            formulation_v3.apply(cfg)
+            sys.modules[__name__].STAGE_SCHEDULE = cfg.CURRICULUM_STAGE_FRACTIONS
         problems = baseline_config.check(cfg, sys.modules[__name__], baseline)
         if problems:
             raise SystemExit(f"code does not match {baseline['id']}: " + "; ".join(problems))
@@ -766,7 +788,8 @@ def main() -> None:
                                   1 if args.torch_threads else 0,
                                   supervisor=args.train_supervisor == "on",
                                   low_speed_start_frac=args.low_speed_start_frac,
-                                  r2_slowdown_test=args.r2_slowdown_test)
+                                  r2_slowdown_test=args.r2_slowdown_test,
+                                  overlay=bool(baseline and "overlay" in baseline.get("formulation", {})))
                          for i in range(args.num_envs)])
     # SB3 appends ".monitor.csv" unless the name already ends that way.
     monitor = "monitor.csv" if resume_steps is None else f"resume_{resume_steps}.monitor.csv"
@@ -854,10 +877,7 @@ def main() -> None:
         # repository, so a resume continues on the same data.
         *([ReplayBufferCheckpoint(run_dir, args.algo, max(args.checkpoint_every // args.num_envs, 1))]
           if args.algo in OFF_POLICY else []),
-        FormulationEvalCallback(run_dir, args.eval_freq, args.eval_per_class,
-                                supervisor_modes=(("off", "on") if args.eval_supervisor == "both"
-                                                  else (args.eval_supervisor,)),
-                                resume_from=resume_steps, algo=args.algo),
+        _eval_callback(args, run_dir, resume_steps, baseline),
     ])
 
     started = time.time()

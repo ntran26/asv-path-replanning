@@ -4,7 +4,12 @@
 count. This file records only what is *not settled*, ordered so the
 highest-leverage item is first.
 
-**Last updated:** 2026-09-27, revision 44 — the campaign mechanism is removed; each learner x seed is trained on demand with `results/train_seed.sh` (F103).
+**Last updated:** 2026-09-28, revision 49 — the Introduction is your draft 4: literature review moved into §1.2, the paper renumbered to six sections, contributions C1-C4, RQ6 added (skeleton revision 4); A37 opened (physical transfer in this paper or the field paper).
+Revision 48: 2026-09-28 — v1 of the field fine-tune plateaued (field 0.52-0.54), so v2 (field share 0.8, failure weighting, entropy boost) took over from its 2.1 M best; baseline-v3 prepared as a fallback (field stages 6-7, space-time solvability on every episode, v3 dev set); all 630 Paper 2 cases found solvable (F107).
+Revision 47: 2026-09-27 — the field fine-tune (your call): SAC seed 0 continued 2 M -> 3 M with Paper 2-style layouts in half the episodes, selected on the development plus a field validation set, tested on the Paper 2 set and the frozen suite (F106).
+Revision 46: 2026-09-27 — the Paper 2 deployment-layout set made field feasible (revision 2.0): targets start inside the basin, hold one heading, stop short of the wall after the encounter, at 0.20-1.10 m/s; a field set-up sheet per run (F104).
+Revision 45: 2026-09-27 — the Paper 2 deployment-layout set: the three published field layouts with and without a target ship, five COLREGs encounters, fixed and varying target speed; a separate evaluation set, not yet run (F104).
+Revision 44: 2026-09-27 — the campaign mechanism is removed; each learner x seed is trained on demand with `results/train_seed.sh` (F103).
 Revision 43: 2026-09-27 — suite 3.4 (your calls): the frozen headline is the development set's kind of scenario (800 constant-velocity episodes, trained class x geometry only, channels 7.5–10 m), reactive and non-compliant targets in a separate robustness set; A36 closed (F102).
 Revision 42: 2026-09-27 — suite 3.3: every Tier B channel 10 m (your call), seed-0 frozen suite rerun; the channel being-overtaken failure is unchanged, so A36 opened (train being-overtaken and null in channels, or report them as untrained geometry) (F101).
 Revision 41: 2026-09-26 — your calls: A34 option (a), built (suite 3.2, `T-RE` on the COLREGs-VO rule, F100); A26 stays at 2 M; the recommended action on the rest (A32 option 4, A33 carried as a known limit, A10, A3/A4/A6 confirmed, freeze signed off). A35 opened: the COLREGs-VO comparator judges its side rule per candidate.
@@ -48,7 +53,7 @@ generator, the scale audit, noise and randomisation.
 
 | Part | Kind | Needs |
 |---|---|---|
-| **A** | Decisions | a call from you — **1 item (A35)**; A36 closed by suite 3.4; A34, A32, A33, A26, A10, A3/A4/A6 and the freeze sign-off decided 2026-09-26 |
+| **A** | Decisions | a call from you — **3 items (A35, A37, A38)**; A36 closed by suite 3.4; A34, A32, A33, A26, A10, A3/A4/A6 and the freeze sign-off decided 2026-09-26 |
 | **B** | Measurements | basin time — `PART2_BASIN_PLAN.md`, with one addition proposed |
 | **C** | Build work | my time — 8 items |
 
@@ -128,6 +133,10 @@ Cost: none to training (D1 keeps training on `T-CV`); the frozen suite has not r
 |---|---|---|
 | **1. Report as untrained geometry (recommended for this paper)** | R1 split three ways: basin / channel, trained classes / channel being-overtaken + null, flagged as a generalisation result | none; it becomes a finding (off-policy learners generalise worse to an untrained layout) |
 | 2. Train it | add being-overtaken and null to `CHANNEL_CLASSES` in training and the development set | a formulation change: baseline-v3, all four learners retrained (~2 weeks here for seed 0, ~6 for three seeds) |
+
+**A38 — the runtime supervisor lowers success; supervisor v2 proposed (2026-09-28, parked).** With it on, seed-0 success drops ~1 point and target collisions do not fall: it fires almost only in narrow-channel overtaking on a domain-based (not contact-based) test, most stops are false alarms (SAC: 25 of 46 stopped episodes lost, 22 of them to boundary contact after the stop), and 90-97 % of target collisions happen without a stop (crossing, head-on). Plan in `planning/SUPERVISOR_V2_PLAN.md`: a safety-only trigger, supervisor-owned rudder and a recovery hand-back, then a DWA-style safety filter that can turn; no retraining, versioned apart from baseline-v2. Waits for a gap in training.
+
+**A37 — physical transfer: in this paper or the field paper (skeleton S13, opened 2026-09-28).** Introduction draft 4 calls the physical-transfer assessment "planned", lists four contributions without it, and its roadmap has no field section; revision 36 had kept field work *in* this paper (RQ4, claim C-6, old contribution C7, Study 3). Options: **(a)** keep the basin trials here -- add a field section after Results and restore RQ4/C-6 in §1.3; **(b)** move them to the field paper -- drop RQ4 and C-6, keep system identification only as the model's provenance, and list the transfer as future work. Draft 4's wording ("planned", transfer evidence "reported separately") reads as (b); until you decide, the skeleton parks the old §7 unnumbered after §4 and the ledger marks C-6 open.
 
 **A35 — the COLREGs-VO comparator applies its side rule per candidate (found building A34, F100).** `colregs_vo._colregs_ok` decides whether the encounter is "live" (closing, DCPA < `SIDE_FREE_DCPA_M` = 2.5 m) **separately for each candidate velocity**. Any candidate that itself opens the pass beyond 2.5 m is exempt from "pass to starboard", so a quick turn to **port** in a head-on counts as compliant. Measured on a head-on 0.3 m off the reciprocal: the comparator as tuned picks 160° (port); judged on the encounter it picks 200° (starboard). Kuwata et al. apply the COLREGS constraint to an obstacle once the encounter is judged dangerous on the present velocities, then to every candidate — which is what `T-RE` now does (`side_live`).
 
