@@ -171,11 +171,19 @@ def main() -> None:
     algo, seed = previous["algo"], int(previous["seed"])
     import baseline_config
     base = json.loads((ROOT / spec["base_config"]).read_text())
-    problems = baseline_config.check(cfg, tf, base)
+    problems = baseline_config.check(cfg, tf, base)      # installs baseline-v3's overlay if it has one
     if problems:
         raise SystemExit(f"code does not match {base['id']}: " + "; ".join(problems))
+    overlay = "overlay" in base.get("formulation", {})
     start_from = spec.get("start_from", "final")
-    if start_from == "best":
+    if start_from == "checkpoint":
+        # SAC recovery plan: an explicit checkpoint, its VecNormalize and a kept replay buffer.
+        resolve = lambda p: Path(p) if Path(p).is_absolute() else ROOT / p
+        start_model, start_vecnorm = resolve(spec["start_model"]), resolve(spec["start_vecnormalize"])
+        buffer = resolve(spec["start_buffer"]) if algo in tf.OFF_POLICY else None
+        if buffer is not None and not buffer.exists():
+            raise SystemExit(f"replay buffer not found: {buffer}")
+    elif start_from == "best":
         start_model, start_vecnorm = source / "best_model.zip", source / "best_vecnormalize.pkl"
         buffer = tf.best_replay_buffer_path(source, algo) if algo in tf.OFF_POLICY else None
         if buffer is not None and not buffer.exists():
@@ -216,17 +224,31 @@ def main() -> None:
               "switches": tf._formulation_switches(), "platform": tf._platform(),
               "observation_schema": cfg.OBSERVATION_SCHEMA_VERSION}
     (run_dir / "config.json").write_text(json.dumps(config, indent=1, default=str))
+    share = spec.get("field_share", (spec.get("stage_definition") or {}).get("overrides", {}).get("field_share"))
     print(f"[FINETUNE] {source.name} {start_steps:,} -> {start_steps + extra:,} steps, "
-          f"field share {spec['field_share']}, into {run_dir.name}", flush=True)
+          f"field share {share}, into {run_dir.name}", flush=True)
 
     base_seed = 100_000 * (seed + 1) + int(spec["reset_seed_offset"])
     stage = int(spec["scenario_stage"])
-    vec = SubprocVecEnv([tf.make_env(i, base_seed, stage, cfg.VESSEL_RANDOMISATION_SCALE,
+    definition = spec.get("stage_definition")
+    # A spec-defined stage is installed after the workers start (it does not exist
+    # in `constants` yet), so they start one stage earlier.
+    start_stage = int(definition["base_stage"]) if definition else stage
+    vec = SubprocVecEnv([tf.make_env(i, base_seed, start_stage, cfg.VESSEL_RANDOMISATION_SCALE,
                                      supervisor=previous.get("train_supervisor", "on") == "on",
-                                     low_speed_start_frac=float(previous.get("low_speed_start_frac", 0.0)))
+                                     low_speed_start_frac=float(previous.get("low_speed_start_frac", 0.0)),
+                                     overlay=overlay)
                          for i in range(num_envs)])
-    vec.env_method("set_field_mix", float(spec["field_share"]), spec.get("encounter_weights"),
-                   int(spec.get("prefetch", 0)))
+    if definition:
+        full = {**cfg.CURRICULUM_STAGES[int(definition["base_stage"])], **definition["overrides"]}
+        vec.env_method("define_stage", stage, full)
+        config["stage_definition_resolved"] = {k: v for k, v in full.items()}
+        (run_dir / "config.json").write_text(json.dumps(config, indent=1, default=str))
+        print(f"[FINETUNE] stage {stage} installed in every worker: base stage "
+              f"{definition['base_stage']} + {sorted(definition['overrides'])}", flush=True)
+    else:
+        vec.env_method("set_field_mix", float(spec["field_share"]), spec.get("encounter_weights"),
+                       int(spec.get("prefetch", 0)))
     vec = tf.RetryingVecMonitor(vec, filename=str(run_dir / "monitor.csv"),
                                 info_keywords=("reached_goal", "collided", "scenario_class"))
     vec = VecNormalize.load(str(start_vecnorm), vec)
@@ -247,8 +269,12 @@ def main() -> None:
         callbacks.append(EntropyBoost(boost["initial_ent_coef"], boost["target_entropy"], boost["steps"]))
     if not args.smoke:
         modes = ("off", "on") if previous.get("eval_supervisor") == "both" else (previous.get("eval_supervisor", "on"),)
+        extra_set = None
+        if overlay:
+            import formulation_v3
+            extra_set = formulation_v3.field_development_set
         callbacks.append(FieldEvalCallback(run_dir, int(spec["eval_freq"]), start_steps, modes, algo,
-                                           int(previous.get("eval_per_class", 20))))
+                                           int(previous.get("eval_per_class", 20)), extra=extra_set))
     started = time.time()
     model.learn(total_timesteps=extra, reset_num_timesteps=False, callback=CallbackList(callbacks),
                 tb_log_name=run_dir.name, progress_bar=False)

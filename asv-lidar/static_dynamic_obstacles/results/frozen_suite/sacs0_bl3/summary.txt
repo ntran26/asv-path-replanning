@@ -1,0 +1,62 @@
+Frozen suite (sacs0_bl3) — model runs\sac_formulation_seed0_bl3\best_model.zip
+3400 episodes, suite manifest 61788ff19fc317c9, 1894 s
+
+== Tier B (headline, R1)
+-- by supervisor
+              n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+supervisor                                                                            
+off         800    0.935        0.040       0.025    1.356      2.657  -35.379   0.000
+on          800    0.915        0.041       0.044    1.379      2.659  -35.248   0.059
+
+-- by class (supervisor off)
+                   n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+class                                                                                      
+being_overtaken  100    0.940        0.020       0.040    0.797      2.812  -38.587     0.0
+crossing         200    0.825        0.135       0.040    1.297      2.497  -23.717     0.0
+head_on          200    0.975        0.005       0.020    1.589      2.918  -39.793     0.0
+null             100    0.970        0.000       0.030    1.648      5.670  -19.227     0.0
+overtaking       200    0.985        0.010       0.005    1.314      2.349  -49.098     0.0
+
+-- by stratum (supervisor off)
+           n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+stratum                                                                            
+basin    500    0.938        0.034       0.028    1.355      2.799  -31.963     0.0
+channel  300    0.930        0.050       0.020    1.358      2.520  -41.072     0.0
+
+-- by target behaviour (supervisor off)
+             n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+behaviour                                                                            
+cv         800    0.935         0.04       0.025    1.356      2.657  -35.379     0.0
+
+-- crossings by side (supervisor off), the A32 split
+                 n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+crossing_side                                                                            
+port           111    0.856        0.117       0.027    1.243      2.521  -18.120     0.0
+starboard       89    0.787        0.157       0.056    1.365      2.408  -30.699     0.0
+
+== Robustness set (R3): the headline's scenarios with reactive (re) and, in head-ons,
+   non-compliant (nc) targets, on the same seeds
+-- by behaviour (supervisor off)
+             n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+behaviour                                                                            
+nc         200     0.90        0.090       0.010    1.529      4.267  -13.813     0.0
+re         700     0.92        0.049       0.031    1.286      2.599  -31.159     0.0
+
+-- by class and behaviour (supervisor off)
+                             n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+class           behaviour                                                                            
+being_overtaken re         100    0.940         0.02       0.040    0.788      3.264  -37.580     0.0
+crossing        re         200    0.845         0.11       0.045    1.310      2.835  -19.806     0.0
+head_on         nc         200    0.900         0.09       0.010    1.529      4.267  -13.813     0.0
+                re         200    0.920         0.04       0.040    1.496      2.538  -20.754     0.0
+overtaking      re         200    0.985         0.01       0.005    1.299      2.346  -49.709     0.0
+
+-- paired with the constant-velocity twin (supervisor off)
+                             n  success_cv_twin  success   lost  gained
+class           behaviour                                              
+being_overtaken re         100            0.940    0.940  0.030   0.030
+crossing        re         200            0.825    0.845  0.085   0.105
+head_on         nc         200            0.975    0.900  0.095   0.020
+                re         200            0.975    0.920  0.065   0.010
+overtaking      re         200            0.985    0.985  0.005   0.005
+
