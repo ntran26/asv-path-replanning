@@ -639,6 +639,9 @@ def main() -> None:
     ap.add_argument("--resume", type=Path, default=None,
                     help="F86: continue this run directory from its latest checkpoint "
                          "(learner, budget and switches are read from its config.json)")
+    ap.add_argument("--extend-to", type=int, default=None,
+                    help="with --resume: raise the run's step budget to this total (recorded in "
+                         "config.json); the curriculum keeps its final stage past the old budget")
     ap.add_argument("--algo", choices=tuple(ALGORITHMS), default="ppo",
                     help="learner: PPO, RecurrentPPO, TD3, SAC, TQC (the five baselines)")
     ap.add_argument("--gradient-steps", type=int, default=0,
@@ -718,7 +721,17 @@ def main() -> None:
         resume_steps = steps[-1]
         resume_ckpt = run_dir / f"{prefix}{resume_steps}_steps.zip"
         resume_vecnorm = run_dir / f"{prefix}vecnormalize_{resume_steps}_steps.pkl"
+        if args.extend_to:
+            if int(args.extend_to) <= int(args.timesteps):
+                raise SystemExit(f"--extend-to {args.extend_to:,} must exceed the run's budget "
+                                 f"{args.timesteps:,}")
+            print(f"[EXTEND] budget {args.timesteps:,} -> {int(args.extend_to):,} steps", flush=True)
+            # The stage schedule is fractions of the budget; every fraction past
+            # the old budget lies beyond the last stage start, so the final stage holds.
+            args.timesteps = int(args.extend_to)
         print(f"[RESUME] {run_dir.name} from {resume_steps:,} of {args.timesteps:,} steps", flush=True)
+    elif args.extend_to:
+        raise SystemExit("--extend-to needs --resume")
     else:
         run_dir = args.runs_dir / (f"{args.algo}_formulation_seed{args.seed}"
                                    + (f"_{args.tag}" if args.tag else "")
@@ -780,6 +793,9 @@ def main() -> None:
         config.setdefault("resumes", []).append(
             {"from_steps": resume_steps, "at": time.strftime("%Y-%m-%d %H:%M:%S"),
              "replay_buffer": "pending"})
+        if args.extend_to:
+            config["resumes"][-1]["extended_from"] = previous.get("timesteps")
+            config["timesteps"] = args.timesteps
     with open(run_dir / "config.json", "w") as fh:
         json.dump(config, fh, indent=1, default=str)
 

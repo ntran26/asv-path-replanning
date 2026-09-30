@@ -132,3 +132,26 @@ def test_near_deployment_layouts_are_close_but_never_the_tested_layout():
     assert st[6]["field_near_share"] == st[7]["field_near_share"] == fv.NEAR_SHARE > 0
     built = ft.sample(np.random.default_rng(2), encounter="HO", varying=False, near=True, solvable_only=True)
     assert built.flags["motif"].startswith("near-")
+
+
+def test_stage8_failure_replay_and_spec_stage():
+    code = """
+import json, numpy as np
+import constants as cfg, curriculum, formulation_v3 as fv, field_training as ft, train_formulation as tf
+fv.apply(cfg); curriculum.apply_stage(tf.PROPULSION_STAGE)
+from env import ASVLidarEnv
+env = ASVLidarEnv(render_mode=None, scenario_stage=7)
+env.reset(seed=3)
+env.define_stage(8, {**cfg.CURRICULUM_STAGES[7], "field_share": 0.0, "failure_replay": 1.0})
+built = ft.sample(np.random.default_rng(4), encounter="NT", varying=False)
+env._failure_pool = [built]
+env.reset(seed=5)
+replayed = env.scenario is built and not env._failure_pool
+env.define_stage(9, {**cfg.CURRICULUM_STAGES[7], "field_share": 0.0})
+env._failure_pool = [built]
+env.reset(seed=6)
+print(json.dumps({"replayed": replayed, "stage": env.scenario_stage,
+                  "untouched_without_key": env.scenario is not built}))
+"""
+    r = json.loads(_run(code).strip().splitlines()[-1])
+    assert r["replayed"] and r["stage"] == 9 and r["untouched_without_key"]

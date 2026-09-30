@@ -512,6 +512,13 @@ class ASVLidarEnv(gym.Env):
                                solvable_only=bool(st.get("st_feasibility")),
                                near_share=float(st.get("field_near_share", 0.0)))
 
+    def define_stage(self, stage: int, definition: dict) -> None:
+        """Install a curriculum stage in this process and switch to it -- stage 8
+        of the SAC recovery plan, defined by its fine-tune spec rather than by
+        `formulation_v3`, so baseline-v3's frozen digest is untouched."""
+        cfg.CURRICULUM_STAGES[int(stage)] = dict(definition)
+        self.set_scenario_stage(int(stage))
+
     def _stage_dict(self):
         if self.scenario_stage is None:
             return None
@@ -554,6 +561,14 @@ class ASVLidarEnv(gym.Env):
         environment's own stream, so a seeded reset reproduces the episode.
         """
         drawn = built is None
+        # Stage 8 of the SAC recovery plan (`planning/SAC_RECOVERY_PLAN.md`): re-issue a
+        # field layout this worker collided in.  A stage without `failure_replay`
+        # draws nothing extra from the stream, so every other run is unchanged.
+        replay_p = float(self._stage_param("failure_replay", 0.0))
+        pool = getattr(self, "_failure_pool", None)
+        if built is None and replay_p > 0.0 and pool and self._rng.uniform() < replay_p:
+            built = pool.pop(int(self._rng.integers(len(pool))))
+            self.failure_replays = getattr(self, "failure_replays", 0) + 1
         if built is None and self.field_mix > 0.0 and self._rng.uniform() < self.field_mix:
             if getattr(self, "_field_queue", None) is not None:
                 built = self._field_queue.get()
@@ -1174,6 +1189,10 @@ class ASVLidarEnv(gym.Env):
         reached_goal = self._reached_goal()
 
         terminated = collision is not None or reached_goal
+        if (collision is not None and self.scenario is not None
+                and (self.scenario.flags or {}).get("fixed_obstacles")
+                and float(self._stage_param("failure_replay", 0.0)) > 0.0):
+            self._failure_pool = (getattr(self, "_failure_pool", None) or [])[-63:] + [self.scenario]
         self.step_count += 1
         truncated = self.step_count >= cfg.MAX_EPISODE_STEPS and not terminated
 

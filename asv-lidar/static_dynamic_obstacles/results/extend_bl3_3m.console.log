@@ -1,19 +1,10 @@
-code matches baseline-v2
-2026-09-27 11:23:31 == ppo seed 0: already trained
-2026-09-27 11:23:33    frozen suite ppos0_bl2: already evaluated
-2026-09-27 11:23:33 == ppo seed 0 done
-code matches baseline-v3
-2026-09-28 14:19:16 == sac seed 0: training
 2026-09-30 01:41:49 == extend watcher armed: waiting for the 2.5 M run (PID 1708) to finish, then 2.5 M -> 3.0 M
 2026-09-30 10:37:31    2.5 M finished; final model kept as final_model_2500000.zip; resuming to 3.0 M
 2026-09-30 10:39:34    pinned learner 4360
 2026-09-30 20:16:15 == sac seed 0 (bl3) 2.5 M -> 3.0 M exit 0
-code matches baseline-v3
 2026-09-30 20:16:46 == sac seed 0: already trained
 2026-09-30 20:20:19    tier 1 sacs0_bl3 supervisor off exit 0
 2026-09-30 20:23:57    tier 1 sacs0_bl3 supervisor on exit 0
 2026-09-30 20:55:38    frozen suite sacs0_bl3 exit 0
 2026-09-30 21:20:00    Paper 2 set sacs0_bl3 exit 0
 2026-09-30 21:20:01 == sac seed 0 done
-2026-09-30 21:42:35 == sacs0_bl3_stage8: stage 8 from 2.5 M to 3.0 M (configs/finetune_v3_stage8.json)
-2026-09-30 21:45:08    pinned learner 17848

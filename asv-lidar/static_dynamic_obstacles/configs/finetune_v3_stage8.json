@@ -1,0 +1,29 @@
+{
+ "id": "v3-stage8-recovery",
+ "created": "2026-09-30",
+ "purpose": "The agreed back-up plan (planning/SAC_RECOVERY_PLAN.md section 0), run on your call to see whether a focused stage 8 improves on the 3 M policy. Restarts from the 2.5 M checkpoint of baseline-v3 SAC seed 0 and trains to 3.0 M (the 3 M limit): three-panel layouts in 70 % of episodes, weighted to the failing cases, failure replay, and an exploration boost. Reward and observation unchanged. The 3 M policy is kept as the best policy (runs/sac_formulation_seed0_bl3/kept_best_3M/).",
+ "base_config": "configs/baseline_v3.json",
+ "start_from": "checkpoint",
+ "start_model": "runs/sac_formulation_seed0_bl3/sac_2500000_steps.zip",
+ "start_vecnormalize": "runs/sac_formulation_seed0_bl3/sac_vecnormalize_2500000_steps.pkl",
+ "start_buffer": "C:/Users/hntran/OneDrive - University of Tasmania/Documents/PhD/asv_replay_buffers/kept_checkpoints/sac_formulation_seed0_bl3_sac_replay_buffer_2500000_steps.pkl",
+ "total_timesteps": 3000000,
+ "tag": "stage8",
+ "scenario_stage": 8,
+ "stage_definition": {
+  "base_stage": 7,
+  "overrides": {
+   "field_share": 0.70,
+   "field_weights": {"NT": 0.25, "HO": 0.20, "CRP": 0.18, "CRS": 0.20, "OT": 0.05, "BO": 0.12},
+   "failure_replay": 0.30
+  }
+ },
+ "field_weights_basis": "failure rates of the 3 M policy: three-panel development set (NT 0.30, HO 0.35, CRP 0.31-0.38, CRS 0.35, OT 0.04-0.08, BO 0.19) and the Paper 2 set's fixed-speed cases (HO 0.35, CRP 0.43, CRS 0.45, OT 0.25, BO 0.35); no-target kept at a quarter of field episodes because passing every no-target layout is a hard requirement",
+ "stage_definition_note": "stage 7 otherwise unchanged: no CPA guard, 30 % of field targets varying speed, 30 % near-reference layouts, space-time solvability, clutter 1-3 weighted to 3",
+ "entropy_boost": {"initial_ent_coef": 0.01, "target_entropy": -1.0, "steps": 100000},
+ "eval_freq": 100000,
+ "checkpoint_every": 250000,
+ "reset_seed_offset": 77777,
+ "selection": "goal - 2 x collision over the development set (120) plus the v3 three-panel development set (150), supervisor off; the 2.5 M start model is evaluated first",
+ "test": "the frozen suite and the Paper 2 set on this run's best model, compared with the 3 M policy (sacs0_bl3)"
+}
