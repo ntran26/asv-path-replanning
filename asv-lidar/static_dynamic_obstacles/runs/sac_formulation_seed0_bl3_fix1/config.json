@@ -1,0 +1,126 @@
+{
+ "finetune": {
+  "id": "v3-fix1-admissibility-static",
+  "created": "2026-10-01",
+  "purpose": "Fix 1 (your call, 2026-10-01): the compliant-turn admissibility test also counts perceived static obstacles (src/colregs/geometry.py obstacle_room; switch ADMISSIBILITY_STATIC). Diagnosis: the test saw only the map boundary, so near a static obstacle the context said the compliant turn was fine and the R-2 slowdown credit never switched on (L2 head-on 0/20: the policy turned starboard into the gate obstacle, never slowing). This run repeats the exact 2.5 M -> 3.0 M stage-7 continuation that produced the kept 3 M policy, with only fix 1 switched on, so the comparison isolates the fix.",
+  "base_config": "configs/baseline_v3.json",
+  "start_from": "checkpoint",
+  "start_model": "runs/sac_formulation_seed0_bl3/sac_2500000_steps.zip",
+  "start_vecnormalize": "runs/sac_formulation_seed0_bl3/sac_vecnormalize_2500000_steps.pkl",
+  "start_buffer": "C:/Users/hntran/OneDrive - University of Tasmania/Documents/PhD/asv_replay_buffers/kept_checkpoints/sac_formulation_seed0_bl3_sac_replay_buffer_2500000_steps.pkl",
+  "total_timesteps": 3000000,
+  "tag": "fix1",
+  "scenario_stage": 7,
+  "stage_definition": {
+   "base_stage": 7,
+   "overrides": {}
+  },
+  "constant_overrides": {
+   "ADMISSIBILITY_STATIC": true
+  },
+  "eval_freq": 100000,
+  "checkpoint_every": 250000,
+  "reset_seed_offset": 66666,
+  "selection": "goal - 2 x collision over the development set (120) plus the v3 three-panel development set (150), safety layer off; the 2.5 M start model is evaluated first (under fix 1)",
+  "test": "the frozen suite and the Paper 2 set on this run's best model (evaluated with fix 1 on, read from config.json), against the kept 3 M policy (sacs0_bl3)"
+ },
+ "spec_path": "configs\\finetune_v3_fix1.json",
+ "source_run": "sac_formulation_seed0_bl3",
+ "started_from": "sac_formulation_seed0_bl3/sac_2500000_steps.zip",
+ "algo": "sac",
+ "seed": 0,
+ "start_steps": 2500000,
+ "extra_timesteps": 500000,
+ "timesteps": 3000000,
+ "num_envs": 10,
+ "hyperparameters": {
+  "learning_rate": 0.0003,
+  "buffer_size": 1000000,
+  "batch_size": 256,
+  "tau": 0.005,
+  "gamma": 0.9509900498999999,
+  "learning_starts": 10000,
+  "train_freq": 1,
+  "ent_coef": "auto",
+  "gradient_steps": 10
+ },
+ "train_supervisor": "off",
+ "eval_supervisor": "both",
+ "low_speed_start_frac": 0.15,
+ "baseline_config": {
+  "id": "baseline-v3",
+  "formulation_digest": "03a9c0c22f53ee0b"
+ },
+ "field_training_revision": "1.0",
+ "replay_buffer": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv_replay_buffers\\kept_checkpoints\\sac_formulation_seed0_bl3_sac_replay_buffer_2500000_steps.pkl",
+ "switches": {
+  "R2_SLOWDOWN_TEST": "stop",
+  "CROSSING_PORT_SHARE_TRAINING": 0.6,
+  "V_HOLD_GROWS": true,
+  "V_PORT_HEADING_DEAD_DEG": 5.0,
+  "V_PORT_LATCHED_RHO": true,
+  "V_PORT_HEADING_NEEDS_ADMISSIBLE": false,
+  "STAGE3_WEIGHTS": null,
+  "DEFAULT_GEOMETRY_MODE": "basin",
+  "OBSERVATION_SCHEMA_VERSION": "a25-v3-context"
+ },
+ "platform": {
+  "python": "3.10.11",
+  "torch": "2.2.1+cpu",
+  "stable_baselines3": "2.3.2",
+  "sb3_contrib": "2.3.0",
+  "numpy": "1.26.4",
+  "os": "Windows-10-10.0.26200-SP0",
+  "machine": "JL2VSV3",
+  "cpu_count": 12,
+  "git": {
+   "head": "476897c51945e23e599fca5cf9113227c8e989e1",
+   "src_dirty": true
+  }
+ },
+ "observation_schema": "a25-v3-context",
+ "constant_overrides": {
+  "ADMISSIBILITY_STATIC": true
+ },
+ "stage_definition_resolved": {
+  "width": [
+   3.5,
+   10.0
+  ],
+  "vary": true,
+  "bend": false,
+  "classes": [
+   "head_on",
+   "crossing",
+   "overtaking",
+   "being_overtaken",
+   "null",
+   "no_target"
+  ],
+  "clutter": [
+   1,
+   3
+  ],
+  "tcpa": "full",
+  "p_basin": 0.75,
+  "slant_max": null,
+  "clutter_weights": {
+   "1": 0.2,
+   "2": 0.3,
+   "3": 0.5
+  },
+  "cpa_guard": 0.0,
+  "field_share": 0.45,
+  "field_weights": {
+   "NT": 0.2,
+   "HO": 0.2,
+   "CRP": 0.15,
+   "CRS": 0.15,
+   "OT": 0.15,
+   "BO": 0.15
+  },
+  "field_varying_share": 0.3,
+  "field_near_share": 0.3,
+  "st_feasibility": true
+ }
+}

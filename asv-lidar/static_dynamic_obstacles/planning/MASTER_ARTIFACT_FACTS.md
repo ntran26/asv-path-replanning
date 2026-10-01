@@ -421,7 +421,7 @@ selection and testing never share an episode:
 | Perception degradation | pose drift, detection dropout, occlusion, velocity-estimate noise, separately and jointly | robustness to sensing |
 
 Selection score: goal rate − 2 × collision rate on the development sets,
-supervisor off.
+safety layer off.
 
 ## 7. Field trials and the UDP bridge (Section 8)
 

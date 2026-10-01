@@ -1,0 +1,20 @@
+{
+ "id": "v3-fix1-admissibility-static",
+ "created": "2026-10-01",
+ "purpose": "Fix 1 (your call, 2026-10-01): the compliant-turn admissibility test also counts perceived static obstacles (src/colregs/geometry.py obstacle_room; switch ADMISSIBILITY_STATIC). Diagnosis: the test saw only the map boundary, so near a static obstacle the context said the compliant turn was fine and the R-2 slowdown credit never switched on (L2 head-on 0/20: the policy turned starboard into the gate obstacle, never slowing). This run repeats the exact 2.5 M -> 3.0 M stage-7 continuation that produced the kept 3 M policy, with only fix 1 switched on, so the comparison isolates the fix.",
+ "base_config": "configs/baseline_v3.json",
+ "start_from": "checkpoint",
+ "start_model": "runs/sac_formulation_seed0_bl3/sac_2500000_steps.zip",
+ "start_vecnormalize": "runs/sac_formulation_seed0_bl3/sac_vecnormalize_2500000_steps.pkl",
+ "start_buffer": "C:/Users/hntran/OneDrive - University of Tasmania/Documents/PhD/asv_replay_buffers/kept_checkpoints/sac_formulation_seed0_bl3_sac_replay_buffer_2500000_steps.pkl",
+ "total_timesteps": 3000000,
+ "tag": "fix1",
+ "scenario_stage": 7,
+ "stage_definition": {"base_stage": 7, "overrides": {}},
+ "constant_overrides": {"ADMISSIBILITY_STATIC": true},
+ "eval_freq": 100000,
+ "checkpoint_every": 250000,
+ "reset_seed_offset": 66666,
+ "selection": "goal - 2 x collision over the development set (120) plus the v3 three-panel development set (150), safety layer off; the 2.5 M start model is evaluated first (under fix 1)",
+ "test": "the frozen suite and the Paper 2 set on this run's best model (evaluated with fix 1 on, read from config.json), against the kept 3 M policy (sacs0_bl3)"
+}

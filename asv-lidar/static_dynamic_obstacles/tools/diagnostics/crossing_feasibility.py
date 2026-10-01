@@ -84,7 +84,7 @@ def main():
     geo = d[d.policy == "follower"].set_index("idx")[["side", "width", "dcpa", "tcpa", "k", "ct", "range0",
                                                       "label_escapable"]].join(best)
     pd.set_option("display.width", 250)
-    lines = ["== target-collision rate by scripted response (development crossings, obstacles off, supervisor off)",
+    lines = ["== target-collision rate by scripted response (development crossings, obstacles off, safety layer off)",
              d.pivot_table(index="policy", columns="side", values="hit", aggfunc="mean").round(2).to_string(),
              "", f"best of all responses still hits the target: {geo.best_hit.mean():.2f} "
              f"({int(geo.best_hit.sum())}/{len(geo)})", "",

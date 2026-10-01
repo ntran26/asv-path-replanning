@@ -29,7 +29,7 @@
 ## 1. Overview
 
 PhD candidate, Australian Maritime College / University of Tasmania (ID 675973).
-Supervisors: Dr Hung Nguyen, Dr Peter King, Dr Minh Tran. Thesis target ~April 2027.
+Safety layers: Dr Hung Nguyen, Dr Peter King, Dr Minh Tran. Thesis target ~April 2027.
 
 Research: machine-learning navigation and control for Autonomous Surface Vessels —
 path following combined with real-time obstacle avoidance via deep RL. Multi-paper series.

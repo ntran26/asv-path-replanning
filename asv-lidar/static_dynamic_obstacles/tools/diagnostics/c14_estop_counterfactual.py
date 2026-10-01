@@ -1,6 +1,6 @@
-"""A18: the C14 head-on set with the emergency-stop supervisor on and off.
+"""A18: the C14 head-on set with the emergency-stop safety layer on and off.
 
-Found (F54): switching the supervisor off cut target collisions from 0.43 to
+Found (F54): switching the safety layer off cut target collisions from 0.43 to
 0.24 at 5 m, 0.25 to 0.15 at 6 m and 0.24 to 0.14 at 7 m, with 10 saved and
 1 added; 10 m was unchanged.
 
@@ -41,7 +41,7 @@ def main():
     print(d.pivot_table(index="wbin", columns="estop", values=["coll_target", "estops", "u_min"],
                         aggfunc="mean", observed=True).round(2))
     on, off = d[d.estop == "on"].set_index("idx"), d[d.estop == "off"].set_index("idx")
-    print("saved by switching the supervisor off:", int((on.coll_target & ~off.coll_target).sum()),
+    print("saved by switching the safety layer off:", int((on.coll_target & ~off.coll_target).sum()),
           " newly collided:", int((~on.coll_target & off.coll_target).sum()))
 
 

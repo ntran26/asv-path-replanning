@@ -83,7 +83,7 @@ def main() -> int:
     ap.add_argument("--model", type=Path, help="a trained policy (.zip)")
     ap.add_argument("--policy", choices=("los_dwa", "colregs_vo", "encounter_vo", "reference"),
                     help="a classical comparator instead of a model")
-    ap.add_argument("--supervisor", choices=("off", "on", "both"), default="off")
+    ap.add_argument("--safety", "--supervisor", dest="supervisor", choices=("off", "on", "both"), default="off")
     ap.add_argument("--tag", help="output folder name (default: from the model or policy)")
     args = ap.parse_args()
     if bool(args.model) == bool(args.policy):

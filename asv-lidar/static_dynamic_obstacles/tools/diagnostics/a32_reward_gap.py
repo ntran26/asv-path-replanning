@@ -18,7 +18,7 @@ reported undiscounted and discounted at PPO's gamma from the branch step: the
 discounted gap is what the advantage of the opening decision sees.
 
 Crossings: the 20 development crossings plus 60 per side from the training
-namespace with the side forced; basin default, obstacles off, supervisor off.
+namespace with the side forced; basin default, obstacles off, safety layer off.
 
     python tools/diagnostics/a32_reward_gap.py --processes 10
 """

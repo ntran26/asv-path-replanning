@@ -181,7 +181,7 @@ def rpm_to_s2(rpm: float, rpm_max: float = 24.0, s2_max: float = 100.0) -> float
 # importable by the bridge without the simulator.
 
 def stop_required(contexts) -> Optional[str]:
-    """The supervisor trigger.  Returns a reason string, or None.
+    """The safety layer trigger.  Returns a reason string, or None.
 
     **Fires only when a give-way encounter is in extremis AND the compliant
     alteration is inadmissible** -- the one situation in which the precedence
@@ -190,21 +190,21 @@ def stop_required(contexts) -> Optional[str]:
 
     * **pre-empt a policy that could still turn.**  If the compliant alteration
       is admissible, avoiding the collision is the policy's job, and a
-      supervisor that stopped the vessel there would train the policy to leave
+      safety layer that stopped the vessel there would train the policy to leave
       its manoeuvres late and be rescued;
     * **fire when being overtaken.**  Stopping dead in front of an overtaking
       vessel is the wrong act under 17(b) -- it removes the stand-on vessel's
       way at the moment the overtaker is relying on it;
     * **read ground truth.**  The contexts are perceived.  A controller on the
-      water has nothing else, and a supervisor that read truth in training
+      water has nothing else, and a safety layer that read truth in training
       would hand the evaluated system information the comparators never get
       (04 §8).
 
     **A18 (decided, option 1): and only when stopping clears.**  A stop cannot
     change a reciprocal head-on target's DCPA -- the target runs onto the
-    stopped ship -- so the supervisor also requires `stop_clears`: the DCPA
+    stopped ship -- so the safety layer also requires `stop_clears`: the DCPA
     recomputed with the own ship stationary reaches `ESTOP_CLEAR_DCPA_M`.
-    Without it the supervisor stopped the own ship dead ahead of narrow-channel
+    Without it the safety layer stopped the own ship dead ahead of narrow-channel
     head-on targets and caused 74 % of their collisions (F54).
 
     `in_extremis` is 02a's own 17(b) predicate -- DCPA inside `d_req` with TCPA

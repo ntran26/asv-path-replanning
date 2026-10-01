@@ -133,7 +133,7 @@ def main():
         n=("goal", "size"), tcpa_first_turn=("tcpa_at_first_turn", "median"),
         peak_turn=("peak_dpsi_compliant", "median"), speed_at_cpa=("speed_at_closest", "median"),
         compliant_first=("first_turn_compliant", lambda s: s.dropna().astype(bool).mean())).round(2)
-    text = (f"Development crossings ({len(d) // 2}), {args.tag} vs reference, supervisor off "
+    text = (f"Development crossings ({len(d) // 2}), {args.tag} vs reference, safety layer off "
             f"({time.time() - started:.0f} s)\n\n== summary (medians)\n{summary}\n\n"
             f"== paired outcome (goal?)\n{paired}\n\n== by outcome\n{by_outcome}\n")
     (OUT / f"summary_{args.tag}.txt").write_text(text, encoding="utf-8")

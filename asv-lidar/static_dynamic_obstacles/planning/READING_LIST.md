@@ -89,7 +89,7 @@ and the direct prior work.
 
 | | Reference | Kind | Why, and where it's used |
 |---|---|---|---|
-| ★ | Krasowski, H. & Althoff, M. (2024). Provable traffic rule compliance in safe reinforcement learning on the open sea. *IEEE Transactions on Intelligent Vehicles* 9(12):7617–7634 | cited (`02`, `PROJECT_BRIEF.md`) | The model for turning COLREGs into checkable predicates — `v_*` terms, the admissibility predicate, the emergency-stop supervisor as a safety layer |
+| ★ | Krasowski, H. & Althoff, M. (2024). Provable traffic rule compliance in safe reinforcement learning on the open sea. *IEEE Transactions on Intelligent Vehicles* 9(12):7617–7634 | cited (`02`, `PROJECT_BRIEF.md`) | The model for turning COLREGs into checkable predicates — `v_*` terms, the admissibility predicate, the emergency-stop safety layer as a safety layer |
 
 ## 8. Classical comparators (and the reactive target model)
 

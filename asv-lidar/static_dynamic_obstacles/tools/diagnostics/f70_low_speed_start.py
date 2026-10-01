@@ -1,6 +1,6 @@
 """Do low-speed starts break the solved encounter?  (F70)
 
-Run 5 (F68: supervisor off in training, 15 % of episodes starting slow or at
+Run 5 (F68: safety layer off in training, 15 % of episodes starting slow or at
 rest) finished at goal 0.76 against run 4's 0.87.  In its last training quarter
 being-overtaken episodes reached the goal 0.52 of the time against run 4's 0.80.
 
@@ -10,7 +10,7 @@ delayed by its acceleration, which moves every CPA: an overtaker solved to pass
 clear of a cruising ship can run into a stationary one (A15's floor no longer
 holds), and a crossing solved to be escapable (A22) may not be.
 
-This replays the development set (20 per class, supervisor off) starting at
+This replays the development set (20 per class, safety layer off) starting at
 cruise and at rest, under
 
 * `follower` -- hold path and speed; isolates what the start speed does to the
@@ -63,7 +63,7 @@ def main() -> None:
     overall = d.groupby(["who", "start"]).agg(
         goal=("outcome", lambda s: (s == "goal").mean()),
         target=("collided_target", "mean")).round(3).unstack("start")
-    text = (f"F70 -- development set, supervisor off, start at cruise vs rest "
+    text = (f"F70 -- development set, safety layer off, start at cruise vs rest "
             f"({len(d)} episodes, {time.time() - started:.0f} s)\n\n== overall\n{overall}\n\n"
             f"== per class\n{table}\n")
     (OUT / "summary.txt").write_text(text, encoding="utf-8")

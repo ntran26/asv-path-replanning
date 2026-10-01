@@ -107,7 +107,7 @@ def main():
             "col", "pf", "prog", "exist", "reward"]
     table = pd.DataFrame({ph: [d[f"{ph}_{c}"].mean() for c in cols] for ph in ("engaged", "other")},
                          index=cols).round(3)
-    text = (f"Being-overtaken development episodes, {args.tag}, supervisor off "
+    text = (f"Being-overtaken development episodes, {args.tag}, safety layer off "
             f"({time.time() - started:.0f} s)\n"
             f"outcomes {d.outcome.value_counts().to_dict()}; max speed mean {d.max_u.mean():.2f} m/s; "
             f"min range to overtaker median {d.min_range.median():.2f} m\n\n"

@@ -74,10 +74,17 @@ def _dilate(mask: np.ndarray, r_cells: int) -> np.ndarray:
 def solvable(start: Tuple[float, float], goal: Tuple[float, float], panels: Sequence,
              built=None, *, nav: Optional[Sequence] = None, horizon_s: Optional[float] = None,
              speed: float = OWN_SPEED_MPS, separation: float = TARGET_SEPARATION_M,
-             dt: float = DT_S) -> dict:
+             dt: float = DT_S, domain: bool = False) -> dict:
     """Is there a trajectory from `start` to `goal` clear of `panels` and of the
     target of `built` (if any) at every step?  Returns {"solvable", "t_goal_s",
-    "static_route"}; `static_route` is F74's answer without the target."""
+    "static_route"}; `static_route` is F74's answer without the target.
+
+    `domain=True` (rule-aware solvability, 2026-10-01): the own ship must also stay
+    out of the target's asymmetric ship domain (fore 3.14 m, aft 1.57 m, abeam
+    1.25 m -- the domain the reward and d_req use) at every step.  Longer ahead
+    than astern, it forbids cutting close across the target's bow and allows a
+    pass astern, so a case unsolvable with it has no encounter-consistent
+    trajectory at all."""
     nav = list(nav_polygon((cfg.MAP_WIDTH, cfg.MAP_HEIGHT))) if nav is None else list(nav)
     horizon_s = cfg.MAX_EPISODE_STEPS * cfg.UPDATE_RATE if horizon_s is None else float(horizon_s)
     free, (x0, y0, res) = feas.free_grid(nav, [list(p) for p in panels])
@@ -92,12 +99,21 @@ def solvable(start: Tuple[float, float], goal: Tuple[float, float], panels: Sequ
 
     static = feas.layout_feasible(tuple(start), tuple(goal), nav, [list(p) for p in panels])
     track = target_track(built, horizon_s, dt) if built is not None else np.zeros((0, 2))
+    if domain and len(track):
+        h = np.radians(float(built.target_heading))
+        fore, aft, abeam = cfg.DOMAIN_FORE, cfg.DOMAIN_AFT, cfg.DOMAIN_LATERAL
     steps = int(round(horizon_s / dt))
     for k in range(1, steps + 1):
         reach = _dilate(reach, r_cells) & free
         if len(track):
             px, py = track[min(k, len(track) - 1)]
             reach &= np.hypot(gx - px, gy - py) >= separation
+            if domain:
+                dx, dy = gx - px, gy - py
+                along = dx * np.sin(h) + dy * np.cos(h)
+                across = dx * np.cos(h) - dy * np.sin(h)
+                a = np.where(along >= 0.0, fore, aft)
+                reach &= (along / a) ** 2 + (across / abeam) ** 2 > 1.0
         if (reach & goal_mask).any():
             return {"solvable": True, "t_goal_s": k * dt, "static_route": bool(static)}
         if not reach.any():

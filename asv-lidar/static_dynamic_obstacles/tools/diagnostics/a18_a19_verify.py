@@ -4,11 +4,11 @@ The same 100 head-on scenarios as `c14_*` (20 per width at 5, 6, 7, 8, 10 m,
 development seeds), obstacles off, nominal hull.  Reports, per width:
 
 * target-collision rate, stops and minimum speed with the run 2 model -- against
-  `c14_estop.csv`'s supervisor-on column (0.43, 0.25, 0.24, 0.16, 0.05);
+  `c14_estop.csv`'s safety-layer-on column (0.43, 0.25, 0.24, 0.16, 0.05);
 * how often a head-on latches a **port** turn sense, for the model and a
   non-avoiding path follower -- against `c14_sense.csv` (0.67 and 0.20).
 
-The run 2 model was trained under the old supervisor and classifier, so this
+The run 2 model was trained under the old safety layer and classifier, so this
 measures the mechanism, not a retrained policy.
 
     python tools/diagnostics/a18_a19_verify.py
@@ -94,7 +94,7 @@ def main():
         coll_target=("coll_target", "mean"), estops=("estops", "mean"), u_min=("u_min", "median"),
         ever_port_sense=("ever_port_sense", "mean"), p_port_sense=("p_port_sense", "mean")).round(2)
     m.insert(0, "coll_before", pd.Series(BEFORE_COLLISION))
-    print("== run 2 model under A18 + A19 (coll_before = old supervisor, old classifier)")
+    print("== run 2 model under A18 + A19 (coll_before = old safety layer, old classifier)")
     print(m)
     f = d[d.policy == "follower"].groupby("wbin", observed=True).agg(
         coll_target=("coll_target", "mean"), ever_port_sense=("ever_port_sense", "mean"),

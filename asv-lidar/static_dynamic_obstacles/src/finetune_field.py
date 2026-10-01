@@ -111,7 +111,7 @@ class FieldEvalCallback(tf.FormulationEvalCallback):
                 tf.save_replay_buffer(self.model, tf.best_replay_buffer_path(self.run_dir, self.algo))
         per_code = " ".join(f"{c} {summary[f'field/{c}/goal']:.2f}" for c in ("NT",) + field_training.ENCOUNTER_CODES
                             if f"field/{c}/goal" in summary)
-        print(f"[EVAL] t={self.num_timesteps:,} supervisor {mode} goal {summary['goal_rate']:.2f} "
+        print(f"[EVAL] t={self.num_timesteps:,} safety {mode} goal {summary['goal_rate']:.2f} "
               f"collision {summary['collision_rate']:.2f} | dev goal {summary['dev/goal']:.2f} "
               f"| field goal {summary['field/goal']:.2f} ({per_code}) ({summary['eval_wall_s']} s)", flush=True)
 
@@ -175,6 +175,10 @@ def main() -> None:
     if problems:
         raise SystemExit(f"code does not match {base['id']}: " + "; ".join(problems))
     overlay = "overlay" in base.get("formulation", {})
+    # Run-time switches (fix 1): set after the frozen check, which reads constants.py as written.
+    overrides = spec.get("constant_overrides") or {}
+    for name, value in overrides.items():
+        setattr(cfg, name, value)
     start_from = spec.get("start_from", "final")
     if start_from == "checkpoint":
         # SAC recovery plan: an explicit checkpoint, its VecNormalize and a kept replay buffer.
@@ -222,7 +226,8 @@ def main() -> None:
               "field_training_revision": field_training.REVISION,
               "replay_buffer": str(buffer) if buffer else None,
               "switches": tf._formulation_switches(), "platform": tf._platform(),
-              "observation_schema": cfg.OBSERVATION_SCHEMA_VERSION}
+              "observation_schema": cfg.OBSERVATION_SCHEMA_VERSION,
+              "constant_overrides": overrides}
     (run_dir / "config.json").write_text(json.dumps(config, indent=1, default=str))
     share = spec.get("field_share", (spec.get("stage_definition") or {}).get("overrides", {}).get("field_share"))
     print(f"[FINETUNE] {source.name} {start_steps:,} -> {start_steps + extra:,} steps, "
@@ -239,6 +244,9 @@ def main() -> None:
                                      low_speed_start_frac=float(previous.get("low_speed_start_frac", 0.0)),
                                      overlay=overlay)
                          for i in range(num_envs)])
+    if overrides:
+        vec.env_method("set_constants", overrides)
+        print(f"[FINETUNE] run-time switches in every worker: {overrides}", flush=True)
     if definition:
         full = {**cfg.CURRICULUM_STAGES[int(definition["base_stage"])], **definition["overrides"]}
         vec.env_method("define_stage", stage, full)

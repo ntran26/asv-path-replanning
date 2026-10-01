@@ -4,7 +4,7 @@ The three published Paper 2 field layouts with and without a target ship
 (`src/paper2_set.py`): 30 no-target episodes, and 300 target scenarios (five
 COLREGs encounters x 3 layouts x 20), each run with a constant-velocity target
 (FIX) and with the same target varying its speed once (VAR) -- 630 episodes per
-supervisor mode.  **Not part of the frozen suite**, and not in the paper's
+safety layer mode.  **Not part of the frozen suite**, and not in the paper's
 headline tables.
 
     python tools/tiers/paper2_suite.py --model runs/sac_formulation_seed0_bl2/best_model.zip
@@ -76,7 +76,7 @@ def _tag_for(model: Path) -> str:
     return f"{m.group(1)}s{m.group(2)}_{m.group(3)}" if m else model.parent.name
 
 
-def evaluate(records, short, manifest, *, tag, model=None, policy="model",
+def evaluate(records, short, manifest, *, tag, model=None, policy="model", safety_version=1,
              supervisor="both", processes=None) -> str:
     """Run the set on one policy; write `results/paper2_set/<tag>/`."""
     out = OUT / tag
@@ -92,7 +92,7 @@ def evaluate(records, short, manifest, *, tag, model=None, policy="model",
     frames = []
     for mode in (("off", "on") if supervisor == "both" else (supervisor,)):
         rows = run_pool(jobs, model_path=model, processes=processes,
-                        overrides={"EMERGENCY_STOP_ENABLED": mode == "on"})
+                        overrides={"EMERGENCY_STOP_ENABLED": mode == "on", "SAFETY_VERSION": int(safety_version)})
         f = pd.DataFrame(rows)
         f["supervisor"] = mode
         frames.append(f)
@@ -107,8 +107,8 @@ def evaluate(records, short, manifest, *, tag, model=None, policy="model",
             f"{time.time() - started:.0f} s", ""]
     if short:
         text += [f"== {len(short)} cell(s) short of their count: {short}", ""]
-    text += ["-- by supervisor", _summarise(d, "supervisor").to_string(), "",
-             f"-- no target, by layout (supervisor {off.supervisor.iloc[0]})",
+    text += ["-- by safety layer", _summarise(d, "supervisor").to_string(), "",
+             f"-- no target, by layout (safety layer {off.supervisor.iloc[0]})",
              _summarise(off[off.encounter == "NT"], "layout").to_string(), "",
              "-- with a target, by encounter and speed", _summarise(tgt, ["encounter", "speed"]).to_string(), "",
              "-- with a target, by layout and speed", _summarise(tgt, ["layout", "speed"]).to_string(), ""]
@@ -138,7 +138,9 @@ def main() -> int:
     ap.add_argument("--policy", choices=("los_dwa", "colregs_vo", "encounter_vo", "reference"),
                     help="a classical comparator instead of a model")
     ap.add_argument("--tag", help="output folder (default for a model: e.g. sacs0_bl2 from its run folder)")
-    ap.add_argument("--supervisor", choices=("off", "on", "both"), default="both")
+    ap.add_argument("--safety-version", type=int, choices=(1, 2), default=1,
+                    help="safety layer used when it is on: 1 = the stop latch (default), 2 = the predictive filter")
+    ap.add_argument("--safety", "--supervisor", dest="supervisor", choices=("off", "on", "both"), default="both")
     ap.add_argument("--processes", type=int, default=None)
     args = ap.parse_args()
     if bool(args.model) == bool(args.policy):
@@ -159,12 +161,12 @@ def main() -> int:
                 "layouts": p2.LAYOUTS}
     if args.policy:
         evaluate(records, short, manifest, tag=args.tag, policy=args.policy,
-                 supervisor=args.supervisor, processes=args.processes)
+                 supervisor=args.supervisor, processes=args.processes, safety_version=args.safety_version)
         return 0
     for m in args.model:
         model = m if m.is_absolute() else ROOT / m
         evaluate(records, short, manifest, tag=args.tag or _tag_for(model), model=model,
-                 supervisor=args.supervisor, processes=args.processes)
+                 supervisor=args.supervisor, processes=args.processes, safety_version=args.safety_version)
     return 0
 
 

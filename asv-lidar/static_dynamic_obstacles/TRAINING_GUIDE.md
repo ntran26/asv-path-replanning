@@ -1,5 +1,8 @@
 # Training guide — training the baseline runs on demand
 
+> **Naming (2026-10-01).** "Supervisor" is now called the **safety layer** ("safety" for short) everywhere in documents, logs and command-line options (`--safety`, `--train-safety`, `--eval-safety`; the old flags still work). Identifiers frozen in the baseline configs and run records keep their old names, because renaming them would break the baseline-v2/v3 digests and the ability to read past results: `train_supervisor`, `eval_supervisor`, `ESTOP_TRIGGER = "supervisor"`, and the `supervisor` column in episode CSVs and `eval_summary.json`.
+
+
 How to train, check, pause, resume and evaluate the baseline runs (PPO,
 RecurrentPPO, SAC, TQC × 3 seeds) on the frozen formulation **baseline-v2**
 (`configs/baseline_v2.json`). **Each run is trained on demand, one learner and
@@ -27,7 +30,7 @@ F96 (baseline-v2), F102 (the frozen suite, suite 3.4); `OPEN_PROBLEMS.md` A26
 | Training output of a run | `runs/<learner>_formulation_seed<N>_bl2.log` |
 | Event log (started / resumed / finished / evaluated) | `results/train_seed.log` (`results/baseline_campaign.log` holds the seed-0 campaign's events) |
 | Tier 1 of a finished run (development set, a diagnostic) | `results/tiers/tier1_<learner>s<N>_bl2_supervisor_{off,on}/summary.txt` |
-| **Frozen suite of a finished run (what the paper reports)** | `results/frozen_suite/<learner>s<N>_bl2/summary.txt` — **Tier B**, suite 3.4: the 800-episode headline and the 900-episode robustness set, supervisor off and on. Tier A is the **extended** set and runs only on request (`--tiers a,b`) |
+| **Frozen suite of a finished run (what the paper reports)** | `results/frozen_suite/<learner>s<N>_bl2/summary.txt` — **Tier B**, suite 3.4: the 800-episode headline and the 900-episode robustness set, safety layer off and on. Tier A is the **extended** set and runs only on request (`--tiers a,b`) |
 | TensorBoard curves | `runs/tensorboard/` |
 | Off-policy replay buffers (SAC/TQC only) | `PhD/asv_replay_buffers/<run>/` — **outside the repository**; the latest checkpoint's while training, and the final one kept when the run ends so it can be continued |
 
@@ -35,7 +38,7 @@ Inside a run folder:
 
 | File | What it is |
 |---|---|
-| `best_model.zip` | **the model the paper uses** — best development-set score (goal − 2 × collision, supervisor off) |
+| `best_model.zip` | **the model the paper uses** — best development-set score (goal − 2 × collision, safety layer off) |
 | `final_model.zip` | the model at 2 M steps; its presence means the run is **finished** |
 | `<learner>_<steps>_steps.zip` | checkpoints every 250 k steps (what a resume starts from) |
 | `*vecnormalize*.pkl` | reward normalisation statistics (a few KB) |
@@ -83,8 +86,8 @@ for the planned runs. The script:
 2. trains the run -- or **resumes** it if the folder has a checkpoint, or skips
    training if it is already finished; a run that died before its first
    checkpoint is moved to `<run>_incomplete_<date>` and restarted;
-3. runs **Tier 1** (development set, supervisor off and on) and the **frozen
-   suite** (headline + robustness set, supervisor off and on) on the run's
+3. runs **Tier 1** (development set, safety layer off and on) and the **frozen
+   suite** (headline + robustness set, safety layer off and on) on the run's
    `best_model.zip`, skipping either if it is already done.
 
 It is safe to start again at any time with the same learner and seed: it picks up
@@ -224,7 +227,7 @@ The frozen suite of a finished run -- what the paper reports -- (add
 python tools/tiers/frozen_suite.py --model runs/sac_formulation_seed1_bl2/best_model.zip --tag sacs1_bl2 --supervisor both
 ```
 
-Tier 1, the development-set diagnostic, supervisor `off` and `on`:
+Tier 1, the development-set diagnostic, safety layer `off` and `on`:
 
 ```bash
 python tools/tiers/tier1_replay.py --model runs/sac_formulation_seed1_bl2/best_model.zip --tag sacs1_bl2_supervisor_off --supervisor off
@@ -232,7 +235,7 @@ python tools/tiers/tier1_replay.py --model runs/sac_formulation_seed1_bl2/best_m
 
 The Paper 2 deployment-layout set -- a separate set, not part of the frozen
 suite (F104): the three published field layouts with and without a target ship,
-630 episodes per supervisor mode, into `results/paper2_set/<tag>/`:
+630 episodes per safety layer mode, into `results/paper2_set/<tag>/`:
 
 ```bash
 python tools/tiers/paper2_suite.py --model runs/sac_formulation_seed1_bl2/best_model.zip --tag sacs1_bl2

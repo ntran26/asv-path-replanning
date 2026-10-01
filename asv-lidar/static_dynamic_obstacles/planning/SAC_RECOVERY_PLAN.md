@@ -63,7 +63,34 @@ practice) is right and is kept above, but going back in time does not help:
   and seeds if v3 is adopted, at the cost of SAC seed 0 following a different
   schedule.
 
-## 1. Where the policy stands (2.5 M, supervisor off)
+> **Stage 8 result (2026-10-01 08:33): no improvement; the 3 M policy stays best.**
+> Best stage-8 checkpoint 2.9 M (dev 0.89, three-panel 0.73 — level with 3 M).
+> Frozen suite headline 0.905 vs **0.935** (being overtaken 0.87 vs 0.94,
+> crossings 0.79 vs 0.82–0.83). Paper 2 set overall 0.66 vs 0.64 (noise), but
+> **no-target 25/30 vs 30/30** (L1 5/10 — fails the hard requirement);
+> fixed-speed targets 0.64 vs 0.63 (head-on and overtaking up, crossings and
+> being overtaken down). The heavier three-panel share traded general skill for
+> no net field gain. Kept policy: `runs/sac_formulation_seed0_bl3/kept_best_3M/`.
+
+> **Fix 1 (2026-10-01): static obstacles in the admissibility test.** Diagnosis
+> (180 field crossing/head-on replays of the 3 M policy): the compliant-turn
+> admissibility test (`colregs/geometry.py: channel_room`) ray-casts only the map
+> boundary, so it flagged a blocked turn in 9 of 180 episodes although a static
+> obstacle sat on the compliant side ahead in about half; the context therefore
+> said "turn", R-2 never credited slowing, and the policy cruised (0.70 m/s vs
+> 0.52 for the rule-following VO), slowing in 0-21 % of engaged crossings. L2
+> head-on 0/20: a 35° starboard turn into the gate obstacle, never slowing.
+> Fix: `geometry.obstacle_room` (perceived static LiDAR returns, the target's own
+> removed at 1.8 m, along the passage to the projected CPA) bounds the room;
+> switch `ADMISSIBILITY_STATIC` (run-time, off by default, recorded in the run's
+> config and applied by the evaluation tools). With it on, blocked turns are
+> flagged in 100 % of L2 head-on and 80-90 % of L1 episodes (0-5 % before).
+> Fine-tune `configs/finetune_v3_fix1.json` (`results/fix1_run.sh`), launched
+> 2026-10-01 14:18: the identical 2.5 → 3.0 M stage-7 continuation with only the
+> fix on. Fix 2 (permit the other side when blocked and slowing cannot clear) is
+> held in reserve. Test: `tests/test_admissibility_static.py`.
+
+## 1. Where the policy stands (2.5 M, safety layer off)
 
 | Set | Goal | Notes |
 |---|---|---|
@@ -136,7 +163,7 @@ steps for less; 2.5 M is the right start. Budget: 0.5 M steps ≈ 9 h, plus
 | 1 | **Focused stage 8** (recommended) | continue stage 7 with three-panel layouts at 0.70 of episodes (was 0.45); weight toward no-target spread layouts and the weakest encounters (crossing from starboard, head-on, crossing from port); **failure replay** — each worker keeps the scenarios it collided in and re-issues one with probability 0.3 (prioritized level replay, Jiang et al., 2021 [VERIFY]) | code: a stage-8 overlay + a small env replay pool (~½ day incl. tests) | more practice exactly where it fails; no change to reward or observation |
 | 2 | **Exploration reset** | for the first 100 k steps raise SAC's target entropy (−2 → −1) or floor the entropy coefficient at 0.01 | config only | re-opens exploration so new avoidance lines can be found; combine with 1 |
 | 3 | **Earlier clearance signal** | reward-only change: obstacle term reaches 2.5 m with decay 0.8 m (was 2.0 / 0.6) | constant in the overlay; formulation change to report | rewards starting the avoidance earlier; changes the formulation, so only if 1 + 2 are not enough |
-| 4 | **Runtime safety filter** (`SUPERVISOR_V2_PLAN.md`) | DWA-style shield around the policy at deployment | ~2 days, no training | prevents collisions in the field; reported as a system result, not learned behavior |
+| 4 | **Runtime safety filter** (`SAFETY_LAYER_V2_PLAN.md`) | DWA-style shield around the policy at deployment | ~2 days, no training | prevents collisions in the field; reported as a system result, not learned behavior |
 
 **Do not** change the observation (the network input would no longer match the
 checkpoint), and do not re-shape the COLREGs terms (not implicated).

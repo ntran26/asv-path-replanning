@@ -9,7 +9,7 @@ in the paper's headline tables.
 Source of the layouts.  Measured from the published Fig. 8 (the full-resolution
 image, calibrated on each panel's 10 x 25 m workspace boundary, +-0.02 m) and
 rounded to 0.1 m: 1 m square panels.  Scenario 1 agrees with Paper 2's
-`static_obstacles/test_run.py` case 1; scenarios 2 and 3 differ from both code
+the Paper 2 folder's `test_run.py` case 1; scenarios 2 and 3 differ from both code
 copies of `test_run.py` (case 2's left panel is at x = 2.0, not 1.5; case 3's
 at (6.5, 8.5) and (5.0, 17.0), not (6.0, 9.3) and (5.5, 17.0)), so the
 published figure is taken as the record.  The legs are the published ones; the

@@ -36,8 +36,8 @@ Revision 20: run 6 finished: goal 0.83, best compliance, crossings 0.40 (F73).
 Revision 19: your option-1 call on A25 (and A24 with it) built (F72).
 Revision 18: CODEX reviewed; A25 opened (F71).
 Revision 17: run 5 did not improve on run 4; low-speed starts ruled out; A24 opened (F70).
-Revision 16: run 4 finished and replayed with the supervisor off and on (F69).
-Revision 15: your supervisor-as-runtime-layer suggestions, built (F68).
+Revision 16: run 4 finished and replayed with the safety layer off and on (F69).
+Revision 15: your safety-layer-as-runtime-layer suggestions, built (F68).
 Revision 14: your option-1 call on A23 (F67).
 Revision 13: run 4 launched, C15's stop-test view (F66), A23.
 Revision 12: your option-1 call on A22 (F63).
@@ -59,7 +59,7 @@ generator, the scale audit, noise and randomisation.
 
 ### Open in revision 21 (`PROJECT_STATE.md` F74, F75)
 
-**A26 — training budget and the off-policy update ratio (TODO(04-4)) — decided (your calls, 2026-09-22), with the budget reopened by F98.** **Learner set: PPO, RecurrentPPO, SAC, TQC at 3 seeds each** (TD3 dropped and 5 seeds -> 3 on 2026-09-24; **12 runs, ~10 days**). *Cost of 3 seeds:* a 0.05 headline difference is at the edge of separability and the 0.20 crossing spread is not separable at all, so learner comparisons hold on the headline only; `RESULT_TABLES.md` still says 5 seeds and needs restating (B6). **Open again: is 2 M enough?** The best checkpoint landed at 2.0 M in three of six on-policy runs and 1.8 M in two more, so the budget may bind. Either raise it to 3 M (~5 extra days) or report the mean of the last three evaluations rather than the maximum.  off-policy update ratio **1.0** gradient step per transition; **5 seeds** per learner (PPO seeds 0-1 are run 11); each seed represented by its **best-on-dev checkpoint** (`best_model.zip`, the callback's goal − 2 × collision score, supervisor off, same rule for every learner; Tier B held out). **Where: this machine** (~28 days back to back) until you have cluster access; every run resumes from its checkpoints, so the rest can move (F95); since 2026-09-27 runs are trained on demand, one learner x seed at a time (`results/train_seed.sh`, F103). Budget 2 M steps each, as recorded in baseline-v1. **2026-09-26 (your call): stays at 2 M for now**; tables report the best-on-dev checkpoint as decided, and the final replay buffers are kept, so the off-policy runs can still be extended if you raise it.
+**A26 — training budget and the off-policy update ratio (TODO(04-4)) — decided (your calls, 2026-09-22), with the budget reopened by F98.** **Learner set: PPO, RecurrentPPO, SAC, TQC at 3 seeds each** (TD3 dropped and 5 seeds -> 3 on 2026-09-24; **12 runs, ~10 days**). *Cost of 3 seeds:* a 0.05 headline difference is at the edge of separability and the 0.20 crossing spread is not separable at all, so learner comparisons hold on the headline only; `RESULT_TABLES.md` still says 5 seeds and needs restating (B6). **Open again: is 2 M enough?** The best checkpoint landed at 2.0 M in three of six on-policy runs and 1.8 M in two more, so the budget may bind. Either raise it to 3 M (~5 extra days) or report the mean of the last three evaluations rather than the maximum.  off-policy update ratio **1.0** gradient step per transition; **5 seeds** per learner (PPO seeds 0-1 are run 11); each seed represented by its **best-on-dev checkpoint** (`best_model.zip`, the callback's goal − 2 × collision score, safety layer off, same rule for every learner; Tier B held out). **Where: this machine** (~28 days back to back) until you have cluster access; every run resumes from its checkpoints, so the rest can move (F95); since 2026-09-27 runs are trained on demand, one learner x seed at a time (`results/train_seed.sh`, F103). Budget 2 M steps each, as recorded in baseline-v1. **2026-09-26 (your call): stays at 2 M for now**; tables report the best-on-dev checkpoint as decided, and the final replay buffers are kept, so the off-policy runs can still be extended if you raise it.
 
 *Original entry:* **A26 — training budget and the off-policy update ratio (TODO(04-4)).** PPO is the development vehicle for testing and adjusting the reward now (your call, 2026-09-18). **Baseline learner set: PPO, RecurrentPPO, TD3, SAC and TQC (your correction: TQC, not SAC-IQN), multiple seeds, trained once everything is decided and the suite is frozen.** All five are built in the shared trainer (F76, F77); `sb3-contrib` 2.3.0 supplies RecurrentPPO and TQC. All five go through the A26 budget. Measured on this machine (10 workers, 12 cores; steps/s, and hours per 2 M-step seed), at 1.0 / 0.2 gradient steps per transition for the off-policy learners:
 
@@ -134,7 +134,7 @@ Cost: none to training (D1 keeps training on `T-CV`); the frozen suite has not r
 | **1. Report as untrained geometry (recommended for this paper)** | R1 split three ways: basin / channel, trained classes / channel being-overtaken + null, flagged as a generalisation result | none; it becomes a finding (off-policy learners generalise worse to an untrained layout) |
 | 2. Train it | add being-overtaken and null to `CHANNEL_CLASSES` in training and the development set | a formulation change: baseline-v3, all four learners retrained (~2 weeks here for seed 0, ~6 for three seeds) |
 
-**A38 — the runtime supervisor lowers success; supervisor v2 proposed (2026-09-28, parked).** With it on, seed-0 success drops ~1 point and target collisions do not fall: it fires almost only in narrow-channel overtaking on a domain-based (not contact-based) test, most stops are false alarms (SAC: 25 of 46 stopped episodes lost, 22 of them to boundary contact after the stop), and 90-97 % of target collisions happen without a stop (crossing, head-on). Plan in `planning/SUPERVISOR_V2_PLAN.md`: a safety-only trigger, supervisor-owned rudder and a recovery hand-back, then a DWA-style safety filter that can turn; no retraining, versioned apart from baseline-v2. Waits for a gap in training.
+**A38 — the runtime safety layer lowers success; safety layer v2 proposed (2026-09-28, parked).** With it on, seed-0 success drops ~1 point and target collisions do not fall: it fires almost only in narrow-channel overtaking on a domain-based (not contact-based) test, most stops are false alarms (SAC: 25 of 46 stopped episodes lost, 22 of them to boundary contact after the stop), and 90-97 % of target collisions happen without a stop (crossing, head-on). Plan in `planning/SAFETY_LAYER_V2_PLAN.md`: a safety-only trigger, safety-layer-owned rudder and a recovery hand-back, then a DWA-style safety filter that can turn; no retraining, versioned apart from baseline-v2. Waits for a gap in training.
 
 **A37 — physical transfer: in this paper or the field paper (skeleton S13, opened 2026-09-28).** Introduction draft 4 calls the physical-transfer assessment "planned", lists four contributions without it, and its roadmap has no field section; revision 36 had kept field work *in* this paper (RQ4, claim C-6, old contribution C7, Study 3). Options: **(a)** keep the basin trials here -- add a field section after Results and restore RQ4/C-6 in §1.3; **(b)** move them to the field paper -- drop RQ4 and C-6, keep system identification only as the model's provenance, and list the transfer as future work. Draft 4's wording ("planned", transfer evidence "reported separately") reads as (b); until you decide, the skeleton parks the old §7 unnumbered after §4 and the ledger marks C-6 open.
 
@@ -212,22 +212,22 @@ Recommendation: 1, then a two-seed check, since one seed cannot resolve a 0.05 d
 
 Recommendation: 1, with 4's stratum split reported whatever is chosen. Option 1 targets the conflict directly and keeps D1; 2 changes what the policy may assume about other vessels, which the paper would have to defend.
 
-### Under test in revision 15 — the supervisor as a runtime layer (`PROJECT_STATE.md` F68)
+### Under test in revision 15 — the safety layer as a runtime layer (`PROJECT_STATE.md` F68)
 
 | Item | State |
 |---|---|
-| Train with the supervisor off; R-2 tests the agent's own (coasting) slowdown | **built** (`--train-supervisor off`, `slowdown_clears`) |
+| Train with the safety layer off; R-2 tests the agent's own (coasting) slowdown | **built** (`--train-supervisor off`, `slowdown_clears`) |
 | Stop kept as a runtime safety layer | unchanged in the environment and bridge |
 | Evaluate off and on; intervention rate as a metric | **built** (`--eval-supervisor both`, Tier 1 `--supervisor`) |
 | Paper: 8(e) as two layers — policy slackens (learned), safety layer stops (engineered) | recorded; a writing item |
 | 10–20 % of training episodes start slow or at rest | **built** (`--low-speed-start-frac`) |
-| Fixed on the way: the supervisor's speed read drew from the shared noise stream | **fixed** — on/off replays are identical when no stop fires |
+| Fixed on the way: the safety layer's speed read drew from the shared noise stream | **fixed** — on/off replays are identical when no stop fires |
 
-**Test:** Tier 1 of run 4 off/on, then run 5 from scratch with all of it, against run 4. Adopt if run 5's policy-only (supervisor off) outcomes match or beat run 4's and its intervention rate is low.
+**Test:** Tier 1 of run 4 off/on, then run 5 from scratch with all of it, against run 4. Adopt if run 5's policy-only (safety layer off) outcomes match or beat run 4's and its intervention rate is low.
 
-**Run 4 baseline (F69):** goal 0.87 / collision 0.13 in training. Tier 1 under current code — supervisor off: crossing goal 0.45, all other classes 0.85–1.00; supervisor on: crossing 0.60, others identical. Intervention rate 0.05 on the development set (crossing 0.20, head-on 0.10), 0.02 on the head-on width set; 8 stops, 0 then hit; 3 outcomes changed, all crossing collisions turned to goals.
+**Run 4 baseline (F69):** goal 0.87 / collision 0.13 in training. Tier 1 under current code — safety layer off: crossing goal 0.45, all other classes 0.85–1.00; safety layer on: crossing 0.60, others identical. Intervention rate 0.05 on the development set (crossing 0.20, head-on 0.10), 0.02 on the head-on width set; 8 stops, 0 then hit; 3 outcomes changed, all crossing collisions turned to goals.
 
-**Run 5 (F70):** goal 0.76 / collision 0.24, the same with the supervisor off and on; intervention rate 0.03. Worse than run 4 in every class, most in null (0.65 against 0.85) and crossing (0.40); faster everywhere. **Not adopted as built.**
+**Run 5 (F70):** goal 0.76 / collision 0.24, the same with the safety layer off and on; intervention rate 0.03. Worse than run 4 in every class, most in null (0.65 against 0.85) and crossing (0.40); faster everywhere. **Not adopted as built.**
 Low-speed starts are ruled out: run 4 scores 0.85 from cruise and 0.84 from rest (head-on 1.00 → 0.80), and starting from rest makes solved encounters easier, not infeasible.
 Lead: R-2's coast test admitted the 8(e) carve-out on 6 % of candidate crossing frames against 38 % for the stop test. See A24.
 
@@ -307,7 +307,7 @@ Run 4 trains with A18–A20.
 
 | Item | Resolution |
 |---|---|
-| A18 supervisor stop | **only when stopping clears** — the target's DCPA with the own ship stationary must reach `ESTOP_CLEAR_DCPA_M` = 1.76 m; the same test gates R-2's slowdown, and where a slowdown cannot clear the Rule 8 term credits the alteration |
+| A18 safety layer stop | **only when stopping clears** — the target's DCPA with the own ship stationary must reach `ESTOP_CLEAR_DCPA_M` = 1.76 m; the same test gates R-2's slowdown, and where a slowdown cannot clear the Rule 8 term credits the alteration |
 | A19 classification | **against the path tangent** — the own ship's alteration can no longer re-label a head-on as a crossing from port |
 
 Run 3 trained before both; its head-on results are not a test of them.
@@ -550,9 +550,9 @@ still worth reading; its head-on learning is not.
 **Recommendation:** (1), then stop run 3 and restart it with A18 and A19 in.
 **To resolve:** say which, and whether to stop run 3.
 
-## A18. The emergency-stop supervisor stops in front of head-on targets
+## A18. The emergency-stop safety layer stops in front of head-on targets
 
-**New, from the C14 diagnosis (`PROJECT_STATE.md` F54).** The supervisor fires
+**New, from the C14 diagnosis (`PROJECT_STATE.md` F54).** The safety layer fires
 when an engaged give-way encounter is in extremis (DCPA < `d_req` = 2.5 m,
 TCPA < 5 s) and the compliant alteration is inadmissible. Admissibility asks
 whether the starboard room to the wall, less B/2 and `c_wall`, covers
@@ -565,24 +565,24 @@ change a reciprocal target's DCPA, so the target hits it.
 
 | head-on, run 2 model, obstacles off (20 per width) | 5 m | 6 m | 7 m | 8 m | 10 m |
 |---|---|---|---|---|---|
-| target collision, supervisor on | 0.43 | 0.25 | 0.24 | 0.16 | 0.05 |
-| target collision, **supervisor off** | **0.24** | **0.15** | **0.14** | 0.11 | 0.05 |
+| target collision, safety layer on | 0.43 | 0.25 | 0.24 | 0.16 | 0.05 |
+| target collision, **safety layer off** | **0.24** | **0.15** | **0.14** | 0.11 | 0.05 |
 | starboard alteration inadmissible (pre-CPA frames) | 0.66 | 0.59 | 0.27 | 0 | 0 |
 
 74 % of target collisions had stopped before CPA, against 10 % of
-non-collisions. Switching the supervisor off saved 10 collisions and caused 1.
+non-collisions. Switching the safety layer off saved 10 collisions and caused 1.
 The remaining narrow excess (0.24 against 0.05) is a policy trained *with* the
-supervisor, and R-2 still pays the same futile slowdown.
+safety layer, and R-2 still pays the same futile slowdown.
 
 **Options:**
 
-1. the supervisor stops only when stopping clears: the DCPA recomputed with
+1. the safety layer stops only when stopping clears: the DCPA recomputed with
    the own ship stationary must reach hull clearance plus `D_SAFE`. That is
    true for a crossing target that will pass ahead, and false for a reciprocal
    head-on. Apply the same test to R-2, so a slowdown that cannot clear is not
    the paid 8(e) answer; the agent must take the lateral room it has;
 2. measure admissibility against hull clearance instead of `d_req`, for the
-   supervisor and R-2. The domain-based `v_*` severities stay as they are;
+   safety layer and R-2. The domain-based `v_*` severities stay as they are;
 3. both;
 4. keep as is: narrow head-on stays a stop-and-be-hit case against D1
    targets.
@@ -597,7 +597,7 @@ geometry the COLREGs terms are built on untouched. **To resolve:** say which.
 is now the dominant failure: evaluation 0.35–0.55 in Tier 2, and flat at
 ~0.58 in training, on both sides alike. So I replayed the 20 development
 crossings under scripted responses taken from t = 0 (hold, half speed, full
-astern, a 30° or 60° compliant alteration), with obstacles and the supervisor
+astern, a 30° or 60° compliant alteration), with obstacles and the safety layer
 off. **The best response per scenario still hits the target in 5 of 20.**
 
 | drawn geometry, medians | TCPA | spawn range | DCPA | speed ratio |
@@ -633,7 +633,7 @@ resolve:** say which. Run 4 should wait for it.
 ## A23. "Stopping clears" assumes the own ship stops where it is
 
 **New, from C15's stop-test view (`PROJECT_STATE.md` F66).** A18 lets the
-supervisor stop only when the target's DCPA *with the own ship stationary at
+safety layer stop only when the target's DCPA *with the own ship stationary at
 its current position* reaches `ESTOP_CLEAR_DCPA_M` = 1.76 m. With the
 hull-fitted geometry that test agrees with the truth twice as often (0.090 →
 0.046 disagreement), yet in a Tier 1 replay it **more than doubled stops (13 →
@@ -645,7 +645,7 @@ bias had understated DCPA-if-stopped and masked this.
 **Options:**
 
 1. **evaluate the stop where the vessel will actually stop.** Project the own
-   ship along its heading by the stopping distance of the latch the supervisor
+   ship along its heading by the stopping distance of the latch the safety layer
    would use (the identified hull's braking, as in F28), and require the target
    hull to clear that swept stretch by hull clearance + `D_SAFE`. Then re-enable
    the hull-fitted view (C15), since the test would at last ask the right
@@ -812,7 +812,7 @@ diagnosis (`PROJECT_STATE.md` F54) found:
   disabling it changed collisions by noise, and most snaps come after CPA;
 * **not room.** A contact-free pass fits in 90–100 % of draws even at 5 m;
 * **not bends.** There is no consistent bend effect once width is held;
-* **the supervisor stop**, via domain-based admissibility (A18).
+* **the safety layer stop**, via domain-based admissibility (A18).
 
 Left for me: the clamp replacement (small, no decision needed).
 

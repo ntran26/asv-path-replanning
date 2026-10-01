@@ -256,7 +256,7 @@ see §8 for what the learner makes of it.
 > compliance. Record the change in `00` rather than leaving the documents in
 > silent conflict.
 
-An engineered supervisor, separate from the policy, takes all way off when a
+An engineered safety layer, separate from the policy, takes all way off when a
 collision is imminent and stopping would clear it. It is **off during
 training** and evaluated **both off and on**. Compliance metrics are reported
 with it off; with it on, the intervention rate is its own column. 8(e) is thus
@@ -284,7 +284,7 @@ gradient step per transition**; **3 seeds** per learner (your call, 2026-09-24;
 was 5); development-set
 evaluation every 2 × 10⁵ steps; each seed represented by its **best
 development-set checkpoint** (score = goal rate − 2 × collision rate,
-supervisor off). The frozen evaluation suite is never used for selection (A26).
+safety layer off). The frozen evaluation suite is never used for selection (A26).
 
 **Development and fairness.** The observation and reward were **specified from
 the rule analysis** (02, 02a, 03a, 04a) and are learner-independent: nothing in
@@ -335,7 +335,7 @@ reports the seed spread. `RESULT_TABLES.md` still says "mean over 5 seeds with
 a 95 % CI" and needs restating for **3 seeds** (B6), with the wider interval
 that implies. Pre-registered metrics: success;
 collisions by type (static, boundary, target); RMS cross-track error; path
-ratio; intervention rate with the supervisor on (R1); violation rate per class,
+ratio; intervention rate with the safety layer on (R1); violation rate per class,
 with crossings split by side (R2); results by target behaviour (R3; `cv` constant velocity (`T-CV`), `re` compliant reactive (`T-RE`, the COLREGs-VO rule from the target's side), `nc` non-compliant (`T-NC2`, alters to port, in head-on; `T-NC1`, stands on when give-way, elsewhere)), channel
 width (R4), perception degradation (R5), ablation (R6), Tier A (R8) and field
 (R9). First-alteration compliance by side is a diagnostic added since (F92).

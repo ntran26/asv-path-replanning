@@ -159,6 +159,45 @@ def channel_room(path, polygon, s_from: float, s_to: float, cross_track: float,
     return d_stbd, d_port
 
 
+def obstacle_room(path, points, s_from: float, s_to: float, cross_track: float,
+                  *, pad: float = None) -> Tuple[float, float]:
+    """Beam-on distance to perceived static obstacles on each side, over the passage.
+
+    Fix 1 (2026-10-01, `ADMISSIBILITY_STATIC`): `channel_room` sees only the
+    map boundary, so a static obstacle beside the passage never made the
+    compliant turn inadmissible.  `points` are the static LiDAR returns (world
+    frame; the tracked target's own returns removed, as the classical
+    comparators do).  Each is placed on the path (arc length `s`, lateral offset
+    positive to starboard); those along the passage from `s_from` to `s_to`,
+    padded by half a hull length, limit the room on their side, measured from
+    the own ship's present lateral station `cross_track`.  Returns
+    `(d_stbd, d_port)` in metres, `inf` where nothing is in the way.
+    """
+    if points is None or len(points) == 0:
+        return float("inf"), float("inf")
+    pts = np.asarray(points, dtype=np.float64)
+    ref = np.asarray(path.points, dtype=np.float64)
+    idx = np.argmin(((pts[:, None, :] - ref[None, :, :]) ** 2).sum(axis=-1), axis=1)
+    lo, hi = (float(s_from), float(s_to)) if s_to >= s_from else (float(s_to), float(s_from))
+    pad = 0.5 * float(cfg.VESSEL_LENGTH) if pad is None else float(pad)
+    s_q = np.asarray(path.s, dtype=np.float64)[idx]
+    keep = (s_q >= lo - pad) & (s_q <= hi + pad)
+    if not np.any(keep):
+        return float("inf"), float("inf")
+    pts, idx = pts[keep], idx[keep]
+    nxt = np.clip(idx + 1, 0, len(ref) - 1)
+    prv = np.clip(idx - 1, 0, len(ref) - 1)
+    tan = ref[nxt] - ref[prv]
+    tan /= np.maximum(np.linalg.norm(tan, axis=1, keepdims=True), 1e-9)
+    off = pts - ref[idx]
+    lateral = -(tan[:, 0] * off[:, 1] - tan[:, 1] * off[:, 0])     # positive to starboard
+    d = lateral - float(cross_track)
+    stbd = d[d > 0.0]
+    port = -d[d < 0.0]
+    return (float(stbd.min()) if stbd.size else float("inf"),
+            float(port.min()) if port.size else float("inf"))
+
+
 def usable_room(d_bnd: float, *, c_wall: float = None, breadth: float = None) -> float:
     """Room usable for an alteration: the beam-on distance less hull and margin."""
     c_wall = cfg.HEAD_ON_WALL_CLEARANCE if c_wall is None else float(c_wall)

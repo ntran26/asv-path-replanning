@@ -716,7 +716,7 @@ explains three of them:
 Tests: **402 passed** (400 + 2). Run 3 (`runs/ppo_formulation_seed0_v3`) trains with all three.
 
 **F54 — C14 diagnosed: narrow head-on collisions are the emergency-stop
-supervisor, through domain-based admissibility.** Scripts and data are in
+safety layer, through domain-based admissibility.** Scripts and data are in
 `results/c14_narrow_head_on/` (scripts in `tools/diagnostics/`). There were 100 head-on scenarios (20 each at 5, 6, 7, 8 and
 10 m), with obstacles off and the nominal hull.
 
@@ -734,7 +734,7 @@ supervisor, through domain-based admissibility.** Scripts and data are in
   90–100 % of draws.
 * *Bends are not it.* Holding width, bent and straight corridors do not
   differ consistently.
-* **The supervisor is.** `emergency_stop.stop_required` fires on an engaged,
+* **The safety layer is.** `emergency_stop.stop_required` fires on an engaged,
   give-way, in-extremis encounter whose compliant turn is inadmissible.
   `A_stbd` compares starboard room with `Dy_req = d_req − DCPA`, a domain
   separation (`d_req` = 2.5 m). At 5 m that is "inadmissible" for DCPA below
@@ -747,10 +747,10 @@ supervisor, through domain-based admissibility.** Scripts and data are in
 
 | run 2 model, target collision | 5 m | 6 m | 7 m | 8 m | 10 m |
 |---|---|---|---|---|---|
-| supervisor on | 0.43 | 0.25 | 0.24 | 0.16 | 0.05 |
-| supervisor off | 0.24 | 0.15 | 0.14 | 0.11 | 0.05 |
+| safety layer on | 0.43 | 0.25 | 0.24 | 0.16 | 0.05 |
+| safety layer off | 0.24 | 0.15 | 0.14 | 0.11 | 0.05 |
 
-Switching the supervisor off saved 10 collisions and added 1. Decision:
+Switching the safety layer off saved 10 collisions and added 1. Decision:
 `OPEN_PROBLEMS.md` A18.
 
 **F55 — regression: A17 flips head-on encounters to a port turn sense.** Class
@@ -976,7 +976,7 @@ compliant sense; the same in the wrong sense):
   makes `v_hold` slightly positive on most frames of a held course.
 * **T0.4 passes.** No head-on episode latches a port sense (A19–A20).
 * **T0.5 passes.** `r_path` is zero throughout (F59).
-* **T0.6 passes.** Supervisor stops: 2, none followed by a collision.
+* **T0.6 passes.** Safety layer stops: 2, none followed by a collision.
 * **T0.3 fails narrowly.** A path follower collects −5.6 of COLREGs penalty on
   null encounters, against a −5 threshold. Explained below.
 * **The scripted policies collide a lot, and one case is not the policy's
@@ -1025,12 +1025,12 @@ head-on width set, 220 episodes in 114 s.
   is 0.14 / 0.15 / 0.10 / 0.21 / 0.21 at 5 / 6 / 7 / 8 / 10 m, against run 2's
   0.43 → 0.05 gradient (F54, F56). With straight paths and A18, width is no
   longer the axis the failures lie on.
-* **F58's stop check.** 25 supervisor stops in 220 episodes, 24 of them head-on,
+* **F58's stop check.** 25 safety layer stops in 220 episodes, 24 of them head-on,
   about 0.2 per episode at every width. **6 of the 22 stopped episodes then hit
   the target (0.27).** A18 admits a stop only when the *perceived* DCPA with the
   own ship stationary reaches 1.76 m, and near CPA that estimate carries C15's
   tracker course error. So A18's residual is C15, not the rule. It is also a
-  policy trained under the old supervisor, so this bounds the mechanism rather
+  policy trained under the old safety layer, so this bounds the mechanism rather
   than measuring a retrained agent.
 * **Being overtaken:** 0.43 collision at or above the floor, against 0.17
   below. It is inverted because of A21: the floor is not a clearance, and
@@ -1095,7 +1095,7 @@ the being-overtaken and null draws changed:
 | head-on, crossing, overtaking, no target | 0.30, 0.35, 0.00, 0.10 | same |
 
 The null rise is a policy trained on teleported null targets meeting real
-ones, with no target contact; Tier 2 is the test of it. Supervisor stops are
+ones, with no target contact; Tier 2 is the test of it. Safety layer stops are
 unchanged: 24, with 6 followed by a target collision (F60, C15).
 
 *Tier 2 launched:* fine-tune of run 3's final model, stage 5 only, 300 k steps,
@@ -1134,7 +1134,7 @@ What it says:
   every evaluation, 0.11–0.13 in training.
 * **Null improved as the Tier 1 replay predicted** once the policy saw real
   channel-keeping null targets: 0.25 → 0.05.
-* **Head-on is middling**, 0.15–0.25; supervisor stops fell to 0.02 per
+* **Head-on is middling**, 0.15–0.25; safety layer stops fell to 0.02 per
   episode.
 * **Crossing is now the dominant failure**, and flat in training at ~0.58.
   Both sides fail alike (port 0.48, starboard 0.44 over the last two
@@ -1142,7 +1142,7 @@ What it says:
 
 *Crossing feasibility* (`tools/diagnostics/crossing_feasibility.py`,
 `results/crossing_feasibility/`). The 20 development crossings, obstacles
-and supervisor off, each replayed under scripted responses taken **from
+and safety layer off, each replayed under scripted responses taken **from
 t = 0**, so late engagement cannot be the excuse:
 
 | response | target hit, from port | from starboard |
@@ -1261,7 +1261,7 @@ the 1 m dead zone clips the near end. Close in, that slide reads as velocity
   sensor, and it anchored on the dead-zone cut). **50 tracking tests pass.**
 
 *Measured* (`tools/diagnostics/c15_track_error.py`,
-`results/c15_track_error/`): path follower, obstacles and supervisor off, 40
+`results/c15_track_error/`): path follower, obstacles and safety layer off, 40
 head-on width-set and 24 development scenarios, each step's nearest dynamic
 track paired with the truth. Three variants:
 
@@ -1343,7 +1343,7 @@ What it says:
   trained on bent corridors and earlier generator geometry cannot say whether
   crossing converges. That is a from-scratch question: run 4.
 
-*Stop-test note (C15).* Supervisor stops rose to 0.06–0.08 per episode (F62:
+*Stop-test note (C15).* Safety layer stops rose to 0.06–0.08 per episode (F62:
 0.02). The close-range perceived-DCPA error F64 measured is the likely reader;
 the stop-test-only use of the fitted centre is C15's next step.
 
@@ -1380,7 +1380,7 @@ the stop test's disagreement with the truth about `stop_clears` fell from
 
 | | stop view off | **on** |
 |---|---|---|
-| supervisor stops (220 episodes) | 13 | **29** |
+| safety layer stops (220 episodes) | 13 | **29** |
 | … followed by a target collision | 6 | **15** |
 | head-on target collision at 5 / 6 / 7 / 8 / 10 m | 0.32 / 0.25 / 0.25 / 0.16 / 0.05 | 0.32 / **0.35 / 0.30** / 0.16 / 0.05 |
 | development set, per class | — | identical |
@@ -1388,11 +1388,11 @@ the stop test's disagreement with the truth about `stop_clears` fell from
 **A more accurate stop test made outcomes worse.** A18 asks whether the target
 would clear *an own ship stationary where it is now* (`dcpa_if_stopped` ≥
 `ESTOP_CLEAR_DCPA_M` = 1.76 m). But a stopping vessel does not stop where it
-is. At stage 4 it cannot reverse, so it coasts. Even the supervisor's astern
+is. At stage 4 it cannot reverse, so it coasts. Even the safety layer's astern
 brake takes 1.1–3.7 s (F28), during which it keeps closing on the target's
 track. The centroid's bias toward the own ship had been understating that
 DCPA and so suppressing stops, which masked the flaw. With accurate geometry
-the supervisor fires in draws whose stationary DCPA is 1.76–2.5 m, the vessel
+the safety layer fires in draws whose stationary DCPA is 1.76–2.5 m, the vessel
 slides forward while stopping, and the hulls meet.
 
 **`STOP_TEST_USES_HULL_FIT` is `False`**, which matches run 4. The view stays
@@ -1404,7 +1404,7 @@ that end in a collision fall to zero; C15's view stays off.**
 *Built.*
 
 * `src/stopping.py`, kept out of `emergency_stop.py`, which the bridge
-  imports simulator-free. `braking_profile(u0)` is the supervisor latch's full
+  imports simulator-free. `braking_profile(u0)` is the safety layer latch's full
   astern (`S2 = −100`) on the nominal identified hull, from surge `u0` to
   `ESTOP_STOP_SPEED` (cap `ESTOP_MAX_BRAKE_S`), sampled at `STOP_TEST_DT_S` =
   0.05 s and cached per cm/s. `dcpa_over_stop(rng, alpha, ct, speed_ts,
@@ -1414,7 +1414,7 @@ that end in a collision fall to zero; C15's view stays off.**
   `dcpa_if_stopped` now calls `dcpa_over_stop`, still against
   `ESTOP_CLEAR_DCPA_M` = 1.76 m. At `u_own` below the stop speed it equals
   A18's stationary DCPA exactly, so every A18 test passes unchanged.
-* The supervisor's trigger, R-2's slowdown carve-out and `r8_parts`'
+* The safety layer's trigger, R-2's slowdown carve-out and `r8_parts`'
   alteration credit all read `stop_clears`, so all three now account for
   braking.
 * Braking from cruise (0.56 m/s) takes 1.05 s over 0.32 m; from 1.05 m/s,
@@ -1446,10 +1446,10 @@ target. **`STOP_TEST_USES_HULL_FIT` stays `False`**; A23 is on by default.
 
 Run 4 trains without A23 (its processes started first). **420 tests pass.**
 
-**F68 — your five suggestions: supervisor as a runtime layer, not a training
+**F68 — your five suggestions: safety layer as a runtime layer, not a training
 signal. Built behind switches, and one confound found and fixed on the way.**
 
-1. **Train with the supervisor off.** `train_formulation.py --train-supervisor
+1. **Train with the safety layer off.** `train_formulation.py --train-supervisor
    off` builds the training environments with `emergency_stop=False`. `R_ESTOP`
    and the latch-held speed-gate suspension only act while the latch holds, so
    both drop out of the training reward with nothing else changed. Actions stay
@@ -1461,7 +1461,7 @@ signal. Built behind switches, and one confound found and fixed on the way.**
    `stopping.braking_profile(u0, "coast")` (RPM `POLICY_SLOWDOWN_RPM` = 0, cap
    `SLOWDOWN_TEST_MAX_S` = 20 s) backs `EncounterContext.dcpa_if_slowed` /
    `slowdown_clears`. R-2's carve-out and the Rule 8 alteration credit read that;
-   the supervisor still reads `stop_clears`. From cruise the latch stops in
+   the safety layer still reads `stop_clears`. From cruise the latch stops in
    1.05 s over 0.32 m; a coast is still moving after 20 s, 6.0 m on.
 2. **The stop stays as a runtime layer.** The environment, bridge and latch are
    unchanged; only where it is applied moves.
@@ -1469,11 +1469,11 @@ signal. Built behind switches, and one confound found and fixed on the way.**
    off|on|both`. With `both`, every evaluation runs the development set twice,
    each row tagged `supervisor`, and the summaries carry `intervention_rate` (share
    of episodes with at least one stop) overall and per class. The best model is
-   chosen on the policy's own score, supervisor off. Tier 1 gained `--supervisor
+   chosen on the policy's own score, safety layer off. Tier 1 gained `--supervisor
    on|off` and an intervention column. Tier B has no runner yet (C3–C6); the
    metric is ready for it.
 4. **8(e) as two layers.** A writing item, recorded here: the policy slackens
-   speed (learned, reported with the supervisor off); the safety layer takes all
+   speed (learned, reported with the safety layer off); the safety layer takes all
    way off (engineered, reported as the intervention rate). Only the first is a
    learned-compliance claim.
 5. **Low-speed starts.** `ASVLidarEnv(low_speed_start_frac=…)`, default 0.
@@ -1482,28 +1482,28 @@ signal. Built behind switches, and one confound found and fixed on the way.**
    (0, 0.5 `U_NOM`], on its own seeded stream, so the scenario draw is
    unchanged. `info["start_speed"]` records it.
 
-**Confound found: the supervisor perturbed the noise stream.** The latch read
+**Confound found: the safety layer perturbed the noise stream.** The latch read
 the own speed by drawing a fresh noisy estimate from the environment's shared
-random stream. Switching the supervisor on therefore shifted every later noise
-draw (pose, ego, tracker dropout). A replay with the supervisor on differed from
+random stream. Switching the safety layer on therefore shifted every later noise
+draw (pose, ego, tracker dropout). A replay with the safety layer on differed from
 one with it off *even when no stop fired*, so an on/off comparison would have
 attributed noise to the stop. The latch now reads the surge the controller
 perceived in its last observation (`_observed_surge`), which is also the more
 faithful field model. Verified: with no stop, all six classes replay
-identically with the supervisor off and on; replays were already
+identically with the safety layer off and on; replays were already
 deterministic, and a reused environment matches a fresh one.
 
 Tests: `test_the_policy_slowdown_is_a_coast_not_the_latch`,
 `test_a_fraction_of_episodes_can_start_slow`. A smoke run
-(`runs/ppo_formulation_seed0_f68_smoke/`, 4 k steps, supervisor off in training,
+(`runs/ppo_formulation_seed0_f68_smoke/`, 4 k steps, safety layer off in training,
 20 % low-speed starts, evaluation both ways) exercised every flag. **422 tests pass.**
 
 *Experiment, next:* (a) when run 4 finishes, Tier 1 of its final policy with the
-supervisor off and on — how much it leans on the stop it trained with, and its
+safety layer off and on — how much it leans on the stop it trained with, and its
 intervention rate; (b) run 5 from scratch with `--train-supervisor off
 --low-speed-start-frac 0.15 --eval-supervisor both`, compared with run 4 on the
 same development set in both modes. A Tier 2 fine-tune cannot answer this
-question: weights trained with the supervisor have already learned around it.
+question: weights trained with the safety layer have already learned around it.
 Run 5 also carries A23, the coast test and the noise fix, which run 4 lacks, so
 the comparison is of the formulation as a whole.
 
@@ -1511,7 +1511,7 @@ the comparison is of the formulation as a whole.
 The runtime layer intervened in 5 % of development episodes and rescued 3
 crossings.**
 
-*Run 4* (`runs/ppo_formulation_seed0_v4/`, 2 M steps, 7.6 h, supervisor on in
+*Run 4* (`runs/ppo_formulation_seed0_v4/`, 2 M steps, 7.6 h, safety layer on in
 training, pre-A23 stop test). Final in-training evaluation: **goal 0.87,
 collision 0.13** (boundary 0.03, obstacle 0.03, target 0.07), the best
 formulation run so far. The curve rose to 0.85–0.86 from 1.4 M and held.
@@ -1531,10 +1531,10 @@ failures were target collisions with no stop, at mean speed 0.39–0.71 m/s — 
 policy steers but does not slacken. Compliance integrals worsened for head-on
 (−25.8) and overtaking (−35.9) against the A22 fine-tune (−17.2, −25.9).
 
-*Tier 1, current code, supervisor off vs on* (`results/tiers/tier1_run4_supervisor_off/`,
+*Tier 1, current code, safety layer off vs on* (`results/tiers/tier1_run4_supervisor_off/`,
 `…_on/`; paired episodes, identical noise since F68):
 
-| | supervisor off | supervisor on |
+| | safety layer off | safety layer on |
 |---|---|---|
 | crossing goal / collision / target | 0.45 / 0.55 / 0.50 | **0.60 / 0.40 / 0.35** |
 | head-on goal | 1.00 | 1.00 |
@@ -1556,7 +1556,7 @@ every class but crossings, where the layer adds 0.15 goal rate. That is the
 runtime-assurance picture F68 asked for, measured on a policy that was not
 trained for it. Run 5 (`--train-supervisor off --low-speed-start-frac 0.15
 --eval-supervisor both`, same seed and budget, all of A23 and F68) is training;
-adopt it if its supervisor-off outcomes match or beat run 4's 0.87 / crossing
+adopt it if its safety-layer-off outcomes match or beat run 4's 0.87 / crossing
 0.45 and its intervention rate stays near 5 %.
 
 **F70 — run 5 (the F68 formulation) did not improve on run 4: goal 0.76
@@ -1565,12 +1565,12 @@ coasting test, which all but switched off the 8(e) slowdown in crossings. Run 6
 isolates it.**
 
 *Run 5* (`runs/ppo_formulation_seed0_v5/`, 2 M steps, 11.1 h — evaluation runs
-twice; supervisor off in training, 15 % low-speed starts, R-2 on the coast
+twice; safety layer off in training, 15 % low-speed starts, R-2 on the coast
 test, A23 and the noise fix). Final: **goal 0.76, collision 0.24** with the
-supervisor off *and* on; intervention rate 0.03. The curve sat at 0.64–0.73 from
+safety layer off *and* on; intervention rate 0.03. The curve sat at 0.64–0.73 from
 0.2 M to 1.8 M, then 0.78 at 2.0 M.
 
-| class (goal) | run 4, Tier 1, supervisor off | run 5, supervisor off | run 5, supervisor on |
+| class (goal) | run 4, Tier 1, safety layer off | run 5, safety layer off | run 5, safety layer on |
 |---|---|---|---|
 | head-on | 1.00 | 0.90 | 0.90 |
 | crossing | 0.45 | 0.40 | 0.40 (target 0.50 → 0.40) |
@@ -1588,7 +1588,7 @@ had shorter episodes (45 against 56 steps) and lower being-overtaken success
 (0.52 against 0.80, stochastic actions, 15 % slow starts included).
 
 *Low-speed starts ruled out* (`tools/diagnostics/f70_low_speed_start.py`,
-`results/f70_low_speed_start/`). The development set, supervisor off, every
+`results/f70_low_speed_start/`). The development set, safety layer off, every
 episode at cruise, then every episode from rest:
 
 | policy | goal, cruise | goal, rest | target collision, cruise | rest |
@@ -1631,7 +1631,7 @@ suggestion 1 literally, R-2 kept the pre-F68 "does slowing clear" test
 
 *Run 6, training* (`runs/ppo_formulation_seed0_v6/`): run 5's command plus
 `--r2-slowdown-test stop`. One change from run 5, so run 5 against run 6 is the
-R-2 test alone; run 6 against run 4 is supervisor-off training plus low-speed
+R-2 test alone; run 6 against run 4 is safety-layer-off training plus low-speed
 starts plus A23 and the noise fix. The switch is `R2_SLOWDOWN_TEST` ("coast"
 default, F68 as built), read by R-2 and the Rule 8 alteration credit. Test
 `test_r2_reads_the_configured_slowing_test`. **423 tests pass.**
@@ -1670,7 +1670,7 @@ PPO smokes. No learned-policy result exists.
 
 *The reference controller on the development set* (`tools/diagnostics/codex_reference_devset.py`,
 `results/codex_reference_devset/`; CODEX's own environment, goal tolerance
-restored to 1.60 m, supervisor off, nominal noise, seeds as Tier 1):
+restored to 1.60 m, safety layer off, nominal noise, seeds as Tier 1):
 
 | class | reference goal | collisions (target / obstacle / boundary) | run 4 Tier 1 goal | run 5 |
 |---|---|---|---|---|
@@ -1752,16 +1752,16 @@ reason in the file), and its adapted `test_observation.py`, `test_env.py`,
 **445 pass.** A 5 k-step smoke ran with the schema stamped.
 
 *Run 6* (`runs/ppo_formulation_seed0_v6/`): 2 M steps, seed 0, 10 workers,
-supervisor off in training, 15 % low-speed starts, evaluation both ways,
+safety layer off in training, 15 % low-speed starts, evaluation both ways,
 `R2_SLOWDOWN_TEST = "stop"`. Compare with run 4 (0.87) and run 5 (0.76) on the
 development set, and with the reference controller's 0.87 / crossing 0.70.
 The stopped R-2-only run is kept as `ppo_formulation_seed0_v6_stopped_r2stop/`.
 
 **F73 — run 6 (A25) finished: goal level with run 4, the best COLREGs compliance
-of any run, and crossings still unsolved. The supervisor changes nothing.**
+of any run, and crossings still unsolved. The safety layer changes nothing.**
 
 *Run 6* (`runs/ppo_formulation_seed0_v6/`, 8.95 h). Final in-training
-evaluation: goal 0.82 / collision 0.17 with the supervisor off and on.
+evaluation: goal 0.82 / collision 0.17 with the safety layer off and on.
 Tier 1 under current code (`results/tiers/tier1_run6_supervisor_off/`, `…_on/`):
 
 | development set | run 4 | run 5 | **run 6** | reference controller |
@@ -1781,8 +1781,8 @@ run 5's obstacle collisions are gone. Crossings did not move: 11 of 12 failures
 are target collisions. Head-on width set: target collisions 0.09 / 0.15 / 0.20 /
 0.21 / 0.21 at 5 / 6 / 7 / 8 / 10 m.
 
-*Supervisor.* 8 stops in 6 of 220 episodes (7 head-on, 1 crossing), none then
-hit, no outcome changed; development intervention rate 0.02. With supervisor-off
+*Safety layer.* 8 stops in 6 of 220 episodes (7 head-on, 1 crossing), none then
+hit, no outcome changed; development intervention rate 0.02. With safety-layer-off
 training the policy stands alone, which is the F68 framing.
 
 **F74 — basin mode (06) built, as amended by your calls: basin is the default
@@ -1850,7 +1850,7 @@ SAC-IQN built and throughput-gated, and the suite rebuilt to 3.0 with its named
 cases realised. The freeze now waits only on you.**
 
 *1. Crossing diagnosis* (`tools/diagnostics/crossing_diagnosis.py`, run 6 vs
-the reference controller, the 20 new development crossings, supervisor off):
+the reference controller, the 20 new development crossings, safety layer off):
 
 | | reference | run 6 |
 |---|---|---|
@@ -1960,7 +1960,7 @@ in this simulator. Run 6's failure is learned, and one reward gap invites it.**
 
 *Scripted responses* (`tools/diagnostics/port_crossing_responses.py`,
 `results/port_crossing_responses/`): 140 crossings (20 development + 60 per
-side, basin default, obstacles off, supervisor off). Each response starts when
+side, basin default, obstacles off, safety layer off). Each response starts when
 the encounter engages, holds until the target is past and opening, then resumes
 the path at cruise. Goal rate over the 109 crossings that engaged (port 57,
 starboard 52):
@@ -2007,7 +2007,7 @@ and confirms the port-crossing failure on the basin geometry.**
 
 *Run 7* (`runs/ppo_formulation_seed0_v7/`, 6.0 h, run 6's setup on the
 basin-default distribution): in-run 0.84 goal / 0.16 collision with the
-supervisor off and on. Tier 1 on the basin-default development set, with run 6
+safety layer off and on. Tier 1 on the basin-default development set, with run 6
 replayed on the same set for comparison:
 
 | development set (basin default) | run 6 (trained on channels) | run 7 (trained basin default) |
@@ -2034,7 +2034,7 @@ Reference controller on the same port / starboard crossings: 0.50 / 0.75.
   6's 0.68, and the stand-on `v_hold` integral doubles (8.7 against 4.3). Goals
   hold (0.90), but it is the stand-on violation `v_hold` exists to price;
   watch it in run 8.
-* Supervisor: 10 stops in 8 of 220 episodes (6 head-on, 4 overtaking), none
+* Safety layer: 10 stops in 8 of 220 episodes (6 head-on, 4 overtaking), none
   then hit; outcomes identical off and on. Head-on width set: target
   collisions 0.09 / 0.15 / 0.15 / 0.00 / 0.00 at 5 / 6 / 7 / 8 / 10 m.
 
@@ -2116,7 +2116,7 @@ Tuning set, final: DWA 0.92, VO 0.83.
 *Tier 1* (`results/classical_comparison/`, `tools/tiers/compare_tier1.py`;
 paired exact McNemar against run 7):
 
-| development set (120), supervisor off | goal | target coll. | crossing goal (port / stbd) | McNemar p vs run 7 |
+| development set (120), safety layer off | goal | target coll. | crossing goal (port / stbd) | McNemar p vs run 7 |
 |---|---|---|---|---|
 | PPO run 7 | 0.842 | 0.133 | 0.17 / 0.50 | — |
 | LOS-PID + DWA | 0.883 | 0.100 | 0.42 / 0.62 | 0.30 |
@@ -2124,7 +2124,7 @@ paired exact McNemar against run 7):
 | reference (CODEX, F74 replay) | 0.892 | 0.075 | — | 0.24 |
 
 Head-on width set (100, obstacles off): run 7 0.85, DWA 0.96 (p = 0.013), VO
-0.99 (p = 0.0001). Supervisor on changes one VO episode and nothing else.
+0.99 (p = 0.0001). Safety layer on changes one VO episode and nothing else.
 **Crossing is the hard class for every method**, classical included; neither
 comparator beats run 7 significantly on the development set. The classical
 methods succeed as often but pay more in the COLREGs term in head-on (DWA −35,
@@ -2135,7 +2135,7 @@ now start with a port swerve, and the stand-on speeding persists.**
 
 *Run 8* (`runs/ppo_formulation_seed0_v8/`, 6.3 h): in-run 0.85 final, peak 0.91
 at 1.8 M (`best_model`). Tier 1 and the crossing diagnosis on the same
-development set as run 7 (F79), supervisor off:
+development set as run 7 (F79), safety layer off:
 
 | | run 7 | run 8 final | run 8 best (1.8 M) | reference |
 |---|---|---|---|---|
@@ -2150,7 +2150,7 @@ development set as run 7 (F79), supervisor off:
 | being overtaken: max speed / `v_hold` integral | 0.94 / 8.7 | 0.80 / 10.3 | -- / -- | -- |
 
 Head-on width set, run 8 final: target collisions 0.05 / 0 / 0 / 0 / 0.05 at
-5 / 6 / 7 / 8 / 10 m (run 7: up to 0.15). Supervisor: 2 stops in 220 episodes,
+5 / 6 / 7 / 8 / 10 m (run 7: up to 0.15). Safety layer: 2 stops in 220 episodes,
 none then hit.
 
 *Reading it.*
@@ -2182,7 +2182,7 @@ heading term did the work.
 
 *Option 3 -- why the policy outruns an overtaker*
 (`tools/diagnostics/standon_speed.py`, the 20 development being-overtaken
-episodes, supervisor off; per-step means while the being-overtaken context is
+episodes, safety layer off; per-step means while the being-overtaken context is
 ENGAGED):
 
 | | run 8 | run 6 |
@@ -2240,7 +2240,7 @@ keeps the starboard swerve: the share drove the fix, and did not cause the
 swerve. Run 10 goes back to 0.60 and adds A29 (your call).**
 
 *Run 9* (`runs/ppo_formulation_seed0_v9/`, 5.0 h): in-run 0.82 final. Tier 1
-and the diagnoses on the development set, supervisor off, against run 8:
+and the diagnoses on the development set, safety layer off, against run 8:
 
 | | run 8 (0.60) | run 9 (0.50) |
 |---|---|---|
@@ -2309,7 +2309,7 @@ stand-on speeding; the starboard-crossing swerve remains.**
 
 *Run 10* (`runs/ppo_formulation_seed0_v10/`, 5.3 h of training, paused once at
 1.40 M and resumed in place, F86): in-run 0.88 final. Tier 1 and the diagnoses
-on the development set, supervisor off:
+on the development set, safety layer off:
 
 | | run 8 | run 9 | **run 10** |
 |---|---|---|---|
@@ -2323,7 +2323,7 @@ on the development set, supervisor off:
 | stand-on, engaged: throttle | +0.31 | +0.29 | −0.07 |
 
 Head-on width set: target collisions 0.14 / 0.10 / 0 / 0.05 / 0.05 at
-5 / 6 / 7 / 8 / 10 m. Supervisor: 8 stops in 6 of 220 episodes, none then hit.
+5 / 6 / 7 / 8 / 10 m. Safety layer: 8 stops in 6 of 220 episodes, none then hit.
 
 *Reading it.*
 * **A29 works.** Engaged and being overtaken, the ship now holds cruise
@@ -2393,7 +2393,7 @@ starboard-crossing swerve -- but port crossings now start with a starboard turn.
 *Run 11* (`runs/ppo_formulation_seed0_v11/`, 5.0 h): in-run 0.93 final. Reward
 audit (`results/scale_audit_f88.json`): orderings unchanged (169 / 94 / −324);
 the random policy's COLREGs integral −24.7 -> −26.9. Tier 1 and the diagnoses,
-development set, supervisor off:
+development set, safety layer off:
 
 | | run 8 | run 10 | **run 11** |
 |---|---|---|---|
@@ -2408,7 +2408,7 @@ development set, supervisor off:
 | mean COLREGs integral (crossing) | −18.2 | −16.5 (−21.6) | −17.4 (−28.6) |
 | head-on width set, target collision 5 / 6 / 7 / 8 / 10 m | 0.05 / 0 / 0 / 0 / 0.05 | 0.14 / 0.10 / 0 / 0.05 / 0.05 | 0 / 0.25 / 0.20 / 0.16 / 0.05 |
 
-Supervisor: 7 stops in 6 of 220 episodes, none then hit.
+Safety layer: 7 stops in 6 of 220 episodes, none then hit.
 
 *Reading it.*
 * **The starboard swerve is gone:** every starboard crossing now starts with the
@@ -2434,7 +2434,7 @@ Single-seed differences below ~0.05 mean nothing.**
 paused overnight, the suspended processes did not survive it, so it finished
 from its 1.75 M checkpoint, F86):
 
-| development set, supervisor off | run 11 seed 0 | run 11 seed 1 | run 10 (seed 0) |
+| development set, safety layer off | run 11 seed 0 | run 11 seed 1 | run 10 (seed 0) |
 |---|---|---|---|
 | goal | 0.925 | 0.875 | 0.875 |
 | head-on | 1.00 | 1.00 | 0.90 |
@@ -2458,7 +2458,7 @@ from its 1.75 M checkpoint, F86):
   0.43). Neither reads the side reliably, and the bias differs by seed, so this
   is a formulation gap rather than the latched weight pushing one way: A31.
 * **What holds across both seeds:** head-on 1.00, being overtaken 0.90-0.95 with
-  all-but-one above-floor draws and 2 of 3 below-floor ones, the supervisor
+  all-but-one above-floor draws and 2 of 3 below-floor ones, the safety layer
   intervening in 1-2 % of episodes, and no stop followed by a collision.
 
 **F91 — the head-on regression: run 11 alters to starboard even where there is
@@ -2507,7 +2507,7 @@ comparison against runs 8 and 11. **502 tests pass.**
 seeds solve it by opposite means, and A31 does not remove the crossing side
 bias. The formulation is not ready to freeze.**
 
-*Headline* (development set, supervisor off, final checkpoint). Run 12 seed 0
+*Headline* (development set, safety layer off, final checkpoint). Run 12 seed 0
 0.83, seed 1 0.88, against run 11's 0.92 / 0.88 and run 8's 0.85 -- inside the
 0.05 seed spread of F90, and neither change was aimed at it.
 
@@ -2584,7 +2584,7 @@ bias is now the blocking formulation gap. Both are A32.
 **F93 -- baseline-v1: the run 11 formulation, saved for the multi-learner
 campaign (your call to prepare it, 2026-09-22).**
 
-*Why run 11.* Development set, supervisor off, final checkpoint:
+*Why run 11.* Development set, safety layer off, final checkpoint:
 
 | run | all | head-on | crossing | being overtaken | overtaking | no target |
 |---|---|---|---|---|---|---|
@@ -2612,7 +2612,7 @@ the stand-on (0.75).
    formulation file changed after run 11 launched.
 2. **`configs/baseline_v1.json`** records the formulation (every upper-case
    constant, the formulation switches, observation schema, curriculum), run 11's
-   run arguments (2 M steps, 10 workers, supervisor off in training and both in
+   run arguments (2 M steps, 10 workers, safety layer off in training and both in
    evaluation, low-speed starts 0.15, 20 per class every 200 k) and each
    learner's hyperparameters and network. Formulation digest `02e853268828a32a`.
 3. **`src/baseline_config.py`** -- `--check` (code against the file),
@@ -2622,7 +2622,7 @@ the stand-on (0.75).
 4. **`train_formulation.py --config`** applies the file's run arguments (only
    `--algo`, `--seed` and `--tag` come from the CLI) and refuses to start if the
    code no longer matches. The CLI defaults differ from run 11's arguments
-   (supervisor on in training, 6 per class), so a campaign launched on defaults
+   (safety layer on in training, 6 per class), so a campaign launched on defaults
    would have silently trained a different formulation; with `--config` it cannot.
    `config.json` records the baseline id and digest.
 5. **Fixed:** `config.json` recorded `"algorithm": "PPO"` for every learner; it
@@ -2653,7 +2653,7 @@ strongly and symmetrically. The side bias is not a reward problem.**
 
 `tools/diagnostics/a32_reward_gap.py` (`results/a32_reward_gap/`): 102 crossings
 (20 development + training-namespace draws with the side forced; 57 from port,
-45 from starboard; basin, obstacles off, supervisor off) branched at the step
+45 from starboard; basin, obstacles off, safety layer off) branched at the step
 the encounter engages into scripted responses -- a 30 or 60 deg alteration in
 the latched compliant sense, the same alteration the other way, or stand-on --
 held until the latch clears, then the path resumed. Same seed and follower up to
@@ -2979,12 +2979,12 @@ on suite 3.2** (the stated reason: the 10 m basin is already narrow water for a
 channel builder's width profile still varies the recorded width (8.8-11.7 m,
 median 10.0) around the requested 10 m.
 
-*Reproducibility.* The 2,080 basin episodes (4 learners x 2 supervisor modes x
+*Reproducibility.* The 2,080 basin episodes (4 learners x 2 safety layer modes x
 260) are identical to suite 3.2's, outcome and step count -- same scenarios, same
 seeds, deterministic policies.
 
-*Headline, supervisor off (suite 3.3 | 3.2):* PPO 0.851 | 0.842, RecurrentPPO
-0.782 | 0.785, SAC 0.853 | 0.854, TQC 0.853 | 0.842. Supervisor on: 0.847, 0.782,
+*Headline, safety layer off (suite 3.3 | 3.2):* PPO 0.851 | 0.842, RecurrentPPO
+0.782 | 0.785, SAC 0.853 | 0.854, TQC 0.853 | 0.842. Safety layer on: 0.847, 0.782,
 0.854, 0.844. **Widening the channels to 10 m changes almost nothing** -- channel
 goal rates move by at most 0.015.
 
@@ -3017,10 +3017,10 @@ widened to 1,000 a cell; `TIER_A_SEED_BASE` kept at 9,600 so Tier A is unchanged
 Both suite 3.3 and 3.4 were decided after seeing seed-0 results; the 3.2 and 3.3
 results are kept (`results/frozen_suite/<tag>_suite3{2,3}_superseded/`). Closes A36.
 
-*Headline, seed 0, supervisor off (95% interval, n = 800) | on:*
+*Headline, seed 0, safety layer off (95% interval, n = 800) | on:*
 SAC **0.892** [0.869, 0.912] | 0.876; TQC **0.873** [0.848, 0.894] | 0.862;
 PPO 0.808 [0.779, 0.833] | 0.796; RecurrentPPO 0.736 [0.705, 0.766] | 0.736. The
-supervisor costs 0-0.016 and intervenes 0-0.05 times an episode. **Against the
+safety layer costs 0-0.016 and intervenes 0-0.05 times an episode. **Against the
 development set** (best checkpoint, the same five classes): SAC 0.91 vs 0.892, TQC
 0.90 vs 0.873, PPO 0.84 vs 0.808, RecurrentPPO 0.84 vs 0.736 -- the off-policy
 learners stay within 0.02-0.03 of their development score (SAC's log holds two
@@ -3078,7 +3078,7 @@ from starboard, overtaking, being overtaken, 20 scenarios per layout (300), each
 run as **FIX** (constant velocity) and **VAR** (the same target on the same seed,
 one speed change on the approach: `targets.T_VS`, new, evaluation only, to
 0.5-0.8x or 1.25-1.5x at 0.05 m/s^2, `constant_temp.TARGET_VS_*`) -- 630 episodes
-per supervisor mode. A target whose nominal track would pass within 0.3 m of a
+per safety layer mode. A target whose nominal track would pass within 0.3 m of a
 panel is redrawn (targets are not steered around panels); cells need 35-72 of
 their 500 seeds. Generator seeds from 310,000 (a gap no namespace uses), episode
 seeds from 470,000.
@@ -3118,8 +3118,8 @@ L2) to leave the faster target room astern.
 
 **F105 -- the Paper 2 deployment-layout set on the four seed-0 models (2026-09-27).**
 
-630 episodes per supervisor mode per model (`results/paper2_set/<learner>s0_bl2/`,
-manifest 67311d20). Goal rate, supervisor off (on within 0.015 of it):
+630 episodes per safety layer mode per model (`results/paper2_set/<learner>s0_bl2/`,
+manifest 67311d20). Goal rate, safety layer off (on within 0.015 of it):
 
 | | overall | no target (30) | with a target (600) | frozen headline, same checkpoint |
 |---|---|---|---|---|
@@ -3167,7 +3167,7 @@ seeds (training namespace; validation 350,000+); any layout within 0.75 m of a
 deployment layout (both leg ends and all three panels) is redrawn, so the test
 set stays unseen. Selection: best goal - 2 x collision over the development set
 (120) plus a field validation set (155: 30 no-target, 25 each of HO, CRP, CRS, OT,
-BO at constant velocity), supervisor off; the 2 M model is evaluated first and
+BO at constant velocity), safety layer off; the 2 M model is evaluated first and
 kept if nothing beats it -- so a regression on the development set costs the
 fine-tune its selection. Evaluations every 100 k.
 

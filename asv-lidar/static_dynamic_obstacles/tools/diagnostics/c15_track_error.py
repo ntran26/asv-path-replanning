@@ -1,7 +1,7 @@
 """C15: tracker error against ground truth, centroid vs hull-fitted measurement.
 
 Replays fixed scenarios with a path follower (so both modes see the same own
-ship motion until the encounter differs), obstacles off, supervisor off, and on
+ship motion until the encounter differs), obstacles off, safety layer off, and on
 every step pairs the dynamic track nearest the true target with the truth.
 Reported by true range bin:
 

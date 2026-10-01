@@ -312,12 +312,12 @@ Eq. 6–8, Table 5) — **the heart of contribution C2**
   rate, not rudder angle; the head-on port-turn penalty is class-gated because
   overtaking needs a port turn (the compliant-sense lookup removes that trap).
 
-**2.3.4 Runtime layer** (~200 words) — the engineered stop supervisor: off in
+**2.3.4 Runtime layer** (~200 words) — the engineered stop safety layer: off in
 training, evaluated separately, interventions not attributed to the policy
 (S10, C-7). Rule 8(e) in two layers: the learned policy slackens speed; the
-engineered layer takes all way off. **[Open, A38:]** the current supervisor
-lowers success slightly (`planning/SUPERVISOR_V2_PLAN.md`). Describe the layer
-that is actually evaluated; if supervisor v2 is adopted, it goes here instead.
+engineered layer takes all way off. **[Open, A38:]** the current safety layer
+lowers success slightly (`planning/SAFETY_LAYER_V2_PLAN.md`). Describe the layer
+that is actually evaluated; if safety layer v2 is adopted, it goes here instead.
 
 **2.3.5 Curriculum** (~350 words, Table 8)
 
@@ -405,7 +405,7 @@ coefficient list.
 | LiDAR rate | skeleton: 10 Hz; decisions at 2 Hz | state what the simulator does per decision step |
 | Scaling statement | skeleton §2.1.2 [TBC] | write, or move to limitations |
 | Formulation | v2 vs v3 | decide after the v3 SAC run (§2.3.5 box) |
-| Supervisor | A38 | describe the evaluated version |
+| Safety layer | A38 | describe the evaluated version |
 | Model provenance | "identified" vs the planned sys-ID campaign (S13) | "identified from field logs (05)"; the campaign is physical transfer |
 
 ---

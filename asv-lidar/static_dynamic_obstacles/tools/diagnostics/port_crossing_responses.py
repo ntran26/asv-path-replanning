@@ -5,7 +5,7 @@ sense is a port turn (pass astern); the reference controller reached the goal in
 only 6 of 12 port crossings either way. Before choosing a fix, this separates
 the learner from the geometry: every crossing is replayed under fixed responses,
 each triggered **when the encounter engages** (as a policy sees it), held until
-the target is past and opening, then the path resumed at cruise; supervisor off:
+the target is past and opening, then the path resumed at cruise; safety layer off:
 
 * `stand_on`   -- hold path and speed (Rule 17(a)(i) for a target from port);
 * `a17_30/60`  -- a 30 / 60 deg alteration in A17's sense (port for a target from
@@ -128,7 +128,7 @@ def main():
     wall = d.pivot_table(index="response", columns="side", values="other_hit", aggfunc="mean").round(2)
     best = d.groupby(["case", "side"]).goal.max().groupby("side").mean().round(2)
     counts = d[d.response == "stand_on"].side.value_counts()
-    text = (f"Scripted crossing responses, triggered at engagement, obstacles off, supervisor off\n"
+    text = (f"Scripted crossing responses, triggered at engagement, obstacles off, safety layer off\n"
             f"{dict(counts)} crossings, {len(d)} episodes, {time.time() - started:.0f} s\n\n"
             f"== goal rate\n{goal}\n\n== target collision rate\n{hit}\n\n"
             f"== wall / other collision rate\n{wall}\n\n"

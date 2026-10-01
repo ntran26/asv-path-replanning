@@ -1,6 +1,6 @@
 """Where a stopping own ship actually goes: the A23 stop test.
 
-A18 let the supervisor stop only when the target would clear *an own ship
+A18 let the safety layer stop only when the target would clear *an own ship
 stationary where it is now*.  A stopping vessel does not stop where it is.  The
 supervisor's latch runs full astern (`S2 = -100`) until the speed estimate falls
 below `ESTOP_STOP_SPEED`, and the hull keeps moving forward while it brakes.

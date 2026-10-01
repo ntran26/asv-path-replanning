@@ -192,7 +192,7 @@ target and obstacle costs raycasting and collision work.
 ### 5.1 Development set — the selection instrument
 
 120 fixed episodes, drawn once at stage 5. Every 200 k steps the current policy
-is replayed over all of them, with the safety supervisor **off** and **on**, and
+is replayed over all of them, with the safety safety layer **off** and **on**, and
 the checkpoint is kept if it improves
 
 $$\text{score} = P(\text{goal}) - 2\,P(\text{collision})$$

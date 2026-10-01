@@ -7,7 +7,7 @@ speed after the target has passed, so its DCPA is close to holding course: it
 may "clear" only where the ship was already clear, and almost never where a
 slowdown is the lawful answer.
 
-Replays the development crossings and head-ons (supervisor off, run 5's final
+Replays the development crossings and head-ons (safety layer off, run 5's final
 model, deterministic) and, at every frame where a give-way context is engaged
 with its compliant alteration inadmissible, records the current DCPA and both
 tests.
@@ -73,7 +73,7 @@ def main() -> None:
         slowdown_clears=("slowdown_clears", "mean"), stop_clears=("stop_clears", "mean"),
         dcpa=("dcpa", "mean"), dcpa_if_slowed=("dcpa_if_slowed", "mean"),
         dcpa_if_stopped=("dcpa_if_stopped", "mean")).round(2)
-    text = (f"R-2 candidate frames (give-way, engaged, alteration inadmissible), run 5 final, supervisor off\n\n"
+    text = (f"R-2 candidate frames (give-way, engaged, alteration inadmissible), run 5 final, safety layer off\n\n"
             f"== all candidate frames\n{by}\n\n== frames not already clear (DCPA < {cfg.ESTOP_CLEAR_DCPA_M} m)\n"
             f"{by_unclear}\n")
     (OUT / "r2_activation.txt").write_text(text, encoding="utf-8")

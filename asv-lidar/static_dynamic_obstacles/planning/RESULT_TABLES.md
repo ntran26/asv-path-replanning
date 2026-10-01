@@ -18,7 +18,7 @@ The CODEX reference controller is a supplementary comparator, not one of the pre
 
 ## R1 — Tier B holdout (**800 constant-velocity episodes per seed**, suite 3.4: 8 cells × 100, drawn like the development set)
 
-| Method | Success | Static coll. | Boundary coll. | Target coll. | RMS CTE (m) | Path ratio | Intervention rate (supervisor on) |
+| Method | Success | Static coll. | Boundary coll. | Target coll. | RMS CTE (m) | Path ratio | Intervention rate (safety layer on) |
 |---|---|---|---|---|---|---|---|
 | SAC | | | | | | | |
 | TQC (distributional) | | | | | | | |
@@ -33,7 +33,7 @@ The CODEX reference controller is a supplementary comparator, not one of the pre
 
 **R1b — success by stratum.** Same rows. Columns: basin, channel wide [7.60, 10.00], channel intermediate [4.26, 7.60], channel narrow [3.50, 4.26].
 
-## R2 — violation rate per class (supervisor off)
+## R2 — violation rate per class (safety layer off)
 
 | Method | Head-on | Crossing (stbd) | Crossing (port) | Overtaking | Being overtaken |
 |---|---|---|---|---|---|

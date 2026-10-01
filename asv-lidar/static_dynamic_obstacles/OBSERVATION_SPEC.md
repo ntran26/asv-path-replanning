@@ -337,7 +337,7 @@ at engagement are then **latched** (A20) until the target is past and opening.
 | 12 | previous rudder | executed rudder command / 100 % | [−1, 1] |
 | 13 | previous throttle | `(RPM − 6) / 6` as executed | [−1, 1] |
 
-The previous action is the **executed** command (after any supervisor override),
+The previous action is the **executed** command (after any safety layer override),
 so the policy sees what the vessel actually did.
 
 **Measured use** (F91): probing trained PPO policies at engagement, flipping
