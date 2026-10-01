@@ -3,7 +3,7 @@
 `CODEX/` (a separate working copy) built a predictive LOS reference controller
 and reports 20/20 on ten hand-built scenes in a 10 m channel. This replays it on
 the development set every PPO run is scored on (20 per class, generated
-corridors 5-10 m, obstacles, nominal noise, supervisor off, stage-4 propulsion,
+corridors 5-10 m, obstacles, nominal noise, safety layer off, stage-4 propulsion,
 seeds 900 000 + i), using CODEX's own environment and sources. Nothing in
 `CODEX/` is modified.
 

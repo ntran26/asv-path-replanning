@@ -136,7 +136,7 @@ class ASVLidarEnv(gym.Env):
         self.pose_stale_prob = float(pose_stale_prob)
         self._stale_rng = np.random.default_rng()
         # F68: a fraction of generated episodes starts slow or at rest, so a
-        # policy resuming after a supervisor stop is in distribution.  Its own
+        # policy resuming after a safety layer stop is in distribution.  Its own
         # stream, like staleness, so it reshuffles no other draw.
         self.low_speed_start_frac = float(low_speed_start_frac)
         self._start_rng = np.random.default_rng()
@@ -338,11 +338,16 @@ class ASVLidarEnv(gym.Env):
         self.model.reset()
         self.lidar.reset()
         self.tracker.reset()
+        self._safety_v2, self.safety_v2_steps = None, 0
+        self._v2_brake, self.safety_v2_brake_steps = False, 0
         self.observer.reset()
         if self._pose_noise is not None:
             self._pose_noise.reset()
 
         options = options or {}
+        handback = self._draw_handback(options)
+        if handback is not None:
+            options = dict(options, generated=handback["built"])
         scenario = options.get("scenario")
         if scenario is not None:
             self._load_scenario(scenario)
@@ -385,6 +390,11 @@ class ASVLidarEnv(gym.Env):
         obs = self._get_obs()
         self._obs_hold = self._obs_fresh
         self._record_obs_health(obs)
+        if handback is not None:
+            replayed = self._replay_handback(handback)
+            if replayed is not None:
+                return replayed, {"handback_start": True}
+            return self.reset(options={"_no_handback": True})     # replay failed: an ordinary episode
         return obs, {}
 
     def _apply_initial_conditions(self, options: dict) -> None:
@@ -511,6 +521,85 @@ class ASVLidarEnv(gym.Env):
                                varying_share=st.get("field_varying_share"),
                                solvable_only=bool(st.get("st_feasibility")),
                                near_share=float(st.get("field_near_share", 0.0)))
+
+    def set_constants(self, overrides: dict) -> None:
+        """Set run-time switches in this process (fix 1's `ADMISSIBILITY_STATIC`)."""
+        for name, value in (overrides or {}).items():
+            setattr(cfg, name, value)
+
+    # -- Hand-back starts (planning/HANDBACK_STARTS_PLAN.md, 2026-10-01) --------
+    # A share of episodes begins where safety layer v2 handed the helm back to a
+    # policy (recorded by tools/diagnostics/harvest_handback_starts.py), so the
+    # policy -- trained without the safety layer -- learns to recover from the
+    # slow, off-heading, near-wall states an intervention leaves.  The episode's
+    # recorded prefix is replayed with the own ship placed on its recorded state
+    # each step, so the targets, the tracker and the encounter contexts are where
+    # they were.  A run-time switch: no pool, no draw, every other run unchanged.
+    HANDBACK_JITTER_DEG = 10.0
+    HANDBACK_JITTER_SPEED = 0.2
+
+    def set_start_pool(self, path: str, share: float, min_stage: int = 6,
+                       jitter: bool = True, seed: int = 0) -> None:
+        import pickle
+        with open(path, "rb") as fh:
+            self._start_pool = pickle.load(fh)["records"]
+        self._start_share, self._start_min_stage = float(share), int(min_stage)
+        self._start_jitter = bool(jitter)
+        self._hb_rng = np.random.default_rng(int(seed))
+        self.handback_starts = 0
+
+    def _draw_handback(self, options: dict):
+        pool = getattr(self, "_start_pool", None)
+        if (not pool or options.get("_no_handback") or options.get("generated") is not None
+                or options.get("scenario") is not None or self.scenario_stage is None
+                or int(self.scenario_stage) < self._start_min_stage):
+            return None
+        if self._hb_rng.uniform() >= self._start_share:
+            return None
+        return pool[int(self._hb_rng.integers(len(pool)))]
+
+    def _set_own_state(self, state) -> None:
+        """(x, y, heading deg, yaw rate deg/s, surge, sway, rudder angle rad)."""
+        x, y, h, r, u, v, servo = map(float, state)
+        self.asv_x, self.asv_y, self.asv_h, self.asv_w = x, y, h % 360.0, r
+        self.u_body, self.v_body = u, v
+        s = self.model._s
+        s[0, 0], s[1, 0], s[2, 0], s[3, 0], s[4, 0] = u, v, math.radians(r), math.radians(h), servo
+
+    def own_state(self) -> Tuple[float, ...]:
+        return (float(self.asv_x), float(self.asv_y), float(self.asv_h), float(self.asv_w),
+                float(self.u_body), float(self.v_body), float(self.model._s[4, 0]))
+
+    def _replay_handback(self, rec):
+        enabled, obs = self.estop_enabled, None
+        self.estop_enabled = False
+        try:
+            n = len(rec["actions"])
+            for j in range(n):
+                state = list(rec["states"][j])
+                if j == n - 1 and self._start_jitter:
+                    state = self._jittered(state)
+                self._set_own_state(state)
+                self._v2_brake = bool(rec["brakes"][j])
+                obs, _, term, trunc, _ = self.step(np.asarray(rec["actions"][j], dtype=np.float32))
+                if term or trunc:
+                    return None
+        finally:
+            self.estop_enabled = enabled
+            self._v2_brake = False
+        self.handback_starts = getattr(self, "handback_starts", 0) + 1
+        return obs
+
+    def _jittered(self, state):
+        """Heading +-10 deg, speed +-20 %: a neighbourhood, not one exact state;
+        kept only if the hull is still clear."""
+        out = list(state)
+        out[2] = state[2] + float(self._hb_rng.uniform(-self.HANDBACK_JITTER_DEG, self.HANDBACK_JITTER_DEG))
+        out[4] = max(0.0, state[4] * float(self._hb_rng.uniform(1 - self.HANDBACK_JITTER_SPEED,
+                                                                 1 + self.HANDBACK_JITTER_SPEED)))
+        self._set_own_state(out)
+        clear = self.collision_kind(self.hull_polygon()) is None
+        return out if clear else list(state)
 
     def define_stage(self, stage: int, definition: dict) -> None:
         """Install a curriculum stage in this process and switch to it -- stage 8
@@ -918,6 +1007,16 @@ class ASVLidarEnv(gym.Env):
             self.tracker.update(detections, self._tracker_dt + cfg.UPDATE_RATE, scan=scan)
             self._tracker_dt = 0.0
         self.tracks = self.tracker.dynamic_tracks()
+        if getattr(cfg, "ADMISSIBILITY_STATIC", False) and not self.pose_stale:
+            # Fix 1: the static LiDAR returns, world frame, the targets' own removed
+            # (1.8 m, the classical comparators' rule) -- what bounds the room for a turn.
+            mask = gated < cfg.LIDAR_RANGE - 1e-5
+            ang = np.radians(np.asarray(self.lidar.bearings)[mask] + est_h)
+            pts = np.column_stack((sensor_x + gated[mask] * np.sin(ang), sensor_y + gated[mask] * np.cos(ang)))
+            for t in self.tracks:
+                if len(pts):
+                    pts = pts[np.hypot(pts[:, 0] - t.position[0], pts[:, 1] - t.position[1]) > 1.8]
+            self.static_points = pts
         self._update_perception_metrics()
 
     def _update_perception_metrics(self) -> None:
@@ -965,7 +1064,7 @@ class ASVLidarEnv(gym.Env):
         self.perceived_velocity = velocity
         # The surge the controller perceived in this observation: what the stop
         # latch reads next step (F68).  It used to draw its own noisy estimate
-        # from the shared stream, so switching the supervisor on shifted every
+        # from the shared stream, so switching the safety layer on shifted every
         # later noise draw and an on/off comparison changed more than the stop.
         self._observed_surge = float(u)
         observation = self.observer.build(
@@ -988,6 +1087,7 @@ class ASVLidarEnv(gym.Env):
             boundary_polygon=self.boundary_polygon,
             s_along=perceived.s_along,
             true_targets=(),
+            static_points=getattr(self, "static_points", None),
             open_water=self.open_water,
             previous_action=self._executed_action,
             cross_track_scale=self.channel.half_width_on_side(
@@ -1110,6 +1210,15 @@ class ASVLidarEnv(gym.Env):
     # ------------------------------------------------------------------
     def step(self, action):
         self.elapsed_time += cfg.UPDATE_RATE
+        # Safety layer v2 (`safety_v2.py`, run-time `SAFETY_VERSION = 2`): a
+        # predictive filter on the action, before anything is commanded.
+        self.safety_v2_changed = False
+        if self.estop_enabled and getattr(cfg, "SAFETY_VERSION", 1) >= 2:
+            if getattr(self, "_safety_v2", None) is None:
+                import safety_v2
+                self._safety_v2 = safety_v2.SafetyFilterV2()
+            action, self.safety_v2_changed = self._safety_v2.filter(self, action)
+            self.safety_v2_steps = getattr(self, "safety_v2_steps", 0) + int(self.safety_v2_changed)
         rudder_cmd = float(np.clip(action[0], -1.0, 1.0))
         throttle_cmd = float(np.clip(action[1], -1.0, 1.0))
 
@@ -1126,6 +1235,12 @@ class ASVLidarEnv(gym.Env):
             cfg.CRUISE_RPM + cfg.RPM_DELTA * throttle_cmd, cfg.RPM_FLOOR, cfg.RPM_CEIL))
         self._estop_started = False
         override = self._emergency_stop_override()
+        if override is None and getattr(self, "_v2_brake", False):
+            # Safety layer v2's brake: one step of full astern, re-decided every step
+            # (iteration 3 -- the v1 latch held the vessel stopped in a target's path).
+            override = (estop_mod.S2_FULL_ASTERN if float(getattr(self, "_observed_surge", self.u_body))
+                        > cfg.ESTOP_STOP_SPEED else 0.0)
+            self.safety_v2_brake_steps = getattr(self, "safety_v2_brake_steps", 0) + 1
         if override is None:
             self.rpm = policy_rpm
             self.propulsion_s2 = estop_mod.rpm_to_s2(policy_rpm)
@@ -1237,7 +1352,7 @@ class ASVLidarEnv(gym.Env):
         was_braking = self.estop.state == estop_mod.BRAKING
 
         reason, self._estop_request = self._estop_request, None
-        if reason is None and cfg.ESTOP_TRIGGER == "supervisor":
+        if reason is None and cfg.ESTOP_TRIGGER == "supervisor" and getattr(cfg, "SAFETY_VERSION", 1) < 2:
             reason = estop_mod.stop_required(contexts)
         if reason is not None and self.estop.request(reason, t=self.elapsed_time,
                                                      speed=speed):

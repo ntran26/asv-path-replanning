@@ -10,7 +10,7 @@ rest) under
 * `reference` -- the CODEX predictive LOS controller (`src/reference_controller.py`),
   perception-only: the classical comparator;
 
-with the supervisor off and nominal noise, seeds as Tier 1. Every layout
+with the safety layer off and nominal noise, seeds as Tier 1. Every layout
 passed the A* feasibility filter at reset, so a reference failure is a
 feasible case the classical method does not solve.
 

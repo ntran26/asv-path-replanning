@@ -278,7 +278,7 @@ Use facts §6.
   score.
 
 ### 9. Safety layer and evaluation design (added)
-- The runtime stop supervisor (facts §5): trigger, maneuver, hand-back; off in
+- The runtime stop safety layer (facts §5): trigger, maneuver, hand-back; off in
   training; learned compliance always reported with it off.
 - What is measured: success; collisions by type; cross-track error; rule
   metrics per encounter; minimum CPA distribution; intervention rate; by

@@ -135,5 +135,6 @@
   "field_near_share": 0.3,
   "st_feasibility": true,
   "failure_replay": 0.3
- }
+ },
+ "wall_clock_s": 35236.23780250549
 }

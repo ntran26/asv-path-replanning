@@ -11,7 +11,7 @@ cannot show what retraining would learn; that is Tier 2.
 
 Reported: per-class outcomes against the model's own last in-training
 evaluation; crossing by side; being overtaken above and below the A15 floor;
-head-on by width; supervisor stops, their reasons, and how often a target
+head-on by width; safety layer stops, their reasons, and how often a target
 collision follows one (the F58 5 m stop check); port-sense latching.
 
     python tools/tiers/tier1_replay.py --model runs/ppo_formulation_seed0_v3/final_model.zip --tag run3
@@ -52,7 +52,7 @@ def main() -> None:
     ap.add_argument("--processes", type=int, default=None, help="worker processes (default: cores - 2)")
     ap.add_argument("--stop-test-fit", choices=("on", "off"), default=None,
                     help="override STOP_TEST_USES_HULL_FIT in the workers (F66 A/B)")
-    ap.add_argument("--supervisor", choices=("on", "off"), default=None,
+    ap.add_argument("--safety", "--supervisor", dest="supervisor", choices=("on", "off"), default=None,
                     help="F68: run the replay with the stop latch on or off")
     ap.add_argument("--policy", choices=("model",) + CONTROLLERS, default="model",
                     help="replay a saved model (default) or an onboard controller")
@@ -127,7 +127,7 @@ def main() -> None:
              "== crossing collision by side x drawn DCPA", crossing if isinstance(crossing, str) else crossing.to_string(), "",
              "== being overtaken, A15 floor", overtaken.to_string(), "",
              "== head-on width set (obstacles off)", head_on.to_string(), "",
-             f"== supervisor stops: {int(d.estops.sum())} in {len(stopped)} episodes; "
+             f"== safety layer stops: {int(d.estops.sum())} in {len(stopped)} episodes; "
              f"followed by a target collision in {int(stopped.estop_then_target_collision.sum())}",
              reasons.to_string() if len(reasons) else "(none)"]
     text = "\n".join(lines)

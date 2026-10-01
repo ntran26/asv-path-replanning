@@ -28,7 +28,7 @@ CONFIG_ID = "baseline-v2"
 # baseline-v1 (`configs/baseline_v1.json`) is kept for the record: it is run 11's
 # formulation, and runs made before 2026-09-23 verify against it.
 
-# The run arguments this freezes (F93).  The CLI defaults differ (supervisor on
+# The run arguments this freezes (F93).  The CLI defaults differ (safety layer on
 # in training, 6 episodes per class), which is why the campaign reads these from
 # the file rather than from the defaults.
 RUN_ARGS = {"timesteps": 2_000_000, "num_envs": 10, "eval_freq": 200_000,
@@ -42,7 +42,7 @@ TAG = "bl2"                        # run-directory suffix for this formulation
 SEEDS = [0, 1, 2]                  # A26: 3 seeds per learner (your call, 2026-09-24;
                                    # was 5).  4 learners x 3 seeds = 12 runs, ~10 days.
 # A26: each seed is represented by its best development-set checkpoint (the eval
-# callback's goal - 2 x collision score, supervisor off); Tier B stays held out.
+# callback's goal - 2 x collision score, safety layer off); Tier B stays held out.
 CHECKPOINT = "best_model.zip"
 
 

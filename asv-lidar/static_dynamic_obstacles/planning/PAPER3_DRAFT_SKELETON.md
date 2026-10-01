@@ -88,7 +88,7 @@ Scope decisions carried into this revision
 | S7     | **Onboard sensing only.** Target state is estimated from a 360° 2D LiDAR (motion classifier, tracker); no AIS, no ground-truth target in the policy input. The navigable limit is a map boundary ray-cast at the noisy estimated pose. Simulator ground truth is used for collision and clearance rewards in training (draft 4 §1.3). |
 | S8     | **Training targets hold constant velocity and never give way** (D1). Reactive (compliant) and non-compliant targets appear only in evaluation (the robustness set, R3). |
 | S9     | **Geometry:** the 10 x 25 m basin of Paper 2's field site (straight and slanted legs, the default) and parallel-walled channels. Headline channels 7.5-10 m; the width sweep (R4) goes to 3.5 m. Every layout admits a static route (A* filter, F74) -- not a proof that every dynamic encounter is avoidable (draft 4 §1.3). |
-| S10    | **8(e) in two layers:** the learned policy slackens speed; an engineered runtime supervisor, off during training, takes all way off when a collision is imminent. Compliance is reported with it **off** (C-7); its interventions are not attributed to the policy. |
+| S10    | **8(e) in two layers:** the learned policy slackens speed; an engineered runtime safety layer, off during training, takes all way off when a collision is imminent. Compliance is reported with it **off** (C-7); its interventions are not attributed to the policy. |
 | S11    | **Formulation plus comparison:** one frozen formulation (observation, reward, curriculum, dynamics), four learners (on-policy, recurrent, off-policy, distributional), 3 seeds, 2 M steps, checkpoint selected on the development set, the frozen suite touched once per policy. |
 | S12    | \[TBC\] The Paper 2 deployment-layout set and the field fine-tune (F104-F107): report as a field-readiness study, as the bridge to the field trials, or leave to the field paper. |
 | S13    | \[TBC, new 2026-09-28\] **Physical transfer.** Draft 4 calls it "planned" and its roadmap has no field section. Either (a) keep basin trials in this paper -- add a field section to the roadmap and keep RQ4, C-6 and old C7; or (b) move them to the field paper -- drop RQ4 and C-6 here and state the transfer as future work. Old §7 is parked, unnumbered, after §4 until then. |
@@ -143,7 +143,7 @@ Automatic COLREG evaluation encodes the evaluator's interpretation (Hagen et al.
 
 **Objective** (draft 4): develop and evaluate a sensor-realistic DRL formulation for path following, static-obstacle avoidance and COLREGs-aware two-vessel encounters in confined water, and compare PPO, recurrent PPO, SAC and TQC under that shared formulation.
 
-**Scope** (draft 4; see S1-S13): one model-scale ASV, one moving target, up to three static obstacles, 10 x 25 m basin and parallel-walled channels; continuous rudder and propulsion at 2 Hz; target from onboard 2D LiDAR (no AIS, no ground-truth target in the policy input); map-derived boundaries at the estimated pose; detection, tracking and encounter classification as explicit stages. Selected requirements of Rules 8, 9, 13, 14, 15/16 and 17(a)(i); the narrow-channel crossing convention (S3); excluded: Rule 17(a)(ii) and 17(b), Rule 18, Rule 19, signalling, simultaneous multiple targets. Constant-velocity, non-cooperating training targets; reactive and non-compliant targets for robustness only. Headline: 800 held-out constant-velocity scenarios per seed (basin, and channels 7.5-10 m); a separate 3.5-10 m width sweep; the stopping supervisor evaluated separately and off for learned-compliance results.
+**Scope** (draft 4; see S1-S13): one model-scale ASV, one moving target, up to three static obstacles, 10 x 25 m basin and parallel-walled channels; continuous rudder and propulsion at 2 Hz; target from onboard 2D LiDAR (no AIS, no ground-truth target in the policy input); map-derived boundaries at the estimated pose; detection, tracking and encounter classification as explicit stages. Selected requirements of Rules 8, 9, 13, 14, 15/16 and 17(a)(i); the narrow-channel crossing convention (S3); excluded: Rule 17(a)(ii) and 17(b), Rule 18, Rule 19, signalling, simultaneous multiple targets. Constant-velocity, non-cooperating training targets; reactive and non-compliant targets for robustness only. Headline: 800 held-out constant-velocity scenarios per seed (basin, and channels 7.5-10 m); a separate 3.5-10 m width sweep; the stopping safety layer evaluated separately and off for learned-compliance results.
 
 Research questions -- draft 4 states four central questions (RQ1, RQ6, RQ3, RQ5):
 
@@ -401,7 +401,7 @@ Geometric only: channel width in ship breadths, spawn TCPA, static clutter count
 
 **Perception.** Track acquisition range; classification latency and stability; velocity estimate error; occlusion duration.
 
-**Intervention dependence** (draft 4 C4). Supervisor intervention rate, reported apart from learned compliance.
+**Intervention dependence** (draft 4 C4). Safety layer intervention rate, reported apart from learned compliance.
 
 \[TBC — presentation format for multi-axis results. A weighted scalar will be contested; prefer a per-axis table or a Pareto view.\]
 

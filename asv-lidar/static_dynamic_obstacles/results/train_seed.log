@@ -17,3 +17,11 @@ code matches baseline-v3
 2026-09-30 21:20:01 == sac seed 0 done
 2026-09-30 21:42:35 == sacs0_bl3_stage8: stage 8 from 2.5 M to 3.0 M (configs/finetune_v3_stage8.json)
 2026-09-30 21:45:08    pinned learner 17848
+2026-10-01 07:36:12    stage 8 exit 0
+2026-10-01 08:08:27    frozen suite sacs0_bl3_stage8 exit 0
+2026-10-01 08:32:56    Paper 2 set sacs0_bl3_stage8 exit 0
+2026-10-01 08:32:57 == sacs0_bl3_stage8 done
+2026-10-01 14:18:18 == sacs0_bl3_fix1: fix 1 from 2.5 M to 3.0 M (configs/finetune_v3_fix1.json)
+2026-10-01 14:20:52    pinned learner 28264
+2026-10-01 20:29:23 == ppos0_bl3_hb watcher armed: waiting for sacs0_bl3_fix1 (training + evaluations) to finish
+2026-10-01 21:29:12    ppos0_bl3_hb watcher stopped: PPO hand-back plan on hold (your call)

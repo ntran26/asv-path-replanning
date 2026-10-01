@@ -236,7 +236,7 @@ so the static panels shown are exactly the ones the policies met.
   rule the width decides), widths {d[d['mode'] == 'channel'].width_m.min():.1f}-{d[d['mode'] == 'channel'].width_m.max():.1f} m.
 - Panels per scenario: {d.panels.mean():.1f} on average ({(d.panels == 0).mean():.0%} have none).
 
-## Goal rate by class (Tier 1, supervisor off)
+## Goal rate by class (Tier 1, safety layer off)
 
 {_md(goals) if not goals.empty else 'No Tier 1 results found.'}
 

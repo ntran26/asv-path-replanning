@@ -1,0 +1,50 @@
+Paper 2 deployment-layout set (sacs0_bl3_stage8) -- runs\sac_formulation_seed0_bl3_stage8\best_model.zip
+1260 episodes, set revision 2.0, manifest 67311d204bcc01d7, 631 s
+
+-- by supervisor
+              n  success  coll_target  coll_other  rms_cte  min_range  estops
+supervisor                                                                   
+off         630    0.659        0.103       0.238    1.516      3.366   0.000
+on          630    0.659        0.103       0.238    1.515      3.366   0.002
+
+-- no target, by layout (supervisor off)
+         n  success  coll_target  coll_other  rms_cte  min_range  estops
+layout                                                                  
+L1      10      0.5          0.0         0.5    2.272        inf     0.0
+L2      10      1.0          0.0         0.0    1.439        inf     0.0
+L3      10      1.0          0.0         0.0    2.472        inf     0.0
+
+-- with a target, by encounter and speed
+                  n  success  coll_target  coll_other  rms_cte  min_range  estops
+encounter speed                                                                  
+BO        FIX    60    0.617        0.000       0.383    1.056      4.107     0.0
+          VAR    60    0.617        0.000       0.383    1.055      4.234     0.0
+CRP       FIX    60    0.500        0.333       0.167    1.358      2.126     0.0
+          VAR    60    0.600        0.300       0.100    1.342      2.017     0.0
+CRS       FIX    60    0.500        0.133       0.367    1.027      2.663     0.0
+          VAR    60    0.567        0.167       0.267    1.049      2.683     0.0
+HO        FIX    60    0.683        0.033       0.283    2.021      3.698     0.0
+          VAR    60    0.650        0.050       0.300    2.029      3.674     0.0
+OT        FIX    60    0.883        0.017       0.100    1.985      3.641     0.0
+          VAR    60    0.883        0.050       0.067    1.960      3.717     0.0
+
+-- with a target, by layout and speed
+                n  success  coll_target  coll_other  rms_cte  min_range  estops
+layout speed                                                                   
+L1     FIX    100     0.53         0.13        0.34    1.389      3.670     0.0
+       VAR    100     0.55         0.12        0.33    1.410      3.780     0.0
+L2     FIX    100     0.53         0.11        0.36    1.071      2.790     0.0
+       VAR    100     0.58         0.14        0.28    1.080      2.880     0.0
+L3     FIX    100     0.85         0.07        0.08    2.009      3.401     0.0
+       VAR    100     0.86         0.08        0.06    1.971      3.493     0.0
+
+-- VAR against its FIX twin (same scenario and seed; only the speed differs)
+      n  success_fix  success_var   lost  gained
+enc                                             
+BO   60        0.617        0.617  0.000   0.000
+CRP  60        0.500        0.600  0.017   0.117
+CRS  60        0.500        0.567  0.000   0.067
+HO   60        0.683        0.650  0.033   0.000
+OT   60        0.883        0.883  0.017   0.017
+
+

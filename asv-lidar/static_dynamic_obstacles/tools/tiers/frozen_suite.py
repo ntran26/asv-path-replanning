@@ -14,7 +14,7 @@ selected on.
   three that cannot be built are reported, not hidden), table R8. It runs
   **only when explicitly requested**, with `--tiers a` or `--tiers a,b`.
 
-Both supervisor modes: compliance is reported with it **off**, and with it
+Both safety layer modes: compliance is reported with it **off**, and with it
 **on** the intervention rate is its own column (claim C-7).
 
 Every Tier B row carries its test ID (`suite.test_id`, e.g. `CH-CR-RE-07`); one
@@ -77,7 +77,9 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", type=Path, required=True)
     ap.add_argument("--tag", required=True)
-    ap.add_argument("--supervisor", choices=("off", "on", "both"), default="both")
+    ap.add_argument("--safety-version", type=int, choices=(1, 2), default=1,
+                    help="safety layer used when it is on: 1 = the stop latch (default), 2 = the predictive filter")
+    ap.add_argument("--safety", "--supervisor", dest="supervisor", choices=("off", "on", "both"), default="both")
     ap.add_argument("--tiers", default="b,r",
                     help="b the headline, r the robustness set (default b,r); a the extended "
                          "named cases, only on request")
@@ -136,7 +138,8 @@ def main() -> int:
     frames = []
     for mode in (("off", "on") if args.supervisor == "both" else (args.supervisor,)):
         rows = run_pool(jobs, model_path=model, processes=args.processes,
-                        overrides={"EMERGENCY_STOP_ENABLED": mode == "on"})
+                        overrides={"EMERGENCY_STOP_ENABLED": mode == "on",
+                                   "SAFETY_VERSION": int(args.safety_version)})
         frame = pd.DataFrame(rows)
         frame["supervisor"] = mode
         frames.append(frame)
@@ -151,10 +154,10 @@ def main() -> int:
         text += [f"== Tier A: {len(tier_a)} of {len(suite.tier_a())} named cases realised"
                  + (f"; not realisable: {', '.join(missing)}" if missing else ""), ""]
         a = d[d.set == "tier_a"]
-        text += ["-- by supervisor", _md(_summarise(a, "supervisor")), "",
-                 "-- by class (supervisor off)",
+        text += ["-- by safety layer", _md(_summarise(a, "supervisor")), "",
+                 "-- by class (safety layer off)",
                  _md(_summarise(a[a.supervisor == "off"], "class")), "",
-                 "-- per case (supervisor off)",
+                 "-- per case (safety layer off)",
                  _md(a[a.supervisor == "off"].set_index("case_id")
                      [["class", "width", "outcome", "min_target_range", "rms_cte"]].round(2)), ""]
     if "b" in tiers:
@@ -162,14 +165,14 @@ def main() -> int:
         if shortfall_b:
             text += [f"== Tier B: {len(shortfall_b)} cell(s) short of their episode count", ""]
         text += ["== Tier B (headline, R1)",
-                 "-- by supervisor", _md(_summarise(b, "supervisor")), "",
-                 "-- by class (supervisor off)",
+                 "-- by safety layer", _md(_summarise(b, "supervisor")), "",
+                 "-- by class (safety layer off)",
                  _md(_summarise(b[b.supervisor == "off"], "class")), "",
-                 "-- by stratum (supervisor off)",
+                 "-- by stratum (safety layer off)",
                  _md(_summarise(b[b.supervisor == "off"], "stratum")), "",
-                 "-- by target behaviour (supervisor off)",
+                 "-- by target behaviour (safety layer off)",
                  _md(_summarise(b[b.supervisor == "off"], "behaviour")), "",
-                 "-- crossings by side (supervisor off), the A32 split",
+                 "-- crossings by side (safety layer off), the A32 split",
                  _md(_summarise(b[(b.supervisor == "off") & (b["class"] == "crossing")],
                                 "crossing_side")), ""]
     if "r" in tiers:
@@ -180,13 +183,13 @@ def main() -> int:
         off = paired[paired.supervisor == "off"]
         text += ["== Robustness set (R3): the headline's scenarios with reactive (re) and, in head-ons,",
                  "   non-compliant (nc) targets, on the same seeds",
-                 "-- by behaviour (supervisor off)", _md(_summarise(r[r.supervisor == "off"], "behaviour")), "",
-                 "-- by class and behaviour (supervisor off)",
+                 "-- by behaviour (safety layer off)", _md(_summarise(r[r.supervisor == "off"], "behaviour")), "",
+                 "-- by class and behaviour (safety layer off)",
                  _md(_summarise(r[r.supervisor == "off"], ["class", "behaviour"])), ""]
         if len(off) and off.twin_outcome.notna().any():
             pair = off.assign(cv_goal=off.twin_outcome == "goal", goal=off.outcome == "goal")
             g = pair.groupby(["class", "behaviour"])
-            text += ["-- paired with the constant-velocity twin (supervisor off)",
+            text += ["-- paired with the constant-velocity twin (safety layer off)",
                      _md(pd.DataFrame({"n": g.size(), "success_cv_twin": g.cv_goal.mean(),
                                        "success": g.goal.mean(),
                                        "lost": g.apply(lambda x: (x.cv_goal & ~x.goal).mean(), include_groups=False),

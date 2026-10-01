@@ -22,7 +22,7 @@ Training distribution
 fraction of the budget, propulsion stage 4 throughout (stop to 2x cruise:
 Rule 8(e) slowdowns need the authority), hull randomisation at
 `VESSEL_RANDOMISATION_SCALE`, nominal pose and ego noise, the free-space
-tracker, the emergency-stop supervisor.
+tracker, the emergency-stop safety layer.
 
 Evaluation
 ----------
@@ -556,7 +556,7 @@ class FormulationEvalCallback(BaseCallback):
             # can be resumed or fine-tuned from the state it was in.
             if getattr(self.model, "replay_buffer", None) is not None:
                 save_replay_buffer(self.model, best_replay_buffer_path(self.run_dir, self.algo))
-        print(f"[EVAL] t={self.num_timesteps:,} supervisor {mode} goal {summary['goal_rate']:.2f} "
+        print(f"[EVAL] t={self.num_timesteps:,} safety {mode} goal {summary['goal_rate']:.2f} "
               f"collision {summary['collision_rate']:.2f} timeout {summary['timeout_rate']:.2f} "
               f"return {summary['mean_return']:.1f} colregs {summary['mean_colregs_integral']:.1f} "
               f"intervention {summary['intervention_rate']:.2f} "
@@ -626,9 +626,9 @@ def main() -> None:
                     help="Tier 2: fine-tune from this saved model instead of a fresh policy")
     ap.add_argument("--init-vecnormalize", type=Path, default=None,
                     help="reward-normalisation statistics to continue from (with --init-model)")
-    ap.add_argument("--train-supervisor", choices=("on", "off"), default="on",
+    ap.add_argument("--train-safety", "--train-supervisor", dest="train_supervisor", choices=("on", "off"), default="on",
                     help="F68: run the stop latch in the training environments")
-    ap.add_argument("--eval-supervisor", choices=("on", "off", "both"), default="on",
+    ap.add_argument("--eval-safety", "--eval-supervisor", dest="eval_supervisor", choices=("on", "off", "both"), default="on",
                     help="F68: evaluate with the stop latch off, on, or both")
     ap.add_argument("--low-speed-start-frac", type=float, default=0.0,
                     help="F68: share of training episodes starting slow or at rest")
@@ -651,6 +651,13 @@ def main() -> None:
     ap.add_argument("--config", type=Path, default=None,
                     help="F93: a frozen baseline (configs/baseline_v1.json) -- applies its run "
                          "arguments and refuses to start if the code no longer matches it")
+    ap.add_argument("--start-pool", type=Path, default=None,
+                    help="hand-back starts (planning/HANDBACK_STARTS_PLAN.md): a pool from "
+                         "tools/diagnostics/harvest_handback_starts.py; a run-time variant, recorded")
+    ap.add_argument("--start-share", type=float, default=0.25,
+                    help="share of episodes that start from the pool (from --start-min-stage)")
+    ap.add_argument("--start-min-stage", type=int, default=6)
+    ap.add_argument("--start-jitter", choices=("on", "off"), default="on")
     args = ap.parse_args()
     _no_efficiency_mode()
 
@@ -702,6 +709,11 @@ def main() -> None:
                     "eval_supervisor", "low_speed_start_frac", "eval_freq", "eval_per_class"):
             if key in previous:
                 setattr(args, key, previous[key])
+        hb = previous.get("handback_starts")
+        args.start_pool = Path(hb["pool"]) if hb else None
+        if hb:
+            args.start_share, args.start_min_stage = hb["share"], hb["min_stage"]
+            args.start_jitter = "on" if hb["jitter"] else "off"
         mismatched = [f"{k}: run {previous[k]!r}, code {v!r}"
                       for k, v in _formulation_switches().items()
                       if k in previous.get("switches", {}) and previous["switches"][k] != v]
@@ -772,6 +784,9 @@ def main() -> None:
         "observation_dim": int(sum(int(np.prod(space.shape))
                                    for space in observation_space().spaces.values())),
         "init_model": str(args.init_model) if args.init_model else None,
+        "handback_starts": (None if args.start_pool is None else
+                            {"pool": str(args.start_pool), "share": args.start_share,
+                             "min_stage": args.start_min_stage, "jitter": args.start_jitter == "on"}),
         "policy": {"features_extractor": "ASVFeaturesExtractor", "net_arch": {"pi": [256, 256], "vf": [256, 256]},
                    "activation": "ReLU"},
         "reward_normalisation": "VecNormalize(norm_obs=False, norm_reward=True, clip_reward=10)",
@@ -807,6 +822,12 @@ def main() -> None:
                                   r2_slowdown_test=args.r2_slowdown_test,
                                   overlay=bool(baseline and "overlay" in baseline.get("formulation", {})))
                          for i in range(args.num_envs)])
+    if args.start_pool is not None:
+        for i in range(args.num_envs):
+            vec.env_method("set_start_pool", str(args.start_pool), args.start_share, args.start_min_stage,
+                           args.start_jitter == "on", seed=base_seed + 7_000 + i, indices=[i])
+        print(f"[HANDBACK] {args.start_share:.0%} of episodes from stage {args.start_min_stage} start "
+              f"from {args.start_pool}", flush=True)
     # SB3 appends ".monitor.csv" unless the name already ends that way.
     monitor = "monitor.csv" if resume_steps is None else f"resume_{resume_steps}.monitor.csv"
     vec = RetryingVecMonitor(vec, filename=str(run_dir / monitor),

@@ -188,6 +188,8 @@ def run_episode(env, built, seed: int, policy: str, model=None, obstacles: Optio
         "min_target_range": min_range,
         "rms_cte": float(np.sqrt(np.mean(np.square(ctes)))),
         "estops": len(stops), "estop_reasons": " | ".join(stops),
+        "safety_v2_steps": int(getattr(env, "safety_v2_steps", 0)),
+        "safety_v2_brake_steps": int(getattr(env, "safety_v2_brake_steps", 0)),
         "estop_then_target_collision": bool(stops) and info["collision_kind"] == "target",
         "first_engaged_cls": first_engaged_cls or "never",
         "engaged_frames": engaged_frames,
@@ -220,6 +222,13 @@ def _init_worker(model_path: Optional[str], overrides: Optional[Dict] = None) ->
     _WORKER["model"] = None
     if model_path:
         _WORKER["model"] = load_model(model_path)
+        # A run that trained with run-time switches (fix 1) is evaluated with them.
+        import json
+        from pathlib import Path as _P
+        run_cfg = _P(model_path).parent / "config.json"
+        if run_cfg.exists():
+            for name, value in (json.loads(run_cfg.read_text()).get("constant_overrides") or {}).items():
+                setattr(cfg, name, value)
 
 
 def load_model(model_path):

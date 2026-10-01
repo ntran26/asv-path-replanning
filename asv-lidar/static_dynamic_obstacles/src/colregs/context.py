@@ -178,7 +178,7 @@ class EncounterContext:
 
         A18 evaluated this with the own ship stationary where it is.  **A23
         (decided, option 1)** evaluates it along the own ship's braking path --
-        the supervisor latch's full astern from its present surge `u_own`, then
+        the safety layer latch's full astern from its present surge `u_own`, then
         stopped (`stopping.dcpa_over_stop`).  At `u_own` below the stop speed
         the two agree exactly.
         """
@@ -266,7 +266,7 @@ class ContextManager:
                path=None, boundary_polygon=None,
                s_along: Optional[float] = None, cross_track: float = 0.0,
                true_targets: Sequence = (), open_water: bool = False,
-               advance_clock: bool = True) -> Dict[int, EncounterContext]:
+               advance_clock: bool = True, static_points=None) -> Dict[int, EncounterContext]:
         """Build this step's contexts.  Returns `{track_id: EncounterContext}`.
 
         `path`, `boundary_polygon` and `s_along` are what the admissibility
@@ -278,6 +278,7 @@ class ContextManager:
         """
         if advance_clock:
             self.step_index += 1
+        self.static_points = static_points       # fix 1 (`ADMISSIBILITY_STATIC`)
 
         speed_os = float(np.linalg.norm(np.asarray(v_os, dtype=np.float64)))
         d_required = geo.d_req()
@@ -465,6 +466,15 @@ class ContextManager:
         ctx.d_bnd_stbd, ctx.d_bnd_port = d_stbd, d_port
         ctx.r_stbd = geo.usable_room(d_stbd)
         ctx.r_port = geo.usable_room(d_port)
+        # Fix 1 (2026-10-01): perceived static obstacles bound the room too, so a
+        # compliant turn blocked by one is inadmissible -- the context says so,
+        # and R-2 / the Rule 8 credit pay for slowing.  Off unless switched on.
+        if getattr(cfg, "ADMISSIBILITY_STATIC", False) and getattr(self, "static_points", None) is not None:
+            o_stbd, o_port = geo.obstacle_room(path, self.static_points, float(s_along),
+                                               float(s_along) + run, float(cross_track))
+            ctx.d_obs_stbd, ctx.d_obs_port = o_stbd, o_port
+            ctx.r_stbd = min(ctx.r_stbd, geo.usable_room(o_stbd))
+            ctx.r_port = min(ctx.r_port, geo.usable_room(o_port))
         ctx.a_stbd = self._hysteretic(ctx.track_id, "stbd", ctx.r_stbd - ctx.dy_req)
         ctx.a_port = self._hysteretic(ctx.track_id, "port", ctx.r_port - ctx.dy_req)
         ctx.admissibility_known = True

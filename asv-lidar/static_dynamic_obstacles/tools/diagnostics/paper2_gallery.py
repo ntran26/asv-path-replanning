@@ -97,7 +97,7 @@ def main():
 
 A **separate** evaluation set, not part of the frozen suite: the three static-obstacle
 layouts of the published Paper 2 field trials (Tran et al., *Drones* 10(9), 680, Fig. 8),
-with and without a target ship. {len(d)} episodes per supervisor mode. Shortfall: {short or 'none'}.
+with and without a target ship. {len(d)} episodes per safety layer mode. Shortfall: {short or 'none'}.
 
 ## Layouts (1 m square panels, measured from the published Fig. 8)
 

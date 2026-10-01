@@ -160,7 +160,7 @@ def test_t8_static_panels_are_rarely_classified_dynamic():
     """03a §10 T8 and §6.3: static panels dynamic on fewer than 1 in 10^4 frames.
 
     A false promotion creates a phantom give-way obligation with COLREGs
-    consequences -- and now a phantom emergency stop: with the supervisor
+    consequences -- and now a phantom emergency stop: with the safety layer
     trigger on, target-free cluttered episodes produced five spurious
     full-astern stops, every one an overtaking encounter with a panel.
 

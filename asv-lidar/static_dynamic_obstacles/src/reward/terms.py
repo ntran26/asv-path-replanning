@@ -124,7 +124,7 @@ def effective_speed_reference(state: RewardState, contexts, cfg) -> dict:
               "reason": "nominal", "rule": ""}
 
     # The stop latch outranks both carve-outs: while it holds, the vessel is
-    # stopping because the supervisor or an operator said so, and `r_pf` must
+    # stopping because the safety layer or an operator said so, and `r_pf` must
     # not charge the policy's speed gate for it.  `r_pf` reads the flag itself;
     # this only reports why.
     if getattr(state, "estop_active", False):

@@ -18,7 +18,7 @@ T0.2  being overtaken: holding course (`compliant`, which holds for this
 T0.3  null encounters carry (almost) no COLREGs penalty for a path follower;
 T0.4  head-on encounters do not latch a port sense (A19/A20), follower <= 0.10;
 T0.5  every reference path is straight (F59): `r_path` is zero throughout;
-T0.6  supervisor stops are rarely followed by a target collision (A18): <= 0.25
+T0.6  safety layer stops are rarely followed by a target collision (A18): <= 0.25
       of stopped episodes, per policy.
 
     python tools/tiers/tier0_scripted.py [--per-class 12] [--tag name]

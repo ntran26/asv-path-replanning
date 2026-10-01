@@ -340,7 +340,7 @@ class ObservationBuilder:
               r_path: float = 0.0, path=None, boundary_polygon=None,
               s_along=None, true_targets: Sequence = (),
               open_water: bool = False, previous_action=(0.0, 0.0),
-              cross_track_scale: Optional[float] = None,
+              cross_track_scale: Optional[float] = None, static_points=None,
               advance_clock: bool = True) -> Dict[str, np.ndarray]:
         """Assemble one observation, building this step's contexts as it goes."""
         contexts = self.contexts.update(
@@ -349,6 +349,7 @@ class ObservationBuilder:
             boundary_polygon=boundary_polygon, s_along=s_along,
             cross_track=float(cross_track_error), true_targets=true_targets,
             open_water=open_water, advance_clock=advance_clock,
+            static_points=static_points,
         )
         self._last = contexts
 

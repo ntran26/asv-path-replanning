@@ -150,7 +150,7 @@ def main():
     out = OUT / args.tag
     (out).mkdir(parents=True, exist_ok=True)
     curriculum.apply_stage(tf.PROPULSION_STAGE)
-    env = ASVLidarEnv(render_mode=None, emergency_stop=False)      # supervisor off
+    env = ASVLidarEnv(render_mode=None, emergency_stop=False)      # safety layer off
     actor = tf.EpisodeActor(load_model(str(args.model)))
     scenarios = tf.development_set(20)
 

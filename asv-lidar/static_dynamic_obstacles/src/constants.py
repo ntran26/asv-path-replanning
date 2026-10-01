@@ -260,7 +260,7 @@ EMERGENCY_STOP_ENABLED = True
 # nothing else).  "manual": only `env.request_emergency_stop()`.
 #
 # **Default "manual", and the reason is upstream of the stop.**  Run with the
-# supervisor on and NO target present, it fired 5 full-astern stops across 18
+# safety layer on and NO target present, it fired 5 full-astern stops across 18
 # cluttered episodes -- 5 of the 12 in 3.5-4 m channels, none at 6 m.  Every one
 # was a static panel promoted to a dynamic track (F31: centroid sliding, 28 % of
 # frames once the vessel passes panels) and classified as an overtaking
@@ -272,7 +272,7 @@ EMERGENCY_STOP_ENABLED = True
 # **Revision 7: back to "supervisor".**  The free-space classifier (§7, F37)
 # produced no phantom track in 24,024 target-free cluttered frames, with and
 # without 3 cm / 0.2 deg pose noise -- a 95 % bound of 1.25 in 10^4 -- and no
-# supervisor stop in 40 target-free episodes.  The cause of the false stops is
+# safety layer stop in 40 target-free episodes.  The cause of the false stops is
 # gone, so the stop fires when 8(e) is the only lawful response, which is what
 # it was built for.
 ESTOP_TRIGGER = "supervisor"
@@ -553,7 +553,7 @@ TRACK_FIT_OFFSET_GAIN = 0.5              # blend of a fresh fit into the track's
 
 # F66 (C15): the A18 stop test can read the hull-fitted centre and axis inside
 # this range.  It halves the test's disagreement with truth (0.090 -> 0.046), but
-# **off**: with accurate geometry the supervisor stopped 29 times, 15 then hit
+# **off**: with accurate geometry the safety layer stopped 29 times, 15 then hit
 # (13 and 6 with the centroid), because A18 assumes the own ship stops where it
 # is.  The centroid's bias had been hiding that.  Still off after A23 (F67):
 # with the braking-path test the view gave 23 stops and 8 stop-then-hit, the
@@ -1033,9 +1033,9 @@ SLOWDOWN_TEST_MAX_S = 20.0               # s, coasting profile cap
 # A24 decided with A25 (option 1): "stop", as before F68.
 R2_SLOWDOWN_TEST = "stop"
 
-# F68: training with the supervisor off, the stop kept as a runtime layer.
+# F68: training with the safety layer off, the stop kept as a runtime layer.
 # A fraction of training episodes starts slow or at rest, so a policy resuming
-# after a supervisor stop is not out of distribution.  0 in the environment by
+# after a safety layer stop is not out of distribution.  0 in the environment by
 # default; `train_formulation.py --low-speed-start-frac` sets it for training.
 LOW_SPEED_START_ZERO_SHARE = 0.5         # of low-speed starts: from rest; the rest uniform on (0, 0.5 U_NOM]
 D_CUT = 2.00                             # m, beyond which r_obs is exactly zero

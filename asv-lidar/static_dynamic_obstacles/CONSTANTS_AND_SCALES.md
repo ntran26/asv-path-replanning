@@ -767,11 +767,11 @@ tracker.
 | `BEING_OVERTAKEN_DCPA_FLOOR` | **1.0 m** | F53, A15 **decided** (option 1): 80 % of being-overtaken draws uniform on [1.0, 2.0] m |
 | `BEING_OVERTAKEN_BELOW_FLOOR_FRAC` | **0.20** | F53, A15: uniform on [0, 1.0) m, labelled `dcpa_below_floor` (Rule 17(b)) |
 | crossing turn sense | **+1 from starboard, −1 from port** | F53, A17 **decided** (option 1): `compliant_turn_sense(cls, crossing_side)` |
-| `ESTOP_CLEAR_DCPA_M` | **1.76 m** | F56, A18 **decided** (option 1), derived: `0.5·LOA + 0.5·B + 2·0.15 + D_SAFE`. The supervisor stop, R-2's slowdown carve-out and the Rule 8 speed credit apply only when the target's DCPA with the own ship stationary reaches this |
+| `ESTOP_CLEAR_DCPA_M` | **1.76 m** | F56, A18 **decided** (option 1), derived: `0.5·LOA + 0.5·B + 2·0.15 + D_SAFE`. The safety layer stop, R-2's slowdown carve-out and the Rule 8 speed credit apply only when the target's DCPA with the own ship stationary reaches this |
 | classification heading | **path tangent at the own ship** | F56, A19 **decided** (option 1): class, crossing side and true class use it; CPA products and the Rule 8 accumulator keep the instantaneous heading; open water falls back to the heading |
 | stop test (`dcpa_if_stopped`) | **closest approach along the latch's braking path, then stopped** | F67, A23 **decided** (option 1): `stopping.dcpa_over_stop`, nominal hull, `STOP_TEST_DT_S` 0.05; against `ESTOP_CLEAR_DCPA_M` 1.76 m. From cruise: 1.05 s, 0.32 m |
-| `POLICY_SLOWDOWN_RPM` / `SLOWDOWN_TEST_MAX_S` | **0 / 20 s** | F68: the agent's own slowdown (a coast) for R-2 and the Rule 8 credit (`slowdown_clears`); the supervisor keeps the latch profile (`stop_clears`) |
-| training supervisor | **switch** (`--train-supervisor`, default on) | F68: off trains without the latch, so `R_ESTOP` and the gate suspension drop out |
+| `POLICY_SLOWDOWN_RPM` / `SLOWDOWN_TEST_MAX_S` | **0 / 20 s** | F68: the agent's own slowdown (a coast) for R-2 and the Rule 8 credit (`slowdown_clears`); the safety layer keeps the latch profile (`stop_clears`) |
+| training safety layer | **switch** (`--train-supervisor`, default on) | F68: off trains without the latch, so `R_ESTOP` and the gate suspension drop out |
 | low-speed starts | **`low_speed_start_frac`**, env default 0; `LOW_SPEED_START_ZERO_SHARE` 0.5 | F68: from rest, or uniform on (0, 0.5 `U_NOM`] |
 | `R2_SLOWDOWN_TEST` | **"stop"** (A24, decided) | F70/F72: R-2's and the Rule 8 credit's slowing test — "stop" (A23, `stop_clears`, the default) or "coast" (F68, `slowdown_clears`); `train_formulation.py --r2-slowdown-test` |
 | port share (F84) | `CROSSING_PORT_SHARE_TRAINING` **0.60** (run 9 tried 0.50) | your call, 2026-09-19 |

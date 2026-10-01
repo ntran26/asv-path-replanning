@@ -8,7 +8,7 @@ on the discordant pairs (`src/compare.py`), against the first tag given.
         encounter_vo_supervisor_off --out results/classical_comparison/supervisor_off.txt
 
 `--reference` adds the CODEX reference controller's development-set replay
-(`results/basin_devset_baselines`, supervisor off; goal and collisions only).
+(`results/basin_devset_baselines`, safety layer off; goal and collisions only).
 """
 from __future__ import annotations
 
