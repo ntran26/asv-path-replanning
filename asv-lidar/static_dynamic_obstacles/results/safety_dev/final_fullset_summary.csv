@@ -1,0 +1,9 @@
+variant,cases,goals,obstacle,boundary,target,timeout,gained_goal_vs_off,lost_goal_vs_off,gained_goal_vs_v2_best,lost_goal_vs_v2_best,gained_goal_vs_v3,lost_goal_vs_v3
+off,150,111,26,2,11,0,0,0,12,16,20,17
+v2_best,150,115,17,2,13,3,16,12,0,0,19,12
+v3,150,108,18,14,10,0,17,20,12,19,0,0
+v4_initial,150,108,23,10,9,0,15,18,13,20,8,8
+v4_memory_dual,150,118,13,10,9,0,18,11,15,12,15,5
+v4_observer_memory_dual,150,118,11,10,11,0,16,9,13,10,20,10
+v4_observer,150,110,16,12,12,0,15,16,13,18,18,16
+v4_observer_memory_selected,150,123,9,7,11,0,19,7,16,8,24,9

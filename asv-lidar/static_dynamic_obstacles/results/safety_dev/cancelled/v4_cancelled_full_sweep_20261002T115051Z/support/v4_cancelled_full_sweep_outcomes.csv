@@ -1,0 +1,13 @@
+level,scope,mode,expected_cases,completed_cases,complete,goals,collision_obstacle,collision_boundary,collision_target,collisions,timeouts,goal_rate,collision_rate
+component,frozen_b,off,800,799,False,747,13,7,32,52,0,0.934918648310388,0.06508135168961202
+component,frozen_b,v4,800,690,False,637,9,12,32,53,0,0.9231884057971015,0.07681159420289856
+component,frozen_b,v5,800,0,False,0,0,0,0,0,0,,
+component,frozen_r,off,900,900,True,824,18,6,52,76,0,0.9155555555555556,0.08444444444444445
+component,frozen_r,v4,900,752,False,691,7,14,40,61,0,0.9188829787234043,0.08111702127659574
+component,frozen_r,v5,900,0,False,0,0,0,0,0,0,,
+group,frozen,off,1700,1699,False,1571,31,13,84,128,0,0.9246615656268393,0.07533843437316068
+group,frozen,v4,1700,1442,False,1328,16,26,72,114,0,0.9209431345353676,0.07905686546463246
+group,frozen,v5,1700,0,False,0,0,0,0,0,0,,
+all,all,off,1700,1699,False,1571,31,13,84,128,0,0.9246615656268393,0.07533843437316068
+all,all,v4,1700,1442,False,1328,16,26,72,114,0,0.9209431345353676,0.07905686546463246
+all,all,v5,1700,0,False,0,0,0,0,0,0,,

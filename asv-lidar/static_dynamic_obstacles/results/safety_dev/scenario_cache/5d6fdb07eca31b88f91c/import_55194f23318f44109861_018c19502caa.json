@@ -1,0 +1,938 @@
+{
+  "source": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\results\\safety_dev\\scenario_cache\\55194f23318f44109861",
+  "destination": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\results\\safety_dev\\scenario_cache\\5d6fdb07eca31b88f91c",
+  "cache_schema": 2,
+  "current_cache_digest": "5d6fdb07eca31b88f91c",
+  "rationale": "Explicitly approved in this session: legacy scenes were generated with identical development generator source and PROPULSION_STAGE settings. Only the environment safety-v4 selection hook and three CRLF line-ending corrections changed outside the generator dependency closure. Selective loader parity against formulation_v3.field_development_set was verified for original indices, seeds and sampling arguments. This imports the named local cache only and preserves every source file.",
+  "source_files_preserved": true,
+  "imported": 150,
+  "already_present": 0,
+  "generator_source_sha256_lf": {
+    "bluefin/dynamics.py": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711",
+    "bluefin/ship_model_v3.py": "21afbc6605035bd905f16db7f1149fec50fc9b73ca0d4bd0a1e76b06b6c4136c",
+    "src/boundary_raycast.py": "c0bc6a018d9d035458f0a98a6c9db695bbb79ea6cf5ad9e94dcf12a6dcc5ceb1",
+    "src/classical/__init__.py": "5292033e9cfed33ed175dd5de593dcdcd089fe05cb99c7c4346263a2ee602237",
+    "src/classical/colregs_vo.py": "2239ddb3c3213147beb34782260e0e1fd589f11f1ef4050c5c2a3c5e24e6d3dd",
+    "src/classical/common.py": "d309a15c29514bfe35d5861b94ea9b4289bfb539c2e922c80b51a5ca25629bff",
+    "src/classical/encounter_vo.py": "5bb79d0136119f816e583680124d49b4e35697fe6bad170928faeeea32b47d6d",
+    "src/constant_temp.py": "85e5dc9992d062466af304f3f3273b249ba16b130c2d89b53fe7cb692b5c81d7",
+    "src/constants.py": "cebc48c94399e2fe76b063b986d5bc1ce22438b766a3dd24a8d29fdeeba36eae",
+    "src/corridor.py": "54f8593848ab3fa7da02ca81a8f51515bb598ea81377e677343b8796fd3fd371",
+    "src/cpa_cri.py": "379751c7fc30099d49d24cf373ac3481ef31a624c6a52b4ad38ca98cca627886",
+    "src/encounter.py": "df6fae6070e2320a6b8f71bcc5d50c061b2a4f920743f5a949bce821cac7f889",
+    "src/feasibility.py": "08a00352509041f545b8060017efc03d098c156f325f5b367b6d3538c3c7b38e",
+    "src/feasibility_st.py": "950fdcce9305af314937a3b73d48df4d60ae59199e910796966a8d74be00bd56",
+    "src/field_training.py": "cbb7ae5c98cddce8fc1cdfc4578faf9fddeaf4e1698ac584bf5495bd6c6b9302",
+    "src/formulation_v3.py": "0faeb49c3366e97f88cee81c5dfa03c86c9a0a16f3815dc146824cab7a062643",
+    "src/lidar_pooling.py": "081d84bfb128a81b888750acf5320d89589a0f8db61dba0d750061c6a1d1f5f6",
+    "src/nominal.py": "7a80561132038b6ea3b242133dc94675cb8c161fc534336af021e9cd8b478f8a",
+    "src/paper2_set.py": "0a52f5e4a2ca7cebbe7dad5f0a3e0c7455c05a95ac9b21919109d62e3de42ddf",
+    "src/path.py": "4334ecc947bc5f6b34237ccf69d788fb3b2b0e0fbe8975f553174483adb365f7",
+    "src/reference_controller.py": "f080cfca745b75b45c93dfca1cf581206908ea4476fc3fede2911f02f066c62b",
+    "src/scenario.py": "193349f091a852e450d242f9c164ab2c7b19576c6eb9e180efc39eb84b7a8883",
+    "src/ship.py": "255391192af7c9254b492f79b9a1d66f81c562176777e9814688ec48971a515a",
+    "src/targets.py": "786d7afd994bdfcc70ac3f6217b9ddf7711b76c6ea51d0788bf6ec51f0435598"
+  },
+  "cases": [
+    {
+      "case": "DV3-BO-CV-01",
+      "scenario_sha256": "a15a98e91cc87f47b8d3ab3ff0055e05b45d1f8593ee4c89b545e57d59f8859d",
+      "pickle_sha256": "0136d5b220e50d130e23fa16e85b6d8e54520aea30cf6e528ff5d9e1e53d72b6",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-02",
+      "scenario_sha256": "ea6cfb2f32099f387a931030a263fe55fb17082e451c4af4cdbed74dbefa008a",
+      "pickle_sha256": "21305454c5a282a238b34f69f7d1e35ed1dcd6a91010e471413e5d313247a6f4",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-03",
+      "scenario_sha256": "3831fd4da5a6414b18a7bc11230b0fc907c3abe5c5840a7b633add5c4ac6ce59",
+      "pickle_sha256": "e2b49ffb0d1d8fb3725426e2587b6689b859098d08b7329488f321f524a6772a",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-04",
+      "scenario_sha256": "a9392c7cd3e521bda23fc031c8c58d55debee0259284452bb41f47bb3ef55ba9",
+      "pickle_sha256": "46ccf629d61a8f5dabe1d6ff75b84c7ac3f0cb45a7e4895e915f834efcee9e7f",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-05",
+      "scenario_sha256": "3c41318158110c76c37ad708d2c209ab8cfb5b013d1010d330aaeeb7e59bf58b",
+      "pickle_sha256": "1ceb76ff54315aa5487868ba69387a0c7faf6e67624f7b2fb61297584db4f87e",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-06",
+      "scenario_sha256": "40584fcce0644dbbc90a511297f736b2da45866243f83143a24f5ff213a70de1",
+      "pickle_sha256": "8a4b102649177a9aef48bf60f51d3b1b13a1f1ae8890fea59a3780c9640f2afc",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-07",
+      "scenario_sha256": "c64e43262e3748e1216034789d28cef99c8e928924381ca37e5789ea8e5be60d",
+      "pickle_sha256": "7d322f8fd06e74aa1e8b83809286b4dac267d9e9c183b0a31c82336b7c5300d0",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-08",
+      "scenario_sha256": "f4487b3feeb896a9c202859c34e027fde3851fbf6b318bb4ed0ade418b81cf96",
+      "pickle_sha256": "28ce46cff5edc9390c98f1b3537e07923523b5c8a43b4fee5aafeeb2887e16df",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-09",
+      "scenario_sha256": "1ada976c6735aeefcefd53f986a93361715255038f414ecfa49bd1e51b4829df",
+      "pickle_sha256": "6baa442149b6db3db16127911585b1ccf1a173b13bd13cc8892637e5aa9bc52d",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-10",
+      "scenario_sha256": "283a85ae071a8ee86173bf69c7760708605970b95d099af05697f4146c6b60cb",
+      "pickle_sha256": "00d558ee6e7e40bc9e8b77cb3843c43f2088cfce63c18964e13469192936bd4d",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-11",
+      "scenario_sha256": "8f94f6d1b6283daec4a8ee3adfc1459a9ba2ab54a6888791c1d1a069acfd3375",
+      "pickle_sha256": "3380c6b30e0b5db8e707516943befd34d44318243192b0e8fc4a1bb90e2e40ad",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-12",
+      "scenario_sha256": "774303d0032098caf8a3ccfe0d5b09014c8cb348f79d6943c6de509c5dd9a934",
+      "pickle_sha256": "8f2ccab74a6b312857eb313fbfb54cc1df94e9596756bc594562064c289c2173",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-13",
+      "scenario_sha256": "e811e9831e28f67c3beeb3f14bffadab7c74586c5125cd88d0fdb52d4df5feee",
+      "pickle_sha256": "5946c41546a2c925281cc35f319bd4c867c67ee8c3618eff987ea1305ba3b025",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-14",
+      "scenario_sha256": "8524e7c4b7bd4486f74edffbe33a01a92b6f7fca4862e902baaafe84e7a02e59",
+      "pickle_sha256": "dca087522019ec209f5fdcc46dc4c4fae5fe325fdec2b00bbedf26f9f772ce76",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-15",
+      "scenario_sha256": "e53521dac3c142eb59454962d10c4da14eac0606bad06ddffe426703aa3db88f",
+      "pickle_sha256": "3cb11b223071a673cfe3c7b407b1a332fe5270d2415622356ccc6b92ea13846a",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-16",
+      "scenario_sha256": "445a1a4a982033210095a57353f6eeaab69f6e69c93948c10b51e0adf65ff044",
+      "pickle_sha256": "7c35450980e1845b211063ad669d37e4066d5efcd1e067b52238b39aa890b2f7",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-17",
+      "scenario_sha256": "70a9b89da1aeb0a85e2fe629be9c75385a8eb6df3544a4737a67609ca6654279",
+      "pickle_sha256": "94820262164855d49f6c140f74675069b9314f39c7299b14f226e538488bed8d",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-18",
+      "scenario_sha256": "05cba6e162c37bb211f68f69cca5a80a3628b40a8664fbc842fbeff3938530b7",
+      "pickle_sha256": "f8d64729ae1268f10053a2054e2b415313e18d92738ca322cda12ccf8c1eac6f",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-19",
+      "scenario_sha256": "3c2155906c33997d3b9a24ac7eb292f03dbf3b2f015e279089b5b754476eefa8",
+      "pickle_sha256": "dabf79b75ee0a8fa006f50f0a0115c3fa3553c19c44bd197ee418bc394a35e69",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-CV-20",
+      "scenario_sha256": "d35135132497d5a30e1ea9f5c091557b77c0a0099b4dcb1436e0ac03bfefdd5c",
+      "pickle_sha256": "f7fb0ac4c3b0e2e16df3fb28d0c6e04833bf663ec85031596aa5e40003347aca",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-VS-01",
+      "scenario_sha256": "be05ccbfd8fb0c90295fc094988913e905a01a221790fe3b705594e8909f9af5",
+      "pickle_sha256": "184745c53d642b47f53515e5faaaf8310d811f1910f94283985b5565f4e10798",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-VS-02",
+      "scenario_sha256": "e404d43493522d3da713893b220fe89958b5fbe6ec1fcb2420a0392f175583f2",
+      "pickle_sha256": "f762fb1800fad17931f7ec652732b5438ab79cf572da2278c1d38bbcf7de0dc9",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-VS-03",
+      "scenario_sha256": "c193156d5778df541675b93f3a7fb9449c247f52949b4eb205db8dcc8b1eda89",
+      "pickle_sha256": "42051f5a9e829376ca2fb9cb4782ff9c6d7725a178d37e81c0485dcdf869b0b1",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-VS-04",
+      "scenario_sha256": "d5b7c3c56f4eab0df61c466ee50b06d546b5540f0fbf45113c658bc8a27080e8",
+      "pickle_sha256": "2ee677f4f3d13826aeb37eeec3016dc4032b5c2bde9dd926b8f100aa3767789f",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-VS-05",
+      "scenario_sha256": "de7a108ee1ed994e47c8cbb4793e0b84979defb2da04611681c922a02a01e169",
+      "pickle_sha256": "479ccf6197d2355afd5b484ee49747b3489b5eac8780a18bbafb199b4dbd3a24",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-BO-VS-06",
+      "scenario_sha256": "82583decd172469b429fb7a7024e53aefc28f3aa91db787f3239af42b1836950",
+      "pickle_sha256": "5e1e243ba7948b9fb34de8efb6d4a1d4832d24e0558e055ddeeff06f5d1a3e7a",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-01",
+      "scenario_sha256": "487d1ee0fa5b5e320fcca9f1dd136b3dc8575253afdfaa5056bc1034215b6a49",
+      "pickle_sha256": "6dee07fc31c875e0517fd8b20c79a486d5e471becdb963dade6ecb5a11cc5806",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-02",
+      "scenario_sha256": "21934d7c10b2b739bb30bd38575f695b10e1010363e17cca2ac1d32c419b9d47",
+      "pickle_sha256": "a94927a13fe2087cecc74b8544d3a1b02350bb8b3842a6e0b050af6aa19297c1",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-03",
+      "scenario_sha256": "afe642bbe85019a3cf259e1ba4f42cd0617896ab466e7612a6895b952435923e",
+      "pickle_sha256": "9b7c73a2626203a06a565ca9ee47f7c2f328c0784bfd20d5b3af78034b676cdc",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-04",
+      "scenario_sha256": "bf63ee74573c6c390c645e03dc8ff78af05d6c43e23181af8c58b3670ee775ab",
+      "pickle_sha256": "ad0eb970e42467b461f180dc14821f65dca53e59978ba077b294a22cf14e16ec",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-05",
+      "scenario_sha256": "7d13761dc1f0ad2851056b3a62af1949e7d52d6e26a0cc43088e748f6968eb5f",
+      "pickle_sha256": "4f0284de9be4d30c72b5252c13d3d59c061b8e3a8e8f83bea65d0af9e7e17c68",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-06",
+      "scenario_sha256": "ed6a0bf55b98589e5cb1d7d11c2f72ae9680af28559cc76a2697eac57b328317",
+      "pickle_sha256": "20dc96e67e0090d8f30b6aa5ca869496d39790ce5f49b807cd3238b530483e05",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-07",
+      "scenario_sha256": "e4e58636f87d5db1586c27331a2e2a17065521b5df29f147979e0e7a9a4d9467",
+      "pickle_sha256": "c6119b99dbdd671683b386cafb73ea3d48e09b5baa09c36dc66fe7441a314901",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-08",
+      "scenario_sha256": "392df10e1bfcb8b562c665f51b73ea877a8b0758070adc94ea15021141cec065",
+      "pickle_sha256": "11d50a53336ab9e28b740e59b3788f20ae8dacc95cfbb1795af5f1a297412251",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-09",
+      "scenario_sha256": "acd9123847425b8dfa967c9ced7d327921f38d4ce22753de7573ac45e922476c",
+      "pickle_sha256": "24569214bbda2ec1c44262e9d22d693c9284452b0fdc9dba2dd97c35e837a264",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-10",
+      "scenario_sha256": "8fef952088be364e7bc9be15752d23a05d503af3225e6d04235fa20b8ccc2f36",
+      "pickle_sha256": "a3bfb128b5c8e5ec9eab31d77e1ef7ca4e20e8db8d9e20f5cde712c18fafc5c9",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-11",
+      "scenario_sha256": "b78c8677abdaf70c1cf84704e97b0ae39ffe31647f63a3f0d81cdb05e3555d25",
+      "pickle_sha256": "17c72d4bce0d876ec547ca97005869d2f042175976feeb286949ab66f13a8b59",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-12",
+      "scenario_sha256": "0b698b07daf443e17c256b57a499509f45ad8c43959a7506c4949df842f478c0",
+      "pickle_sha256": "21f4b3de99b59fb1a95477d720dbe58599e4f9b66081463709b14ae918f0e0bc",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-13",
+      "scenario_sha256": "496ba431ff1725e8e5d5014ddf1e762cbf18b27d8a11920164725781fa3d2446",
+      "pickle_sha256": "ad22e9f8927318c93569a4f31d0a219a7ee8e15630454fcfdde1d916dbdba06d",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-14",
+      "scenario_sha256": "869a3f4175d7a5841ffdb9a932e98a02b2c2412654b87a23f4d2a5c7ca4527dd",
+      "pickle_sha256": "76153e2266176bd0b8eb47b314ab1617363fd5c5b46fc4cf3605cc4d3425c25d",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-15",
+      "scenario_sha256": "8f3800fb98f47a6c0bb385bccc50d6cc39b0e29997a1c0e1de9bf2e394bdcd67",
+      "pickle_sha256": "d99366a3214e94c1ea057157545c67762a0f2bc8169cf8e6c14376319fbda568",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-16",
+      "scenario_sha256": "81cae5ce5c87aa7373cd202cd2c023f39ba1507c64a4649c94700e585dda76a8",
+      "pickle_sha256": "5bafaff3238e5274d3946719ed4e965437a3857012b035c467d87563e2a7dee4",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-17",
+      "scenario_sha256": "59bba61884b9c5230c4d5d4c9ce2ce3264b4e5941557094cdf67c96a0dac330f",
+      "pickle_sha256": "da0c5e53ee89ffd93fc59a68f25e979e86fe560babd8a00e2ed1bc498c3fdd29",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-18",
+      "scenario_sha256": "1455d07b866a46c58a6b1c144e58c44da6d65f325e1b193d7f8063f2d6bb711c",
+      "pickle_sha256": "71ea8ff525bb66866b507e7cc96251bf8346a923049ec0abd7cc00bc12d08429",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-19",
+      "scenario_sha256": "94892a8a420d820f3d21e2aed59bf50ab2b20c01354c1524453623dd8625cee0",
+      "pickle_sha256": "c31a8de4b1cdf7d619d8ee2473f12d9fb51e21c824ef4ab442847b43a82ed17f",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-CV-20",
+      "scenario_sha256": "5da8ab7dfb92d8f5ae03b214154b8b9e029805e79280e1f4e0b4315355f4e67a",
+      "pickle_sha256": "553afc5cb7816814c480c5a3668654bc6f1405d63953122e8f8a87eba86756a7",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-VS-01",
+      "scenario_sha256": "0b9a7b012c96435817813efa5b9f910713cecffb829f29bd7d4ca191207f4820",
+      "pickle_sha256": "d58319c1b04619e5645d12d2b42faf610dc702777da4c8899dbe400729ec9fbe",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-VS-02",
+      "scenario_sha256": "c5ce78dea27d4d26d3d1eaf52b76939ed72acc2fca5bede9f924f81e99b054d2",
+      "pickle_sha256": "b31056a3eb0f8b40ff76f7bbee35c2483f0139375bfc9279fd0edbee3ee883de",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-VS-03",
+      "scenario_sha256": "38431ac74480514513099944cd8a7d5b64b72f75d11fbd226a808153be94c11d",
+      "pickle_sha256": "acff01a54c35654373d1b65cbba7fb4d7c1576081dd58070e2dd323030133aa9",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-VS-04",
+      "scenario_sha256": "2febc467a9cbb05a7492ddea9b8fe18339d6d27f82b7a49b689b1ba0febd4ea4",
+      "pickle_sha256": "f41a0e2479b971afb1e7ae0f2c97cc5fa0250189922f26d41be31d05ffba540b",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-VS-05",
+      "scenario_sha256": "4ac5558f86edb284e022780923969cc1d255d00e99668205eb1100fc09b874b1",
+      "pickle_sha256": "ccfc061817294aa6133917d4121cd5264cec1721739b8bb7da823fee5a06cb2a",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRP-VS-06",
+      "scenario_sha256": "3bf27ddf8bd8e1f318cba10c7c71b942e2cbedd1f61caf7ec97310c5aa97d24c",
+      "pickle_sha256": "f9d4152729ef6ffc5fca72f55fa754c7a0cc4b0e180cb8676b34a8f2085e2a1d",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-01",
+      "scenario_sha256": "52758daeceb092b10e95ecbd252d0d440a44680d494a68278d8e5549eb7e31a4",
+      "pickle_sha256": "664ccd7d7b6a38598ef995e19fa0233af4e485f481f63a69fd8b4f71129c2752",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-02",
+      "scenario_sha256": "f47277bdc95727326412a2c47f6f2c962883df37877812bfbe96bb8ea3fc378a",
+      "pickle_sha256": "22ea1ffa796529b21ddd2f82d12662b2fdcd0aad39bc35cf327f2df623c40609",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-03",
+      "scenario_sha256": "53029799b85097d15a62831862bf850b21eafb31ca53a592a03265079531e4e9",
+      "pickle_sha256": "8371da1a40ad41400a2279b4a4d6909b16e654026bf58fe4f0b6d79b6517d585",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-04",
+      "scenario_sha256": "61218205227240a2e85db4ab35e3db161173a3cad9f693e18d2208c54f9d4824",
+      "pickle_sha256": "ee887cbd6ac1b89e4a0631595f1944376f1a31cca9b2e0e1ff39fdc648fc650b",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-05",
+      "scenario_sha256": "db6fac809800aec2c90cad64519bd914a9c23f78a7765ae579bc183ca94aace2",
+      "pickle_sha256": "7283c7ac70d851c33ca9cdda30a7131cf541527c685f9840d6241b9eb11ac20c",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-06",
+      "scenario_sha256": "2505f8c053f2fb418cf9eb0b19bf509b0753fe65cf6093a633b091fa39fe91fc",
+      "pickle_sha256": "726781df94b6bf8dbe63c5c28e7d3041f69a04c9a6d1cc2cd17fd6bfe63c4578",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-07",
+      "scenario_sha256": "7926efa78568b540ffb82f5dc8f8a12caa8567211caae99327c8d06753ed801c",
+      "pickle_sha256": "080f8e5c5b7bafde3e361861a29d88d41c4bdf9592cbec1d9f19fd5925069e6d",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-08",
+      "scenario_sha256": "9782f57d25c00a84c142d9229ab334fa51f60be355b2659fdd2b6dcfc3ad4414",
+      "pickle_sha256": "291257da096e93ce147a4d92048b38261c906ef285d3a34ded0cabb2bfedce2e",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-09",
+      "scenario_sha256": "40abd882bfcb7b8297b9bd76fd7adf72c613513d5b9e91ee6f51d6adc88e03c4",
+      "pickle_sha256": "e9510a5fc26867764b85400e10e60b1c1b996bf6418c4562939ce35e51fe01d9",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-10",
+      "scenario_sha256": "5569d261fef39d5506b191a3ef384cffd29656a29911329329e3e9f52368ae35",
+      "pickle_sha256": "2a23736a0a1eaa7565f601d94e93e4e1887b282ce6ccc2327d60c04113b6278e",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-11",
+      "scenario_sha256": "ea07499730925b8be91d8b8d2c3f212e1036da5ad37d2311a2c94e50589da0d8",
+      "pickle_sha256": "84120b2ff07ae9d8bb060dec8a849b70142f0e4fe611cfe7e9fdb0edc95c122e",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-12",
+      "scenario_sha256": "f7bd9c8d370d8c6db2243f689dd85adfdd731b7c181ecdab71957c3ba0b4084c",
+      "pickle_sha256": "378ee39c23d5d995cbbdeb73f34814e013d40bd8bd236a1cbfa9b92740d06199",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-13",
+      "scenario_sha256": "9f641eda5e42af29fa0e0dd249c0585595bd0d051e78aa79a9d39d2e1e3f4c45",
+      "pickle_sha256": "7190ec64d380d57cf0bb216f597b9e8599cf0f7b5d3c1ffd93a56c7800bf7f07",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-14",
+      "scenario_sha256": "2868b47c27adfe90d21624e58add5be9e3cb0379c1f334b895d08d59c0cec47f",
+      "pickle_sha256": "66eb9eb6ba7742736a1fcb3fc9b927b9828b39f5a4d89aa96ec350dac7f1a2e4",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-15",
+      "scenario_sha256": "921a448f64999e45eedaee9a1ea4f0d8dd1b44d6fbfe7ae3f329b8898dfe2442",
+      "pickle_sha256": "a5a9769a0a19a653957683509aece1cee0c8c223a1fe7af41c697ae880250332",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-16",
+      "scenario_sha256": "e0d3a11e5c8bcf3a030d30297c85c76b4d75b40a2c27bb882bb59e8f1ea976aa",
+      "pickle_sha256": "cbcc52c187d48a6729829c370eedd8ec63b21cc898596a0ddb3c49e7a10387b9",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-17",
+      "scenario_sha256": "8885baf535eb1f7bc496353a7c96f8be8dde0eb901de7b6738bc4e00701e6e82",
+      "pickle_sha256": "fb45585e1ad5d5c1ff347e90caff61c10601ab761eeee75c95499c90248446da",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-18",
+      "scenario_sha256": "1e91532058cb60e4d37e2993a55819949eb9cb564a97260905ad50728374b270",
+      "pickle_sha256": "296f82c6e02298663c7a494b7310f517202165ad484eceff2579b4e296a8133a",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-19",
+      "scenario_sha256": "b6f42d0e3589312cf2e1cae1c9ecc0cf68f1aa299a7cf8db7a0aa792184a7e38",
+      "pickle_sha256": "54ecd5a08f595b74a22fa4461488c6ccd5e4bf32ebff3dbc3bb8309ccd9b3335",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-CV-20",
+      "scenario_sha256": "7ae31b5ec3411f970e29d52181e96a45ec731b7ae6c28e2cf612c1cad2cda685",
+      "pickle_sha256": "8048b31e0b6c7c4c0ecb2ac1d06a8139aaa9573dc53de750f2cdf9c7a971c771",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-VS-01",
+      "scenario_sha256": "9fc75789c9ea91cb1e50be915710cb51130805af400fd96de7b628a36991dc6a",
+      "pickle_sha256": "17231a06fdd5e7e8bfe2093454821ddaad13326a11cc7053a3eaadb3f7245425",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-VS-02",
+      "scenario_sha256": "b44abb6ee682a6c13f15f4c8b0e5fc63b8761f8956351ab91d3a0ea906219b36",
+      "pickle_sha256": "c32dc09441625af6ab5bd439f8fb5c62a41d7ebd4110170d596d0dc68922cc73",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-VS-03",
+      "scenario_sha256": "2b27640a9ab2f8a9e61906990ecdb2453be3deeb2ed04941030af8540818e2be",
+      "pickle_sha256": "47a2cc27ecf5a8605fb41f261ce76b54d8e6f81f04edea4f40bdd53631e08109",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-VS-04",
+      "scenario_sha256": "32bc24fe239f84da164517a1372c280c1ca640987a44ab6630e91d4c4db2968e",
+      "pickle_sha256": "60e7a569c29aa5a59ad293a2ae7843c5ce24dfd842f77c3aaa9f51cea1eafc75",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-VS-05",
+      "scenario_sha256": "be080e0ac24034cb3a35eba307613e330790825f03749bfbd4c5218a9f9dada2",
+      "pickle_sha256": "e94e67d5d6b8f57cdaa7b1d00add37473841115c1b7211d83ec8a5cfe2180ed5",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-CRS-VS-06",
+      "scenario_sha256": "03745828f4400936dcfed31a850c122a61d6d536e7ae86a4669f1f7b8d4a3c62",
+      "pickle_sha256": "2883a79a3f9a2e5bdad658b168e72a47c2e61b2c54dddc047918585fbe50c992",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-01",
+      "scenario_sha256": "a02d7506c6371505fe3463540272f3755d7973bb4e3f9107616c7a79c0765cec",
+      "pickle_sha256": "9581c6ed8269348cc43aae2dd86209b0d28df8251039ce70a3c0640ec33cb137",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-02",
+      "scenario_sha256": "0bb1038a729f6b2be6a197db1170282dccbb88978782a996b53f9e34f2555549",
+      "pickle_sha256": "5c54497ef781edd1a4471235e7c596a716be49bfc3304c977119255774bd5e4f",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-03",
+      "scenario_sha256": "902f497799fa504670423e9d81c08e0e193da736889455dee3a9e979a88a1d5e",
+      "pickle_sha256": "6025b118a57e80899f235dd962cd3c183684f07acab257ac56648f1659b3a98d",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-04",
+      "scenario_sha256": "5d3fadc3fa07e1b7cc4a7f22326234fd7217d47d3f6fc115737bcaa981a4c629",
+      "pickle_sha256": "a10869f2e9304206c3217b40d5491dd1bb8949f4a68a3513ef84059712c485c3",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-05",
+      "scenario_sha256": "6e9286de7892001e7729d7918fde183989f0cebe3f9fbe476c8b4c08996b67cb",
+      "pickle_sha256": "4ac36753f7d68457753b1254266ae8fd3cc6d14fc50a41de083d371797451eb5",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-06",
+      "scenario_sha256": "72e91d06905ead86d7a153d18f8e208e8eb38dd864844c8eb616cf825da4104b",
+      "pickle_sha256": "ef30b560e7060ddc47daf5ad45ef85cbadf4e48652df7b4eae9361fd1c9ca717",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-07",
+      "scenario_sha256": "d1bc0c910c754c2a55971633f1a909ebab66c9a052302c6d3eacc8665828d125",
+      "pickle_sha256": "ce66d69f1eff864f638368094306c25dc4d36140d6322e5031ad84e9f1243929",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-08",
+      "scenario_sha256": "e54259d556d2dbd5a0903174261f0ed42540b8775d4c803ab1cd2a39a6f09cdf",
+      "pickle_sha256": "f8a089bcd327b06b2b0d164fdb5b0577c2c2beb9996e273b652fc11b4a64e6dc",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-09",
+      "scenario_sha256": "8a38496fff6d820bf2f294695ea91126f78b3b1c79a6d487be7d53ed2ffadde0",
+      "pickle_sha256": "631e907f521ec61a3c0d225fe95bd7a6cb5b1679659cee4a28a80b0469c0881c",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-10",
+      "scenario_sha256": "dc812fd12e74128e12fb7da8b43c413fae089e9d0174331561a6fabc23de2817",
+      "pickle_sha256": "d659aafdb8ee483735de93ad7c1410545ebf6103f57f1fafed771d3c35d3067e",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-11",
+      "scenario_sha256": "2716f57ba5aa6b4db49bf3d9b86d434cca7697e07e20999042ba38f55407756a",
+      "pickle_sha256": "b05131562c4ebbac627f90d6a5306447cc1f74f4dff09918481d482e4fa88806",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-12",
+      "scenario_sha256": "87e34e1d896109b144688ea9c9511bbf652de6c656f4f0f249322f6ff911adbe",
+      "pickle_sha256": "7960edbaf67cee4f3cdfe7442546d8a1ddc88305560820f79f142204c83404f9",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-13",
+      "scenario_sha256": "6ebbe5efb28f35b89b58c3e0fba9c21d5080dbd1938fc9ffdeec502970a91e25",
+      "pickle_sha256": "c7f776f5f4015b12d245242b63991eaa63a9cc62851d36d0226926c78124338c",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-14",
+      "scenario_sha256": "80ea502b89c480e84e93cd1c365ba820027102318ad66fb4f570f177272193df",
+      "pickle_sha256": "9ec38c8b3bec2aa768f001c1a59de7deef9c9a232d4fb94a46b97e907f4404a7",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-15",
+      "scenario_sha256": "6267375a0328a2748d470e557c46b4ad38260e3fe9ab684cb1800b149cfb113b",
+      "pickle_sha256": "305004463a1a8897cd905b5e103c5d5015e2d536f655ed25fbc10ebe51ed8ac3",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-16",
+      "scenario_sha256": "d0c175cdfb29293dfb36f1ab6a6333892cf4ad97464cd59361209f33d21af4f0",
+      "pickle_sha256": "3f0c45568a279f6d927bb7ccd9565f2215ab65b88200ea687ede6d4099557a64",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-17",
+      "scenario_sha256": "ba0e9b5aae43eecd19b0031c2171a0a78c3c3c933e6ff3658ada1c1ca29f4773",
+      "pickle_sha256": "a713523832f12cdc2def50bdd4fa9961306377294e9bb0c99403c44c598b59f0",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-18",
+      "scenario_sha256": "07dae5d89238f0fd39bbca57be1cbb487b5dda6580c1e6639765688a7f2578a0",
+      "pickle_sha256": "3e30b5e16665cdb7707ee024826090b84c2b419a2f7a37fc8de71a3f8387331c",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-19",
+      "scenario_sha256": "87fc98017afafa698aa2c7689ad1eceffaa2b5c47de0269f4dcde73dd84116bc",
+      "pickle_sha256": "f18bfc0dc93f2c5525b6fb84597866daba3c01a0686c1dbe4a5f02c7bd4e551f",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-CV-20",
+      "scenario_sha256": "ade52145893d8f6d6730748e261d02654f94ad3e5582956b86e850eb773a98a7",
+      "pickle_sha256": "182565729351f2333317af052e010e26f0c65879ed341d5b88523de6585e3ee4",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-VS-01",
+      "scenario_sha256": "4bbbef9b9c2cd521478bbf6774d9a9561062ab1e161ae0d720924879fe53d1a0",
+      "pickle_sha256": "ed794e55f5972b1a4cfbe68740ccdb60ad99f3dd621d70bc0ee1875c7fe066bb",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-VS-02",
+      "scenario_sha256": "1a36503fc368fb5b0c85e81008255c2b4dcedb853103bd58e5b6d4b468f842df",
+      "pickle_sha256": "0890c2735e9edbe9ebb25b21f8e69dc0d547d9406ee2fb44698fa72ce902950e",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-VS-03",
+      "scenario_sha256": "1312cf80f765d2002fafd963dc60af5e02bfabe87cf61976505353258e89da48",
+      "pickle_sha256": "5f5a423829e399ae4923de8216241458e1fe9720702ad841b4b36b697f8f5678",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-VS-04",
+      "scenario_sha256": "0133f0b881a077443a7a20b00935f20b54f452cb881b5066f256a5204ca411b8",
+      "pickle_sha256": "409b02d5aa8f80259c308865e25115130f44f02f49c4b17d344ce1019a7bc8f2",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-VS-05",
+      "scenario_sha256": "6357c06067770793023321b2a1072d662e608b42f7c4726f8d515a5452902759",
+      "pickle_sha256": "460bc73d6c020c6692392e33f217df4b664f24b55ce38508ceff3d444d7ba825",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-HO-VS-06",
+      "scenario_sha256": "e82e7f7124ab5e13bfa39737577e3fd2f00b6fe95a2311edaf45930c56ae05ee",
+      "pickle_sha256": "3d5745ee16ccbfc2b49086999e4b6fb0b1893f8cab65b10c6cb3d6aca652afb7",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-01",
+      "scenario_sha256": "f9d7a7c86f9c702511ae63a822d14eb638506493ce6f72988ba0f18b848ce484",
+      "pickle_sha256": "a3af5773ba16b8d7b03bdb740de52942fff4018bcf4966bbf7abcbf3873f9c5c",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-02",
+      "scenario_sha256": "c363438dbc67873feb50926d909d766639489e896eb9b0485c26ef82e3daf010",
+      "pickle_sha256": "a17e107b9c33086bbfda5cf586220cbccfc9e641e9730d8ef287ba3e4116500e",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-03",
+      "scenario_sha256": "10dee19f3638c54d880a5163f6fe9b6db676c36bc426468cf596822aa704cb39",
+      "pickle_sha256": "6c6d705264881cdb26f28235d4406714a58401727dd3575c8ccb94e9c0aa4104",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-04",
+      "scenario_sha256": "265ce5fbba83247086f3e0052db4a8a251bc40e9853a191af70a4c90a0626103",
+      "pickle_sha256": "e77d13c8e9593e8ca08bead308e8f89057d3b3fe5705bd882e0640b6bf037141",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-05",
+      "scenario_sha256": "e29427090b94eca4894a0a2f291f32110a511b5b3914facb81e0c0ce9b6147ed",
+      "pickle_sha256": "76a408431362de6462f79f9871c87f42e352accabdb0aa509ac0ed3a8e39e74e",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-06",
+      "scenario_sha256": "232c44e8a8333ce354524df5d77ab1ba217c44966f2788a2848fbb16df5c4e81",
+      "pickle_sha256": "2d3c2d1c432f320695c6d29e44b9e9f28727f52c2bc776875c87ceb4615ad40b",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-07",
+      "scenario_sha256": "80c604ba974bc4dfc93ef40cee4d6ff6f7df8778c6b575bbaf7db455367b0f92",
+      "pickle_sha256": "f791193710b6bead39e54dc5a51bc359470ccb38ad82fcdcb117f6c4419c3e2a",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-08",
+      "scenario_sha256": "5bed58c550cccaaf3939289b78467c075932cee8aa17b2165784ba0ce1c2e72c",
+      "pickle_sha256": "18e347a3ff9b882b6348048dd35abfc3c6cff7299435216e6b14333ff56ed0d6",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-09",
+      "scenario_sha256": "8250673ae17e828386c2da19951ae100c33c051f526fbaa2ca97a49dbfdf8e92",
+      "pickle_sha256": "6eddd5c85db630933992dea38d185ffbfae68d548779915f8406999c605d80d7",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-10",
+      "scenario_sha256": "3516ffda152834783cf6c22a267439588f1cbd3a26e2a7ddba275adfd87d7ea5",
+      "pickle_sha256": "2c1a7631bd9557ccd30573b290e42dc8326d71d007c1c8940743230922d65c41",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-11",
+      "scenario_sha256": "f171651b09f414eb8f33df85db1eba9569cd9e3fd15e3702dae4d6a098a8901b",
+      "pickle_sha256": "c0b8ecbe805ce0c16c0b2d4cda8b2f4024681460ce94e0df4861fe1311f1faf7",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-12",
+      "scenario_sha256": "47007b33b516b72beb469ca64e087641b25ab3e505e19b3b9468eb4eeb76ada2",
+      "pickle_sha256": "4fd91be1872c033c90e271f1c5f1e9e9d27d496e410e73e9bcbad08918521e0a",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-13",
+      "scenario_sha256": "4e3a80324805d32daccfc9468e8af47efb58054c030eecf053cd6765ede3b254",
+      "pickle_sha256": "d332fa3559aa8e08c72aa9449f26e24acac9077a2a60fb35f908b9d17b1d6419",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-14",
+      "scenario_sha256": "f42d257620006ab3bb4278d8a9ca78822aa67987930734a7678c55e413979441",
+      "pickle_sha256": "217d5e0ba77e8d56bd801affb818e8dc1f7a46cb803fcb2d83602a8b11dd73f9",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-15",
+      "scenario_sha256": "a18038f03a1252707c1fded74a34d6c561b5b6e6928acd857fc8d42d5917d20b",
+      "pickle_sha256": "a5a0e478766d797b55081c44a32fc6395b75b04e0364621b82c04e1761d5204f",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-16",
+      "scenario_sha256": "7204516d0a3c25b4a421bfe7a2a8d798a557b54be6f09d1a4da6ee27df23f3e5",
+      "pickle_sha256": "c8bf1c5aa3d7116ee1920a83f3478b1cdfe4e4e9bf1677e6bd2dd0190435e1e5",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-17",
+      "scenario_sha256": "b44b1745330f7c2a3b7f5ba56c769a86342199e1c220fa2502758c8885073725",
+      "pickle_sha256": "613c4f805eba82f7ca252ee2766cbab194241ef89cc1ddd487a4444bf2b8fad9",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-18",
+      "scenario_sha256": "511e77e911e9b3dc9c18fa54b5ad4fb808a90ffca5ed0d4b7a0b3751873ee219",
+      "pickle_sha256": "49bbaa0133b9207b96fbcb62811c7af6a11487ddc86c34b9038e880894dda8a9",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-19",
+      "scenario_sha256": "930d2258a2434375572e042001deebfce883eec72f5ebbe42eb40ed167cc14f8",
+      "pickle_sha256": "b2994d3773091ac2c4773a6851480fd840104c25872f975cf4dc06bf54406d85",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-NT-CV-20",
+      "scenario_sha256": "60d9f7adf6353873c59c3f251573f5350725b422cc127a5092d1879d9222b01c",
+      "pickle_sha256": "87102dd637841ce02a93ff2cc4f4a74d11c2fd41a374e3b054df9348092b2953",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-01",
+      "scenario_sha256": "752211f4c071874f86890d3a7474f64340a94dd7d3c82d93ad3d9ca33f510dd4",
+      "pickle_sha256": "03043fac7b2d2a7c407ba9c160263d67f1f1c326c677321310e8b85f64a2ea91",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-02",
+      "scenario_sha256": "bd2f6fed3ef64cec201959f58e70a9d411dfe72363e7e2ff4eb2dcbb24d953a3",
+      "pickle_sha256": "620a21f7a7bd699e41d03251814c77a9be347546d7065850b398ba29fd1d238d",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-03",
+      "scenario_sha256": "56f58056e532e4bdbd9bdd9272690a93bd477da71b3590ec3c32541e8308967c",
+      "pickle_sha256": "c7b2ef6feb9728afce4cffe5f5b6dc75bebf12eada09bcf593e192428a8f767e",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-04",
+      "scenario_sha256": "8c7d9358477ac0b8e1ddc1aff6f6b55ba6b268617658fd05d037cb4200545740",
+      "pickle_sha256": "9e7c55088c489e60f0b8fd954daca60a36239c1440bc5e2e1c682e8185eb2cfa",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-05",
+      "scenario_sha256": "34f759a62a6d653ae74f8c23b8b42b1811e13671d144200060e9791bc41e21e2",
+      "pickle_sha256": "481ee72aeaf6d43acd38f40a0eff500e772ca4c43d883230df0ef5dbd6734fcf",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-06",
+      "scenario_sha256": "77eae9986beb96efc8a24e8352c7523981015457beb042f9386989048d2970ee",
+      "pickle_sha256": "8b830a235bc40a503240bd97dbf240bcef281cabbf9262901b1dde7c96c5f355",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-07",
+      "scenario_sha256": "b7cc324afb55220edddc1e902cb3a66759afa91e9a29d7ee8570f7f684d81552",
+      "pickle_sha256": "4e010b8d6752d1612d1426d7c8f70e52ba6d64c566ec37441d3eb9acfd09703f",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-08",
+      "scenario_sha256": "e9d084138b3cb39461802427c076c5db01493f606029704e6c0542e8d34b21fa",
+      "pickle_sha256": "ee0373630cae988de087791eb89b81aaa518d53de2f40aeec6fb348e8f5813a9",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-09",
+      "scenario_sha256": "a38e7e9bda211033f8a293ecd1e5c3d50f868cf80d65b794833c42c97eecef45",
+      "pickle_sha256": "8e6dc4f4816eed00447d7f26ea21209e0c7342480603ad48d5e552c172ca735d",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-10",
+      "scenario_sha256": "066e335f76eef3927238529da47569fcc2b92758e533a447397d74ecd090c362",
+      "pickle_sha256": "f937870813f80b79d443856b1b470968d90915db411bee6e7d00733406fc0240",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-11",
+      "scenario_sha256": "0ea22df9c3a70c8e219eeda8d3c99ec5f0b13d6b1d0b0b69cb99745da4af03b7",
+      "pickle_sha256": "6913be77f643ff4156e5c3dfc39ee0b96104bf52365c650b9acfefdb611a2016",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-12",
+      "scenario_sha256": "e1e1625295096052b665206f4ea2d925f284f8d5c1979f008d05fe2d9f44b079",
+      "pickle_sha256": "5d5b5653595848e46cb10cee9e23f56b0cfb5a3adf3233bccdf7c1cfdafa8016",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-13",
+      "scenario_sha256": "e704c1dfb63f82eb25d5df1d5e853e389282a61c46b9288b32b3fdd68f85d0f4",
+      "pickle_sha256": "22866aa091b2522219f273541e5df56aceafd8c0ab20a937c26edb20359b9345",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-14",
+      "scenario_sha256": "d9013a8218f1f7cf624f4ff1cef3c72454d756545a16296e32ed875e0b7419b7",
+      "pickle_sha256": "2eb24bb9d387ce6e40a05db4cf30aa34444e5843ce764370d2ae79bf7c067b21",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-15",
+      "scenario_sha256": "caf27f695a5b5d0e88a1210b597785fbddee742999949f6ec767c659d06aa0eb",
+      "pickle_sha256": "3b5e9317aef1ae6576643ca9c625eacbfb3de4de1adc9081e96a9bbfeda84ce1",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-16",
+      "scenario_sha256": "53bada46e3155851f27da81a1fff34314c1f52f46be3f8c40b7ca337aa561997",
+      "pickle_sha256": "f2bb4d84b223fd83cbad7743de1e7f9d01214fee33dbd23e8a522b85fac736e0",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-17",
+      "scenario_sha256": "7440806b8ddadee1a06ea5d00c3f780603e54fc128ee1ffadeb0aa67416865aa",
+      "pickle_sha256": "9b2454b47e211d4b5b215287cb200b262627eb06cb8ead6c2f0ce9fe95a93b26",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-18",
+      "scenario_sha256": "acc10af859e8579145af174240f38ed5dbc309fbc9f7ed3e6cb506bdb153459b",
+      "pickle_sha256": "30f39abd1930355772a48a7f94e9d5a24f20182d8575ecddea41544c358a99f9",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-19",
+      "scenario_sha256": "1f8b5afe6bdfce29d4287f99d078c09f20aaaa3abf385c97d802768ec3e638f8",
+      "pickle_sha256": "c3c8d85faf5976532000bc4f86bb7cf543c18d91fc7e15be2161b850d29c6a5c",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-CV-20",
+      "scenario_sha256": "05b9c8a86461340b772bd06cdfbace5477dbc07b7f2928d4312eb18124d14255",
+      "pickle_sha256": "98bcc2031d92c7fb5c792aabec04fc1e2b94c5dbd17c066d4f129bd35f0811f5",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-VS-01",
+      "scenario_sha256": "f22f1f28e5210b68a512c83ac3e757cd424f52a404ca7f879636e4642531f423",
+      "pickle_sha256": "57d049a66247d55353caa4cb199bb007f3ffc5ab08fd23d907eeb4f34fa6d693",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-VS-02",
+      "scenario_sha256": "aafc810255d528bb8d98c5d451ded2855244ee397cb29dac3aafc209bea21c93",
+      "pickle_sha256": "b5a092f1e2ad4757ffce613d0c6bb483a2689e22a45b5dfb4acf1ff8848d9c4a",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-VS-03",
+      "scenario_sha256": "4bb89fb029ab2323b7181781bda82405328815cfff2d15c3a2185326766d6c0b",
+      "pickle_sha256": "4bc0cfcf18496a23792029f534761afc36260449bd53679823a72f7091624357",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-VS-04",
+      "scenario_sha256": "7cb08fc2f610875c89d3ebbe76fdf746c38b6c97ec2854573c324a1f6f613fe6",
+      "pickle_sha256": "586c6404be3e5353028d6d62b5f1a7d06ac60a8a7b0fff9e0434a3e43f14f355",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-VS-05",
+      "scenario_sha256": "0cb74dec7ce67a6cde291dd1668baabb3d5ec7d0bba876d62c353ed3d163fc4d",
+      "pickle_sha256": "67627c8dca8c879e42fa460f6ee1720aae0c71fcc8096a1f37831df92b57bf2c",
+      "status": "imported"
+    },
+    {
+      "case": "DV3-OT-VS-06",
+      "scenario_sha256": "ed2c6693c3296ee096812b409a1f5885c72c1be9430f6413503d5aa7b59dd9f6",
+      "pickle_sha256": "069fd4a5ad388898267c6a300c373d96c54e65fc5099c1385e232b5873078c48",
+      "status": "imported"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "audited_cases": 9,
+  "audited_steps": 552,
+  "full_run_outcomes_reproduced": 9,
+  "last_contact_modes": {
+    "no escape": 6,
+    "last certificate": 1
+  },
+  "last_ten_modes": {
+    "no escape": 40,
+    "recovery": 17,
+    "last certificate": 13
+  },
+  "filter_call_seconds": {
+    "0.5": 0.07732879999912251,
+    "0.95": 0.12170602499936645,
+    "0.99": 0.14723924999912924,
+    "1.0": 0.2985597000006237
+  },
+  "environment_step_seconds": {
+    "0.5": 0.11812829999871605,
+    "0.95": 0.4446749500002622,
+    "0.99": 0.5230522939996082,
+    "1.0": 0.5807573999991291
+  },
+  "timing_scope": "9 selected development cases on this host with PPO active and regression checks partly concurrent; filter call excludes issued-command observer callback; not a real-time guarantee",
+  "validation": {
+    "new_tests": 65,
+    "legacy_tests_passed": 4,
+    "passed": 69,
+    "known_legacy_test_deselected": 1,
+    "legacy_failure": "tests/test_safety_v3.py::test_filter_steers_off_an_obstacle_dead_ahead_and_leaves_open_water_alone",
+    "legacy_failure_reproduced_with_original_HEAD_env": true,
+    "original_env_sha256": "0bec1cf93f76360262a71d3dadcf20a186381faa34b5e10cb7fec9d6b558e9e3"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "tag": "policy_feedback_v1",
+  "mode": "v5",
+  "suite": "frozen_b",
+  "case": "B-06-000",
+  "seed": 400600,
+  "scenario_sha256": "c8d3582fe956a3abba139ee78d215d28877d411ec0bc39979e069b3634b9818d",
+  "run_metadata_sha256": "5d589941ca28274817c802b66ba5c7c44ee9abed0af5cb15c5bf602fc68141e7",
+  "attempt": 22
+}

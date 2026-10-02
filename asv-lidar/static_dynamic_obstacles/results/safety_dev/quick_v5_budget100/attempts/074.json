@@ -1,0 +1,10 @@
+{
+  "tag": "policy_feedback_v1",
+  "mode": "off",
+  "suite": "field_deployment",
+  "case": "P2-L3-CRP-VAR-06",
+  "seed": 470225,
+  "scenario_sha256": "06d5aafe93ddfec81b07f7c3e4b8b85d981a22d04d8568948ffc59d7daa028f6",
+  "run_metadata_sha256": "5d589941ca28274817c802b66ba5c7c44ee9abed0af5cb15c5bf602fc68141e7",
+  "attempt": 74
+}

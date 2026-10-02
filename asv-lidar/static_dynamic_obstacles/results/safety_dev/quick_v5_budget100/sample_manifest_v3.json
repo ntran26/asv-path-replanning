@@ -1,0 +1,1050 @@
+{
+  "schema": 1,
+  "plan_revision": 3,
+  "selection_salt": "quick-v5-24cases-2026-10-02-v1",
+  "modes": [
+    "off",
+    "v4",
+    "v5"
+  ],
+  "new_episodes_planned": 72,
+  "previous_sample_manifest_sha256": "14d3290b9d8a7f9e315f2e09a831ab3f8fee540fbe513b60076f711c1d50fccd",
+  "shared_new_attempt_cap": 100,
+  "original_cases": 2890,
+  "original_mode_episodes_planned": 8670,
+  "inventory_path": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\results\\safety_dev\\suites\\inventory_v5\\manifest.json",
+  "inventory_sha256": "a2f8cc2df0a254d3da1d01f3ee84985215f89a87eab9cc7806b59babe20a260e",
+  "scenario_cache_digest": "3bbbc6d2619b4502b137",
+  "cache_sha256": {
+    "frozen_b": "afdbc4121a5b46434a037f6cf82d9e15bd1e7a74553d3ce91df282d9ca1788e8",
+    "frozen_a": "033b57b0392f35062e09e1ce0db1d66f427bb4e754072da0c943b09fb2969454",
+    "field_deployment": "19ab624281f8666127b592bec526e65df31f4618f4c6996a23a4f0aad337d2a1",
+    "field_validation": "9388735b58fdfdb79fa927f0cd8e54aef7d2cefa6971474ac9c58379080cd5fb"
+  },
+  "frozen_baseline_sha256": "95095e4ef300f789468c083a08319944d3a33c8dbc961222a76c7dcf05d03300",
+  "selection_source_sha256": "7748046d6203ad09856c0dbfd809ee733f2c66e46ace48a9ca97d34fe60f2715",
+  "cases": [
+    {
+      "suite": "frozen_b",
+      "case": "B-03-024",
+      "test_id": "BAS-BO-CV-025",
+      "seed": 400324,
+      "obstacles": null,
+      "scenario_sha256": "d4fd27ca6fd8eb7c60b05a971fa8dd1028b268cfe0399c2806c0685388d80592",
+      "sampling_stratum": "frozen_b/BAS-BO-CV",
+      "stratum_population": 100,
+      "family": "BAS-BO-CV",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "being_overtaken",
+        "geometry_mode": "basin",
+        "nominal_width_m": 9.334341911629437,
+        "effective_width_at_cpa_m": 9.334341911629437,
+        "bend_deg": 0.0,
+        "slant_deg": -9.732486084620714,
+        "canonical_obstacle_polygons": 0,
+        "declared_obstacle_count": 2,
+        "obstacle_specification": "seeded at environment reset",
+        "target_motion": "T-CV",
+        "target_speed_mps": 0.8429727754358358,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 1.3885985926455848,
+        "nominal_tcpa_s": 14.728384669747363,
+        "own_spawn": [
+          6.289996147155762,
+          8.798029899597168
+        ],
+        "target_spawn": [
+          9.057310098067894,
+          5.297156337726964
+        ],
+        "basin_leg": null
+      }
+    },
+    {
+      "suite": "frozen_b",
+      "case": "B-01-066",
+      "test_id": "BAS-CR-CV-067",
+      "seed": 400166,
+      "obstacles": null,
+      "scenario_sha256": "98281131b397183dbcc06c3e0d14214bdeeaa8d443bc67a78b12930a42eba056",
+      "sampling_stratum": "frozen_b/BAS-CR-CV",
+      "stratum_population": 100,
+      "family": "BAS-CR-CV",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "crossing",
+        "geometry_mode": "basin",
+        "nominal_width_m": 9.229837826132634,
+        "effective_width_at_cpa_m": 9.22983782613263,
+        "bend_deg": 0.0,
+        "slant_deg": -4.608305385079449,
+        "canonical_obstacle_polygons": 0,
+        "declared_obstacle_count": 3,
+        "obstacle_specification": "seeded at environment reset",
+        "target_motion": "T-CV",
+        "target_speed_mps": 0.5782982946597102,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 1.9879659679604278,
+        "nominal_tcpa_s": 8.331536081083689,
+        "own_spawn": [
+          7.134390830993652,
+          2.0
+        ],
+        "target_spawn": [
+          8.840299417136743,
+          10.334670223105148
+        ],
+        "basin_leg": null
+      }
+    },
+    {
+      "suite": "frozen_b",
+      "case": "B-00-060",
+      "test_id": "BAS-HO-CV-061",
+      "seed": 400060,
+      "obstacles": null,
+      "scenario_sha256": "6b6320e3aac7d4653772661efd72f3f7cbf10e32ad941d884fcdfe8b183fe541",
+      "sampling_stratum": "frozen_b/BAS-HO-CV",
+      "stratum_population": 100,
+      "family": "BAS-HO-CV",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "head_on",
+        "geometry_mode": "basin",
+        "nominal_width_m": 9.218301230648192,
+        "effective_width_at_cpa_m": 9.21830123064819,
+        "bend_deg": 0.0,
+        "slant_deg": -3.6109727139686765,
+        "canonical_obstacle_polygons": 0,
+        "declared_obstacle_count": 0,
+        "obstacle_specification": "seeded at environment reset",
+        "target_motion": "T-CV",
+        "target_speed_mps": 0.55729453846205,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 1.6309782039955667,
+        "nominal_tcpa_s": 14.494508409004201,
+        "own_spawn": [
+          6.03985595703125,
+          2.0
+        ],
+        "target_spawn": [
+          3.3641260776227315,
+          18.02863897691696
+        ],
+        "basin_leg": null
+      }
+    },
+    {
+      "suite": "frozen_b",
+      "case": "B-04-083",
+      "test_id": "BAS-NU-CV-084",
+      "seed": 400483,
+      "obstacles": null,
+      "scenario_sha256": "87e95b37f3a3db39482f2026f978afc0df1bc723c233e473ecd6338ca5674857",
+      "sampling_stratum": "frozen_b/BAS-NU-CV",
+      "stratum_population": 100,
+      "family": "BAS-NU-CV",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "null",
+        "geometry_mode": "basin",
+        "nominal_width_m": 9.211213514312858,
+        "effective_width_at_cpa_m": 9.211213514312856,
+        "bend_deg": 0.0,
+        "slant_deg": 2.827444862724765,
+        "canonical_obstacle_polygons": 0,
+        "declared_obstacle_count": 1,
+        "obstacle_specification": "seeded at environment reset",
+        "target_motion": "T-CV",
+        "target_speed_mps": 0.6281032044205442,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 2.9094500176235956,
+        "nominal_tcpa_s": -80.38922191146193,
+        "own_spawn": [
+          4.976159572601318,
+          2.0
+        ],
+        "target_spawn": [
+          2.14327762421761,
+          9.53641634725525
+        ],
+        "basin_leg": null
+      }
+    },
+    {
+      "suite": "frozen_b",
+      "case": "B-02-032",
+      "test_id": "BAS-OT-CV-033",
+      "seed": 400232,
+      "obstacles": null,
+      "scenario_sha256": "1ba5bd8a93246293a0f1c04b378023226f28c1d4ec37c7862f7e30bdb079355b",
+      "sampling_stratum": "frozen_b/BAS-OT-CV",
+      "stratum_population": 100,
+      "family": "BAS-OT-CV",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "overtaking",
+        "geometry_mode": "basin",
+        "nominal_width_m": 9.213321121987006,
+        "effective_width_at_cpa_m": 9.213321121987004,
+        "bend_deg": 0.0,
+        "slant_deg": -3.081429740237946,
+        "canonical_obstacle_polygons": 0,
+        "declared_obstacle_count": 2,
+        "obstacle_specification": "seeded at environment reset",
+        "target_motion": "T-CV",
+        "target_speed_mps": 0.297647453305021,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 1.2059353591827644,
+        "nominal_tcpa_s": 23.57935654167151,
+        "own_spawn": [
+          4.302023410797119,
+          2.0
+        ],
+        "target_spawn": [
+          2.801393258353547,
+          8.07836612918426
+        ],
+        "basin_leg": null
+      }
+    },
+    {
+      "suite": "frozen_b",
+      "case": "B-06-000",
+      "test_id": "CH-CR-CV-001",
+      "seed": 400600,
+      "obstacles": null,
+      "scenario_sha256": "c8d3582fe956a3abba139ee78d215d28877d411ec0bc39979e069b3634b9818d",
+      "sampling_stratum": "frozen_b/CH-CR-CV",
+      "stratum_population": 100,
+      "family": "CH-CR-CV",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "crossing",
+        "geometry_mode": "channel",
+        "nominal_width_m": 9.577817335519024,
+        "effective_width_at_cpa_m": 9.379200567171033,
+        "bend_deg": 0.0,
+        "slant_deg": 0.0,
+        "canonical_obstacle_polygons": 0,
+        "declared_obstacle_count": 0,
+        "obstacle_specification": "seeded at environment reset",
+        "target_motion": "T-CV",
+        "target_speed_mps": 0.665630227704699,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 1.7400314865612074,
+        "nominal_tcpa_s": 8.785476249857902,
+        "own_spawn": [
+          4.962225437164307,
+          1.4500000476837158
+        ],
+        "target_spawn": [
+          0.22133583934921486,
+          7.609763122389165
+        ],
+        "basin_leg": null
+      }
+    },
+    {
+      "suite": "frozen_b",
+      "case": "B-05-059",
+      "test_id": "CH-HO-CV-060",
+      "seed": 400559,
+      "obstacles": null,
+      "scenario_sha256": "a9db995cdd5a311634b65102069ea37628045eb6109045e0fe59810f774e6396",
+      "sampling_stratum": "frozen_b/CH-HO-CV",
+      "stratum_population": 100,
+      "family": "CH-HO-CV",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "head_on",
+        "geometry_mode": "channel",
+        "nominal_width_m": 9.261664833211375,
+        "effective_width_at_cpa_m": 9.534443575133322,
+        "bend_deg": 0.0,
+        "slant_deg": 0.0,
+        "canonical_obstacle_polygons": 0,
+        "declared_obstacle_count": 1,
+        "obstacle_specification": "seeded at environment reset",
+        "target_motion": "T-CV",
+        "target_speed_mps": 0.5719846171870817,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 0.6912569181894446,
+        "nominal_tcpa_s": 16.484487061835583,
+        "own_spawn": [
+          5.5119476318359375,
+          1.4500000476837158
+        ],
+        "target_spawn": [
+          5.965882432260915,
+          20.08618302219601
+        ],
+        "basin_leg": null
+      }
+    },
+    {
+      "suite": "frozen_b",
+      "case": "B-07-054",
+      "test_id": "CH-OT-CV-055",
+      "seed": 400754,
+      "obstacles": null,
+      "scenario_sha256": "7397dcedf6a9d3d9c6e946a1b3e8955335e5f7edef57f85c4bb50eb63d14c243",
+      "sampling_stratum": "frozen_b/CH-OT-CV",
+      "stratum_population": 100,
+      "family": "CH-OT-CV",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "overtaking",
+        "geometry_mode": "channel",
+        "nominal_width_m": 8.129584630759348,
+        "effective_width_at_cpa_m": 8.128016294066889,
+        "bend_deg": 0.0,
+        "slant_deg": 0.0,
+        "canonical_obstacle_polygons": 0,
+        "declared_obstacle_count": 2,
+        "obstacle_specification": "seeded at environment reset",
+        "target_motion": "T-CV",
+        "target_speed_mps": 0.2640207780812015,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 1.3078815937191897,
+        "nominal_tcpa_s": 27.780385227668837,
+        "own_spawn": [
+          5.803909778594971,
+          1.4500000476837158
+        ],
+        "target_spawn": [
+          6.4727885517018775,
+          9.750706524104446
+        ],
+        "basin_leg": null
+      }
+    },
+    {
+      "suite": "frozen_r",
+      "case": "B-00-048-NC",
+      "test_id": "BAS-HO-NC-049",
+      "seed": 400048,
+      "obstacles": null,
+      "scenario_sha256": "7cac7727766a6d4a4cad2608a13f3de4e072a0b0856b2ea0e3e3b72546ab31ac",
+      "sampling_stratum": "frozen_r/BAS-HO-NC",
+      "stratum_population": 100,
+      "family": "BAS-HO-NC",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "head_on",
+        "geometry_mode": "basin",
+        "nominal_width_m": 9.32946351607073,
+        "effective_width_at_cpa_m": 9.329463516070728,
+        "bend_deg": 0.0,
+        "slant_deg": 9.556227850170982,
+        "canonical_obstacle_polygons": 0,
+        "declared_obstacle_count": 1,
+        "obstacle_specification": "seeded at environment reset",
+        "target_motion": "T-NC2",
+        "target_speed_mps": 0.6003598726339573,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 0.8774623978071259,
+        "nominal_tcpa_s": 14.765955513754061,
+        "own_spawn": [
+          3.510380268096924,
+          2.0
+        ],
+        "target_spawn": [
+          6.506031157630363,
+          18.835973385114784
+        ],
+        "basin_leg": null
+      }
+    },
+    {
+      "suite": "frozen_r",
+      "case": "B-05-072-RE",
+      "test_id": "CH-HO-RE-073",
+      "seed": 400572,
+      "obstacles": null,
+      "scenario_sha256": "686108d4a20abedd490ecc292f10e7d572f315d6e88b0285575bd2512e7bf3fc",
+      "sampling_stratum": "frozen_r/CH-HO-RE",
+      "stratum_population": 100,
+      "family": "CH-HO-RE",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "head_on",
+        "geometry_mode": "channel",
+        "nominal_width_m": 9.707242713422351,
+        "effective_width_at_cpa_m": 8.958476876834183,
+        "bend_deg": 0.0,
+        "slant_deg": 0.0,
+        "canonical_obstacle_polygons": 0,
+        "declared_obstacle_count": 1,
+        "obstacle_specification": "seeded at environment reset",
+        "target_motion": "T-RE",
+        "target_speed_mps": 0.5690994517276371,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 0.539350741351236,
+        "nominal_tcpa_s": 13.186354246762619,
+        "own_spawn": [
+          5.572881698608398,
+          1.4500000476837158
+        ],
+        "target_spawn": [
+          5.99914323425426,
+          16.318101549130546
+        ],
+        "basin_leg": null
+      }
+    },
+    {
+      "suite": "frozen_r",
+      "case": "B-01-081-RE",
+      "test_id": "BAS-CR-RE-082",
+      "seed": 400181,
+      "obstacles": null,
+      "scenario_sha256": "458b9d21e5fe4384a4a94b34e5475685b9bd0c70101f44b4e8ca064ddd5d6460",
+      "sampling_stratum": "frozen_r/BAS-CR-RE",
+      "stratum_population": 100,
+      "family": "BAS-CR-RE",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "crossing",
+        "geometry_mode": "basin",
+        "nominal_width_m": 9.201294041880073,
+        "effective_width_at_cpa_m": 9.201294041880072,
+        "bend_deg": 0.0,
+        "slant_deg": -0.960931502966841,
+        "canonical_obstacle_polygons": 0,
+        "declared_obstacle_count": 1,
+        "obstacle_specification": "seeded at environment reset",
+        "target_motion": "T-RE",
+        "target_speed_mps": 0.5413937668649612,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 0.8503687407169441,
+        "nominal_tcpa_s": 9.49514144116129,
+        "own_spawn": [
+          4.024961471557617,
+          2.0
+        ],
+        "target_spawn": [
+          8.284423979215637,
+          10.70768343755711
+        ],
+        "basin_leg": null
+      }
+    },
+    {
+      "suite": "frozen_r",
+      "case": "B-07-052-RE",
+      "test_id": "CH-OT-RE-053",
+      "seed": 400752,
+      "obstacles": null,
+      "scenario_sha256": "1ff34c80c25695d21f2b4c96ca83d6ffbce4f3c6c92e253d16bc3153db70f32f",
+      "sampling_stratum": "frozen_r/CH-OT-RE",
+      "stratum_population": 100,
+      "family": "CH-OT-RE",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "overtaking",
+        "geometry_mode": "channel",
+        "nominal_width_m": 9.441443005392438,
+        "effective_width_at_cpa_m": 8.69986155508639,
+        "bend_deg": 0.0,
+        "slant_deg": 0.0,
+        "canonical_obstacle_polygons": 0,
+        "declared_obstacle_count": 0,
+        "obstacle_specification": "seeded at environment reset",
+        "target_motion": "T-RE",
+        "target_speed_mps": 0.2460246688548409,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 0.35010544645006303,
+        "nominal_tcpa_s": 20.4220812996147,
+        "own_spawn": [
+          5.291776657104492,
+          1.4500000476837158
+        ],
+        "target_spawn": [
+          5.722780646374067,
+          7.927823972238284
+        ],
+        "basin_leg": null
+      }
+    },
+    {
+      "suite": "field_validation",
+      "case": "FV-NT-05",
+      "test_id": "",
+      "seed": 950004,
+      "obstacles": null,
+      "scenario_sha256": "e21fda77e0aae54673ae843d8de8c7ac14d8f1bbd7362552562221a82bfb6d3b",
+      "sampling_stratum": "field_validation/FV-NT",
+      "stratum_population": 30,
+      "family": "FV-NT",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "no_target",
+        "geometry_mode": "basin",
+        "nominal_width_m": 9.209357350873818,
+        "effective_width_at_cpa_m": 9.209357350873818,
+        "bend_deg": 0.0,
+        "slant_deg": -2.583070172781719,
+        "canonical_obstacle_polygons": 3,
+        "declared_obstacle_count": 0,
+        "obstacle_specification": "fixed polygons",
+        "target_motion": "T-CV",
+        "target_speed_mps": 0.0,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 0.0,
+        "nominal_tcpa_s": 0.0,
+        "own_spawn": [
+          6.0839104652404785,
+          2.0
+        ],
+        "target_spawn": [
+          0.0,
+          0.0
+        ],
+        "basin_leg": [
+          [
+            6.083910489729491,
+            2.0
+          ],
+          [
+            5.181637535255979,
+            22.0
+          ]
+        ]
+      }
+    },
+    {
+      "suite": "field_validation",
+      "case": "FV-HO-12",
+      "test_id": "",
+      "seed": 950041,
+      "obstacles": null,
+      "scenario_sha256": "b9783308cc7d58afde02e1115990b1fba17c09287159bb54bebce1ca699cc857",
+      "sampling_stratum": "field_validation/FV-HO",
+      "stratum_population": 25,
+      "family": "FV-HO",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "head_on",
+        "geometry_mode": "basin",
+        "nominal_width_m": 9.233478501461372,
+        "effective_width_at_cpa_m": 9.23347850146137,
+        "bend_deg": 0.0,
+        "slant_deg": 4.880555688983274,
+        "canonical_obstacle_polygons": 3,
+        "declared_obstacle_count": 2,
+        "obstacle_specification": "fixed polygons",
+        "target_motion": "T-CV",
+        "target_speed_mps": 0.4651309966867482,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 0.8136342259464941,
+        "nominal_tcpa_s": 16.108491629712024,
+        "own_spawn": [
+          6.292232036590576,
+          2.0
+        ],
+        "target_spawn": [
+          6.811071613123538,
+          18.495890074875447
+        ],
+        "basin_leg": [
+          [
+            6.292232195510314,
+            2.0
+          ],
+          [
+            8.0,
+            22.0
+          ]
+        ]
+      }
+    },
+    {
+      "suite": "field_validation",
+      "case": "FV-CRP-25",
+      "test_id": "",
+      "seed": 950079,
+      "obstacles": null,
+      "scenario_sha256": "c8448ea68badadcbcf1311c6cb501b5d26abe0613191978289cd750c6fee044d",
+      "sampling_stratum": "field_validation/FV-CRP",
+      "stratum_population": 25,
+      "family": "FV-CRP",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "crossing",
+        "geometry_mode": "basin",
+        "nominal_width_m": 9.249599575458836,
+        "effective_width_at_cpa_m": 9.249599575458838,
+        "bend_deg": 0.0,
+        "slant_deg": 5.93621203037616,
+        "canonical_obstacle_polygons": 3,
+        "declared_obstacle_count": 1,
+        "obstacle_specification": "fixed polygons",
+        "target_motion": "T-CV",
+        "target_speed_mps": 0.36897703218390143,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 0.017162737867782718,
+        "nominal_tcpa_s": 8.192971419126478,
+        "own_spawn": [
+          4.487794399261475,
+          2.0
+        ],
+        "target_spawn": [
+          3.1509512346838378,
+          8.979451177216735
+        ],
+        "basin_leg": [
+          [
+            4.487794404015763,
+            2.0
+          ],
+          [
+            6.567369559579644,
+            22.0
+          ]
+        ]
+      }
+    },
+    {
+      "suite": "field_validation",
+      "case": "FV-BO-18",
+      "test_id": "",
+      "seed": 950147,
+      "obstacles": null,
+      "scenario_sha256": "644d3c20ede9e25c171f202b32e9a9408061c49f2908dbaad8dbe3858cc16bdd",
+      "sampling_stratum": "field_validation/FV-BO",
+      "stratum_population": 25,
+      "family": "FV-BO",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "being_overtaken",
+        "geometry_mode": "basin",
+        "nominal_width_m": 9.27888836036206,
+        "effective_width_at_cpa_m": 9.278888360362057,
+        "bend_deg": 0.0,
+        "slant_deg": -7.476602571291723,
+        "canonical_obstacle_polygons": 3,
+        "declared_obstacle_count": 0,
+        "obstacle_specification": "fixed polygons",
+        "target_motion": "T-CV",
+        "target_speed_mps": 0.918044353729606,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 1.7407397755622098,
+        "nominal_tcpa_s": 10.767584448122856,
+        "own_spawn": [
+          5.235790252685547,
+          8.84863567352295
+        ],
+        "target_spawn": [
+          5.780291875032894,
+          4.447328239006502
+        ],
+        "basin_leg": [
+          [
+            6.134585177829134,
+            2.0
+          ],
+          [
+            3.509843580985581,
+            22.0
+          ]
+        ]
+      }
+    },
+    {
+      "suite": "frozen_a",
+      "case": "A-HO-N",
+      "test_id": "",
+      "seed": 300002,
+      "obstacles": null,
+      "scenario_sha256": "92c4e7f267e187d27a6c09460912d540efbb97aef5a176d23ace785a32b6c6de",
+      "sampling_stratum": "frozen_a/A-HO-N",
+      "stratum_population": 1,
+      "family": "HO",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "head_on",
+        "geometry_mode": "channel",
+        "nominal_width_m": 4.072075661485838,
+        "effective_width_at_cpa_m": 4.278367010434961,
+        "bend_deg": 0.0,
+        "slant_deg": 0.0,
+        "canonical_obstacle_polygons": 0,
+        "declared_obstacle_count": 0,
+        "obstacle_specification": "seeded at environment reset",
+        "target_motion": "T-CV",
+        "target_speed_mps": 0.70535095034093,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 0.8662158110279103,
+        "nominal_tcpa_s": 13.0963391811373,
+        "own_spawn": [
+          4.98787260055542,
+          1.4500000476837158
+        ],
+        "target_spawn": [
+          4.435222910103696,
+          18.008863369146326
+        ],
+        "basin_leg": null
+      }
+    },
+    {
+      "suite": "frozen_a",
+      "case": "A-CRS-I",
+      "test_id": "",
+      "seed": 300004,
+      "obstacles": null,
+      "scenario_sha256": "a641fc240c464381d4b78a0cb4a1f66e746e54134a8cc426c6d902a0796e1059",
+      "sampling_stratum": "frozen_a/A-CRS-I",
+      "stratum_population": 1,
+      "family": "CRS",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "crossing",
+        "geometry_mode": "channel",
+        "nominal_width_m": 5.999999999999999,
+        "effective_width_at_cpa_m": 5.804594398057649,
+        "bend_deg": 0.0,
+        "slant_deg": 0.0,
+        "canonical_obstacle_polygons": 0,
+        "declared_obstacle_count": 0,
+        "obstacle_specification": "seeded at environment reset",
+        "target_motion": "T-CV",
+        "target_speed_mps": 0.5426475465780565,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 0.9080261671356913,
+        "nominal_tcpa_s": 9.147176285637757,
+        "own_spawn": [
+          5.442333221435547,
+          1.4500000476837158
+        ],
+        "target_spawn": [
+          8.809547755010756,
+          9.679175107467671
+        ],
+        "basin_leg": null
+      }
+    },
+    {
+      "suite": "field_deployment",
+      "case": "P2-L1-OT-FIX-12",
+      "test_id": "P2-L1-OT-FIX-12",
+      "seed": 470071,
+      "obstacles": null,
+      "scenario_sha256": "f3739c9daef5de13fea665b730d319f062ea574cb3f550725192719d39ec80c2",
+      "sampling_stratum": "field_deployment/L1/FIX",
+      "stratum_population": 100,
+      "family": "P2-L1-OT-FIX",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "overtaking",
+        "geometry_mode": "basin",
+        "nominal_width_m": 9.200000000000001,
+        "effective_width_at_cpa_m": 9.2,
+        "bend_deg": 0.0,
+        "slant_deg": 0.0,
+        "canonical_obstacle_polygons": 3,
+        "declared_obstacle_count": 0,
+        "obstacle_specification": "fixed polygons",
+        "target_motion": "T-CV",
+        "target_speed_mps": 0.22355631766826423,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 0.1829432838518692,
+        "nominal_tcpa_s": 27.974827310950303,
+        "own_spawn": [
+          5.0,
+          2.0
+        ],
+        "target_spawn": [
+          4.466867415060143,
+          11.416298156402815
+        ],
+        "basin_leg": [
+          [
+            5.0,
+            2.0
+          ],
+          [
+            5.0,
+            22.0
+          ]
+        ]
+      }
+    },
+    {
+      "suite": "field_deployment",
+      "case": "P2-L1-HO-VAR-19",
+      "test_id": "P2-L1-HO-VAR-19",
+      "seed": 470018,
+      "obstacles": null,
+      "scenario_sha256": "8dc3b21108967218272bc4396840cb9678f2847137f5fcab68f7084c455f6731",
+      "sampling_stratum": "field_deployment/L1/VAR",
+      "stratum_population": 100,
+      "family": "P2-L1-HO-VAR",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "head_on",
+        "geometry_mode": "basin",
+        "nominal_width_m": 9.200000000000001,
+        "effective_width_at_cpa_m": 9.2,
+        "bend_deg": 0.0,
+        "slant_deg": 0.0,
+        "canonical_obstacle_polygons": 3,
+        "declared_obstacle_count": 0,
+        "obstacle_specification": "fixed polygons",
+        "target_motion": "T-VS",
+        "target_speed_mps": 0.487946593895685,
+        "target_speed_profile": [
+          9.873604807408377,
+          0.3044286632926877,
+          0.05
+        ],
+        "nominal_dcpa_m": 1.2210442848077685,
+        "nominal_tcpa_s": 15.289483420599684,
+        "own_spawn": [
+          5.0,
+          2.0
+        ],
+        "target_spawn": [
+          4.416553382779162,
+          18.016334204693027
+        ],
+        "basin_leg": [
+          [
+            5.0,
+            2.0
+          ],
+          [
+            5.0,
+            22.0
+          ]
+        ]
+      }
+    },
+    {
+      "suite": "field_deployment",
+      "case": "P2-L2-OT-FIX-16",
+      "test_id": "P2-L2-OT-FIX-16",
+      "seed": 470175,
+      "obstacles": null,
+      "scenario_sha256": "860ee26209f3cbbdaf984a8287c7de05236de98c8a280b4cd7604b9c0f2b7496",
+      "sampling_stratum": "field_deployment/L2/FIX",
+      "stratum_population": 100,
+      "family": "P2-L2-OT-FIX",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "overtaking",
+        "geometry_mode": "basin",
+        "nominal_width_m": 9.482643773590642,
+        "effective_width_at_cpa_m": 9.483142938920619,
+        "bend_deg": 0.0,
+        "slant_deg": 14.036243467926479,
+        "canonical_obstacle_polygons": 3,
+        "declared_obstacle_count": 3,
+        "obstacle_specification": "fixed polygons",
+        "target_motion": "T-CV",
+        "target_speed_mps": 0.28244526360663047,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 1.6665912301621642,
+        "nominal_tcpa_s": 20.940944721518814,
+        "own_spawn": [
+          3.0,
+          2.0
+        ],
+        "target_spawn": [
+          3.777598219919908,
+          8.099513235791933
+        ],
+        "basin_leg": [
+          [
+            3.0,
+            2.0
+          ],
+          [
+            8.0,
+            22.0
+          ]
+        ]
+      }
+    },
+    {
+      "suite": "field_deployment",
+      "case": "P2-L2-HO-VAR-03",
+      "test_id": "P2-L2-HO-VAR-03",
+      "seed": 470102,
+      "obstacles": null,
+      "scenario_sha256": "a9c9aa173858a8db0914f3cdc8ac6e135c8aedee4aa704f9831f4a33f3d85bd8",
+      "sampling_stratum": "field_deployment/L2/VAR",
+      "stratum_population": 100,
+      "family": "P2-L2-HO-VAR",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "head_on",
+        "geometry_mode": "basin",
+        "nominal_width_m": 9.482643773590642,
+        "effective_width_at_cpa_m": 9.483142938920619,
+        "bend_deg": 0.0,
+        "slant_deg": 14.036243467926479,
+        "canonical_obstacle_polygons": 3,
+        "declared_obstacle_count": 3,
+        "obstacle_specification": "fixed polygons",
+        "target_motion": "T-VS",
+        "target_speed_mps": 0.6343436445052972,
+        "target_speed_profile": [
+          8.209451862294758,
+          0.8702030505525743,
+          0.05
+        ],
+        "nominal_dcpa_m": 0.19585520539220913,
+        "nominal_tcpa_s": 12.795060115739016,
+        "own_spawn": [
+          3.0,
+          2.0
+        ],
+        "target_spawn": [
+          7.876727159332836,
+          16.426698355505124
+        ],
+        "basin_leg": [
+          [
+            3.0,
+            2.0
+          ],
+          [
+            8.0,
+            22.0
+          ]
+        ]
+      }
+    },
+    {
+      "suite": "field_deployment",
+      "case": "P2-L3-CRP-FIX-01",
+      "test_id": "P2-L3-CRP-FIX-01",
+      "seed": 470220,
+      "obstacles": null,
+      "scenario_sha256": "b9014d788b6e497dc518e552dfd46ab5f4f293794836c0858f835cb095ab362f",
+      "sampling_stratum": "field_deployment/L3/FIX",
+      "stratum_population": 100,
+      "family": "P2-L3-CRP-FIX",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "crossing",
+        "geometry_mode": "basin",
+        "nominal_width_m": 9.482643773590642,
+        "effective_width_at_cpa_m": 9.483142938920619,
+        "bend_deg": 0.0,
+        "slant_deg": -14.036243467926479,
+        "canonical_obstacle_polygons": 3,
+        "declared_obstacle_count": 2,
+        "obstacle_specification": "fixed polygons",
+        "target_motion": "T-CV",
+        "target_speed_mps": 0.4653924720313176,
+        "target_speed_profile": null,
+        "nominal_dcpa_m": 0.06780968522019926,
+        "nominal_tcpa_s": 8.484995318264254,
+        "own_spawn": [
+          7.0,
+          2.0
+        ],
+        "target_spawn": [
+          1.8857269112942285,
+          7.043613550039077
+        ],
+        "basin_leg": [
+          [
+            7.0,
+            2.0
+          ],
+          [
+            2.0,
+            22.0
+          ]
+        ]
+      }
+    },
+    {
+      "suite": "field_deployment",
+      "case": "P2-L3-CRP-VAR-06",
+      "test_id": "P2-L3-CRP-VAR-06",
+      "seed": 470225,
+      "obstacles": null,
+      "scenario_sha256": "06d5aafe93ddfec81b07f7c3e4b8b85d981a22d04d8568948ffc59d7daa028f6",
+      "sampling_stratum": "field_deployment/L3/VAR",
+      "stratum_population": 100,
+      "family": "P2-L3-CRP-VAR",
+      "design_probability": null,
+      "inverse_probability_weight": null,
+      "features": {
+        "encounter_class": "crossing",
+        "geometry_mode": "basin",
+        "nominal_width_m": 9.482643773590642,
+        "effective_width_at_cpa_m": 9.483142938920619,
+        "bend_deg": 0.0,
+        "slant_deg": -14.036243467926479,
+        "canonical_obstacle_polygons": 3,
+        "declared_obstacle_count": 3,
+        "obstacle_specification": "fixed polygons",
+        "target_motion": "T-VS",
+        "target_speed_mps": 0.5495806528018863,
+        "target_speed_profile": [
+          5.261932769448051,
+          0.3128291093226022,
+          0.05
+        ],
+        "nominal_dcpa_m": 0.16833571410843878,
+        "nominal_tcpa_s": 8.703153032965036,
+        "own_spawn": [
+          7.0,
+          2.0
+        ],
+        "target_spawn": [
+          2.387618962354495,
+          10.107704996113384
+        ],
+        "basin_leg": [
+          [
+            7.0,
+            2.0
+          ],
+          [
+            2.0,
+            22.0
+          ]
+        ]
+      }
+    }
+  ],
+  "sampling_design": "Fixed predeclared strata; choose lowest SHA256 rank without using outcomes. This is a diagnostic subset, not a probability sample.",
+  "limitations": [
+    "No inverse-probability weights: design inclusion probabilities are not defined.",
+    "24 cases do not estimate all 2,890-case performance; omitted families remain untested by this quick run.",
+    "All field-layout and validation cases are simulated, not new real-world trials.",
+    "Old partial benchmark outcomes remain separate; new off/v4/v5 triples use identical scenario and reset seed.",
+    "Each failed/interrupted/repeated episode attempt consumes the shared maximum of100."
+  ]
+}

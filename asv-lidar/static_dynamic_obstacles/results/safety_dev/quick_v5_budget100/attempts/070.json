@@ -1,0 +1,10 @@
+{
+  "tag": "policy_feedback_v1",
+  "mode": "v5",
+  "suite": "field_deployment",
+  "case": "P2-L2-HO-VAR-03",
+  "seed": 470102,
+  "scenario_sha256": "a9c9aa173858a8db0914f3cdc8ac6e135c8aedee4aa704f9831f4a33f3d85bd8",
+  "run_metadata_sha256": "5d589941ca28274817c802b66ba5c7c44ee9abed0af5cb15c5bf602fc68141e7",
+  "attempt": 70
+}

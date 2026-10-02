@@ -1,0 +1,13 @@
+level,scope,candidate,reference,expected_union_cases,paired_cases,missing_candidate,missing_reference,complete_pairs,candidate_goals,reference_goals,candidate_collisions,reference_collisions,candidate_timeouts,reference_timeouts,gained_goal,lost_goal,rescued_collision,introduced_collision,collision_to_goal,collision_to_timeout,changed_outcome,net_goals,net_collision_reduction
+component,frozen_b,v4,off,800,689,110,1,False,636,642,53,47,0,0,20,26,20,26,20,0,50,-6,-6
+component,frozen_r,v4,off,900,752,148,0,False,691,689,61,63,0,0,21,19,21,19,21,0,45,2,2
+group,frozen,v4,off,1700,1441,258,1,False,1327,1331,114,110,0,0,41,45,41,45,41,0,95,-4,-4
+all,all,v4,off,1700,1441,258,1,False,1327,1331,114,110,0,0,41,45,41,45,41,0,95,-4,-4
+component,frozen_b,v5,off,800,0,800,1,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+component,frozen_r,v5,off,900,0,900,0,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+group,frozen,v5,off,1700,0,1700,1,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+all,all,v5,off,1700,0,1700,1,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+component,frozen_b,v5,v4,800,0,800,110,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+component,frozen_r,v5,v4,900,0,900,148,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+group,frozen,v5,v4,1700,0,1700,258,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+all,all,v5,v4,1700,0,1700,258,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0

@@ -1,0 +1,146 @@
+{
+  "utc": "2026-10-02T11:50:51.303191+00:00",
+  "status": "user_cancelled_partial_benchmark",
+  "process_shutdown": "Root coordinator owns shutdown verification; this artifact makes no claim about process termination.",
+  "snapshot_method": "Shared-read raw bytes; only newline-terminated valid journal records count. No replay, missing-case imputation, or episode evaluation.",
+  "archive_path": "results/safety_dev/cancelled/v4_cancelled_full_sweep_20261002T115051Z",
+  "runs": [
+    {
+      "run": "v5_frozen_r",
+      "status": "incomplete",
+      "completed": 1652,
+      "expected": 2700,
+      "complete": false,
+      "modes": {
+        "off": {
+          "completed": 900,
+          "expected": 900
+        },
+        "v4": {
+          "completed": 752,
+          "expected": 900
+        },
+        "v5": {
+          "completed": 0,
+          "expected": 900
+        }
+      },
+      "outcomes": {
+        "collision:target": 92,
+        "goal": 1515,
+        "collision:boundary": 20,
+        "collision:obstacle": 25
+      },
+      "journal_snapshot_bytes": 1996849,
+      "ignored_tail_bytes": 0,
+      "mode_outcomes": {
+        "off": {
+          "collision:target": 52,
+          "goal": 824,
+          "collision:boundary": 6,
+          "collision:obstacle": 18
+        },
+        "v4": {
+          "collision:target": 40,
+          "goal": 691,
+          "collision:boundary": 14,
+          "collision:obstacle": 7
+        },
+        "v5": {}
+      },
+      "last_case": "B-06-051-RE"
+    },
+    {
+      "run": "v5_frozen_b",
+      "status": "incomplete",
+      "completed": 1489,
+      "expected": 2400,
+      "complete": false,
+      "modes": {
+        "off": {
+          "completed": 799,
+          "expected": 800
+        },
+        "v4": {
+          "completed": 690,
+          "expected": 800
+        },
+        "v5": {
+          "completed": 0,
+          "expected": 800
+        }
+      },
+      "outcomes": {
+        "goal": 1384,
+        "collision:obstacle": 22,
+        "collision:boundary": 19,
+        "collision:target": 64
+      },
+      "journal_snapshot_bytes": 1809073,
+      "ignored_tail_bytes": 0,
+      "mode_outcomes": {
+        "off": {
+          "goal": 747,
+          "collision:obstacle": 13,
+          "collision:boundary": 7,
+          "collision:target": 32
+        },
+        "v4": {
+          "goal": 637,
+          "collision:obstacle": 9,
+          "collision:target": 32,
+          "collision:boundary": 12
+        },
+        "v5": {}
+      },
+      "last_case": "B-06-089"
+    }
+  ],
+  "files": {
+    "v5_frozen_r/manifest.json": {
+      "sha256": "3c4364154717a716ae98d95d4c0c86aaf114890f02c807f37f041c278190edc9",
+      "bytes": 250877,
+      "source": "results/safety_dev/suites/v5_frozen_r/manifest.json"
+    },
+    "v5_frozen_r/episodes.jsonl": {
+      "sha256": "0da7be966f07ef4eba6936dd5c9c13d1b46a44e91b7d23751c295f978c30dfc0",
+      "bytes": 1996849,
+      "source": "results/safety_dev/suites/v5_frozen_r/episodes.jsonl"
+    },
+    "v5_frozen_r/episodes.csv": {
+      "sha256": "15eff1431e05cfd7972ef013c59c03919e86b431ce159b4ba5d5544b40fa5326",
+      "bytes": 350801,
+      "source": "results/safety_dev/suites/v5_frozen_r/episodes.csv"
+    },
+    "v5_frozen_r/progress.json": {
+      "sha256": "d339ad6d4160c2a2c4be143be8f5cc4e1585cf3b8938bb7e1c4a36298d0175f5",
+      "bytes": 1016,
+      "source": "results/safety_dev/suites/v5_frozen_r/progress.json"
+    },
+    "v5_frozen_b/manifest.json": {
+      "sha256": "0f8598ce891d6db11c8a41484c4b4b0f3aba6a7c342637f43318460238a0e9f4",
+      "bytes": 223577,
+      "source": "results/safety_dev/suites/v5_frozen_b/manifest.json"
+    },
+    "v5_frozen_b/episodes.jsonl": {
+      "sha256": "fb7c6281de6e06442f87f8780bef5b6524028e88304f41f726b74500f6d81d50",
+      "bytes": 1809073,
+      "source": "results/safety_dev/suites/v5_frozen_b/episodes.jsonl"
+    },
+    "v5_frozen_b/episodes.csv": {
+      "sha256": "983022a752de5f4515649ae2474a0e5ccf463b185362c10b8ffcfb72ee061512",
+      "bytes": 311989,
+      "source": "results/safety_dev/suites/v5_frozen_b/episodes.csv"
+    },
+    "v5_frozen_b/progress.json": {
+      "sha256": "97bf363ded543a57da206e2b7f92da3e3eea7b1b12d9e1cc1ac68081e6d52f85",
+      "bytes": 1016,
+      "source": "results/safety_dev/suites/v5_frozen_b/progress.json"
+    },
+    "v5_frozen_b/reconciliation_missing_off_B-06-040.json": {
+      "sha256": "16e0f59a88c4906be0ce7bc68de09ea5ccaa266954f7c37cd3dcad2d2f766867",
+      "bytes": 949,
+      "source": "results/safety_dev/suites/v5_frozen_b/reconciliation_missing_off_B-06-040.json"
+    }
+  }
+}

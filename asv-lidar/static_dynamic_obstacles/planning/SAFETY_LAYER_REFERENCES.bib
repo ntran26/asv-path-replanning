@@ -1,0 +1,143 @@
+% Primary-source metadata verified on 2026-10-02.
+% Method mapping for SAFETY_LAYER_V5_PLAN.md:
+% - bastani2019modelpredictiveshielding: one learned-policy action followed by
+%   a predicted backup motivates one-decision commitment.
+% - wabersich2023predictivebarrier: soft-constrained predictive recovery
+%   motivates the sampled constraint-deficit ranking.
+% - eriksen2019branchingcourse: feedback course/speed trajectory generation
+%   motivates course-holding candidates.
+% - chen2021backupcbf: forward integration under a feedback backup motivates
+%   recomputing course-control actions along each predicted trajectory.
+% The finite sampled adaptations do not inherit the papers' formal guarantees.
+% The four course samples and +/-30-degree offsets are engineering choices.
+
+% Source: https://arxiv.org/abs/1905.10691
+% Osbert Bastani is the sole author; first submitted in 2019, revised in 2020.
+@misc{bastani2019modelpredictiveshielding,
+  author        = {Bastani, Osbert},
+  title         = {Safe Reinforcement Learning with Nonlinear Dynamics via Model Predictive Shielding},
+  year          = {2019},
+  eprint        = {1905.10691},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG},
+  doi           = {10.48550/arXiv.1905.10691},
+  url           = {https://arxiv.org/abs/1905.10691},
+  note          = {Version 3 revised 21 October 2020}
+}
+
+% Source: https://www.research-collection.ethz.ch/entities/publication/777c5871-fd43-4b6f-9b3e-35deb0aa1678
+% ETH permanent record: http://hdl.handle.net/20.500.11850/595016
+@article{wabersich2023predictivebarrier,
+  author    = {Wabersich, Kim Peter and Zeilinger, Melanie N.},
+  title     = {Predictive control barrier functions: Enhanced safety mechanisms for learning-based control},
+  journal   = {IEEE Transactions on Automatic Control},
+  year      = {2023},
+  month     = may,
+  volume    = {68},
+  number    = {5},
+  pages     = {2638--2651},
+  doi       = {10.1109/TAC.2022.3175628},
+  url       = {https://doi.org/10.1109/TAC.2022.3175628}
+}
+
+% Source: https://ntnuopen.ntnu.no/ntnu-xmlui/handle/11250/2631206
+% Published title is used; the arXiv version is https://arxiv.org/abs/1907.00039.
+@article{eriksen2019branchingcourse,
+  author    = {Eriksen, Bj{\o}rn-Olav Holtung and Breivik, Morten and Wilthil, Erik Falm{\aa}r and Fl{\aa}ten, Andreas Lindahl and Brekke, Edmund F{\o}rland},
+  title     = {The branching-course model predictive control algorithm for maritime collision avoidance},
+  journal   = {Journal of Field Robotics},
+  year      = {2019},
+  volume    = {36},
+  number    = {7},
+  pages     = {1222--1249},
+  doi       = {10.1002/rob.21900},
+  url       = {https://doi.org/10.1002/rob.21900}
+}
+
+% Source: https://arxiv.org/abs/2104.11332
+@misc{chen2021backupcbf,
+  author        = {Chen, Yuxiao and Jankovic, Mrdjan and Santillo, Mario and Ames, Aaron D.},
+  title         = {Backup Control Barrier Functions: Formulation and Comparative Study},
+  year          = {2021},
+  eprint        = {2104.11332},
+  archivePrefix = {arXiv},
+  primaryClass  = {eess.SY},
+  doi           = {10.48550/arXiv.2104.11332},
+  url           = {https://arxiv.org/abs/2104.11332}
+}
+
+% Inherited v4 methods: related prior work identified retrospectively.
+% These references document architectural relationships, not the historical
+% motivation of the earlier implementation or transferred formal guarantees.
+% luenberger1971observers: model dynamics plus output-error correction;
+% our observer uses nonlinear prediction and a fixed scalar measurement gain,
+% without covariance propagation, Kalman gain calculation, or pole placement.
+% Publisher metadata: https://ieeexplore.ieee.org/document/1099826/
+% Paper: https://lab.prd.vanderbilt.edu/taha/wp-content/uploads/sites/154/2017/10/Observers_Original_Paper.pdf
+@article{luenberger1971observers,
+  author    = {Luenberger, David G.},
+  title     = {An introduction to observers},
+  journal   = {IEEE Transactions on Automatic Control},
+  year      = {1971},
+  month     = dec,
+  volume    = {16},
+  number    = {6},
+  pages     = {596--602},
+  doi       = {10.1109/TAC.1971.1099826},
+  url       = {https://doi.org/10.1109/TAC.1971.1099826}
+}
+
+% hornung2013octomap: range-ray free-space evidence and occupied-return priority;
+% our implementation deletes contradicted 2D memory points directly, without
+% an occupancy grid, octree, probabilistic log-odds update, or OctoMap dependency.
+% Publisher metadata: https://link.springer.com/article/10.1007/s10514-012-9321-0
+% Author's paper: https://www.arminhornung.de/Research/pub/hornung13auro.pdf
+@article{hornung2013octomap,
+  author    = {Hornung, Armin and Wurm, Kai M. and Bennewitz, Maren and Stachniss, Cyrill and Burgard, Wolfram},
+  title     = {{OctoMap}: An efficient probabilistic {3D} mapping framework based on octrees},
+  journal   = {Autonomous Robots},
+  year      = {2013},
+  month     = apr,
+  volume    = {34},
+  pages     = {189--206},
+  doi       = {10.1007/s10514-012-9321-0},
+  url       = {https://doi.org/10.1007/s10514-012-9321-0}
+}
+
+% New v5 sideslip-rescue source, Sec. II.B and Eq. (14):
+% beta = atan2(v, u), course = heading + beta.
+% The implementation uses this kinematic compensation only, not the paper's
+% adaptive LOS law or stability proof; low-speed drift can violate its small,
+% constant-sideslip assumptions. Existing hard trajectory checks still apply.
+% Primary metadata: https://orbit.dtu.dk/en/publications/line-of-sight-path-following-for-dubins-paths-with-adaptive-sides/
+% Accepted manuscript: https://backend.orbit.dtu.dk/ws/files/129469382/FossenPettersenGaleazzi2014.pdf
+@article{fossen2015sideslip,
+  author    = {Fossen, Thor Inge and Pettersen, Kristin Ytterstad and Galeazzi, Roberto},
+  title     = {Line-of-Sight Path Following for {Dubins} Paths with Adaptive Sideslip Compensation of Drift Forces},
+  journal   = {IEEE Transactions on Control Systems Technology},
+  year      = {2015},
+  month     = mar,
+  volume    = {23},
+  number    = {2},
+  pages     = {820--827},
+  doi       = {10.1109/TCST.2014.2338354},
+  url       = {https://doi.org/10.1109/TCST.2014.2338354}
+}
+
+% Verified-policy priority: Sec. 4.1, Eq. (5a) minimizes the first-action
+% deviation from the learned input subject to feasibility. The sampled v5
+% adaptation preserves the current feasible pool and does not inherit the
+% terminal-set/model assumptions required for the paper's safety guarantee.
+% Primary metadata and version date: https://arxiv.org/abs/1812.05506v4
+% First submitted in 2018; the cited equation is from version 4, May 2021.
+@misc{wabersich2021predictivesafety,
+  author        = {Wabersich, Kim P. and Zeilinger, Melanie N.},
+  title         = {A predictive safety filter for learning-based control of constrained nonlinear dynamical systems},
+  year          = {2021},
+  eprint        = {1812.05506},
+  archivePrefix = {arXiv},
+  primaryClass  = {eess.SY},
+  doi           = {10.48550/arXiv.1812.05506},
+  url           = {https://arxiv.org/abs/1812.05506v4},
+  note          = {Version 4 revised 17 May 2021; Section 4.1, equation (5a)}
+}

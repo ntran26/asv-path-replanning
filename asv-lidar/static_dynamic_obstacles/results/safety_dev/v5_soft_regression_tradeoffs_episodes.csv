@@ -1,0 +1,6 @@
+mode,case,seed,outcome,steps,safety_v2_steps,safety_v2_brake_steps,seconds,soft_decisions,avoidable_prefix_decisions
+v5,DV3-HO-CV-03,900142,collision:obstacle,50,28,6,16.388087200000882,8,0
+v5,DV3-OT-CV-11,900228,collision:boundary,46,14,3,14.509954500001186,9,0
+v5,DV3-OT-CV-18,900235,collision:obstacle,54,41,3,9.150399300000572,18,0
+v5,DV3-OT-VS-03,900240,timeout,180,127,38,30.393834000002244,109,1
+v5,DV3-BO-CV-19,900262,collision:boundary,64,37,6,11.632410399997752,15,0

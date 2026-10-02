@@ -1,0 +1,24 @@
+{
+  "observed_at_utc": "2026-10-02T10:24:23.403913+00:00",
+  "reason": "CSV contains a case absent from the durable JSONL snapshot; source unknown. Retain original CSV evidence, rerun this exact case via unchanged --resume after current work completes.",
+  "csv_snapshot_sha256": "178684b3837931e876229358214cf63d7cf9c5eeedcff6421d5781b056bcc17a",
+  "original_csv_row": {
+    "mode": "off",
+    "suite": "frozen_b",
+    "case": "B-06-040",
+    "test_id": "CH-CR-CV-041",
+    "seed": "400640",
+    "scenario_sha256": "1dc83b8d67fa8a6e47dd0dd61f911ecaa0d2b65611bba7f57203cf34933198d8",
+    "outcome": "goal",
+    "steps": "46",
+    "safety_v2_steps": "0",
+    "safety_v2_brake_steps": "0",
+    "estops": "0",
+    "seconds": "2.6755072999985714",
+    "return": "-32.07098878451423",
+    "collided": "False",
+    "collided_target": "False",
+    "rms_cte": "2.1355979918018178",
+    "min_target_range": "3.1945024774892636"
+  }
+}

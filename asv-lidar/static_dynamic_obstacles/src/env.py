@@ -1215,7 +1215,13 @@ class ASVLidarEnv(gym.Env):
         self.safety_v2_changed = False
         if self.estop_enabled and getattr(cfg, "SAFETY_VERSION", 1) >= 2:
             if getattr(self, "_safety_v2", None) is None:
-                if getattr(cfg, "SAFETY_VERSION", 1) >= 3:      # v3: committed backup, recovery mode
+                if getattr(cfg, "SAFETY_VERSION", 1) == 5:
+                    import safety_v5
+                    self._safety_v2 = safety_v5.SafetyFilterV5()
+                elif getattr(cfg, "SAFETY_VERSION", 1) == 4:
+                    import safety_v4
+                    self._safety_v2 = safety_v4.SafetyFilterV4()
+                elif getattr(cfg, "SAFETY_VERSION", 1) >= 3:    # v3: committed backup, recovery mode
                     import safety_v3
                     self._safety_v2 = safety_v3.SafetyFilterV3()
                 else:
@@ -1255,6 +1261,13 @@ class ASVLidarEnv(gym.Env):
             np.clip(self.rudder / 100.0, -1.0, 1.0),
             np.clip((self.rpm - cfg.CRUISE_RPM) / max(cfg.RPM_DELTA, 1e-6), -1.0, 1.0),
         ], dtype=np.float32)
+
+        # Optional safety observer: use the command after bridge limiting and
+        # brake-to-zero conversion, while retaining the pre-step estimate.
+        if self.estop_enabled and self._safety_v2 is not None:
+            observe_command = getattr(self._safety_v2, "observe_issued_command", None)
+            if observe_command is not None:
+                observe_command(self.rudder / 100.0, self.rpm)
 
         x_before, y_before = self.asv_x, self.asv_y
 

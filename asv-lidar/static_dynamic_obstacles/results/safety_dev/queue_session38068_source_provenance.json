@@ -1,0 +1,25 @@
+{
+  "execution_session_id": 38068,
+  "session_id_is_not_asserted_to_be_os_pid": true,
+  "first_attempt_log": "results/safety_dev/queue_v5_frozen_r_1_146baac55386476780030061578bced2.log",
+  "loaded_old_wrapper_sha256": "a4bf052b84f5ce299a31670d6a894481f585bbe237897ccd07cefad1ee98264c",
+  "new_wrapper_path": "tools/diagnostics/safety/run_frozen_queue.py",
+  "new_wrapper_sha256": "c516e7dd24573c5abb5eeec33b8a92ba8f34ea7e0645f6e36df91ab3fe9fb793",
+  "loaded_behavior": "Session 38068 retains the original imported wrapper code for frozen_r and its later dev/field_validation/frozen_a component.",
+  "later_log_caveat": "The old wrapper hashes the file from disk at each component start. Later headers from this same process may name the new source hash while executing the old loaded wrapper behavior. The first R attempt header records the old source hash.",
+  "scope": "Only launcher bookkeeping changed: broader fatal-exception rejection, persisted-journal completion checks/reconciliation, and import-time launcher/status hashes. Frozen controller, evaluator, scenarios, seeds and settings are unchanged.",
+  "frozen_source_checks": [
+    {
+      "run": "v5_frozen_r",
+      "checked_files": 77,
+      "mismatches": []
+    },
+    {
+      "run": "v5_frozen_b",
+      "checked_files": 77,
+      "mismatches": []
+    }
+  ],
+  "original_source_archive": "No pre-edit local source copy was retained; no reconstructed source was archived.",
+  "completion_policy": "Root will independently reconcile journals after the active lanes complete. Existing evaluations were not interrupted."
+}

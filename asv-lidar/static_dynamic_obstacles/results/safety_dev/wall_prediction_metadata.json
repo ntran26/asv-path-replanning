@@ -1,0 +1,42 @@
+{
+  "command": [
+    "tools/diagnostics/safety/prediction_audit.py",
+    "--modes",
+    "v3,oracle",
+    "--cases",
+    "DV3-OT-CV-16,DV3-BO-CV-04",
+    "--tag",
+    "wall_prediction"
+  ],
+  "development_only": true,
+  "model": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\runs\\sac_formulation_seed0_bl3\\kept_best_3M\\best_model.zip",
+  "model_sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+  "source_sha256": {
+    "src/safety_v2.py": "209195c3b9241dfa6a798b7cfca857dfd14218c38625d99bc2a9c0d97c1b3d55",
+    "src/safety_v3.py": "28efcc06af8ec0ffc0074267b7f1b2e36ba4fd1f6e033900c39b9b96b6d40d0a",
+    "src/classical/common.py": "456f39769ffa237f826eff8f9852a6d0823a2f975f85d2345ba7b42105e0977d",
+    "src/env.py": "4ba3863eeadd8d658922bcb9d1cd287a7f443e74e044dc9c3bb18e9ed2f0df89",
+    "src/ship.py": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+    "tools/diagnostics/safety/oracle.py": "d4d399f3fa9748ee899c842a748515658b9fd0faf76889a6cbb3bde478646e5d"
+  },
+  "runtime_overrides": {},
+  "horizons_s": [
+    1.0,
+    2.0,
+    4.0,
+    8.0
+  ],
+  "stride": 4,
+  "prediction_dt": 0.125,
+  "update_rate": 0.5,
+  "boundary_error_sign": "predicted minus actual; negative means pessimistic",
+  "true_ego": "true initial position, heading and body velocity; same estimated actuator history",
+  "boundary_geometry": "same inflated hull and common.boundary_clearance on known map polygon",
+  "partial_collision_steps": "excluded from horizon errors, retained in mode traces",
+  "limitations": [
+    "No terminal-runout or hypothetical-backup-plan score is compared to actual motion.",
+    "True-ego replay is not an oracle closed-loop filter evaluation.",
+    "Running clearance minima are sampled at decision boundaries, not continuous time.",
+    "Overlapping windows are not independent statistical samples."
+  ]
+}

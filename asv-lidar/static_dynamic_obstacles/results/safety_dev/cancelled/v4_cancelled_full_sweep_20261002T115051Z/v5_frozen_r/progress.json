@@ -1,0 +1,55 @@
+{
+  "completed": 1652,
+  "expected": 2700,
+  "complete": false,
+  "outcomes": [
+    {
+      "mode": "off",
+      "suite": "frozen_r",
+      "outcome": "collision:boundary",
+      "n": 6
+    },
+    {
+      "mode": "off",
+      "suite": "frozen_r",
+      "outcome": "collision:obstacle",
+      "n": 18
+    },
+    {
+      "mode": "off",
+      "suite": "frozen_r",
+      "outcome": "collision:target",
+      "n": 52
+    },
+    {
+      "mode": "off",
+      "suite": "frozen_r",
+      "outcome": "goal",
+      "n": 824
+    },
+    {
+      "mode": "v4",
+      "suite": "frozen_r",
+      "outcome": "collision:boundary",
+      "n": 14
+    },
+    {
+      "mode": "v4",
+      "suite": "frozen_r",
+      "outcome": "collision:obstacle",
+      "n": 7
+    },
+    {
+      "mode": "v4",
+      "suite": "frozen_r",
+      "outcome": "collision:target",
+      "n": 40
+    },
+    {
+      "mode": "v4",
+      "suite": "frozen_r",
+      "outcome": "goal",
+      "n": 691
+    }
+  ]
+}

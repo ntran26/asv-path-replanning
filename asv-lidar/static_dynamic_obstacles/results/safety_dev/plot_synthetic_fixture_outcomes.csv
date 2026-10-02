@@ -1,0 +1,10 @@
+level,scope,mode,expected_cases,completed_cases,complete,goals,collision_obstacle,collision_boundary,collision_target,timeouts,collisions
+group,dev,off,370,370,True,270,40,15,40,5,95
+group,dev,v4,370,370,True,300,20,10,40,0,70
+group,dev,v5,370,370,True,300,22,8,40,0,70
+group,frozen,off,1735,200,False,130,25,20,25,0,70
+group,frozen,v4,1735,200,False,180,8,4,8,0,20
+group,frozen,v5,1735,200,False,180,8,4,8,0,20
+group,field,off,785,100,False,70,12,5,13,0,30
+group,field,v4,785,100,False,80,8,4,8,0,20
+group,field,v5,785,100,False,80,8,4,8,0,20

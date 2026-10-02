@@ -1,0 +1,15 @@
+case,reset_seed,v3_outcome,oracle_state_outcome,oracle_full_outcome,memory_only_outcome,dual_brake_only_outcome,observer_only_outcome,v4_initial_outcome,v3_final_phase,v3_collision_step,v3_last10_no_escape,v3_last10_last_certificate,v3_last10_recovery,v3_last10_nominal,v3_last10_idle
+DV3-BO-CV-04,900247,collision:boundary,collision:obstacle,collision:boundary,collision:boundary,goal,goal,goal,no escape,17,7,1,0,2,0
+DV3-BO-CV-17,900260,collision:boundary,goal,goal,collision:boundary,collision:boundary,goal,collision:boundary,no escape,64,7,3,0,0,0
+DV3-CRP-VS-05,900190,collision:boundary,collision:boundary,goal,goal,collision:boundary,collision:boundary,collision:boundary,no escape,82,10,0,0,0,0
+DV3-CRS-CV-04,900195,collision:boundary,goal,collision:boundary,collision:boundary,collision:boundary,collision:obstacle,collision:boundary,no escape,61,7,3,0,0,0
+DV3-CRS-CV-06,900197,collision:boundary,collision:boundary,goal,goal,collision:boundary,goal,collision:boundary,no escape,100,10,0,0,0,0
+DV3-CRS-CV-10,900201,collision:boundary,goal,goal,goal,collision:boundary,goal,goal,no escape,57,9,1,0,0,0
+DV3-HO-CV-03,900142,collision:boundary,goal,goal,collision:boundary,collision:boundary,goal,collision:obstacle,no escape,40,6,4,0,0,0
+DV3-HO-VS-01,900160,collision:boundary,collision:boundary,collision:obstacle,collision:boundary,goal,goal,collision:boundary,no escape,65,1,4,5,0,0
+DV3-NT-CV-12,900131,collision:boundary,collision:obstacle,goal,collision:boundary,collision:boundary,collision:obstacle,collision:boundary,no escape,33,7,2,1,0,0
+DV3-OT-CV-03,900220,collision:boundary,goal,goal,goal,collision:boundary,collision:boundary,collision:target,no escape,162,9,1,0,0,0
+DV3-OT-CV-09,900226,collision:boundary,collision:boundary,goal,goal,collision:boundary,collision:boundary,collision:boundary,no escape,96,10,0,0,0,0
+DV3-OT-CV-11,900228,collision:boundary,goal,goal,collision:boundary,goal,goal,collision:boundary,no escape,47,5,4,1,0,0
+DV3-OT-CV-16,900233,collision:boundary,goal,goal,collision:boundary,goal,goal,collision:target,no escape,62,10,0,0,0,0
+DV3-OT-VS-03,900240,collision:boundary,goal,goal,collision:boundary,collision:boundary,goal,goal,no escape,123,6,4,0,0,0
