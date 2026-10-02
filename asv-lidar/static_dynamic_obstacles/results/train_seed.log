@@ -25,3 +25,14 @@ code matches baseline-v3
 2026-10-01 14:20:52    pinned learner 28264
 2026-10-01 20:29:23 == ppos0_bl3_hb watcher armed: waiting for sacs0_bl3_fix1 (training + evaluations) to finish
 2026-10-01 21:29:12    ppos0_bl3_hb watcher stopped: PPO hand-back plan on hold (your call)
+2026-10-02 01:24:25    fix-1 fine-tune exit 0
+2026-10-02 02:00:38    frozen suite sacs0_bl3_fix1 exit 0
+2026-10-02 02:24:15    Paper 2 set sacs0_bl3_fix1 exit 0
+2026-10-02 02:24:16 == sacs0_bl3_fix1 done
+2026-10-02 02:26:33    fix-1 finished; collecting hand-back states
+2026-10-02 02:48:15    hand-back collection exit 0 (1275 records from 520 episodes)
+2026-10-02 02:48:16 == ppos0_bl3_hb: training 0 -> 2.5 M (hand-back starts, 25 % from stage 6)
+2026-10-02 02:50:50    pinned learner 18644
+2026-10-02 03:48:25 == ppos0_bl3 armed: waiting for the held hand-back run (ppos0_bl3_hb) to be stopped
+2026-10-02 07:57:25    removed the held hand-back run's folder (ppos0_bl3_hb)
+2026-10-02 07:57:25 == ppos0_bl3: training 0 -> 2.5 M (filter-free, baseline-v3)

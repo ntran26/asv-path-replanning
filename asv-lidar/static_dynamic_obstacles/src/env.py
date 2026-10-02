@@ -1215,8 +1215,12 @@ class ASVLidarEnv(gym.Env):
         self.safety_v2_changed = False
         if self.estop_enabled and getattr(cfg, "SAFETY_VERSION", 1) >= 2:
             if getattr(self, "_safety_v2", None) is None:
-                import safety_v2
-                self._safety_v2 = safety_v2.SafetyFilterV2()
+                if getattr(cfg, "SAFETY_VERSION", 1) >= 3:      # v3: committed backup, recovery mode
+                    import safety_v3
+                    self._safety_v2 = safety_v3.SafetyFilterV3()
+                else:
+                    import safety_v2
+                    self._safety_v2 = safety_v2.SafetyFilterV2()
             action, self.safety_v2_changed = self._safety_v2.filter(self, action)
             self.safety_v2_steps = getattr(self, "safety_v2_steps", 0) + int(self.safety_v2_changed)
         rudder_cmd = float(np.clip(action[0], -1.0, 1.0))
