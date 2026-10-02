@@ -1,0 +1,31 @@
+{
+ "model": "runs/sac_formulation_seed0_bl3/kept_best_3M/best_model.zip",
+ "safety_version": 2,
+ "created": "2026-10-02 02:48",
+ "episodes": 520,
+ "records": 1275,
+ "by_source": {
+  "dev": 732,
+  "field": 543
+ },
+ "by_episode_outcome": {
+  "collision:boundary": 229,
+  "goal": 763,
+  "collision:obstacle": 222,
+  "collision:target": 45,
+  "timeout": 16
+ },
+ "harvest_outcomes": {
+  "dev:collision:boundary": 26,
+  "dev:goal": 213,
+  "dev:collision:obstacle": 43,
+  "dev:collision:target": 17,
+  "dev:timeout": 1,
+  "field:goal": 150,
+  "field:collision:obstacle": 30,
+  "field:collision:boundary": 19,
+  "field:collision:target": 20,
+  "field:timeout": 1
+ },
+ "prefix_steps_mean": 35.66196078431373
+}
