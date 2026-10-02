@@ -1,0 +1,852 @@
+{
+  "checkpoint": "runs\\sac_formulation_seed0_bl3\\kept_best_3M\\best_model.zip",
+  "checkpoint_sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+  "model_config_sha256": "a4df64a97f641de0b1c660b04f73ccc8401a29f7fa48711c2a6ee694dc98ed44",
+  "episode_seed_base": 900120,
+  "modes": [
+    "v5"
+  ],
+  "overrides": {
+    "V2": {},
+    "V3": {},
+    "V4": {},
+    "V5": {
+      "ONE_DECISION_COMMIT": false,
+      "SOFT_RECOVERY": false,
+      "FEEDBACK_BACKUPS": true
+    }
+  },
+  "torch_threads": 1,
+  "effective_module_constants": {
+    "V2": {
+      "COMMIT_S": "1.0",
+      "HORIZON_S": "8.0",
+      "ENGAGE_RANGE_M": "7.0",
+      "GAP_STATIC_M": "0.05",
+      "GAP_BOUNDARY_M": "0.02",
+      "GAP_TARGET_M": "0.1",
+      "MARGIN_M": "0.1",
+      "TRIGGER_MARGIN_M": "0.15",
+      "ROOM_SLACK_M": "0.2",
+      "TERMINAL_M": "2.0",
+      "TERMINAL_S": "3.0",
+      "TERMINAL_STOP_SPEED": "0.1",
+      "TERMINAL_BOUNDARY": "False",
+      "RUDDERS": "(-1.0, -0.5, 0.0, 0.5, 1.0)",
+      "THROTTLES": "(-1.0, 0.0, 1.0)",
+      "BRAKE": "None",
+      "BRAKE_RUDDERS": "(-1.0, 0.0, 1.0)",
+      "RECOVERY": "((-1.0, 0.0), (1.0, 0.0), (0.0, -1.0), (-1.0, None), (0.0, None), (1.0, None))",
+      "RECOVERY_TURN_S": "2.0",
+      "MEMORY_S": "90.0",
+      "W_THROTTLE": "2.0",
+      "EGO_SMOOTHING": "0.3",
+      "W_PREVIOUS": "0.3",
+      "HOLD_BACK_GAIN_S": "1.0",
+      "HOLD_STEPS": "2",
+      "ASTERN_RPM": "-24.0",
+      "BRAKE_EFFICIENCY": "0.25",
+      "BRAKE_DELAY_S": "0.75"
+    },
+    "V3": {
+      "HANDBACK_MARGIN_M": "0.3",
+      "HANDBACK_SPEED": "0.3",
+      "HANDBACK_HEADING_DEG": "30.0",
+      "MIN_RECOVERY_STEPS": "4",
+      "REJOIN_THROTTLE": "0.0",
+      "W_CONTINUE": "0.25",
+      "RECOVERY_REFERENCE": "'policy'",
+      "REJOIN_LOOKAHEAD_M": "2.5",
+      "LAST_CERT_MAX_STEPS": "4"
+    },
+    "V4": {
+      "COUNTERSTEER_RECOVERY": "False",
+      "RETAIN_NOMINAL_PLAN": "False",
+      "DUAL_BRAKE_PREDICTION": "False",
+      "FREE_SPACE_MEMORY": "True",
+      "MODEL_EGO_OBSERVER": "True"
+    },
+    "V5": {
+      "ONE_DECISION_COMMIT": "False",
+      "SOFT_RECOVERY": "False",
+      "FEEDBACK_BACKUPS": "True"
+    }
+  },
+  "sources": {
+    "src/constants.py": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+    "src/env.py": "3664ee0c505fa18f26d7c0250d1ec0fff40f45d83f80c663d22cdda0ede6fb9b",
+    "src/safety_v2.py": "209195c3b9241dfa6a798b7cfca857dfd14218c38625d99bc2a9c0d97c1b3d55",
+    "src/safety_v3.py": "28efcc06af8ec0ffc0074267b7f1b2e36ba4fd1f6e033900c39b9b96b6d40d0a",
+    "src/safety_v4.py": "0f2bc31c9028c11390bf19e06de89e82e546c184645255aa007921896b649f28",
+    "src/safety_v5.py": "dbabebb6ee6b03d97281ada174a53288c8df4123db15917936a47881639626d0",
+    "src/safety_recovery.py": "c41aa11f6b021eee8cea53b2bf8fa68db3c5b86f56876eb36f341c1faff8b1e0",
+    "src/safety_feedback.py": "5abe80b77166dbcf1205d88fb9277e72ffcb7eb6d98ee1176bd3edc747a48e3e",
+    "src/safety_prediction.py": "1635a91c204fe0a88810abff635e18125cb428f7acfdc7bce58767609d9f1f6b",
+    "src/safety_perception.py": "cf1624ec42e9b3eaafc572aef7d3932c55a90ace39fb5014cc11ba50923b3378",
+    "src/safety_observer.py": "9d5feb13e0b50982c76bb3b0c4af5afea7cef5fa0a2e35e41a23cbced141cb1f",
+    "src/classical/common.py": "456f39769ffa237f826eff8f9852a6d0823a2f975f85d2345ba7b42105e0977d",
+    "src/formulation_v3.py": "0faeb49c3366e97f88cee81c5dfa03c86c9a0a16f3815dc146824cab7a062643",
+    "src/ship.py": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+    "bluefin/dynamics.py": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711",
+    "bluefin/ship_model_v3.py": "21afbc6605035bd905f16db7f1149fec50fc9b73ca0d4bd0a1e76b06b6c4136c",
+    "tools/diagnostics/safety/oracle.py": "0a5c5035784b0de7b4118b149bbc276d926c4738e2a5cd69529976aeed0f20c2",
+    "tools/diagnostics/safety/paired_eval.py": "22c2ce15f256c28f3dd4aa485a1050f0bb8676e8668e3e06b241909cb50544d0",
+    "tools/diagnostics/safety/prediction_audit.py": "2d13fa1d83965dd27d4a06767918d0f9ab436650c63608805e677b6c38361d6a"
+  },
+  "source_hash_time": "before scenario generation and model loading",
+  "scenario_cache_digest": "5d6fdb07eca31b88f91c",
+  "python": "3.10.11 (tags/v3.10.11:7d4cc5a, Apr  5 2023, 00:38:17) [MSC v.1929 64 bit (AMD64)]",
+  "torch": "2.2.1+cpu",
+  "cases": [
+    {
+      "case": "DV3-NT-CV-01",
+      "reset_seed": 900120,
+      "scenario_sha256": "f9d7a7c86f9c702511ae63a822d14eb638506493ce6f72988ba0f18b848ce484"
+    },
+    {
+      "case": "DV3-NT-CV-02",
+      "reset_seed": 900121,
+      "scenario_sha256": "c363438dbc67873feb50926d909d766639489e896eb9b0485c26ef82e3daf010"
+    },
+    {
+      "case": "DV3-NT-CV-03",
+      "reset_seed": 900122,
+      "scenario_sha256": "10dee19f3638c54d880a5163f6fe9b6db676c36bc426468cf596822aa704cb39"
+    },
+    {
+      "case": "DV3-NT-CV-04",
+      "reset_seed": 900123,
+      "scenario_sha256": "265ce5fbba83247086f3e0052db4a8a251bc40e9853a191af70a4c90a0626103"
+    },
+    {
+      "case": "DV3-NT-CV-05",
+      "reset_seed": 900124,
+      "scenario_sha256": "e29427090b94eca4894a0a2f291f32110a511b5b3914facb81e0c0ce9b6147ed"
+    },
+    {
+      "case": "DV3-NT-CV-06",
+      "reset_seed": 900125,
+      "scenario_sha256": "232c44e8a8333ce354524df5d77ab1ba217c44966f2788a2848fbb16df5c4e81"
+    },
+    {
+      "case": "DV3-NT-CV-07",
+      "reset_seed": 900126,
+      "scenario_sha256": "80c604ba974bc4dfc93ef40cee4d6ff6f7df8778c6b575bbaf7db455367b0f92"
+    },
+    {
+      "case": "DV3-NT-CV-08",
+      "reset_seed": 900127,
+      "scenario_sha256": "5bed58c550cccaaf3939289b78467c075932cee8aa17b2165784ba0ce1c2e72c"
+    },
+    {
+      "case": "DV3-NT-CV-09",
+      "reset_seed": 900128,
+      "scenario_sha256": "8250673ae17e828386c2da19951ae100c33c051f526fbaa2ca97a49dbfdf8e92"
+    },
+    {
+      "case": "DV3-NT-CV-10",
+      "reset_seed": 900129,
+      "scenario_sha256": "3516ffda152834783cf6c22a267439588f1cbd3a26e2a7ddba275adfd87d7ea5"
+    },
+    {
+      "case": "DV3-NT-CV-11",
+      "reset_seed": 900130,
+      "scenario_sha256": "f171651b09f414eb8f33df85db1eba9569cd9e3fd15e3702dae4d6a098a8901b"
+    },
+    {
+      "case": "DV3-NT-CV-12",
+      "reset_seed": 900131,
+      "scenario_sha256": "47007b33b516b72beb469ca64e087641b25ab3e505e19b3b9468eb4eeb76ada2"
+    },
+    {
+      "case": "DV3-NT-CV-13",
+      "reset_seed": 900132,
+      "scenario_sha256": "4e3a80324805d32daccfc9468e8af47efb58054c030eecf053cd6765ede3b254"
+    },
+    {
+      "case": "DV3-NT-CV-14",
+      "reset_seed": 900133,
+      "scenario_sha256": "f42d257620006ab3bb4278d8a9ca78822aa67987930734a7678c55e413979441"
+    },
+    {
+      "case": "DV3-NT-CV-15",
+      "reset_seed": 900134,
+      "scenario_sha256": "a18038f03a1252707c1fded74a34d6c561b5b6e6928acd857fc8d42d5917d20b"
+    },
+    {
+      "case": "DV3-NT-CV-16",
+      "reset_seed": 900135,
+      "scenario_sha256": "7204516d0a3c25b4a421bfe7a2a8d798a557b54be6f09d1a4da6ee27df23f3e5"
+    },
+    {
+      "case": "DV3-NT-CV-17",
+      "reset_seed": 900136,
+      "scenario_sha256": "b44b1745330f7c2a3b7f5ba56c769a86342199e1c220fa2502758c8885073725"
+    },
+    {
+      "case": "DV3-NT-CV-18",
+      "reset_seed": 900137,
+      "scenario_sha256": "511e77e911e9b3dc9c18fa54b5ad4fb808a90ffca5ed0d4b7a0b3751873ee219"
+    },
+    {
+      "case": "DV3-NT-CV-19",
+      "reset_seed": 900138,
+      "scenario_sha256": "930d2258a2434375572e042001deebfce883eec72f5ebbe42eb40ed167cc14f8"
+    },
+    {
+      "case": "DV3-NT-CV-20",
+      "reset_seed": 900139,
+      "scenario_sha256": "60d9f7adf6353873c59c3f251573f5350725b422cc127a5092d1879d9222b01c"
+    },
+    {
+      "case": "DV3-HO-CV-01",
+      "reset_seed": 900140,
+      "scenario_sha256": "a02d7506c6371505fe3463540272f3755d7973bb4e3f9107616c7a79c0765cec"
+    },
+    {
+      "case": "DV3-HO-CV-02",
+      "reset_seed": 900141,
+      "scenario_sha256": "0bb1038a729f6b2be6a197db1170282dccbb88978782a996b53f9e34f2555549"
+    },
+    {
+      "case": "DV3-HO-CV-03",
+      "reset_seed": 900142,
+      "scenario_sha256": "902f497799fa504670423e9d81c08e0e193da736889455dee3a9e979a88a1d5e"
+    },
+    {
+      "case": "DV3-HO-CV-04",
+      "reset_seed": 900143,
+      "scenario_sha256": "5d3fadc3fa07e1b7cc4a7f22326234fd7217d47d3f6fc115737bcaa981a4c629"
+    },
+    {
+      "case": "DV3-HO-CV-05",
+      "reset_seed": 900144,
+      "scenario_sha256": "6e9286de7892001e7729d7918fde183989f0cebe3f9fbe476c8b4c08996b67cb"
+    },
+    {
+      "case": "DV3-HO-CV-06",
+      "reset_seed": 900145,
+      "scenario_sha256": "72e91d06905ead86d7a153d18f8e208e8eb38dd864844c8eb616cf825da4104b"
+    },
+    {
+      "case": "DV3-HO-CV-07",
+      "reset_seed": 900146,
+      "scenario_sha256": "d1bc0c910c754c2a55971633f1a909ebab66c9a052302c6d3eacc8665828d125"
+    },
+    {
+      "case": "DV3-HO-CV-08",
+      "reset_seed": 900147,
+      "scenario_sha256": "e54259d556d2dbd5a0903174261f0ed42540b8775d4c803ab1cd2a39a6f09cdf"
+    },
+    {
+      "case": "DV3-HO-CV-09",
+      "reset_seed": 900148,
+      "scenario_sha256": "8a38496fff6d820bf2f294695ea91126f78b3b1c79a6d487be7d53ed2ffadde0"
+    },
+    {
+      "case": "DV3-HO-CV-10",
+      "reset_seed": 900149,
+      "scenario_sha256": "dc812fd12e74128e12fb7da8b43c413fae089e9d0174331561a6fabc23de2817"
+    },
+    {
+      "case": "DV3-HO-CV-11",
+      "reset_seed": 900150,
+      "scenario_sha256": "2716f57ba5aa6b4db49bf3d9b86d434cca7697e07e20999042ba38f55407756a"
+    },
+    {
+      "case": "DV3-HO-CV-12",
+      "reset_seed": 900151,
+      "scenario_sha256": "87e34e1d896109b144688ea9c9511bbf652de6c656f4f0f249322f6ff911adbe"
+    },
+    {
+      "case": "DV3-HO-CV-13",
+      "reset_seed": 900152,
+      "scenario_sha256": "6ebbe5efb28f35b89b58c3e0fba9c21d5080dbd1938fc9ffdeec502970a91e25"
+    },
+    {
+      "case": "DV3-HO-CV-14",
+      "reset_seed": 900153,
+      "scenario_sha256": "80ea502b89c480e84e93cd1c365ba820027102318ad66fb4f570f177272193df"
+    },
+    {
+      "case": "DV3-HO-CV-15",
+      "reset_seed": 900154,
+      "scenario_sha256": "6267375a0328a2748d470e557c46b4ad38260e3fe9ab684cb1800b149cfb113b"
+    },
+    {
+      "case": "DV3-HO-CV-16",
+      "reset_seed": 900155,
+      "scenario_sha256": "d0c175cdfb29293dfb36f1ab6a6333892cf4ad97464cd59361209f33d21af4f0"
+    },
+    {
+      "case": "DV3-HO-CV-17",
+      "reset_seed": 900156,
+      "scenario_sha256": "ba0e9b5aae43eecd19b0031c2171a0a78c3c3c933e6ff3658ada1c1ca29f4773"
+    },
+    {
+      "case": "DV3-HO-CV-18",
+      "reset_seed": 900157,
+      "scenario_sha256": "07dae5d89238f0fd39bbca57be1cbb487b5dda6580c1e6639765688a7f2578a0"
+    },
+    {
+      "case": "DV3-HO-CV-19",
+      "reset_seed": 900158,
+      "scenario_sha256": "87fc98017afafa698aa2c7689ad1eceffaa2b5c47de0269f4dcde73dd84116bc"
+    },
+    {
+      "case": "DV3-HO-CV-20",
+      "reset_seed": 900159,
+      "scenario_sha256": "ade52145893d8f6d6730748e261d02654f94ad3e5582956b86e850eb773a98a7"
+    },
+    {
+      "case": "DV3-HO-VS-01",
+      "reset_seed": 900160,
+      "scenario_sha256": "4bbbef9b9c2cd521478bbf6774d9a9561062ab1e161ae0d720924879fe53d1a0"
+    },
+    {
+      "case": "DV3-HO-VS-02",
+      "reset_seed": 900161,
+      "scenario_sha256": "1a36503fc368fb5b0c85e81008255c2b4dcedb853103bd58e5b6d4b468f842df"
+    },
+    {
+      "case": "DV3-HO-VS-03",
+      "reset_seed": 900162,
+      "scenario_sha256": "1312cf80f765d2002fafd963dc60af5e02bfabe87cf61976505353258e89da48"
+    },
+    {
+      "case": "DV3-HO-VS-04",
+      "reset_seed": 900163,
+      "scenario_sha256": "0133f0b881a077443a7a20b00935f20b54f452cb881b5066f256a5204ca411b8"
+    },
+    {
+      "case": "DV3-HO-VS-05",
+      "reset_seed": 900164,
+      "scenario_sha256": "6357c06067770793023321b2a1072d662e608b42f7c4726f8d515a5452902759"
+    },
+    {
+      "case": "DV3-HO-VS-06",
+      "reset_seed": 900165,
+      "scenario_sha256": "e82e7f7124ab5e13bfa39737577e3fd2f00b6fe95a2311edaf45930c56ae05ee"
+    },
+    {
+      "case": "DV3-CRP-CV-01",
+      "reset_seed": 900166,
+      "scenario_sha256": "487d1ee0fa5b5e320fcca9f1dd136b3dc8575253afdfaa5056bc1034215b6a49"
+    },
+    {
+      "case": "DV3-CRP-CV-02",
+      "reset_seed": 900167,
+      "scenario_sha256": "21934d7c10b2b739bb30bd38575f695b10e1010363e17cca2ac1d32c419b9d47"
+    },
+    {
+      "case": "DV3-CRP-CV-03",
+      "reset_seed": 900168,
+      "scenario_sha256": "afe642bbe85019a3cf259e1ba4f42cd0617896ab466e7612a6895b952435923e"
+    },
+    {
+      "case": "DV3-CRP-CV-04",
+      "reset_seed": 900169,
+      "scenario_sha256": "bf63ee74573c6c390c645e03dc8ff78af05d6c43e23181af8c58b3670ee775ab"
+    },
+    {
+      "case": "DV3-CRP-CV-05",
+      "reset_seed": 900170,
+      "scenario_sha256": "7d13761dc1f0ad2851056b3a62af1949e7d52d6e26a0cc43088e748f6968eb5f"
+    },
+    {
+      "case": "DV3-CRP-CV-06",
+      "reset_seed": 900171,
+      "scenario_sha256": "ed6a0bf55b98589e5cb1d7d11c2f72ae9680af28559cc76a2697eac57b328317"
+    },
+    {
+      "case": "DV3-CRP-CV-07",
+      "reset_seed": 900172,
+      "scenario_sha256": "e4e58636f87d5db1586c27331a2e2a17065521b5df29f147979e0e7a9a4d9467"
+    },
+    {
+      "case": "DV3-CRP-CV-08",
+      "reset_seed": 900173,
+      "scenario_sha256": "392df10e1bfcb8b562c665f51b73ea877a8b0758070adc94ea15021141cec065"
+    },
+    {
+      "case": "DV3-CRP-CV-09",
+      "reset_seed": 900174,
+      "scenario_sha256": "acd9123847425b8dfa967c9ced7d327921f38d4ce22753de7573ac45e922476c"
+    },
+    {
+      "case": "DV3-CRP-CV-10",
+      "reset_seed": 900175,
+      "scenario_sha256": "8fef952088be364e7bc9be15752d23a05d503af3225e6d04235fa20b8ccc2f36"
+    },
+    {
+      "case": "DV3-CRP-CV-11",
+      "reset_seed": 900176,
+      "scenario_sha256": "b78c8677abdaf70c1cf84704e97b0ae39ffe31647f63a3f0d81cdb05e3555d25"
+    },
+    {
+      "case": "DV3-CRP-CV-12",
+      "reset_seed": 900177,
+      "scenario_sha256": "0b698b07daf443e17c256b57a499509f45ad8c43959a7506c4949df842f478c0"
+    },
+    {
+      "case": "DV3-CRP-CV-13",
+      "reset_seed": 900178,
+      "scenario_sha256": "496ba431ff1725e8e5d5014ddf1e762cbf18b27d8a11920164725781fa3d2446"
+    },
+    {
+      "case": "DV3-CRP-CV-14",
+      "reset_seed": 900179,
+      "scenario_sha256": "869a3f4175d7a5841ffdb9a932e98a02b2c2412654b87a23f4d2a5c7ca4527dd"
+    },
+    {
+      "case": "DV3-CRP-CV-15",
+      "reset_seed": 900180,
+      "scenario_sha256": "8f3800fb98f47a6c0bb385bccc50d6cc39b0e29997a1c0e1de9bf2e394bdcd67"
+    },
+    {
+      "case": "DV3-CRP-CV-16",
+      "reset_seed": 900181,
+      "scenario_sha256": "81cae5ce5c87aa7373cd202cd2c023f39ba1507c64a4649c94700e585dda76a8"
+    },
+    {
+      "case": "DV3-CRP-CV-17",
+      "reset_seed": 900182,
+      "scenario_sha256": "59bba61884b9c5230c4d5d4c9ce2ce3264b4e5941557094cdf67c96a0dac330f"
+    },
+    {
+      "case": "DV3-CRP-CV-18",
+      "reset_seed": 900183,
+      "scenario_sha256": "1455d07b866a46c58a6b1c144e58c44da6d65f325e1b193d7f8063f2d6bb711c"
+    },
+    {
+      "case": "DV3-CRP-CV-19",
+      "reset_seed": 900184,
+      "scenario_sha256": "94892a8a420d820f3d21e2aed59bf50ab2b20c01354c1524453623dd8625cee0"
+    },
+    {
+      "case": "DV3-CRP-CV-20",
+      "reset_seed": 900185,
+      "scenario_sha256": "5da8ab7dfb92d8f5ae03b214154b8b9e029805e79280e1f4e0b4315355f4e67a"
+    },
+    {
+      "case": "DV3-CRP-VS-01",
+      "reset_seed": 900186,
+      "scenario_sha256": "0b9a7b012c96435817813efa5b9f910713cecffb829f29bd7d4ca191207f4820"
+    },
+    {
+      "case": "DV3-CRP-VS-02",
+      "reset_seed": 900187,
+      "scenario_sha256": "c5ce78dea27d4d26d3d1eaf52b76939ed72acc2fca5bede9f924f81e99b054d2"
+    },
+    {
+      "case": "DV3-CRP-VS-03",
+      "reset_seed": 900188,
+      "scenario_sha256": "38431ac74480514513099944cd8a7d5b64b72f75d11fbd226a808153be94c11d"
+    },
+    {
+      "case": "DV3-CRP-VS-04",
+      "reset_seed": 900189,
+      "scenario_sha256": "2febc467a9cbb05a7492ddea9b8fe18339d6d27f82b7a49b689b1ba0febd4ea4"
+    },
+    {
+      "case": "DV3-CRP-VS-05",
+      "reset_seed": 900190,
+      "scenario_sha256": "4ac5558f86edb284e022780923969cc1d255d00e99668205eb1100fc09b874b1"
+    },
+    {
+      "case": "DV3-CRP-VS-06",
+      "reset_seed": 900191,
+      "scenario_sha256": "3bf27ddf8bd8e1f318cba10c7c71b942e2cbedd1f61caf7ec97310c5aa97d24c"
+    },
+    {
+      "case": "DV3-CRS-CV-01",
+      "reset_seed": 900192,
+      "scenario_sha256": "52758daeceb092b10e95ecbd252d0d440a44680d494a68278d8e5549eb7e31a4"
+    },
+    {
+      "case": "DV3-CRS-CV-02",
+      "reset_seed": 900193,
+      "scenario_sha256": "f47277bdc95727326412a2c47f6f2c962883df37877812bfbe96bb8ea3fc378a"
+    },
+    {
+      "case": "DV3-CRS-CV-03",
+      "reset_seed": 900194,
+      "scenario_sha256": "53029799b85097d15a62831862bf850b21eafb31ca53a592a03265079531e4e9"
+    },
+    {
+      "case": "DV3-CRS-CV-04",
+      "reset_seed": 900195,
+      "scenario_sha256": "61218205227240a2e85db4ab35e3db161173a3cad9f693e18d2208c54f9d4824"
+    },
+    {
+      "case": "DV3-CRS-CV-05",
+      "reset_seed": 900196,
+      "scenario_sha256": "db6fac809800aec2c90cad64519bd914a9c23f78a7765ae579bc183ca94aace2"
+    },
+    {
+      "case": "DV3-CRS-CV-06",
+      "reset_seed": 900197,
+      "scenario_sha256": "2505f8c053f2fb418cf9eb0b19bf509b0753fe65cf6093a633b091fa39fe91fc"
+    },
+    {
+      "case": "DV3-CRS-CV-07",
+      "reset_seed": 900198,
+      "scenario_sha256": "7926efa78568b540ffb82f5dc8f8a12caa8567211caae99327c8d06753ed801c"
+    },
+    {
+      "case": "DV3-CRS-CV-08",
+      "reset_seed": 900199,
+      "scenario_sha256": "9782f57d25c00a84c142d9229ab334fa51f60be355b2659fdd2b6dcfc3ad4414"
+    },
+    {
+      "case": "DV3-CRS-CV-09",
+      "reset_seed": 900200,
+      "scenario_sha256": "40abd882bfcb7b8297b9bd76fd7adf72c613513d5b9e91ee6f51d6adc88e03c4"
+    },
+    {
+      "case": "DV3-CRS-CV-10",
+      "reset_seed": 900201,
+      "scenario_sha256": "5569d261fef39d5506b191a3ef384cffd29656a29911329329e3e9f52368ae35"
+    },
+    {
+      "case": "DV3-CRS-CV-11",
+      "reset_seed": 900202,
+      "scenario_sha256": "ea07499730925b8be91d8b8d2c3f212e1036da5ad37d2311a2c94e50589da0d8"
+    },
+    {
+      "case": "DV3-CRS-CV-12",
+      "reset_seed": 900203,
+      "scenario_sha256": "f7bd9c8d370d8c6db2243f689dd85adfdd731b7c181ecdab71957c3ba0b4084c"
+    },
+    {
+      "case": "DV3-CRS-CV-13",
+      "reset_seed": 900204,
+      "scenario_sha256": "9f641eda5e42af29fa0e0dd249c0585595bd0d051e78aa79a9d39d2e1e3f4c45"
+    },
+    {
+      "case": "DV3-CRS-CV-14",
+      "reset_seed": 900205,
+      "scenario_sha256": "2868b47c27adfe90d21624e58add5be9e3cb0379c1f334b895d08d59c0cec47f"
+    },
+    {
+      "case": "DV3-CRS-CV-15",
+      "reset_seed": 900206,
+      "scenario_sha256": "921a448f64999e45eedaee9a1ea4f0d8dd1b44d6fbfe7ae3f329b8898dfe2442"
+    },
+    {
+      "case": "DV3-CRS-CV-16",
+      "reset_seed": 900207,
+      "scenario_sha256": "e0d3a11e5c8bcf3a030d30297c85c76b4d75b40a2c27bb882bb59e8f1ea976aa"
+    },
+    {
+      "case": "DV3-CRS-CV-17",
+      "reset_seed": 900208,
+      "scenario_sha256": "8885baf535eb1f7bc496353a7c96f8be8dde0eb901de7b6738bc4e00701e6e82"
+    },
+    {
+      "case": "DV3-CRS-CV-18",
+      "reset_seed": 900209,
+      "scenario_sha256": "1e91532058cb60e4d37e2993a55819949eb9cb564a97260905ad50728374b270"
+    },
+    {
+      "case": "DV3-CRS-CV-19",
+      "reset_seed": 900210,
+      "scenario_sha256": "b6f42d0e3589312cf2e1cae1c9ecc0cf68f1aa299a7cf8db7a0aa792184a7e38"
+    },
+    {
+      "case": "DV3-CRS-CV-20",
+      "reset_seed": 900211,
+      "scenario_sha256": "7ae31b5ec3411f970e29d52181e96a45ec731b7ae6c28e2cf612c1cad2cda685"
+    },
+    {
+      "case": "DV3-CRS-VS-01",
+      "reset_seed": 900212,
+      "scenario_sha256": "9fc75789c9ea91cb1e50be915710cb51130805af400fd96de7b628a36991dc6a"
+    },
+    {
+      "case": "DV3-CRS-VS-02",
+      "reset_seed": 900213,
+      "scenario_sha256": "b44abb6ee682a6c13f15f4c8b0e5fc63b8761f8956351ab91d3a0ea906219b36"
+    },
+    {
+      "case": "DV3-CRS-VS-03",
+      "reset_seed": 900214,
+      "scenario_sha256": "2b27640a9ab2f8a9e61906990ecdb2453be3deeb2ed04941030af8540818e2be"
+    },
+    {
+      "case": "DV3-CRS-VS-04",
+      "reset_seed": 900215,
+      "scenario_sha256": "32bc24fe239f84da164517a1372c280c1ca640987a44ab6630e91d4c4db2968e"
+    },
+    {
+      "case": "DV3-CRS-VS-05",
+      "reset_seed": 900216,
+      "scenario_sha256": "be080e0ac24034cb3a35eba307613e330790825f03749bfbd4c5218a9f9dada2"
+    },
+    {
+      "case": "DV3-CRS-VS-06",
+      "reset_seed": 900217,
+      "scenario_sha256": "03745828f4400936dcfed31a850c122a61d6d536e7ae86a4669f1f7b8d4a3c62"
+    },
+    {
+      "case": "DV3-OT-CV-01",
+      "reset_seed": 900218,
+      "scenario_sha256": "752211f4c071874f86890d3a7474f64340a94dd7d3c82d93ad3d9ca33f510dd4"
+    },
+    {
+      "case": "DV3-OT-CV-02",
+      "reset_seed": 900219,
+      "scenario_sha256": "bd2f6fed3ef64cec201959f58e70a9d411dfe72363e7e2ff4eb2dcbb24d953a3"
+    },
+    {
+      "case": "DV3-OT-CV-03",
+      "reset_seed": 900220,
+      "scenario_sha256": "56f58056e532e4bdbd9bdd9272690a93bd477da71b3590ec3c32541e8308967c"
+    },
+    {
+      "case": "DV3-OT-CV-04",
+      "reset_seed": 900221,
+      "scenario_sha256": "8c7d9358477ac0b8e1ddc1aff6f6b55ba6b268617658fd05d037cb4200545740"
+    },
+    {
+      "case": "DV3-OT-CV-05",
+      "reset_seed": 900222,
+      "scenario_sha256": "34f759a62a6d653ae74f8c23b8b42b1811e13671d144200060e9791bc41e21e2"
+    },
+    {
+      "case": "DV3-OT-CV-06",
+      "reset_seed": 900223,
+      "scenario_sha256": "77eae9986beb96efc8a24e8352c7523981015457beb042f9386989048d2970ee"
+    },
+    {
+      "case": "DV3-OT-CV-07",
+      "reset_seed": 900224,
+      "scenario_sha256": "b7cc324afb55220edddc1e902cb3a66759afa91e9a29d7ee8570f7f684d81552"
+    },
+    {
+      "case": "DV3-OT-CV-08",
+      "reset_seed": 900225,
+      "scenario_sha256": "e9d084138b3cb39461802427c076c5db01493f606029704e6c0542e8d34b21fa"
+    },
+    {
+      "case": "DV3-OT-CV-09",
+      "reset_seed": 900226,
+      "scenario_sha256": "a38e7e9bda211033f8a293ecd1e5c3d50f868cf80d65b794833c42c97eecef45"
+    },
+    {
+      "case": "DV3-OT-CV-10",
+      "reset_seed": 900227,
+      "scenario_sha256": "066e335f76eef3927238529da47569fcc2b92758e533a447397d74ecd090c362"
+    },
+    {
+      "case": "DV3-OT-CV-11",
+      "reset_seed": 900228,
+      "scenario_sha256": "0ea22df9c3a70c8e219eeda8d3c99ec5f0b13d6b1d0b0b69cb99745da4af03b7"
+    },
+    {
+      "case": "DV3-OT-CV-12",
+      "reset_seed": 900229,
+      "scenario_sha256": "e1e1625295096052b665206f4ea2d925f284f8d5c1979f008d05fe2d9f44b079"
+    },
+    {
+      "case": "DV3-OT-CV-13",
+      "reset_seed": 900230,
+      "scenario_sha256": "e704c1dfb63f82eb25d5df1d5e853e389282a61c46b9288b32b3fdd68f85d0f4"
+    },
+    {
+      "case": "DV3-OT-CV-14",
+      "reset_seed": 900231,
+      "scenario_sha256": "d9013a8218f1f7cf624f4ff1cef3c72454d756545a16296e32ed875e0b7419b7"
+    },
+    {
+      "case": "DV3-OT-CV-15",
+      "reset_seed": 900232,
+      "scenario_sha256": "caf27f695a5b5d0e88a1210b597785fbddee742999949f6ec767c659d06aa0eb"
+    },
+    {
+      "case": "DV3-OT-CV-16",
+      "reset_seed": 900233,
+      "scenario_sha256": "53bada46e3155851f27da81a1fff34314c1f52f46be3f8c40b7ca337aa561997"
+    },
+    {
+      "case": "DV3-OT-CV-17",
+      "reset_seed": 900234,
+      "scenario_sha256": "7440806b8ddadee1a06ea5d00c3f780603e54fc128ee1ffadeb0aa67416865aa"
+    },
+    {
+      "case": "DV3-OT-CV-18",
+      "reset_seed": 900235,
+      "scenario_sha256": "acc10af859e8579145af174240f38ed5dbc309fbc9f7ed3e6cb506bdb153459b"
+    },
+    {
+      "case": "DV3-OT-CV-19",
+      "reset_seed": 900236,
+      "scenario_sha256": "1f8b5afe6bdfce29d4287f99d078c09f20aaaa3abf385c97d802768ec3e638f8"
+    },
+    {
+      "case": "DV3-OT-CV-20",
+      "reset_seed": 900237,
+      "scenario_sha256": "05b9c8a86461340b772bd06cdfbace5477dbc07b7f2928d4312eb18124d14255"
+    },
+    {
+      "case": "DV3-OT-VS-01",
+      "reset_seed": 900238,
+      "scenario_sha256": "f22f1f28e5210b68a512c83ac3e757cd424f52a404ca7f879636e4642531f423"
+    },
+    {
+      "case": "DV3-OT-VS-02",
+      "reset_seed": 900239,
+      "scenario_sha256": "aafc810255d528bb8d98c5d451ded2855244ee397cb29dac3aafc209bea21c93"
+    },
+    {
+      "case": "DV3-OT-VS-03",
+      "reset_seed": 900240,
+      "scenario_sha256": "4bb89fb029ab2323b7181781bda82405328815cfff2d15c3a2185326766d6c0b"
+    },
+    {
+      "case": "DV3-OT-VS-04",
+      "reset_seed": 900241,
+      "scenario_sha256": "7cb08fc2f610875c89d3ebbe76fdf746c38b6c97ec2854573c324a1f6f613fe6"
+    },
+    {
+      "case": "DV3-OT-VS-05",
+      "reset_seed": 900242,
+      "scenario_sha256": "0cb74dec7ce67a6cde291dd1668baabb3d5ec7d0bba876d62c353ed3d163fc4d"
+    },
+    {
+      "case": "DV3-OT-VS-06",
+      "reset_seed": 900243,
+      "scenario_sha256": "ed2c6693c3296ee096812b409a1f5885c72c1be9430f6413503d5aa7b59dd9f6"
+    },
+    {
+      "case": "DV3-BO-CV-01",
+      "reset_seed": 900244,
+      "scenario_sha256": "a15a98e91cc87f47b8d3ab3ff0055e05b45d1f8593ee4c89b545e57d59f8859d"
+    },
+    {
+      "case": "DV3-BO-CV-02",
+      "reset_seed": 900245,
+      "scenario_sha256": "ea6cfb2f32099f387a931030a263fe55fb17082e451c4af4cdbed74dbefa008a"
+    },
+    {
+      "case": "DV3-BO-CV-03",
+      "reset_seed": 900246,
+      "scenario_sha256": "3831fd4da5a6414b18a7bc11230b0fc907c3abe5c5840a7b633add5c4ac6ce59"
+    },
+    {
+      "case": "DV3-BO-CV-04",
+      "reset_seed": 900247,
+      "scenario_sha256": "a9392c7cd3e521bda23fc031c8c58d55debee0259284452bb41f47bb3ef55ba9"
+    },
+    {
+      "case": "DV3-BO-CV-05",
+      "reset_seed": 900248,
+      "scenario_sha256": "3c41318158110c76c37ad708d2c209ab8cfb5b013d1010d330aaeeb7e59bf58b"
+    },
+    {
+      "case": "DV3-BO-CV-06",
+      "reset_seed": 900249,
+      "scenario_sha256": "40584fcce0644dbbc90a511297f736b2da45866243f83143a24f5ff213a70de1"
+    },
+    {
+      "case": "DV3-BO-CV-07",
+      "reset_seed": 900250,
+      "scenario_sha256": "c64e43262e3748e1216034789d28cef99c8e928924381ca37e5789ea8e5be60d"
+    },
+    {
+      "case": "DV3-BO-CV-08",
+      "reset_seed": 900251,
+      "scenario_sha256": "f4487b3feeb896a9c202859c34e027fde3851fbf6b318bb4ed0ade418b81cf96"
+    },
+    {
+      "case": "DV3-BO-CV-09",
+      "reset_seed": 900252,
+      "scenario_sha256": "1ada976c6735aeefcefd53f986a93361715255038f414ecfa49bd1e51b4829df"
+    },
+    {
+      "case": "DV3-BO-CV-10",
+      "reset_seed": 900253,
+      "scenario_sha256": "283a85ae071a8ee86173bf69c7760708605970b95d099af05697f4146c6b60cb"
+    },
+    {
+      "case": "DV3-BO-CV-11",
+      "reset_seed": 900254,
+      "scenario_sha256": "8f94f6d1b6283daec4a8ee3adfc1459a9ba2ab54a6888791c1d1a069acfd3375"
+    },
+    {
+      "case": "DV3-BO-CV-12",
+      "reset_seed": 900255,
+      "scenario_sha256": "774303d0032098caf8a3ccfe0d5b09014c8cb348f79d6943c6de509c5dd9a934"
+    },
+    {
+      "case": "DV3-BO-CV-13",
+      "reset_seed": 900256,
+      "scenario_sha256": "e811e9831e28f67c3beeb3f14bffadab7c74586c5125cd88d0fdb52d4df5feee"
+    },
+    {
+      "case": "DV3-BO-CV-14",
+      "reset_seed": 900257,
+      "scenario_sha256": "8524e7c4b7bd4486f74edffbe33a01a92b6f7fca4862e902baaafe84e7a02e59"
+    },
+    {
+      "case": "DV3-BO-CV-15",
+      "reset_seed": 900258,
+      "scenario_sha256": "e53521dac3c142eb59454962d10c4da14eac0606bad06ddffe426703aa3db88f"
+    },
+    {
+      "case": "DV3-BO-CV-16",
+      "reset_seed": 900259,
+      "scenario_sha256": "445a1a4a982033210095a57353f6eeaab69f6e69c93948c10b51e0adf65ff044"
+    },
+    {
+      "case": "DV3-BO-CV-17",
+      "reset_seed": 900260,
+      "scenario_sha256": "70a9b89da1aeb0a85e2fe629be9c75385a8eb6df3544a4737a67609ca6654279"
+    },
+    {
+      "case": "DV3-BO-CV-18",
+      "reset_seed": 900261,
+      "scenario_sha256": "05cba6e162c37bb211f68f69cca5a80a3628b40a8664fbc842fbeff3938530b7"
+    },
+    {
+      "case": "DV3-BO-CV-19",
+      "reset_seed": 900262,
+      "scenario_sha256": "3c2155906c33997d3b9a24ac7eb292f03dbf3b2f015e279089b5b754476eefa8"
+    },
+    {
+      "case": "DV3-BO-CV-20",
+      "reset_seed": 900263,
+      "scenario_sha256": "d35135132497d5a30e1ea9f5c091557b77c0a0099b4dcb1436e0ac03bfefdd5c"
+    },
+    {
+      "case": "DV3-BO-VS-01",
+      "reset_seed": 900264,
+      "scenario_sha256": "be05ccbfd8fb0c90295fc094988913e905a01a221790fe3b705594e8909f9af5"
+    },
+    {
+      "case": "DV3-BO-VS-02",
+      "reset_seed": 900265,
+      "scenario_sha256": "e404d43493522d3da713893b220fe89958b5fbe6ec1fcb2420a0392f175583f2"
+    },
+    {
+      "case": "DV3-BO-VS-03",
+      "reset_seed": 900266,
+      "scenario_sha256": "c193156d5778df541675b93f3a7fb9449c247f52949b4eb205db8dcc8b1eda89"
+    },
+    {
+      "case": "DV3-BO-VS-04",
+      "reset_seed": 900267,
+      "scenario_sha256": "d5b7c3c56f4eab0df61c466ee50b06d546b5540f0fbf45113c658bc8a27080e8"
+    },
+    {
+      "case": "DV3-BO-VS-05",
+      "reset_seed": 900268,
+      "scenario_sha256": "de7a108ee1ed994e47c8cbb4793e0b84979defb2da04611681c922a02a01e169"
+    },
+    {
+      "case": "DV3-BO-VS-06",
+      "reset_seed": 900269,
+      "scenario_sha256": "82583decd172469b429fb7a7024e53aefc28f3aa91db787f3239af42b1836950"
+    }
+  ]
+}

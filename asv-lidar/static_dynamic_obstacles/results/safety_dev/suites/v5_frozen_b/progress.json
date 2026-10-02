@@ -1,0 +1,55 @@
+{
+  "completed": 1591,
+  "expected": 2400,
+  "complete": false,
+  "outcomes": [
+    {
+      "mode": "off",
+      "suite": "frozen_b",
+      "outcome": "collision:boundary",
+      "n": 7
+    },
+    {
+      "mode": "off",
+      "suite": "frozen_b",
+      "outcome": "collision:obstacle",
+      "n": 13
+    },
+    {
+      "mode": "off",
+      "suite": "frozen_b",
+      "outcome": "collision:target",
+      "n": 32
+    },
+    {
+      "mode": "off",
+      "suite": "frozen_b",
+      "outcome": "goal",
+      "n": 748
+    },
+    {
+      "mode": "v4",
+      "suite": "frozen_b",
+      "outcome": "collision:boundary",
+      "n": 12
+    },
+    {
+      "mode": "v4",
+      "suite": "frozen_b",
+      "outcome": "collision:obstacle",
+      "n": 9
+    },
+    {
+      "mode": "v4",
+      "suite": "frozen_b",
+      "outcome": "collision:target",
+      "n": 33
+    },
+    {
+      "mode": "v4",
+      "suite": "frozen_b",
+      "outcome": "goal",
+      "n": 737
+    }
+  ]
+}

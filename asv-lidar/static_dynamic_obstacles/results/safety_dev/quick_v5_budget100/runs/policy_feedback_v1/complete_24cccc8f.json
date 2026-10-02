@@ -1,0 +1,1085 @@
+{
+  "completed": 72,
+  "expected": 72,
+  "sample_only": true,
+  "population_performance_estimate": false,
+  "paired_cases": 24,
+  "gained_goals_vs_v4": 0,
+  "lost_goals_vs_v4": 0,
+  "gained_goals_vs_off": 3,
+  "lost_goals_vs_off": 2,
+  "comparisons": {
+    "v5_vs_v4": {
+      "candidate": "v5",
+      "reference": "v4",
+      "paired_cases": 24,
+      "candidate_unpaired_cases": 0,
+      "reference_unpaired_cases": 0,
+      "gained_goals": 0,
+      "lost_goals": 0,
+      "pairs": [
+        {
+          "suite": "field_deployment",
+          "case": "P2-L1-HO-VAR-19",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_deployment",
+          "case": "P2-L1-OT-FIX-12",
+          "candidate_outcome": "collision:boundary",
+          "reference_outcome": "collision:boundary",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_deployment",
+          "case": "P2-L2-HO-VAR-03",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_deployment",
+          "case": "P2-L2-OT-FIX-16",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_deployment",
+          "case": "P2-L3-CRP-FIX-01",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_deployment",
+          "case": "P2-L3-CRP-VAR-06",
+          "candidate_outcome": "collision:target",
+          "reference_outcome": "collision:target",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_validation",
+          "case": "FV-BO-18",
+          "candidate_outcome": "collision:obstacle",
+          "reference_outcome": "collision:obstacle",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_validation",
+          "case": "FV-CRP-25",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_validation",
+          "case": "FV-HO-12",
+          "candidate_outcome": "collision:target",
+          "reference_outcome": "collision:obstacle",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_validation",
+          "case": "FV-NT-05",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_a",
+          "case": "A-CRS-I",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_a",
+          "case": "A-HO-N",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-00-060",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-01-066",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-02-032",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-03-024",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-04-083",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-05-059",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-06-000",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-07-054",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_r",
+          "case": "B-00-048-NC",
+          "candidate_outcome": "collision:target",
+          "reference_outcome": "collision:target",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_r",
+          "case": "B-01-081-RE",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_r",
+          "case": "B-05-072-RE",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_r",
+          "case": "B-07-052-RE",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        }
+      ]
+    },
+    "v5_vs_off": {
+      "candidate": "v5",
+      "reference": "off",
+      "paired_cases": 24,
+      "candidate_unpaired_cases": 0,
+      "reference_unpaired_cases": 0,
+      "gained_goals": 3,
+      "lost_goals": 2,
+      "pairs": [
+        {
+          "suite": "field_deployment",
+          "case": "P2-L1-HO-VAR-19",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_deployment",
+          "case": "P2-L1-OT-FIX-12",
+          "candidate_outcome": "collision:boundary",
+          "reference_outcome": "collision:obstacle",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_deployment",
+          "case": "P2-L2-HO-VAR-03",
+          "candidate_outcome": "goal",
+          "reference_outcome": "collision:obstacle",
+          "gained_goal": true,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_deployment",
+          "case": "P2-L2-OT-FIX-16",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_deployment",
+          "case": "P2-L3-CRP-FIX-01",
+          "candidate_outcome": "goal",
+          "reference_outcome": "collision:target",
+          "gained_goal": true,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_deployment",
+          "case": "P2-L3-CRP-VAR-06",
+          "candidate_outcome": "collision:target",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": true
+        },
+        {
+          "suite": "field_validation",
+          "case": "FV-BO-18",
+          "candidate_outcome": "collision:obstacle",
+          "reference_outcome": "collision:obstacle",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_validation",
+          "case": "FV-CRP-25",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_validation",
+          "case": "FV-HO-12",
+          "candidate_outcome": "collision:target",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": true
+        },
+        {
+          "suite": "field_validation",
+          "case": "FV-NT-05",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_a",
+          "case": "A-CRS-I",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_a",
+          "case": "A-HO-N",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-00-060",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-01-066",
+          "candidate_outcome": "goal",
+          "reference_outcome": "collision:obstacle",
+          "gained_goal": true,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-02-032",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-03-024",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-04-083",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-05-059",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-06-000",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-07-054",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_r",
+          "case": "B-00-048-NC",
+          "candidate_outcome": "collision:target",
+          "reference_outcome": "collision:target",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_r",
+          "case": "B-01-081-RE",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_r",
+          "case": "B-05-072-RE",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_r",
+          "case": "B-07-052-RE",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        }
+      ]
+    },
+    "v4_vs_off": {
+      "candidate": "v4",
+      "reference": "off",
+      "paired_cases": 24,
+      "candidate_unpaired_cases": 0,
+      "reference_unpaired_cases": 0,
+      "gained_goals": 3,
+      "lost_goals": 2,
+      "pairs": [
+        {
+          "suite": "field_deployment",
+          "case": "P2-L1-HO-VAR-19",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_deployment",
+          "case": "P2-L1-OT-FIX-12",
+          "candidate_outcome": "collision:boundary",
+          "reference_outcome": "collision:obstacle",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_deployment",
+          "case": "P2-L2-HO-VAR-03",
+          "candidate_outcome": "goal",
+          "reference_outcome": "collision:obstacle",
+          "gained_goal": true,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_deployment",
+          "case": "P2-L2-OT-FIX-16",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_deployment",
+          "case": "P2-L3-CRP-FIX-01",
+          "candidate_outcome": "goal",
+          "reference_outcome": "collision:target",
+          "gained_goal": true,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_deployment",
+          "case": "P2-L3-CRP-VAR-06",
+          "candidate_outcome": "collision:target",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": true
+        },
+        {
+          "suite": "field_validation",
+          "case": "FV-BO-18",
+          "candidate_outcome": "collision:obstacle",
+          "reference_outcome": "collision:obstacle",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_validation",
+          "case": "FV-CRP-25",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "field_validation",
+          "case": "FV-HO-12",
+          "candidate_outcome": "collision:obstacle",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": true
+        },
+        {
+          "suite": "field_validation",
+          "case": "FV-NT-05",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_a",
+          "case": "A-CRS-I",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_a",
+          "case": "A-HO-N",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-00-060",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-01-066",
+          "candidate_outcome": "goal",
+          "reference_outcome": "collision:obstacle",
+          "gained_goal": true,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-02-032",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-03-024",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-04-083",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-05-059",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-06-000",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_b",
+          "case": "B-07-054",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_r",
+          "case": "B-00-048-NC",
+          "candidate_outcome": "collision:target",
+          "reference_outcome": "collision:target",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_r",
+          "case": "B-01-081-RE",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_r",
+          "case": "B-05-072-RE",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        },
+        {
+          "suite": "frozen_r",
+          "case": "B-07-052-RE",
+          "candidate_outcome": "goal",
+          "reference_outcome": "goal",
+          "gained_goal": false,
+          "lost_goal": false
+        }
+      ]
+    }
+  },
+  "outcomes": {
+    "off/goal": 18,
+    "v4/goal": 19,
+    "v5/goal": 19,
+    "off/collision:obstacle": 4,
+    "off/collision:target": 2,
+    "v4/collision:target": 2,
+    "v5/collision:target": 3,
+    "v4/collision:obstacle": 2,
+    "v5/collision:obstacle": 1,
+    "v4/collision:boundary": 1,
+    "v5/collision:boundary": 1
+  },
+  "mechanism_counts": {
+    "off": {
+      "evaluated_steps": 0,
+      "admitted_steps": 0,
+      "episodes_evaluated": 0,
+      "episodes_admitted": 0,
+      "recovery_template_counts": {},
+      "sideslip_rescue_evaluated_steps": 0,
+      "sideslip_rescue_evaluated_episodes": 0,
+      "sideslip_rescue_admitted_steps": 0,
+      "sideslip_rescue_admitted_episodes": 0,
+      "verified_policy_priority_enabled_steps": 0,
+      "verified_policy_priority_enabled_episodes": 0,
+      "verified_policy_preserved_steps": 0,
+      "verified_policy_preserved_episodes": 0,
+      "continuation_override_prevented_steps": 0,
+      "continuation_override_prevented_episodes": 0,
+      "policy_feedback_evaluated_steps": 0,
+      "policy_feedback_evaluated_episodes": 0,
+      "policy_feedback_preserved_steps": 0,
+      "policy_feedback_preserved_episodes": 0
+    },
+    "v4": {
+      "evaluated_steps": 0,
+      "admitted_steps": 0,
+      "episodes_evaluated": 0,
+      "episodes_admitted": 0,
+      "recovery_template_counts": {
+        "v3": 892,
+        "continuation": 86
+      },
+      "sideslip_rescue_evaluated_steps": 0,
+      "sideslip_rescue_evaluated_episodes": 0,
+      "sideslip_rescue_admitted_steps": 0,
+      "sideslip_rescue_admitted_episodes": 0,
+      "verified_policy_priority_enabled_steps": 0,
+      "verified_policy_priority_enabled_episodes": 0,
+      "verified_policy_preserved_steps": 0,
+      "verified_policy_preserved_episodes": 0,
+      "continuation_override_prevented_steps": 0,
+      "continuation_override_prevented_episodes": 0,
+      "policy_feedback_evaluated_steps": 0,
+      "policy_feedback_evaluated_episodes": 0,
+      "policy_feedback_preserved_steps": 0,
+      "policy_feedback_preserved_episodes": 0
+    },
+    "v5": {
+      "evaluated_steps": 0,
+      "admitted_steps": 0,
+      "episodes_evaluated": 0,
+      "episodes_admitted": 0,
+      "recovery_template_counts": {
+        "v3": 928,
+        "continuation": 62,
+        "current_heading": 1,
+        "starboard_30": 3,
+        "edge_parallel": 2
+      },
+      "sideslip_rescue_evaluated_steps": 0,
+      "sideslip_rescue_evaluated_episodes": 0,
+      "sideslip_rescue_admitted_steps": 0,
+      "sideslip_rescue_admitted_episodes": 0,
+      "verified_policy_priority_enabled_steps": 1068,
+      "verified_policy_priority_enabled_episodes": 24,
+      "verified_policy_preserved_steps": 132,
+      "verified_policy_preserved_episodes": 10,
+      "continuation_override_prevented_steps": 39,
+      "continuation_override_prevented_episodes": 9,
+      "policy_feedback_evaluated_steps": 42,
+      "policy_feedback_evaluated_episodes": 15,
+      "policy_feedback_preserved_steps": 6,
+      "policy_feedback_preserved_episodes": 3
+    }
+  },
+  "pairs": [
+    {
+      "suite": "field_deployment",
+      "case": "P2-L1-HO-VAR-19",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 11,
+      "v5_continuation_override_prevented_steps": 4,
+      "v5_recovery_template_counts": {
+        "v3": 51,
+        "continuation": 1
+      }
+    },
+    {
+      "suite": "field_deployment",
+      "case": "P2-L1-OT-FIX-12",
+      "v4_outcome": "collision:boundary",
+      "v5_outcome": "collision:boundary",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 20,
+      "v5_continuation_override_prevented_steps": 6,
+      "v5_recovery_template_counts": {
+        "v3": 68,
+        "continuation": 10
+      }
+    },
+    {
+      "suite": "field_deployment",
+      "case": "P2-L2-HO-VAR-03",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 31,
+      "v5_continuation_override_prevented_steps": 5,
+      "v5_recovery_template_counts": {
+        "v3": 59,
+        "continuation": 8
+      }
+    },
+    {
+      "suite": "field_deployment",
+      "case": "P2-L2-OT-FIX-16",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 7,
+      "v5_continuation_override_prevented_steps": 3,
+      "v5_recovery_template_counts": {
+        "v3": 57,
+        "continuation": 1
+      }
+    },
+    {
+      "suite": "field_deployment",
+      "case": "P2-L3-CRP-FIX-01",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 14,
+      "v5_continuation_override_prevented_steps": 9,
+      "v5_recovery_template_counts": {
+        "v3": 53,
+        "continuation": 12
+      }
+    },
+    {
+      "suite": "field_deployment",
+      "case": "P2-L3-CRP-VAR-06",
+      "v4_outcome": "collision:target",
+      "v5_outcome": "collision:target",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 0,
+      "v5_continuation_override_prevented_steps": 0,
+      "v5_recovery_template_counts": {
+        "v3": 5
+      }
+    },
+    {
+      "suite": "field_validation",
+      "case": "FV-BO-18",
+      "v4_outcome": "collision:obstacle",
+      "v5_outcome": "collision:obstacle",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 0,
+      "v5_continuation_override_prevented_steps": 0,
+      "v5_recovery_template_counts": {
+        "v3": 1,
+        "continuation": 4
+      }
+    },
+    {
+      "suite": "field_validation",
+      "case": "FV-CRP-25",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 0,
+      "v5_continuation_override_prevented_steps": 0,
+      "v5_recovery_template_counts": {
+        "v3": 37
+      }
+    },
+    {
+      "suite": "field_validation",
+      "case": "FV-HO-12",
+      "v4_outcome": "collision:obstacle",
+      "v5_outcome": "collision:target",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 1,
+      "v5_continuation_override_prevented_steps": 0,
+      "v5_recovery_template_counts": {
+        "v3": 16,
+        "edge_parallel": 2,
+        "continuation": 10
+      }
+    },
+    {
+      "suite": "field_validation",
+      "case": "FV-NT-05",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 0,
+      "v5_continuation_override_prevented_steps": 0,
+      "v5_recovery_template_counts": {
+        "v3": 39,
+        "starboard_30": 3,
+        "continuation": 2
+      }
+    },
+    {
+      "suite": "frozen_a",
+      "case": "A-CRS-I",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 29,
+      "v5_continuation_override_prevented_steps": 5,
+      "v5_recovery_template_counts": {
+        "v3": 63,
+        "continuation": 5
+      }
+    },
+    {
+      "suite": "frozen_a",
+      "case": "A-HO-N",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 3,
+      "v5_continuation_override_prevented_steps": 1,
+      "v5_recovery_template_counts": {
+        "v3": 43
+      }
+    },
+    {
+      "suite": "frozen_b",
+      "case": "B-00-060",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 5,
+      "v5_continuation_override_prevented_steps": 1,
+      "v5_recovery_template_counts": {
+        "v3": 27,
+        "continuation": 5
+      }
+    },
+    {
+      "suite": "frozen_b",
+      "case": "B-01-066",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 11,
+      "v5_continuation_override_prevented_steps": 5,
+      "v5_recovery_template_counts": {
+        "v3": 52
+      }
+    },
+    {
+      "suite": "frozen_b",
+      "case": "B-02-032",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 0,
+      "v5_continuation_override_prevented_steps": 0,
+      "v5_recovery_template_counts": {
+        "v3": 51,
+        "current_heading": 1
+      }
+    },
+    {
+      "suite": "frozen_b",
+      "case": "B-03-024",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 0,
+      "v5_continuation_override_prevented_steps": 0,
+      "v5_recovery_template_counts": {
+        "v3": 37
+      }
+    },
+    {
+      "suite": "frozen_b",
+      "case": "B-04-083",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 0,
+      "v5_continuation_override_prevented_steps": 0,
+      "v5_recovery_template_counts": {
+        "v3": 43
+      }
+    },
+    {
+      "suite": "frozen_b",
+      "case": "B-05-059",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 0,
+      "v5_continuation_override_prevented_steps": 0,
+      "v5_recovery_template_counts": {
+        "v3": 25
+      }
+    },
+    {
+      "suite": "frozen_b",
+      "case": "B-06-000",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 0,
+      "v5_continuation_override_prevented_steps": 0,
+      "v5_recovery_template_counts": {
+        "v3": 31
+      }
+    },
+    {
+      "suite": "frozen_b",
+      "case": "B-07-054",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 0,
+      "v5_continuation_override_prevented_steps": 0,
+      "v5_recovery_template_counts": {
+        "v3": 50
+      }
+    },
+    {
+      "suite": "frozen_r",
+      "case": "B-00-048-NC",
+      "v4_outcome": "collision:target",
+      "v5_outcome": "collision:target",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 0,
+      "v5_continuation_override_prevented_steps": 0,
+      "v5_recovery_template_counts": {
+        "v3": 6,
+        "continuation": 4
+      }
+    },
+    {
+      "suite": "frozen_r",
+      "case": "B-01-081-RE",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 0,
+      "v5_continuation_override_prevented_steps": 0,
+      "v5_recovery_template_counts": {
+        "v3": 38
+      }
+    },
+    {
+      "suite": "frozen_r",
+      "case": "B-05-072-RE",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 0,
+      "v5_continuation_override_prevented_steps": 0,
+      "v5_recovery_template_counts": {
+        "v3": 25
+      }
+    },
+    {
+      "suite": "frozen_r",
+      "case": "B-07-052-RE",
+      "v4_outcome": "goal",
+      "v5_outcome": "goal",
+      "gained_goal": false,
+      "lost_goal": false,
+      "v5_sideslip_evaluated_steps": 0,
+      "v5_sideslip_admitted_steps": 0,
+      "v5_verified_policy_preserved_steps": 0,
+      "v5_continuation_override_prevented_steps": 0,
+      "v5_recovery_template_counts": {
+        "v3": 51
+      }
+    }
+  ]
+}

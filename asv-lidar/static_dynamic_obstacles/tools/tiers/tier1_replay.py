@@ -50,6 +50,8 @@ def main() -> None:
     ap.add_argument("--per-class", type=int, default=20)
     ap.add_argument("--tag", default="run3")
     ap.add_argument("--processes", type=int, default=None, help="worker processes (default: cores - 2)")
+    ap.add_argument("--safety-version", type=int, choices=(1, 2, 3, 4, 5), default=1,
+                    help="runtime filter version when --safety on")
     ap.add_argument("--stop-test-fit", choices=("on", "off"), default=None,
                     help="override STOP_TEST_USES_HULL_FIT in the workers (F66 A/B)")
     ap.add_argument("--safety", "--supervisor", dest="supervisor", choices=("on", "off"), default=None,
@@ -68,7 +70,7 @@ def main() -> None:
     ho = head_on_width_set()
     jobs = [(b, 900_000 + i, args.policy, None, {"set": "development", "scenario": i}) for i, b in enumerate(dev)]
     jobs += [(b, 700_000 + i, args.policy, 0, {"set": "head_on_width", "scenario": i}) for i, b in enumerate(ho)]
-    overrides = {}
+    overrides = {"SAFETY_VERSION": args.safety_version}
     if args.stop_test_fit is not None:
         overrides["STOP_TEST_USES_HULL_FIT"] = args.stop_test_fit == "on"
     if args.supervisor is not None:

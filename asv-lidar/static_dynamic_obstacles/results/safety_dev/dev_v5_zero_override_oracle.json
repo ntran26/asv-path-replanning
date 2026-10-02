@@ -1,0 +1,113 @@
+{
+  "checkpoint": "runs\\sac_formulation_seed0_bl3\\kept_best_3M\\best_model.zip",
+  "checkpoint_sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+  "model_config_sha256": "a4df64a97f641de0b1c660b04f73ccc8401a29f7fa48711c2a6ee694dc98ed44",
+  "episode_seed_base": 900120,
+  "modes": [
+    "v4",
+    "oracle4"
+  ],
+  "overrides": {
+    "V2": {},
+    "V3": {},
+    "V4": {}
+  },
+  "torch_threads": 1,
+  "effective_module_constants": {
+    "V2": {
+      "COMMIT_S": "1.0",
+      "HORIZON_S": "8.0",
+      "ENGAGE_RANGE_M": "7.0",
+      "GAP_STATIC_M": "0.05",
+      "GAP_BOUNDARY_M": "0.02",
+      "GAP_TARGET_M": "0.1",
+      "MARGIN_M": "0.1",
+      "TRIGGER_MARGIN_M": "0.15",
+      "ROOM_SLACK_M": "0.2",
+      "TERMINAL_M": "2.0",
+      "TERMINAL_S": "3.0",
+      "TERMINAL_STOP_SPEED": "0.1",
+      "TERMINAL_BOUNDARY": "False",
+      "RUDDERS": "(-1.0, -0.5, 0.0, 0.5, 1.0)",
+      "THROTTLES": "(-1.0, 0.0, 1.0)",
+      "BRAKE": "None",
+      "BRAKE_RUDDERS": "(-1.0, 0.0, 1.0)",
+      "RECOVERY": "((-1.0, 0.0), (1.0, 0.0), (0.0, -1.0), (-1.0, None), (0.0, None), (1.0, None))",
+      "RECOVERY_TURN_S": "2.0",
+      "MEMORY_S": "90.0",
+      "W_THROTTLE": "2.0",
+      "EGO_SMOOTHING": "0.3",
+      "W_PREVIOUS": "0.3",
+      "HOLD_BACK_GAIN_S": "1.0",
+      "HOLD_STEPS": "2",
+      "ASTERN_RPM": "-24.0",
+      "BRAKE_EFFICIENCY": "0.25",
+      "BRAKE_DELAY_S": "0.75"
+    },
+    "V3": {
+      "HANDBACK_MARGIN_M": "0.3",
+      "HANDBACK_SPEED": "0.3",
+      "HANDBACK_HEADING_DEG": "30.0",
+      "MIN_RECOVERY_STEPS": "4",
+      "REJOIN_THROTTLE": "0.0",
+      "W_CONTINUE": "0.25",
+      "RECOVERY_REFERENCE": "'policy'",
+      "REJOIN_LOOKAHEAD_M": "2.5",
+      "LAST_CERT_MAX_STEPS": "4"
+    },
+    "V4": {
+      "COUNTERSTEER_RECOVERY": "False",
+      "RETAIN_NOMINAL_PLAN": "False",
+      "DUAL_BRAKE_PREDICTION": "False",
+      "FREE_SPACE_MEMORY": "True",
+      "MODEL_EGO_OBSERVER": "True"
+    }
+  },
+  "sources": {
+    "src/constants.py": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+    "src/env.py": "3664ee0c505fa18f26d7c0250d1ec0fff40f45d83f80c663d22cdda0ede6fb9b",
+    "src/safety_v2.py": "209195c3b9241dfa6a798b7cfca857dfd14218c38625d99bc2a9c0d97c1b3d55",
+    "src/safety_v3.py": "28efcc06af8ec0ffc0074267b7f1b2e36ba4fd1f6e033900c39b9b96b6d40d0a",
+    "src/safety_v4.py": "0f2bc31c9028c11390bf19e06de89e82e546c184645255aa007921896b649f28",
+    "src/safety_v5.py": "dbabebb6ee6b03d97281ada174a53288c8df4123db15917936a47881639626d0",
+    "src/safety_recovery.py": "c41aa11f6b021eee8cea53b2bf8fa68db3c5b86f56876eb36f341c1faff8b1e0",
+    "src/safety_feedback.py": "5abe80b77166dbcf1205d88fb9277e72ffcb7eb6d98ee1176bd3edc747a48e3e",
+    "src/safety_prediction.py": "1635a91c204fe0a88810abff635e18125cb428f7acfdc7bce58767609d9f1f6b",
+    "src/safety_perception.py": "cf1624ec42e9b3eaafc572aef7d3932c55a90ace39fb5014cc11ba50923b3378",
+    "src/safety_observer.py": "9d5feb13e0b50982c76bb3b0c4af5afea7cef5fa0a2e35e41a23cbced141cb1f",
+    "src/classical/common.py": "456f39769ffa237f826eff8f9852a6d0823a2f975f85d2345ba7b42105e0977d",
+    "src/formulation_v3.py": "0faeb49c3366e97f88cee81c5dfa03c86c9a0a16f3815dc146824cab7a062643",
+    "src/ship.py": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+    "bluefin/dynamics.py": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711",
+    "bluefin/ship_model_v3.py": "21afbc6605035bd905f16db7f1149fec50fc9b73ca0d4bd0a1e76b06b6c4136c",
+    "tools/diagnostics/safety/oracle.py": "0a5c5035784b0de7b4118b149bbc276d926c4738e2a5cd69529976aeed0f20c2",
+    "tools/diagnostics/safety/paired_eval.py": "22c2ce15f256c28f3dd4aa485a1050f0bb8676e8668e3e06b241909cb50544d0",
+    "tools/diagnostics/safety/prediction_audit.py": "2d13fa1d83965dd27d4a06767918d0f9ab436650c63608805e677b6c38361d6a"
+  },
+  "source_hash_time": "before scenario generation and model loading",
+  "scenario_cache_digest": "5d6fdb07eca31b88f91c",
+  "python": "3.10.11 (tags/v3.10.11:7d4cc5a, Apr  5 2023, 00:38:17) [MSC v.1929 64 bit (AMD64)]",
+  "torch": "2.2.1+cpu",
+  "cases": [
+    {
+      "case": "DV3-CRP-CV-02",
+      "reset_seed": 900167,
+      "scenario_sha256": "21934d7c10b2b739bb30bd38575f695b10e1010363e17cca2ac1d32c419b9d47"
+    },
+    {
+      "case": "DV3-CRP-CV-12",
+      "reset_seed": 900177,
+      "scenario_sha256": "0b698b07daf443e17c256b57a499509f45ad8c43959a7506c4949df842f478c0"
+    },
+    {
+      "case": "DV3-BO-CV-10",
+      "reset_seed": 900253,
+      "scenario_sha256": "283a85ae071a8ee86173bf69c7760708605970b95d099af05697f4146c6b60cb"
+    },
+    {
+      "case": "DV3-BO-VS-05",
+      "reset_seed": 900268,
+      "scenario_sha256": "de7a108ee1ed994e47c8cbb4793e0b84979defb2da04611681c922a02a01e169"
+    }
+  ]
+}

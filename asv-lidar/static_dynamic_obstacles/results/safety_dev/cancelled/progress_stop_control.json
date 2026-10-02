@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-02T13:03:56.230238+00:00",
+  "helper_pid": 17400,
+  "method": "Read-only handles deny progress writes AFTER committed journal records; administrative user-requested cancellation",
+  "targets": [
+    "v5_frozen_r/progress.json",
+    "v5_frozen_b/progress.json"
+  ],
+  "release_marker": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\results\\safety_dev\\cancelled\\release_progress_stop",
+  "maximum_hold_seconds": 600,
+  "policy_episode_error": false
+}

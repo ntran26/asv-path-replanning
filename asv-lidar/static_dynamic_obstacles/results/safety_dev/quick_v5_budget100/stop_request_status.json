@@ -1,0 +1,25 @@
+{
+  "recorded_at": "2026-10-02T12:04:05.026044+00:00",
+  "user_request": "Stop the full evaluation; quick evaluation with at most100 new episode runs total.",
+  "evaluation_pids": [
+    28312,
+    27248,
+    7328
+  ],
+  "identified_parent_shell_pids": [
+    7716,
+    24512
+  ],
+  "attempts": [
+    "Stop-Process normal permissions",
+    "Stop-Process require_escalated",
+    "taskkill /PID28312 /T /F require_escalated",
+    "Ctrl-C to owned exec sessions38068 and10110"
+  ],
+  "result": "Windows access denied; journals subsequently advanced. Parent shells were absent in the later process snapshot; evaluation shutdown remains unconfirmed.",
+  "automatic_approval_review_rejected": false,
+  "user_manual_stop_requested": true,
+  "ppo_processes_targeted": false,
+  "new_quick_episode_attempts": 0,
+  "next_step": "Do not launch the quick campaign until old evaluation workers are confirmed stopped."
+}

@@ -1,0 +1,33 @@
+{
+  "verified_utc": "2026-10-02T13:16:47.641524+00:00",
+  "old_evaluation_sessions": {
+    "38068": {
+      "exit_code": 1
+    },
+    "10110": {
+      "exit_code": 1
+    }
+  },
+  "evaluation_pids_verified_absent": [
+    28312,
+    27248,
+    7328
+  ],
+  "committed_records": {
+    "v5_frozen_r": 1756,
+    "v5_frozen_b": 1591,
+    "total": 3347
+  },
+  "cancellation": "User requested stop. Read-only progress handles stopped summary writes only after durable journal commits; both handles now released.",
+  "wrapper_retry_exit_code": "0xc0000142",
+  "wrapper_retry_note": "One retry subprocess returned before any stdout or additional episode record. Do not infer a policy failure.",
+  "pending_elevation_launcher": {
+    "pid": 25356,
+    "cancelled": true,
+    "tool_session": 13495,
+    "exit_code": -1
+  },
+  "ppo_targeted": false,
+  "manual_user_stop_still_required": false,
+  "resume_full_sweep": false
+}

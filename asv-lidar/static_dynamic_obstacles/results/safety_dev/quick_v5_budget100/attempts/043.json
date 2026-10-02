@@ -1,0 +1,10 @@
+{
+  "tag": "policy_feedback_v1",
+  "mode": "v5",
+  "suite": "field_validation",
+  "case": "FV-NT-05",
+  "seed": 950004,
+  "scenario_sha256": "e21fda77e0aae54673ae843d8de8c7ac14d8f1bbd7362552562221a82bfb6d3b",
+  "run_metadata_sha256": "5d589941ca28274817c802b66ba5c7c44ee9abed0af5cb15c5bf602fc68141e7",
+  "attempt": 43
+}

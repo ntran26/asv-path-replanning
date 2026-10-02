@@ -1,0 +1,31 @@
+{
+  "source": "results\\safety_dev\\v4_selected_contacts_steps.csv",
+  "source_sha256": "d4a05255da4c8de7588491de10642f15a37e6e361855e5731e71f36e95916cbb",
+  "cases": {
+    "DV3-CRP-VS-04": {
+      "brake_steps": [
+        5,
+        8,
+        17
+      ],
+      "pulse_lengths": [
+        1,
+        1,
+        1
+      ]
+    },
+    "DV3-CRS-CV-04": {
+      "brake_steps": [
+        11,
+        39,
+        42
+      ],
+      "pulse_lengths": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "interpretation": "All logged brake pulses in these selected-v4 losses are isolated one-decision commands. Ongoing-delay carryover cannot explain their initial brake-response mismatch. No new episodes were run."
+}

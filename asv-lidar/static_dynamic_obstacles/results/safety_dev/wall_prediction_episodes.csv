@@ -1,0 +1,5 @@
+mode,case,seed,outcome,steps,interventions,seconds,excluded_partial_collision_steps
+v3,DV3-OT-CV-16,900233,collision:boundary,63,6,17.941,1
+v3,DV3-BO-CV-04,900247,collision:boundary,18,9,3.709,1
+oracle,DV3-OT-CV-16,900233,goal,64,16,21.005,0
+oracle,DV3-BO-CV-04,900247,collision:boundary,55,38,11.983,1

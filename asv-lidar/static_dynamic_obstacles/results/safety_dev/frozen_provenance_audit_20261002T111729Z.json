@@ -1,0 +1,61 @@
+{
+  "recorded_utc": "2026-10-02 11:17:29 UTC",
+  "status": "Interim read-only provenance audit passed; evaluations are ongoing.",
+  "snapshot_note": "This records a point-in-time comparison against the immutable run manifests, not final benchmark completion or continuous verification of running-process memory.",
+  "method": "Rehashed every recorded source file, checkpoint and checkpoint config; reconstructed suite_eval settings in a separate read-only process using propulsion stage 4, checkpoint constant_overrides, and no V2_SET/V3_SET/V4_SET/V5_SET environment overrides. No scenarios or policy episodes were run by the audit.",
+  "audits": [
+    {
+      "tag": "v5_frozen_r",
+      "manifest": "results/safety_dev/suites/v5_frozen_r/manifest.json",
+      "source_files_checked": 77,
+      "source_hash_mismatches": [],
+      "settings_differing_keys": [],
+      "expected_episodes": 2700,
+      "benchmark_complete": false
+    },
+    {
+      "tag": "v5_frozen_b",
+      "manifest": "results/safety_dev/suites/v5_frozen_b/manifest.json",
+      "source_files_checked": 77,
+      "source_hash_mismatches": [],
+      "settings_differing_keys": [],
+      "expected_episodes": 2400,
+      "benchmark_complete": false
+    }
+  ],
+  "cross_lane_source_hashes_identical": true,
+  "cross_lane_effective_safety_constants_identical": true,
+  "checkpoint": "runs/sac_formulation_seed0_bl3/kept_best_3M/best_model.zip",
+  "checkpoint_sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+  "config_sha256": "a4df64a97f641de0b1c660b04f73ccc8401a29f7fa48711c2a6ee694dc98ed44",
+  "effective_v5": {
+    "ONE_DECISION_COMMIT": false,
+    "SOFT_RECOVERY": false,
+    "FEEDBACK_BACKUPS": true,
+    "FEEDBACK_ONLY_INFEASIBLE": true
+  },
+  "runtime": {
+    "python": "3.10.11",
+    "platform": "win32",
+    "numpy": "1.26.4",
+    "torch": "2.2.1",
+    "stable-baselines3": "2.3.2",
+    "sb3-contrib": "2.3.0",
+    "gymnasium": "0.29.1"
+  },
+  "threads": 1,
+  "processes_per_evaluation_lane": 1,
+  "last_observed_lane_a": {
+    "tag": "v5_frozen_r",
+    "committed_unique_episodes": 1503,
+    "off_completed": 900,
+    "v4_completed": 603,
+    "evaluator_alive": true,
+    "episode_error_journal_present": false
+  },
+  "limitations": [
+    "Completed-case outcomes are reported separately in the durable benchmark journals.",
+    "Checkpoint and effective settings were compared to each manifest; the audit did not inspect live worker memory.",
+    "A final provenance check is still required after both evaluation queues finish."
+  ]
+}

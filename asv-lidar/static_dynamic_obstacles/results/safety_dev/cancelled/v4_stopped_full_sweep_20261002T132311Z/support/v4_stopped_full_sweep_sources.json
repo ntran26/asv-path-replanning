@@ -1,0 +1,253 @@
+{
+  "inputs": [
+    {
+      "directory": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\results\\safety_dev\\cancelled\\v4_stopped_full_sweep_20261002T132311Z\\v5_frozen_r",
+      "manifest_sha256": "3c4364154717a716ae98d95d4c0c86aaf114890f02c807f37f041c278190edc9",
+      "journal_snapshot_sha256": "a0de294fa7871f83eb14ae636a202c987df7f6927a15721a9b9b403c81f8e002",
+      "expected": 2700,
+      "completed": 1756,
+      "ignored_uncommitted_bytes": 0,
+      "declared_suite_details": {
+        "frozen_b_shortfall": [],
+        "counts": {
+          "frozen_r": 900
+        },
+        "scenario_cache_digest": "3bbbc6d2619b4502b137",
+        "historical_manifest_checks": {
+          "frozen": {
+            "matched_cases": 900,
+            "reference_cases": 1700,
+            "manifest_digest": "61788ff19fc317c9ae69a1366bdc5ee08ed3ea3b743b4e23ef9bb2c243f4b584"
+          }
+        }
+      }
+    },
+    {
+      "directory": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\results\\safety_dev\\cancelled\\v4_stopped_full_sweep_20261002T132311Z\\v5_frozen_b",
+      "manifest_sha256": "0f8598ce891d6db11c8a41484c4b4b0f3aba6a7c342637f43318460238a0e9f4",
+      "journal_snapshot_sha256": "11d0242b2106ed69933f98f20acaa1d91aa3e03e8f8a3b54cf862839bdf477eb",
+      "expected": 2400,
+      "completed": 1591,
+      "ignored_uncommitted_bytes": 0,
+      "declared_suite_details": {
+        "frozen_b_shortfall": [],
+        "counts": {
+          "frozen_b": 800
+        },
+        "scenario_cache_digest": "3bbbc6d2619b4502b137",
+        "historical_manifest_checks": {
+          "frozen": {
+            "matched_cases": 800,
+            "reference_cases": 1700,
+            "manifest_digest": "61788ff19fc317c9ae69a1366bdc5ee08ed3ea3b743b4e23ef9bb2c243f4b584"
+          }
+        }
+      }
+    }
+  ],
+  "allow_partial": true,
+  "completed": 3347,
+  "expected": 5100,
+  "complete": false,
+  "require_full_benchmark": false,
+  "benchmark_coverage": {
+    "complete": false,
+    "required_episodes": 8670,
+    "required_modes": [
+      "off",
+      "v4",
+      "v5"
+    ],
+    "required_components": {
+      "dev_field": 150,
+      "dev_legacy": 120,
+      "dev_width": 100,
+      "frozen_a": 35,
+      "frozen_b": 800,
+      "frozen_r": 900,
+      "field_deployment": 630,
+      "field_validation": 155
+    },
+    "coverage_mismatches": [
+      {
+        "mode": "off",
+        "component": "dev_field",
+        "required": 150,
+        "declared": 0,
+        "completed": 0
+      },
+      {
+        "mode": "off",
+        "component": "dev_legacy",
+        "required": 120,
+        "declared": 0,
+        "completed": 0
+      },
+      {
+        "mode": "off",
+        "component": "dev_width",
+        "required": 100,
+        "declared": 0,
+        "completed": 0
+      },
+      {
+        "mode": "off",
+        "component": "field_deployment",
+        "required": 630,
+        "declared": 0,
+        "completed": 0
+      },
+      {
+        "mode": "off",
+        "component": "field_validation",
+        "required": 155,
+        "declared": 0,
+        "completed": 0
+      },
+      {
+        "mode": "off",
+        "component": "frozen_a",
+        "required": 35,
+        "declared": 0,
+        "completed": 0
+      },
+      {
+        "mode": "off",
+        "component": "frozen_b",
+        "required": 800,
+        "declared": 800,
+        "completed": 799
+      },
+      {
+        "mode": "v4",
+        "component": "dev_field",
+        "required": 150,
+        "declared": 0,
+        "completed": 0
+      },
+      {
+        "mode": "v4",
+        "component": "dev_legacy",
+        "required": 120,
+        "declared": 0,
+        "completed": 0
+      },
+      {
+        "mode": "v4",
+        "component": "dev_width",
+        "required": 100,
+        "declared": 0,
+        "completed": 0
+      },
+      {
+        "mode": "v4",
+        "component": "field_deployment",
+        "required": 630,
+        "declared": 0,
+        "completed": 0
+      },
+      {
+        "mode": "v4",
+        "component": "field_validation",
+        "required": 155,
+        "declared": 0,
+        "completed": 0
+      },
+      {
+        "mode": "v4",
+        "component": "frozen_a",
+        "required": 35,
+        "declared": 0,
+        "completed": 0
+      },
+      {
+        "mode": "v4",
+        "component": "frozen_b",
+        "required": 800,
+        "declared": 800,
+        "completed": 792
+      },
+      {
+        "mode": "v4",
+        "component": "frozen_r",
+        "required": 900,
+        "declared": 900,
+        "completed": 856
+      },
+      {
+        "mode": "v5",
+        "component": "dev_field",
+        "required": 150,
+        "declared": 0,
+        "completed": 0
+      },
+      {
+        "mode": "v5",
+        "component": "dev_legacy",
+        "required": 120,
+        "declared": 0,
+        "completed": 0
+      },
+      {
+        "mode": "v5",
+        "component": "dev_width",
+        "required": 100,
+        "declared": 0,
+        "completed": 0
+      },
+      {
+        "mode": "v5",
+        "component": "field_deployment",
+        "required": 630,
+        "declared": 0,
+        "completed": 0
+      },
+      {
+        "mode": "v5",
+        "component": "field_validation",
+        "required": 155,
+        "declared": 0,
+        "completed": 0
+      },
+      {
+        "mode": "v5",
+        "component": "frozen_a",
+        "required": 35,
+        "declared": 0,
+        "completed": 0
+      },
+      {
+        "mode": "v5",
+        "component": "frozen_b",
+        "required": 800,
+        "declared": 800,
+        "completed": 0
+      },
+      {
+        "mode": "v5",
+        "component": "frozen_r",
+        "required": 900,
+        "declared": 900,
+        "completed": 0
+      }
+    ]
+  },
+  "definitions": {
+    "rescue": "reference collision becomes candidate goal or timeout",
+    "regression": "reference goal or timeout becomes candidate collision",
+    "rates": "completed cases only; consult coverage before interpreting partial reports",
+    "aggregation": "episode-weighted pooled counts; each robustness variant is a separate paired case, not an independent statistical replicate",
+    "field_sets": "simulated field-layout/validation scenarios; these results are not new real-world trials",
+    "groups": {
+      "dev_field": "dev",
+      "dev_legacy": "dev",
+      "dev_width": "dev",
+      "frozen_a": "frozen",
+      "frozen_b": "frozen",
+      "frozen_r": "frozen",
+      "field_deployment": "field",
+      "field_validation": "field"
+    }
+  },
+  "report_source_sha256": "61ec79a2d823c873f88d71123c93d308fbe2f830c1873395726c16919cece777"
+}

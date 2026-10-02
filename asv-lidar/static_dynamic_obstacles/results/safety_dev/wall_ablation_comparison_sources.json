@@ -1,0 +1,16 @@
+{
+  "sources": {
+    "all_wall_prediction_boundary_modes.csv": "a55e7a015e4ece78e91853d1cb6665b6e2e9f69e10efd7331724adad93432254",
+    "all_wall_prediction_episodes.csv": "f15970ae62c5ffa52f5c52f0f21e042198883e032293940521dec4d9be537039",
+    "all_wall_prediction_errors.csv": "34d1d14d171d1ca994771bf2629c76ab3029b09a2df21833c2bbeb315104236a",
+    "dev_v4_initial.csv": "1b43d771260550b6cbd1e41828f34f1b26642611ef96f4a5ae693fd01fe144d6",
+    "wall_dual_brake_only_episodes.csv": "aebac4b61f09fe1eb6de7f720efe392ce7e8524190f2d4f9bce019bca827b841",
+    "wall_memory_only_episodes.csv": "0e11e6413ae981a5547e3a627d707899a23bb8575c090944964c67b4d35b1f4d",
+    "wall_observer_only_episodes.csv": "56f0a930601ca8307aee18677d4ad4b6941db1f3c58fd9e9e433135f8801ca38",
+    "wall_oracle_state_episodes.csv": "1ef3b97a6543b328d899ec10572deb476afccae492b026d85a66076ef6db6da1"
+  },
+  "scope": "Only the original 14 v3 boundary-contact development cases. Completed artifacts only; ongoing combined full evaluations excluded.",
+  "braking_definition": "At least one negative actual RPM command in the future replay window.",
+  "quantiles": "Pandas linear quantiles over overlapping replay origins; descriptive, not independent uncertainty intervals.",
+  "mode_counts": "Last ten executed decisions including the collision-triggering decision; final phase read from maximum step per case."
+}

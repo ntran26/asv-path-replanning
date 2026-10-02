@@ -1,0 +1,9 @@
+mode,case,enc,outcome,v2,estops
+v4,DV3-CRP-CV-02,CRP,collision:target,0,0
+v4,DV3-CRP-CV-12,CRP,collision:target,0,0
+v4,DV3-BO-CV-10,BO,collision:obstacle,0,0
+v4,DV3-BO-VS-05,BO,collision:obstacle,0,0
+oracle4,DV3-CRP-CV-02,CRP,goal,27,6
+oracle4,DV3-CRP-CV-12,CRP,goal,23,4
+oracle4,DV3-BO-CV-10,BO,collision:obstacle,0,0
+oracle4,DV3-BO-VS-05,BO,collision:obstacle,0,0

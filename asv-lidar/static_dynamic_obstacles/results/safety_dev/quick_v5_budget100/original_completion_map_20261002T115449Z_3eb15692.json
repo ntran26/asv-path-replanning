@@ -1,0 +1,29 @@
+{
+  "planned": 8670,
+  "committed": 3143,
+  "not_recorded": 5527,
+  "sources": [
+    {
+      "run": "inventory_v5",
+      "included": false,
+      "reason": "different frozen settings/source snapshot"
+    },
+    {
+      "run": "v5_frozen_b",
+      "included": true,
+      "committed": 1490,
+      "ignored_tail_bytes": 0,
+      "manifest_sha256": "0f8598ce891d6db11c8a41484c4b4b0f3aba6a7c342637f43318460238a0e9f4",
+      "journal_sha256": "1b570580896f3348c4ed12416f3aa84ba4973d03f382f7677b3f1d69a3dfd305"
+    },
+    {
+      "run": "v5_frozen_r",
+      "included": true,
+      "committed": 1653,
+      "ignored_tail_bytes": 0,
+      "manifest_sha256": "3c4364154717a716ae98d95d4c0c86aaf114890f02c807f37f041c278190edc9",
+      "journal_sha256": "3f524b6d8b50287acf7c4a987d813217db15f9e25b6a0f0e59cba32b6ba46d32"
+    }
+  ],
+  "scope": "original frozen benchmark only; snapshot is not a complete benchmark result"
+}

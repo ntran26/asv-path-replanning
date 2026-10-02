@@ -1,0 +1,10 @@
+{
+  "tag": "policy_feedback_v1",
+  "mode": "v4",
+  "suite": "field_validation",
+  "case": "FV-BO-18",
+  "seed": 950147,
+  "scenario_sha256": "644d3c20ede9e25c171f202b32e9a9408061c49f2908dbaad8dbe3858cc16bdd",
+  "run_metadata_sha256": "5d589941ca28274817c802b66ba5c7c44ee9abed0af5cb15c5bf602fc68141e7",
+  "attempt": 51
+}

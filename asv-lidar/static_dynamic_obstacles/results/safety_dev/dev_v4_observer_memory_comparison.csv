@@ -1,0 +1,4 @@
+reference,paired_cases,candidate_goals,reference_goals,gained,lost,net
+off,150,123,111,19,7,12
+v2_iter2,150,123,115,16,8,8
+v3,150,123,108,24,9,15

@@ -1,0 +1,24 @@
+{
+  "selection": "v4_observer_memory_selected",
+  "cases": 150,
+  "source_sha256": {
+    "results\\safety_v2_dev_iter2.csv": "1b6a21aa0e6e94c478adad9ceabb73974e06fd24444f7bd137670056b0d2bfc2",
+    "results\\safety_v2_dev_v3_iter2_refpolicy.csv": "0c1b565da9c0382cbb8e4edd897bbb0f26908c4def08e9a465ae7f244884960f",
+    "results\\safety_dev\\dev_v4_initial.csv": "1b43d771260550b6cbd1e41828f34f1b26642611ef96f4a5ae693fd01fe144d6",
+    "results\\safety_dev\\dev_v4_memory_brake.csv": "e506cef77b61dcf5a9193f4802be1eb993ef09ed8a3dc7bf0fe695939e78e4a1",
+    "results\\safety_dev\\dev_v4_observer_memory_brake.csv": "d1a2f2355fa572e453a07484b04ef0ead61cfa2456f1db76ac8a8afc42ea6d2f",
+    "results\\safety_dev\\dev_v4_observer.csv": "f50b91e3bbf7fdbfaad581d7e882ef4a7af7820645470c770f7b7ffef009b37d",
+    "results\\safety_dev\\dev_v4_observer_memory.csv": "60034c3a30fa641c28ff850e1290a4c239d176e396b0850938314508a56386a2"
+  },
+  "source_modes": {
+    "off": "off",
+    "v2_best": "v2",
+    "v3": "v3",
+    "v4_initial": "v4",
+    "v4_memory_dual": "v4",
+    "v4_observer_memory_dual": "v4",
+    "v4_observer": "v4",
+    "v4_observer_memory_selected": "v4"
+  },
+  "comparison": "Paired original development case IDs. Goal gains/losses are binary goal transitions. Adding dual compares observer+memory+dual against selected observer+memory."
+}

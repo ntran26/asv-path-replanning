@@ -1,0 +1,198 @@
+{
+  "command": [
+    "tools/diagnostics/safety/prediction_audit.py",
+    "--modes",
+    "v4",
+    "--cases",
+    "DV3-NT-CV-12,DV3-HO-CV-03,DV3-HO-VS-01,DV3-CRP-VS-05,DV3-CRS-CV-04,DV3-CRS-CV-06,DV3-CRS-CV-10,DV3-OT-CV-03,DV3-OT-CV-09,DV3-OT-CV-11,DV3-OT-CV-16,DV3-OT-VS-03,DV3-BO-CV-04,DV3-BO-CV-17",
+    "--tag",
+    "wall_memory_only",
+    "--no-predictions"
+  ],
+  "development_only": true,
+  "model": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\runs\\sac_formulation_seed0_bl3\\kept_best_3M\\best_model.zip",
+  "model_sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+  "model_config_sha256": "a4df64a97f641de0b1c660b04f73ccc8401a29f7fa48711c2a6ee694dc98ed44",
+  "source_sha256": {
+    "src/safety_v2.py": "209195c3b9241dfa6a798b7cfca857dfd14218c38625d99bc2a9c0d97c1b3d55",
+    "src/safety_v3.py": "28efcc06af8ec0ffc0074267b7f1b2e36ba4fd1f6e033900c39b9b96b6d40d0a",
+    "src/classical/common.py": "456f39769ffa237f826eff8f9852a6d0823a2f975f85d2345ba7b42105e0977d",
+    "src/env.py": "56b4ccd7dd89d1bd79fc9079b32279f005671e0ed9ab333deed259ce111c54c1",
+    "src/ship.py": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+    "src/constants.py": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+    "src/constant_temp.py": "85e5dc9992d062466af304f3f3273b249ba16b130c2d89b53fe7cb692b5c81d7",
+    "src/train_formulation.py": "17469b857e6f3ecdbd58a0ac01d3fd3133e93507f9bc2a1fe2a3c1790fa4c1aa",
+    "bluefin/dynamics.py": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711",
+    "bluefin/ship_model_v3.py": "21afbc6605035bd905f16db7f1149fec50fc9b73ca0d4bd0a1e76b06b6c4136c",
+    "tools/diagnostics/safety/prediction_audit.py": "5b6792f9b789fcc251d62d2780d1d16e77eecc0a63514b5df2ea9318eb36402f",
+    "src/safety_v4.py": "d1eb5b0304a767724dd36d32df7c6683c58db55be5e8cdb25a59070743fed96b",
+    "src/safety_prediction.py": "1635a91c204fe0a88810abff635e18125cb428f7acfdc7bce58767609d9f1f6b",
+    "src/safety_perception.py": "cf1624ec42e9b3eaafc572aef7d3932c55a90ace39fb5014cc11ba50923b3378"
+  },
+  "scenario_cache_digest": "5d6fdb07eca31b88f91c",
+  "scenario_cache_schema": 2,
+  "runtime_overrides": {
+    "V4_SET:FREE_SPACE_MEMORY": true,
+    "V4_SET:COUNTERSTEER_RECOVERY": false,
+    "V4_SET:RETAIN_NOMINAL_PLAN": false
+  },
+  "horizons_s": [
+    1.0,
+    2.0,
+    4.0,
+    8.0
+  ],
+  "stride": 4,
+  "effective_safety_constants": {
+    "v2": {
+      "COMMIT_S": "1.0",
+      "HORIZON_S": "8.0",
+      "ENGAGE_RANGE_M": "7.0",
+      "GAP_STATIC_M": "0.05",
+      "GAP_BOUNDARY_M": "0.02",
+      "GAP_TARGET_M": "0.1",
+      "MARGIN_M": "0.1",
+      "TRIGGER_MARGIN_M": "0.15",
+      "ROOM_SLACK_M": "0.2",
+      "TERMINAL_M": "2.0",
+      "TERMINAL_S": "3.0",
+      "TERMINAL_STOP_SPEED": "0.1",
+      "TERMINAL_BOUNDARY": "False",
+      "RUDDERS": "(-1.0, -0.5, 0.0, 0.5, 1.0)",
+      "THROTTLES": "(-1.0, 0.0, 1.0)",
+      "BRAKE": "None",
+      "BRAKE_RUDDERS": "(-1.0, 0.0, 1.0)",
+      "RECOVERY": "((-1.0, 0.0), (1.0, 0.0), (0.0, -1.0), (-1.0, None), (0.0, None), (1.0, None))",
+      "RECOVERY_TURN_S": "2.0",
+      "MEMORY_S": "90.0",
+      "W_THROTTLE": "2.0",
+      "EGO_SMOOTHING": "0.3",
+      "W_PREVIOUS": "0.3",
+      "HOLD_BACK_GAIN_S": "1.0",
+      "HOLD_STEPS": "2",
+      "ASTERN_RPM": "-24.0",
+      "BRAKE_EFFICIENCY": "0.25",
+      "BRAKE_DELAY_S": "0.75"
+    },
+    "v3": {
+      "HANDBACK_MARGIN_M": "0.3",
+      "HANDBACK_SPEED": "0.3",
+      "HANDBACK_HEADING_DEG": "30.0",
+      "MIN_RECOVERY_STEPS": "4",
+      "REJOIN_THROTTLE": "0.0",
+      "W_CONTINUE": "0.25",
+      "RECOVERY_REFERENCE": "'policy'",
+      "REJOIN_LOOKAHEAD_M": "2.5",
+      "LAST_CERT_MAX_STEPS": "4"
+    },
+    "v4": {
+      "COUNTERSTEER_RECOVERY": "False",
+      "RETAIN_NOMINAL_PLAN": "False",
+      "DUAL_BRAKE_PREDICTION": "False",
+      "FREE_SPACE_MEMORY": "True"
+    }
+  },
+  "prediction_dt": 0.125,
+  "update_rate": 0.5,
+  "source_hash_time": "before scenario generation, model loading and episode evaluation",
+  "oracle_modes": {
+    "oracle": "v3 true ego and targets, exact static geometry",
+    "oracle_state": "v3 true ego and targets, original remembered scan points unchanged"
+  },
+  "boundary_error_sign": "predicted minus actual; negative means pessimistic",
+  "true_ego": "true initial position, heading and body velocity; same estimated actuator history",
+  "boundary_geometry": "same inflated hull and common.boundary_clearance on known map polygon",
+  "partial_collision_steps": "excluded from horizon errors, retained in mode traces",
+  "limitations": [
+    "No terminal-runout or hypothetical-backup-plan score is compared to actual motion.",
+    "True-ego replay is not an oracle closed-loop filter evaluation.",
+    "Running clearance minima are sampled at decision boundaries, not continuous time.",
+    "Overlapping windows are not independent statistical samples."
+  ],
+  "cases": [
+    {
+      "case": "DV3-NT-CV-12",
+      "full_set_index": 11,
+      "reset_seed": 900131,
+      "scenario_sha256": "47007b33b516b72beb469ca64e087641b25ab3e505e19b3b9468eb4eeb76ada2"
+    },
+    {
+      "case": "DV3-HO-CV-03",
+      "full_set_index": 22,
+      "reset_seed": 900142,
+      "scenario_sha256": "902f497799fa504670423e9d81c08e0e193da736889455dee3a9e979a88a1d5e"
+    },
+    {
+      "case": "DV3-HO-VS-01",
+      "full_set_index": 40,
+      "reset_seed": 900160,
+      "scenario_sha256": "4bbbef9b9c2cd521478bbf6774d9a9561062ab1e161ae0d720924879fe53d1a0"
+    },
+    {
+      "case": "DV3-CRP-VS-05",
+      "full_set_index": 70,
+      "reset_seed": 900190,
+      "scenario_sha256": "4ac5558f86edb284e022780923969cc1d255d00e99668205eb1100fc09b874b1"
+    },
+    {
+      "case": "DV3-CRS-CV-04",
+      "full_set_index": 75,
+      "reset_seed": 900195,
+      "scenario_sha256": "61218205227240a2e85db4ab35e3db161173a3cad9f693e18d2208c54f9d4824"
+    },
+    {
+      "case": "DV3-CRS-CV-06",
+      "full_set_index": 77,
+      "reset_seed": 900197,
+      "scenario_sha256": "2505f8c053f2fb418cf9eb0b19bf509b0753fe65cf6093a633b091fa39fe91fc"
+    },
+    {
+      "case": "DV3-CRS-CV-10",
+      "full_set_index": 81,
+      "reset_seed": 900201,
+      "scenario_sha256": "5569d261fef39d5506b191a3ef384cffd29656a29911329329e3e9f52368ae35"
+    },
+    {
+      "case": "DV3-OT-CV-03",
+      "full_set_index": 100,
+      "reset_seed": 900220,
+      "scenario_sha256": "56f58056e532e4bdbd9bdd9272690a93bd477da71b3590ec3c32541e8308967c"
+    },
+    {
+      "case": "DV3-OT-CV-09",
+      "full_set_index": 106,
+      "reset_seed": 900226,
+      "scenario_sha256": "a38e7e9bda211033f8a293ecd1e5c3d50f868cf80d65b794833c42c97eecef45"
+    },
+    {
+      "case": "DV3-OT-CV-11",
+      "full_set_index": 108,
+      "reset_seed": 900228,
+      "scenario_sha256": "0ea22df9c3a70c8e219eeda8d3c99ec5f0b13d6b1d0b0b69cb99745da4af03b7"
+    },
+    {
+      "case": "DV3-OT-CV-16",
+      "full_set_index": 113,
+      "reset_seed": 900233,
+      "scenario_sha256": "53bada46e3155851f27da81a1fff34314c1f52f46be3f8c40b7ca337aa561997"
+    },
+    {
+      "case": "DV3-OT-VS-03",
+      "full_set_index": 120,
+      "reset_seed": 900240,
+      "scenario_sha256": "4bb89fb029ab2323b7181781bda82405328815cfff2d15c3a2185326766d6c0b"
+    },
+    {
+      "case": "DV3-BO-CV-04",
+      "full_set_index": 127,
+      "reset_seed": 900247,
+      "scenario_sha256": "a9392c7cd3e521bda23fc031c8c58d55debee0259284452bb41f47bb3ef55ba9"
+    },
+    {
+      "case": "DV3-BO-CV-17",
+      "full_set_index": 140,
+      "reset_seed": 900260,
+      "scenario_sha256": "70a9b89da1aeb0a85e2fe629be9c75385a8eb6df3544a4737a67609ca6654279"
+    }
+  ]
+}
