@@ -1,0 +1,1295 @@
+{
+  "created_utc": "2026-10-03T11:47:53.092937+00:00",
+  "episodes_run_by_analysis": 0,
+  "completed_records": 36,
+  "completions": {
+    "v18_v19_probe_a": {
+      "completed_runs": 18,
+      "elapsed_s": 409.9652153999923,
+      "source_drift": [],
+      "checkpoint_unchanged": true,
+      "selection_unchanged": true
+    },
+    "v18_v19_probe_b": {
+      "completed_runs": 18,
+      "elapsed_s": 534.1893713000027,
+      "source_drift": [],
+      "checkpoint_unchanged": true,
+      "selection_unchanged": true
+    }
+  },
+  "summary": {
+    "v16": {
+      "outcomes": {
+        "goal": 5,
+        "collision:target": 3,
+        "collision:boundary": 4
+      },
+      "gains": 0,
+      "losses": 0,
+      "command_divergent_cases": 0,
+      "active_cases": null,
+      "active_decisions": null
+    },
+    "v18": {
+      "outcomes": {
+        "goal": 5,
+        "collision:target": 3,
+        "collision:boundary": 4
+      },
+      "gains": 0,
+      "losses": 0,
+      "command_divergent_cases": 0,
+      "active_cases": 2,
+      "active_decisions": 4
+    },
+    "v19": {
+      "outcomes": {
+        "goal": 5,
+        "collision:target": 3,
+        "collision:obstacle": 1,
+        "collision:boundary": 3
+      },
+      "gains": 0,
+      "losses": 0,
+      "command_divergent_cases": 1,
+      "active_cases": 3,
+      "active_decisions": 4
+    }
+  },
+  "cases": [
+    {
+      "case": "DV3:DV3-BO-CV-04",
+      "seed": 900247,
+      "scenario_sha256": "a9392c7cd3e521bda23fc031c8c58d55debee0259284452bb41f47bb3ef55ba9",
+      "old_v16": {
+        "tag": "motion_axis_probe5",
+        "outcome": "goal",
+        "steps": 29,
+        "outcome_reproduced": true,
+        "constant_differences": [],
+        "commands": {
+          "compared_decisions": 29,
+          "same_trace_length": true,
+          "first_exact_command_difference": null,
+          "first_command_divergence": null
+        }
+      },
+      "modes": {
+        "v16": {
+          "outcome": "goal",
+          "steps": 29,
+          "interventions": 7,
+          "brake_steps": 0,
+          "paired_commands": {
+            "compared_decisions": 29,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": null
+        },
+        "v18": {
+          "outcome": "goal",
+          "steps": 29,
+          "interventions": 7,
+          "brake_steps": 0,
+          "paired_commands": {
+            "compared_decisions": 29,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        },
+        "v19": {
+          "outcome": "goal",
+          "steps": 29,
+          "interventions": 7,
+          "brake_steps": 0,
+          "paired_commands": {
+            "compared_decisions": 29,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        }
+      }
+    },
+    {
+      "case": "DV3:DV3-CRS-CV-04",
+      "seed": 900195,
+      "scenario_sha256": "61218205227240a2e85db4ab35e3db161173a3cad9f693e18d2208c54f9d4824",
+      "old_v16": {
+        "tag": "v16_broader40_paired",
+        "outcome": "collision:boundary",
+        "steps": 67,
+        "outcome_reproduced": true,
+        "constant_differences": [],
+        "commands": {
+          "compared_decisions": 67,
+          "same_trace_length": true,
+          "first_exact_command_difference": null,
+          "first_command_divergence": null
+        }
+      },
+      "modes": {
+        "v16": {
+          "outcome": "collision:boundary",
+          "steps": 67,
+          "interventions": 16,
+          "brake_steps": 5,
+          "paired_commands": {
+            "compared_decisions": 67,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": null
+        },
+        "v18": {
+          "outcome": "collision:boundary",
+          "steps": 67,
+          "interventions": 16,
+          "brake_steps": 5,
+          "paired_commands": {
+            "compared_decisions": 67,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 3,
+            "events": [
+              {
+                "step": 46,
+                "why": "continue",
+                "changed": true,
+                "command": [
+                  -0.5,
+                  0.0
+                ],
+                "evidence": {
+                  "frame": 46,
+                  "pose_stale": false,
+                  "max_age_steps": 3,
+                  "updated_source_ids": [],
+                  "replaced_source_ids": [
+                    62
+                  ],
+                  "replacements": [
+                    {
+                      "source_id": 62,
+                      "heading_rad": 4.39822971502571,
+                      "fit_age_steps": 1,
+                      "fit_serial": 878
+                    }
+                  ],
+                  "expired_source_ids": [],
+                  "identity_reset_source_ids": [],
+                  "rejections": {
+                    "no_recent_same_source_fit": 2
+                  },
+                  "stored_heading_count": 1,
+                  "static_points_preserved": 47
+                }
+              },
+              {
+                "step": 47,
+                "why": "turn",
+                "changed": true,
+                "command": [
+                  -1.0,
+                  0.0
+                ],
+                "evidence": {
+                  "frame": 47,
+                  "pose_stale": false,
+                  "max_age_steps": 3,
+                  "updated_source_ids": [],
+                  "replaced_source_ids": [
+                    62
+                  ],
+                  "replacements": [
+                    {
+                      "source_id": 62,
+                      "heading_rad": 4.39822971502571,
+                      "fit_age_steps": 2,
+                      "fit_serial": 878
+                    }
+                  ],
+                  "expired_source_ids": [],
+                  "identity_reset_source_ids": [],
+                  "rejections": {
+                    "no_recent_same_source_fit": 2
+                  },
+                  "stored_heading_count": 1,
+                  "static_points_preserved": 48
+                }
+              },
+              {
+                "step": 48,
+                "why": "turn",
+                "changed": false,
+                "command": [
+                  -0.9975009560585022,
+                  3.5375958681106567
+                ],
+                "evidence": {
+                  "frame": 48,
+                  "pose_stale": false,
+                  "max_age_steps": 3,
+                  "updated_source_ids": [],
+                  "replaced_source_ids": [
+                    62
+                  ],
+                  "replacements": [
+                    {
+                      "source_id": 62,
+                      "heading_rad": 4.39822971502571,
+                      "fit_age_steps": 3,
+                      "fit_serial": 878
+                    }
+                  ],
+                  "expired_source_ids": [],
+                  "identity_reset_source_ids": [],
+                  "rejections": {
+                    "no_recent_same_source_fit": 2,
+                    "unconfirmed": 1
+                  },
+                  "stored_heading_count": 1,
+                  "static_points_preserved": 55
+                }
+              }
+            ],
+            "heading_track_decisions": 3,
+            "transferred_point_decisions": 0
+          }
+        },
+        "v19": {
+          "outcome": "collision:obstacle",
+          "steps": 61,
+          "interventions": 16,
+          "brake_steps": 5,
+          "paired_commands": {
+            "compared_decisions": 61,
+            "same_trace_length": false,
+            "first_exact_command_difference": 13,
+            "first_command_divergence": {
+              "step": 13,
+              "reference_command": [
+                -0.34524205327033997,
+                -24.0
+              ],
+              "candidate_command": [
+                -0.3387790024280548,
+                -24.0
+              ],
+              "same_pre_state": true,
+              "same_policy_action": true,
+              "reference_reason": "searched escape",
+              "candidate_reason": "searched escape",
+              "reference_checked_clearance": 0.19604349115350247,
+              "candidate_checked_clearance": 0.1961098167483513
+            }
+          },
+          "activation": {
+            "active_decisions": 2,
+            "events": [
+              {
+                "step": 4,
+                "why": "nominal",
+                "changed": false,
+                "command": [
+                  -0.986404538154602,
+                  4.711541175842285
+                ],
+                "evidence": {
+                  "frame": 4,
+                  "enabled": true,
+                  "pose_stale": false,
+                  "coordinate_match": "exact_float64",
+                  "static_points_before": 53,
+                  "static_points_after": 50,
+                  "removed_point_count": 3,
+                  "source_ids_transferred": [
+                    44
+                  ],
+                  "transfers": [
+                    {
+                      "source_id": 44,
+                      "target_id": -1000000,
+                      "scan_serial": 540,
+                      "cluster_points": 37,
+                      "removed_points": 3,
+                      "remembered_equal_points_retained": 0
+                    }
+                  ],
+                  "rejections": {
+                    "insufficient_current_motion_evidence": 3
+                  },
+                  "underlying_memory_unchanged": true
+                }
+              },
+              {
+                "step": 13,
+                "why": "searched escape",
+                "changed": true,
+                "command": [
+                  -0.3387790024280548,
+                  -24.0
+                ],
+                "evidence": {
+                  "frame": 13,
+                  "enabled": true,
+                  "pose_stale": false,
+                  "coordinate_match": "exact_float64",
+                  "static_points_before": 58,
+                  "static_points_after": 49,
+                  "removed_point_count": 9,
+                  "source_ids_transferred": [
+                    44
+                  ],
+                  "transfers": [
+                    {
+                      "source_id": 44,
+                      "target_id": -1000000,
+                      "scan_serial": 558,
+                      "cluster_points": 109,
+                      "removed_points": 9,
+                      "remembered_equal_points_retained": 0
+                    }
+                  ],
+                  "rejections": {
+                    "insufficient_current_motion_evidence": 1,
+                    "cluster_is_not_unique_current_scan": 1
+                  },
+                  "underlying_memory_unchanged": true
+                }
+              }
+            ],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 12
+          }
+        }
+      }
+    },
+    {
+      "case": "TS2:BAS-HO-NC-059",
+      "seed": 400058,
+      "scenario_sha256": "fb19c06cd0042fa9cbef579b8df7015a195330bcbb9c2de11a17cacec6d1e657",
+      "old_v16": {
+        "tag": "motion_axis_probe5",
+        "outcome": "collision:target",
+        "steps": 28,
+        "outcome_reproduced": true,
+        "constant_differences": [],
+        "commands": {
+          "compared_decisions": 28,
+          "same_trace_length": true,
+          "first_exact_command_difference": null,
+          "first_command_divergence": null
+        }
+      },
+      "modes": {
+        "v16": {
+          "outcome": "collision:target",
+          "steps": 28,
+          "interventions": 7,
+          "brake_steps": 5,
+          "paired_commands": {
+            "compared_decisions": 28,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": null
+        },
+        "v18": {
+          "outcome": "collision:target",
+          "steps": 28,
+          "interventions": 7,
+          "brake_steps": 5,
+          "paired_commands": {
+            "compared_decisions": 28,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        },
+        "v19": {
+          "outcome": "collision:target",
+          "steps": 28,
+          "interventions": 7,
+          "brake_steps": 5,
+          "paired_commands": {
+            "compared_decisions": 28,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        }
+      }
+    },
+    {
+      "case": "TS2:BAS-NU-CV-070",
+      "seed": 400469,
+      "scenario_sha256": "1df385f81fb213531debfb03cfdf7988a26460f5be774b12a7b4d069fd525880",
+      "old_v16": {
+        "tag": "motion_axis_remaining27",
+        "outcome": "collision:boundary",
+        "steps": 78,
+        "outcome_reproduced": true,
+        "constant_differences": [],
+        "commands": {
+          "compared_decisions": 78,
+          "same_trace_length": true,
+          "first_exact_command_difference": null,
+          "first_command_divergence": null
+        }
+      },
+      "modes": {
+        "v16": {
+          "outcome": "collision:boundary",
+          "steps": 78,
+          "interventions": 1,
+          "brake_steps": 0,
+          "paired_commands": {
+            "compared_decisions": 78,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": null
+        },
+        "v18": {
+          "outcome": "collision:boundary",
+          "steps": 78,
+          "interventions": 1,
+          "brake_steps": 0,
+          "paired_commands": {
+            "compared_decisions": 78,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        },
+        "v19": {
+          "outcome": "collision:boundary",
+          "steps": 78,
+          "interventions": 1,
+          "brake_steps": 0,
+          "paired_commands": {
+            "compared_decisions": 78,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        }
+      }
+    },
+    {
+      "case": "TS2:CH-HO-CV-043",
+      "seed": 400542,
+      "scenario_sha256": "5206adfd9242edd176492a21796ff13318b2e5114ccc9f1f70b312af25a2b5ee",
+      "old_v16": {
+        "tag": "motion_axis_remaining27",
+        "outcome": "goal",
+        "steps": 60,
+        "outcome_reproduced": true,
+        "constant_differences": [],
+        "commands": {
+          "compared_decisions": 60,
+          "same_trace_length": true,
+          "first_exact_command_difference": null,
+          "first_command_divergence": null
+        }
+      },
+      "modes": {
+        "v16": {
+          "outcome": "goal",
+          "steps": 60,
+          "interventions": 0,
+          "brake_steps": 0,
+          "paired_commands": {
+            "compared_decisions": 60,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": null
+        },
+        "v18": {
+          "outcome": "goal",
+          "steps": 60,
+          "interventions": 0,
+          "brake_steps": 0,
+          "paired_commands": {
+            "compared_decisions": 60,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        },
+        "v19": {
+          "outcome": "goal",
+          "steps": 60,
+          "interventions": 0,
+          "brake_steps": 0,
+          "paired_commands": {
+            "compared_decisions": 60,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        }
+      }
+    },
+    {
+      "case": "TS2:CH-HO-CV-073",
+      "seed": 400572,
+      "scenario_sha256": "e9019500f29c085ff4a67a5c479025ec50bfac889214ce487774d981ad00ed68",
+      "old_v16": {
+        "tag": "motion_axis_probe5",
+        "outcome": "goal",
+        "steps": 54,
+        "outcome_reproduced": true,
+        "constant_differences": [],
+        "commands": {
+          "compared_decisions": 54,
+          "same_trace_length": true,
+          "first_exact_command_difference": null,
+          "first_command_divergence": null
+        }
+      },
+      "modes": {
+        "v16": {
+          "outcome": "goal",
+          "steps": 54,
+          "interventions": 1,
+          "brake_steps": 0,
+          "paired_commands": {
+            "compared_decisions": 54,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": null
+        },
+        "v18": {
+          "outcome": "goal",
+          "steps": 54,
+          "interventions": 1,
+          "brake_steps": 0,
+          "paired_commands": {
+            "compared_decisions": 54,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        },
+        "v19": {
+          "outcome": "goal",
+          "steps": 54,
+          "interventions": 1,
+          "brake_steps": 0,
+          "paired_commands": {
+            "compared_decisions": 54,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        }
+      }
+    },
+    {
+      "case": "TS2:P2-L1-CRP-FIX-05",
+      "seed": 470024,
+      "scenario_sha256": "b1aae753c8a63ff87e5a751905a9f5187c701301f6d9849b7ffc537a8cd58078",
+      "old_v16": {
+        "tag": "motion_axis_remaining27",
+        "outcome": "collision:target",
+        "steps": 34,
+        "outcome_reproduced": true,
+        "constant_differences": [],
+        "commands": {
+          "compared_decisions": 34,
+          "same_trace_length": true,
+          "first_exact_command_difference": null,
+          "first_command_divergence": null
+        }
+      },
+      "modes": {
+        "v16": {
+          "outcome": "collision:target",
+          "steps": 34,
+          "interventions": 6,
+          "brake_steps": 5,
+          "paired_commands": {
+            "compared_decisions": 34,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": null
+        },
+        "v18": {
+          "outcome": "collision:target",
+          "steps": 34,
+          "interventions": 6,
+          "brake_steps": 5,
+          "paired_commands": {
+            "compared_decisions": 34,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 1,
+            "events": [
+              {
+                "step": 34,
+                "why": "no escape",
+                "changed": false,
+                "command": [
+                  -0.9996663331985474,
+                  11.999254703521729
+                ],
+                "evidence": {
+                  "frame": 34,
+                  "pose_stale": false,
+                  "max_age_steps": 3,
+                  "updated_source_ids": [],
+                  "replaced_source_ids": [
+                    15
+                  ],
+                  "replacements": [
+                    {
+                      "source_id": 15,
+                      "heading_rad": 1.9896753472735358,
+                      "fit_age_steps": 1,
+                      "fit_serial": 132
+                    }
+                  ],
+                  "expired_source_ids": [],
+                  "identity_reset_source_ids": [],
+                  "rejections": {
+                    "no_recent_same_source_fit": 3
+                  },
+                  "stored_heading_count": 1,
+                  "static_points_preserved": 28
+                }
+              }
+            ],
+            "heading_track_decisions": 1,
+            "transferred_point_decisions": 0
+          }
+        },
+        "v19": {
+          "outcome": "collision:target",
+          "steps": 34,
+          "interventions": 6,
+          "brake_steps": 5,
+          "paired_commands": {
+            "compared_decisions": 34,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 1,
+            "events": [
+              {
+                "step": 17,
+                "why": "policy prefix repaired",
+                "changed": false,
+                "command": [
+                  -0.9850600957870483,
+                  11.329248905181885
+                ],
+                "evidence": {
+                  "frame": 17,
+                  "enabled": true,
+                  "pose_stale": false,
+                  "coordinate_match": "exact_float64",
+                  "static_points_before": 40,
+                  "static_points_after": 37,
+                  "removed_point_count": 3,
+                  "source_ids_transferred": [
+                    20
+                  ],
+                  "transfers": [
+                    {
+                      "source_id": 20,
+                      "target_id": -1000001,
+                      "scan_serial": 168,
+                      "cluster_points": 80,
+                      "removed_points": 3,
+                      "remembered_equal_points_retained": 0
+                    }
+                  ],
+                  "rejections": {
+                    "insufficient_current_motion_evidence": 2
+                  },
+                  "underlying_memory_unchanged": true
+                }
+              }
+            ],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 3
+          }
+        }
+      }
+    },
+    {
+      "case": "TS2:P2-L1-CRP-VAR-12",
+      "seed": 470031,
+      "scenario_sha256": "7c56e2bdd8ab8c70ffbf29a0bd97bd767cbae23360db70f2d103474fb40b9f96",
+      "old_v16": {
+        "tag": "motion_axis_remaining27",
+        "outcome": "goal",
+        "steps": 51,
+        "outcome_reproduced": true,
+        "constant_differences": [],
+        "commands": {
+          "compared_decisions": 51,
+          "same_trace_length": true,
+          "first_exact_command_difference": null,
+          "first_command_divergence": null
+        }
+      },
+      "modes": {
+        "v16": {
+          "outcome": "goal",
+          "steps": 51,
+          "interventions": 3,
+          "brake_steps": 0,
+          "paired_commands": {
+            "compared_decisions": 51,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": null
+        },
+        "v18": {
+          "outcome": "goal",
+          "steps": 51,
+          "interventions": 3,
+          "brake_steps": 0,
+          "paired_commands": {
+            "compared_decisions": 51,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        },
+        "v19": {
+          "outcome": "goal",
+          "steps": 51,
+          "interventions": 3,
+          "brake_steps": 0,
+          "paired_commands": {
+            "compared_decisions": 51,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        }
+      }
+    },
+    {
+      "case": "TS2:P2-L1-CRS-FIX-09",
+      "seed": 470048,
+      "scenario_sha256": "ecfc8021b54fafb96792d4d5a1e2fe6c58e808cf54d0c4e1a4713188d29ec6c9",
+      "old_v16": {
+        "tag": "motion_axis_remaining27",
+        "outcome": "goal",
+        "steps": 55,
+        "outcome_reproduced": true,
+        "constant_differences": [],
+        "commands": {
+          "compared_decisions": 55,
+          "same_trace_length": true,
+          "first_exact_command_difference": null,
+          "first_command_divergence": null
+        }
+      },
+      "modes": {
+        "v16": {
+          "outcome": "goal",
+          "steps": 55,
+          "interventions": 0,
+          "brake_steps": 0,
+          "paired_commands": {
+            "compared_decisions": 55,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": null
+        },
+        "v18": {
+          "outcome": "goal",
+          "steps": 55,
+          "interventions": 0,
+          "brake_steps": 0,
+          "paired_commands": {
+            "compared_decisions": 55,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        },
+        "v19": {
+          "outcome": "goal",
+          "steps": 55,
+          "interventions": 0,
+          "brake_steps": 0,
+          "paired_commands": {
+            "compared_decisions": 55,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        }
+      }
+    },
+    {
+      "case": "TS2:P2-L2-CRS-FIX-19",
+      "seed": 470158,
+      "scenario_sha256": "54110bb8065ea7f480c6bb572430900efec753b7558b6af17232d9d7603ddf96",
+      "old_v16": {
+        "tag": "v16_broader40_paired",
+        "outcome": "collision:boundary",
+        "steps": 36,
+        "outcome_reproduced": true,
+        "constant_differences": [],
+        "commands": {
+          "compared_decisions": 36,
+          "same_trace_length": true,
+          "first_exact_command_difference": null,
+          "first_command_divergence": null
+        }
+      },
+      "modes": {
+        "v16": {
+          "outcome": "collision:boundary",
+          "steps": 36,
+          "interventions": 8,
+          "brake_steps": 5,
+          "paired_commands": {
+            "compared_decisions": 36,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": null
+        },
+        "v18": {
+          "outcome": "collision:boundary",
+          "steps": 36,
+          "interventions": 8,
+          "brake_steps": 5,
+          "paired_commands": {
+            "compared_decisions": 36,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        },
+        "v19": {
+          "outcome": "collision:boundary",
+          "steps": 36,
+          "interventions": 8,
+          "brake_steps": 5,
+          "paired_commands": {
+            "compared_decisions": 36,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 1,
+            "events": [
+              {
+                "step": 3,
+                "why": "nominal",
+                "changed": false,
+                "command": [
+                  0.9593147039413452,
+                  11.87719202041626
+                ],
+                "evidence": {
+                  "frame": 3,
+                  "enabled": true,
+                  "pose_stale": false,
+                  "coordinate_match": "exact_float64",
+                  "static_points_before": 39,
+                  "static_points_after": 37,
+                  "removed_point_count": 2,
+                  "source_ids_transferred": [
+                    95
+                  ],
+                  "transfers": [
+                    {
+                      "source_id": 95,
+                      "target_id": -1000000,
+                      "scan_serial": 1333,
+                      "cluster_points": 37,
+                      "removed_points": 2,
+                      "remembered_equal_points_retained": 0
+                    }
+                  ],
+                  "rejections": {
+                    "insufficient_current_motion_evidence": 3
+                  },
+                  "underlying_memory_unchanged": true
+                }
+              }
+            ],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 2
+          }
+        }
+      }
+    },
+    {
+      "case": "TS2:P2-L3-BO-FIX-09",
+      "seed": 470288,
+      "scenario_sha256": "5441c16f3dd3d6f0b0e9566fe5c95d891e0251172c3ad8db93104ff9cac960a3",
+      "old_v16": {
+        "tag": "v16_broader40_paired",
+        "outcome": "collision:boundary",
+        "steps": 70,
+        "outcome_reproduced": true,
+        "constant_differences": [],
+        "commands": {
+          "compared_decisions": 70,
+          "same_trace_length": true,
+          "first_exact_command_difference": null,
+          "first_command_divergence": null
+        }
+      },
+      "modes": {
+        "v16": {
+          "outcome": "collision:boundary",
+          "steps": 70,
+          "interventions": 25,
+          "brake_steps": 11,
+          "paired_commands": {
+            "compared_decisions": 70,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": null
+        },
+        "v18": {
+          "outcome": "collision:boundary",
+          "steps": 70,
+          "interventions": 25,
+          "brake_steps": 11,
+          "paired_commands": {
+            "compared_decisions": 70,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        },
+        "v19": {
+          "outcome": "collision:boundary",
+          "steps": 70,
+          "interventions": 25,
+          "brake_steps": 11,
+          "paired_commands": {
+            "compared_decisions": 70,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        }
+      }
+    },
+    {
+      "case": "TS2:P2-L3-CRP-FIX-03",
+      "seed": 470222,
+      "scenario_sha256": "c0f7f8d4411f5c36958d40a2b0b9b797dfcec2074d3b71aac6e77be797ffc030",
+      "old_v16": {
+        "tag": "v16_broader40_paired",
+        "outcome": "collision:target",
+        "steps": 19,
+        "outcome_reproduced": true,
+        "constant_differences": [],
+        "commands": {
+          "compared_decisions": 19,
+          "same_trace_length": true,
+          "first_exact_command_difference": null,
+          "first_command_divergence": null
+        }
+      },
+      "modes": {
+        "v16": {
+          "outcome": "collision:target",
+          "steps": 19,
+          "interventions": 5,
+          "brake_steps": 4,
+          "paired_commands": {
+            "compared_decisions": 19,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": null
+        },
+        "v18": {
+          "outcome": "collision:target",
+          "steps": 19,
+          "interventions": 5,
+          "brake_steps": 4,
+          "paired_commands": {
+            "compared_decisions": 19,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        },
+        "v19": {
+          "outcome": "collision:target",
+          "steps": 19,
+          "interventions": 5,
+          "brake_steps": 4,
+          "paired_commands": {
+            "compared_decisions": 19,
+            "same_trace_length": true,
+            "first_exact_command_difference": null,
+            "first_command_divergence": null
+          },
+          "activation": {
+            "active_decisions": 0,
+            "events": [],
+            "heading_track_decisions": 0,
+            "transferred_point_decisions": 0
+          }
+        }
+      }
+    }
+  ],
+  "fresh_v16_old_outcomes_reproduced": 12,
+  "fresh_v16_old_full_command_sequences_identical": 12,
+  "command_comparison_absolute_tolerance": 1e-07,
+  "shared_pre_state_absolute_tolerance": 1e-09,
+  "provenance_sha256": {
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\manifest.json": "7074c27c5a6fe7c1272dde3b21207f5e26062a8f668771b0d7d86073128a101f",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\completion.json": "35221ad5ec94eaf0bb3f7052c1042e76e9e6bf5ba4dec29461935b3bcb68fac9",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\attempts\\001_result.json": "39ddab86c069b210cdfeef386ea56b55edd285733864823b4465c2c8f237bed3",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\attempts\\002_result.json": "ef8147c5d940b0f46b8abf7f905964afe73ee808ccc69569367a5fd3a33b6f52",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\attempts\\003_result.json": "c6c03e01cba6bb59f691f014e01b79bff63b6213b524b829a9245dd201637040",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\attempts\\004_result.json": "358a7765b2ad506e05d865a610faba74340dbe8c37838ca43cf23b772d65ceeb",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\attempts\\005_result.json": "3f19800d48a72625d2e0eb693bb3e555a6076bc34cd91142d6323dd9006a2932",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\attempts\\006_result.json": "4cf236228db93a09f4c884cf2aa68cf92e6745c2f05e0955e16753847108c175",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\attempts\\007_result.json": "57b0952a81f6ce3062473e094263a64a23a78a6a29f95b9b9b5b6b56a0d329a7",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\attempts\\008_result.json": "9e5274ae375c9eb3b27e8c7309ff4eeccd63b7e1b7414836d1ab0627989f8aa5",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\attempts\\009_result.json": "dc0b01eb9cb29d2da26edf74a4074bbc19389c048b13c1a78e3bca385412f346",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\attempts\\010_result.json": "892b1e47a7783970697403f1f28872c1b0daa4202aa075f8aca232f67c1eb0ab",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\attempts\\011_result.json": "359c1c9780c6aca21177ef21b826bd9c81f0e56858aa90e7b9a325faa8bae73e",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\attempts\\012_result.json": "a9cf72c5396d09df8b1f4b85087ff176566976ed2e4482ad1b5a591331b75208",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\attempts\\013_result.json": "a314dc9c54037d8b3a6129adcddfb91817197f241c5c795e5c50030b9d3cba03",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\attempts\\014_result.json": "50dc15869a1c55a3063102c3f61791078a3d88c95ea5f86a86dc6e9533b5ef09",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\attempts\\015_result.json": "4e48e74c9421a61df5c4f282e67888fca85696f65219b80a3dfc2bc4f8ff2d27",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\attempts\\016_result.json": "f45963f458c2f0807d6df7951fc310f1262e9e32b0ac4ed473a2e29bbd7ca96f",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\attempts\\017_result.json": "56f495f3d5d01d4dbbbd2fd4989d21590b439eff1d84b0b70cf7da80d2315c0c",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\attempts\\018_result.json": "5266947288d5869cfaaaa99fc0db029909ec1ff5de07b23e03b9210b12125d77",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\episodes.csv": "972c378c214c080a66a5fa3185b3e8f1e90d5882d0bcc1f686c8897bdaa9f20a",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\traces\\001_v16.jsonl": "cfd2633b9053dd71b29203c2a80cd5fdba946c0e4789803123aa6f5c3e888d50",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\traces\\002_v18.jsonl": "17dfc9c1ab72570a0bef3ed6996f8178ea260da8c33ad6ee8c71085d74836105",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\traces\\003_v19.jsonl": "52f72f8a38a17c01e7fd0bd6f304933d61ea21a1754506da1515e12b0cbba3c2",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\traces\\004_v18.jsonl": "3db1fb8144cac3bb9a76ddf9cb814cc7bd68a808532a1b0636c393c3f75a5281",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\traces\\005_v19.jsonl": "98534b8c2752abd1f1935afd38b4ab48b6727b0491b3d69c65ac73fe6095fe24",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\traces\\006_v16.jsonl": "f77a0866305401ba3ab5db2a8e9d1f086bff2eba018a4eccdef701cf93c9c9b1",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\traces\\007_v19.jsonl": "c21b0b63189caf1cff1ebf10d611dc3b374ebe1b49f7e3947388e0c3d3149a92",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\traces\\008_v16.jsonl": "e0d906edd090e533747e6bf43ed60bca9020277ac05f2b6d225a94958f677c84",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\traces\\009_v18.jsonl": "0493adf0731bbd6f49d0f43f97ddc6f3ee5a1dcb350dc939adca4cf30fdbd90b",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\traces\\010_v16.jsonl": "2e659ed5eb648956900c86ddb8ac40688d68ed6b6c378f9fe00d8f6579aba6ac",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\traces\\011_v18.jsonl": "346a581202b457d39d8f3bae9858bf6453a1d40cc20ecf56e14c8d9581bbf6a6",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\traces\\012_v19.jsonl": "5a6e80ece20ca5efe97503c3672829af04e7fd4c5c0a5c203ada6925c1fa3262",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\traces\\013_v18.jsonl": "2d1a211008a38d8e3963af2d3a408d71ceaad17ed42561983cc7c2e1b4d0b762",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\traces\\014_v19.jsonl": "ff0a3d6f0c738841c546305d413ad7d405f78a1e4e8b7bd9de2e2e131ad89cb1",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\traces\\015_v16.jsonl": "53fc7e9b3fa25077fc1cb50fbb358c41bba3d0b4453f59973c563db5dd49253f",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\traces\\016_v19.jsonl": "53af163aa68f1dccfbf9498940c1a48b354140cf58ed42179d8de92dad4501b0",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\traces\\017_v16.jsonl": "5ef6c257892e6e9f4f2b5ffe4ddd890140c1372f15de410034f4abc14cea81b6",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_a\\traces\\018_v18.jsonl": "1acc37ccf4cc9967f7f199c433421d4621c17f801cee5ac5ef54ff9e0c8976b7",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\manifest.json": "fab86ef247ff9d1ec0f063c7b645428166f3a8d817f23d85e36aefc2eec3434a",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\completion.json": "85443c31f5e8acf936be37c7050e4f6aae8d9f10ce7a67cb8008b167890ee309",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\attempts\\001_result.json": "0ba890c6a1723867332392b6a8c0c4efbb2ee39ae3cec16742a1eaea54f041a3",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\attempts\\002_result.json": "dedadb4490e0afc82557765e0a2a97c1b7e58c88639100f1eb5c05293dbdf6da",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\attempts\\003_result.json": "3d04583c3c46e101c5c30b51e02a7772b8ff307ced5bd753b0a845c2c890df8e",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\attempts\\004_result.json": "baa2152e8b67fe5c5fa748c3a2b1c4766c474cbc7e106c44138fa9c280201ba0",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\attempts\\005_result.json": "cb88d3fa56b1313beca51630ddda0ff9e475a48e02cfcf285f1b2ad2421ced49",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\attempts\\006_result.json": "50dcf37d6ddf5c63d67567258746e1a268beec698807490dd98c8dc22799e5ee",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\attempts\\007_result.json": "f731d7770f4ac8456152ce0e306bc99a6c4a91b6f6e935c93f4afd614a54cfd9",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\attempts\\008_result.json": "ae190d7344d7d22fab5e2b1818177c74235298f5f2aec90fe44bd15947b27120",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\attempts\\009_result.json": "31f49adf834318d17bc5ba647ed327a7f827c156101caac5543d69c1fee6dc8b",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\attempts\\010_result.json": "d0b67e3e42fe0329fe2d1b9cdca89e82475014835c426aa8e820d03dc543c4f2",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\attempts\\011_result.json": "78ffc44cb48ddcad3d3977225c674e5d7b176524ad680fa7cc648af2c21513f2",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\attempts\\012_result.json": "b7870ee879b83d07084d65e3bcd005858b6b16b329792f0d7d7d9e908820333f",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\attempts\\013_result.json": "3fca28fd4691869de16361b8f21ee170b01c2831544668f07edfefb23b30c1e7",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\attempts\\014_result.json": "b4df560f26f2b776552d66dd8fe41e1aa45a462746b646d8ed9ba163bf4b5e93",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\attempts\\015_result.json": "0c0efe7b00688347b23cfc6fba2753f9c1291fc06ad87c28d4ff867f37e846ec",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\attempts\\016_result.json": "3b03560ba68ef20c01de5074b3446000a15dfe763480a7998c7a2ace7bce09bb",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\attempts\\017_result.json": "31bb3c1294a83205e63145da9a57a5866a48e2acef049064fd300e4a6858034b",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\attempts\\018_result.json": "e9495a8e4f1692697cfaf3f5aed82368bc3d71d3ebe87d552e7608ceaf21d4df",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\episodes.csv": "67808c644581f74e5705211e6d718a781a18c80df8d769f20a4e3c0b4ff5f595",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\traces\\001_v16.jsonl": "2fe290ca4fb1d79bc089282c32125368c1a8831d46e8925f8962de790175e66e",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\traces\\002_v18.jsonl": "5156e08ea4c0c4beb14fe376de757a5fb6166f82c9eb5e691839630e6391fbb7",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\traces\\003_v19.jsonl": "9edcee829f6907a6419a395bdbb3e5a30cbe900d2c342f9838c6455d32e1de2f",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\traces\\004_v18.jsonl": "0d23bb26ad381f291aa85e40f0980aa6dfc9a87674113e4b1c72d89cfd106720",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\traces\\005_v19.jsonl": "b82614c96f25e4e8189d84ab0b5812dcfbf6535e484b641ff74653a23ae99ff7",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\traces\\006_v16.jsonl": "863e190afca76ce780a6d404ada909e10a59f9ae98369931ce1efc4e53fdaa07",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\traces\\007_v19.jsonl": "a3824ea9cec1f14d76eb8c6ee60b7d8846e028de9574aed54ba282cfb3d1b2bf",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\traces\\008_v16.jsonl": "f951195c9ec0c092b01fd3e25e164b50121c937e75accf8152ae36c5097b963b",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\traces\\009_v18.jsonl": "fd856b23f2b3f96588ea7fe7ff9dd5992660548c1022c1750fcb1122149658fe",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\traces\\010_v16.jsonl": "3c70c4b06215e0ffefe6226ad185802741721b8a1a7970801d121f3332c51df7",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\traces\\011_v18.jsonl": "573629c8b4bfe25525a7d45ff8cd8f463bbc39200ab92e11a5c78fb6f06845b0",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\traces\\012_v19.jsonl": "99a5d2a4cf10813ef1bc58f952384370ce7084536d9b89b347c1feeb375a9bcf",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\traces\\013_v18.jsonl": "47b149c88a0127cfb50d563445cc027928fb8de9f49a81f1dbcb1e109d2830db",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\traces\\014_v19.jsonl": "ad03c20b13d308902fccbf139ee83bfa8abc9d0143031ce21edc04274b2ded4b",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\traces\\015_v16.jsonl": "f9a102a135ff75abfbaa1811c4d98853167d6b5380bc0fed50e7f38399af6bfd",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\traces\\016_v19.jsonl": "18830454637a0c62ebe19113a71610d8e8ae76ee1955d27ebb7c028a85aec7c9",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\traces\\017_v16.jsonl": "72c43187b94a7a9118b1486e4de4806d8f88ca81cb1bb645fbd414bd7206b90a",
+    "results\\safety_dev\\v10_iterations\\v18_v19_probe_b\\traces\\018_v18.jsonl": "854b9fd1d3ac4a8cd3dc723f3d4943fac4e271ea05095b7e0e2013083d7cfa32",
+    "results\\safety_dev\\v10_iterations\\motion_axis_probe5\\manifest.json": "c7e5cb95d796fbaacf7269a29c4892f1af2d844d233b4b71b82d585f87449f97",
+    "results\\safety_dev\\v10_iterations\\motion_axis_probe5\\episodes.csv": "0437ee0c1b611c3cb5f63c1a70086babf937cc202a8ac24602019b70202f2e7d",
+    "results\\safety_dev\\v10_iterations\\motion_axis_probe5\\traces\\001_v16.jsonl": "14967921fb5f43bd7a4430acc46b11dec77fcef2507b389565ee2f1bc565e3aa",
+    "results\\safety_dev\\v10_iterations\\motion_axis_probe5\\traces\\003_v16.jsonl": "c96f4e06282ecaf690d9fcdf4b4a79c7e964825637b6d97e589e7a3445b224fe",
+    "results\\safety_dev\\v10_iterations\\motion_axis_probe5\\traces\\004_v16.jsonl": "8d39e91319f45c4726a9d163b3f90a07034f18b462a8272f8d78c937ad273c2b",
+    "results\\safety_dev\\v10_iterations\\motion_axis_remaining27\\manifest.json": "ba5bcf28dc25bad4f5d8a9ab1dbdc43966015c7e12758043b22106918ea7948a",
+    "results\\safety_dev\\v10_iterations\\motion_axis_remaining27\\episodes.csv": "fab2550cd96a583ae07d6d9eb47ed8201e8577b3bc9fded92e7aba7320f0c6c5",
+    "results\\safety_dev\\v10_iterations\\motion_axis_remaining27\\traces\\009_v16.jsonl": "7b6648d790041267ce73d86f360084ae8ecd7de4e75402e82a2079aec93e4c3c",
+    "results\\safety_dev\\v10_iterations\\motion_axis_remaining27\\traces\\015_v16.jsonl": "997ea0fdf8dbe00a988dce5f585f3903fb3c422360a1392fed27a9e2bee1953c",
+    "results\\safety_dev\\v10_iterations\\motion_axis_remaining27\\traces\\016_v16.jsonl": "d5e3438510c0129c9d29cc877dc67e53c5410b9a0ee3c8f34b51286af0228162",
+    "results\\safety_dev\\v10_iterations\\motion_axis_remaining27\\traces\\026_v16.jsonl": "d684454f0bf13ef980e9ece692ecfdbdc5626c322a3591b8a710ac3188dd4dcd",
+    "results\\safety_dev\\v10_iterations\\motion_axis_remaining27\\traces\\027_v16.jsonl": "37185798a54595a436d87cc8f9a9191611d21fa099d282671f602db9dfccf386",
+    "results\\safety_dev\\v10_iterations\\v16_broader40_paired\\manifest.json": "f5085abab5f686fc6bd6a8f19bdb06b50e35a76fe7bcd473fee62cd51b35f18d",
+    "results\\safety_dev\\v10_iterations\\v16_broader40_paired\\episodes.csv": "e45113f909f908dcd053be943f4cbca17e5f4dabf74ee1ec59313ba3abb4e299",
+    "results\\safety_dev\\v10_iterations\\v16_broader40_paired\\traces\\002_v16.jsonl": "9bdcc9c3447fa4cdc5f8963768cd417d29e8f913f8c9adcd5e047f3c028f8f25",
+    "results\\safety_dev\\v10_iterations\\v16_broader40_paired\\traces\\003_v16.jsonl": "02021967d38f38dfcdaa61c4fc036138ecaff9c906e2a7edd616ae57beb51f0e",
+    "results\\safety_dev\\v10_iterations\\v16_broader40_paired\\traces\\007_v16.jsonl": "990e084a5979310592f3c0665453d1f5ef76cea016e9307c340ba9bb479ea057",
+    "results\\safety_dev\\v10_iterations\\v16_broader40_paired\\traces\\011_v16.jsonl": "8358909759f50ab89a6495ba081f673b9fde03776f596f18b3a07954ef9c166e",
+    "results\\safety_dev\\v18_development\\probe12_trace_audit\\reproducer.py": "0aebbbe75e2a89cf28370d72f3f2637628f8dff33fda30fb6ff4b24266cbc1d1"
+  },
+  "limitations": [
+    "Selected 12-case development diagnostic, not a population success-rate estimate.",
+    "Method activations are geometry changes, not necessarily command changes or intervention prevention.",
+    "Transferred point-decision counts may include repeated physical points; source IDs are local associations, not unique ships.",
+    "Light traces contain no complete prediction snapshots, so this analysis does not re-score candidate trajectories or assert why every activation did not affect control.",
+    "Root-owned validated_development_report is the separate strict campaign validation."
+  ]
+}

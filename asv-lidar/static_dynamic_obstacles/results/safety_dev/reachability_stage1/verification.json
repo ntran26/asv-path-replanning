@@ -1,0 +1,105 @@
+{
+  "created_utc": "2026-10-03T15:36:25.671371+00:00",
+  "new_episode_runs": 0,
+  "production_controller_modified": false,
+  "tests": {
+    "command": "python -B -m pytest -q tests/test_safety_reachability.py tests/test_safety_reachability_servo.py tests/test_safety_reachability_algebra.py tests/test_safety_reachability_containment.py -p no:cacheprovider",
+    "passed": 101,
+    "failed": 0,
+    "reported_wall_seconds": 29.84,
+    "execution": "model_audit agent; root separately inspected results and ran initial 72-test suite before body-algebra changes"
+  },
+  "protected_files": {
+    "src/constants.py": {
+      "sha256": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+      "unchanged": true
+    },
+    "src/env.py": {
+      "sha256": "ea11983e161910b8105593ff5606a7999059ecf2dd60154056a8840e6af424e1",
+      "unchanged": true
+    },
+    "src/safety_v16.py": {
+      "sha256": "9cfea6e053054c1738036bda44ec33977a1446dfc441a4a6599fd7c6d591382a",
+      "unchanged": true
+    },
+    "src/asv_lidar.py": {
+      "sha256": "2f27eadc63511ea2ef2030279ef0cdebbf3893fd5010e0584c65829e60c1fcf0",
+      "unchanged": true
+    },
+    "src/ship.py": {
+      "sha256": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+      "unchanged": true
+    },
+    "bluefin/dynamics.py": {
+      "sha256": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711",
+      "unchanged": true
+    },
+    "bluefin/ship_model_v3.py": {
+      "sha256": "21afbc6605035bd905f16db7f1149fec50fc9b73ca0d4bd0a1e76b06b6c4136c",
+      "unchanged": true
+    },
+    "runs/sac_formulation_seed0_bl3/kept_best_3M/best_model.zip": {
+      "sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+      "unchanged": true
+    }
+  },
+  "source_archives": {
+    "initial_conditional_v1": {
+      "core_and_runner_match_evaluated_hashes": true,
+      "sha256": "3db9b3e9d98e87469f4a5a8f7ccecf2633495abea81ae68a18fc53c34646a894"
+    },
+    "algebraic_conditional_v2": {
+      "core_and_runner_match_evaluated_hashes": true,
+      "sha256": "2ca408f5456cb568eb3faa64c9fbb6a2b240cfc262af6322e5fa96682a1f6ade"
+    }
+  },
+  "artifacts": {
+    "results/safety_dev/reachability_stage1/README.md": {
+      "sha256": "229656bda014d9a47ffe019adf5626cdbb91fb85d88cd7a2f5319ab2bcba98b7",
+      "bytes": 10094
+    },
+    "results/safety_dev/reachability_stage1/algebraic_conditional_v2/audit.json": {
+      "sha256": "1c2a6d86f03d0c8786e87426ed025fd50043eb723d23e417b867ce44d42b4979",
+      "bytes": 20927
+    },
+    "results/safety_dev/reachability_stage1/algebraic_conditional_v2/endpoints.csv": {
+      "sha256": "5b6da15833d9a4bdf1043ea43c73491dfb4ff9fa941773df3708a168f95c5f6e",
+      "bytes": 1586
+    },
+    "results/safety_dev/reachability_stage1/algebraic_conditional_v2/REPORT.md": {
+      "sha256": "e95c0c0ba89dfe6ff823259489b1d3a6095113292d63539616abe762a38c7866",
+      "bytes": 1654
+    },
+    "results/safety_dev/reachability_stage1/algebraic_conditional_v2/source.zip": {
+      "sha256": "2ca408f5456cb568eb3faa64c9fbb6a2b240cfc262af6322e5fa96682a1f6ade",
+      "bytes": 100019
+    },
+    "results/safety_dev/reachability_stage1/initial_conditional_v1/audit.json": {
+      "sha256": "8f20c9bf5a924356941321dc1bb9a4117a908caacfe4a86f37bd742ce3fc38fd",
+      "bytes": 20935
+    },
+    "results/safety_dev/reachability_stage1/initial_conditional_v1/endpoints.csv": {
+      "sha256": "4d5625ecd5f696d5684b6b51c213f5f641ac6cfc4126fafe5a889c29a96c73d4",
+      "bytes": 1595
+    },
+    "results/safety_dev/reachability_stage1/initial_conditional_v1/REPORT.md": {
+      "sha256": "1b1e24d88d2457e6092b9cd3d769b1829eba4e4a741395344a88fa969700a6e7",
+      "bytes": 1653
+    },
+    "results/safety_dev/reachability_stage1/initial_conditional_v1/source.zip": {
+      "sha256": "3db9b3e9d98e87469f4a5a8f7ccecf2633495abea81ae68a18fc53c34646a894",
+      "bytes": 40528
+    }
+  },
+  "modified_document_newlines": {
+    "planning/SAFETY_LAYER_HANDOFF.md": {
+      "crlf": 0,
+      "lf": 776
+    },
+    "planning/SAFETY_LAYER_COMPLETE_SUMMARY.md": {
+      "crlf": 0,
+      "lf": 850
+    }
+  },
+  "scope": "Conditional real-arithmetic numerical-map diagnostic; no action/mission certificate."
+}

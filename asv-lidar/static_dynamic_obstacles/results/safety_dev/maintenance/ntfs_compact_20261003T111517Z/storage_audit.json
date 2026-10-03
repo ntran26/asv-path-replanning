@@ -1,0 +1,28 @@
+{
+  "initial_safety_dev_logical_bytes": 2827335053,
+  "initial_safety_dev_GetCompressedFileSizeW_bytes": 2827335053,
+  "initial_files": 3010,
+  "initial_jsonl_bytes": 2687145821,
+  "initial_offline_or_recall_files": 0,
+  "initial_reparse_paths": 0,
+  "initial_compressed_files": 0,
+  "safety_source_bytes": 254874,
+  "safety_script_tree_bytes_before_maintenance_tool": 718082,
+  "safety_tests_bytes_before_maintenance_tests": 443764,
+  "duplicate_cache_pickle_groups": 150,
+  "duplicate_cache_pickle_redundant_bytes": 4404436,
+  "byte_identical_source_archive_groups": 0,
+  "duplicate_scan_resident_bytes_read": 17765853,
+  "preserved_duplicate_cache_directories": [
+    "scenario_cache/55194f23318f44109861",
+    "scenario_cache/5d6fdb07eca31b88f91c"
+  ],
+  "reproducible_safety_bytecode_candidates": 6,
+  "reproducible_safety_bytecode_candidate_bytes": 28852,
+  "notes": [
+    "CIM process-command enumeration was access denied; root confirmed no active safety evaluations before applying maintenance.",
+    "Only completed pilot/iteration traces were compressed; no cached scenes, reports, results or source archives were deleted.",
+    "GetCompressedFileSizeW measurements are recorded separately from whole-drive free-space change.",
+    "Do not remove original trace paths or source archives: saved report validators and offline audits depend on them."
+  ]
+}

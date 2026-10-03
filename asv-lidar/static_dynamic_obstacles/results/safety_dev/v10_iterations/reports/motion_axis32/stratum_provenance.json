@@ -1,0 +1,11 @@
+{
+  "derivation": "Completed validated summary/paired records only; original report files preserved.",
+  "input_sha256": {
+    "paired.csv": "341512a5d99cb00a1fe21cc9f403863b4c58724494309447a5dd6a84b858849c",
+    "summary.json": "50844de83fa32a6d0c7a6f12a4655c72b47cb692acc289c21b2c920654747d4b",
+    "provenance.json": "83ec61443c66a8dd34d02eb7fc9373699d07e882662dbad457db9bb1c0d3cd41"
+  },
+  "script_sha256": "2d8f289e80d1e8939983a61b4d7f5442a93080828fc411caec2779ce4990d620",
+  "count_helper_sha256": "6be8c59be55543de057331f4bb8abfa3107b4b11a0580447fda25f514920f215",
+  "new_episodes": 0
+}

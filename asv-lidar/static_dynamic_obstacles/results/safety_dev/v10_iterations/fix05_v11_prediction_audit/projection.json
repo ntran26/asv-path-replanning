@@ -1,0 +1,544 @@
+{
+  "scope": "saved-state, same-plan/bank sensitivity; no episodes or action selection",
+  "trace_sha256": "7667f6a87c3ce27e344763429f9267285ef06bf850b1bd8d9e4c25b20ec5f12d",
+  "source_hashes": {
+    "src/safety_v2.py": "209195c3b9241dfa6a798b7cfca857dfd14218c38625d99bc2a9c0d97c1b3d55",
+    "src/safety_v3.py": "28efcc06af8ec0ffc0074267b7f1b2e36ba4fd1f6e033900c39b9b96b6d40d0a",
+    "src/safety_v4.py": "0f2bc31c9028c11390bf19e06de89e82e546c184645255aa007921896b649f28",
+    "src/safety_v7.py": "94a64f2c0914ddafe0cbc8f2d0f3256c4aee99ade16fe796e6d13a095c300444",
+    "src/classical/common.py": "456f39769ffa237f826eff8f9852a6d0823a2f975f85d2345ba7b42105e0977d",
+    "src/tracking.py": "9929426c0c9aa74bb0846358c0edc73ec5dca817beca755c7fe79d06d4b1d639",
+    "src/safety_track_persistence.py": "ed3f876f55e8e6f33fbe6b7f5a32c5e626b9cfdcdf98c23bb0ff4a51b9c26e0b"
+  },
+  "projection": {
+    "step": 19,
+    "source_id": 4,
+    "prior": [
+      6.3015365213029195,
+      9.29519936056988
+    ],
+    "old_fit": [
+      6.171763158834111,
+      9.075636339143589
+    ],
+    "projected": [
+      6.281293236966,
+      9.305072670040598
+    ],
+    "truth": [
+      6.287085399498231,
+      9.301649685577269
+    ],
+    "old_error_m": 0.25373460930260183,
+    "projected_error_m": 0.0067279989176553,
+    "old_innovation_m": 0.2550471446307579,
+    "projected_innovation_m": 0.022522717434846285,
+    "axes": [
+      {
+        "axis": "longitudinal",
+        "observed_extent": 1.7207334292504481,
+        "full_extent": true,
+        "centre_interval": [
+          1.5643803017480862,
+          1.568646872497638
+        ],
+        "prior_coordinate": 1.5890363045577098,
+        "selected_coordinate": 1.5665135871228622,
+        "old_fit_coordinate": 1.568646872497638
+      },
+      {
+        "axis": "lateral",
+        "observed_extent": 0.24259161263531048,
+        "full_extent": false,
+        "centre_interval": [
+          -11.120059189012002,
+          -10.862650801647312
+        ],
+        "prior_coordinate": -11.116881635820846,
+        "selected_coordinate": -11.116881635820846,
+        "old_fit_coordinate": -10.862650801647312
+      }
+    ]
+  },
+  "variants": [
+    {
+      "step": 18,
+      "logged_why": "turn",
+      "logged_clearance": 0.012263931077608939,
+      "variants": {
+        "onboard_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 27,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": 0.13156357548704792,
+          "padded_stored_first_violation_s": null,
+          "padded_stored_clearance": 0.012263931077608939
+        },
+        "drop_base_id4_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 45,
+          "trigger_passing_bank_plans": 27,
+          "best_hard_passing_bank_clearance": 0.3202087371015284,
+          "padded_stored_first_violation_s": null,
+          "padded_stored_clearance": 0.2010717146540755
+        },
+        "oracle_target_scoring_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 45,
+          "trigger_passing_bank_plans": 27,
+          "best_hard_passing_bank_clearance": 0.3230854826202,
+          "padded_stored_first_violation_s": null,
+          "padded_stored_clearance": 0.20385507964338315
+        }
+      }
+    },
+    {
+      "step": 19,
+      "logged_why": "last certificate",
+      "logged_clearance": -0.12506714050510387,
+      "variants": {
+        "onboard_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null,
+          "padded_stored_first_violation_s": 1.375,
+          "padded_stored_clearance": -0.12506714050510387
+        },
+        "drop_base_id4_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null,
+          "padded_stored_first_violation_s": 1.375,
+          "padded_stored_clearance": -0.12506714050510387
+        },
+        "oracle_target_scoring_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 45,
+          "trigger_passing_bank_plans": 9,
+          "best_hard_passing_bank_clearance": 0.27061488912417364,
+          "padded_stored_first_violation_s": null,
+          "padded_stored_clearance": 0.20741158876585822
+        },
+        "projected_anchor_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 9,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": 0.05955683687075089,
+          "padded_stored_first_violation_s": 4.125,
+          "padded_stored_clearance": -0.0036726479574738513
+        },
+        "projected_anchor_without_base4": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 27,
+          "trigger_passing_bank_plans": 9,
+          "best_hard_passing_bank_clearance": 0.19032089930568255,
+          "padded_stored_first_violation_s": null,
+          "padded_stored_clearance": 0.12664864344414223
+        }
+      }
+    },
+    {
+      "step": 20,
+      "logged_why": "last certificate",
+      "logged_clearance": -0.2974153343430722,
+      "variants": {
+        "onboard_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null,
+          "padded_stored_first_violation_s": 0.875,
+          "padded_stored_clearance": -0.2974153343430722
+        },
+        "drop_base_id4_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null,
+          "padded_stored_first_violation_s": 0.875,
+          "padded_stored_clearance": -0.10737517601517375
+        },
+        "oracle_target_scoring_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 43,
+          "trigger_passing_bank_plans": 9,
+          "best_hard_passing_bank_clearance": 0.22758805534900098,
+          "padded_stored_first_violation_s": null,
+          "padded_stored_clearance": 0.22717045426076057
+        },
+        "projected_anchor_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null,
+          "padded_stored_first_violation_s": 1.125,
+          "padded_stored_clearance": -0.2974153343430722
+        },
+        "projected_anchor_without_base4": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 27,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": 0.14481856966094028,
+          "padded_stored_first_violation_s": null,
+          "padded_stored_clearance": 0.14439080483341218
+        }
+      }
+    },
+    {
+      "step": 21,
+      "logged_why": "last certificate",
+      "logged_clearance": -0.33535390417415867,
+      "variants": {
+        "onboard_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null,
+          "padded_stored_first_violation_s": 2.375,
+          "padded_stored_clearance": -0.3353539041741588
+        },
+        "drop_base_id4_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 6,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": 0.003658890763694661,
+          "padded_stored_first_violation_s": null,
+          "padded_stored_clearance": 0.0031051012673514317
+        },
+        "oracle_target_scoring_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 60,
+          "trigger_passing_bank_plans": 54,
+          "best_hard_passing_bank_clearance": 0.3402255894747196,
+          "padded_stored_first_violation_s": null,
+          "padded_stored_clearance": 0.3396303044396939
+        },
+        "projected_anchor_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null,
+          "padded_stored_first_violation_s": 2.375,
+          "padded_stored_clearance": -0.3353539041741588
+        },
+        "projected_anchor_without_base4": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 54,
+          "trigger_passing_bank_plans": 54,
+          "best_hard_passing_bank_clearance": 0.25735159324781676,
+          "padded_stored_first_violation_s": null,
+          "padded_stored_clearance": 0.25596977053722647
+        }
+      }
+    },
+    {
+      "step": 22,
+      "logged_why": "last certificate",
+      "logged_clearance": -0.31280223575170074,
+      "variants": {
+        "onboard_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null,
+          "padded_stored_first_violation_s": 0.125,
+          "padded_stored_clearance": -0.31280223575170074
+        },
+        "drop_base_id4_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 36,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": 0.005833034380690133,
+          "padded_stored_first_violation_s": null,
+          "padded_stored_clearance": 0.00555050078000105
+        },
+        "oracle_target_scoring_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 60,
+          "trigger_passing_bank_plans": 54,
+          "best_hard_passing_bank_clearance": 0.3350805253281218,
+          "padded_stored_first_violation_s": null,
+          "padded_stored_clearance": 0.334892839086378
+        },
+        "projected_anchor_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null,
+          "padded_stored_first_violation_s": 0.125,
+          "padded_stored_clearance": -0.31280223575170074
+        },
+        "projected_anchor_without_base4": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 60,
+          "trigger_passing_bank_plans": 54,
+          "best_hard_passing_bank_clearance": 0.25839434536383565,
+          "padded_stored_first_violation_s": null,
+          "padded_stored_clearance": 0.2582035499098462
+        }
+      }
+    },
+    {
+      "step": 23,
+      "logged_why": "no escape",
+      "logged_clearance": "-inf",
+      "variants": {
+        "onboard_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "drop_base_id4_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 4,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": 0.0007450666474589085
+        },
+        "oracle_target_scoring_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 59,
+          "trigger_passing_bank_plans": 53,
+          "best_hard_passing_bank_clearance": 0.3314894088879906
+        },
+        "projected_anchor_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "projected_anchor_without_base4": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 59,
+          "trigger_passing_bank_plans": 50,
+          "best_hard_passing_bank_clearance": 0.2547535876095335
+        }
+      }
+    },
+    {
+      "step": 24,
+      "logged_why": "no escape",
+      "logged_clearance": "-inf",
+      "variants": {
+        "onboard_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "drop_base_id4_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 9,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": 0.005100987419845243
+        },
+        "oracle_target_scoring_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 54,
+          "trigger_passing_bank_plans": 53,
+          "best_hard_passing_bank_clearance": 0.33737386313735185
+        },
+        "projected_anchor_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "projected_anchor_without_base4": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 53,
+          "trigger_passing_bank_plans": 27,
+          "best_hard_passing_bank_clearance": 0.2593130600191941
+        }
+      }
+    },
+    {
+      "step": 25,
+      "logged_why": "no escape",
+      "logged_clearance": "-inf",
+      "variants": {
+        "onboard_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "drop_base_id4_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "oracle_target_scoring_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 27,
+          "trigger_passing_bank_plans": 9,
+          "best_hard_passing_bank_clearance": 0.16398911879758113
+        },
+        "projected_anchor_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 9,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": 0.08728594025288802
+        },
+        "projected_anchor_without_base4": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 12,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": 0.08728594025288802
+        }
+      }
+    },
+    {
+      "step": 26,
+      "logged_why": "no escape",
+      "logged_clearance": "-inf",
+      "variants": {
+        "onboard_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "drop_base_id4_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "oracle_target_scoring_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "projected_anchor_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "projected_anchor_without_base4": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        }
+      }
+    },
+    {
+      "step": 27,
+      "logged_why": "no escape",
+      "logged_clearance": "-inf",
+      "variants": {
+        "onboard_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "drop_base_id4_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "oracle_target_scoring_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "projected_anchor_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "projected_anchor_without_base4": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        }
+      }
+    },
+    {
+      "step": 28,
+      "logged_why": "no escape",
+      "logged_clearance": "-inf",
+      "variants": {
+        "onboard_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "drop_base_id4_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "oracle_target_scoring_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "projected_anchor_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "projected_anchor_without_base4": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        }
+      }
+    },
+    {
+      "step": 29,
+      "logged_why": "no escape",
+      "logged_clearance": "-inf",
+      "variants": {
+        "onboard_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "drop_base_id4_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "oracle_target_scoring_only": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "projected_anchor_all": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        },
+        "projected_anchor_without_base4": {
+          "bank_plans": 120,
+          "hard_passing_bank_plans": 0,
+          "trigger_passing_bank_plans": 0,
+          "best_hard_passing_bank_clearance": null
+        }
+      }
+    }
+  ],
+  "caveat": "Changing recorded perception while holding own trajectories fixed is not a closed-loop rescue test. The projected centre uses only the previous onboard anchor, current onboard heading and returns. Truth-target substitution is labelled sensitivity scoring only. Old stored tails are padded with V7 convention for parity with the full-horizon logged proposal check."
+}

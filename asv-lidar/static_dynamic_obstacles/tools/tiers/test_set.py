@@ -40,7 +40,27 @@ with every episode whose own hull starts in contact with a panel replaced
 the scenario (`flags["own_start_s"]` = `L1_BO_START_S`, honoured by
 `scenario.own_start_s`) under the Paper 2 field rules plus the start check,
 rotated FIX/VAR and trimmed to the same count.  All other episodes are v1's.
-Default `--version 2`; results in `results/test_set/v2/<tag>/`.
+Results in `results/test_set/v2/<tag>/`.
+
+**Version 3 (2026-10-03, the user's call: field deployment runs boustrophedon
+survey lanes, so straight legs are the common case; vary the obstacle
+arrangements more, keep some slanted legs).** v3 is v2 with:
+* in each Paper 2 layout cell (L1-L3 x HO/CRP/CRS/OT/BO), a share `V3_FIELD_REPLACE`
+  (L1 1/3; L2, L3 2/3) of the episodes replaced by **new three-panel arrangements**
+  (`FS-<code>` cells):
+  `field_training.sample` layouts (Paper 2-style motifs, never near L1-L3, an A*
+  route, the field rules, space-time solvable), matching encounter and FIX/VAR,
+  legs `V3_FS_STRAIGHT` straight / the rest slanted, own hull start-clear;
+* `V3_FROZEN_REPLACE` of the slanted frozen-basin episodes that keep all three
+  panels at reset replaced by new straight-leg episodes of the same class and
+  target behaviour that also do (panels placed at reset as in the frozen suite --
+  the CPA guard drops panels near the encounter, so of 130 basin episodes asking
+  for three only 31 keep them), start-clear and space-time solvable.
+* for balance: `V3_NT_ADD` no-target and `V3_OT_DENSE` dense overtaking field-style
+  episodes in place of overtaking episodes with no static obstacle (175 of v2's
+  238 overtaking episodes had none).
+Everything else is v2's; the development sets are untouched.  Default
+`--version 3`; results in `results/test_set/v3/<tag>/`.
 
     python tools/tiers/test_set.py --build                      # write the definition
     python tools/tiers/test_set.py --model runs/.../best_model.zip --tag sacs0_bl3 --safety off
@@ -83,6 +103,18 @@ START_GAP_M = 0.30                    # v2: a regenerated episode's own hull sta
 L1_BO_START_S = 8.0                   # v2: L1 being-overtaken starts 8 m along the leg (y = 10),
                                       # its stern 0.6 m past the (5, 8) panel
 CELL_FIXES = {("L1", "BO"): {"own_start_s": L1_BO_START_S}}
+V3_FIELD_REPLACE = {"L1": 1 / 3, "L2": 2 / 3, "L3": 2 / 3}   # v3: share of each Paper 2 layout cell given a
+                                      # new arrangement (L2/L3 legs are slanted, L1's straight)
+V3_FS_STRAIGHT = 0.75                 # v3: of the new field-style episodes, straight legs
+V3_FROZEN_REPLACE = 17                # v3: of the 25 slanted frozen-basin episodes that keep all three
+                                      # panels at reset, this many replaced by straight ones that also do
+V3_NT_ADD = 27                        # v3 balance: no-target field-style episodes added (3 -> 30) ...
+V3_OT_DENSE = 70                      # ... and dense field-style overtaking, both in place of overtaking
+                                      # episodes with no static obstacle at all (175 of 238 in v2)
+V3_FS_SEED_BASE = 450_000             # v3 generator seeds (seed_fn adds 200,000): no other set uses them
+V3_FS_EPISODE_SEED = 496_000
+V3_FROZEN_SEED_INDEX = 8_500          # frozen_eval namespace index (Tier B uses 0-7,999)
+V3_FROZEN_EPISODE_SEED = 497_000
 
 
 def out_dir(version=None):
@@ -188,7 +220,9 @@ def _trim(items, target=TARGET_EPISODES, max_cut=MAX_CELL_CUT):
 def build(env=None):
     """The set, from the cache `results/test_set[/vN]/set_v<version>.pkl` when its
     digest matches `definition.json`, else built and cached (v1 about 25 min)."""
-    if not SET_VERSION.startswith("1"):
+    if SET_VERSION.startswith("3"):
+        return build_v3(env)
+    if SET_VERSION.startswith("2"):
         return build_v2(env)
     return build_v1(env)
 
@@ -320,11 +354,167 @@ def build_v2(env=None):
     return kept, report
 
 
+def _hash_order(items):
+    return sorted(items, key=lambda it: hashlib.sha256(it["test_id"].encode()).hexdigest())
+
+
+def _panels(it):
+    """Panels actually placed at reset (frozen-suite panels near the encounter are
+    dropped by the CPA guard, so the requested count can overstate it)."""
+    if "panels" in it:
+        return int(it["panels"])
+    fixed = (it["built"].flags or {}).get("fixed_obstacles")
+    return len(fixed) if fixed else int(it["built"].n_obstacles)
+
+
+def _fs_episode(env, code, variant, straight, k):
+    """One new field-style three-panel episode (see the v3 docstring)."""
+    import field_training as ft
+    import scenario as scn
+    while True:
+        base = V3_FS_SEED_BASE + k * 20
+        built = ft.sample(np.random.default_rng(base), namespace="test_v3", encounter=code,
+                          varying=(variant == "VAR"),
+                          generator=scn.ScenarioGenerator(stage=5, seed_namespace="frozen_eval"),
+                          seed_fn=lambda j, base=base: base + 200_000 + j, solvable_only=True,
+                          near=False, straight=straight)
+        episode_seed = V3_FS_EPISODE_SEED + k
+        k += 1
+        if _start_clear(env, built, episode_seed):
+            return built, episode_seed, k
+
+
+def _frozen_straight(env, cls, variant, k):
+    """One new straight-leg three-panel frozen-basin episode (see the v3 docstring)."""
+    import feasibility_st
+    import scenario as scn
+    gen = scn.ScenarioGenerator(stage=5, seed_namespace="frozen_eval")
+    while True:
+        seed = scn.seed_for("frozen_eval", V3_FROZEN_SEED_INDEX + k)
+        episode_seed = V3_FROZEN_EPISODE_SEED + k
+        k += 1
+        x = float(np.random.default_rng(seed + 1).uniform(*cfg.BASIN_X_RANGE))
+        built = gen.sample(seed, case_id=f"v3-{seed}", encounter_class=cls,
+                           behaviour=suite.target_model(variant.lower(), cls), geometry_mode="basin",
+                           flags={"stratum": "basin",
+                                  "basin_leg": [[x, float(cfg.BASIN_START_Y)], [x, float(cfg.BASIN_GOAL_Y)]]})
+        if built is None or int(built.n_obstacles) != 3:
+            continue
+        if not _start_clear(env, built, episode_seed):       # resets: the panels are placed
+            continue
+        if len(env.obstacles) != 3:                          # all three must survive the CPA guard
+            continue
+        if not feasibility_st.scenario_solvable(built, [list(map(tuple, p)) for p in env.obstacles])["solvable"]:
+            continue
+        return built, episode_seed, k
+
+
+def build_v3(env=None):
+    """v2 with new obstacle arrangements and more straight legs (see the docstring)."""
+    import pickle
+    curriculum.apply_stage(tf.PROPULSION_STAGE)
+    out = out_dir("3.0")
+    cache, meta = out / "set_v3.0.pkl", out / "definition.json"
+    if cache.exists() and meta.exists():
+        with open(cache, "rb") as fh:
+            kept, report = pickle.load(fh)
+        if report.get("manifest_digest") == json.loads(meta.read_text()).get("manifest_digest"):
+            return kept, report
+    if env is None:
+        from env import ASVLidarEnv
+        env = ASVLidarEnv(render_mode=None, emergency_stop=False)
+    v2, v2_report = build_v2(env)
+    for it in v2:                                         # realised panel counts (placed at reset)
+        env.reset(seed=it["episode_seed"], options={"generated": it["built"]})
+        it["panels"] = len(env.obstacles)
+    drop, new = set(), []
+    # 1. Paper 2 layout cells: half get a new arrangement (same encounter and FIX/VAR).
+    field = [it for it in v2 if it["source"] == "paper2" and not it["cell"].endswith("-NT")]
+    k_fs, j_fs, counts = 0, 0, {}
+    for cell in sorted({it["cell"] for it in field}):
+        members = _hash_order([it for it in field if it["cell"] == cell])
+        for it in members[:int(round(V3_FIELD_REPLACE[cell[:2]] * len(members)))]:
+            drop.add(it["test_id"])
+            code = cell.split("-", 1)[1]
+            straight = int((j_fs + 1) * V3_FS_STRAIGHT) > int(j_fs * V3_FS_STRAIGHT)   # exact share, spread out
+            built, seed, k_fs = _fs_episode(env, code, it["variant"], straight, k_fs)
+            n = counts[code] = counts.get(code, 0) + 1
+            tid = f"FS-{code}-{it['variant']}-{n:03d}"
+            built.case_id = tid
+            new.append({"built": built, "episode_seed": seed, "source": "paper2", "cell": f"FS-{code}",
+                        "class": built.encounter_class, "stratum": "field", "variant": it["variant"],
+                        "test_id": tid, "origin_id": tid, "leg": "straight" if straight else "slanted",
+                        "panels": len(built.flags["fixed_obstacles"])})
+            j_fs += 1
+            print(f"[v3] {tid} ({'straight' if straight else 'slanted'}) replaces {it['test_id']}", flush=True)
+    # 2. Frozen basin: slanted three-panel episodes made straight, cell by cell in proportion.
+    slanted = [it for it in v2 if it["source"] == "frozen" and it["built"].geometry_mode == "basin"
+               and _panels(it) >= 3 and abs(float(it["built"].slant_realised_deg)) > 2.0]
+    quota = {}
+    for cell in sorted({it["cell"] for it in slanted}):
+        quota[cell] = int(round(V3_FROZEN_REPLACE * sum(it["cell"] == cell for it in slanted) / len(slanted)))
+    while sum(quota.values()) != V3_FROZEN_REPLACE:                 # rounding: settle on the largest cell
+        big = max(quota, key=lambda c: sum(it["cell"] == c for it in slanted))
+        quota[big] += 1 if sum(quota.values()) < V3_FROZEN_REPLACE else -1
+    k_fr, made = 0, {}
+    for cell, q in quota.items():
+        for it in _hash_order([it for it in slanted if it["cell"] == cell])[:q]:
+            drop.add(it["test_id"])
+            cls = it["class"]
+            built, seed, k_fr = _frozen_straight(env, cls, it["variant"], k_fr)
+            n = made[(cls, it["variant"])] = made.get((cls, it["variant"]), 0) + 1
+            tid = f"BAS-{suite.CLASS_CODES[cls]}-{it['variant']}-S{n:03d}"
+            built.case_id = tid
+            new.append({"built": built, "episode_seed": seed, "source": "frozen", "cell": cell, "class": cls,
+                        "stratum": "basin", "variant": it["variant"], "test_id": tid, "origin_id": tid,
+                        "leg": "straight", "panels": 3})
+            print(f"[v3] {tid} (straight) replaces {it['test_id']}", flush=True)
+    # 3. Balance (paper): overtaking was mostly empty water and no-target field
+    #    layouts had three episodes.  Replace obstacle-free overtaking episodes with
+    #    no-target and dense overtaking field-style episodes.
+    empty_ot = _hash_order([it for it in v2 if it["source"] == "frozen" and it["class"] == "overtaking"
+                            and _panels(it) == 0 and it["test_id"] not in drop])
+    plan = [("NT", "")] * V3_NT_ADD + [("OT", "FIX" if i % 2 == 0 else "VAR") for i in range(V3_OT_DENSE)]
+    for it, (code, variant) in zip(empty_ot, plan):
+        drop.add(it["test_id"])
+        straight = int((j_fs + 1) * V3_FS_STRAIGHT) > int(j_fs * V3_FS_STRAIGHT)
+        built, seed, k_fs = _fs_episode(env, code, variant, straight, k_fs)
+        n = counts[code] = counts.get(code, 0) + 1
+        tid = f"FS-{code}-{variant or 'NT'}-{n:03d}" if code != "NT" else f"FS-NT-{n:03d}"
+        built.case_id = tid
+        new.append({"built": built, "episode_seed": seed, "source": "paper2", "cell": f"FS-{code}",
+                    "class": built.encounter_class, "stratum": "field", "variant": variant,
+                    "test_id": tid, "origin_id": tid, "leg": "straight" if straight else "slanted",
+                    "panels": len(built.flags["fixed_obstacles"])})
+        j_fs += 1
+        print(f"[v3] {tid} ({'straight' if straight else 'slanted'}) replaces {it['test_id']} (balance)", flush=True)
+    kept = [it for it in v2 if it["test_id"] not in drop] + new
+    three = [it for it in kept if _panels(it) >= 3]
+    straight_share = float(np.mean([abs(float(it["built"].slant_realised_deg)) <= 2.0 for it in three]))
+    digests = {it["test_id"]: it["built"].digest() for it in kept}
+    blob = json.dumps(digests, sort_keys=True, separators=(",", ":"))
+    report = {"version": "3.0", "base": "2.0", "base_digest": v2_report["manifest_digest"],
+              "episodes": len(kept), "distinct_scenarios": v2_report.get("distinct_scenarios"),
+              "removed_near_duplicates": v2_report.get("removed_near_duplicates"), "replaced": sorted(drop), "new": [it["test_id"] for it in new],
+              "new_field_style": sum(it["cell"].startswith("FS-") for it in new),
+              "new_frozen_straight": sum(not it["cell"].startswith("FS-") for it in new),
+              "three_panel_episodes": len(three), "three_panel_straight_share": round(straight_share, 3),
+              "settings": {"field_replace": V3_FIELD_REPLACE, "fs_straight": V3_FS_STRAIGHT,
+                           "frozen_replace": V3_FROZEN_REPLACE, "nt_add": V3_NT_ADD, "ot_dense": V3_OT_DENSE},
+              "manifest_digest": hashlib.sha256(blob.encode()).hexdigest()}
+    out.mkdir(parents=True, exist_ok=True)
+    with open(cache, "wb") as fh:
+        pickle.dump((kept, report), fh)
+    return kept, report
+
+
 def _write_definition(kept, report):
     out = out_dir()
     out.mkdir(parents=True, exist_ok=True)
     rows = [{k: it[k] for k in ("test_id", "origin_id", "source", "cell", "class", "stratum", "variant",
-                                "episode_seed", "nn_distance")} | {"digest": it["built"].digest()} for it in kept]
+                                "episode_seed")} | {"nn_distance": it.get("nn_distance"), "panels": _panels(it),
+                                                     "leg": "straight" if abs(float(it["built"].slant_realised_deg)) <= 2.0 else "slanted",
+                                                     "digest": it["built"].digest()} for it in kept]
     pd.DataFrame(rows).to_csv(out / "definition.csv", index=False)
     (out / "definition.json").write_text(json.dumps(report, indent=1, default=str))
 
@@ -343,7 +533,7 @@ def _summary(d: pd.DataFrame, group) -> pd.DataFrame:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--build", action="store_true", help="write the set definition only")
-    ap.add_argument("--version", choices=("1", "2"), default="2")
+    ap.add_argument("--version", choices=("1", "2", "3"), default="3")
     ap.add_argument("--model", type=Path)
     ap.add_argument("--policy", help="classical comparator(s) instead of a model, comma-separated: "
                                      "los_dwa, colregs_vo, encounter_vo, reference")
@@ -383,7 +573,8 @@ def _reusable(tag, mode, kept):
     reproduced all 1,000 of its earlier frozen-suite and Paper 2 rows."""
     if SET_VERSION.startswith("1"):
         return None
-    v1_rows, v1_def = OUT / tag / "episodes.csv", OUT / "definition.csv"
+    prev = "1.0" if SET_VERSION.startswith("2") else "2.0"          # the version this one is built on
+    v1_rows, v1_def = out_dir(prev) / tag / "episodes.csv", out_dir(prev) / "definition.csv"
     if not (v1_rows.exists() and v1_def.exists()):
         return None
     rows = pd.read_csv(v1_rows)
@@ -405,7 +596,7 @@ def evaluate(kept, report, *, tag, args, t0, model=None, policy="model"):
                  {k: it[k] for k in ("test_id", "origin_id", "source", "cell", "stratum", "variant")})
                 for it in kept if it["test_id"] not in done]
         if done:
-            print(f"[{tag}] reusing {len(done)} v1 rows; evaluating {len(jobs)} episodes", flush=True)
+            print(f"[{tag}] reusing {len(done)} rows of the previous version; evaluating {len(jobs)} episodes", flush=True)
         rows = run_pool(jobs, model_path=model, processes=args.processes,
                         overrides={"EMERGENCY_STOP_ENABLED": mode == "on",
                                    "SAFETY_VERSION": int(args.safety_version)}) if jobs else []

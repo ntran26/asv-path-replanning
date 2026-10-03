@@ -1,0 +1,318 @@
+{
+  "created_utc": "2026-10-03T08:50:56.987552+00:00",
+  "scope": "pure helper plus saved onboard snapshot replay; no environment reset/step or episodes",
+  "source_hashes": {
+    "src/safety_consistent_tracks.py": "304c6f41f5dc251cb41a29e5631f3d98560d1721afe656eb55860b9f8a7ed640",
+    "src/safety_v13.py": "3e14a7a6a0a687e143ee680220e0fcbb1eb92a4155a10b2e583d084b499e0b59"
+  },
+  "projection_matches_independent_math_atol": 1e-12,
+  "disabled_parity_frames": 29,
+  "v11_recorded_track_views_reproduced_frames": 29,
+  "replay": [
+    {
+      "step": 1,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [],
+      "consistent_source4_position": null
+    },
+    {
+      "step": 2,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [],
+      "consistent_source4_position": null
+    },
+    {
+      "step": 3,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000000
+      ],
+      "consistent_source4_position": null
+    },
+    {
+      "step": 4,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000000
+      ],
+      "consistent_source4_position": null
+    },
+    {
+      "step": 5,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000000
+      ],
+      "consistent_source4_position": null
+    },
+    {
+      "step": 6,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000000
+      ],
+      "consistent_source4_position": null
+    },
+    {
+      "step": 7,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000000
+      ],
+      "consistent_source4_position": null
+    },
+    {
+      "step": 8,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000000
+      ],
+      "consistent_source4_position": null
+    },
+    {
+      "step": 9,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000000
+      ],
+      "consistent_source4_position": null
+    },
+    {
+      "step": 10,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000000
+      ],
+      "consistent_source4_position": null
+    },
+    {
+      "step": 11,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000000
+      ],
+      "consistent_source4_position": null
+    },
+    {
+      "step": 12,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000000
+      ],
+      "consistent_source4_position": null
+    },
+    {
+      "step": 13,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000000
+      ],
+      "consistent_source4_position": null
+    },
+    {
+      "step": 14,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000000
+      ],
+      "consistent_source4_position": null
+    },
+    {
+      "step": 15,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000000
+      ],
+      "consistent_source4_position": null
+    },
+    {
+      "step": 16,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000000,
+        -1000001
+      ],
+      "consistent_source4_position": [
+        5.687046453440668,
+        9.563609720578468
+      ]
+    },
+    {
+      "step": 17,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000000,
+        -1000001
+      ],
+      "consistent_source4_position": [
+        5.928528551110557,
+        9.447782982937337
+      ]
+    },
+    {
+      "step": 18,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000000,
+        -1000001
+      ],
+      "consistent_source4_position": [
+        6.109009518762801,
+        9.368846801956327
+      ]
+    },
+    {
+      "step": 19,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000000,
+        -1000001
+      ],
+      "consistent_source4_position": [
+        6.274763724585259,
+        9.291685185722727
+      ]
+    },
+    {
+      "step": 20,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000001
+      ],
+      "consistent_source4_position": [
+        6.462423067712496,
+        9.19202114176864
+      ]
+    },
+    {
+      "step": 21,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000001
+      ],
+      "consistent_source4_position": [
+        6.650082410839733,
+        9.092357097814554
+      ]
+    },
+    {
+      "step": 22,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000001
+      ],
+      "consistent_source4_position": [
+        6.83774175396697,
+        8.992693053860467
+      ]
+    },
+    {
+      "step": 23,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000001
+      ],
+      "consistent_source4_position": [
+        7.025401097094207,
+        8.89302900990638
+      ]
+    },
+    {
+      "step": 24,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000001
+      ],
+      "consistent_source4_position": [
+        7.213060440221444,
+        8.793364965952293
+      ]
+    },
+    {
+      "step": 25,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000001
+      ],
+      "consistent_source4_position": [
+        7.400719783348681,
+        8.693700921998207
+      ]
+    },
+    {
+      "step": 26,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000001
+      ],
+      "consistent_source4_position": [
+        7.5883791264759175,
+        8.59403687804412
+      ]
+    },
+    {
+      "step": 27,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        -1000001
+      ],
+      "consistent_source4_position": [
+        7.776038469603154,
+        8.494372834090033
+      ]
+    },
+    {
+      "step": 28,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        7,
+        -1000001
+      ],
+      "consistent_source4_position": [
+        7.963697812730391,
+        8.394708790135946
+      ]
+    },
+    {
+      "step": 29,
+      "disabled_parity": true,
+      "v11_reproduced_recorded_views": true,
+      "consistent_track_ids": [
+        7,
+        -1000001
+      ],
+      "consistent_source4_position": [
+        8.151357155857628,
+        8.29504474618186
+      ]
+    }
+  ]
+}

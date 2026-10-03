@@ -1,0 +1,460 @@
+{
+  "schema": 1,
+  "iterations": [
+    {
+      "tag": "persistence_three",
+      "directory": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\results\\safety_dev\\v10_iterations\\persistence_three",
+      "complete": true,
+      "planned_runs": 3,
+      "attempted": 3,
+      "completed": 3,
+      "distinct_cases": 3,
+      "filter_error_steps": 0,
+      "groups": [
+        {
+          "mode": "v11",
+          "dimension": "overall",
+          "slice": "all",
+          "n": 3,
+          "outcomes": {
+            "goal": 2,
+            "collision:target": 1,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 3,
+              "gained_goals": 2,
+              "lost_goals": 0,
+              "net_goals": 2,
+              "gained_cases": [
+                "TS2:P2-L1-CRP-VAR-14",
+                "TS2:P2-L1-CRS-VAR-08"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 1,
+                "collision:target -> goal": 2
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 3,
+              "gained_goals": 2,
+              "lost_goals": 0,
+              "net_goals": 2,
+              "gained_cases": [
+                "TS2:P2-L1-CRP-VAR-14",
+                "TS2:P2-L1-CRS-VAR-08"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 1,
+                "collision:target -> goal": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 3,
+              "gained_goals": 2,
+              "lost_goals": 0,
+              "net_goals": 2,
+              "gained_cases": [
+                "TS2:P2-L1-CRP-VAR-14",
+                "TS2:P2-L1-CRS-VAR-08"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 1,
+                "collision:target -> goal": 2
+              }
+            },
+            {
+              "reference": "v10",
+              "evidence": "fresh_reference_iteration",
+              "matched_cases": 3,
+              "gained_goals": 2,
+              "lost_goals": 0,
+              "net_goals": 2,
+              "gained_cases": [
+                "TS2:P2-L1-CRP-VAR-14",
+                "TS2:P2-L1-CRS-VAR-08"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 1,
+                "collision:target -> goal": 2
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v11",
+          "dimension": "dataset",
+          "slice": "ts2",
+          "n": 3,
+          "outcomes": {
+            "goal": 2,
+            "collision:target": 1,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 3,
+              "gained_goals": 2,
+              "lost_goals": 0,
+              "net_goals": 2,
+              "gained_cases": [
+                "TS2:P2-L1-CRP-VAR-14",
+                "TS2:P2-L1-CRS-VAR-08"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 1,
+                "collision:target -> goal": 2
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 3,
+              "gained_goals": 2,
+              "lost_goals": 0,
+              "net_goals": 2,
+              "gained_cases": [
+                "TS2:P2-L1-CRP-VAR-14",
+                "TS2:P2-L1-CRS-VAR-08"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 1,
+                "collision:target -> goal": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 3,
+              "gained_goals": 2,
+              "lost_goals": 0,
+              "net_goals": 2,
+              "gained_cases": [
+                "TS2:P2-L1-CRP-VAR-14",
+                "TS2:P2-L1-CRS-VAR-08"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 1,
+                "collision:target -> goal": 2
+              }
+            },
+            {
+              "reference": "v10",
+              "evidence": "fresh_reference_iteration",
+              "matched_cases": 3,
+              "gained_goals": 2,
+              "lost_goals": 0,
+              "net_goals": 2,
+              "gained_cases": [
+                "TS2:P2-L1-CRP-VAR-14",
+                "TS2:P2-L1-CRS-VAR-08"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 1,
+                "collision:target -> goal": 2
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v11",
+          "dimension": "stratum",
+          "slice": "unrescued_optimistic_no_fire",
+          "n": 3,
+          "outcomes": {
+            "goal": 2,
+            "collision:target": 1,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 3,
+              "gained_goals": 2,
+              "lost_goals": 0,
+              "net_goals": 2,
+              "gained_cases": [
+                "TS2:P2-L1-CRP-VAR-14",
+                "TS2:P2-L1-CRS-VAR-08"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 1,
+                "collision:target -> goal": 2
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 3,
+              "gained_goals": 2,
+              "lost_goals": 0,
+              "net_goals": 2,
+              "gained_cases": [
+                "TS2:P2-L1-CRP-VAR-14",
+                "TS2:P2-L1-CRS-VAR-08"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 1,
+                "collision:target -> goal": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 3,
+              "gained_goals": 2,
+              "lost_goals": 0,
+              "net_goals": 2,
+              "gained_cases": [
+                "TS2:P2-L1-CRP-VAR-14",
+                "TS2:P2-L1-CRS-VAR-08"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 1,
+                "collision:target -> goal": 2
+              }
+            },
+            {
+              "reference": "v10",
+              "evidence": "fresh_reference_iteration",
+              "matched_cases": 3,
+              "gained_goals": 2,
+              "lost_goals": 0,
+              "net_goals": 2,
+              "gained_cases": [
+                "TS2:P2-L1-CRP-VAR-14",
+                "TS2:P2-L1-CRS-VAR-08"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 1,
+                "collision:target -> goal": 2
+              }
+            }
+          ]
+        }
+      ],
+      "mechanisms": {
+        "v11": {
+          "changed_action_steps": 49,
+          "brake_steps": 23,
+          "decisions": 195,
+          "decision_reasons": {
+            "searched policy": 13,
+            "nominal": 75,
+            "policy prefix repaired": 7,
+            "continue": 16,
+            "turn": 26,
+            "last certificate": 20,
+            "no escape": 22,
+            "policy margin dominates": 3,
+            "idle": 10,
+            "brake": 3
+          },
+          "events": {
+            "v9_current_plan_checked": {
+              "steps": null,
+              "episodes": null,
+              "observed_steps": 0,
+              "observed_episodes": 0
+            },
+            "v9_override_suppressed": {
+              "steps": null,
+              "episodes": null,
+              "observed_steps": 0,
+              "observed_episodes": 0
+            },
+            "v10_pair_checked": {
+              "steps": 52,
+              "episodes": 3,
+              "observed_steps": 195,
+              "observed_episodes": 3
+            },
+            "v10_policy_preserved": {
+              "steps": 3,
+              "episodes": 2,
+              "observed_steps": 195,
+              "observed_episodes": 3
+            },
+            "v11_policy_prefix_search_checked": {
+              "steps": 0,
+              "episodes": 0,
+              "observed_steps": 195,
+              "observed_episodes": 3
+            },
+            "v11_policy_prefix_preserved": {
+              "steps": 0,
+              "episodes": 0,
+              "observed_steps": 195,
+              "observed_episodes": 3
+            }
+          },
+          "track_persistence": {
+            "observed_episodes": 3,
+            "added_hypothesis_decisions": 112,
+            "admission_events": 6,
+            "coasted_hypothesis_decisions": 90,
+            "contradicted_source_events": 0,
+            "expired_source_events": 5,
+            "measured_refresh_events": 16,
+            "observed_decisions": 195
+          },
+          "policy_prefix_search": {
+            "observed_episodes": 0,
+            "accepted_plans": null,
+            "evaluated_plans": null,
+            "hard_passing_plans": null,
+            "observed_decisions": 0
+          }
+        }
+      },
+      "episode_seconds": 149.4789926999656,
+      "campaign_seconds": 149.88227599998936,
+      "pilot_source_differences": {
+        "src/field_training.py": {
+          "candidate": "66601e1fc4a730d2e82711bb6151fcebdcca88c1216f8c49f85cff18781bf772",
+          "reference": "cbb7ae5c98cddce8fc1cdfc4578faf9fddeaf4e1698ac584bf5495bd6c6b9302"
+        },
+        "src/safety_fast_geometry.py": {
+          "candidate": "4aeddf2d749f9d3ef1724fb929d3d6e1451bf14bfdfa455384072d2786f29ef3",
+          "reference": null
+        },
+        "src/safety_policy_prefix.py": {
+          "candidate": "bd8076006d82c4ef8bf022451d410f8c4c590db08ca7f2d8f43618de43c0a424",
+          "reference": null
+        },
+        "src/safety_track_persistence.py": {
+          "candidate": "ed3f876f55e8e6f33fbe6b7f5a32c5e626b9cfdcdf98c23bb0ff4a51b9c26e0b",
+          "reference": null
+        },
+        "src/safety_v10.py": {
+          "candidate": "5ee4e28a464b8a1219426e0e86d6af6be74ece56b512fb50d9ad981d64e4a00e",
+          "reference": null
+        },
+        "src/safety_v11.py": {
+          "candidate": "c15435494f7df9528bf370535ba2143f6a579d45f03532614d3640deb8d624ae",
+          "reference": null
+        },
+        "tools/diagnostics/safety/safety_v11_iteration.py": {
+          "candidate": "046dcc772d173fb82fcdcc7e7394ae47aa3547c2c028bad3e36fe504834f45ec",
+          "reference": null
+        },
+        "tools/diagnostics/safety/trace_snapshot.py": {
+          "candidate": "76c26d39f7e29024be8a97189794eb3f17ba4d5ff9271e971bb8c07be3a19325",
+          "reference": null
+        }
+      },
+      "fresh_reference_provenance": {
+        "conditional_policy_32": {
+          "directory": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\results\\safety_dev\\v10_iterations\\conditional_policy_32",
+          "overlapping_cases": 3,
+          "source_differences": {
+            "src/safety_fast_geometry.py": {
+              "candidate": "4aeddf2d749f9d3ef1724fb929d3d6e1451bf14bfdfa455384072d2786f29ef3",
+              "reference": null
+            },
+            "src/safety_policy_prefix.py": {
+              "candidate": "bd8076006d82c4ef8bf022451d410f8c4c590db08ca7f2d8f43618de43c0a424",
+              "reference": null
+            },
+            "src/safety_track_persistence.py": {
+              "candidate": "ed3f876f55e8e6f33fbe6b7f5a32c5e626b9cfdcdf98c23bb0ff4a51b9c26e0b",
+              "reference": null
+            },
+            "src/safety_v11.py": {
+              "candidate": "c15435494f7df9528bf370535ba2143f6a579d45f03532614d3640deb8d624ae",
+              "reference": null
+            },
+            "tools/diagnostics/safety/safety_iteration.py": {
+              "candidate": null,
+              "reference": "6eb975a8dcbdff54733bf7f492c674a85b9818626cdd7cd85fac1b920ee8137e"
+            },
+            "tools/diagnostics/safety/safety_v11_iteration.py": {
+              "candidate": "046dcc772d173fb82fcdcc7e7394ae47aa3547c2c028bad3e36fe504834f45ec",
+              "reference": null
+            },
+            "tools/diagnostics/safety/trace_snapshot.py": {
+              "candidate": "76c26d39f7e29024be8a97189794eb3f17ba4d5ff9271e971bb8c07be3a19325",
+              "reference": null
+            }
+          },
+          "filter_classes": {
+            "v10": "safety_v10.SafetyFilterV10"
+          },
+          "constructor_options": {
+            "v10": {}
+          }
+        }
+      },
+      "cohort_components": null,
+      "checkpoint_sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+      "config_sha256": "a4df64a97f641de0b1c660b04f73ccc8401a29f7fa48711c2a6ee694dc98ed44",
+      "filter_classes": {
+        "v11": "safety_v11.SafetyFilterV11"
+      },
+      "constructor_options": {
+        "v11": {}
+      }
+    }
+  ],
+  "report_generation_new_episodes": 0,
+  "completed_iteration_records": 3,
+  "distinct_cases": 3,
+  "repeated_case_record_counts": {},
+  "scope": "Finite, enriched development cohorts; fresh/historical references remain distinct; no formal safety or population claim.",
+  "baseline_source_audit": {
+    "path": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\results\\safety_dev\\v10_iterations\\baseline_source_audit.json",
+    "sha256": "92a81c373d35d075153e4e3fb6998e8b38c9598387b64451e158866e0c1d6878"
+  }
+}

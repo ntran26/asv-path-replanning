@@ -1,0 +1,127 @@
+{
+  "new_episode_runs": 0,
+  "git_head": "907f76f3cb88affebd545690b6df504fe816118f",
+  "files": {
+    "src/env.py": {
+      "sha256": "99eda74c73a1ac69df7753f33f854892c3e90ae41accb2772ec845fdeb41b70b",
+      "crlf": 0,
+      "lf": 2034,
+      "head_sha256": "422b93eb2d7f8d47c45877fef588c098eae8d32813b6cf901b03e21515eb885e",
+      "original_line_endings_preserved": true
+    },
+    "src/safety_v6.py": {
+      "sha256": "07c1c716aea2c149f7e96a0aede2ab50d99c633706ba6d889e18a02bc52478f6",
+      "crlf": 0,
+      "lf": 315,
+      "head_sha256": "9e4573889bb481c8ed106529116fd54031b8aaf9c38557334f9f02845170feb8",
+      "original_line_endings_preserved": true
+    },
+    "src/safety_v8.py": {
+      "sha256": "3f1954a8212cb56f9e098c7e90d8d7f31e3e0f5dd75284adc2dac77a9a13486e",
+      "crlf": 0,
+      "lf": 37,
+      "head_sha256": "3c796a2884e4b2f2cfd42b7436566dad273317eaf17c9dd5ac943a477a4752d7",
+      "original_line_endings_preserved": true
+    },
+    "tools/diagnostics/safety/trigger_counterfactual.py": {
+      "sha256": "3b8dc49261da7f3942c838a7c539cac0dd724cf10bdb2e0cc41414d150ecaa7a",
+      "crlf": 304,
+      "lf": 304,
+      "head_sha256": "f5d44fb079e8088b0316c9ad0ae85e2aa04537c99dc555a6d8424da516f44d79",
+      "original_line_endings_preserved": true
+    },
+    "tools/tiers/frozen_suite.py": {
+      "sha256": "2ee47d00b3e2f99c14a6d45937d74657993571754f0ecce8745036135a8d6f23",
+      "crlf": 0,
+      "lf": 205,
+      "head_sha256": "672014265f1add66c48bb394a74be4be442b726faac8db9c98ccb25af9b30c8d",
+      "original_line_endings_preserved": true
+    },
+    "tools/tiers/paper2_suite.py": {
+      "sha256": "d0990ee30640e891d3a01cb1ac3485cfeec5f6af5e725f5141ec3ca94883f1b5",
+      "crlf": 0,
+      "lf": 174,
+      "head_sha256": "4c6142f1ed6d57e6ef4040114513e72e1e2b017c910e00dc6dd83b71c923d7af",
+      "original_line_endings_preserved": true
+    },
+    "planning/SAFETY_LAYER_V8_PLAN.md": {
+      "sha256": "141d1e2274cd1bd2b1df14906140b6d08a33dbf753a1602cbf513d0e7a7849c2",
+      "crlf": 0,
+      "lf": 188,
+      "head_sha256": "77171e8455183a08c9d7e18de60cbe9b32f7132da770948e88e894540e773785",
+      "original_line_endings_preserved": true
+    },
+    "planning/SAFETY_LAYER_HANDOFF.md": {
+      "sha256": "22194d06eb5ae0ec794444d4d13e3169cf3296c9433cab71d6dd903fabb75542",
+      "crlf": 0,
+      "lf": 694,
+      "head_sha256": "6233eb676cbfb53b3fb77f4d93a8f1fbe44c2f256a6ac82062ac99873f9610d2",
+      "original_line_endings_preserved": true
+    },
+    "src/safety_v9.py": {
+      "sha256": "a0bdb65ff9cd499b1fa02dcf0ec8ea4b8f78729e52afa23f1d529c81a1a4918a",
+      "crlf": 0,
+      "lf": 166
+    },
+    "src/safety_target_prediction.py": {
+      "sha256": "5cc68ae3c41300c0b36b552ef0e0ddb136dce89dad0c24062941448353484311",
+      "crlf": 0,
+      "lf": 192
+    },
+    "tests/test_safety_v9.py": {
+      "sha256": "2db72e7790986c47a21f38a6509f29b723fe4fe34b2b83ef7d99a3701a2c1fe2",
+      "crlf": 0,
+      "lf": 246
+    },
+    "tests/test_safety_v8_isolation.py": {
+      "sha256": "acd5a3c1dc880d3af8fbb43843768d73fa61d45595c618a5b47289bc96ddd6a8",
+      "crlf": 0,
+      "lf": 165
+    },
+    "tests/test_safety_target_prediction.py": {
+      "sha256": "fa0dcc887c3c2809ba68203dfbf843be42c354f8259699182544f8275ba3920c",
+      "crlf": 0,
+      "lf": 176
+    },
+    "tests/test_trigger_filter_dispatch.py": {
+      "sha256": "80d3c495deb992b384e26ca4f45cdd4bd5c7aa5d8d60b34177eb50bf5988f890",
+      "crlf": 0,
+      "lf": 28
+    },
+    "tests/test_safety_v8_followup_audit.py": {
+      "sha256": "7875f3b2171f858b3b064f3859d960bc032766759028a9d4ddf26d2420f702c8",
+      "crlf": 0,
+      "lf": 79
+    },
+    "tools/diagnostics/safety/v8_followup_audit.py": {
+      "sha256": "6d49a0a61d55f718b44fc1fee642eb3594eecd0ccb804df70a2500a5a4dd408d",
+      "crlf": 0,
+      "lf": 315
+    },
+    "tools/diagnostics/safety/v8_no_fire_diagnosis.py": {
+      "sha256": "f39566694ae1bbeff64db65f259c314599eb773ee77a903a161c219cd4e702e0",
+      "crlf": 0,
+      "lf": 113
+    },
+    "planning/SAFETY_LAYER_V9_PLAN.md": {
+      "sha256": "af77dfc469d040d1b7ad3c50e5d610c0d269a1fce573f639ead388e912f226cc",
+      "crlf": 0,
+      "lf": 162
+    }
+  },
+  "constants_sha256": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+  "constants_unchanged": true,
+  "checkpoint_sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+  "v6_accessor_only_AST_verified": true,
+  "source_snapshot_sha256": "58efdeba0763e1769679d6a974d74ad6319d8c0eeb0a7eff56c798089d41d982",
+  "v8_saved_testset_goals": 912,
+  "v9_episode_result": null,
+  "v9_defaults": {
+    "REQUIRE_CURRENT_PLAN": true,
+    "PREFER_POLICY_MARGIN": true,
+    "TARGET_TURN_RATE_DEG_S": 0.0
+  },
+  "old_v6_attempt_records": 149,
+  "historical_reconstruction_provenance": "audit/provenance.json",
+  "scope": "No training, checkpoint, constants or Paper2 project modifications; no episodes, new evaluations or queued jobs."
+}

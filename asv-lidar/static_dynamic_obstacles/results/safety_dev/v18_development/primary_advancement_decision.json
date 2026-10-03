@@ -1,0 +1,36 @@
+{
+  "created_utc": "2026-10-03T11:44:14.237376+00:00",
+  "completed_development_runs": 36,
+  "development_outcomes": {
+    "v16": {
+      "collision:target": 3,
+      "collision:boundary": 4,
+      "goal": 5
+    },
+    "v18": {
+      "collision:target": 3,
+      "collision:boundary": 4,
+      "goal": 5
+    },
+    "v19": {
+      "collision:target": 3,
+      "collision:boundary": 3,
+      "goal": 5,
+      "collision:obstacle": 1
+    }
+  },
+  "qualified": {
+    "v18": 5,
+    "v19": 5
+  },
+  "chosen_candidate": "v19",
+  "primary_modes": [
+    "off",
+    "v16",
+    "v19"
+  ],
+  "primary_case_list_sha256": "0a4157efcca4c77598c75458aa8e38e12a1436bf0ccc17229fa6d4100e579fce",
+  "primary_new_runs": 54,
+  "promotion": false,
+  "reason": "Same development goal count and no lost V16 goals permit a small frozen evaluation; no improvement claim or default promotion."
+}

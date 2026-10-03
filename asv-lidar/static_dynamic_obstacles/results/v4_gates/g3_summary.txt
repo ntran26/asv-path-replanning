@@ -1,13 +1,13 @@
 G3 curriculum draws (200 resets per stage)
 
-                        n  field  near_of_field  crossing  head_on  panels3  start_contact  start_gap<0.3  reset_mean_s  reset_p95_s  st_redraws
-overlay        stage                                                                                                                            
-formulation_v3 5      200  0.000          0.000     0.215    0.185    0.160              0              0         0.246        0.883         0.0
-               6      200  0.200          0.375     0.255    0.200    0.410              0              1         1.544        4.555         0.0
-               7      200  0.465          0.344     0.220    0.190    0.670              1              1         2.346       11.625         0.0
-formulation_v4 5      200  0.185          0.541     0.325    0.240    0.345              0              0         2.564       15.311         0.0
-               6      200  0.385          0.506     0.440    0.170    0.625              0              0         3.582       17.361         0.0
-               7      200  0.580          0.578     0.350    0.220    0.755              1              2         4.499       18.938         0.0
+                        n  field  near_of_field  crossing  head_on  panels3  straight_of_3p  vs_of_field_targets  start_contact  start_gap<0.3  reset_mean_s  reset_p95_s  st_redraws
+overlay        stage                                                                                                                                                                 
+formulation_v3 5      200  0.000          0.000     0.215    0.185    0.160           0.375                  NaN              0              0         0.148        0.556         0.0
+               6      200  0.200          0.375     0.255    0.185    0.410           0.317                0.000              0              1         0.958        2.570         0.0
+               7      200  0.465          0.301     0.300    0.170    0.670           0.254                0.280              0              1         1.588        8.062         0.0
+formulation_v4 5      200  0.185          0.378     0.320    0.215    0.370           0.757                0.290              0              0         0.857        3.341         0.0
+               6      200  0.380          0.434     0.350    0.185    0.640           0.539                0.466              0              0         1.462        6.869         0.0
+               7      200  0.575          0.530     0.365    0.160    0.705           0.546                0.505              0              0         1.610        5.442         0.0
 
-G3 CHECK: v4 own-start contacts 1, mean reset 4.50 s (< 1 s); field shares [0.18, 0.38, 0.58] (design 0.20/0.40/0.55)
-(1818 s)
+G3 CHECK: v4 own-start contacts 0, mean reset 1.61 s (< 1 s); field shares [0.18, 0.38, 0.57] (design 0.20/0.40/0.55)
+(706 s)

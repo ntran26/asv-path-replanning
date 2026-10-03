@@ -5,7 +5,10 @@ would solve the case without it.
 
 **Status:**
 - Phase 1 done: 429 episodes, 819 replays.
-- Phase 2 (the remaining 721 test-set-v2 successes) running.
+- Phase 2 (the remaining 721 test-set-v2 successes) complete; results below.
+- Follow-up: saved-data audit and experimental V9 implemented, with no new episodes.
+  See [V9 plan](SAFETY_LAYER_V9_PLAN.md) and
+  [follow-up report](../results/safety_dev/v8_followup_offline/report.md).
 - Code:
   - `tools/diagnostics/safety/trigger_counterfactual.py` (shadow runs and replays)
   - `tools/diagnostics/safety/trigger_analysis.py` (analysis)
@@ -59,7 +62,7 @@ direct evaluation.
    those fires do no harm.** v7 breaks 4 of 75 false-alarm episodes on DV3 and 9 of 84 among the
    controls. The cost of over-triggering is about 1 in 10 false-alarm episodes, not every one.
 2. **v7 is close to the oracle trigger.** A perfect trigger would add only 13 episodes (+79 against
-   +66) across these 429. Better triggering is worth roughly 3 % of the failures; the filter's
+   +66) across these 429. This is roughly three percentage points of the selected 429 episodes; the filter's
    rescue capacity (58 of 128 test-set failures) matters more.
 3. **A critic gate does not help at the first fire.** SAC's Q(s, π(s)) is lower in episodes the
    policy goes on to fail (median −5.2 against −2.9), but the distributions overlap. The best
@@ -154,21 +157,32 @@ cannot change. Results in `results/safety_dev/trigger_counterfactual/v7_nohold/`
   P2-L1-CRS-FIX-07.
 
 **Implemented** as `src/safety_v8.py`:
-- `SafetyFilterV8(SafetyFilterV7)` disables hold-back for the duration of each decision, so v2–v7
-  are unchanged.
+- `SafetyFilterV8(SafetyFilterV7)` now disables hold-back through an instance method. The
+  follow-up removed temporary mutation of a shared module constant, preserving the serial
+  behavior while isolating nested/concurrent v2–v7 decisions.
 - Selected with `SAFETY_VERSION = 8`; `frozen_suite.py` and `paper2_suite.py` now accept versions
-  6–8.
+  6–9 (V9 is experimental and has no new episode results).
 - Test `tests/test_safety_v8.py`: selected, never holds back, shared constant restored. v7 tests
   still pass.
 
-**The rule in plain words:** with no certified escape, the policy's action stands. That is the
-direct answer to "fire only when justified" that this data supports.
+**Scope correction:** V8 removes the time-to-contact hold-back fallback only. It still inherits
+`last certificate`, which can execute a stored plan after its current check fails. Thus V8 does
+not require every override to have a currently passing backup, and these sampled model checks
+are not formal safety certificates. The stricter rule is an experimental V9 ablation.
 
 ## Next steps
 
-1. **Phase 2:** v4 and v7 on the 721 test-set-v2 successes not yet run (first-fire replay only).
-   With phase 1, this gives the **closed-loop v7 result on all 1,000 test-set-v2 episodes**,
-   against SAC alone at 0.872.
-2. Look into v7's 9–13 breaks one by one (traces exist in `steps.csv`; replays can be re-run from
-   saved states).
-3. Prototype fix (a) or (c), then re-measure on the same 429 + 721 with the same method.
+1. Phase 2 and nohold reconstruction are complete: the saved-file audit verifies all 1,150
+   identities, including the 71 unrescued and 17 broken test-set-v2 episodes.
+2. `steps.csv` stores policy-only shadow summaries; `branches.csv` stores branch outcomes.
+   Complete environment snapshots and branch decision traces were not persisted. Re-running
+   exact checks requires new state acquisition, not just reading these CSVs.
+3. V9 implements a current-plan requirement and same-tail improvement comparison (option c).
+   Optional turning-target hypotheses (option a) are implemented but disabled by default.
+   See its plan for citations, counterexamples and synthetic validation.
+4. The latest user instruction in the safety thread remains **no new runs**. This follow-up
+   performs saved-data analysis and code tests only; no re-measurement is queued. Any later
+   comparison must count lost rescues as well as recovered policy successes.
+
+The reported oracle ceilings choose between the already observed first-fire branch and SAC's
+recorded outcome. They do not bound other trigger times or new recovery methods.

@@ -1,0 +1,37 @@
+{
+  "verified_utc": "2026-10-03T10:36:52.000259+00:00",
+  "new_runs": 399,
+  "distinct_scenarios": 72,
+  "completed_tags": 19,
+  "all_completion_tokens_clean": true,
+  "all_reservations_completed": true,
+  "no_retries": true,
+  "campaign_evaluation_processes_active": 0,
+  "queued_episode_runs": 0,
+  "constants_sha256": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+  "checkpoint_sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+  "objective_achieved": false,
+  "tests": [
+    {
+      "scope": "V16 core, native, conditional prefix and reporting",
+      "passed": 184,
+      "seconds": 29.17
+    },
+    {
+      "scope": "V17 observer new tests",
+      "passed": 23,
+      "seconds": 0.93
+    },
+    {
+      "scope": "Final native selection throughV17",
+      "passed": 28,
+      "seconds": 43.89
+    },
+    {
+      "scope": "Final reporting helper",
+      "passed": 76,
+      "seconds": 15.52
+    }
+  ],
+  "test_counts_are_overlapping_not_additive": true
+}

@@ -1,0 +1,32 @@
+{
+  "new_episode_runs": 0,
+  "unique_pytest_tests_passed": 134,
+  "supplemental_agent_reported_synthetic_checks": 3,
+  "failed": 0,
+  "commands": [
+    {
+      "command": "python -B -m pytest -q tests/test_safety_v9.py tests/test_safety_v8_isolation.py tests/test_safety_target_prediction.py tests/test_safety_v7.py tests/test_safety_v6_search.py tests/test_safety_v6_hook.py",
+      "passed": 111,
+      "seconds": 6.4
+    },
+    {
+      "command": "python -B -m pytest -q tests/test_safety_v9.py",
+      "passed": 25,
+      "seconds": 1.61,
+      "note": "Final V9 source with four ablation tests added;21 previously passing tests repeated."
+    },
+    {
+      "command": "python -B -m pytest -q tests/test_trigger_filter_dispatch.py",
+      "passed": 10,
+      "seconds": 56.32
+    },
+    {
+      "command": "python -B -m pytest -q tests/test_safety_v8_followup_audit.py",
+      "passed": 9,
+      "seconds": 0.22,
+      "run_by": "diagnostic_build"
+    }
+  ],
+  "skipped_episode_test": "tests/test_safety_v8.py constructs and steps an environment; not run",
+  "line_ending_check": "Original LF/CRLF preserved; scoped git diff check uses cr-at-eol"
+}

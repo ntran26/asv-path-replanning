@@ -1,0 +1,16 @@
+{
+  "created_utc": "2026-10-03T09:47:25.316761+00:00",
+  "scope": "independent static AST comparison; no imports/controller/episode calls",
+  "source": "src/safety_v6.py",
+  "before_sha256": "07c1c716aea2c149f7e96a0aede2ab50d99c633706ba6d889e18a02bc52478f6",
+  "after_sha256": "62a920e4d3d18c77bdbbc51923c05e144f414019f514c76099673982c7ad3f48",
+  "archive_sha256": "19b91913c408aefafce5142626e182fd3a77eeba7c9b71b9412866f2378ee369",
+  "ast_equal_after_removing_only_new_diagnostic_fields": true,
+  "removed_dict_keys": [
+    "selection_best_clearance",
+    "selection_branch",
+    "selection_floor"
+  ],
+  "removed_statement": "diagnostics.update(selection_branch=..., selection_floor=..., selection_best_clearance=...)",
+  "interpretation": "All pre-existing V6 computation, control flow, constants and calls are AST-identical. Only the three current-call diagnostic fields were added."
+}

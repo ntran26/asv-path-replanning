@@ -532,7 +532,8 @@ class ASVLidarEnv(gym.Env):
                                prefetch=int(getattr(cfg, "FIELD_PREFETCH", 6)),
                                varying_share=st.get("field_varying_share"),
                                solvable_only=bool(st.get("st_feasibility")),
-                               near_share=float(st.get("field_near_share", 0.0)))
+                               near_share=float(st.get("field_near_share", 0.0)),
+                               straight_share=st.get("field_straight_share"))
 
     def set_constants(self, overrides: dict) -> None:
         """Set run-time switches in this process (fix 1's `ADMISSIBILITY_STATIC`)."""
@@ -644,7 +645,8 @@ class ASVLidarEnv(gym.Env):
         return st.get(key, default) if st else default
 
     def set_field_mix(self, share: float, weights=None, prefetch: int = 0,
-                      varying_share=None, solvable_only: bool = False, near_share: float = 0.0) -> None:
+                      varying_share=None, solvable_only: bool = False, near_share: float = 0.0,
+                      straight_share=None) -> None:
         """Draw `share` of generated episodes from the field-layout family,
         encounters drawn by `weights` when given.  `prefetch > 0` generates them
         ahead in a background thread (a queue of that size) from its own seeded
@@ -655,6 +657,7 @@ class ASVLidarEnv(gym.Env):
         self._field_varying = varying_share
         self._field_solvable = bool(solvable_only)
         self._field_near = float(near_share)
+        self._field_straight = straight_share          # baseline-v4 revision; None = unchanged
         if prefetch and getattr(self, "_field_queue", None) is None:
             import queue
             import threading
@@ -666,7 +669,8 @@ class ASVLidarEnv(gym.Env):
                 while True:
                     self._field_queue.put(field_training.sample(
                         field_rng, weights=self._field_weights, varying_share=self._field_varying,
-                        solvable_only=self._field_solvable, near_share=self._field_near))
+                        solvable_only=self._field_solvable, near_share=self._field_near,
+                        straight_share=self._field_straight))
             threading.Thread(target=_produce, daemon=True).start()
 
     def _load_generated(self, built=None, _depth: int = 0) -> None:
@@ -692,7 +696,8 @@ class ASVLidarEnv(gym.Env):
                 built = field_training.sample(self._rng, weights=getattr(self, "_field_weights", None),
                                               varying_share=getattr(self, "_field_varying", None),
                                               solvable_only=getattr(self, "_field_solvable", False),
-                                              near_share=getattr(self, "_field_near", 0.0))
+                                              near_share=getattr(self, "_field_near", 0.0),
+                                              straight_share=getattr(self, "_field_straight", None))
         if built is None:
             stage = self.scenario_stage if self.scenario_stage is not None else 5
             if self._generator is None or self._generator.stage != stage:
@@ -1241,7 +1246,40 @@ class ASVLidarEnv(gym.Env):
         self.safety_v2_changed = False
         if self.estop_enabled and getattr(cfg, "SAFETY_VERSION", 1) >= 2:
             if getattr(self, "_safety_v2", None) is None:
-                if getattr(cfg, "SAFETY_VERSION", 1) == 8:      # v8: v7 without hold-back
+                if getattr(cfg, "SAFETY_VERSION", 1) == 19:
+                    import safety_v19
+                    self._safety_v2 = safety_v19.SafetyFilterV19()
+                elif getattr(cfg, "SAFETY_VERSION", 1) == 18:
+                    import safety_v18
+                    self._safety_v2 = safety_v18.SafetyFilterV18()
+                elif getattr(cfg, "SAFETY_VERSION", 1) == 17:
+                    import safety_v17
+                    self._safety_v2 = safety_v17.SafetyFilterV17()
+                elif getattr(cfg, "SAFETY_VERSION", 1) == 16:
+                    import safety_v16
+                    self._safety_v2 = safety_v16.SafetyFilterV16()
+                elif getattr(cfg, "SAFETY_VERSION", 1) == 15:
+                    import safety_v15
+                    self._safety_v2 = safety_v15.SafetyFilterV15()
+                elif getattr(cfg, "SAFETY_VERSION", 1) == 14:
+                    import safety_v14
+                    self._safety_v2 = safety_v14.SafetyFilterV14()
+                elif getattr(cfg, "SAFETY_VERSION", 1) == 13:
+                    import safety_v13
+                    self._safety_v2 = safety_v13.SafetyFilterV13()
+                elif getattr(cfg, "SAFETY_VERSION", 1) == 12:
+                    import safety_v12
+                    self._safety_v2 = safety_v12.SafetyFilterV12()
+                elif getattr(cfg, "SAFETY_VERSION", 1) == 11:
+                    import safety_v11
+                    self._safety_v2 = safety_v11.SafetyFilterV11()
+                elif getattr(cfg, "SAFETY_VERSION", 1) == 10:
+                    import safety_v10
+                    self._safety_v2 = safety_v10.SafetyFilterV10()
+                elif getattr(cfg, "SAFETY_VERSION", 1) == 9:      # experimental currently checked interventions
+                    import safety_v9
+                    self._safety_v2 = safety_v9.SafetyFilterV9()
+                elif getattr(cfg, "SAFETY_VERSION", 1) == 8:    # v8: v7 without hold-back
                     import safety_v8
                     self._safety_v2 = safety_v8.SafetyFilterV8()
                 elif getattr(cfg, "SAFETY_VERSION", 1) == 7:

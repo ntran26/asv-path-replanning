@@ -1,0 +1,119 @@
+{
+  "created_utc": "2026-10-03T11:31:22.414375+00:00",
+  "scope": "Replay saved FIX05 hull-heading observations; no environment or new episode.\n\nThe new adapter consumes only each recorded onboard raw tracker state and the\ncaptured perception snapshot. Truth is consulted only after prediction, for the\nreported heading error. A previously reconstructed exact checked plan is read\nfrom its immutable audit and its original logged clearance is revalidated.\n",
+  "case": {
+    "case": "TS2:P2-L1-CRP-FIX-05",
+    "scenario_id": "P2-L1-CRP-FIX-05",
+    "dataset": "ts2",
+    "seed": 470024,
+    "scenario_sha256": "b1aae753c8a63ff87e5a751905a9f5187c701301f6d9849b7ffc537a8cd58078",
+    "selection_stratum": "unrescued_optimistic_no_fire",
+    "rationale": "All three no-fire target collisions with positive last-decision margin; check that a decision guard is not credited for fixing absent threat information.",
+    "selection_rank_sha256": "072e49cd8e47544c4d0d32645cf163b6cf2cc41242e1ff2f576ae0e3ff7fa87a",
+    "historical": {
+      "policy_outcome": "collision:target",
+      "v4_outcome": "collision:target",
+      "v7_outcome": "collision:target",
+      "v8_outcome": "collision:target",
+      "v8_category": "both_fail",
+      "first_reason": "no fire",
+      "first_fire_step": "",
+      "selected_clearance": "",
+      "policy_prefix_repair_clearance": ""
+    }
+  },
+  "saved_mode": "v13",
+  "new_episodes": 0,
+  "environment_reset_calls": 0,
+  "environment_step_calls": 0,
+  "policy_inference_calls": 0,
+  "saved_decisions": 39,
+  "overrides": [
+    {
+      "step": 34,
+      "replacements": [
+        {
+          "source_id": 21,
+          "heading_rad": 1.9896753472735358,
+          "fit_age_steps": 1,
+          "fit_serial": 476
+        }
+      ]
+    },
+    {
+      "step": 35,
+      "replacements": [
+        {
+          "source_id": 21,
+          "heading_rad": 1.9896753472735358,
+          "fit_age_steps": 2,
+          "fit_serial": 476
+        }
+      ]
+    },
+    {
+      "step": 36,
+      "replacements": [
+        {
+          "source_id": 21,
+          "heading_rad": 1.9896753472735358,
+          "fit_age_steps": 3,
+          "fit_serial": 476
+        }
+      ]
+    }
+  ],
+  "same_plan_score": {
+    "step": 34,
+    "plan_origin": "reconstructed best policy primitive, not retained by preset",
+    "original_first_violation_s": null,
+    "original_clearance_m": 0.13407427935968697,
+    "revised_first_violation_s": 0.125,
+    "revised_clearance_m": -0.2907310576663213,
+    "original_headings_deg": {
+      "21": 147.56165406212725,
+      "-1000001": 116.00000000000001
+    },
+    "revised_headings_deg": {
+      "21": 114.00000000000001,
+      "-1000001": 116.00000000000001
+    },
+    "truth_heading_deg_scoring_only": 115.7837675325377,
+    "previous_full_truth_target_cv_clearance_m_scoring_only": 0.007051333795842524
+  },
+  "source_sha256": {
+    "src/classical/common.py": "456f39769ffa237f826eff8f9852a6d0823a2f975f85d2345ba7b42105e0977d",
+    "src/safety_v2.py": "209195c3b9241dfa6a798b7cfca857dfd14218c38625d99bc2a9c0d97c1b3d55",
+    "src/safety_v3.py": "28efcc06af8ec0ffc0074267b7f1b2e36ba4fd1f6e033900c39b9b96b6d40d0a",
+    "src/ship.py": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+    "src/reference_controller.py": "f080cfca745b75b45c93dfca1cf581206908ea4476fc3fede2911f02f066c62b",
+    "bluefin/dynamics.py": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711",
+    "src/safety_heading_memory.py": "378dfd5dec60a7246854bdf484146203ef8e5f29f753686fbda264d7c86187d9",
+    "src/safety_v18.py": "b45c50791e86c93f0423f008a6c9baee302cb90bbed4d69afe9b7e41dad02655",
+    "src/safety_provisional_tracks.py": "70f6e892346f60d81118fb88e5ef7a4fb6637f9d8670ac513ab91724c3af62ce",
+    "src/constants.py": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+    "tests/test_safety_v18.py": "c7a441676afa5397a0e3d1733cf6708c859745b24f639f23ec4c08940cab4cd2"
+  },
+  "trace": {
+    "path": "results\\safety_dev\\v10_iterations\\consistent_track_probe8\\traces\\003_v13.jsonl",
+    "sha256": "a9850fa8c87d1b03967090323f642681761f0f1f65f869cc0a1f07a3bbfe00cc"
+  },
+  "manifest": {
+    "path": "results\\safety_dev\\v10_iterations\\consistent_track_probe8\\manifest.json",
+    "sha256": "6b55983f1283aef2a9947831732cbb7647644b7bdceba1f13a5028ab01e18af1"
+  },
+  "original_plan_audit": {
+    "path": "results\\safety_dev\\v10_iterations\\audits\\fix05_v13_final_audit\\audit.json",
+    "sha256": "1e3cb6081246961c99f7454c5022ca5c62a0afc42b521eaf6832d931e161b7b1"
+  },
+  "script_sha256": "4b487945180226f45ad158f43cbd7580ee69154d905a9a044904e34e6174b8f0",
+  "inherited_age_budget_steps": 3,
+  "citation": "Granstrom, Baum & Reuter, Extended Object Tracking, https://arxiv.org/abs/1604.00970; shape/kinematic modelling inspiration only.",
+  "limitations": [
+    "This applies the new adapter to captured V13 snapshots, not a reconstructed V16 or V18 episode.",
+    "All later measurements/actions come from the original saved trajectory; alternative closed-loop outcomes are unknown.",
+    "Position and velocity errors remain. The previous full-truth-target sensitivity passes this plan at +0.00705m; correcting only heading can increase conservatism when centre is biased.",
+    "The held axis may be wrong during a genuine poorly observed turn; expiry is an engineering budget, not an uncertainty bound.",
+    "Old unrelated controller hashes need not match: this audit only calls the checked shared rollout/evaluator and the new perception adapter."
+  ]
+}

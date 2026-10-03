@@ -1,0 +1,321 @@
+{
+  "schema": 1,
+  "tag": "v18_development12",
+  "scenarios": 12,
+  "scope": "Targeted development: missing hull orientation case, all six known V16 broken SAC successes, two V16 geometry rescues, one active rescue, and two no-intervention success controls. Not a population estimate.",
+  "source_selection_sha256": {
+    "results/safety_dev/v9_paired_pilot/selection.json": "ee04253c16e0dfa7bbca7f2472362e432c5e4fb66fb411bc6c69d84bb3982b3b",
+    "results/safety_dev/v10_iterations/selection_broader40.json": "f179baf57c49c2e564dd68a2f476bc4c324e7eb9243db815512fb8287a946a67"
+  },
+  "cases": [
+    {
+      "case": "TS2:P2-L1-CRP-FIX-05",
+      "scenario_id": "P2-L1-CRP-FIX-05",
+      "dataset": "ts2",
+      "seed": 470024,
+      "scenario_sha256": "b1aae753c8a63ff87e5a751905a9f5187c701301f6d9849b7ffc537a8cd58078",
+      "selection_stratum": "unrescued_optimistic_no_fire",
+      "rationale": "All three no-fire target collisions with positive last-decision margin; check that a decision guard is not credited for fixing absent threat information.",
+      "selection_rank_sha256": "072e49cd8e47544c4d0d32645cf163b6cf2cc41242e1ff2f576ae0e3ff7fa87a",
+      "historical": {
+        "policy_outcome": "collision:target",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "collision:target",
+        "v8_outcome": "collision:target",
+        "v8_category": "both_fail",
+        "first_reason": "no fire",
+        "first_fire_step": "",
+        "selected_clearance": "",
+        "policy_prefix_repair_clearance": ""
+      }
+    },
+    {
+      "case": "TS2:BAS-HO-NC-059",
+      "scenario_id": "BAS-HO-NC-059",
+      "dataset": "ts2",
+      "seed": 400058,
+      "scenario_sha256": "fb19c06cd0042fa9cbef579b8df7015a195330bcbb9c2de11a17cacec6d1e657",
+      "selection_stratum": "expired_consequences",
+      "rationale": "Include every observed consequence-bearing expired-plan case: four rescues and four breaks across DV3/TS2.",
+      "selection_rank_sha256": "0d8f690ce36b45742ae4b23aa06b9d651b1325c77a29567a3c2143cec341f6f5",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "collision:target",
+        "v8_outcome": "collision:target",
+        "v8_category": "broken",
+        "first_reason": "last certificate",
+        "first_fire_step": "20",
+        "selected_clearance": "-0.670574977063368",
+        "policy_prefix_repair_clearance": "-0.9155400386140955"
+      }
+    },
+    {
+      "case": "TS2:BAS-NU-CV-070",
+      "scenario_id": "BAS-NU-CV-070",
+      "dataset": "ts2",
+      "seed": 400469,
+      "scenario_sha256": "1df385f81fb213531debfb03cfdf7988a26460f5be774b12a7b4d069fd525880",
+      "selection_stratum": "other_broken_boundary",
+      "rationale": "Protect successful SAC trajectories across this collision type; current certified first proposals may still lead to later failures.",
+      "selection_rank_sha256": "27aa674262305130961650e24f560b961f18ccba79059f223c7d5b2ddcf34f66",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "collision:boundary",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "broken",
+        "first_reason": "turn",
+        "first_fire_step": "6",
+        "selected_clearance": "0.06744661225996389",
+        "policy_prefix_repair_clearance": "0.006297536524014755"
+      }
+    },
+    {
+      "case": "TS2:CH-HO-CV-073",
+      "scenario_id": "CH-HO-CV-073",
+      "dataset": "ts2",
+      "seed": 400572,
+      "scenario_sha256": "e9019500f29c085ff4a67a5c479025ec50bfac889214ce487774d981ad00ed68",
+      "selection_stratum": "other_broken_target",
+      "rationale": "Protect successful SAC trajectories across this collision type; current certified first proposals may still lead to later failures.",
+      "selection_rank_sha256": "183571a1a6c5218449a8a32f7a35f9e767f2d0d339697b7abeab6b067c5e7cdd",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "collision:target",
+        "v8_outcome": "collision:target",
+        "v8_category": "broken",
+        "first_reason": "brake",
+        "first_fire_step": "12",
+        "selected_clearance": "0.03445371077977785",
+        "policy_prefix_repair_clearance": "-0.8018640612545971"
+      }
+    },
+    {
+      "case": "DV3:DV3-BO-CV-04",
+      "scenario_id": "DV3-BO-CV-04",
+      "dataset": "dv3",
+      "seed": 900247,
+      "scenario_sha256": "a9392c7cd3e521bda23fc031c8c58d55debee0259284452bb41f47bb3ef55ba9",
+      "selection_stratum": "expired_consequences",
+      "rationale": "Include every observed consequence-bearing expired-plan case: four rescues and four breaks across DV3/TS2.",
+      "selection_rank_sha256": "2e4d35aa7e1500e5075fe8f64215986ac17188471b0471604940fba087b4278c",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "broken",
+        "first_reason": "last certificate",
+        "first_fire_step": "10",
+        "selected_clearance": "-0.42126009887376215",
+        "policy_prefix_repair_clearance": "-0.42725057676329736"
+      }
+    },
+    {
+      "case": "TS2:P2-L2-CRS-FIX-19",
+      "scenario_id": "P2-L2-CRS-FIX-19",
+      "dataset": "ts2",
+      "seed": 470158,
+      "scenario_sha256": "54110bb8065ea7f480c6bb572430900efec753b7558b6af17232d9d7603ddf96",
+      "selection_stratum": "remaining_known_sac_regression",
+      "rationale": "Every remaining saved SAC success broken by V8.",
+      "selection_rank_sha256": "357e126158900ddfc7bc4809d3e597052c2cd00a6cdb08b6b22abf431e17cf69",
+      "family": [
+        "L2-CRS",
+        "FIX",
+        "crossing"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.482643773590642",
+        "width_ratio": "1.0222222222222224",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.5505343449599254",
+        "speed_ratio": "0.9862831770391032",
+        "dcpa_m": "2.4146628912605834",
+        "tcpa_s": "9.715453457652272",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": "3.0"
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "collision:boundary",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "broken",
+        "first_reason": "turn",
+        "first_fire_step": "16",
+        "selected_clearance": "0.20251864175329204",
+        "policy_prefix_repair_clearance": "0.05465229422062311"
+      }
+    },
+    {
+      "case": "TS2:P2-L3-BO-FIX-09",
+      "scenario_id": "P2-L3-BO-FIX-09",
+      "dataset": "ts2",
+      "seed": 470288,
+      "scenario_sha256": "5441c16f3dd3d6f0b0e9566fe5c95d891e0251172c3ad8db93104ff9cac960a3",
+      "selection_stratum": "remaining_known_sac_regression",
+      "rationale": "Every remaining saved SAC success broken by V8.",
+      "selection_rank_sha256": "4bebcce64e1f7282977ffc48ac9b3202eb4a9f23fc770028770868bcae916755",
+      "family": [
+        "L3-BO",
+        "FIX",
+        "being_overtaken"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.482643773590642",
+        "width_ratio": "1.0222222222222224",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "1.0055756113180978",
+        "speed_ratio": "1.8014903479928142",
+        "dcpa_m": "1.4488926005626206",
+        "tcpa_s": "10.009675865137945",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": "3.0"
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "broken",
+        "first_reason": "turn",
+        "first_fire_step": "29",
+        "selected_clearance": "0.15595094401194962",
+        "policy_prefix_repair_clearance": "0.11832206560691391"
+      }
+    },
+    {
+      "case": "TS2:P2-L3-CRP-FIX-03",
+      "scenario_id": "P2-L3-CRP-FIX-03",
+      "dataset": "ts2",
+      "seed": 470222,
+      "scenario_sha256": "c0f7f8d4411f5c36958d40a2b0b9b797dfcec2074d3b71aac6e77be797ffc030",
+      "selection_stratum": "remaining_known_sac_regression",
+      "rationale": "Every remaining saved SAC success broken by V8.",
+      "selection_rank_sha256": "7e7dbec549a2cb708b0f505d5a90c920e6736621912a024f078744b8f9fa25dc",
+      "family": [
+        "L3-CRP",
+        "FIX",
+        "crossing"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.482643773590642",
+        "width_ratio": "1.0222222222222224",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.4573045492410211",
+        "speed_ratio": "0.8192618459302496",
+        "dcpa_m": "0.30751290527181063",
+        "tcpa_s": "8.459199358142248",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": "3.0"
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "collision:target",
+        "v8_outcome": "collision:target",
+        "v8_category": "broken",
+        "first_reason": "turn",
+        "first_fire_step": "3",
+        "selected_clearance": "0.014054601287506824",
+        "policy_prefix_repair_clearance": "-0.2655340875949397"
+      }
+    },
+    {
+      "case": "DV3:DV3-CRS-CV-04",
+      "scenario_id": "DV3-CRS-CV-04",
+      "dataset": "dv3",
+      "seed": 900195,
+      "scenario_sha256": "61218205227240a2e85db4ab35e3db161173a3cad9f693e18d2208c54f9d4824",
+      "selection_stratum": "remaining_known_sac_regression",
+      "rationale": "Every remaining saved SAC success broken by V8.",
+      "selection_rank_sha256": "ad0e933eaea1ad2b45b8a7bfed06c77609834476aa71b73b1f8245404d4fd551",
+      "family": [
+        "CRS",
+        "CV",
+        "CRS"
+      ],
+      "static_geometry_metadata": null,
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "collision:boundary",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "broken",
+        "first_reason": "brake",
+        "first_fire_step": "11",
+        "selected_clearance": "0.022599969040473816",
+        "policy_prefix_repair_clearance": "-0.09406767031834282"
+      }
+    },
+    {
+      "case": "TS2:P2-L1-CRP-VAR-12",
+      "scenario_id": "P2-L1-CRP-VAR-12",
+      "dataset": "ts2",
+      "seed": 470031,
+      "scenario_sha256": "7c56e2bdd8ab8c70ffbf29a0bd97bd767cbae23360db70f2d103474fb40b9f96",
+      "selection_stratum": "rescued_searched_escape",
+      "rationale": "Regression protection for an existing rescue mechanism, including low-clearance successes.",
+      "selection_rank_sha256": "4f434eec67b7dd8d324e3d9666bce2152232b21352c1eb0cc153ba638389fc36",
+      "historical": {
+        "policy_outcome": "collision:obstacle",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "searched escape",
+        "first_fire_step": "2",
+        "selected_clearance": "0.2657000105556206",
+        "policy_prefix_repair_clearance": "0.019490192512146662"
+      }
+    },
+    {
+      "case": "TS2:CH-HO-CV-043",
+      "scenario_id": "CH-HO-CV-043",
+      "dataset": "ts2",
+      "seed": 400542,
+      "scenario_sha256": "5206adfd9242edd176492a21796ff13318b2e5114ccc9f1f70b312af25a2b5ee",
+      "selection_stratum": "success_never_fire_frozen",
+      "rationale": "Untouched successful-policy negative control from this scenario source.",
+      "selection_rank_sha256": "0036fc4dd6f965971aaf87810c35c358335e03210433ad2b118d32c36a49041e",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "both_goal",
+        "first_reason": "no fire",
+        "first_fire_step": "",
+        "selected_clearance": "",
+        "policy_prefix_repair_clearance": ""
+      }
+    },
+    {
+      "case": "TS2:P2-L1-CRS-FIX-09",
+      "scenario_id": "P2-L1-CRS-FIX-09",
+      "dataset": "ts2",
+      "seed": 470048,
+      "scenario_sha256": "ecfc8021b54fafb96792d4d5a1e2fe6c58e808cf54d0c4e1a4713188d29ec6c9",
+      "selection_stratum": "success_never_fire_field_layout",
+      "rationale": "Untouched successful-policy negative control from this scenario source.",
+      "selection_rank_sha256": "0bece88b7b169f975117c13c40292099d17c20d941856bfe6ac7a5f3ee45f969",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "both_goal",
+        "first_reason": "no fire",
+        "first_fire_step": "",
+        "selected_clearance": "",
+        "policy_prefix_repair_clearance": ""
+      }
+    }
+  ]
+}

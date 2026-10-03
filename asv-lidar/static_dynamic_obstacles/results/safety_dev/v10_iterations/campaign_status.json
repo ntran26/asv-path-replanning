@@ -1,0 +1,293 @@
+{
+  "updated_utc": "2026-10-03T10:36:52.000259+00:00",
+  "scope": "This continuation only. Earlier96-run pilot and older ledgers remain separate. The100percent objective is not achieved.",
+  "completed": 399,
+  "planned": 399,
+  "distinct_scenarios": 72,
+  "campaign_evaluation_processes_active": 0,
+  "queued_episode_runs": 0,
+  "runs": [
+    {
+      "tag": "baseline_thread_check",
+      "planned": 2,
+      "reserved": 2,
+      "completed": 2,
+      "complete": true,
+      "outcomes": {
+        "v8": {
+          "goal": 1,
+          "collision:target": 1
+        }
+      }
+    },
+    {
+      "tag": "conditional_policy_32",
+      "planned": 32,
+      "reserved": 32,
+      "completed": 32,
+      "complete": true,
+      "outcomes": {
+        "v10": {
+          "collision:target": 9,
+          "goal": 18,
+          "collision:boundary": 3,
+          "collision:obstacle": 2
+        }
+      }
+    },
+    {
+      "tag": "conditional_prefix32",
+      "planned": 32,
+      "reserved": 32,
+      "completed": 32,
+      "complete": true,
+      "outcomes": {
+        "v15": {
+          "collision:target": 6,
+          "goal": 23,
+          "collision:obstacle": 2,
+          "collision:boundary": 1
+        }
+      }
+    },
+    {
+      "tag": "consistent_track_probe8",
+      "planned": 8,
+      "reserved": 8,
+      "completed": 8,
+      "complete": true,
+      "outcomes": {
+        "v12": {
+          "goal": 3,
+          "collision:target": 1
+        },
+        "v13": {
+          "goal": 2,
+          "collision:target": 1,
+          "collision:obstacle": 1
+        }
+      }
+    },
+    {
+      "tag": "feasible_policy_32",
+      "planned": 32,
+      "reserved": 32,
+      "completed": 32,
+      "complete": true,
+      "outcomes": {
+        "v10": {
+          "collision:target": 10,
+          "collision:boundary": 4,
+          "collision:obstacle": 3,
+          "goal": 15
+        }
+      }
+    },
+    {
+      "tag": "margin_only_32",
+      "planned": 32,
+      "reserved": 32,
+      "completed": 32,
+      "complete": true,
+      "outcomes": {
+        "v9_margin": {
+          "collision:target": 9,
+          "collision:boundary": 5,
+          "goal": 16,
+          "collision:obstacle": 2
+        }
+      }
+    },
+    {
+      "tag": "missing_target_diagnostics",
+      "planned": 3,
+      "reserved": 3,
+      "completed": 3,
+      "complete": true,
+      "outcomes": {
+        "v8": {
+          "collision:target": 3
+        }
+      }
+    },
+    {
+      "tag": "motion_axis_probe5",
+      "planned": 5,
+      "reserved": 5,
+      "completed": 5,
+      "complete": true,
+      "outcomes": {
+        "v16": {
+          "collision:target": 1,
+          "goal": 4
+        }
+      }
+    },
+    {
+      "tag": "motion_axis_remaining27",
+      "planned": 27,
+      "reserved": 27,
+      "completed": 27,
+      "complete": true,
+      "outcomes": {
+        "v16": {
+          "goal": 21,
+          "collision:obstacle": 2,
+          "collision:boundary": 1,
+          "collision:target": 3
+        }
+      }
+    },
+    {
+      "tag": "persistence_remaining29",
+      "planned": 29,
+      "reserved": 29,
+      "completed": 29,
+      "complete": true,
+      "outcomes": {
+        "v11": {
+          "collision:target": 6,
+          "collision:obstacle": 3,
+          "collision:boundary": 4,
+          "goal": 16
+        }
+      }
+    },
+    {
+      "tag": "persistence_three",
+      "planned": 3,
+      "reserved": 3,
+      "completed": 3,
+      "complete": true,
+      "outcomes": {
+        "v11": {
+          "collision:target": 1,
+          "goal": 2
+        }
+      }
+    },
+    {
+      "tag": "persistent_preference_probe4",
+      "planned": 4,
+      "reserved": 4,
+      "completed": 4,
+      "complete": true,
+      "outcomes": {
+        "v14": {
+          "goal": 3,
+          "collision:target": 1
+        }
+      }
+    },
+    {
+      "tag": "persistent_preference_remaining28",
+      "planned": 28,
+      "reserved": 28,
+      "completed": 28,
+      "complete": true,
+      "outcomes": {
+        "v14": {
+          "collision:target": 4,
+          "collision:boundary": 3,
+          "goal": 19,
+          "collision:obstacle": 2
+        }
+      }
+    },
+    {
+      "tag": "persistent_prefix32",
+      "planned": 32,
+      "reserved": 32,
+      "completed": 32,
+      "complete": true,
+      "outcomes": {
+        "v14": {
+          "collision:target": 7,
+          "goal": 21,
+          "collision:boundary": 2,
+          "collision:obstacle": 2
+        }
+      }
+    },
+    {
+      "tag": "prefix_remaining16",
+      "planned": 16,
+      "reserved": 16,
+      "completed": 16,
+      "complete": true,
+      "outcomes": {
+        "v11_prefix": {
+          "goal": 8,
+          "collision:boundary": 1,
+          "collision:target": 6,
+          "collision:obstacle": 1
+        }
+      }
+    },
+    {
+      "tag": "prefix_success16",
+      "planned": 16,
+      "reserved": 16,
+      "completed": 16,
+      "complete": true,
+      "outcomes": {
+        "v11_prefix": {
+          "collision:target": 3,
+          "goal": 9,
+          "collision:boundary": 3,
+          "collision:obstacle": 1
+        }
+      }
+    },
+    {
+      "tag": "v16_broader40_paired",
+      "planned": 80,
+      "reserved": 80,
+      "completed": 80,
+      "complete": true,
+      "outcomes": {
+        "off": {
+          "goal": 21,
+          "collision:obstacle": 10,
+          "collision:target": 8,
+          "collision:boundary": 1
+        },
+        "v16": {
+          "collision:boundary": 6,
+          "goal": 25,
+          "collision:target": 5,
+          "collision:obstacle": 4
+        }
+      }
+    },
+    {
+      "tag": "v16_feasible_probe9",
+      "planned": 9,
+      "reserved": 9,
+      "completed": 9,
+      "complete": true,
+      "outcomes": {
+        "v16": {
+          "collision:target": 2,
+          "goal": 3,
+          "collision:obstacle": 2,
+          "collision:boundary": 2
+        }
+      }
+    },
+    {
+      "tag": "v17_fresh_yaw_probe9",
+      "planned": 9,
+      "reserved": 9,
+      "completed": 9,
+      "complete": true,
+      "outcomes": {
+        "v17": {
+          "collision:target": 1,
+          "goal": 6,
+          "collision:boundary": 2
+        }
+      }
+    }
+  ]
+}

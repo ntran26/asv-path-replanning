@@ -1,0 +1,161 @@
+{
+ "pilot": "A",
+ "overlay": "formulation_v4",
+ "overlay_snapshot": {
+  "id": "baseline-v4",
+  "revision": "4.0-draft",
+  "timesteps": 2500000,
+  "stage_fractions": [
+   [
+    0.0,
+    1
+   ],
+   [
+    0.064,
+    2
+   ],
+   [
+    0.144,
+    3
+   ],
+   [
+    0.256,
+    4
+   ],
+   [
+    0.4,
+    5
+   ],
+   [
+    0.6,
+    6
+   ],
+   [
+    0.8,
+    7
+   ]
+  ],
+  "stage_overrides": {
+   "5": {
+    "clutter": [
+     0,
+     3
+    ],
+    "clutter_weights": {
+     "0": 0.1,
+     "1": 0.2,
+     "2": 0.3,
+     "3": 0.4
+    },
+    "cpa_guard": 0.2,
+    "field_share": 0.2,
+    "field_varying_share": 0.0,
+    "field_weights": {
+     "NT": 0.15,
+     "HO": 0.25,
+     "CRP": 0.2,
+     "CRS": 0.2,
+     "OT": 0.1,
+     "BO": 0.1
+    },
+    "field_near_share": 0.5,
+    "st_feasibility": true,
+    "start_clear": true
+   },
+   "6": {
+    "clutter": [
+     1,
+     3
+    ],
+    "clutter_weights": {
+     "1": 0.2,
+     "2": 0.3,
+     "3": 0.5
+    },
+    "cpa_guard": 0.0,
+    "field_share": 0.4,
+    "field_varying_share": 0.15,
+    "field_weights": {
+     "NT": 0.15,
+     "HO": 0.25,
+     "CRP": 0.2,
+     "CRS": 0.2,
+     "OT": 0.1,
+     "BO": 0.1
+    },
+    "field_near_share": 0.5,
+    "st_feasibility": true,
+    "start_clear": true
+   },
+   "7": {
+    "clutter": [
+     1,
+     3
+    ],
+    "clutter_weights": {
+     "1": 0.2,
+     "2": 0.3,
+     "3": 0.5
+    },
+    "cpa_guard": 0.0,
+    "field_share": 0.55,
+    "field_varying_share": 0.3,
+    "field_weights": {
+     "NT": 0.15,
+     "HO": 0.25,
+     "CRP": 0.2,
+     "CRS": 0.2,
+     "OT": 0.1,
+     "BO": 0.1
+    },
+    "field_near_share": 0.5,
+    "st_feasibility": true,
+    "start_clear": true
+   }
+  },
+  "field_prefetch": 6,
+  "st_max_redraws": 30,
+  "dev": {
+   "seed_base": 360000,
+   "no_target": 20,
+   "per_encounter_cv": 20,
+   "per_encounter_vs": 6,
+   "near_per_ten": 3
+  },
+  "near_layouts": {
+   "panel_shift_m": [
+    0.4,
+    1.5
+   ],
+   "end_shift_m": 0.75,
+   "distance_m": [
+    1.0,
+    2.0
+   ]
+  },
+  "class_weights_567": {
+   "head_on": 0.2,
+   "crossing": 0.3,
+   "overtaking": 0.14,
+   "being_overtaken": 0.12,
+   "null": 0.1,
+   "no_target": 0.14
+  },
+  "constant_overrides": {
+   "ADMISSIBILITY_STATIC": true
+  }
+ },
+ "start_checkpoint": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\runs\\ppo_formulation_seed0_bl3\\ppo_1500000_steps.zip",
+ "steps": [
+  1500000,
+  2000000
+ ],
+ "gamma": 0.9509900498999999,
+ "gamma_checkpoint": 0.9509900498999999,
+ "algo": "ppo",
+ "constant_overrides": {
+  "ADMISSIBILITY_STATIC": true
+ },
+ "started": "2026-10-03 14:28",
+ "wall_clock_s": 14042.465955257416
+}

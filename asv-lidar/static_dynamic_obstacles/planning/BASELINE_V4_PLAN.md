@@ -127,6 +127,109 @@ v3's 1.5 M checkpoint. Both are evaluated against that run's 2.0 M checkpoint on
 development set (`tools/diagnostics/v4_gates/pilot.py`). Arm B's value function was fitted for
 γ 0.951, so it starts at a disadvantage.
 
+## 5c. Queued for after G4: draft 4.1 and the development-set extension (2026-10-03)
+
+The trigger is test set v3 (`tools/tiers/test_set.py --version 3`). It has more straight survey
+lanes and new dense arrangements. SAC 3 M scores 0.853 overall, and is weakest on:
+
+| Group | SAC 3 M |
+|---|---|
+| Varying-speed targets | 0.61 (constant speed: 0.78) |
+| Dense crossing from port (FS-CRP) | 0.45 |
+| Dense being overtaken (FS-BO) | 0.64 |
+
+The changes are queued by `results/v4_after_g4.sh`. After `== G4 done` it runs
+`tools/diagnostics/v4_gates/revise_v4_after_g4.py`, then gate G3. The G4 pilots read draft 4.0,
+so nothing changes before they finish.
+
+| Change | Draft 4.0 | Draft 4.1 |
+|---|---|---|
+| Straight legs: dense generator draws (≥ 3 panels) | not set | 70 % (`dense_straight_share`) |
+| Straight legs: field layouts | not set | 70 % (`field_straight_share`) |
+| Varying-speed field targets, stages 5 / 6 / 7 | 0 / 15 / 30 % | 20 / 50 / 50 % |
+| Field weights NT / HO / CRP / CRS / OT / BO | .15 / .25 / .20 / .20 / .10 / .10 | .15 / .20 / .175 / .175 / .15 / .15 |
+| Development set | DV3 (150) + frozen-like (120) | the same, **plus** `dev_set_v4.extension()` (60) |
+
+- The development-set extension (`src/dev_set_v4.py`) has 10 episodes each of NT, HO, CRP, CRS, OT
+  and BO, with 70 % straight legs and half the targets at varying speed. It uses generator seeds
+  520,000+, which no other set uses.
+- Code support is in place: opt-in stage keys in `scenario.py`, `field_training.py` and `env.py`,
+  and tests in `tests/test_dense_straight.py`. Baseline v2 and v3 are unchanged (`baseline_config`
+  check passes).
+- **Still to do before a full v4 run:** wire `train_formulation.py` to a `configs/baseline_v4.json`
+  that installs `formulation_v4`. Its development evaluation currently hard-codes
+  `formulation_v3.field_development_set`.
+
+**Applied (2026-10-03, 21:33).** `formulation_v4.py` is now `4.1-draft`. G3 on it passed its
+checks: no own-start contacts; field shares 0.18 / 0.38 / 0.57; straight legs in 55–76 % of
+3-panel draws; varying-speed targets in 29–51 % of field targets; mean reset 1.6 s.
+
+## 5d. G4 result: both arms fail (2026-10-03, 21:29)
+
+Results are in `results/v4_gates/g4_summary.txt`. Pairs are compared on the same episodes and
+seeds.
+
+| | Conflict set (118) | Field dev (150) | G1 conflicts (40) | Frozen-like dev (120) |
+|---|---|---|---|---|
+| Control (PPO v3, 2.0 M) | 0.356 | 0.473 | 0.300 | 0.883 |
+| A: draft 4.0, γ 0.951 | 0.356 (**+0.0**; 12 gained, 12 lost) | 0.473 | 0.275 | 0.842 (**−4.2**) |
+| B: draft 4.0, γ 0.98 | 0.364 (**+0.8**; 13 gained, 12 lost) | 0.507 | 0.350 | 0.842 (**−4.2**) |
+
+How to read it:
+- Neither the overlay (fix 1, a denser field curriculum, more crossings) nor the longer horizon
+  moved the conflict set within 0.5 M steps.
+- Both arms lose the same 4.2 points on the frozen-like set. That loss belongs to the overlay
+  rather than the discount; the fix-1 fine-tune lost 5.7 points the same way.
+- G1 found that 14 of its 40 conflicts are solved by no scripted or classical behaviour. If
+  conflicts like these are a large share of the conflict set, the +15-point gate cannot be met
+  by any learner. The oracle below measures that.
+
+## 5e. Near-impossible episodes and the crossing trace (2026-10-03)
+
+**Your call (2026-10-03):** near-impossible episodes should be left out of the test set and the
+development set, or kept to a very small share. That way they neither confuse the policy nor
+mislead readers of the statistics.
+
+**Oracle feasibility (`src/oracle_feasibility.py`).** `feasibility_st` treats the own ship as a
+point that can move in any direction at once. It therefore passes encounters that a vessel with
+a turning circle can no longer escape.
+
+The oracle works differently. From the episode's true initial state (same seed), it rolls out a
+library of manoeuvres in a copy of the environment:
+
+```
+follower at cruise until t0  ->  hold heading + dpsi at throttle tau for D s  ->  follower
+```
+
+The library covers t0 at 8 values from 0 to 18 s, dpsi at 7 values from −70° to +70°, tau at 4
+values from −1 to +1, and D of 4, 8 and 14 s: up to 574 manoeuvres. The oracle has three
+properties:
+- **Perfect foresight:** the target moves exactly as it will in the episode.
+- **The true vessel model,** checked against `env.step` to about 1e-7 m.
+- **The policy's own action space,** with no astern.
+
+There is no COLREGs condition, so it asks only whether the episode can be survived at all. It is
+a lower bound on solvability, and its outputs are graded rather than a single verdict:
+- the number of solving manoeuvres;
+- the best minimum clearance;
+- `latest_start_s`, the latest start time from which a manoeuvre still works.
+
+**The rule is set on the development side before it is applied to the test set:**
+- Run the oracle on the development sets (`tools/diagnostics/feasibility/oracle_sets.py dev`).
+- Check it against outcomes we already have: any episode the oracle calls unsolvable but a
+  controller solved is a miss.
+- Fix the threshold, for example "no manoeuvre keeps 0.2 m clearance".
+- Rebuild test set v4 and the development set without these episodes, or with a capped share
+  that is reported separately.
+
+**Crossing trace (`tools/diagnostics/crossing/crossing_trace.py`).** This traces SAC 3 M step by
+step on the 108 development crossings and joins the oracle's `latest_start_s`. Each failure goes
+into one bin: infeasible, engaged too late, wrong way, no action, late, or acted in time but not
+enough.
+
+Both run detached via `results/feasibility_run.sh`; results go to `results/feasibility/` and
+`results/crossing_trace/`.
+
 ## 6. Order
 
 1. Test set v2 and its SAC and classical results (running).

@@ -233,6 +233,17 @@ class ScenarioGenerator:
         # to admit a target easily -- which is exactly the contamination the
         # rejection ledger exists to measure rather than to hide.
         flags = dict(flags or {})
+        # baseline-v4 revision (opt-in stage key `dense_straight_share`): field
+        # deployment runs boustrophedon survey lanes, so a dense draw (at least
+        # `dense_panels` panels requested) gets a straight leg with this
+        # probability.  The panel count is then drawn before the leg; a stage
+        # without the key draws exactly as before.
+        self._pre_obstacles, self._force_straight = None, False
+        share = stage.get("dense_straight_share")
+        if share is not None:
+            self._pre_obstacles = self._sample_obstacle_count(rng)
+            self._force_straight = (self._pre_obstacles >= int(stage.get("dense_panels", 3))
+                                    and rng.uniform() < float(share))
         channel = self._sample_geometry(rng, stage, width, cls, geometry_mode, flags)
         key = _ledger_key(channel)
 
@@ -271,7 +282,8 @@ class ScenarioGenerator:
                     # along its leg (L1 being-overtaken otherwise starts on a panel).
                     channel.start_s_override = float(flags["own_start_s"])
                 return channel
-            return corr.sample_basin(rng, slant_max_deg=stage.get("slant_max"))
+            return corr.sample_basin(rng, slant_max_deg=(0.0 if getattr(self, "_force_straight", False)
+                                                         else stage.get("slant_max")))
         if not width:
             lo, hi = stage["width"]
             lo = max(float(lo), float(cfg.CHANNEL_MIN_WIDTH_BY_CLASS.get(cls, 0.0)))
@@ -341,7 +353,7 @@ class ScenarioGenerator:
         _record_geometry(scenario, channel, start_s)
 
         if cls == "no_target":
-            scenario.n_obstacles = self._sample_obstacle_count(rng)
+            scenario.n_obstacles = self._obstacle_count(rng)
             return scenario
 
         solved = (self._place_null(rng, own, own_heading) if cls == "null"
@@ -386,7 +398,7 @@ class ScenarioGenerator:
         scenario.dcpa_floor_m = solved.get("floor")
         # A22's label: can a lawful escape clear this crossing?  None otherwise.
         scenario.crossing_escapable = escapable
-        scenario.n_obstacles = self._sample_obstacle_count(rng)
+        scenario.n_obstacles = self._obstacle_count(rng)
         # 06 §3.3: the clear width where the encounter happens.
         scenario.w_eff_at_cpa = float(channel.width_at_s(
             start_s + cfg.U_NOM * max(float(solved.get("tcpa", 0.0)), 0.0)))
@@ -562,6 +574,11 @@ class ScenarioGenerator:
             if tgt.confinement_violation(probe, channel, poly) is not None:
                 return False
         return True
+
+    def _obstacle_count(self, rng) -> int:
+        """The panel count: pre-drawn with the leg under `dense_straight_share`, else drawn here."""
+        pre = getattr(self, "_pre_obstacles", None)
+        return int(pre) if pre is not None else self._sample_obstacle_count(rng)
 
     def _sample_obstacle_count(self, rng) -> int:
         stage = cfg.CURRICULUM_STAGES[self.stage]

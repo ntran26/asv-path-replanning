@@ -68,7 +68,11 @@ MAX_BRANCHES = 4
 _W = {}
 
 LAST_KEYS = ("mode", "why", "policy_margin", "best_margin", "checked_clearance", "plan_steps",
-             "recovery_steps", "v6_proposed_change", "v7_policy_preserved", "v7_repair_clearance")
+             "recovery_steps", "v6_proposed_change", "v7_policy_preserved", "v7_repair_clearance",
+             "v9_current_plan_checked", "v9_override_suppressed", "v9_parent_why",
+             "v9_proposed_clearance", "v9_policy_tail_clearance",
+             "v9_proposed_first_violation", "v9_policy_first_violation",
+             "v9_target_turn_rate_deg_s")
 
 
 def _outcome(info) -> str:
@@ -136,17 +140,22 @@ def _critic(obs):
     return float(torch.min(q1, q2)), float(log_std.mean())
 
 
+def _version_number(version):
+    if version not in ("v4", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16", "v17", "v18", "v19"):
+        raise ValueError(f"Unsupported counterfactual filter: {version}")
+    return int(version[1:])
+
+
 def _new_filter(version):
-    if version == "v4":
-        import safety_v4
-        return safety_v4.SafetyFilterV4()
-    import safety_v7
-    return safety_v7.SafetyFilterV7()
+    import importlib
+    number = _version_number(version)
+    module = importlib.import_module(f"safety_v{number}")
+    return getattr(module, f"SafetyFilterV{number}")()
 
 
 def _branch(env, filt, obs, version):
     """Replay from a saved state with the filter acting; returns (outcome, interventions, steps)."""
-    cfg.SAFETY_VERSION = 4 if version == "v4" else 7
+    cfg.SAFETY_VERSION = _version_number(version)
     env.estop_enabled = True
     env._safety_v2 = filt
     env.safety_v2_steps = 0
@@ -186,6 +195,8 @@ def run_case(job):
             last = trial.last or {}
             row[f"{v}_fire"] = bool(changed)
             for k in LAST_KEYS:
+                if k.startswith("v9_") and v != "v9":
+                    continue  # Preserve existing V4/V7 trace columns.
                 val = last.get(k)
                 if isinstance(val, (bool, int, float, str, np.floating, np.integer)) or val is None:
                     row[f"{v}_{k}"] = val
@@ -243,6 +254,14 @@ def main():
     ap.add_argument("--max-branches", type=int, default=MAX_BRANCHES,
                     help="replays per version and episode (1 = first fire only: the closed-loop outcome)")
     a = ap.parse_args()
+    versions = tuple(a.versions.split(","))
+    if not versions or len(set(versions)) != len(versions):
+        ap.error("Use distinct filter versions")
+    for version in versions:
+        try:
+            _version_number(version)
+        except ValueError as error:
+            ap.error(str(error))
     global OUT
     base = OUT
     if a.tag:
@@ -264,11 +283,11 @@ def main():
     if a.limit:
         jobs = jobs[:a.limit]
     print(f"{len(jobs)} episodes to run ({len(done)} already done), {a.processes} processes", flush=True)
-    (OUT / "config.json").write_text(json.dumps({"model": str(MODEL), "versions": VERSIONS,
+    (OUT / "config.json").write_text(json.dumps({"model": str(MODEL), "versions": versions,
                                                  "branch_every": BRANCH_EVERY, "max_branches": a.max_branches, "overrides": a.overrides, "tag": a.tag,
                                                  "started": time.strftime("%Y-%m-%d %H:%M")}, indent=1))
     t0 = time.time()
-    with ProcessPoolExecutor(max_workers=a.processes, initializer=_init, initargs=(a.max_branches, a.overrides, a.versions.split(","))) as pool:
+    with ProcessPoolExecutor(max_workers=a.processes, initializer=_init, initargs=(a.max_branches, a.overrides, versions)) as pool:
         futures = [pool.submit(run_case, j) for j in jobs]
         for i, fut in enumerate(as_completed(futures), 1):
             ep, rows, branches = fut.result()

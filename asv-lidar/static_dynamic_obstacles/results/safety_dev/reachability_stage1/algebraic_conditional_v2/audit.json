@@ -1,0 +1,582 @@
+{
+  "created_utc": "2026-10-03T15:31:44.109946+00:00",
+  "episode_calls": 0,
+  "own": {
+    "decision": 11,
+    "requested_horizon_s": 8.0,
+    "available_prestate_horizon_s": 8.0,
+    "delay_branches": [
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "history_command_count": 10,
+    "initial_bounds": {
+      "x": {
+        "lo": 5.8340854699484295,
+        "hi": 6.014085469948429
+      },
+      "y": {
+        "lo": 4.6844415250345754,
+        "hi": 4.864441525034575
+      },
+      "heading": {
+        "lo": 5.226589065661483,
+        "hi": 5.2475330166854155
+      },
+      "u": {
+        "lo": 0.40874670657711376,
+        "hi": 0.7087467065771138
+      },
+      "v": {
+        "lo": 0.0036820830864586485,
+        "hi": 0.3036820830864587
+      },
+      "r": {
+        "lo": -0.14772721905817152,
+        "hi": -0.043007463938511736
+      }
+    },
+    "endpoints": [
+      {
+        "decision": 11,
+        "horizon_s": 0.0,
+        "bounds": {
+          "x": {
+            "lo": 5.8340854699484295,
+            "hi": 6.014085469948429
+          },
+          "y": {
+            "lo": 4.6844415250345754,
+            "hi": 4.864441525034575
+          },
+          "heading": {
+            "lo": 5.226589065661483,
+            "hi": 5.2475330166854155
+          },
+          "u": {
+            "lo": 0.40874670657711376,
+            "hi": 0.7087467065771138
+          },
+          "v": {
+            "lo": 0.0036820830864586485,
+            "hi": 0.3036820830864587
+          },
+          "r": {
+            "lo": -0.14772721905817152,
+            "hi": -0.043007463938511736
+          }
+        },
+        "status": "enclosed",
+        "branches_completed": 5,
+        "scoring_truth": {
+          "x": 5.943556943443723,
+          "y": 4.714642238051148,
+          "heading": 5.236611803590194,
+          "u": 0.6033655765013948,
+          "v": 0.14723462870527637,
+          "r": -0.10928955575253368
+        },
+        "component_containment": {
+          "x": true,
+          "y": true,
+          "heading": true,
+          "u": true,
+          "v": true,
+          "r": true
+        },
+        "truth_contained": true
+      },
+      {
+        "decision": 12,
+        "horizon_s": 0.5,
+        "bounds": {
+          "u": {
+            "lo": -5e-324,
+            "hi": 1.6739144958338141
+          },
+          "v": {
+            "lo": -0.9081712707651253,
+            "hi": 1.048742607309556
+          },
+          "r": {
+            "lo": -2.7925268031909276,
+            "hi": 2.7925268031909276
+          },
+          "heading": {
+            "lo": 4.549541751548328,
+            "hi": 5.9313293432277
+          },
+          "servo": {
+            "lo": -0.2679929317060177,
+            "hi": 0.04690095772842687
+          },
+          "x": {
+            "lo": 5.294710529550747,
+            "hi": 6.096662166522046
+          },
+          "y": {
+            "lo": 4.606469311723463,
+            "hi": 5.417635552101554
+          }
+        },
+        "status": "enclosed",
+        "branches_completed": 5,
+        "scoring_truth": {
+          "x": 5.698998498605415,
+          "y": 4.932287321264022,
+          "heading": 5.203774755235785,
+          "u": 0.6745392117980585,
+          "v": 0.14196648995922126,
+          "r": -0.012804121984444831
+        },
+        "component_containment": {
+          "x": true,
+          "y": true,
+          "heading": true,
+          "u": true,
+          "v": true,
+          "r": true
+        },
+        "truth_contained": true
+      },
+      {
+        "decision": 13,
+        "horizon_s": 1.0,
+        "bounds": {
+          "u": {
+            "lo": -5e-324,
+            "hi": 5.000000000000001
+          },
+          "v": {
+            "lo": -3.0000000000000004,
+            "hi": 3.0000000000000004
+          },
+          "r": {
+            "lo": -2.7925268031909276,
+            "hi": 2.7925268031909276
+          },
+          "heading": {
+            "lo": 1.0326110296338755,
+            "hi": 9.453027296361775
+          },
+          "servo": {
+            "lo": -0.15527651237859563,
+            "hi": 0.24245504949932503
+          },
+          "x": {
+            "lo": 1.0566120306308378,
+            "hi": 9.73880498081194
+          },
+          "y": {
+            "lo": 0.6336088213315773,
+            "hi": 9.668238825572779
+          }
+        },
+        "status": "unknown_width_limit",
+        "branches_completed": 5,
+        "truth_contained": null
+      }
+    ],
+    "status": "unknown",
+    "stop_reason": "union box width resource limit; no narrowing applied",
+    "guards": {
+      "max_seconds": 60.0,
+      "max_position_width_m": 10.0,
+      "max_heading_width_rad": 6.283185307179586,
+      "max_branches": 32
+    },
+    "future_controls": "NONCAUSAL recorded same-branch controls, fixed offline",
+    "terminal_poststate_used": false,
+    "initial_actuator_bounds_by_delay": {
+      "12": {
+        "servo": {
+          "lo": 0.08373386506223167,
+          "hi": 0.2103157785804944
+        }
+      },
+      "13": {
+        "servo": {
+          "lo": 0.09164729739916457,
+          "hi": 0.22110167745201367
+        }
+      },
+      "14": {
+        "servo": {
+          "lo": 0.1002489024491392,
+          "hi": 0.23241957290617793
+        }
+      },
+      "15": {
+        "servo": {
+          "lo": 0.10959833077857871,
+          "hi": 0.24429585705490484
+        }
+      },
+      "16": {
+        "servo": {
+          "lo": 0.11976039661733881,
+          "hi": 0.25675822610872784
+        }
+      }
+    },
+    "wall_seconds": 11.795820599989383,
+    "branch_diagnostics": [
+      {
+        "scope": "conditional_real_arithmetic_numerical_map",
+        "backend": "experimental_mpmath.iv_private_context",
+        "mission_safety_certificate": false,
+        "binary64_roundoff_validated": false,
+        "continuous_ode_validated": false,
+        "swept_geometry_validated": false,
+        "declared_delay_steps": 12,
+        "rud_delay_used_to_select_branch": false,
+        "parameter_dependence": "fixed_realizations_enclosed_without_correlation_tracking",
+        "max_internal_magnitude": 1000000000000.0,
+        "history_commands": 10,
+        "advanced_substeps": 20,
+        "last_failure": null
+      },
+      {
+        "scope": "conditional_real_arithmetic_numerical_map",
+        "backend": "experimental_mpmath.iv_private_context",
+        "mission_safety_certificate": false,
+        "binary64_roundoff_validated": false,
+        "continuous_ode_validated": false,
+        "swept_geometry_validated": false,
+        "declared_delay_steps": 13,
+        "rud_delay_used_to_select_branch": false,
+        "parameter_dependence": "fixed_realizations_enclosed_without_correlation_tracking",
+        "max_internal_magnitude": 1000000000000.0,
+        "history_commands": 10,
+        "advanced_substeps": 20,
+        "last_failure": null
+      },
+      {
+        "scope": "conditional_real_arithmetic_numerical_map",
+        "backend": "experimental_mpmath.iv_private_context",
+        "mission_safety_certificate": false,
+        "binary64_roundoff_validated": false,
+        "continuous_ode_validated": false,
+        "swept_geometry_validated": false,
+        "declared_delay_steps": 14,
+        "rud_delay_used_to_select_branch": false,
+        "parameter_dependence": "fixed_realizations_enclosed_without_correlation_tracking",
+        "max_internal_magnitude": 1000000000000.0,
+        "history_commands": 10,
+        "advanced_substeps": 20,
+        "last_failure": null
+      },
+      {
+        "scope": "conditional_real_arithmetic_numerical_map",
+        "backend": "experimental_mpmath.iv_private_context",
+        "mission_safety_certificate": false,
+        "binary64_roundoff_validated": false,
+        "continuous_ode_validated": false,
+        "swept_geometry_validated": false,
+        "declared_delay_steps": 15,
+        "rud_delay_used_to_select_branch": false,
+        "parameter_dependence": "fixed_realizations_enclosed_without_correlation_tracking",
+        "max_internal_magnitude": 1000000000000.0,
+        "history_commands": 10,
+        "advanced_substeps": 20,
+        "last_failure": null
+      },
+      {
+        "scope": "conditional_real_arithmetic_numerical_map",
+        "backend": "experimental_mpmath.iv_private_context",
+        "mission_safety_certificate": false,
+        "binary64_roundoff_validated": false,
+        "continuous_ode_validated": false,
+        "swept_geometry_validated": false,
+        "declared_delay_steps": 16,
+        "rud_delay_used_to_select_branch": false,
+        "parameter_dependence": "fixed_realizations_enclosed_without_correlation_tracking",
+        "max_internal_magnitude": 1000000000000.0,
+        "history_commands": 10,
+        "advanced_substeps": 20,
+        "last_failure": null
+      }
+    ],
+    "known_endpoint_misses": [],
+    "mission_safety_certificate": false
+  },
+  "target_turn": {
+    "decision": 20,
+    "next_decision": 21,
+    "pairs": [
+      {
+        "scoring_target_index": 0,
+        "heading_before_deg": 104.08366683644724,
+        "heading_after_deg": 185.96831101981002,
+        "shortest_change_deg": 81.88464418336275,
+        "interval_s": 0.5,
+        "mean_turn_deg_s": 163.7692883667255,
+        "declared_bound_deg_s": 8.0,
+        "violates_bound": true
+      }
+    ],
+    "current_onboard_views": [
+      {
+        "id": -1000000,
+        "position": [
+          5.73704569194543,
+          12.315141136748384
+        ],
+        "velocity": [
+          0.6016246765899953,
+          -0.21731778831435059
+        ],
+        "heading": 1.8151424220741028
+      }
+    ],
+    "scope": "same saved filtered branch; no OFF future inference or target certificate"
+  },
+  "conditional_hypotheses": {
+    "name": "bootstrap_axis_hull_plus_declared_3sigma_jitter_and_sensors",
+    "scale": 1.0,
+    "jitter_fraction": 0.05,
+    "sigma_multiple": 3.0,
+    "parameter_bounds": {
+      "T12": {
+        "lo": 13.83987138976605,
+        "hi": 19.455311610233952
+      },
+      "t_boost": {
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "u_boost": {
+        "lo": 0.5,
+        "hi": 0.5
+      },
+      "X_uu": {
+        "lo": 10.497501061657175,
+        "hi": 17.714631938342823
+      },
+      "X_vv": {
+        "lo": 47.155944154699,
+        "hi": 59.565906845301
+      },
+      "X_rr": {
+        "lo": 0.0,
+        "hi": 16.77636875259699
+      },
+      "X_delta": {
+        "lo": 0.0,
+        "hi": 0.668993161481687
+      },
+      "Y_v": {
+        "lo": 0.0,
+        "hi": 8.603118389944115
+      },
+      "Y_vv": {
+        "lo": 193.2446393423692,
+        "hi": 255.8164426576308
+      },
+      "k_R": {
+        "lo": 0.3501138376034506,
+        "hi": 2.9066391623965497
+      },
+      "k_race": {
+        "lo": 0.0,
+        "hi": 0.2698911479917969
+      },
+      "N_r": {
+        "lo": 0.0,
+        "hi": 12.661937717611364
+      },
+      "N_rr": {
+        "lo": 0.0,
+        "hi": 8.760768992217066
+      },
+      "N_uv": {
+        "lo": -90.81688198422114,
+        "hi": -47.42549501577884
+      },
+      "rud_rate": {
+        "lo": 2574.0128601802257,
+        "hi": 3015.3483188197742
+      },
+      "rud_tau": {
+        "lo": 0.6027775407911895,
+        "hi": 1.0350494592088104
+      },
+      "rud_delay": {
+        "lo": 0.5800278539831074,
+        "hi": 0.7972161460168925
+      }
+    },
+    "bootstrap_count": 28,
+    "deterministic_full_support": false,
+    "probability_claim": false,
+    "initial_servo_at_reset_rad": 0.0,
+    "all_past_issued_commands_used": true
+  },
+  "provenance": {
+    "own": {
+      "case": "TS2:BAS-NU-CV-070",
+      "mode": "v15",
+      "seed": 400469,
+      "steps": 78,
+      "outcome": "collision:boundary",
+      "checkpoint_sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+      "config_sha256": "a4df64a97f641de0b1c660b04f73ccc8401a29f7fa48711c2a6ee694dc98ed44",
+      "effective_constants": {
+        "UPDATE_RATE": 0.5,
+        "PHYSICS_DT": 0.1,
+        "FIXED_RPM": false,
+        "RUDDER_COMMAND_LIMIT": false,
+        "VESSEL_RANDOMISATION_SCALE": 1.0,
+        "POSE_STALE_PROB": 0.0,
+        "BOUNDARY_POSE_NOISE_XY": 0.03,
+        "BOUNDARY_POSE_NOISE_HEADING_DEG": 0.2,
+        "BOUNDARY_POSE_NOISE_WALK": 0.0,
+        "EGO_SPEED_NOISE": 0.05,
+        "EGO_YAW_RATE_NOISE_DPS": 1.0
+      },
+      "scenario_sha256": "1df385f81fb213531debfb03cfdf7988a26460f5be774b12a7b4d069fd525880",
+      "evaluated_sources_sha256": "75c221878164a1a937000bdd538c59d77b32c008eca73dab2722f5ae9fc115ba",
+      "physics_sources": {
+        "src/constants.py": {
+          "current_sha256": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+          "recorded_sha256": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+          "status": "matched"
+        },
+        "src/constant_temp.py": {
+          "current_sha256": "85e5dc9992d062466af304f3f3273b249ba16b130c2d89b53fe7cb692b5c81d7",
+          "recorded_sha256": "85e5dc9992d062466af304f3f3273b249ba16b130c2d89b53fe7cb692b5c81d7",
+          "status": "matched"
+        },
+        "src/ship.py": {
+          "current_sha256": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+          "recorded_sha256": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+          "status": "matched"
+        },
+        "bluefin/dynamics.py": {
+          "current_sha256": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711",
+          "recorded_sha256": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711",
+          "status": "matched"
+        },
+        "bluefin/ship_model_v3.py": {
+          "current_sha256": "21afbc6605035bd905f16db7f1149fec50fc9b73ca0d4bd0a1e76b06b6c4136c",
+          "recorded_sha256": "21afbc6605035bd905f16db7f1149fec50fc9b73ca0d4bd0a1e76b06b6c4136c",
+          "status": "matched"
+        },
+        "src/targets.py": {
+          "current_sha256": "786d7afd994bdfcc70ac3f6217b9ddf7711b76c6ea51d0788bf6ec51f0435598",
+          "recorded_sha256": "786d7afd994bdfcc70ac3f6217b9ddf7711b76c6ea51d0788bf6ec51f0435598",
+          "status": "matched"
+        },
+        "src/env.py": {
+          "current_sha256": "ea11983e161910b8105593ff5606a7999059ecf2dd60154056a8840e6af424e1",
+          "recorded_sha256": "1a7eb213d89f980f6a9a681b112be5e76f6000672c4778af9c72d69f0e8f49d7",
+          "archived_sha256": "1a7eb213d89f980f6a9a681b112be5e76f6000672c4778af9c72d69f0e8f49d7",
+          "status": "current_differs_not_executed",
+          "archived_verified": true
+        }
+      },
+      "input_sha256": {
+        "results\\safety_dev\\v10_iterations\\conditional_prefix32\\traces\\014_v15.jsonl": "20b9627f004d1960f3a2f466fade483e007abd1a7184a22c32bfdd5cae4cf939",
+        "results\\safety_dev\\v10_iterations\\conditional_prefix32\\manifest.json": "e43fadeb0b332189ad138646e20508401ff3998debc40147cfc9a32c6ee402e7",
+        "results\\safety_dev\\v10_iterations\\conditional_prefix32\\completion.json": "abac525504417a6592fa0aac38215806671c1904ab1501d91e1a0677fb79b756",
+        "results\\safety_dev\\v10_iterations\\conditional_prefix32\\attempts\\014_result.json": "1d4c90353066e863c1c1b7614435f02ceb2dfa067d47c45e22ce16a27ce2a935"
+      }
+    },
+    "target": {
+      "case": "TS2:BAS-HO-NC-059",
+      "mode": "v16",
+      "seed": 400058,
+      "steps": 28,
+      "outcome": "collision:target",
+      "checkpoint_sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+      "config_sha256": "a4df64a97f641de0b1c660b04f73ccc8401a29f7fa48711c2a6ee694dc98ed44",
+      "effective_constants": {
+        "UPDATE_RATE": 0.5,
+        "PHYSICS_DT": 0.1,
+        "FIXED_RPM": false,
+        "RUDDER_COMMAND_LIMIT": false,
+        "VESSEL_RANDOMISATION_SCALE": 1.0,
+        "POSE_STALE_PROB": 0.0,
+        "BOUNDARY_POSE_NOISE_XY": 0.03,
+        "BOUNDARY_POSE_NOISE_HEADING_DEG": 0.2,
+        "BOUNDARY_POSE_NOISE_WALK": 0.0,
+        "EGO_SPEED_NOISE": 0.05,
+        "EGO_YAW_RATE_NOISE_DPS": 1.0
+      },
+      "scenario_sha256": "fb19c06cd0042fa9cbef579b8df7015a195330bcbb9c2de11a17cacec6d1e657",
+      "evaluated_sources_sha256": "4027dcf18c701fad7df213dadd86b2789ac24fac86552787a1c612942979173c",
+      "physics_sources": {
+        "src/constants.py": {
+          "current_sha256": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+          "recorded_sha256": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+          "status": "matched"
+        },
+        "src/constant_temp.py": {
+          "current_sha256": "85e5dc9992d062466af304f3f3273b249ba16b130c2d89b53fe7cb692b5c81d7",
+          "recorded_sha256": "85e5dc9992d062466af304f3f3273b249ba16b130c2d89b53fe7cb692b5c81d7",
+          "status": "matched"
+        },
+        "src/ship.py": {
+          "current_sha256": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+          "recorded_sha256": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+          "status": "matched"
+        },
+        "bluefin/dynamics.py": {
+          "current_sha256": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711",
+          "recorded_sha256": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711",
+          "status": "matched"
+        },
+        "bluefin/ship_model_v3.py": {
+          "current_sha256": "21afbc6605035bd905f16db7f1149fec50fc9b73ca0d4bd0a1e76b06b6c4136c",
+          "recorded_sha256": "21afbc6605035bd905f16db7f1149fec50fc9b73ca0d4bd0a1e76b06b6c4136c",
+          "status": "matched"
+        },
+        "src/targets.py": {
+          "current_sha256": "786d7afd994bdfcc70ac3f6217b9ddf7711b76c6ea51d0788bf6ec51f0435598",
+          "recorded_sha256": "786d7afd994bdfcc70ac3f6217b9ddf7711b76c6ea51d0788bf6ec51f0435598",
+          "status": "matched"
+        },
+        "src/env.py": {
+          "current_sha256": "ea11983e161910b8105593ff5606a7999059ecf2dd60154056a8840e6af424e1",
+          "recorded_sha256": "1a7eb213d89f980f6a9a681b112be5e76f6000672c4778af9c72d69f0e8f49d7",
+          "archived_sha256": "1a7eb213d89f980f6a9a681b112be5e76f6000672c4778af9c72d69f0e8f49d7",
+          "status": "current_differs_not_executed",
+          "archived_verified": true
+        }
+      },
+      "input_sha256": {
+        "results\\safety_dev\\v10_iterations\\motion_axis_probe5\\traces\\001_v16.jsonl": "14967921fb5f43bd7a4430acc46b11dec77fcef2507b389565ee2f1bc565e3aa",
+        "results\\safety_dev\\v10_iterations\\motion_axis_probe5\\manifest.json": "c7e5cb95d796fbaacf7269a29c4892f1af2d844d233b4b71b82d585f87449f97",
+        "results\\safety_dev\\v10_iterations\\motion_axis_probe5\\completion.json": "43f30b9b4e3b6a606439f0e815b9083ce0bc9b28de0584d939e57151a43e8ddc",
+        "results\\safety_dev\\v10_iterations\\motion_axis_probe5\\attempts\\001_result.json": "5c5ceb6fd06c404248e3f9ed8dcc457e67884fc69799a451d3738c34fecce94c"
+      }
+    },
+    "script_sha256": "7af102a5121fc78f357b90dc330286225bc47c61a5234c10680056c68fdbf1e0",
+    "core_sha256": "d2bf16150953d30024b508fcdf02b9a2a845225fabe456030293bdbb77dc0bb4",
+    "runtime": {
+      "python": "3.10.11",
+      "numpy": "1.26.4",
+      "mpmath": "1.3.0",
+      "native_thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1"
+      }
+    }
+  },
+  "limitations": [
+    "Gaussian sensor noise and parameter jitter have unbounded support; declared finite boxes are conditional hypotheses.",
+    "Recorded future controls are NONCAUSAL same-branch diagnostic inputs, not an executable feedback policy.",
+    "Truth is used only after propagation for PREdecision endpoint scoring, never to construct/tune bounds.",
+    "Natural interval arithmetic loses parameter/state dependence; wide/failed boxes mean unknown, never safe.",
+    "Experimental mpmath.iv real-arithmetic numerical-map enclosure; binary64 roundoff, continuous ODE and swept geometry are unvalidated.",
+    "No obstacle/target occupancy certificate, recursive feasibility, terminal backup or mission safety guarantee.",
+    "Actual plant parameters and servo are unlogged, so a containment miss cannot distinguish an assumption violation from an implementation error."
+  ],
+  "reference": "Kochdumper et al., https://arxiv.org/abs/2210.10691 ; architecture inspiration only."
+}

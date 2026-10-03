@@ -1,0 +1,356 @@
+{
+  "groups": {
+    "all": {
+      "n": 1150,
+      "outcomes": {
+        "policy": {
+          "goal": 983,
+          "collision:obstacle": 81,
+          "collision:target": 72,
+          "collision:boundary": 14
+        },
+        "v4": {
+          "goal": 1003,
+          "collision:obstacle": 42,
+          "collision:target": 71,
+          "collision:boundary": 34
+        },
+        "v7": {
+          "goal": 1032,
+          "collision:boundary": 36,
+          "collision:obstacle": 39,
+          "collision:target": 43
+        },
+        "v8": {
+          "goal": 1039,
+          "collision:boundary": 35,
+          "collision:obstacle": 41,
+          "collision:target": 35
+        }
+      },
+      "v8_categories": {
+        "both_goal": 962,
+        "broken": 21,
+        "both_fail": 90,
+        "rescued": 77
+      },
+      "reconstruction": {
+        "first_fire_branch": 526,
+        "base_v7_never_fired": 601,
+        "nohold_never_fired": 23
+      },
+      "v7_to_v8_changed_outcomes": 15
+    },
+    "ts2": {
+      "n": 1000,
+      "outcomes": {
+        "policy": {
+          "goal": 872,
+          "collision:target": 61,
+          "collision:obstacle": 55,
+          "collision:boundary": 12
+        },
+        "v4": {
+          "goal": 880,
+          "collision:boundary": 27,
+          "collision:target": 60,
+          "collision:obstacle": 33
+        },
+        "v7": {
+          "goal": 904,
+          "collision:boundary": 31,
+          "collision:target": 38,
+          "collision:obstacle": 27
+        },
+        "v8": {
+          "goal": 912,
+          "collision:boundary": 30,
+          "collision:target": 31,
+          "collision:obstacle": 27
+        }
+      },
+      "v8_categories": {
+        "both_goal": 855,
+        "both_fail": 71,
+        "rescued": 57,
+        "broken": 17
+      },
+      "reconstruction": {
+        "base_v7_never_fired": 561,
+        "first_fire_branch": 421,
+        "nohold_never_fired": 18
+      },
+      "v7_to_v8_changed_outcomes": 13,
+      "first_fire_margin_groups": {
+        "rescued": {
+          "n": 57,
+          "selected_below_trigger_015": 22,
+          "selected_negative": 0,
+          "risk_monitor_urgent": 0
+        },
+        "broken": {
+          "n": 17,
+          "selected_below_trigger_015": 9,
+          "selected_negative": 3,
+          "risk_monitor_urgent": 0
+        },
+        "both_fail": {
+          "n": 54,
+          "selected_below_trigger_015": 29,
+          "selected_negative": 2,
+          "risk_monitor_urgent": 0
+        },
+        "both_goal": {
+          "n": 293,
+          "selected_below_trigger_015": 144,
+          "selected_negative": 22,
+          "risk_monitor_urgent": 0
+        }
+      }
+    },
+    "dv3": {
+      "n": 150,
+      "outcomes": {
+        "policy": {
+          "goal": 111,
+          "collision:obstacle": 26,
+          "collision:target": 11,
+          "collision:boundary": 2
+        },
+        "v4": {
+          "goal": 123,
+          "collision:obstacle": 9,
+          "collision:target": 11,
+          "collision:boundary": 7
+        },
+        "v7": {
+          "goal": 128,
+          "collision:boundary": 5,
+          "collision:obstacle": 12,
+          "collision:target": 5
+        },
+        "v8": {
+          "goal": 127,
+          "collision:boundary": 5,
+          "collision:obstacle": 14,
+          "collision:target": 4
+        }
+      },
+      "v8_categories": {
+        "both_goal": 107,
+        "broken": 4,
+        "both_fail": 19,
+        "rescued": 20
+      },
+      "reconstruction": {
+        "first_fire_branch": 105,
+        "base_v7_never_fired": 40,
+        "nohold_never_fired": 5
+      },
+      "v7_to_v8_changed_outcomes": 2
+    }
+  },
+  "first_fire_reasons": [
+    {
+      "dataset": "all",
+      "reason": "brake",
+      "n": 54,
+      "rescued": 15,
+      "broken": 4,
+      "both_fail": 10,
+      "both_goal": 25,
+      "selected_negative": 0,
+      "repair_clearance_not_worse": 0
+    },
+    {
+      "dataset": "all",
+      "reason": "continue",
+      "n": 73,
+      "rescued": 12,
+      "broken": 2,
+      "both_fail": 10,
+      "both_goal": 49,
+      "selected_negative": 0,
+      "repair_clearance_not_worse": 11
+    },
+    {
+      "dataset": "all",
+      "reason": "last certificate",
+      "n": 36,
+      "rescued": 4,
+      "broken": 4,
+      "both_fail": 4,
+      "both_goal": 24,
+      "selected_negative": 36,
+      "repair_clearance_not_worse": 24
+    },
+    {
+      "dataset": "all",
+      "reason": "no fire",
+      "n": 624,
+      "rescued": 0,
+      "broken": 0,
+      "both_fail": 22,
+      "both_goal": 602,
+      "selected_negative": 0,
+      "repair_clearance_not_worse": 0
+    },
+    {
+      "dataset": "all",
+      "reason": "searched escape",
+      "n": 61,
+      "rescued": 5,
+      "broken": 0,
+      "both_fail": 5,
+      "both_goal": 51,
+      "selected_negative": 0,
+      "repair_clearance_not_worse": 0
+    },
+    {
+      "dataset": "all",
+      "reason": "turn",
+      "n": 302,
+      "rescued": 41,
+      "broken": 11,
+      "both_fail": 39,
+      "both_goal": 211,
+      "selected_negative": 0,
+      "repair_clearance_not_worse": 3
+    },
+    {
+      "dataset": "ts2",
+      "reason": "brake",
+      "n": 44,
+      "rescued": 11,
+      "broken": 2,
+      "both_fail": 9,
+      "both_goal": 22,
+      "selected_negative": 0,
+      "repair_clearance_not_worse": 0
+    },
+    {
+      "dataset": "ts2",
+      "reason": "continue",
+      "n": 49,
+      "rescued": 9,
+      "broken": 2,
+      "both_fail": 6,
+      "both_goal": 32,
+      "selected_negative": 0,
+      "repair_clearance_not_worse": 6
+    },
+    {
+      "dataset": "ts2",
+      "reason": "last certificate",
+      "n": 27,
+      "rescued": 0,
+      "broken": 3,
+      "both_fail": 2,
+      "both_goal": 22,
+      "selected_negative": 27,
+      "repair_clearance_not_worse": 19
+    },
+    {
+      "dataset": "ts2",
+      "reason": "no fire",
+      "n": 579,
+      "rescued": 0,
+      "broken": 0,
+      "both_fail": 17,
+      "both_goal": 562,
+      "selected_negative": 0,
+      "repair_clearance_not_worse": 0
+    },
+    {
+      "dataset": "ts2",
+      "reason": "searched escape",
+      "n": 46,
+      "rescued": 2,
+      "broken": 0,
+      "both_fail": 5,
+      "both_goal": 39,
+      "selected_negative": 0,
+      "repair_clearance_not_worse": 0
+    },
+    {
+      "dataset": "ts2",
+      "reason": "turn",
+      "n": 255,
+      "rescued": 35,
+      "broken": 10,
+      "both_fail": 32,
+      "both_goal": 178,
+      "selected_negative": 0,
+      "repair_clearance_not_worse": 3
+    },
+    {
+      "dataset": "dv3",
+      "reason": "brake",
+      "n": 10,
+      "rescued": 4,
+      "broken": 2,
+      "both_fail": 1,
+      "both_goal": 3,
+      "selected_negative": 0,
+      "repair_clearance_not_worse": 0
+    },
+    {
+      "dataset": "dv3",
+      "reason": "continue",
+      "n": 24,
+      "rescued": 3,
+      "broken": 0,
+      "both_fail": 4,
+      "both_goal": 17,
+      "selected_negative": 0,
+      "repair_clearance_not_worse": 5
+    },
+    {
+      "dataset": "dv3",
+      "reason": "last certificate",
+      "n": 9,
+      "rescued": 4,
+      "broken": 1,
+      "both_fail": 2,
+      "both_goal": 2,
+      "selected_negative": 9,
+      "repair_clearance_not_worse": 5
+    },
+    {
+      "dataset": "dv3",
+      "reason": "no fire",
+      "n": 45,
+      "rescued": 0,
+      "broken": 0,
+      "both_fail": 5,
+      "both_goal": 40,
+      "selected_negative": 0,
+      "repair_clearance_not_worse": 0
+    },
+    {
+      "dataset": "dv3",
+      "reason": "searched escape",
+      "n": 15,
+      "rescued": 3,
+      "broken": 0,
+      "both_fail": 0,
+      "both_goal": 12,
+      "selected_negative": 0,
+      "repair_clearance_not_worse": 0
+    },
+    {
+      "dataset": "dv3",
+      "reason": "turn",
+      "n": 47,
+      "rescued": 6,
+      "broken": 1,
+      "both_fail": 7,
+      "both_goal": 33,
+      "selected_negative": 0,
+      "repair_clearance_not_worse": 0
+    }
+  ],
+  "new_episode_runs": 0,
+  "exact_prediction_recheck_possible_from_csv": false,
+  "margin_comparison_is_not_full_dominance": true
+}

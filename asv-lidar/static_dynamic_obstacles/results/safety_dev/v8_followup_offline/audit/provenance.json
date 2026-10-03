@@ -1,0 +1,22 @@
+{
+  "inputs_sha256": {
+    "results\\safety_dev\\trigger_counterfactual\\episodes.csv": "2d58ea10c82e1041742b92e8f852f6dbe154923fe23cd674197eb76b05c640fd",
+    "results\\safety_dev\\trigger_counterfactual\\steps.csv": "4ec73460bdaef4af96d95beb2c0b24d49e0ba79872305a0c983ef624bd925601",
+    "results\\safety_dev\\trigger_counterfactual\\branches.csv": "93f621fbcfacadf57caa46cf8b81ee9a874040c1e611dd70f85050ea5fe03fdc",
+    "results\\safety_dev\\trigger_counterfactual\\v7_nohold\\episodes.csv": "c9e7732ea9f444bd124fac2e955912dc94c27fc6aa663458d43b60639e3b0665",
+    "results\\safety_dev\\trigger_counterfactual\\v7_nohold\\steps.csv": "10e75505d2ab3c8ab6435c4c80c0839d15df548f2267ccdced210fcd70b0b048",
+    "results\\safety_dev\\trigger_counterfactual\\v7_nohold\\branches.csv": "fc1f779f1c7a63c25f44cb4fea94d7d2324a1da2979a42df201047d32fe6aec3"
+  },
+  "review_sources_current_sha256_not_run_snapshot": {
+    "planning\\SAFETY_LAYER_V8_PLAN.md": "77171e8455183a08c9d7e18de60cbe9b32f7132da770948e88e894540e773785",
+    "src\\safety_v6.py": "07c1c716aea2c149f7e96a0aede2ab50d99c633706ba6d889e18a02bc52478f6",
+    "src\\safety_v7.py": "94a64f2c0914ddafe0cbc8f2d0f3256c4aee99ade16fe796e6d13a095c300444",
+    "src\\safety_v8.py": "3f1954a8212cb56f9e098c7e90d8d7f31e3e0f5dd75284adc2dac77a9a13486e",
+    "tools\\diagnostics\\safety\\trigger_counterfactual.py": "f5d44fb079e8088b0316c9ad0ae85e2aa04537c99dc555a6d8424da516f44d79",
+    "results\\safety_dev\\trigger_counterfactual\\config.json": "8614a93a3fbee3ff9a40f7ee41c35c8dc8ecdf8f4acc5d8c9f26216a9ac4426c",
+    "results\\safety_dev\\trigger_counterfactual\\config_phase1.json": "b1d7faeb6e8077d8168428897c457d2c130f040391573695c020e5731edf3e3c",
+    "results\\safety_dev\\trigger_counterfactual\\v7_nohold\\config.json": "f62a8a461fd89dc44983331d8c1f9fda2e198f69768d063585560aa993d65b76"
+  },
+  "analysis_script_sha256": "6d49a0a61d55f718b44fc1fee642eb3594eecd0ccb804df70a2500a5a4dd408d",
+  "new_episode_runs": 0
+}

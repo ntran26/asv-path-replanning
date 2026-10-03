@@ -1,0 +1,6 @@
+candidate,N,goal,collision:target,collision:obstacle,collision:boundary,timeout,reference,matched_cases,gained_goals,lost_goals,net_goals,source_scope
+"V11 policy-prefix search, tracks disabled",32,17,9,2,4,0,off,32,8,7,1,sum of separately validated pieces; unequal inventories disclosed
+"V11 policy-prefix search, tracks disabled",32,17,9,2,4,0,v8,32,3,2,1,sum of separately validated pieces; unequal inventories disclosed
+"V11 policy-prefix search, tracks disabled",32,17,9,2,4,0,v9,32,7,6,1,sum of separately validated pieces; unequal inventories disclosed
+"V11 policy-prefix search, tracks disabled",32,17,9,2,4,0,v10,32,2,3,-1,sum of separately validated pieces; unequal inventories disclosed
+"V11 policy-prefix search, tracks disabled",32,17,9,2,4,0,v11,32,3,4,-1,sum of separately validated pieces; unequal inventories disclosed

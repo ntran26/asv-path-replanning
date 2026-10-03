@@ -1,0 +1,83 @@
+{
+  "created_utc": "2026-10-03T11:55:20.672138+00:00",
+  "completed_new_episode_runs": 90,
+  "development_scenarios": 12,
+  "primary_subset_scenarios": 18,
+  "full_primary_scenarios": 1000,
+  "runs": [
+    {
+      "path": "results/safety_dev/v10_iterations/v18_v19_probe_a",
+      "runs": 18,
+      "source_files_verified": 110,
+      "manifest_sha256": "7074c27c5a6fe7c1272dde3b21207f5e26062a8f668771b0d7d86073128a101f",
+      "completion_sha256": "35221ad5ec94eaf0bb3f7052c1042e76e9e6bf5ba4dec29461935b3bcb68fac9"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/v18_v19_probe_b",
+      "runs": 18,
+      "source_files_verified": 110,
+      "manifest_sha256": "fab86ef247ff9d1ec0f063c7b645428166f3a8d817f23d85e36aefc2eec3434a",
+      "completion_sha256": "85443c31f5e8acf936be37c7050e4f6aae8d9f10ce7a67cb8008b167890ee309"
+    },
+    {
+      "path": "results/safety_dev/testset_v3_main/runs/v19_quick_a",
+      "runs": 27,
+      "source_files_verified": 110,
+      "manifest_sha256": "ddbc436f495c23c6d92fd7718b7d4eba75b4c0a05922fbcd0a2d45d46460a2fc",
+      "completion_sha256": "562f2aa5ca540cfdde47b50f068972d2fe788bc7ccc671fb66d8c29c097adad0"
+    },
+    {
+      "path": "results/safety_dev/testset_v3_main/runs/v19_quick_b",
+      "runs": 27,
+      "source_files_verified": 110,
+      "manifest_sha256": "d690e1521167b517d33f2ecd2a5b66a40314f8e9800bbd66571cf8c4060d931c",
+      "completion_sha256": "b85ffc0cf4f6b3e4f7df7c14e28e187cef0f5ad329cfaaf16a17bf83c45bb0c1"
+    }
+  ],
+  "immutable_identity": {
+    "src/constants.py": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+    "runs/sac_formulation_seed0_bl3/kept_best_3M/best_model.zip": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+    "runs/sac_formulation_seed0_bl3/kept_best_3M/config.json": "a4df64a97f641de0b1c660b04f73ccc8401a29f7fa48711c2a6ee694dc98ed44"
+  },
+  "maintenance": [
+    {
+      "path": "results\\safety_dev\\maintenance\\ntfs_compact_20261003T111517Z\\summary.json",
+      "files": 495,
+      "reclaimed_bytes": 945003157,
+      "summary_sha256": "71f432dd2d0722abdcfbee138601e09c176c861a10f807e6e2d70391182359df"
+    },
+    {
+      "path": "results\\safety_dev\\maintenance\\ntfs_compact_20261003T115342Z\\summary.json",
+      "files": 90,
+      "reclaimed_bytes": 29320117,
+      "summary_sha256": "caf44b4c41a3be3652818e0ac95fea63f60c6f7d30f9b07a5d82499e78318e6a"
+    }
+  ],
+  "compressed_files": 585,
+  "compression_allocation_reclaimed_bytes": 974323274,
+  "all_compression_hashes_equal": true,
+  "files_deleted": 0,
+  "objective_achieved": false,
+  "default_promoted": false,
+  "evaluation_processes_remaining": 0,
+  "max_evaluation_processes": 2,
+  "automatic_retries": 0,
+  "free_bytes_now": 11650027520,
+  "validation": {
+    "v18_tests": 26,
+    "v19_tests": 33,
+    "native_dispatch_tests": 32,
+    "maintenance_tests": 15,
+    "continuous_bank_selector_tests": 4
+  },
+  "primary_tuning": false,
+  "primary_command_audit": {
+    "path": "results/safety_dev/testset_v3_main/quick_v19_trace_audit/audit.json",
+    "v19_v16_exact_command_sequences_equal": 18,
+    "matched_cases": 18,
+    "v19_active_decisions": 11,
+    "policy_successes_preserved": 14,
+    "policy_successes": 14,
+    "policy_failures_rescued": 1
+  }
+}

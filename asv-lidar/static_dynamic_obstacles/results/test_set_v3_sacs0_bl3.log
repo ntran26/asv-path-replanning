@@ -1,0 +1,341 @@
+[v3] FS-BO-VAR-001 (slanted) replaces P2v2-L1-BO-VAR-10
+[v3] FS-BO-FIX-002 (straight) replaces P2v2-L1-BO-FIX-09
+[v3] FS-BO-VAR-003 (straight) replaces P2v2-L1-BO-VAR-16
+[v3] FS-BO-VAR-004 (straight) replaces P2v2-L1-BO-VAR-06
+[v3] FS-BO-FIX-005 (slanted) replaces P2v2-L1-BO-FIX-07
+[v3] FS-CRP-FIX-001 (straight) replaces P2-L1-CRP-FIX-13
+[v3] FS-CRP-FIX-002 (straight) replaces P2-L1-CRP-FIX-09
+[v3] FS-CRP-FIX-003 (straight) replaces P2-L1-CRP-FIX-03
+[v3] FS-CRP-FIX-004 (slanted) replaces P2-L1-CRP-FIX-15
+[v3] FS-CRP-FIX-005 (straight) replaces P2-L1-CRP-FIX-19
+[v3] FS-CRP-FIX-006 (straight) replaces P2-L1-CRP-FIX-11
+[v3] FS-CRS-VAR-001 (straight) replaces P2-L1-CRS-VAR-10
+[v3] FS-CRS-FIX-002 (slanted) replaces P2-L1-CRS-FIX-07
+[v3] FS-CRS-VAR-003 (straight) replaces P2-L1-CRS-VAR-04
+[v3] FS-CRS-FIX-004 (straight) replaces P2-L1-CRS-FIX-19
+[v3] FS-CRS-VAR-005 (straight) replaces P2-L1-CRS-VAR-12
+[v3] FS-CRS-VAR-006 (slanted) replaces P2-L1-CRS-VAR-14
+[v3] FS-HO-FIX-001 (straight) replaces P2-L1-HO-FIX-01
+[v3] FS-HO-FIX-002 (straight) replaces P2-L1-HO-FIX-07
+[v3] FS-HO-VAR-003 (straight) replaces P2-L1-HO-VAR-16
+[v3] FS-HO-VAR-004 (slanted) replaces P2-L1-HO-VAR-12
+[v3] FS-HO-VAR-005 (straight) replaces P2-L1-HO-VAR-02
+[v3] FS-OT-VAR-001 (straight) replaces P2-L1-OT-VAR-20
+[v3] FS-OT-FIX-002 (straight) replaces P2-L1-OT-FIX-05
+[v3] FS-OT-VAR-003 (slanted) replaces P2-L1-OT-VAR-06
+[v3] FS-OT-FIX-004 (straight) replaces P2-L1-OT-FIX-13
+[v3] FS-OT-VAR-005 (straight) replaces P2-L1-OT-VAR-10
+[v3] FS-BO-VAR-006 (straight) replaces P2-L2-BO-VAR-10
+[v3] FS-BO-VAR-007 (slanted) replaces P2-L2-BO-VAR-18
+[v3] FS-BO-FIX-008 (straight) replaces P2-L2-BO-FIX-07
+[v3] FS-BO-VAR-009 (straight) replaces P2-L2-BO-VAR-08
+[v3] FS-BO-FIX-010 (straight) replaces P2-L2-BO-FIX-17
+[v3] FS-BO-FIX-011 (slanted) replaces P2-L2-BO-FIX-03
+[v3] FS-BO-VAR-012 (straight) replaces P2-L2-BO-VAR-06
+[v3] FS-BO-VAR-013 (straight) replaces P2-L2-BO-VAR-16
+[v3] FS-BO-FIX-014 (straight) replaces P2-L2-BO-FIX-11
+[v3] FS-BO-VAR-015 (slanted) replaces P2-L2-BO-VAR-04
+[v3] FS-CRP-FIX-007 (straight) replaces P2-L2-CRP-FIX-13
+[v3] FS-CRP-VAR-008 (straight) replaces P2-L2-CRP-VAR-20
+[v3] FS-CRP-VAR-009 (straight) replaces P2-L2-CRP-VAR-02
+[v3] FS-CRP-FIX-010 (slanted) replaces P2-L2-CRP-FIX-07
+[v3] FS-CRP-FIX-011 (straight) replaces P2-L2-CRP-FIX-11
+[v3] FS-CRP-VAR-012 (straight) replaces P2-L2-CRP-VAR-10
+[v3] FS-CRP-FIX-013 (straight) replaces P2-L2-CRP-FIX-19
+[v3] FS-CRP-VAR-014 (slanted) replaces P2-L2-CRP-VAR-18
+[v3] FS-CRP-VAR-015 (straight) replaces P2-L2-CRP-VAR-16
+[v3] FS-CRP-VAR-016 (straight) replaces P2-L2-CRP-VAR-08
+[v3] FS-CRS-FIX-007 (straight) replaces P2-L2-CRS-FIX-13
+[v3] FS-CRS-VAR-008 (slanted) replaces P2-L2-CRS-VAR-12
+[v3] FS-CRS-VAR-009 (straight) replaces P2-L2-CRS-VAR-08
+[v3] FS-CRS-FIX-010 (straight) replaces P2-L2-CRS-FIX-07
+[v3] FS-CRS-VAR-011 (straight) replaces P2-L2-CRS-VAR-14
+[v3] FS-CRS-FIX-012 (slanted) replaces P2-L2-CRS-FIX-11
+[v3] FS-CRS-VAR-013 (straight) replaces P2-L2-CRS-VAR-16
+[v3] FS-CRS-FIX-014 (straight) replaces P2-L2-CRS-FIX-01
+[v3] FS-CRS-VAR-015 (straight) replaces P2-L2-CRS-VAR-18
+[v3] FS-CRS-FIX-016 (slanted) replaces P2-L2-CRS-FIX-15
+[v3] FS-CRS-VAR-017 (straight) replaces P2-L2-CRS-VAR-20
+[v3] FS-HO-FIX-006 (straight) replaces P2-L2-HO-FIX-05
+[v3] FS-HO-FIX-007 (straight) replaces P2-L2-HO-FIX-03
+[v3] FS-HO-FIX-008 (slanted) replaces P2-L2-HO-FIX-11
+[v3] FS-HO-FIX-009 (straight) replaces P2-L2-HO-FIX-07
+[v3] FS-HO-FIX-010 (straight) replaces P2-L2-HO-FIX-13
+[v3] FS-HO-VAR-011 (straight) replaces P2-L2-HO-VAR-12
+[v3] FS-HO-FIX-012 (slanted) replaces P2-L2-HO-FIX-17
+[v3] FS-HO-FIX-013 (straight) replaces P2-L2-HO-FIX-19
+[v3] FS-HO-VAR-014 (straight) replaces P2-L2-HO-VAR-08
+[v3] FS-HO-FIX-015 (straight) replaces P2-L2-HO-FIX-09
+[v3] FS-OT-VAR-006 (slanted) replaces P2-L2-OT-VAR-02
+[v3] FS-OT-FIX-007 (straight) replaces P2-L2-OT-FIX-03
+[v3] FS-OT-VAR-008 (straight) replaces P2-L2-OT-VAR-16
+[v3] FS-OT-VAR-009 (straight) replaces P2-L2-OT-VAR-14
+[v3] FS-OT-FIX-010 (slanted) replaces P2-L2-OT-FIX-11
+[v3] FS-OT-FIX-011 (straight) replaces P2-L2-OT-FIX-17
+[v3] FS-OT-FIX-012 (straight) replaces P2-L2-OT-FIX-19
+[v3] FS-OT-VAR-013 (straight) replaces P2-L2-OT-VAR-06
+[v3] FS-OT-FIX-014 (slanted) replaces P2-L2-OT-FIX-09
+[v3] FS-OT-FIX-015 (straight) replaces P2-L2-OT-FIX-15
+[v3] FS-BO-VAR-016 (straight) replaces P2-L3-BO-VAR-20
+[v3] FS-BO-VAR-017 (straight) replaces P2-L3-BO-VAR-06
+[v3] FS-BO-VAR-018 (slanted) replaces P2-L3-BO-VAR-12
+[v3] FS-BO-FIX-019 (straight) replaces P2-L3-BO-FIX-07
+[v3] FS-BO-FIX-020 (straight) replaces P2-L3-BO-FIX-05
+[v3] FS-BO-VAR-021 (straight) replaces P2-L3-BO-VAR-16
+[v3] FS-BO-FIX-022 (slanted) replaces P2-L3-BO-FIX-11
+[v3] FS-BO-FIX-023 (straight) replaces P2-L3-BO-FIX-13
+[v3] FS-BO-VAR-024 (straight) replaces P2-L3-BO-VAR-10
+[v3] FS-BO-VAR-025 (straight) replaces P2-L3-BO-VAR-18
+[v3] FS-CRP-FIX-017 (slanted) replaces P2-L3-CRP-FIX-15
+[v3] FS-CRP-VAR-018 (straight) replaces P2-L3-CRP-VAR-04
+[v3] FS-CRP-VAR-019 (straight) replaces P2-L3-CRP-VAR-14
+[v3] FS-CRP-VAR-020 (straight) replaces P2-L3-CRP-VAR-06
+[v3] FS-CRP-VAR-021 (slanted) replaces P2-L3-CRP-VAR-02
+[v3] FS-CRP-VAR-022 (straight) replaces P2-L3-CRP-VAR-12
+[v3] FS-CRP-VAR-023 (straight) replaces P2-L3-CRP-VAR-20
+[v3] FS-CRP-FIX-024 (straight) replaces P2-L3-CRP-FIX-05
+[v3] FS-CRP-VAR-025 (slanted) replaces P2-L3-CRP-VAR-08
+[v3] FS-CRP-FIX-026 (straight) replaces P2-L3-CRP-FIX-13
+[v3] FS-CRP-FIX-027 (straight) replaces P2-L3-CRP-FIX-03
+[v3] FS-CRP-FIX-028 (straight) replaces P2-L3-CRP-FIX-19
+[v3] FS-CRP-VAR-029 (slanted) replaces P2-L3-CRP-VAR-16
+[v3] FS-CRS-VAR-018 (straight) replaces P2-L3-CRS-VAR-10
+[v3] FS-CRS-VAR-019 (straight) replaces P2-L3-CRS-VAR-16
+[v3] FS-CRS-VAR-020 (straight) replaces P2-L3-CRS-VAR-12
+[v3] FS-CRS-FIX-021 (slanted) replaces P2-L3-CRS-FIX-17
+[v3] FS-CRS-FIX-022 (straight) replaces P2-L3-CRS-FIX-09
+[v3] FS-CRS-VAR-023 (straight) replaces P2-L3-CRS-VAR-18
+[v3] FS-CRS-FIX-024 (straight) replaces P2-L3-CRS-FIX-13
+[v3] FS-CRS-FIX-025 (slanted) replaces P2-L3-CRS-FIX-15
+[v3] FS-CRS-VAR-026 (straight) replaces P2-L3-CRS-VAR-20
+[v3] FS-CRS-FIX-027 (straight) replaces P2-L3-CRS-FIX-03
+[v3] FS-HO-FIX-016 (straight) replaces P2-L3-HO-FIX-03
+[v3] FS-HO-VAR-017 (slanted) replaces P2-L3-HO-VAR-08
+[v3] FS-HO-VAR-018 (straight) replaces P2-L3-HO-VAR-18
+[v3] FS-HO-FIX-019 (straight) replaces P2-L3-HO-FIX-17
+[v3] FS-HO-FIX-020 (straight) replaces P2-L3-HO-FIX-09
+[v3] FS-HO-VAR-021 (slanted) replaces P2-L3-HO-VAR-20
+[v3] FS-HO-FIX-022 (straight) replaces P2-L3-HO-FIX-07
+[v3] FS-HO-VAR-023 (straight) replaces P2-L3-HO-VAR-04
+[v3] FS-HO-FIX-024 (straight) replaces P2-L3-HO-FIX-01
+[v3] FS-HO-VAR-025 (slanted) replaces P2-L3-HO-VAR-16
+[v3] FS-OT-VAR-016 (straight) replaces P2-L3-OT-VAR-10
+[v3] FS-OT-VAR-017 (straight) replaces P2-L3-OT-VAR-02
+[v3] FS-OT-FIX-018 (straight) replaces P2-L3-OT-FIX-19
+[v3] FS-OT-FIX-019 (slanted) replaces P2-L3-OT-FIX-11
+[v3] FS-OT-VAR-020 (straight) replaces P2-L3-OT-VAR-16
+[v3] FS-OT-FIX-021 (straight) replaces P2-L3-OT-FIX-13
+[v3] FS-OT-VAR-022 (straight) replaces P2-L3-OT-VAR-06
+[v3] FS-OT-FIX-023 (slanted) replaces P2-L3-OT-FIX-09
+[v3] FS-OT-FIX-024 (straight) replaces P2-L3-OT-FIX-17
+[v3] FS-OT-FIX-025 (straight) replaces P2-L3-OT-FIX-07
+[v3] BAS-CR-CV-S001 (straight) replaces BAS-CR-CV-047
+[v3] BAS-CR-CV-S002 (straight) replaces BAS-CR-CV-067
+[v3] BAS-CR-RE-S001 (straight) replaces BAS-CR-RE-070
+[v3] BAS-CR-CV-S003 (straight) replaces BAS-CR-CV-041
+[v3] BAS-CR-RE-S002 (straight) replaces BAS-CR-RE-074
+[v3] BAS-CR-RE-S003 (straight) replaces BAS-CR-RE-076
+[v3] BAS-CR-RE-S004 (straight) replaces BAS-CR-RE-002
+[v3] BAS-CR-RE-S005 (straight) replaces BAS-CR-RE-028
+[v3] BAS-CR-CV-S004 (straight) replaces BAS-CR-CV-085
+[v3] BAS-CR-RE-S006 (straight) replaces BAS-CR-RE-066
+[v3] BAS-NU-CV-S001 (straight) replaces BAS-NU-CV-050
+[v3] BAS-NU-CV-S002 (straight) replaces BAS-NU-CV-083
+[v3] BAS-NU-CV-S003 (straight) replaces BAS-NU-CV-098
+[v3] BAS-NU-CV-S004 (straight) replaces BAS-NU-CV-072
+[v3] BAS-NU-CV-S005 (straight) replaces BAS-NU-CV-065
+[v3] BAS-NU-CV-S006 (straight) replaces BAS-NU-CV-030
+[v3] BAS-NU-CV-S007 (straight) replaces BAS-NU-CV-010
+[v3] FS-NT-001 (straight) replaces CH-OT-RE-062 (balance)
+[v3] FS-NT-002 (slanted) replaces CH-OT-RE-052 (balance)
+[v3] FS-NT-003 (straight) replaces CH-OT-RE-098 (balance)
+[v3] FS-NT-004 (straight) replaces BAS-OT-RE-082 (balance)
+[v3] FS-NT-005 (straight) replaces CH-OT-RE-092 (balance)
+[v3] FS-NT-006 (slanted) replaces BAS-OT-CV-093 (balance)
+[v3] FS-NT-007 (straight) replaces BAS-OT-CV-081 (balance)
+[v3] FS-NT-008 (straight) replaces CH-OT-CV-067 (balance)
+[v3] FS-NT-009 (straight) replaces BAS-OT-CV-033 (balance)
+[v3] FS-NT-010 (slanted) replaces CH-OT-RE-048 (balance)
+[v3] FS-NT-011 (straight) replaces CH-OT-RE-030 (balance)
+[v3] FS-NT-012 (straight) replaces BAS-OT-RE-072 (balance)
+[v3] FS-NT-013 (straight) replaces CH-OT-RE-080 (balance)
+[v3] FS-NT-014 (slanted) replaces CH-OT-RE-026 (balance)
+[v3] FS-NT-015 (straight) replaces BAS-OT-RE-064 (balance)
+[v3] FS-NT-016 (straight) replaces BAS-OT-CV-039 (balance)
+[v3] FS-NT-017 (straight) replaces BAS-OT-CV-031 (balance)
+[v3] FS-NT-018 (slanted) replaces BAS-OT-CV-023 (balance)
+[v3] FS-NT-019 (straight) replaces BAS-OT-CV-021 (balance)
+[v3] FS-NT-020 (straight) replaces CH-OT-RE-004 (balance)
+[v3] FS-NT-021 (straight) replaces CH-OT-CV-059 (balance)
+[v3] FS-NT-022 (slanted) replaces CH-OT-RE-068 (balance)
+[v3] FS-NT-023 (straight) replaces BAS-OT-CV-069 (balance)
+[v3] FS-NT-024 (straight) replaces CH-OT-CV-033 (balance)
+[v3] FS-NT-025 (straight) replaces CH-OT-CV-041 (balance)
+[v3] FS-NT-026 (slanted) replaces BAS-OT-CV-025 (balance)
+[v3] FS-NT-027 (straight) replaces CH-OT-RE-022 (balance)
+[v3] FS-OT-FIX-026 (straight) replaces BAS-OT-CV-013 (balance)
+[v3] FS-OT-VAR-027 (straight) replaces CH-OT-RE-024 (balance)
+[v3] FS-OT-FIX-028 (slanted) replaces CH-OT-CV-039 (balance)
+[v3] FS-OT-VAR-029 (straight) replaces CH-OT-RE-094 (balance)
+[v3] FS-OT-FIX-030 (straight) replaces CH-OT-RE-016 (balance)
+[v3] FS-OT-VAR-031 (straight) replaces BAS-OT-RE-090 (balance)
+[v3] FS-OT-FIX-032 (slanted) replaces CH-OT-CV-049 (balance)
+[v3] FS-OT-VAR-033 (straight) replaces CH-OT-CV-093 (balance)
+[v3] FS-OT-FIX-034 (straight) replaces BAS-OT-CV-007 (balance)
+[v3] FS-OT-VAR-035 (straight) replaces BAS-OT-RE-020 (balance)
+[v3] FS-OT-FIX-036 (slanted) replaces CH-OT-RE-040 (balance)
+[v3] FS-OT-VAR-037 (straight) replaces BAS-OT-RE-056 (balance)
+[v3] FS-OT-FIX-038 (straight) replaces BAS-OT-RE-032 (balance)
+[v3] FS-OT-VAR-039 (straight) replaces CH-OT-CV-045 (balance)
+[v3] FS-OT-FIX-040 (slanted) replaces CH-OT-RE-046 (balance)
+[v3] FS-OT-VAR-041 (straight) replaces BAS-OT-CV-061 (balance)
+[v3] FS-OT-FIX-042 (straight) replaces CH-OT-CV-029 (balance)
+[v3] FS-OT-VAR-043 (straight) replaces BAS-OT-RE-010 (balance)
+[v3] FS-OT-FIX-044 (slanted) replaces BAS-OT-RE-096 (balance)
+[v3] FS-OT-VAR-045 (straight) replaces BAS-OT-RE-016 (balance)
+[v3] FS-OT-FIX-046 (straight) replaces BAS-OT-CV-015 (balance)
+[v3] FS-OT-VAR-047 (straight) replaces CH-OT-CV-009 (balance)
+[v3] FS-OT-FIX-048 (slanted) replaces CH-OT-RE-056 (balance)
+[v3] FS-OT-VAR-049 (straight) replaces BAS-OT-RE-018 (balance)
+[v3] FS-OT-FIX-050 (straight) replaces CH-OT-CV-097 (balance)
+[v3] FS-OT-VAR-051 (straight) replaces BAS-OT-CV-053 (balance)
+[v3] FS-OT-FIX-052 (slanted) replaces BAS-OT-CV-019 (balance)
+[v3] FS-OT-VAR-053 (straight) replaces BAS-OT-RE-014 (balance)
+[v3] FS-OT-FIX-054 (straight) replaces BAS-OT-RE-100 (balance)
+[v3] FS-OT-VAR-055 (straight) replaces CH-OT-RE-074 (balance)
+[v3] FS-OT-FIX-056 (slanted) replaces CH-OT-RE-070 (balance)
+[v3] FS-OT-VAR-057 (straight) replaces CH-OT-RE-078 (balance)
+[v3] FS-OT-FIX-058 (straight) replaces BAS-OT-RE-068 (balance)
+[v3] FS-OT-VAR-059 (straight) replaces CH-OT-RE-002 (balance)
+[v3] FS-OT-FIX-060 (slanted) replaces CH-OT-RE-064 (balance)
+[v3] FS-OT-VAR-061 (straight) replaces CH-OT-CV-031 (balance)
+[v3] FS-OT-FIX-062 (straight) replaces BAS-OT-RE-074 (balance)
+[v3] FS-OT-VAR-063 (straight) replaces CH-OT-RE-038 (balance)
+[v3] FS-OT-FIX-064 (slanted) replaces CH-OT-RE-088 (balance)
+[v3] FS-OT-VAR-065 (straight) replaces BAS-OT-CV-017 (balance)
+[v3] FS-OT-FIX-066 (straight) replaces CH-OT-RE-018 (balance)
+[v3] FS-OT-VAR-067 (straight) replaces BAS-OT-CV-001 (balance)
+[v3] FS-OT-FIX-068 (slanted) replaces CH-OT-RE-072 (balance)
+[v3] FS-OT-VAR-069 (straight) replaces BAS-OT-RE-036 (balance)
+[v3] FS-OT-FIX-070 (straight) replaces BAS-OT-CV-099 (balance)
+[v3] FS-OT-VAR-071 (straight) replaces CH-OT-CV-047 (balance)
+[v3] FS-OT-FIX-072 (slanted) replaces CH-OT-CV-065 (balance)
+[v3] FS-OT-VAR-073 (straight) replaces BAS-OT-RE-078 (balance)
+[v3] FS-OT-FIX-074 (straight) replaces CH-OT-CV-081 (balance)
+[v3] FS-OT-VAR-075 (straight) replaces BAS-OT-CV-075 (balance)
+[v3] FS-OT-FIX-076 (slanted) replaces CH-OT-CV-001 (balance)
+[v3] FS-OT-VAR-077 (straight) replaces CH-OT-CV-053 (balance)
+[v3] FS-OT-FIX-078 (straight) replaces CH-OT-RE-050 (balance)
+[v3] FS-OT-VAR-079 (straight) replaces BAS-OT-RE-034 (balance)
+[v3] FS-OT-FIX-080 (slanted) replaces BAS-OT-RE-008 (balance)
+[v3] FS-OT-VAR-081 (straight) replaces BAS-OT-CV-065 (balance)
+[v3] FS-OT-FIX-082 (straight) replaces BAS-OT-CV-083 (balance)
+[v3] FS-OT-VAR-083 (straight) replaces CH-OT-RE-044 (balance)
+[v3] FS-OT-FIX-084 (slanted) replaces BAS-OT-CV-045 (balance)
+[v3] FS-OT-VAR-085 (straight) replaces BAS-OT-RE-080 (balance)
+[v3] FS-OT-FIX-086 (straight) replaces BAS-OT-RE-076 (balance)
+[v3] FS-OT-VAR-087 (straight) replaces CH-OT-RE-028 (balance)
+[v3] FS-OT-FIX-088 (slanted) replaces CH-OT-RE-060 (balance)
+[v3] FS-OT-VAR-089 (straight) replaces CH-OT-CV-017 (balance)
+[v3] FS-OT-FIX-090 (straight) replaces CH-OT-RE-010 (balance)
+[v3] FS-OT-VAR-091 (straight) replaces CH-OT-CV-075 (balance)
+[v3] FS-OT-FIX-092 (slanted) replaces CH-OT-CV-095 (balance)
+[v3] FS-OT-VAR-093 (straight) replaces BAS-OT-CV-059 (balance)
+[v3] FS-OT-FIX-094 (straight) replaces BAS-OT-CV-091 (balance)
+[v3] FS-OT-VAR-095 (straight) replaces BAS-OT-RE-050 (balance)
+test set 3.0: 1000 episodes from 1103 distinct scenarios (103 near-duplicates removed), digest b8212ecf2a4f2529, built in 935 s
+source  cell                 
+frozen  basin-being_overtaken     95
+        basin-crossing           100
+        basin-head_on            100
+        basin-null                75
+        basin-overtaking          54
+        channel-crossing         100
+        channel-head_on           98
+        channel-overtaking        42
+paper2  FS-BO                     25
+        FS-CRP                    29
+        FS-CRS                    27
+        FS-HO                     25
+        FS-NT                     27
+        FS-OT                     95
+        L1-BO                     10
+        L1-CRP                    11
+        L1-CRS                    12
+        L1-HO                     10
+        L1-NT                      1
+        L1-OT                     10
+        L2-BO                      5
+        L2-CRP                     5
+        L2-CRS                     6
+        L2-HO                      5
+        L2-NT                      1
+        L2-OT                      5
+        L3-BO                      5
+        L3-CRP                     6
+        L3-CRS                     5
+        L3-HO                      5
+        L3-NT                      1
+        L3-OT                      5
+[sacs0_bl3] reusing 755 rows of the previous version; evaluating 245 episodes
+Test set 3.0 (sacs0_bl3) -- runs\sac_formulation_seed0_bl3\kept_best_3M\best_model.zip
+1000 episodes, digest b8212ecf2a4f2529, 1217 s
+
+-- overall
+           n  success  coll_target  coll_other  timeout
+safety                                                 
+off     1000    0.853        0.066       0.081      0.0
+
+-- by source (safety off)
+          n  success  coll_target  coll_other  timeout
+source                                                
+frozen  664    0.922        0.048       0.030      0.0
+paper2  336    0.717        0.101       0.182      0.0
+
+-- by cell (safety off)
+                                n  success  coll_target  coll_other  timeout
+source cell                                                                 
+frozen basin-being_overtaken   95    0.947        0.021       0.032      0.0
+       basin-crossing         100    0.830        0.150       0.020      0.0
+       basin-head_on          100    0.920        0.050       0.030      0.0
+       basin-null              75    0.947        0.000       0.053      0.0
+       basin-overtaking        54    0.963        0.019       0.019      0.0
+       channel-crossing       100    0.880        0.070       0.050      0.0
+       channel-head_on         98    0.959        0.020       0.020      0.0
+       channel-overtaking      42    1.000        0.000       0.000      0.0
+paper2 FS-BO                   25    0.640        0.000       0.360      0.0
+       FS-CRP                  29    0.448        0.345       0.207      0.0
+       FS-CRS                  27    0.667        0.185       0.148      0.0
+       FS-HO                   25    0.880        0.000       0.120      0.0
+       FS-NT                   27    0.926        0.000       0.074      0.0
+       FS-OT                   95    0.832        0.011       0.158      0.0
+       L1-BO                   10    1.000        0.000       0.000      0.0
+       L1-CRP                  11    0.273        0.364       0.364      0.0
+       L1-CRS                  12    0.500        0.333       0.167      0.0
+       L1-HO                   10    1.000        0.000       0.000      0.0
+       L1-NT                    1    1.000        0.000       0.000      0.0
+       L1-OT                   10    0.500        0.100       0.400      0.0
+       L2-BO                    5    1.000        0.000       0.000      0.0
+       L2-CRP                   5    0.400        0.400       0.200      0.0
+       L2-CRS                   6    0.333        0.333       0.333      0.0
+       L2-HO                    5    0.000        0.000       1.000      0.0
+       L2-NT                    1    1.000        0.000       0.000      0.0
+       L2-OT                    5    1.000        0.000       0.000      0.0
+       L3-BO                    5    1.000        0.000       0.000      0.0
+       L3-CRP                   6    0.333        0.333       0.333      0.0
+       L3-CRS                   5    0.600        0.200       0.200      0.0
+       L3-HO                    5    0.800        0.000       0.200      0.0
+       L3-NT                    1    1.000        0.000       0.000      0.0
+       L3-OT                    5    0.600        0.400       0.000      0.0
+
+-- by variant (safety off)
+                  n  success  coll_target  coll_other  timeout
+source variant                                                
+frozen CV       340    0.926        0.053       0.021      0.0
+       NC        66    0.909        0.076       0.015      0.0
+       RE       258    0.919        0.035       0.047      0.0
+paper2           27    0.926        0.000       0.074      0.0
+       FIX      156    0.776        0.090       0.135      0.0
+       VAR      150    0.613        0.133       0.253      0.0
+
+

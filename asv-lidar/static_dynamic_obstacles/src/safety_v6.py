@@ -85,6 +85,10 @@ class SafetyFilterV6(v4.SafetyFilterV4):
                            brake_efficiency=BRAKE_EFFICIENCY,
                            brake_delay_s=BRAKE_DELAY_S)
 
+    def _hold_back_gain_s(self):
+        """Required delay gain; subclasses may isolate a fallback ablation."""
+        return v2.HOLD_BACK_GAIN_S
+
     def _accept_search(self, env, action, result, diagnostics):
         """Issue the first command of the exact checked plan and retain its tail."""
         fixed = result.diagnostics["fixed_policy"]
@@ -126,7 +130,8 @@ class SafetyFilterV6(v4.SafetyFilterV4):
         if not self._threat_in_reach(snap):
             self._release()
             self.actuators.issue(env, float(action[0]))
-            self.last = {"mode": "idle", "plan_steps": 0}
+            self.last = {"mode": "idle", "plan_steps": 0,
+                         "selection_floor": None, "selection_best_clearance": None, "selection_branch": None}
             return action.astype(np.float32), False
 
         traffic = any(np.hypot(*(t.position - snap.position)) < v2.ENGAGE_RANGE_M
@@ -167,6 +172,7 @@ class SafetyFilterV6(v4.SafetyFilterV4):
         is_brake = np.isnan(candidates[:, 1])
         cont_ok = bool(np.isinf(cont_first))
         diagnostics = {
+            "selection_floor": None, "selection_best_clearance": None, "selection_branch": None,
             "continuation_checked": continuation is not None,
             "continuation_ok": cont_ok,
             "continuation_clearance": float(cont_clear),
@@ -243,6 +249,8 @@ class SafetyFilterV6(v4.SafetyFilterV4):
             best = max(float(margin[pool].max()) if len(pool) else -np.inf,
                        cont_clear if cont_ok else -np.inf)
             floor = min(v2.TRIGGER_MARGIN_M, best - v2.ROOM_SLACK_M)
+            diagnostics.update(selection_branch="ordinary", selection_floor=float(floor),
+                               selection_best_clearance=float(best))
             pool = pool[margin[pool] >= floor]
             score = distance(pool) if len(pool) else np.array([])
             use_continuation = False
@@ -278,7 +286,7 @@ class SafetyFilterV6(v4.SafetyFilterV4):
         else:
             latest = first.max(axis=1)
             chosen = int(np.lexsort((-clear.max(axis=1), -latest))[0])
-            if latest[chosen] - latest[0] < v2.HOLD_BACK_GAIN_S:
+            if latest[chosen] - latest[0] < self._hold_back_gain_s():
                 return self._pass_checked(env, action, margin, "no escape", None, diagnostics)
             out, plan, why = candidates[chosen].copy(), None, "hold back"
             chosen_clearance = float(clear[chosen].max())

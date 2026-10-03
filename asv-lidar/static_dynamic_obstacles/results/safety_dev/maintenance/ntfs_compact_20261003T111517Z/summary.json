@@ -1,0 +1,12 @@
+{
+  "completed_files": 495,
+  "reclaimed_bytes": 945003157,
+  "logical_bytes_unchanged": 2639723157,
+  "all_content_hashes_equal": true,
+  "no_files_deleted": true,
+  "elapsed_s": 114.29363749999902,
+  "free_bytes_before": 10667499520,
+  "free_bytes_after": 11577221120,
+  "inventory_sha256": "e85add9c4bd60953e448bed9c7f77a468e038966a7b22d1c4692ef8d18445dfc",
+  "progress_sha256": "a8385670f48984b62712a95f6ed3f6ad77259185f5116584f135a8226f3d9c96"
+}

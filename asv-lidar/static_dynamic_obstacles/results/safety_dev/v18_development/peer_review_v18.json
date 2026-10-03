@@ -1,0 +1,44 @@
+{
+  "review": "Independent read-only V18 source review",
+  "status": "no_blocker_found",
+  "reviewer": "oracle_support",
+  "review_date": "2026-10-03",
+  "scope": [
+    "src/safety_heading_memory.py",
+    "src/safety_v18.py",
+    "tests/test_safety_v18.py",
+    "src/safety_provisional_tracks.py::_current_fit",
+    "src/tracking.py::Track.confirmed and Tracker.update",
+    "src/safety_motion_axis.py and perception integration"
+  ],
+  "sha256": {
+    "src/safety_heading_memory.py": "378dfd5dec60a7246854bdf484146203ef8e5f29f753686fbda264d7c86187d9",
+    "src/safety_v18.py": "b45c50791e86c93f0423f008a6c9baee302cb90bbed4d69afe9b7e41dad02655",
+    "tests/test_safety_v18.py": "c7a441676afa5397a0e3d1733cf6708c859745b24f639f23ec4c08940cab4cd2"
+  },
+  "checks": [
+    "Runtime inputs are onboard raw tracks and pose-stale status; no true vessel, target, scenario or outcome access.",
+    "Track.confirmed is exactly hits >= TRACK_MIN_HITS; fresh matched free-space tracker updates append the current scan serial.",
+    "Only a new finite observed cluster from a fresh matched confirmed track can seed or apply heading memory.",
+    "Current valid fits refresh memory without replacing the current view. Finite but rejected fits clear stored memory.",
+    "Missing raw IDs, reduced age/hits, and the existing TRACK_MAX_MISSES decision-age limit discard memory; duplicate raw/base IDs reject ambiguity.",
+    "Current MotionAxisPerception corrections take priority over remembered heading.",
+    "Only existing nonnegative same-source views can have heading replaced; synthetic views, admission, positions, velocities, context and static points remain unchanged.",
+    "The base perception is called once, and diagnostics are detached before publication.",
+    "hull_heading_memory=False retains the exact parent V16 perception object and delegates action/state behavior; no raw-yaw observer ablation is introduced.",
+    "Synthetic tests cover expiry, stale/missed/repeated observations, invalid fits, identity reset/absence, source zero, duplicate IDs, motion-axis precedence, nonmutation, forbidden truth access and disabled delegation."
+  ],
+  "limitations": [
+    "A genuinely turning but partly observed target may make a remembered hull axis inaccurate before expiry.",
+    "An undetectable same-ID reuse without absence or decreased age/hits remains dependent on the raw tracker's identity assumption.",
+    "New-serial/current-cluster freshness depends on the reviewed tracker update invariant; the adapter does not independently compare history serial with tracker._scans.",
+    "This is an engineering heading hold, not an uncertainty bound, manoeuvre predictor or safety guarantee.",
+    "Source review does not establish episode improvement or absence of regressions."
+  ],
+  "verification": {
+    "reviewer_executed_tests": 0,
+    "reviewer_executed_episodes": 0,
+    "author_reported_synthetic_tests_passed": 26,
+    "controller_source_edits_by_reviewer": false
+  }
+}

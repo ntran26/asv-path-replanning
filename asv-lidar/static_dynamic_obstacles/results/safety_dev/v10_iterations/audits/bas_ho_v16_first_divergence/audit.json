@@ -1,0 +1,1855 @@
+{
+  "scope": "Saved completed first-divergence diagnostic. No episodes, controller search or new rule. Future OFF commands are noncausal scoring inputs only.",
+  "case": "TS2:BAS-HO-NC-059",
+  "result": {
+    "outcome": "collision:target",
+    "steps": 28,
+    "safety_v2_steps": 7
+  },
+  "first_divergence": 20,
+  "off_prestate_policy_match": true,
+  "v15_v16_recorded_commands_states_equal": true,
+  "inputs": {
+    "results/safety_dev/v10_iterations/motion_axis_probe5/traces/001_v16.jsonl": "14967921fb5f43bd7a4430acc46b11dec77fcef2507b389565ee2f1bc565e3aa",
+    "results/safety_dev/v9_paired_pilot/traces/001_off.jsonl": "ac32a036bd74b23a67e9240a9548426885d796df1a93afcb3bc1f5e4104cfeb3",
+    "results/safety_dev/v10_iterations/conditional_prefix32/traces/001_v15.jsonl": "930231d19fea87dec1bbb02dec6aea660c63eae11c70cdb2e63632a1c6b20d83",
+    "results/safety_dev/v10_iterations/persistent_prefix32/traces/001_v14.jsonl": "b8b0a159fe6ce698248cf732cd70c1d1ecc5348ab0524bcffd7b9e64e9e28652"
+  },
+  "model_sources_match_manifest": {
+    "src/constants.py": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+    "src/constant_temp.py": "85e5dc9992d062466af304f3f3273b249ba16b130c2d89b53fe7cb692b5c81d7",
+    "src/classical/common.py": "456f39769ffa237f826eff8f9852a6d0823a2f975f85d2345ba7b42105e0977d",
+    "src/safety_v2.py": "209195c3b9241dfa6a798b7cfca857dfd14218c38625d99bc2a9c0d97c1b3d55",
+    "src/safety_v3.py": "28efcc06af8ec0ffc0074267b7f1b2e36ba4fd1f6e033900c39b9b96b6d40d0a",
+    "src/safety_v7.py": "94a64f2c0914ddafe0cbc8f2d0f3256c4aee99ade16fe796e6d13a095c300444",
+    "src/safety_v10.py": "5ee4e28a464b8a1219426e0e86d6af6be74ece56b512fb50d9ad981d64e4a00e",
+    "src/ship.py": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+    "bluefin/dynamics.py": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711"
+  },
+  "decision_filter": {
+    "mode": "recovery",
+    "why": "continue",
+    "policy_margin": "-inf",
+    "best_margin": 0.09,
+    "checked_clearance": 0.5009914006948839,
+    "recovery_template": "continuation",
+    "changed": true,
+    "brake": true,
+    "chosen": [
+      -0.5448097586631775,
+      -1.0
+    ],
+    "recovery_steps": 0,
+    "uncertified_steps": 0,
+    "nominal_plan_retained": false,
+    "plan_steps": 15,
+    "selection_floor": 0.15,
+    "selection_best_clearance": 0.5009914006948839,
+    "selection_branch": "ordinary",
+    "continuation_checked": true,
+    "continuation_ok": true,
+    "continuation_clearance": 0.5009914006948839,
+    "policy_safe": false,
+    "any_safe": true,
+    "n_safe_candidates": 8,
+    "countersteer_recovery_enabled": false,
+    "dual_brake_sequences": 0,
+    "fast_brake_rejections": 0,
+    "calibrated_braking": false,
+    "fitted_hull_perception": false,
+    "provisional_tracks": true,
+    "provisional_motion_evidence": true,
+    "trajectory_search": true,
+    "track_history": false,
+    "policy_search": {
+      "fixed_policy": true,
+      "rounds": 3,
+      "sampled_plans": 192,
+      "seed_plans": 7,
+      "dropped_brake_seeds": 0,
+      "evaluated_plans": 199,
+      "accepted_plans": 0,
+      "maximum_clearance": -0.23538574923140151,
+      "accepted": false,
+      "policy_distance": "inf"
+    },
+    "v7_policy_repair_enabled": true,
+    "v7_repair_checked": true,
+    "v7_policy_preserved": false,
+    "v6_proposed_change": true,
+    "v6_proposal_why": "continue",
+    "v6_proposal_action": [
+      -0.5448097586631775,
+      -1.0
+    ],
+    "v6_proposal_brake": true,
+    "risk_monitor": {
+      "fresh": true,
+      "horizon_s": 1.0,
+      "urgent": false,
+      "persistent": false,
+      "recommend_rescue": false,
+      "policy_action": [
+        -0.202811598777771,
+        0.5421338081359863
+      ],
+      "world_velocity_mps": [
+        0.26165677760861683,
+        0.7485050391795849
+      ],
+      "yaw_rate_rad_s": 0.27297880568522015,
+      "hazards": [
+        {
+          "key": "static_memory",
+          "kind": "static_memory",
+          "current_clearance_m": 2.712786772004277,
+          "minimum_predicted_clearance_m": 1.8887377613682754,
+          "first_violation_s": null,
+          "measured_closing_rate_mps": 0.8337222936710127,
+          "predicted_closing": true,
+          "threatening": false,
+          "consecutive_fresh_threats": 0,
+          "urgent": false,
+          "persistent": false
+        },
+        {
+          "key": "boundary:0",
+          "kind": "boundary",
+          "current_clearance_m": 6.917629371901116,
+          "minimum_predicted_clearance_m": 7.007752277613374,
+          "first_violation_s": null,
+          "measured_closing_rate_mps": -0.7044242654287629,
+          "predicted_closing": false,
+          "threatening": false,
+          "consecutive_fresh_threats": 0,
+          "urgent": false,
+          "persistent": false
+        },
+        {
+          "key": "boundary:1",
+          "kind": "boundary",
+          "current_clearance_m": 3.166608001093041,
+          "minimum_predicted_clearance_m": 2.619315492253683,
+          "first_violation_s": null,
+          "measured_closing_rate_mps": 0.37298346035038676,
+          "predicted_closing": true,
+          "threatening": false,
+          "consecutive_fresh_threats": 0,
+          "urgent": false,
+          "persistent": false
+        },
+        {
+          "key": "boundary:2",
+          "kind": "boundary",
+          "current_clearance_m": 15.077409846440736,
+          "minimum_predicted_clearance_m": 14.354680317897738,
+          "first_violation_s": null,
+          "measured_closing_rate_mps": 0.7742420537491661,
+          "predicted_closing": true,
+          "threatening": false,
+          "consecutive_fresh_threats": 0,
+          "urgent": false,
+          "persistent": false
+        },
+        {
+          "key": "boundary:3",
+          "kind": "boundary",
+          "current_clearance_m": 4.682698586525492,
+          "minimum_predicted_clearance_m": 4.685797303946982,
+          "first_violation_s": null,
+          "measured_closing_rate_mps": -0.0045617133805464505,
+          "predicted_closing": false,
+          "threatening": false,
+          "consecutive_fresh_threats": 0,
+          "urgent": false,
+          "persistent": false
+        },
+        {
+          "key": "track:-1000000",
+          "kind": "target",
+          "current_clearance_m": 2.2519225329562103,
+          "minimum_predicted_clearance_m": 1.3293979008391126,
+          "first_violation_s": null,
+          "measured_closing_rate_mps": 0.7595413217812874,
+          "predicted_closing": true,
+          "threatening": false,
+          "consecutive_fresh_threats": 0,
+          "urgent": false,
+          "persistent": false
+        }
+      ],
+      "shadow_only": true
+    },
+    "v7_rate_limit_skip": false,
+    "v7_repair_first_violation": "inf",
+    "v7_repair_clearance": 0.09995070306419698,
+    "v10_pair_checked": true,
+    "v10_policy_preserved": false,
+    "v10_parent_why": "continue",
+    "v10_parent_action": [
+      -0.5448097586631775,
+      -1.0
+    ],
+    "v10_parent_brake": true,
+    "v10_prefer_feasible_policy": true,
+    "v10_prefer_policy_margin": true,
+    "v10_prefer_any_feasible_policy": false,
+    "v10_target_turn_rate_deg_s": 0.0,
+    "v10_proposed_first_violation": "inf",
+    "v10_policy_first_violation": "inf",
+    "v10_proposed_clearance": 0.50099140208737,
+    "v10_policy_tail_clearance": 0.09995070306419687,
+    "v10_proposed_currently_passing": true,
+    "v10_policy_tail_passing": true,
+    "v11_track_admission": true,
+    "v11_track_persistence": true,
+    "v11_policy_prefix_search_enabled": true,
+    "v11_policy_prefix_search_checked": false,
+    "v11_prefix_request_checked": true,
+    "v11_policy_prefix_preserved": false,
+    "v11_parent_why": "continue",
+    "v11_parent_changed": true,
+    "v11_parent_action": [
+      -0.5448097586631775,
+      -1.0
+    ],
+    "v11_parent_brake": true,
+    "track_persistence": {
+      "frame": 20,
+      "pose_stale": false,
+      "enable_admission": true,
+      "enable_persistence": true,
+      "max_coast_s": 8.0,
+      "min_motion_observations": 3,
+      "base_track_count": 1,
+      "added_hypotheses": 1,
+      "updates": [
+        {
+          "source_id": 1,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "endpoint_translation_m": [
+            1.2612156534462582,
+            1.255032700176351
+          ],
+          "max_translation_residual_m": 0.0478688233308598,
+          "geometry_prior": {
+            "prior_centre": [
+              5.721042076769644,
+              12.319131286158433
+            ],
+            "corrected_centre": [
+              5.73704569194543,
+              12.315141136748384
+            ],
+            "observed_extents": [
+              1.6944516283511315,
+              0.24412400624884434
+            ],
+            "full_axes": [
+              true,
+              false
+            ],
+            "centre_interval_lower": [
+              2.5720544421407174,
+              -13.520906421504726
+            ],
+            "centre_interval_upper": [
+              2.602602813789586,
+              -13.26503042775357
+            ],
+            "uncorrected_centre": [
+              5.781477221902268,
+              12.493346269947095
+            ],
+            "anchor_age_s": 0.5
+          }
+        }
+      ],
+      "hypotheses": [
+        {
+          "source_id": 1,
+          "id": -1000000,
+          "anchor_frame": 20,
+          "age_s": 0.0,
+          "position": [
+            5.73704569194543,
+            12.315141136748384
+          ],
+          "velocity": [
+            0.6016246765899953,
+            -0.21731778831435059
+          ]
+        }
+      ],
+      "rejections": {},
+      "expired_source_ids": [],
+      "contradicted_source_ids": [],
+      "static_points_preserved": 19,
+      "geometry_prior": true,
+      "source_ownership": true,
+      "prefer_persistent_estimates": true,
+      "selection_rule": "persistent_when_valid",
+      "first_admission_owners": {
+        "1": "base"
+      },
+      "source_owners": {
+        "1": "persistent"
+      },
+      "base_track_ids": [
+        1
+      ],
+      "generated_hypotheses": 1,
+      "suppressed_hypotheses": [],
+      "suppressed_source_ids": [],
+      "replaced_base_source_ids": [
+        1
+      ],
+      "replaced_base_view_count": 1,
+      "published_source_ids": [
+        1
+      ],
+      "published_persistent_count": 1
+    },
+    "v11_prefix_minimum_clearance": null,
+    "v11_prefix_request_reason": "adequate_parent_clearance",
+    "v11_prefix_skip_reason": "adequate_parent_clearance",
+    "v13_geometry_prior": true,
+    "v13_source_ownership": true,
+    "v14_prefer_persistent_estimates": true,
+    "v15_conditional_prefix": true,
+    "v16_motion_axis_geometry": true,
+    "motion_axis_geometry": {
+      "frame": 20,
+      "time_s": 10.0,
+      "pose_stale": false,
+      "base_track_count": 1,
+      "replaced_source_ids": [],
+      "updates": [],
+      "rejections": {},
+      "stored_observation_counts": {},
+      "static_points_preserved": 19
+    },
+    "model_ego_observer": true
+  },
+  "represented_tracks": [
+    {
+      "id": -1000000,
+      "position": [
+        5.73704569194543,
+        12.315141136748384
+      ],
+      "velocity": [
+        0.6016246765899953,
+        -0.21731778831435059
+      ],
+      "heading": 1.8151424220741028
+    }
+  ],
+  "current_raw_target": {
+    "id": 1,
+    "position": [
+      5.76895534528739,
+      12.249150925299974
+    ],
+    "velocity": [
+      0.588782383187382,
+      -0.21408527957555973
+    ],
+    "state": [
+      5.76895534528739,
+      12.249150925299974,
+      0.588782383187382,
+      -0.21408527957555973
+    ],
+    "cov": [
+      [
+        0.0015709336475575363,
+        0.0,
+        0.0015240294953816887,
+        0.0
+      ],
+      [
+        0.0,
+        0.0015709336475575363,
+        0.0,
+        0.0015240294953816887
+      ],
+      [
+        0.0015240294953816885,
+        0.0,
+        0.003903882107499972,
+        0.0
+      ],
+      [
+        0.0,
+        0.0015240294953816885,
+        0.0,
+        0.003903882107499972
+      ]
+    ],
+    "hits": 20,
+    "misses": 0,
+    "age": 20,
+    "max_coast": 0,
+    "is_dynamic": false,
+    "confirmed": true,
+    "evidence_run": 0,
+    "quiet_run": 8,
+    "last_fit_centre": [
+      5.781477221902268,
+      12.493346269947095
+    ],
+    "last_fit_heading_deg": 104.0,
+    "fit_offset": [
+      0.0,
+      0.0
+    ],
+    "fit_offset_known": false,
+    "_pending": null,
+    "_pending_steps": 0,
+    "evidence": {
+      "appear": 0,
+      "vacate": 3,
+      "compared": 94,
+      "violations": 3,
+      "moving": false
+    }
+  },
+  "target_current_truth_scoring_only": {
+    "index": 0,
+    "x": 5.754601607985099,
+    "y": 12.51214830812393,
+    "heading": 104.08366683644724,
+    "speed": 0.6107990927072305,
+    "velocity": [
+      0.5924393408995952,
+      -0.14863094901947332
+    ],
+    "hull": [
+      [
+        6.593600938528937,
+        12.301660485799236
+      ],
+      [
+        6.47952190962901,
+        12.196251875310104
+      ],
+      [
+        6.284248679113993,
+        12.15760778851498
+      ],
+      [
+        5.936252332903926,
+        12.208828321745742
+      ],
+      [
+        5.1602991948287,
+        12.403499140080719
+      ],
+      [
+        4.859634417169954,
+        12.499549603251996
+      ],
+      [
+        4.971570137712567,
+        12.945722657645252
+      ],
+      [
+        5.2819684562880616,
+        12.888469851377735
+      ],
+      [
+        6.057921594363288,
+        12.693799033042758
+      ],
+      [
+        6.388884243969043,
+        12.574682600230414
+      ],
+      [
+        6.542789925587877,
+        12.44843664518455
+      ]
+    ]
+  },
+  "current_ego": {
+    "truth_u_v_r_deg_s": [
+      0.8079421611792635,
+      0.0731840523608879,
+      15.7075251874428
+    ],
+    "raw_u_v_r_deg_s": [
+      0.7389923137541806,
+      0.002086427070321792,
+      14.819857078524239
+    ],
+    "filtered_u_v_r_deg_s": [
+      0.7911657018461469,
+      0.052734193537503936,
+      15.640533462284917
+    ]
+  },
+  "known_successful_off_steps": [
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35
+  ],
+  "known_successful_continuation_scores": {
+    "onboard": {
+      "minimum_including_terminal": -0.7933902952407779,
+      "first_violation_s": 2.5,
+      "hard_safe": false,
+      "components_within_horizon": {
+        "static": {
+          "minimum": 0.14759229106048782,
+          "at_s": 3.75,
+          "first_violation_s": null
+        },
+        "boundary": {
+          "minimum": 1.8660826141455242,
+          "at_s": 5.25,
+          "first_violation_s": null
+        },
+        "target:-1000000": {
+          "minimum": -0.7933902952407779,
+          "at_s": 3.25,
+          "first_violation_s": 2.5
+        }
+      }
+    },
+    "raw_yaw_only": {
+      "minimum_including_terminal": -0.795646316757144,
+      "first_violation_s": 2.5,
+      "hard_safe": false,
+      "components_within_horizon": {
+        "static": {
+          "minimum": 0.14442272100831194,
+          "at_s": 3.75,
+          "first_violation_s": null
+        },
+        "boundary": {
+          "minimum": 1.8693242438182662,
+          "at_s": 5.25,
+          "first_violation_s": null
+        },
+        "target:-1000000": {
+          "minimum": -0.795646316757144,
+          "at_s": 3.25,
+          "first_violation_s": 2.5
+        }
+      }
+    },
+    "true_current_ego_scoring_only": {
+      "minimum_including_terminal": -0.8947625199133373,
+      "first_violation_s": 2.5,
+      "hard_safe": false,
+      "components_within_horizon": {
+        "static": {
+          "minimum": 0.27693764654158365,
+          "at_s": 3.75,
+          "first_violation_s": null
+        },
+        "boundary": {
+          "minimum": 1.736279838798641,
+          "at_s": 5.5,
+          "first_violation_s": null
+        },
+        "target:-1000000": {
+          "minimum": -0.8947625199133373,
+          "at_s": 3.375,
+          "first_violation_s": 2.5
+        }
+      }
+    },
+    "true_current_target_CV_scoring_only": {
+      "minimum_including_terminal": -0.6758989987545764,
+      "first_violation_s": 3.0,
+      "hard_safe": false,
+      "components_within_horizon": {
+        "static": {
+          "minimum": 0.14759229106048782,
+          "at_s": 3.75,
+          "first_violation_s": null
+        },
+        "boundary": {
+          "minimum": 1.8660826141455242,
+          "at_s": 5.25,
+          "first_violation_s": null
+        },
+        "target:-9000": {
+          "minimum": -0.6758989987545764,
+          "at_s": 3.625,
+          "first_violation_s": 3.0
+        }
+      }
+    },
+    "onboard_fresh_fit_centre_only": {
+      "minimum_including_terminal": -0.7490100150107091,
+      "first_violation_s": 2.75,
+      "hard_safe": false,
+      "components_within_horizon": {
+        "static": {
+          "minimum": 0.14759229106048782,
+          "at_s": 3.75,
+          "first_violation_s": null
+        },
+        "boundary": {
+          "minimum": 1.8660826141455242,
+          "at_s": 5.25,
+          "first_violation_s": null
+        },
+        "target:-1000000": {
+          "minimum": -0.7490100150107091,
+          "at_s": 3.375,
+          "first_violation_s": 2.75
+        }
+      }
+    },
+    "onboard_base_centroid_and_velocity": {
+      "minimum_including_terminal": -0.8496042848463825,
+      "first_violation_s": 2.5,
+      "hard_safe": false,
+      "components_within_horizon": {
+        "static": {
+          "minimum": 0.14759229106048782,
+          "at_s": 3.75,
+          "first_violation_s": null
+        },
+        "boundary": {
+          "minimum": 1.8660826141455242,
+          "at_s": 5.25,
+          "first_violation_s": null
+        },
+        "target:1": {
+          "minimum": -0.8496042848463825,
+          "at_s": 3.25,
+          "first_violation_s": 2.5
+        }
+      }
+    },
+    "true_target_centre_only_scoring": {
+      "minimum_including_terminal": -0.7372682771866942,
+      "first_violation_s": 2.75,
+      "hard_safe": false,
+      "components_within_horizon": {
+        "static": {
+          "minimum": 0.14759229106048782,
+          "at_s": 3.75,
+          "first_violation_s": null
+        },
+        "boundary": {
+          "minimum": 1.8660826141455242,
+          "at_s": 5.25,
+          "first_violation_s": null
+        },
+        "target:-1000000": {
+          "minimum": -0.7372682771866942,
+          "at_s": 3.375,
+          "first_violation_s": 2.75
+        }
+      }
+    },
+    "true_target_velocity_only_scoring": {
+      "minimum_including_terminal": -0.7611529539830457,
+      "first_violation_s": 2.75,
+      "hard_safe": false,
+      "components_within_horizon": {
+        "static": {
+          "minimum": 0.14759229106048782,
+          "at_s": 3.75,
+          "first_violation_s": null
+        },
+        "boundary": {
+          "minimum": 1.8660826141455242,
+          "at_s": 5.25,
+          "first_violation_s": null
+        },
+        "target:-1000000": {
+          "minimum": -0.7611529539830457,
+          "at_s": 3.5,
+          "first_violation_s": 2.75
+        }
+      }
+    }
+  },
+  "parent_vs_same_tail_reproduction": {
+    "first": [
+      null,
+      null
+    ],
+    "clear": [
+      0.50099140208737,
+      0.09995070306419687
+    ]
+  },
+  "actual_off_own_endpoints_scored_with_onboard_geometry": {
+    "static": {
+      "minimum": 0.29432045453688155,
+      "at_s": 4.0,
+      "first_violation_s": null
+    },
+    "boundary": {
+      "minimum": 1.7349419541030988,
+      "at_s": 5.5,
+      "first_violation_s": null
+    },
+    "target:-1000000": {
+      "minimum": -0.8305057790022721,
+      "at_s": 3.5,
+      "first_violation_s": 2.5
+    }
+  },
+  "existing_broad_prefix": {
+    "first_divergence": 20,
+    "same_snapshot_policy_prestate_and_command": true,
+    "prefix_search": {
+      "accepted": false,
+      "fixed_policy_decisions": 1,
+      "fixed_policy_seconds": 0.5,
+      "horizon_decisions": 16,
+      "minimum_clearance": 0.15,
+      "rounds": 3,
+      "seed_plans": 14,
+      "sampled_plans": 178,
+      "evaluated_plans": 192,
+      "maximum_plans": 192,
+      "accepted_plans": 0,
+      "hard_passing_plans": 122,
+      "maximum_clearance": 0.13747936174179784,
+      "maximum_hard_passing_clearance": 0.13747936174179784,
+      "dropped_brake_backup": false,
+      "backup_seed_checked": true
+    },
+    "result": {
+      "attempt": 1,
+      "case": "TS2:BAS-HO-NC-059",
+      "mode": "v14",
+      "seed": 400058,
+      "dataset": "ts2",
+      "stratum": "expired_consequences",
+      "elapsed_s": 13.23907130000589,
+      "why_counts": {
+        "nominal": 8,
+        "idle": 10,
+        "policy prefix searched": 2,
+        "continue": 2,
+        "last certificate": 4,
+        "no escape": 1
+      },
+      "policy": "model",
+      "class": "head_on",
+      "width": 9.250139869323428,
+      "dcpa_m": 1.3656287349746266,
+      "ct_deg": 174.11538433033172,
+      "crossing_side": "",
+      "dcpa_below_floor": null,
+      "crossing_escapable": null,
+      "outcome": "collision:target",
+      "collided": true,
+      "collided_target": true,
+      "steps": 27,
+      "return": -333.6749339674747,
+      "colregs_integral": -7.525548585956302,
+      "frames_v_port": 0,
+      "frames_v_bow": 4,
+      "frames_v_side": 0,
+      "frames_v_hold": 0,
+      "frames_v_r8": 2,
+      "integral_v_port": 0.0,
+      "integral_v_bow": 1.085577001901299,
+      "integral_v_side": 0.0,
+      "integral_v_hold": 0.0,
+      "integral_v_r8": 0.4782094281210827,
+      "mean_speed": 0.6044029888678935,
+      "max_speed": 0.8984974229278815,
+      "min_target_range": 1.0328753739968364,
+      "rms_cte": 1.5763772653423438,
+      "estops": 0,
+      "estop_reasons": "",
+      "safety_v2_steps": 6,
+      "safety_v2_brake_steps": 6,
+      "estop_then_target_collision": false,
+      "first_engaged_cls": "crossing",
+      "engaged_frames": 4,
+      "p_port_sense": 1.0,
+      "ever_port_sense_non_overtaking": true,
+      "r_path_max": 0.0
+    }
+  },
+  "existing_any_feasible_flag_at_saved_decision": {
+    "would_preserve_this_policy_action": true,
+    "reason": "Existing safety_v10.py passes the exact checked policy-tail plan when prefer_any_feasible_policy=True; no episode outcome implied."
+  },
+  "own_endpoint_position_error_m": [
+    0.027579673385795065,
+    0.0397826650992937,
+    0.05199626982117193,
+    0.06431130607056709,
+    0.07748689728206906,
+    0.09151974027448251,
+    0.10606102369175513,
+    0.12103818028454062,
+    0.13661666870114395,
+    0.15293318836708986,
+    0.16999953619008318,
+    0.1877191040607019,
+    0.2059914964319888,
+    0.22465696886086894,
+    0.24346987793468838,
+    0.2622212443706134
+  ],
+  "own_endpoint_heading_error_deg": [
+    0.17066984065186197,
+    0.9942056252545588,
+    1.6150612595388987,
+    1.8463566870619263,
+    1.8590739227537298,
+    1.8469390680080402,
+    1.8979203448046742,
+    2.0128174804832875,
+    2.155872311020418,
+    2.2949649257926454,
+    2.410719144286164,
+    2.4908069427149107,
+    2.5388007389869016,
+    2.573284955507836,
+    2.5987925396113276,
+    2.600568221421207
+  ],
+  "v16_recorded_target_future": [
+    {
+      "step": 20,
+      "dt_s": 0.0,
+      "position_error_from_current_CV": 0.0,
+      "heading_change_deg": 0.0,
+      "speed": 0.6107990927072305
+    },
+    {
+      "step": 21,
+      "dt_s": 0.5,
+      "position_error_from_current_CV": 0.2422256601718094,
+      "heading_change_deg": 81.88464418336278,
+      "speed": 0.6107990927072305
+    },
+    {
+      "step": 22,
+      "dt_s": 1.0,
+      "position_error_from_current_CV": 0.6361605503857262,
+      "heading_change_deg": 81.88464418336278,
+      "speed": 0.6107990927072305
+    },
+    {
+      "step": 23,
+      "dt_s": 1.5,
+      "position_error_from_current_CV": 1.0349574689414358,
+      "heading_change_deg": 81.88464418336278,
+      "speed": 0.6107990927072305
+    },
+    {
+      "step": 24,
+      "dt_s": 2.0,
+      "position_error_from_current_CV": 1.4345673286386544,
+      "heading_change_deg": 81.88464418336278,
+      "speed": 0.6107990927072305
+    },
+    {
+      "step": 25,
+      "dt_s": 2.5,
+      "position_error_from_current_CV": 1.834458944622752,
+      "heading_change_deg": 81.88464418336278,
+      "speed": 0.6107990927072305
+    },
+    {
+      "step": 26,
+      "dt_s": 3.0,
+      "position_error_from_current_CV": 2.234481049336644,
+      "heading_change_deg": 81.88464418336278,
+      "speed": 0.6107990927072305
+    },
+    {
+      "step": 27,
+      "dt_s": 3.5,
+      "position_error_from_current_CV": 2.6345742049545593,
+      "heading_change_deg": 81.88464418336278,
+      "speed": 0.6107990927072305
+    },
+    {
+      "step": 28,
+      "dt_s": 4.0,
+      "position_error_from_current_CV": 3.0347103097673918,
+      "heading_change_deg": 81.88464418336278,
+      "speed": 0.6107990927072305
+    }
+  ],
+  "persistent_source_evolution": [
+    {
+      "step": 10,
+      "age_s": 0.0,
+      "truth_heading_deg": 144.08366683644738,
+      "persistent_heading_deg": 144.0,
+      "current_fit_heading_deg": 144.0,
+      "raw_velocity": [
+        0.2779689719044097,
+        -0.47641967238227767
+      ],
+      "rejections": {},
+      "persistent_position_error": 0.054385057879693624,
+      "persistent_velocity_error": 0.04498400468138547,
+      "fresh_fit_position_error": 0.054385057879693624,
+      "updates": [
+        {
+          "source_id": 1,
+          "synthetic_id": -1000000,
+          "kind": "admission",
+          "base_admitted": true,
+          "observations": 3,
+          "observation_frames": [
+            7,
+            9,
+            10
+          ],
+          "endpoint_translation_m": [
+            0.9394158062559104,
+            0.9974510927428462
+          ],
+          "max_translation_residual_m": 0.02784934256892178
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "age_s": 0.5,
+      "truth_heading_deg": 140.08366683644732,
+      "persistent_heading_deg": 144.0,
+      "current_fit_heading_deg": 140.0,
+      "raw_velocity": [
+        0.38853477137431797,
+        -0.4535409492570309
+      ],
+      "rejections": {
+        "current_extent_partial": 1
+      },
+      "persistent_position_error": 0.06231849489984017,
+      "persistent_velocity_error": 0.03178584802953753,
+      "fresh_fit_position_error": 0.03010742037167659,
+      "updates": []
+    },
+    {
+      "step": 12,
+      "age_s": 0.0,
+      "truth_heading_deg": 136.08366683644726,
+      "persistent_heading_deg": 136.0,
+      "current_fit_heading_deg": 136.0,
+      "raw_velocity": [
+        0.36385353873550086,
+        -0.45978578763373706
+      ],
+      "rejections": {},
+      "persistent_position_error": 0.06371466234649038,
+      "persistent_velocity_error": 0.02903494481790997,
+      "fresh_fit_position_error": 0.03791223145133412,
+      "updates": [
+        {
+          "source_id": 1,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 3,
+          "observation_frames": [
+            9,
+            10,
+            12
+          ],
+          "endpoint_translation_m": [
+            0.9616843518669711,
+            0.9688019235263132
+          ],
+          "max_translation_residual_m": 0.025295105928059242,
+          "geometry_prior": {
+            "prior_centre": [
+              3.6546110673679824,
+              13.620752327343371
+            ],
+            "corrected_centre": [
+              3.6208049817080608,
+              13.655759553834823
+            ],
+            "observed_extents": [
+              1.6783627979208786,
+              0.25152648536314004
+            ],
+            "full_axes": [
+              true,
+              false
+            ],
+            "centre_interval_lower": [
+              -7.331227463624591,
+              -12.116982479127465
+            ],
+            "centre_interval_upper": [
+              -7.28459026154547,
+              -11.868508964490605
+            ],
+            "uncorrected_centre": [
+              3.6397276952963074,
+              13.674033005935883
+            ],
+            "anchor_age_s": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "step": 13,
+      "age_s": 0.0,
+      "truth_heading_deg": 132.0836668364472,
+      "persistent_heading_deg": 132.0,
+      "current_fit_heading_deg": 132.0,
+      "raw_velocity": [
+        0.454823438173071,
+        -0.4130800428048972
+      ],
+      "rejections": {},
+      "persistent_position_error": 0.03786284478259562,
+      "persistent_velocity_error": 0.034641059034676555,
+      "fresh_fit_position_error": 0.037862844782596355,
+      "updates": [
+        {
+          "source_id": 1,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 4,
+          "observation_frames": [
+            9,
+            10,
+            12,
+            13
+          ],
+          "endpoint_translation_m": [
+            1.3147899898158313,
+            1.288254525686698
+          ],
+          "max_translation_residual_m": 0.10132217019069734,
+          "geometry_prior": {
+            "prior_centre": [
+              3.838786178226991,
+              13.42261530168436
+            ],
+            "corrected_centre": [
+              3.911471997268123,
+              13.474019075395516
+            ],
+            "observed_extents": [
+              1.6309947126010824,
+              0.3634875441109031
+            ],
+            "full_axes": [
+              true,
+              true
+            ],
+            "centre_interval_lower": [
+              -6.156091022940148,
+              -12.698689411496144
+            ],
+            "centre_interval_upper": [
+              -6.062085735541231,
+              -12.562176955607047
+            ],
+            "uncorrected_centre": [
+              3.911471997268124,
+              13.474019075395516
+            ],
+            "anchor_age_s": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "step": 14,
+      "age_s": 0.0,
+      "truth_heading_deg": 128.08366683644715,
+      "persistent_heading_deg": 128.0,
+      "current_fit_heading_deg": 128.0,
+      "raw_velocity": [
+        0.4475578176861416,
+        -0.41054007648290025
+      ],
+      "rejections": {},
+      "persistent_position_error": 0.009676944566934373,
+      "persistent_velocity_error": 0.00743547545323287,
+      "fresh_fit_position_error": 0.009676944566934373,
+      "updates": [
+        {
+          "source_id": 1,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 4,
+          "observation_frames": [
+            10,
+            12,
+            13,
+            14
+          ],
+          "endpoint_translation_m": [
+            1.2611233760052114,
+            1.1890628289129763
+          ],
+          "max_translation_residual_m": 0.10455602645404798,
+          "geometry_prior": {
+            "prior_centre": [
+              4.1549440741394665,
+              13.265180116111477
+            ],
+            "corrected_centre": [
+              4.116152773888297,
+              13.290889206375102
+            ],
+            "observed_extents": [
+              1.6305162610936321,
+              0.30814907456742624
+            ],
+            "full_axes": [
+              true,
+              false
+            ],
+            "centre_interval_lower": [
+              -4.98635767732783,
+              -13.00752030905696
+            ],
+            "centre_interval_upper": [
+              -4.891873938421463,
+              -12.815669383624387
+            ],
+            "uncorrected_centre": [
+              4.116152773888297,
+              13.290889206375102
+            ],
+            "anchor_age_s": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "step": 15,
+      "age_s": 0.0,
+      "truth_heading_deg": 124.08366683644716,
+      "persistent_heading_deg": 124.0,
+      "current_fit_heading_deg": 124.0,
+      "raw_velocity": [
+        0.4744220124224366,
+        -0.39696652345392375
+      ],
+      "rejections": {},
+      "persistent_position_error": 0.036359328604800366,
+      "persistent_velocity_error": 0.02240353072911966,
+      "fresh_fit_position_error": 0.030765014989579204,
+      "updates": [
+        {
+          "source_id": 1,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 4,
+          "observation_frames": [
+            12,
+            13,
+            14,
+            15
+          ],
+          "endpoint_translation_m": [
+            0.9924967533595206,
+            0.9323209647588775
+          ],
+          "max_translation_residual_m": 0.06961751654274966,
+          "geometry_prior": {
+            "prior_centre": [
+              4.359389413230388,
+              13.10013195750988
+            ],
+            "corrected_centre": [
+              4.376543715004885,
+              13.088561234862496
+            ],
+            "observed_extents": [
+              1.6304835738395496,
+              0.33124871720796634
+            ],
+            "full_axes": [
+              true,
+              false
+            ],
+            "centre_interval_lower": [
+              -3.7379695945889724,
+              -13.311742280145202
+            ],
+            "centre_interval_upper": [
+              -3.643453168428522,
+              -13.142990997353168
+            ],
+            "uncorrected_centre": [
+              4.384093411161418,
+              13.099754119708305
+            ],
+            "anchor_age_s": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "step": 16,
+      "age_s": 0.0,
+      "truth_heading_deg": 120.08366683644718,
+      "persistent_heading_deg": 119.99999999999999,
+      "current_fit_heading_deg": 120.0,
+      "raw_velocity": [
+        0.4896894683787378,
+        -0.3473849576327822
+      ],
+      "rejections": {},
+      "persistent_position_error": 0.033363126488973625,
+      "persistent_velocity_error": 0.04620609348608686,
+      "fresh_fit_position_error": 0.01598753453928691,
+      "updates": [
+        {
+          "source_id": 1,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "endpoint_translation_m": [
+            1.2316551784810552,
+            1.2659640116092044
+          ],
+          "max_translation_residual_m": 0.052204272090456,
+          "geometry_prior": {
+            "prior_centre": [
+              4.6404210019235705,
+              12.91500349896588
+            ],
+            "corrected_centre": [
+              4.614983324909112,
+              12.929689948637737
+            ],
+            "observed_extents": [
+              1.712580047370898,
+              0.22829283668309586
+            ],
+            "full_axes": [
+              true,
+              false
+            ],
+            "centre_interval_lower": [
+              -2.474362153220553,
+              -13.55014592639829
+            ],
+            "centre_interval_upper": [
+              -2.4619422005914506,
+              -13.278438763081386
+            ],
+            "uncorrected_centre": [
+              4.637590477592681,
+              12.968846685700148
+            ],
+            "anchor_age_s": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "step": 17,
+      "age_s": 0.0,
+      "truth_heading_deg": 116.0836668364472,
+      "persistent_heading_deg": 116.00000000000001,
+      "current_fit_heading_deg": 116.0,
+      "raw_velocity": [
+        0.4903286371007359,
+        -0.31125861754355455
+      ],
+      "rejections": {},
+      "persistent_position_error": 0.07013150222540973,
+      "persistent_velocity_error": 0.08655611178063329,
+      "fresh_fit_position_error": 0.01738746329738897,
+      "updates": [
+        {
+          "source_id": 1,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "endpoint_translation_m": [
+            1.1392683196541609,
+            1.2001750722572975
+          ],
+          "max_translation_residual_m": 0.06087773933235879,
+          "geometry_prior": {
+            "prior_centre": [
+              4.871602689967016,
+              12.754801283685106
+            ],
+            "corrected_centre": [
+              4.8495033921836495,
+              12.765579831398474
+            ],
+            "observed_extents": [
+              1.687036371451767,
+              0.2189118814426667
+            ],
+            "full_axes": [
+              true,
+              false
+            ],
+            "centre_interval_lower": [
+              -1.2563389079895064,
+              -13.660228788140875
+            ],
+            "centre_interval_upper": [
+              -1.2183752794412734,
+              -13.379140669583542
+            ],
+            "uncorrected_centre": [
+              4.876120970281054,
+              12.82015395402512
+            ],
+            "anchor_age_s": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "step": 18,
+      "age_s": 0.0,
+      "truth_heading_deg": 112.08366683644721,
+      "persistent_heading_deg": 112.0,
+      "current_fit_heading_deg": 112.0,
+      "raw_velocity": [
+        0.5214921824932194,
+        -0.2602875365279142
+      ],
+      "rejections": {},
+      "persistent_position_error": 0.12218122076737381,
+      "persistent_velocity_error": 0.04841209623023947,
+      "fresh_fit_position_error": 0.023980713562209925,
+      "updates": [
+        {
+          "source_id": 1,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "endpoint_translation_m": [
+            1.18608673099072,
+            1.2590624581556964
+          ],
+          "max_translation_residual_m": 0.04721844829391552,
+          "geometry_prior": {
+            "prior_centre": [
+              5.097436624367225,
+              12.596978488925624
+            ],
+            "corrected_centre": [
+              5.116466490576402,
+              12.589289923902983
+            ],
+            "observed_extents": [
+              1.7023288782927875,
+              0.22139646634627574
+            ],
+            "full_axes": [
+              true,
+              false
+            ],
+            "centre_interval_lower": [
+              0.016538549722262874,
+              -13.731608497139547
+            ],
+            "centre_interval_upper": [
+              0.0392096714294754,
+              -13.453004963485823
+            ],
+            "uncorrected_centre": [
+              5.169795506520792,
+              12.72128387017257
+            ],
+            "anchor_age_s": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "step": 19,
+      "age_s": 0.0,
+      "truth_heading_deg": 108.08366683644722,
+      "persistent_heading_deg": 108.0,
+      "current_fit_heading_deg": 108.0,
+      "raw_velocity": [
+        0.566066433052985,
+        -0.23906489541063158
+      ],
+      "rejections": {},
+      "persistent_position_error": 0.15894680398348418,
+      "persistent_velocity_error": 0.04858798441606102,
+      "fresh_fit_position_error": 0.02482046445015495,
+      "updates": [
+        {
+          "source_id": 1,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "endpoint_translation_m": [
+            1.2002964077293292,
+            1.2813397851587864
+          ],
+          "max_translation_residual_m": 0.06316905663655635,
+          "geometry_prior": {
+            "prior_centre": [
+              5.387757076215393,
+              12.453283220384334
+            ],
+            "corrected_centre": [
+              5.435673279513648,
+              12.437714302164032
+            ],
+            "observed_extents": [
+              1.7044828735719781,
+              0.24769545935982684
+            ],
+            "full_axes": [
+              true,
+              false
+            ],
+            "centre_interval_lower": [
+              1.3159088391698675,
+              -13.667222839219743
+            ],
+            "centre_interval_upper": [
+              1.3364259655978894,
+              -13.41491829857957
+            ],
+            "uncorrected_centre": [
+              5.484664272963723,
+              12.588493076175187
+            ],
+            "anchor_age_s": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "step": 20,
+      "age_s": 0.0,
+      "truth_heading_deg": 104.08366683644724,
+      "persistent_heading_deg": 104.0,
+      "current_fit_heading_deg": 104.0,
+      "raw_velocity": [
+        0.588782383187382,
+        -0.21408527957555973
+      ],
+      "rejections": {},
+      "persistent_position_error": 0.1977878554446294,
+      "persistent_velocity_error": 0.06929828485659392,
+      "fresh_fit_position_error": 0.03279962290984294,
+      "updates": [
+        {
+          "source_id": 1,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "endpoint_translation_m": [
+            1.2612156534462582,
+            1.255032700176351
+          ],
+          "max_translation_residual_m": 0.0478688233308598,
+          "geometry_prior": {
+            "prior_centre": [
+              5.721042076769644,
+              12.319131286158433
+            ],
+            "corrected_centre": [
+              5.73704569194543,
+              12.315141136748384
+            ],
+            "observed_extents": [
+              1.6944516283511315,
+              0.24412400624884434
+            ],
+            "full_axes": [
+              true,
+              false
+            ],
+            "centre_interval_lower": [
+              2.5720544421407174,
+              -13.520906421504726
+            ],
+            "centre_interval_upper": [
+              2.602602813789586,
+              -13.26503042775357
+            ],
+            "uncorrected_centre": [
+              5.781477221902268,
+              12.493346269947095
+            ],
+            "anchor_age_s": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "step": 21,
+      "age_s": 0.5,
+      "truth_heading_deg": 185.96831101981002,
+      "persistent_heading_deg": 104.0,
+      "current_fit_heading_deg": 124.0,
+      "raw_velocity": [
+        0.48172377141461253,
+        -0.39506977983413116
+      ],
+      "rejections": {
+        "oversized_cluster": 1
+      },
+      "persistent_position_error": 0.2666032668775264,
+      "persistent_velocity_error": 0.7711271244212703,
+      "fresh_fit_position_error": 0.39652248077640834,
+      "updates": []
+    },
+    {
+      "step": 22,
+      "age_s": 1.0,
+      "truth_heading_deg": 185.96831101981002,
+      "persistent_heading_deg": 104.0,
+      "current_fit_heading_deg": 96.0,
+      "raw_velocity": [
+        0.2887745002161037,
+        -0.4633299553635943
+      ],
+      "rejections": {
+        "oversized_cluster": 1
+      },
+      "persistent_position_error": 0.5509423409672486,
+      "persistent_velocity_error": 0.7711271244212703,
+      "fresh_fit_position_error": 0.6419824105674019,
+      "updates": []
+    },
+    {
+      "step": 23,
+      "age_s": 0.0,
+      "truth_heading_deg": 185.96831101981002,
+      "persistent_heading_deg": 186.0,
+      "current_fit_heading_deg": 186.0,
+      "raw_velocity": [
+        0.15958810653200117,
+        -0.49622613283598477
+      ],
+      "rejections": {},
+      "persistent_position_error": 0.08843369529740394,
+      "persistent_velocity_error": 0.07487655122948424,
+      "fresh_fit_position_error": 0.08843369529740355,
+      "updates": [
+        {
+          "source_id": 1,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 3,
+          "observation_frames": [
+            21,
+            22,
+            23
+          ],
+          "endpoint_translation_m": [
+            0.5380625506154253,
+            0.613749074931583
+          ],
+          "max_translation_residual_m": 0.038766841777153664,
+          "geometry_prior": {
+            "prior_centre": [
+              6.639482706830423,
+              11.989164454276859
+            ],
+            "corrected_centre": [
+              5.84371338841514,
+              11.734597539086826
+            ],
+            "observed_extents": [
+              1.656419251948103,
+              0.360561463881373
+            ],
+            "full_axes": [
+              true,
+              true
+            ],
+            "centre_interval_lower": [
+              -12.315438940250104,
+              -4.654820735269759
+            ],
+            "centre_interval_upper": [
+              -12.246858192198205,
+              -4.515382199151132
+            ],
+            "uncorrected_centre": [
+              5.84371338841514,
+              11.734597539086828
+            ],
+            "anchor_age_s": 1.5
+          }
+        }
+      ]
+    },
+    {
+      "step": 24,
+      "age_s": 0.0,
+      "truth_heading_deg": 185.96831101981002,
+      "persistent_heading_deg": 186.0,
+      "current_fit_heading_deg": 186.0,
+      "raw_velocity": [
+        0.03825409669228087,
+        -0.5249798559899775
+      ],
+      "rejections": {},
+      "persistent_position_error": 0.128953555754093,
+      "persistent_velocity_error": 0.06829568713798784,
+      "fresh_fit_position_error": 0.04616564617825704,
+      "updates": [
+        {
+          "source_id": 1,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 4,
+          "observation_frames": [
+            21,
+            22,
+            23,
+            24
+          ],
+          "endpoint_translation_m": [
+            0.8663358225972146,
+            0.9651233305347358
+          ],
+          "max_translation_residual_m": 0.0455075662123538,
+          "geometry_prior": {
+            "prior_centre": [
+              5.846725263871619,
+              11.444741946724
+            ],
+            "corrected_centre": [
+              5.8413032828586235,
+              11.393155243302488
+            ],
+            "observed_extents": [
+              1.6795202355694663,
+              0.24252586490363548
+            ],
+            "full_axes": [
+              true,
+              false
+            ],
+            "centre_interval_lower": [
+              -11.964064684646951,
+              -4.7433552823926535
+            ],
+            "centre_interval_upper": [
+              -11.918584920216416,
+              -4.485881147296289
+            ],
+            "uncorrected_centre": [
+              5.70951535198401,
+              11.40700671299431
+            ],
+            "anchor_age_s": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "step": 25,
+      "age_s": 0.0,
+      "truth_heading_deg": 185.96831101981002,
+      "persistent_heading_deg": 186.0,
+      "current_fit_heading_deg": 186.0,
+      "raw_velocity": [
+        -0.05127192345601919,
+        -0.4926253686147377
+      ],
+      "rejections": {},
+      "persistent_position_error": 0.15503709911322652,
+      "persistent_velocity_error": 0.03638510091181648,
+      "fresh_fit_position_error": 0.1966898085175186,
+      "updates": [
+        {
+          "source_id": 1,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            21,
+            22,
+            23,
+            24,
+            25
+          ],
+          "endpoint_translation_m": [
+            1.10659844147753,
+            1.23414887441794
+          ],
+          "max_translation_residual_m": 0.04756249098480968,
+          "geometry_prior": {
+            "prior_centre": [
+              5.84294632507079,
+              11.08229429266064
+            ],
+            "corrected_centre": [
+              5.848626631285117,
+              11.136338796195332
+            ],
+            "observed_extents": [
+              1.7082831605723552,
+              0.24714060452601316
+            ],
+            "full_axes": [
+              true,
+              false
+            ],
+            "centre_interval_lower": [
+              -11.695039140763747,
+              -4.694200666966115
+            ],
+            "centre_interval_upper": [
+              -11.6783223013361,
+              -4.441341271492128
+            ],
+            "uncorrected_centre": [
+              5.890076121021214,
+              11.131982279274467
+            ],
+            "anchor_age_s": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "step": 26,
+      "age_s": 0.5,
+      "truth_heading_deg": 185.96831101981002,
+      "persistent_heading_deg": 186.0,
+      "current_fit_heading_deg": 186.0,
+      "raw_velocity": [
+        -0.011875173797355143,
+        -0.22877361344079156
+      ],
+      "rejections": {
+        "current_extent_partial": 1,
+        "unconfirmed": 1
+      },
+      "persistent_position_error": 0.17309061959836453,
+      "persistent_velocity_error": 0.03638510091181648,
+      "fresh_fit_position_error": 0.025550198999612417,
+      "updates": []
+    },
+    {
+      "step": 27,
+      "age_s": 1.0,
+      "truth_heading_deg": 185.96831101981002,
+      "persistent_heading_deg": 186.0,
+      "current_fit_heading_deg": 186.0,
+      "raw_velocity": [
+        0.0013283098655991182,
+        -0.1029555053309727
+      ],
+      "rejections": {
+        "low_or_inconsistent_measured_speed": 1,
+        "invalid_fit": 1
+      },
+      "persistent_position_error": 0.19117050208813155,
+      "persistent_velocity_error": 0.03638510091181648,
+      "fresh_fit_position_error": 0.017947754863137183,
+      "updates": []
+    },
+    {
+      "step": 28,
+      "age_s": 1.5,
+      "truth_heading_deg": 185.96831101981002,
+      "persistent_heading_deg": 186.0,
+      "current_fit_heading_deg": null,
+      "raw_velocity": [
+        0.0040312006726738875,
+        -0.06008296651342923
+      ],
+      "rejections": {
+        "invalid_fit": 1,
+        "current_extent_partial": 1
+      },
+      "persistent_position_error": 0.20926991405477477,
+      "persistent_velocity_error": 0.03638510091181648,
+      "fresh_fit_position_error": null,
+      "updates": []
+    }
+  ],
+  "limitations": [
+    "OFF lacks future target states; current-target CV sensitivities do not assert the unrecorded counterfactual future.",
+    "Actual-own endpoint scoring uses .5s sampling, not continuous contact checks.",
+    "A current passing model backup does not establish a closed-loop rescue or justify a general gate from one case."
+  ]
+}

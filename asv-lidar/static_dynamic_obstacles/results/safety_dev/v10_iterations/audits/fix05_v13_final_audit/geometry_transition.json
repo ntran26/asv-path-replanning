@@ -1,0 +1,235 @@
+[
+  {
+    "step": 29,
+    "raw_fit_heading_deg": 110.0,
+    "raw_fit_centre": [
+      7.934231080214644,
+      8.011306485085841
+    ],
+    "raw_centroid_position": [
+      8.42268790508718,
+      8.02572158252453
+    ],
+    "velocity": [
+      0.16775588037904934,
+      -0.1366230702848288
+    ],
+    "dynamic": false,
+    "view_position": [
+      7.934231080214644,
+      8.011306485085841
+    ],
+    "view_heading_deg": 110.0
+  },
+  {
+    "step": 30,
+    "raw_fit_heading_deg": 112.0,
+    "raw_fit_centre": [
+      8.081842700270663,
+      8.444446858570231
+    ],
+    "raw_centroid_position": [
+      8.496296311702514,
+      7.996436749993751
+    ],
+    "velocity": [
+      0.15801116710107826,
+      -0.09959081128420808
+    ],
+    "dynamic": true,
+    "view_position": [
+      8.496296311702514,
+      7.996436749993751
+    ],
+    "view_heading_deg": 112.0
+  },
+  {
+    "step": 31,
+    "raw_fit_heading_deg": 114.0,
+    "raw_fit_centre": [
+      8.321917646510155,
+      8.347269676757254
+    ],
+    "raw_centroid_position": [
+      8.595113287549214,
+      7.952530176739952
+    ],
+    "velocity": [
+      0.17695590753138485,
+      -0.093959586614771
+    ],
+    "dynamic": true,
+    "view_position": [
+      8.595113287549214,
+      7.952530176739952
+    ],
+    "view_heading_deg": 114.00000000000001
+  },
+  {
+    "step": 32,
+    "raw_fit_heading_deg": 114.0,
+    "raw_fit_centre": [
+      8.415941956109155,
+      8.264664556844522
+    ],
+    "raw_centroid_position": [
+      8.653963139095026,
+      7.903488549316046
+    ],
+    "velocity": [
+      0.14829757467286223,
+      -0.09595393400738414
+    ],
+    "dynamic": true,
+    "view_position": [
+      8.653963139095026,
+      7.903488549316046
+    ],
+    "view_heading_deg": 114.00000000000001
+  },
+  {
+    "step": 33,
+    "raw_fit_heading_deg": 114.0,
+    "raw_fit_centre": [
+      8.372365122072978,
+      8.274340271103918
+    ],
+    "raw_centroid_position": [
+      8.650552300242083,
+      7.888216143266456
+    ],
+    "velocity": [
+      0.07300272094803954,
+      -0.06420435946506867
+    ],
+    "dynamic": true,
+    "view_position": [
+      8.650552300242083,
+      7.888216143266456
+    ],
+    "view_heading_deg": 114.00000000000001
+  },
+  {
+    "step": 34,
+    "raw_fit_heading_deg": null,
+    "raw_fit_centre": [
+      8.379911374204374,
+      8.20902756828649
+    ],
+    "raw_centroid_position": [
+      8.667690771209596,
+      7.834393704578397
+    ],
+    "velocity": [
+      0.054206280089488225,
+      -0.0852892064737112
+    ],
+    "dynamic": true,
+    "view_position": [
+      8.667690771209596,
+      7.834393704578397
+    ],
+    "view_heading_deg": 147.56165406212725
+  },
+  {
+    "step": 35,
+    "raw_fit_heading_deg": null,
+    "raw_fit_centre": [
+      8.47050037755842,
+      8.241514747879899
+    ],
+    "raw_centroid_position": [
+      8.727022983598138,
+      7.83088416686243
+    ],
+    "velocity": [
+      0.08547718909305621,
+      -0.04731761797442647
+    ],
+    "dynamic": true,
+    "view_position": [
+      8.727022983598138,
+      7.83088416686243
+    ],
+    "view_heading_deg": 118.96760333426815
+  },
+  {
+    "step": 36,
+    "raw_fit_heading_deg": null,
+    "raw_fit_centre": [
+      8.431976067512217,
+      8.292569402782306
+    ],
+    "raw_centroid_position": [
+      8.762378138287593,
+      7.854072264420842
+    ],
+    "velocity": [
+      0.07831449695815625,
+      -0.001871325249857246
+    ],
+    "dynamic": false,
+    "view_position": [
+      8.762378138287593,
+      7.854072264420842
+    ],
+    "view_heading_deg": 118.96760333426815
+  },
+  {
+    "step": 37,
+    "raw_fit_heading_deg": null,
+    "raw_fit_centre": null,
+    "raw_centroid_position": [
+      8.755089105971338,
+      7.825823902509796
+    ],
+    "velocity": [
+      0.03325666898859114,
+      -0.028367545932008378
+    ],
+    "dynamic": false,
+    "view_position": [
+      8.755089105971338,
+      7.825823902509797
+    ],
+    "view_heading_deg": 118.96760333426815
+  },
+  {
+    "step": 38,
+    "raw_fit_heading_deg": null,
+    "raw_fit_centre": null,
+    "raw_centroid_position": [
+      8.801083155553208,
+      7.795414750393414
+    ],
+    "velocity": [
+      0.06174531022886608,
+      -0.04410831724386239
+    ],
+    "dynamic": false,
+    "view_position": [
+      8.801083155553206,
+      7.795414750393416
+    ],
+    "view_heading_deg": 118.96760333426815
+  },
+  {
+    "step": 39,
+    "raw_fit_heading_deg": null,
+    "raw_fit_centre": null,
+    "raw_centroid_position": [
+      8.879151725850953,
+      7.795997703198404
+    ],
+    "velocity": [
+      0.107532109624184,
+      -0.022147075984568332
+    ],
+    "dynamic": false,
+    "view_position": [
+      8.879151725850953,
+      7.795997703198406
+    ],
+    "view_heading_deg": 118.96760333426815
+  }
+]

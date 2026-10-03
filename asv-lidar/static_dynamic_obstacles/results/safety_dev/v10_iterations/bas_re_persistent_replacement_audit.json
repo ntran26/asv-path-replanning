@@ -1,0 +1,126 @@
+{
+  "scope": "Saved-state noncausal diagnostic only. Same recorded successful SAC16-command sequence, same own predictor, static/boundary/terminal checks; replace exact-source base view with the stored geometry-prior persistent view, with no union. No episodes, environment calls, search or source edits.",
+  "case": "TS2:BAS-CR-RE-072",
+  "decision": 8,
+  "input_trace": "results/safety_dev/v10_iterations/consistent_track_probe8/traces/002_v13.jsonl",
+  "input_trace_sha256": "54391b7310f138276637f89c84f8f172849d69c3d355150c334bc6ace5d85e3f",
+  "prior_audit": "results/safety_dev/v10_iterations/bas_re_known_sac_continuation_audit.json",
+  "prior_audit_sha256": "1fada3032adbac9c2afb8993a9a1a04be869b2955fa909ef22c81d2e8a5a5b2b",
+  "baseline_reproduces_previous_audit": true,
+  "base": {
+    "first_violation_s": 3.375,
+    "minimum_clearance_m": -0.22557214619940777,
+    "hard_safe": false,
+    "target_components": [
+      {
+        "id": 10,
+        "minimum_clearance_m": -0.22557214619940777,
+        "minimum_time_s": 4.0,
+        "first_violation_s": 3.375
+      }
+    ]
+  },
+  "persistent_replacement": {
+    "first_violation_s": null,
+    "minimum_clearance_m": 0.21481715591461722,
+    "hard_safe": true,
+    "target_components": [
+      {
+        "id": -1000000,
+        "minimum_clearance_m": 0.21481715591461722,
+        "minimum_time_s": 4.75,
+        "first_violation_s": null
+      }
+    ]
+  },
+  "current_state_errors": [
+    {
+      "source_id": 10,
+      "persistent_id": -1000000,
+      "base_position_error_m_scoring_only": 0.4484277608425727,
+      "persistent_position_error_m_scoring_only": 0.07696256053851096,
+      "base_velocity_error_mps_scoring_only": 0.15617217785552295,
+      "persistent_velocity_error_mps_scoring_only": 0.0751997416501608,
+      "base_heading_error_deg_scoring_only": 0.8674362066120693,
+      "persistent_heading_error_deg_scoring_only": 4.867436206612069,
+      "anchor_age_s": 0.5,
+      "owner_in_evaluated_v13": "base",
+      "base_position": [
+        3.904054515637056,
+        7.583097370083354
+      ],
+      "persistent_position": [
+        3.5813584841843933,
+        7.781158402360171
+      ],
+      "base_velocity": [
+        0.6180164421096701,
+        -0.13471060513487182
+      ],
+      "persistent_velocity": [
+        0.5051469160821739,
+        -0.1130056690174962
+      ]
+    }
+  ],
+  "recorded_current_true_target": {
+    "index": 0,
+    "x": 3.541501472824828,
+    "y": 7.8469964944507495,
+    "heading": 110.86743620661207,
+    "speed": 0.5009509936974853,
+    "velocity": [
+      0.46809215215481487,
+      -0.17844224605617254
+    ],
+    "hull": [
+      [
+        4.349763591690742,
+        7.538877447317369
+      ],
+      [
+        4.2240320815971675,
+        7.447682121946003
+      ],
+      [
+        4.025561214080171,
+        7.432374779033178
+      ],
+      [
+        3.686051493556774,
+        7.524342978265983
+      ],
+      [
+        2.9385258344900325,
+        7.8093085709904955
+      ],
+      [
+        2.6513117460506157,
+        7.940201914602443
+      ],
+      [
+        2.8151669618672113,
+        8.37002916856582
+      ],
+      [
+        3.1166293299428536,
+        8.276512107907209
+      ],
+      [
+        3.864154989009595,
+        7.991546515182696
+      ],
+      [
+        4.178730220169597,
+        7.834169820781551
+      ],
+      [
+        4.316645899232634,
+        7.690627961142694
+      ]
+    ]
+  },
+  "future_target_truth_used": false,
+  "caveat": "Reactive future target truth is unavailable in the saved OFF trace. Initial-state truth only scores estimation error and is never used in the replacement. The stored persistent view is0.5s old, not a new full measurement at decision8. A passing sequence here does not establish closed-loop outcomes or general preference for persistence.",
+  "interpretation": "Exact-source persistent replacement makes this known-successful continuation pass unchanged model checks; this supports testing estimate selection rather than only enlarging the backup bank."
+}
