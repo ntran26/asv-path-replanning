@@ -1,0 +1,1618 @@
+{
+  "schema": 1,
+  "tag": "v10_broader40",
+  "scenarios": 40,
+  "scope": "Outcome-enriched development challenge, frozen before expanded-candidate results. Candidate-only runs are staged separately; this selection does not authorize or assume fresh baseline runs.",
+  "salt": "v10-broader40-2026-10-03-before-expanded-outcomes-v1",
+  "ranking": "SHA256(UTF8(salt + '|' + canonical case)) ascending; categorical rescue matching takes priority, with hash tie-breaks.",
+  "excluded_previous_cases": [
+    "DV3:DV3-BO-CV-04",
+    "DV3:DV3-CRP-CV-04",
+    "DV3:DV3-CRP-CV-17",
+    "DV3:DV3-HO-CV-03",
+    "DV3:DV3-HO-VS-01",
+    "TS2:BAS-BO-CV-063",
+    "TS2:BAS-CR-RE-072",
+    "TS2:BAS-HO-NC-059",
+    "TS2:BAS-HO-NC-071",
+    "TS2:BAS-NU-CV-070",
+    "TS2:CH-CR-CV-007",
+    "TS2:CH-CR-CV-015",
+    "TS2:CH-CR-CV-031",
+    "TS2:CH-CR-CV-059",
+    "TS2:CH-CR-CV-073",
+    "TS2:CH-CR-RE-038",
+    "TS2:CH-HO-CV-043",
+    "TS2:CH-HO-CV-073",
+    "TS2:CH-HO-RE-060",
+    "TS2:P2-L1-CRP-FIX-03",
+    "TS2:P2-L1-CRP-FIX-05",
+    "TS2:P2-L1-CRP-VAR-12",
+    "TS2:P2-L1-CRP-VAR-14",
+    "TS2:P2-L1-CRS-FIX-09",
+    "TS2:P2-L1-CRS-VAR-08",
+    "TS2:P2-L1-OT-VAR-20",
+    "TS2:P2-L2-CRP-VAR-02",
+    "TS2:P2-L2-CRP-VAR-16",
+    "TS2:P2-L2-HO-FIX-05",
+    "TS2:P2-L2-HO-FIX-11",
+    "TS2:P2-L2-HO-FIX-19",
+    "TS2:P2-L3-CRS-FIX-05"
+  ],
+  "excluded_count": 32,
+  "input_sha256": {
+    "results/safety_dev/v8_followup_offline/audit/all_1150.csv": "0329ea7148ae95fc6145368f6c70c04f1165907f3455926ea3a940ea63f238d7",
+    "results/safety_dev/v9_paired_pilot/selection.json": "ee04253c16e0dfa7bbca7f2472362e432c5e4fb66fb411bc6c69d84bb3982b3b",
+    "results/test_set/v2/definition.csv": "a5a51b6c6a04762352a746fb90e785798cdb51af5eeb3cfb3fdc0d8e1f47220f",
+    "results/safety_dev/suites/inventory_v5/manifest.json": "a2f8cc2df0a254d3da1d01f3ee84985215f89a87eab9cc7806b59babe20a260e",
+    "results/safety_dev/testset_v2_offline/analysis/scenario_features.csv": "4f22d808cc6d342e7e116ea11b5250e01203d20d31346379f1b1922672663ad0"
+  },
+  "selection_builder": "tools/diagnostics/safety/select_v10_broader40.py",
+  "selection_builder_sha256": "a2928db91eebad96b468a13cdfe5b5734d8bcf23acb8ce2b2eb65f1e17dea8d5",
+  "strata": [
+    {
+      "name": "remaining_known_sac_regression",
+      "eligible": 11,
+      "selected": 11
+    },
+    {
+      "name": "rescue_control",
+      "eligible": 67,
+      "selected": 11,
+      "selection": "Sequential mandatory-regression hash order; distinct controls; exact dataset/reason and categorical family preference."
+    },
+    {
+      "name": "both_goal_active_dv3",
+      "eligible": 67,
+      "selected": 1
+    },
+    {
+      "name": "both_goal_active_ts2",
+      "eligible": 289,
+      "selected": 4
+    },
+    {
+      "name": "both_goal_no_fire_dv3",
+      "eligible": 40,
+      "selected": 1
+    },
+    {
+      "name": "both_goal_no_fire_ts2",
+      "eligible": 560,
+      "selected": 4
+    },
+    {
+      "name": "both_fail_active_dv3",
+      "eligible": 14,
+      "selected": 1
+    },
+    {
+      "name": "both_fail_active_ts2",
+      "eligible": 51,
+      "selected": 3
+    },
+    {
+      "name": "both_fail_no_fire_dv3",
+      "eligible": 5,
+      "selected": 1
+    },
+    {
+      "name": "both_fail_no_fire_ts2",
+      "eligible": 14,
+      "selected": 3
+    }
+  ],
+  "cases": [
+    {
+      "case": "TS2:P2-L2-CRS-FIX-19",
+      "scenario_id": "P2-L2-CRS-FIX-19",
+      "dataset": "ts2",
+      "seed": 470158,
+      "scenario_sha256": "54110bb8065ea7f480c6bb572430900efec753b7558b6af17232d9d7603ddf96",
+      "selection_stratum": "remaining_known_sac_regression",
+      "rationale": "Every remaining saved SAC success broken by V8.",
+      "selection_rank_sha256": "357e126158900ddfc7bc4809d3e597052c2cd00a6cdb08b6b22abf431e17cf69",
+      "family": [
+        "L2-CRS",
+        "FIX",
+        "crossing"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.482643773590642",
+        "width_ratio": "1.0222222222222224",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.5505343449599254",
+        "speed_ratio": "0.9862831770391032",
+        "dcpa_m": "2.4146628912605834",
+        "tcpa_s": "9.715453457652272",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": "3.0"
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "collision:boundary",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "broken",
+        "first_reason": "turn",
+        "first_fire_step": "16",
+        "selected_clearance": "0.20251864175329204",
+        "policy_prefix_repair_clearance": "0.05465229422062311"
+      }
+    },
+    {
+      "case": "TS2:P2-L3-BO-FIX-09",
+      "scenario_id": "P2-L3-BO-FIX-09",
+      "dataset": "ts2",
+      "seed": 470288,
+      "scenario_sha256": "5441c16f3dd3d6f0b0e9566fe5c95d891e0251172c3ad8db93104ff9cac960a3",
+      "selection_stratum": "remaining_known_sac_regression",
+      "rationale": "Every remaining saved SAC success broken by V8.",
+      "selection_rank_sha256": "4bebcce64e1f7282977ffc48ac9b3202eb4a9f23fc770028770868bcae916755",
+      "family": [
+        "L3-BO",
+        "FIX",
+        "being_overtaken"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.482643773590642",
+        "width_ratio": "1.0222222222222224",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "1.0055756113180978",
+        "speed_ratio": "1.8014903479928142",
+        "dcpa_m": "1.4488926005626206",
+        "tcpa_s": "10.009675865137945",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": "3.0"
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "broken",
+        "first_reason": "turn",
+        "first_fire_step": "29",
+        "selected_clearance": "0.15595094401194962",
+        "policy_prefix_repair_clearance": "0.11832206560691391"
+      }
+    },
+    {
+      "case": "TS2:CH-OT-RE-064",
+      "scenario_id": "CH-OT-RE-064",
+      "dataset": "ts2",
+      "seed": 400763,
+      "scenario_sha256": "b3ff0c1e528a2be89175eed9b3ec2388c1415e0366a23b161ec8153b58572015",
+      "selection_stratum": "remaining_known_sac_regression",
+      "rationale": "Every remaining saved SAC success broken by V8.",
+      "selection_rank_sha256": "575e393eccf69e3ec4379cec2a1ef5cba3d53f828dcd630c27a954c6fc5cce23",
+      "family": [
+        "channel-overtaking",
+        "RE",
+        "overtaking"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "8.184771183161226",
+        "width_ratio": "1.657452099048441",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.03196083233931944",
+        "target_speed": "0.23406029432105432",
+        "speed_ratio": "0.4193193990803264",
+        "dcpa_m": "1.2638395219054124",
+        "tcpa_s": "24.563805823656715",
+        "obstacle_count_for_matching": "1.0",
+        "fixed_obstacle_count": ""
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "broken",
+        "first_reason": "brake",
+        "first_fire_step": "17",
+        "selected_clearance": "0.17247027842500506",
+        "policy_prefix_repair_clearance": "-0.03508967737182463"
+      }
+    },
+    {
+      "case": "TS2:P2-L3-CRP-FIX-03",
+      "scenario_id": "P2-L3-CRP-FIX-03",
+      "dataset": "ts2",
+      "seed": 470222,
+      "scenario_sha256": "c0f7f8d4411f5c36958d40a2b0b9b797dfcec2074d3b71aac6e77be797ffc030",
+      "selection_stratum": "remaining_known_sac_regression",
+      "rationale": "Every remaining saved SAC success broken by V8.",
+      "selection_rank_sha256": "7e7dbec549a2cb708b0f505d5a90c920e6736621912a024f078744b8f9fa25dc",
+      "family": [
+        "L3-CRP",
+        "FIX",
+        "crossing"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.482643773590642",
+        "width_ratio": "1.0222222222222224",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.4573045492410211",
+        "speed_ratio": "0.8192618459302496",
+        "dcpa_m": "0.30751290527181063",
+        "tcpa_s": "8.459199358142248",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": "3.0"
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "collision:target",
+        "v8_outcome": "collision:target",
+        "v8_category": "broken",
+        "first_reason": "turn",
+        "first_fire_step": "3",
+        "selected_clearance": "0.014054601287506824",
+        "policy_prefix_repair_clearance": "-0.2655340875949397"
+      }
+    },
+    {
+      "case": "TS2:BAS-CR-RE-070",
+      "scenario_id": "BAS-CR-RE-070",
+      "dataset": "ts2",
+      "seed": 400169,
+      "scenario_sha256": "67740a6fdabbdc806c9efb1537b96db7b6941f5c829dd97815517647feaeffb5",
+      "selection_stratum": "remaining_known_sac_regression",
+      "rationale": "Every remaining saved SAC success broken by V8.",
+      "selection_rank_sha256": "a3e2196172007624aa3f5ca53a3570b95e0568344a3a29ccb3ceb75192131c9d",
+      "family": [
+        "basin-crossing",
+        "RE",
+        "crossing"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.211631421002906",
+        "width_ratio": "1.0000000000000002",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.5170397867509399",
+        "speed_ratio": "0.926277621370666",
+        "dcpa_m": "1.0138608374984766",
+        "tcpa_s": "9.89235289249146",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": ""
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "collision:obstacle",
+        "v7_outcome": "collision:obstacle",
+        "v8_outcome": "collision:obstacle",
+        "v8_category": "broken",
+        "first_reason": "turn",
+        "first_fire_step": "27",
+        "selected_clearance": "0.1682723251843955",
+        "policy_prefix_repair_clearance": "-0.0118949475073084"
+      }
+    },
+    {
+      "case": "DV3:DV3-CRS-CV-04",
+      "scenario_id": "DV3-CRS-CV-04",
+      "dataset": "dv3",
+      "seed": 900195,
+      "scenario_sha256": "61218205227240a2e85db4ab35e3db161173a3cad9f693e18d2208c54f9d4824",
+      "selection_stratum": "remaining_known_sac_regression",
+      "rationale": "Every remaining saved SAC success broken by V8.",
+      "selection_rank_sha256": "ad0e933eaea1ad2b45b8a7bfed06c77609834476aa71b73b1f8245404d4fd551",
+      "family": [
+        "CRS",
+        "CV",
+        "CRS"
+      ],
+      "static_geometry_metadata": null,
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "collision:boundary",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "broken",
+        "first_reason": "brake",
+        "first_fire_step": "11",
+        "selected_clearance": "0.022599969040473816",
+        "policy_prefix_repair_clearance": "-0.09406767031834282"
+      }
+    },
+    {
+      "case": "DV3:DV3-CRP-CV-16",
+      "scenario_id": "DV3-CRP-CV-16",
+      "dataset": "dv3",
+      "seed": 900181,
+      "scenario_sha256": "81cae5ce5c87aa7373cd202cd2c023f39ba1507c64a4649c94700e585dda76a8",
+      "selection_stratum": "remaining_known_sac_regression",
+      "rationale": "Every remaining saved SAC success broken by V8.",
+      "selection_rank_sha256": "bee45d7c3a6c4ff68fc65df32c30ab005131c71d3b7f2ea6a157dcf05834b8c4",
+      "family": [
+        "CRP",
+        "CV",
+        "CRP"
+      ],
+      "static_geometry_metadata": null,
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "collision:obstacle",
+        "v8_outcome": "collision:obstacle",
+        "v8_category": "broken",
+        "first_reason": "turn",
+        "first_fire_step": "2",
+        "selected_clearance": "0.11144270421072452",
+        "policy_prefix_repair_clearance": "-0.05091065490312838"
+      }
+    },
+    {
+      "case": "DV3:DV3-CRS-CV-12",
+      "scenario_id": "DV3-CRS-CV-12",
+      "dataset": "dv3",
+      "seed": 900203,
+      "scenario_sha256": "f7bd9c8d370d8c6db2243f689dd85adfdd731b7c181ecdab71957c3ba0b4084c",
+      "selection_stratum": "remaining_known_sac_regression",
+      "rationale": "Every remaining saved SAC success broken by V8.",
+      "selection_rank_sha256": "e4db2bf3da63e61bf2c15910f082a242cdd4503d3a7bd8f4a65eb005f6d1261c",
+      "family": [
+        "CRS",
+        "CV",
+        "CRS"
+      ],
+      "static_geometry_metadata": null,
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "broken",
+        "first_reason": "brake",
+        "first_fire_step": "8",
+        "selected_clearance": "0.01333779991073411",
+        "policy_prefix_repair_clearance": "-0.02237124128983206"
+      }
+    },
+    {
+      "case": "TS2:BAS-CR-CV-045",
+      "scenario_id": "BAS-CR-CV-045",
+      "dataset": "ts2",
+      "seed": 400144,
+      "scenario_sha256": "f52a79f53888f69df0d6f07cca0127d2300fb66a359ff4d87793178e1127924b",
+      "selection_stratum": "remaining_known_sac_regression",
+      "rationale": "Every remaining saved SAC success broken by V8.",
+      "selection_rank_sha256": "e795f4bdbf150148a5707aeb7d0ef85df146142f5269ca495359a8c618e727a9",
+      "family": [
+        "basin-crossing",
+        "CV",
+        "crossing"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.217376498983159",
+        "width_ratio": "1.0",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.3904602378137959",
+        "speed_ratio": "0.6995101529705054",
+        "dcpa_m": "1.0370932059081714",
+        "tcpa_s": "10.753358195068827",
+        "obstacle_count_for_matching": "1.0",
+        "fixed_obstacle_count": ""
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "collision:target",
+        "v8_outcome": "collision:target",
+        "v8_category": "broken",
+        "first_reason": "continue",
+        "first_fire_step": "10",
+        "selected_clearance": "0.27294495212217196",
+        "policy_prefix_repair_clearance": "0.1443649968945727"
+      }
+    },
+    {
+      "case": "TS2:BAS-CR-RE-090",
+      "scenario_id": "BAS-CR-RE-090",
+      "dataset": "ts2",
+      "seed": 400189,
+      "scenario_sha256": "bb72b5b246983466863db4aa9c88c59ab06c6800411748499ba9700669d9ecab",
+      "selection_stratum": "remaining_known_sac_regression",
+      "rationale": "Every remaining saved SAC success broken by V8.",
+      "selection_rank_sha256": "f5387a2f6378c9d1b6ce22d587af41d513e35ff954692de3f0a8264f6b3ea995",
+      "family": [
+        "basin-crossing",
+        "RE",
+        "crossing"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.23323852068304",
+        "width_ratio": "1.0",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.3389351634545245",
+        "speed_ratio": "0.6072028982070675",
+        "dcpa_m": "0.9709757700430671",
+        "tcpa_s": "10.138574635762245",
+        "obstacle_count_for_matching": "2.0",
+        "fixed_obstacle_count": ""
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "collision:target",
+        "v8_outcome": "collision:target",
+        "v8_category": "broken",
+        "first_reason": "continue",
+        "first_fire_step": "19",
+        "selected_clearance": "0.05430250228014835",
+        "policy_prefix_repair_clearance": "0.05273021103931105"
+      }
+    },
+    {
+      "case": "TS2:BAS-OT-CV-095",
+      "scenario_id": "BAS-OT-CV-095",
+      "dataset": "ts2",
+      "seed": 400294,
+      "scenario_sha256": "6f44f17b24bee789569aedacd9a1f3234af5de93190b5cda9bfb952b2c27f53e",
+      "selection_stratum": "remaining_known_sac_regression",
+      "rationale": "Every remaining saved SAC success broken by V8.",
+      "selection_rank_sha256": "fb18fbf1dd500bbc89f96705dfda5eb11fed76bc7aef0eaea724f427acb1db50",
+      "family": [
+        "basin-overtaking",
+        "CV",
+        "overtaking"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.22741453649665",
+        "width_ratio": "1.0000000000000002",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.28959760995717343",
+        "speed_ratio": "0.5188145906360907",
+        "dcpa_m": "1.6013931233922973",
+        "tcpa_s": "27.728282338021437",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": ""
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "broken",
+        "first_reason": "turn",
+        "first_fire_step": "16",
+        "selected_clearance": "0.16612724223560538",
+        "policy_prefix_repair_clearance": "0.09645963804349296"
+      }
+    },
+    {
+      "case": "TS2:P2-L2-CRS-VAR-14",
+      "scenario_id": "P2-L2-CRS-VAR-14",
+      "dataset": "ts2",
+      "seed": 470153,
+      "scenario_sha256": "ea19dc0c6d9274a7120d955fa007ff6b521e2e3a206f310a20511eca3f121a2d",
+      "selection_stratum": "rescue_control",
+      "rationale": "Match a regression's dataset and initial intervention reason; prefer family/variant, then fixed hash.",
+      "selection_rank_sha256": "46aab5f2d6dd28108c63f02cd412294e9a6a89d57bf071bcd8f90644226e52d1",
+      "family": [
+        "L2-CRS",
+        "VAR",
+        "crossing"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.482643773590642",
+        "width_ratio": "1.0222222222222224",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.6087233466393106",
+        "speed_ratio": "1.0905288684668657",
+        "dcpa_m": "0.37599950626197143",
+        "tcpa_s": "8.22907105408223",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": "3.0"
+      },
+      "historical": {
+        "policy_outcome": "collision:obstacle",
+        "v4_outcome": "collision:obstacle",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "turn",
+        "first_fire_step": "21",
+        "selected_clearance": "0.0014133807157497187",
+        "policy_prefix_repair_clearance": "-0.04136374948058029"
+      },
+      "rescue_matching": {
+        "regression_case": "TS2:P2-L2-CRS-FIX-19",
+        "dataset_and_first_reason_exact": true,
+        "priority": 1,
+        "priority_meaning": "same cell",
+        "eligible_remaining_same_dataset_reason": 33
+      }
+    },
+    {
+      "case": "TS2:BAS-BO-CV-055",
+      "scenario_id": "BAS-BO-CV-055",
+      "dataset": "ts2",
+      "seed": 400354,
+      "scenario_sha256": "2f1b9992049aabbf154d9ee1d6155129ab7a5bc5093e651044b4260498b91bae",
+      "selection_stratum": "rescue_control",
+      "rationale": "Match a regression's dataset and initial intervention reason; prefer family/variant, then fixed hash.",
+      "selection_rank_sha256": "59cef199b22e0b211f87e54e9cfce18e4c6c52c5f2fc697d8c1ae653fbaf18a9",
+      "family": [
+        "basin-being_overtaken",
+        "CV",
+        "being_overtaken"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.211897995992256",
+        "width_ratio": "1.0000000000000004",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.9429834424512034",
+        "speed_ratio": "1.689356375366088",
+        "dcpa_m": "1.4379708985414914",
+        "tcpa_s": "13.16064585798889",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": ""
+      },
+      "historical": {
+        "policy_outcome": "collision:target",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "turn",
+        "first_fire_step": "11",
+        "selected_clearance": "0.2576121284103128",
+        "policy_prefix_repair_clearance": "0.09591953780133158"
+      },
+      "rescue_matching": {
+        "regression_case": "TS2:P2-L3-BO-FIX-09",
+        "dataset_and_first_reason_exact": true,
+        "priority": 2,
+        "priority_meaning": "same scenario class",
+        "eligible_remaining_same_dataset_reason": 32
+      }
+    },
+    {
+      "case": "TS2:P2-L3-CRP-FIX-19",
+      "scenario_id": "P2-L3-CRP-FIX-19",
+      "dataset": "ts2",
+      "seed": 470238,
+      "scenario_sha256": "d4b1f7eb3bbff4b4c0ff0d639e6d022fd94ca1bb2158a1cbcc0091b4579ef822",
+      "selection_stratum": "rescue_control",
+      "rationale": "Match a regression's dataset and initial intervention reason; prefer family/variant, then fixed hash.",
+      "selection_rank_sha256": "2a6a43de4d535e76e1378b7a53e79b326d189c83ec6607fa6f482a34adf16b0b",
+      "family": [
+        "L3-CRP",
+        "FIX",
+        "crossing"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.482643773590642",
+        "width_ratio": "1.0222222222222224",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.5553870784900059",
+        "speed_ratio": "0.9949768570741251",
+        "dcpa_m": "0.4486740298193312",
+        "tcpa_s": "7.997762901023911",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": "3.0"
+      },
+      "historical": {
+        "policy_outcome": "collision:target",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "brake",
+        "first_fire_step": "4",
+        "selected_clearance": "0.08145268601863784",
+        "policy_prefix_repair_clearance": "-0.24248916497347608"
+      },
+      "rescue_matching": {
+        "regression_case": "TS2:CH-OT-RE-064",
+        "dataset_and_first_reason_exact": true,
+        "priority": 3,
+        "priority_meaning": "dataset and reason only",
+        "eligible_remaining_same_dataset_reason": 10
+      }
+    },
+    {
+      "case": "TS2:P2-L3-CRP-FIX-17",
+      "scenario_id": "P2-L3-CRP-FIX-17",
+      "dataset": "ts2",
+      "seed": 470236,
+      "scenario_sha256": "218e79099bdfc7769f09a3015d0c19b63eaeb3ca8657142b8ed7d4722a471929",
+      "selection_stratum": "rescue_control",
+      "rationale": "Match a regression's dataset and initial intervention reason; prefer family/variant, then fixed hash.",
+      "selection_rank_sha256": "ea78514314e01e9a3f85edf485198315afb3a2d8b800fb2185c2dc61e7b6fc97",
+      "family": [
+        "L3-CRP",
+        "FIX",
+        "crossing"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.482643773590642",
+        "width_ratio": "1.0222222222222224",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.4481703599980839",
+        "speed_ratio": "0.8028979310016429",
+        "dcpa_m": "0.7703159418092622",
+        "tcpa_s": "8.406173228517579",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": "3.0"
+      },
+      "historical": {
+        "policy_outcome": "collision:obstacle",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "turn",
+        "first_fire_step": "4",
+        "selected_clearance": "0.08963126292135085",
+        "policy_prefix_repair_clearance": "0.07920460312035357"
+      },
+      "rescue_matching": {
+        "regression_case": "TS2:P2-L3-CRP-FIX-03",
+        "dataset_and_first_reason_exact": true,
+        "priority": 0,
+        "priority_meaning": "same cell and variant",
+        "eligible_remaining_same_dataset_reason": 31
+      }
+    },
+    {
+      "case": "TS2:BAS-CR-RE-022",
+      "scenario_id": "BAS-CR-RE-022",
+      "dataset": "ts2",
+      "seed": 400121,
+      "scenario_sha256": "6e1e9493e1d1d567aea2ee5fa14e840e5211159289fab1fdf1c92194cc6df07e",
+      "selection_stratum": "rescue_control",
+      "rationale": "Match a regression's dataset and initial intervention reason; prefer family/variant, then fixed hash.",
+      "selection_rank_sha256": "1207b83d248836082e8e0b5353f76ab06f63be2ceaf528a46301b233bca6ec79",
+      "family": [
+        "basin-crossing",
+        "RE",
+        "crossing"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.222359982648808",
+        "width_ratio": "1.0000000000000002",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.35989458202462277",
+        "speed_ratio": "0.6447517307648504",
+        "dcpa_m": "2.2756795814494133",
+        "tcpa_s": "13.708064731849763",
+        "obstacle_count_for_matching": "2.0",
+        "fixed_obstacle_count": ""
+      },
+      "historical": {
+        "policy_outcome": "collision:target",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "turn",
+        "first_fire_step": "25",
+        "selected_clearance": "0.16252360819470255",
+        "policy_prefix_repair_clearance": "0.13267894457880777"
+      },
+      "rescue_matching": {
+        "regression_case": "TS2:BAS-CR-RE-070",
+        "dataset_and_first_reason_exact": true,
+        "priority": 0,
+        "priority_meaning": "same cell and variant",
+        "eligible_remaining_same_dataset_reason": 30
+      }
+    },
+    {
+      "case": "DV3:DV3-CRS-CV-10",
+      "scenario_id": "DV3-CRS-CV-10",
+      "dataset": "dv3",
+      "seed": 900201,
+      "scenario_sha256": "5569d261fef39d5506b191a3ef384cffd29656a29911329329e3e9f52368ae35",
+      "selection_stratum": "rescue_control",
+      "rationale": "Match a regression's dataset and initial intervention reason; prefer family/variant, then fixed hash.",
+      "selection_rank_sha256": "03ead9fabcfe2287ac0e1bc6647dee6920d0942e0dc1d005a76583fdc2476bea",
+      "family": [
+        "CRS",
+        "CV",
+        "CRS"
+      ],
+      "static_geometry_metadata": null,
+      "historical": {
+        "policy_outcome": "collision:target",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "brake",
+        "first_fire_step": "9",
+        "selected_clearance": "0.27406517191515556",
+        "policy_prefix_repair_clearance": "0.09090247170074056"
+      },
+      "rescue_matching": {
+        "regression_case": "DV3:DV3-CRS-CV-04",
+        "dataset_and_first_reason_exact": true,
+        "priority": 0,
+        "priority_meaning": "same cell and variant",
+        "eligible_remaining_same_dataset_reason": 4
+      }
+    },
+    {
+      "case": "DV3:DV3-CRP-CV-12",
+      "scenario_id": "DV3-CRP-CV-12",
+      "dataset": "dv3",
+      "seed": 900177,
+      "scenario_sha256": "0b698b07daf443e17c256b57a499509f45ad8c43959a7506c4949df842f478c0",
+      "selection_stratum": "rescue_control",
+      "rationale": "Match a regression's dataset and initial intervention reason; prefer family/variant, then fixed hash.",
+      "selection_rank_sha256": "b9376ec5226080989d9cbb5d6b39860351430dbfc817e10047b0e75fb469b986",
+      "family": [
+        "CRP",
+        "CV",
+        "CRP"
+      ],
+      "static_geometry_metadata": null,
+      "historical": {
+        "policy_outcome": "collision:target",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "turn",
+        "first_fire_step": "11",
+        "selected_clearance": "0.047081295999595596",
+        "policy_prefix_repair_clearance": "-0.1982744722563916"
+      },
+      "rescue_matching": {
+        "regression_case": "DV3:DV3-CRP-CV-16",
+        "dataset_and_first_reason_exact": true,
+        "priority": 0,
+        "priority_meaning": "same cell and variant",
+        "eligible_remaining_same_dataset_reason": 6
+      }
+    },
+    {
+      "case": "DV3:DV3-CRS-CV-01",
+      "scenario_id": "DV3-CRS-CV-01",
+      "dataset": "dv3",
+      "seed": 900192,
+      "scenario_sha256": "52758daeceb092b10e95ecbd252d0d440a44680d494a68278d8e5549eb7e31a4",
+      "selection_stratum": "rescue_control",
+      "rationale": "Match a regression's dataset and initial intervention reason; prefer family/variant, then fixed hash.",
+      "selection_rank_sha256": "66c34fb736a3dd8b0571dc113bff05d8649a66d4baf72682f220c21449ac4a6a",
+      "family": [
+        "CRS",
+        "CV",
+        "CRS"
+      ],
+      "static_geometry_metadata": null,
+      "historical": {
+        "policy_outcome": "collision:target",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "brake",
+        "first_fire_step": "11",
+        "selected_clearance": "0.12169966601673593",
+        "policy_prefix_repair_clearance": "-0.008393478245093983"
+      },
+      "rescue_matching": {
+        "regression_case": "DV3:DV3-CRS-CV-12",
+        "dataset_and_first_reason_exact": true,
+        "priority": 0,
+        "priority_meaning": "same cell and variant",
+        "eligible_remaining_same_dataset_reason": 3
+      }
+    },
+    {
+      "case": "TS2:P2-L1-CRP-FIX-15",
+      "scenario_id": "P2-L1-CRP-FIX-15",
+      "dataset": "ts2",
+      "seed": 470034,
+      "scenario_sha256": "4fb9ec85a8c9eec33926e30b677c424c5efe38e687ee43e560190f6438f16628",
+      "selection_stratum": "rescue_control",
+      "rationale": "Match a regression's dataset and initial intervention reason; prefer family/variant, then fixed hash.",
+      "selection_rank_sha256": "206133aadd68f08fd32818730e1e77bf7d19c6d2f2e1508da88fc75960eec62e",
+      "family": [
+        "L1-CRP",
+        "FIX",
+        "crossing"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.200000000000001",
+        "width_ratio": "1.0",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.5140984434781526",
+        "speed_ratio": "0.9210082000994855",
+        "dcpa_m": "0.7014434332234137",
+        "tcpa_s": "8.308384169287313",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": "3.0"
+      },
+      "historical": {
+        "policy_outcome": "collision:obstacle",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "continue",
+        "first_fire_step": "25",
+        "selected_clearance": "0.06512145902293469",
+        "policy_prefix_repair_clearance": "0.09718902742925366"
+      },
+      "rescue_matching": {
+        "regression_case": "TS2:BAS-CR-CV-045",
+        "dataset_and_first_reason_exact": true,
+        "priority": 2,
+        "priority_meaning": "same scenario class",
+        "eligible_remaining_same_dataset_reason": 7
+      }
+    },
+    {
+      "case": "TS2:P2-L1-CRP-FIX-09",
+      "scenario_id": "P2-L1-CRP-FIX-09",
+      "dataset": "ts2",
+      "seed": 470028,
+      "scenario_sha256": "a98b0cfd293099e17945d31a554bad22f4d6a02fbd5451cc2282534b69a90551",
+      "selection_stratum": "rescue_control",
+      "rationale": "Match a regression's dataset and initial intervention reason; prefer family/variant, then fixed hash.",
+      "selection_rank_sha256": "75b78b232c9c30e3c60ddb4321a9e10bab4915133ee3088add770328ccf96966",
+      "family": [
+        "L1-CRP",
+        "FIX",
+        "crossing"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.200000000000001",
+        "width_ratio": "1.0",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.3433406333969924",
+        "speed_ratio": "0.6150953047952955",
+        "dcpa_m": "2.19745828772721",
+        "tcpa_s": "8.303070236793088",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": "3.0"
+      },
+      "historical": {
+        "policy_outcome": "collision:obstacle",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "continue",
+        "first_fire_step": "26",
+        "selected_clearance": "0.1519158224152593",
+        "policy_prefix_repair_clearance": "0.057176617181778286"
+      },
+      "rescue_matching": {
+        "regression_case": "TS2:BAS-CR-RE-090",
+        "dataset_and_first_reason_exact": true,
+        "priority": 2,
+        "priority_meaning": "same scenario class",
+        "eligible_remaining_same_dataset_reason": 6
+      }
+    },
+    {
+      "case": "TS2:BAS-OT-CV-087",
+      "scenario_id": "BAS-OT-CV-087",
+      "dataset": "ts2",
+      "seed": 400286,
+      "scenario_sha256": "1fbb34e3be89b96892d3d9c1dacbcbbbc4bf1ca6d53feb2e6c717818b3abe328",
+      "selection_stratum": "rescue_control",
+      "rationale": "Match a regression's dataset and initial intervention reason; prefer family/variant, then fixed hash.",
+      "selection_rank_sha256": "f460e4e2b945540ec99d220b65c9a33e9b5d95d5f790913c04a0af7ad8484167",
+      "family": [
+        "basin-overtaking",
+        "CV",
+        "overtaking"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.217505638881894",
+        "width_ratio": "1.0000000000000002",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.2274349765643757",
+        "speed_ratio": "0.4074501315118766",
+        "dcpa_m": "1.9951747776903659",
+        "tcpa_s": "27.572827835496646",
+        "obstacle_count_for_matching": "1.0",
+        "fixed_obstacle_count": ""
+      },
+      "historical": {
+        "policy_outcome": "collision:obstacle",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "turn",
+        "first_fire_step": "19",
+        "selected_clearance": "0.061973562455403905",
+        "policy_prefix_repair_clearance": "-0.004830707013268695"
+      },
+      "rescue_matching": {
+        "regression_case": "TS2:BAS-OT-CV-095",
+        "dataset_and_first_reason_exact": true,
+        "priority": 0,
+        "priority_meaning": "same cell and variant",
+        "eligible_remaining_same_dataset_reason": 29
+      }
+    },
+    {
+      "case": "DV3:DV3-OT-CV-08",
+      "scenario_id": "DV3-OT-CV-08",
+      "dataset": "dv3",
+      "seed": 900225,
+      "scenario_sha256": "e9d084138b3cb39461802427c076c5db01493f606029704e6c0542e8d34b21fa",
+      "selection_stratum": "both_goal_active_dv3",
+      "rationale": "Fixed hash rank within predeclared dataset, historical outcome, and trigger-activity stratum.",
+      "selection_rank_sha256": "09f68e056135700dec6eb52a96648e8eb9c73a501a6750ff9b41fc7fd46557bd",
+      "family": [
+        "OT",
+        "CV",
+        "OT"
+      ],
+      "static_geometry_metadata": null,
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "both_goal",
+        "first_reason": "turn",
+        "first_fire_step": "15",
+        "selected_clearance": "0.18690678831796792",
+        "policy_prefix_repair_clearance": "0.14816939315782096"
+      }
+    },
+    {
+      "case": "TS2:BAS-BO-CV-075",
+      "scenario_id": "BAS-BO-CV-075",
+      "dataset": "ts2",
+      "seed": 400374,
+      "scenario_sha256": "a6633de3c06064baad8b6be4ee07464e8f22e1350d074c53898a90132542f491",
+      "selection_stratum": "both_goal_active_ts2",
+      "rationale": "Fixed hash rank within predeclared dataset, historical outcome, and trigger-activity stratum.",
+      "selection_rank_sha256": "01c9716d85506cc0a936f530554356b41e4293c01c51996e381cf3eb82ee9869",
+      "family": [
+        "basin-being_overtaken",
+        "CV",
+        "being_overtaken"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.212398894805947",
+        "width_ratio": "1.0",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.9253624232965416",
+        "speed_ratio": "1.6577882908067283",
+        "dcpa_m": "1.9081933517027996",
+        "tcpa_s": "10.75434581945098",
+        "obstacle_count_for_matching": "2.0",
+        "fixed_obstacle_count": ""
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "both_goal",
+        "first_reason": "turn",
+        "first_fire_step": "31",
+        "selected_clearance": "0.23006134342737397",
+        "policy_prefix_repair_clearance": "0.10373814193274701"
+      }
+    },
+    {
+      "case": "TS2:BAS-CR-RE-018",
+      "scenario_id": "BAS-CR-RE-018",
+      "dataset": "ts2",
+      "seed": 400117,
+      "scenario_sha256": "da3d73dbbc7d46760f18e823e0b32cd42ccce8b9fde63d140e764d63042da14f",
+      "selection_stratum": "both_goal_active_ts2",
+      "rationale": "Fixed hash rank within predeclared dataset, historical outcome, and trigger-activity stratum.",
+      "selection_rank_sha256": "027c60b0543480d77aa21560a082221aa8d3be1bf53d9119237181de1c706e21",
+      "family": [
+        "basin-crossing",
+        "RE",
+        "crossing"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.200007316122752",
+        "width_ratio": "1.0000000000000002",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.39039397523799513",
+        "speed_ratio": "0.6993914434578694",
+        "dcpa_m": "0.6831058562121795",
+        "tcpa_s": "10.126897285132216",
+        "obstacle_count_for_matching": "0.0",
+        "fixed_obstacle_count": ""
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "both_goal",
+        "first_reason": "brake",
+        "first_fire_step": "3",
+        "selected_clearance": "0.024355176594763217",
+        "policy_prefix_repair_clearance": "-0.4351272148256782"
+      }
+    },
+    {
+      "case": "TS2:CH-CR-CV-091",
+      "scenario_id": "CH-CR-CV-091",
+      "dataset": "ts2",
+      "seed": 400690,
+      "scenario_sha256": "4f93b9a711aef3809ae40844602349a77850ee51a4eac100e5f42a97dfba611c",
+      "selection_stratum": "both_goal_active_ts2",
+      "rationale": "Fixed hash rank within predeclared dataset, historical outcome, and trigger-activity stratum.",
+      "selection_rank_sha256": "02a3a2ae251eb08317b1e5fb5c2269af54f8bd6c73c7294496e995dde2fdc234",
+      "family": [
+        "channel-crossing",
+        "CV",
+        "crossing"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "7.53663073130384",
+        "width_ratio": "1.7839390087436944",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.26859123339020236",
+        "target_speed": "0.4563664829955113",
+        "speed_ratio": "0.8175812987212251",
+        "dcpa_m": "0.7840981918284686",
+        "tcpa_s": "11.586706279843952",
+        "obstacle_count_for_matching": "2.0",
+        "fixed_obstacle_count": ""
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "both_goal",
+        "first_reason": "searched escape",
+        "first_fire_step": "13",
+        "selected_clearance": "0.1504376061962188",
+        "policy_prefix_repair_clearance": "0.0676864732635272"
+      }
+    },
+    {
+      "case": "TS2:CH-OT-CV-051",
+      "scenario_id": "CH-OT-CV-051",
+      "dataset": "ts2",
+      "seed": 400750,
+      "scenario_sha256": "93606f4af42122c21796b5cf4d88b13b1dad44d61d1fb6de656fec32484f16ac",
+      "selection_stratum": "both_goal_active_ts2",
+      "rationale": "Fixed hash rank within predeclared dataset, historical outcome, and trigger-activity stratum.",
+      "selection_rank_sha256": "02fac45dce19d18de629cfcea6fd745020f39e3342e8142ec268078de0173c9d",
+      "family": [
+        "channel-overtaking",
+        "CV",
+        "overtaking"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "7.809028446687921",
+        "width_ratio": "1.3704511249333422",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.03625517314222286",
+        "target_speed": "0.26030953525724526",
+        "speed_ratio": "0.46634495703583556",
+        "dcpa_m": "0.12801055206906597",
+        "tcpa_s": "28.42640364366641",
+        "obstacle_count_for_matching": "1.0",
+        "fixed_obstacle_count": ""
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "both_goal",
+        "first_reason": "turn",
+        "first_fire_step": "38",
+        "selected_clearance": "0.024079854117378258",
+        "policy_prefix_repair_clearance": "-0.17695011363434995"
+      }
+    },
+    {
+      "case": "DV3:DV3-CRP-CV-20",
+      "scenario_id": "DV3-CRP-CV-20",
+      "dataset": "dv3",
+      "seed": 900185,
+      "scenario_sha256": "5da8ab7dfb92d8f5ae03b214154b8b9e029805e79280e1f4e0b4315355f4e67a",
+      "selection_stratum": "both_goal_no_fire_dv3",
+      "rationale": "Fixed hash rank within predeclared dataset, historical outcome, and trigger-activity stratum.",
+      "selection_rank_sha256": "01d8ee2dce796cbd37c113290782d286dbcda239b62e3fe6b319503eb4db89db",
+      "family": [
+        "CRP",
+        "CV",
+        "CRP"
+      ],
+      "static_geometry_metadata": null,
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "both_goal",
+        "first_reason": "no fire",
+        "first_fire_step": "",
+        "selected_clearance": "",
+        "policy_prefix_repair_clearance": ""
+      }
+    },
+    {
+      "case": "TS2:P2-L2-BO-FIX-19",
+      "scenario_id": "P2-L2-BO-FIX-19",
+      "dataset": "ts2",
+      "seed": 470198,
+      "scenario_sha256": "350b2370dedc5876672e105247fe647d16bffab15530b74db511ae5932433d68",
+      "selection_stratum": "both_goal_no_fire_ts2",
+      "rationale": "Fixed hash rank within predeclared dataset, historical outcome, and trigger-activity stratum.",
+      "selection_rank_sha256": "003b8b467b53dfcc4960c483a9f4f2a5d1119090e14b85d7abbcf02c0bebf1e9",
+      "family": [
+        "L2-BO",
+        "FIX",
+        "being_overtaken"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.482643773590642",
+        "width_ratio": "1.0222222222222224",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.8549488443328621",
+        "speed_ratio": "1.5316422492331607",
+        "dcpa_m": "1.8948733852108395",
+        "tcpa_s": "15.129026353954114",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": "3.0"
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "both_goal",
+        "first_reason": "no fire",
+        "first_fire_step": "",
+        "selected_clearance": "",
+        "policy_prefix_repair_clearance": ""
+      }
+    },
+    {
+      "case": "TS2:BAS-BO-RE-024",
+      "scenario_id": "BAS-BO-RE-024",
+      "dataset": "ts2",
+      "seed": 400323,
+      "scenario_sha256": "3bbc413e569d819dacc92e226c677f5dc7b2187b18caea9cd055a9fed1fff31c",
+      "selection_stratum": "both_goal_no_fire_ts2",
+      "rationale": "Fixed hash rank within predeclared dataset, historical outcome, and trigger-activity stratum.",
+      "selection_rank_sha256": "02245032a17f15472c0479711cccb24d05a87be56b3eeb4bf42c1fdcce01d1da",
+      "family": [
+        "basin-being_overtaken",
+        "RE",
+        "being_overtaken"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.358045143545912",
+        "width_ratio": "1.0000000000000004",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "1.0125989720308217",
+        "speed_ratio": "1.814072710166315",
+        "dcpa_m": "1.8798879545510911",
+        "tcpa_s": "11.092760196628806",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": ""
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "both_goal",
+        "first_reason": "no fire",
+        "first_fire_step": "",
+        "selected_clearance": "",
+        "policy_prefix_repair_clearance": ""
+      }
+    },
+    {
+      "case": "TS2:BAS-OT-RE-016",
+      "scenario_id": "BAS-OT-RE-016",
+      "dataset": "ts2",
+      "seed": 400215,
+      "scenario_sha256": "d8a0dcbc36cc82620483faf3d294f536927c58e98c95385266c5aecf787c822e",
+      "selection_stratum": "both_goal_no_fire_ts2",
+      "rationale": "Fixed hash rank within predeclared dataset, historical outcome, and trigger-activity stratum.",
+      "selection_rank_sha256": "0288ea9de733c20ac474d99756b536c8e194253d726c34435fe328954f41f8bc",
+      "family": [
+        "basin-overtaking",
+        "RE",
+        "overtaking"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.313661266320532",
+        "width_ratio": "1.0000000000000002",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.27321717802923995",
+        "speed_ratio": "0.48946902011708704",
+        "dcpa_m": "1.3745240067803763",
+        "tcpa_s": "26.693199239621762",
+        "obstacle_count_for_matching": "2.0",
+        "fixed_obstacle_count": ""
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "both_goal",
+        "first_reason": "no fire",
+        "first_fire_step": "",
+        "selected_clearance": "",
+        "policy_prefix_repair_clearance": ""
+      }
+    },
+    {
+      "case": "TS2:P2-L3-OT-FIX-09",
+      "scenario_id": "P2-L3-OT-FIX-09",
+      "dataset": "ts2",
+      "seed": 470268,
+      "scenario_sha256": "46b0bc5c94eba01124d0c4f8920725768853273db43e6fe3f108e80660b68d50",
+      "selection_stratum": "both_goal_no_fire_ts2",
+      "rationale": "Fixed hash rank within predeclared dataset, historical outcome, and trigger-activity stratum.",
+      "selection_rank_sha256": "02e1c53a56d963d1d94c4c4f45aa5238c282911d14841d0e46066085d053abcd",
+      "family": [
+        "L3-OT",
+        "FIX",
+        "overtaking"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.482643773590642",
+        "width_ratio": "1.0222222222222224",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.25056786928639496",
+        "speed_ratio": "0.44889274655824346",
+        "dcpa_m": "1.2105213102279628",
+        "tcpa_s": "22.86768195066438",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": "3.0"
+      },
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "both_goal",
+        "first_reason": "no fire",
+        "first_fire_step": "",
+        "selected_clearance": "",
+        "policy_prefix_repair_clearance": ""
+      }
+    },
+    {
+      "case": "DV3:DV3-NT-CV-15",
+      "scenario_id": "DV3-NT-CV-15",
+      "dataset": "dv3",
+      "seed": 900134,
+      "scenario_sha256": "a18038f03a1252707c1fded74a34d6c561b5b6e6928acd857fc8d42d5917d20b",
+      "selection_stratum": "both_fail_active_dv3",
+      "rationale": "Fixed hash rank within predeclared dataset, historical outcome, and trigger-activity stratum.",
+      "selection_rank_sha256": "169ac21692932bfa260954b337cd91a6f3d4afe8a42f676cccfcff9c6a2097c8",
+      "family": [
+        "NT",
+        "CV",
+        "NT"
+      ],
+      "static_geometry_metadata": null,
+      "historical": {
+        "policy_outcome": "collision:obstacle",
+        "v4_outcome": "collision:obstacle",
+        "v7_outcome": "collision:obstacle",
+        "v8_outcome": "collision:obstacle",
+        "v8_category": "both_fail",
+        "first_reason": "turn",
+        "first_fire_step": "31",
+        "selected_clearance": "0.00903099546621254",
+        "policy_prefix_repair_clearance": "-0.043616087706401976"
+      }
+    },
+    {
+      "case": "TS2:CH-HO-RE-057",
+      "scenario_id": "CH-HO-RE-057",
+      "dataset": "ts2",
+      "seed": 400556,
+      "scenario_sha256": "b92973a3d5b6597a11154631531ee3b318c54006553acc97bb3ca12d914ad3d3",
+      "selection_stratum": "both_fail_active_ts2",
+      "rationale": "Fixed hash rank within predeclared dataset, historical outcome, and trigger-activity stratum.",
+      "selection_rank_sha256": "01dce5fcfaa6a2e98f840b2e0063ee9c30a73303662ac93ca52ae9b4f7a65de2",
+      "family": [
+        "channel-head_on",
+        "RE",
+        "head_on"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "7.799605674009834",
+        "width_ratio": "1.6109833937316607",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.05101986713633387",
+        "target_speed": "0.5739263851846724",
+        "speed_ratio": "1.0281900552593337",
+        "dcpa_m": "1.1463962549053055",
+        "tcpa_s": "12.685990900254652",
+        "obstacle_count_for_matching": "1.0",
+        "fixed_obstacle_count": ""
+      },
+      "historical": {
+        "policy_outcome": "collision:obstacle",
+        "v4_outcome": "collision:obstacle",
+        "v7_outcome": "collision:obstacle",
+        "v8_outcome": "collision:obstacle",
+        "v8_category": "both_fail",
+        "first_reason": "turn",
+        "first_fire_step": "30",
+        "selected_clearance": "0.008943999955307078",
+        "policy_prefix_repair_clearance": "-0.0758859758303861"
+      }
+    },
+    {
+      "case": "TS2:P2-L2-HO-VAR-16",
+      "scenario_id": "P2-L2-HO-VAR-16",
+      "dataset": "ts2",
+      "seed": 470115,
+      "scenario_sha256": "205e653798f2ce842d0f4a0cde0ad3638013737df9d0988c92e1ea2c2f34932b",
+      "selection_stratum": "both_fail_active_ts2",
+      "rationale": "Fixed hash rank within predeclared dataset, historical outcome, and trigger-activity stratum.",
+      "selection_rank_sha256": "03eebeea01f5275f9b9cac99a78c69173ae330d4d82e838a2e6cece66b6fc7fd",
+      "family": [
+        "L2-HO",
+        "VAR",
+        "head_on"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.482643773590642",
+        "width_ratio": "1.0222222222222224",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.7215678394291545",
+        "speed_ratio": "1.2926899613742209",
+        "dcpa_m": "0.7229273472337814",
+        "tcpa_s": "13.968290181629342",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": "3.0"
+      },
+      "historical": {
+        "policy_outcome": "collision:obstacle",
+        "v4_outcome": "goal",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "both_fail",
+        "first_reason": "continue",
+        "first_fire_step": "15",
+        "selected_clearance": "0.30516115270930944",
+        "policy_prefix_repair_clearance": "-0.11046162128150348"
+      }
+    },
+    {
+      "case": "TS2:P2-L2-HO-VAR-14",
+      "scenario_id": "P2-L2-HO-VAR-14",
+      "dataset": "ts2",
+      "seed": 470113,
+      "scenario_sha256": "f9456f40de727599acadd818277a8398e247cb2bf1d8d899554940a8eac8c46f",
+      "selection_stratum": "both_fail_active_ts2",
+      "rationale": "Fixed hash rank within predeclared dataset, historical outcome, and trigger-activity stratum.",
+      "selection_rank_sha256": "07dc6f90f0e37048e764dd1e0880321cfe67cc6dd799250bd27b76bb5ee3ffb0",
+      "family": [
+        "L2-HO",
+        "VAR",
+        "head_on"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.482643773590642",
+        "width_ratio": "1.0222222222222224",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.5414452004849106",
+        "speed_ratio": "0.9699999598857073",
+        "dcpa_m": "0.0024479198137994373",
+        "tcpa_s": "16.32452062109498",
+        "obstacle_count_for_matching": "3.0",
+        "fixed_obstacle_count": "3.0"
+      },
+      "historical": {
+        "policy_outcome": "collision:obstacle",
+        "v4_outcome": "collision:obstacle",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "both_fail",
+        "first_reason": "turn",
+        "first_fire_step": "14",
+        "selected_clearance": "0.23165536383381385",
+        "policy_prefix_repair_clearance": "0.1268080034049553"
+      }
+    },
+    {
+      "case": "DV3:DV3-BO-CV-10",
+      "scenario_id": "DV3-BO-CV-10",
+      "dataset": "dv3",
+      "seed": 900253,
+      "scenario_sha256": "283a85ae071a8ee86173bf69c7760708605970b95d099af05697f4146c6b60cb",
+      "selection_stratum": "both_fail_no_fire_dv3",
+      "rationale": "Fixed hash rank within predeclared dataset, historical outcome, and trigger-activity stratum.",
+      "selection_rank_sha256": "0a61a534cb58a455b9298e5da44723ee888e1082510d3ef077787a2836daf6e2",
+      "family": [
+        "BO",
+        "CV",
+        "BO"
+      ],
+      "static_geometry_metadata": null,
+      "historical": {
+        "policy_outcome": "collision:obstacle",
+        "v4_outcome": "collision:obstacle",
+        "v7_outcome": "collision:obstacle",
+        "v8_outcome": "collision:obstacle",
+        "v8_category": "both_fail",
+        "first_reason": "no fire",
+        "first_fire_step": "",
+        "selected_clearance": "",
+        "policy_prefix_repair_clearance": ""
+      }
+    },
+    {
+      "case": "TS2:BAS-NU-CV-043",
+      "scenario_id": "BAS-NU-CV-043",
+      "dataset": "ts2",
+      "seed": 400442,
+      "scenario_sha256": "dd1501840aa57c630657295ebef372f43819e0cd22fc5a0dbe74d5df2477d5c7",
+      "selection_stratum": "both_fail_no_fire_ts2",
+      "rationale": "Fixed hash rank within predeclared dataset, historical outcome, and trigger-activity stratum.",
+      "selection_rank_sha256": "5d8d16a35995d65011edf57a36a01782f051b8b50fd55979cdff219d8c30c3a9",
+      "family": [
+        "basin-null",
+        "CV",
+        "null"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.264314958932058",
+        "width_ratio": "1.0000000000000004",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.5896868718133897",
+        "speed_ratio": "1.0564249927635236",
+        "dcpa_m": "8.362687385109988",
+        "tcpa_s": "7.334858382846761",
+        "obstacle_count_for_matching": "2.0",
+        "fixed_obstacle_count": ""
+      },
+      "historical": {
+        "policy_outcome": "collision:boundary",
+        "v4_outcome": "collision:boundary",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "both_fail",
+        "first_reason": "no fire",
+        "first_fire_step": "",
+        "selected_clearance": "",
+        "policy_prefix_repair_clearance": ""
+      }
+    },
+    {
+      "case": "TS2:BAS-HO-NC-002",
+      "scenario_id": "BAS-HO-NC-002",
+      "dataset": "ts2",
+      "seed": 400001,
+      "scenario_sha256": "99293eee7c7992a16018409fa52f449462991d5ad4fe11349fe573e970f93da7",
+      "selection_stratum": "both_fail_no_fire_ts2",
+      "rationale": "Fixed hash rank within predeclared dataset, historical outcome, and trigger-activity stratum.",
+      "selection_rank_sha256": "79073d54c85bc7fc5fb7faa3d1151c9dade1b4946235559d5d79343ad3b49998",
+      "family": [
+        "basin-head_on",
+        "NC",
+        "head_on"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.222510656862553",
+        "width_ratio": "1.0000000000000002",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.5449749651000181",
+        "speed_ratio": "0.9763235389514999",
+        "dcpa_m": "1.13358741649509",
+        "tcpa_s": "15.533441547303234",
+        "obstacle_count_for_matching": "2.0",
+        "fixed_obstacle_count": ""
+      },
+      "historical": {
+        "policy_outcome": "collision:target",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "collision:target",
+        "v8_outcome": "collision:target",
+        "v8_category": "both_fail",
+        "first_reason": "no fire",
+        "first_fire_step": "",
+        "selected_clearance": "",
+        "policy_prefix_repair_clearance": ""
+      }
+    },
+    {
+      "case": "TS2:BAS-CR-CV-027",
+      "scenario_id": "BAS-CR-CV-027",
+      "dataset": "ts2",
+      "seed": 400126,
+      "scenario_sha256": "6d154397e6644ecffcef27bacb19ea6475348fc1dd37595371691acde378685b",
+      "selection_stratum": "both_fail_no_fire_ts2",
+      "rationale": "Fixed hash rank within predeclared dataset, historical outcome, and trigger-activity stratum.",
+      "selection_rank_sha256": "8040e12684d0968571834799aa6c08c77d264e5d45833fdd630728e8c564b69e",
+      "family": [
+        "basin-crossing",
+        "CV",
+        "crossing"
+      ],
+      "static_geometry_metadata": {
+        "nominal_width": "9.200001417707888",
+        "width_ratio": "1.0000000000000002",
+        "bend_deg": "0.0",
+        "path_offset_frac": "0.0",
+        "target_speed": "0.4864829789384158",
+        "speed_ratio": "0.8715350503296108",
+        "dcpa_m": "0.5733015671944983",
+        "tcpa_s": "8.360990553197746",
+        "obstacle_count_for_matching": "0.0",
+        "fixed_obstacle_count": ""
+      },
+      "historical": {
+        "policy_outcome": "collision:target",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "collision:target",
+        "v8_outcome": "collision:target",
+        "v8_category": "both_fail",
+        "first_reason": "no fire",
+        "first_fire_step": "",
+        "selected_clearance": "",
+        "policy_prefix_repair_clearance": ""
+      }
+    }
+  ],
+  "dataset_counts": {
+    "ts2": 30,
+    "dv3": 10
+  },
+  "historical_category_counts": {
+    "broken": 11,
+    "rescued": 11,
+    "both_goal": 10,
+    "both_fail": 8
+  },
+  "historical_mode_goal_counts": {
+    "policy": 21,
+    "v4": 25,
+    "v7": 21,
+    "v8": 21
+  },
+  "limitations": [
+    "Historical outcomes intentionally define diagnostic strata; no representative population estimate or statistical significance claim is justified.",
+    "All 11 previously unselected known SAC-to-V8 regressions are included; coverage does not imply all possible candidate regressions are known.",
+    "Rescue matching is categorical diagnostic balancing, not causal matching, a learned classifier, or a runtime controller rule.",
+    "Saved outcomes are historical references. Fresh versus historical comparisons require source/model/seed provenance qualification; no fresh baseline outcomes are fabricated.",
+    "Numeric geometry metadata is available from saved TS2 analysis; DV3 geometry is pinned by canonical digest without importing or regenerating scenarios.",
+    "No simulator, model inference, environment reset, or episode execution occurs in this selection script."
+  ]
+}

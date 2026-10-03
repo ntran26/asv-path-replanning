@@ -1,0 +1,356 @@
+{
+  "scope": "Metadata/scoring from saved traces only. Exact-source existing-track priority deliberately ignores freshness and quality; no new gate or episode was evaluated.",
+  "trace": "results/safety_dev/v10_iterations/persistence_three/traces/001_v11.jsonl",
+  "trace_sha256": "7667f6a87c3ce27e344763429f9267285ef06bf850b1bd8d9e4c25b20ec5f12d",
+  "case": "TS2:P2-L1-CRP-FIX-05",
+  "frames": [
+    {
+      "step": 16,
+      "tracks": [
+        {
+          "id": -1000001,
+          "position_error_m_scoring_only": 0.03551728533019553,
+          "speed_mps": 0.3400069649642681,
+          "published_dynamic": false,
+          "provisional_retained_dynamic": false,
+          "raw_hits": null,
+          "raw_misses": null,
+          "raw_current_fit": null
+        }
+      ]
+    },
+    {
+      "step": 17,
+      "tracks": [
+        {
+          "id": 4,
+          "position_error_m_scoring_only": 0.04569260174454803,
+          "speed_mps": 0.3993336084495826,
+          "published_dynamic": false,
+          "provisional_retained_dynamic": false,
+          "raw_hits": 8,
+          "raw_misses": 0,
+          "raw_current_fit": true
+        },
+        {
+          "id": -1000001,
+          "position_error_m_scoring_only": 0.04569260174454803,
+          "speed_mps": 0.4000397153518459,
+          "published_dynamic": false,
+          "provisional_retained_dynamic": false,
+          "raw_hits": null,
+          "raw_misses": null,
+          "raw_current_fit": null
+        }
+      ]
+    },
+    {
+      "step": 18,
+      "tracks": [
+        {
+          "id": 4,
+          "position_error_m_scoring_only": 0.3398215706044252,
+          "speed_mps": 0.42984562334176896,
+          "published_dynamic": true,
+          "provisional_retained_dynamic": false,
+          "raw_hits": 9,
+          "raw_misses": 0,
+          "raw_current_fit": true
+        },
+        {
+          "id": -1000001,
+          "position_error_m_scoring_only": 0.01978039033923243,
+          "speed_mps": 0.41174756318541084,
+          "published_dynamic": false,
+          "provisional_retained_dynamic": false,
+          "raw_hits": null,
+          "raw_misses": null,
+          "raw_current_fit": null
+        }
+      ]
+    },
+    {
+      "step": 19,
+      "tracks": [
+        {
+          "id": 4,
+          "position_error_m_scoring_only": 0.34485547340668893,
+          "speed_mps": 0.42529061595720274,
+          "published_dynamic": true,
+          "provisional_retained_dynamic": false,
+          "raw_hits": 10,
+          "raw_misses": 0,
+          "raw_current_fit": true
+        },
+        {
+          "id": -1000001,
+          "position_error_m_scoring_only": 0.25373460930260183,
+          "speed_mps": 0.42496564905991246,
+          "published_dynamic": false,
+          "provisional_retained_dynamic": false,
+          "raw_hits": null,
+          "raw_misses": null,
+          "raw_current_fit": null
+        }
+      ]
+    },
+    {
+      "step": 20,
+      "tracks": [
+        {
+          "id": 4,
+          "position_error_m_scoring_only": 0.2335981290884568,
+          "speed_mps": 0.19495309763326046,
+          "published_dynamic": true,
+          "provisional_retained_dynamic": false,
+          "raw_hits": 11,
+          "raw_misses": 0,
+          "raw_current_fit": true
+        },
+        {
+          "id": -1000001,
+          "position_error_m_scoring_only": 0.2618049518253734,
+          "speed_mps": 0.42496564905991246,
+          "published_dynamic": false,
+          "provisional_retained_dynamic": false,
+          "raw_hits": null,
+          "raw_misses": null,
+          "raw_current_fit": null
+        }
+      ]
+    },
+    {
+      "step": 21,
+      "tracks": [
+        {
+          "id": 4,
+          "position_error_m_scoring_only": 0.31683586936229075,
+          "speed_mps": 0.09109221831527045,
+          "published_dynamic": true,
+          "provisional_retained_dynamic": false,
+          "raw_hits": 12,
+          "raw_misses": 0,
+          "raw_current_fit": true
+        },
+        {
+          "id": -1000001,
+          "position_error_m_scoring_only": 0.26990326066129344,
+          "speed_mps": 0.42496564905991246,
+          "published_dynamic": false,
+          "provisional_retained_dynamic": false,
+          "raw_hits": null,
+          "raw_misses": null,
+          "raw_current_fit": null
+        }
+      ]
+    },
+    {
+      "step": 22,
+      "tracks": [
+        {
+          "id": 4,
+          "position_error_m_scoring_only": 0.4216275262990058,
+          "speed_mps": 0.10357238206107672,
+          "published_dynamic": true,
+          "provisional_retained_dynamic": false,
+          "raw_hits": 13,
+          "raw_misses": 0,
+          "raw_current_fit": true
+        },
+        {
+          "id": -1000001,
+          "position_error_m_scoring_only": 0.2780270920322006,
+          "speed_mps": 0.42496564905991246,
+          "published_dynamic": false,
+          "provisional_retained_dynamic": false,
+          "raw_hits": null,
+          "raw_misses": null,
+          "raw_current_fit": null
+        }
+      ]
+    },
+    {
+      "step": 23,
+      "tracks": [
+        {
+          "id": 4,
+          "position_error_m_scoring_only": 0.5343434832081676,
+          "speed_mps": 0.12103785042742628,
+          "published_dynamic": false,
+          "provisional_retained_dynamic": true,
+          "raw_hits": 14,
+          "raw_misses": 0,
+          "raw_current_fit": true
+        },
+        {
+          "id": -1000001,
+          "position_error_m_scoring_only": 0.28617427236761894,
+          "speed_mps": 0.42496564905991246,
+          "published_dynamic": false,
+          "provisional_retained_dynamic": false,
+          "raw_hits": null,
+          "raw_misses": null,
+          "raw_current_fit": null
+        }
+      ]
+    },
+    {
+      "step": 24,
+      "tracks": [
+        {
+          "id": 4,
+          "position_error_m_scoring_only": 0.6483308079765553,
+          "speed_mps": 0.16550754287282315,
+          "published_dynamic": false,
+          "provisional_retained_dynamic": true,
+          "raw_hits": 15,
+          "raw_misses": 0,
+          "raw_current_fit": false
+        },
+        {
+          "id": -1000001,
+          "position_error_m_scoring_only": 0.29434286283068145,
+          "speed_mps": 0.42496564905991246,
+          "published_dynamic": false,
+          "provisional_retained_dynamic": false,
+          "raw_hits": null,
+          "raw_misses": null,
+          "raw_current_fit": null
+        }
+      ]
+    },
+    {
+      "step": 25,
+      "tracks": [
+        {
+          "id": 4,
+          "position_error_m_scoring_only": 0.051991839145658844,
+          "speed_mps": 0.14433735133673686,
+          "published_dynamic": false,
+          "provisional_retained_dynamic": true,
+          "raw_hits": 16,
+          "raw_misses": 0,
+          "raw_current_fit": true
+        },
+        {
+          "id": -1000001,
+          "position_error_m_scoring_only": 0.3025311291529458,
+          "speed_mps": 0.42496564905991246,
+          "published_dynamic": false,
+          "provisional_retained_dynamic": false,
+          "raw_hits": null,
+          "raw_misses": null,
+          "raw_current_fit": null
+        }
+      ]
+    },
+    {
+      "step": 26,
+      "tracks": [
+        {
+          "id": 4,
+          "position_error_m_scoring_only": 0.8767802522919185,
+          "speed_mps": 0.16479023196857848,
+          "published_dynamic": true,
+          "provisional_retained_dynamic": false,
+          "raw_hits": 17,
+          "raw_misses": 0,
+          "raw_current_fit": false
+        },
+        {
+          "id": -1000001,
+          "position_error_m_scoring_only": 0.31073751589842363,
+          "speed_mps": 0.42496564905991246,
+          "published_dynamic": false,
+          "provisional_retained_dynamic": false,
+          "raw_hits": null,
+          "raw_misses": null,
+          "raw_current_fit": null
+        }
+      ]
+    },
+    {
+      "step": 27,
+      "tracks": [
+        {
+          "id": 4,
+          "position_error_m_scoring_only": 1.0009726631790417,
+          "speed_mps": 0.16479023196857848,
+          "published_dynamic": true,
+          "provisional_retained_dynamic": false,
+          "raw_hits": 17,
+          "raw_misses": 1,
+          "raw_current_fit": false
+        },
+        {
+          "id": -1000001,
+          "position_error_m_scoring_only": 0.3189606244348361,
+          "speed_mps": 0.42496564905991246,
+          "published_dynamic": false,
+          "provisional_retained_dynamic": false,
+          "raw_hits": null,
+          "raw_misses": null,
+          "raw_current_fit": null
+        }
+      ]
+    },
+    {
+      "step": 28,
+      "tracks": [
+        {
+          "id": 4,
+          "position_error_m_scoring_only": 1.1278495457304956,
+          "speed_mps": 0.16479023196857848,
+          "published_dynamic": true,
+          "provisional_retained_dynamic": false,
+          "raw_hits": 17,
+          "raw_misses": 2,
+          "raw_current_fit": false
+        },
+        {
+          "id": -1000001,
+          "position_error_m_scoring_only": 0.32719919401790837,
+          "speed_mps": 0.42496564905991246,
+          "published_dynamic": false,
+          "provisional_retained_dynamic": false,
+          "raw_hits": null,
+          "raw_misses": null,
+          "raw_current_fit": null
+        }
+      ]
+    },
+    {
+      "step": 29,
+      "tracks": [
+        {
+          "id": 4,
+          "position_error_m_scoring_only": 1.256598021217332,
+          "speed_mps": 0.16479023196857848,
+          "published_dynamic": true,
+          "provisional_retained_dynamic": false,
+          "raw_hits": 17,
+          "raw_misses": 3,
+          "raw_current_fit": false
+        },
+        {
+          "id": -1000001,
+          "position_error_m_scoring_only": 0.33545208549813443,
+          "speed_mps": 0.42496564905991246,
+          "published_dynamic": false,
+          "provisional_retained_dynamic": false,
+          "raw_hits": null,
+          "raw_misses": null,
+          "raw_current_fit": null
+        }
+      ]
+    }
+  ],
+  "findings": [
+    "At23?25 source4 is absent from env published dynamic IDs but retained by ProvisionalTrackPerception.",
+    "At27?29 source4 is still published dynamic despite1?3 consecutive misses and no current fit.",
+    "At29 source4 centre error1.2566m versus persistent source4 error0.3355m; existing priority would suppress the better-scoring hypothesis at this stored state.",
+    "BAS-CR-RE-072 standard trace confirms base source4 present but lacks raw publication/miss metadata; anchor refresh events at4?7 establish current matched full-extent observations there. No per-frame raw freshness inference beyond recorded evidence."
+  ],
+  "v12_option": "existing_track_priority",
+  "no_outcome_counterfactual": true
+}

@@ -1,0 +1,20 @@
+{
+  "created_utc": "2026-10-03T11:35:27.791627+00:00",
+  "rule": "Advance a candidate only if it has at least the V16 development goal count and loses none of V16 successful cases. Among eligible candidates choose greatest goal count, then V19 on a tie. If neither qualifies, primary quick comparison is OFF versus V16 only. This rule does not claim all SAC successes are preserved.",
+  "development_scenarios": 12,
+  "development_modes": [
+    "v16",
+    "v18",
+    "v19"
+  ],
+  "development_runs": 36,
+  "primary_scenarios": 18,
+  "primary_modes_if_candidate_qualifies": [
+    "off",
+    "v16",
+    "eligible_candidate"
+  ],
+  "max_new_runs_this_batch": 90,
+  "primary_cases": "results/safety_dev/testset_v3_main/quick_v18_case_list.json",
+  "primary_tuning": false
+}

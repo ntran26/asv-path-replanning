@@ -1,8 +1,120 @@
 # Safety layer — debugging handoff (2026-10-02)
 
+**Complete standalone history:** [SAFETY_LAYER_COMPLETE_SUMMARY.md](SAFETY_LAYER_COMPLETE_SUMMARY.md) consolidates V1-V19, citations, results, diagnosed failures, rejected approaches and the requirements for a defensible safety guarantee. Read it first for a new research session; this file retains the chronological handoff history.
+
 This is a self-contained brief for continuing the safety-layer work in a new session.
 
 Project root: `asv-lidar/static_dynamic_obstacles`. Run every command from that folder.
+
+## Latest continuation: reachability containment prototype (2026-10-03)
+
+Read [SAFETY_REACHABILITY_STAGE1_PLAN.md](SAFETY_REACHABILITY_STAGE1_PLAN.md) and [the saved-data results](../results/safety_dev/reachability_stage1/README.md). The new standalone `src/safety_reachability.py` models a conditional interval extension of the numerical plant; it is not a numbered controller or an online certificate. SAC/V16, constants, environment and checkpoint remain unchanged. There were zero new episodes and 101 focused tests passed.
+
+BAS-NU decision 11: initial and 0.5-second recorded states are contained under the declared bounds, but both tested interval expressions exceed a usefulness guard at 1 second of the requested 8 seconds. Exact algebra reduces the 0.5-second x/y interval widths from 1.083/1.149 m to 0.802/0.811 m; this remains too broad for close clearance. BAS-HO records an 81.884644-degree target turn over 0.5 seconds, contradicting a global 8 degrees/s envelope. Gaussian sensor/parameter noise has no declared finite support; the diagnostic's three-sigma boxes are conditional hypotheses, not guaranteed limits. Target corridor resets and the mismatch between boundary predicates remain explicit model obligations.
+
+Both source versions, assumptions, widths and hashes are preserved under `results/safety_dev/reachability_stage1/`. No mission-safety or success-rate improvement is claimed. The next step needs useful dependence-preserving enclosures and full hybrid target/geometry semantics, followed by a verified feedback/terminal continuation. Do not promote this prototype or shrink its bounds to make saved trajectories pass.
+
+## Latest continuation: V18/V19 and disk cleanup (2026-10-03)
+
+Start with `results/safety_dev/v18_development/report.md` and the V18/V19 plans. All90 new runs are complete:36 targeted development runs (12 scenarios x V16/V18/V19) and54 primary-v3 subset runs (18 scenarios x OFF/V16/V19). No retries or evaluations remain queued.
+
+Neither new candidate improves the measured goal count over V16; neither is promoted. Development results are5/12 for all three filters, retaining the same six broken SAC successes. V18 activates but changes no commands; V19 changes one boundary failure to an obstacle failure. On the separately frozen18-case primary subset, fresh SAC reaches14 goals and V16/V19 each reach15, rescuing the same case and preserving all14 SAC successes. This is18/1000 v3 scenarios, not the full benchmark or proof of100% safety. The subset was selected from metadata before outcomes; no primary tuning occurred.
+
+585 completed trace files were losslessly NTFS-compressed, recovering974,323,274 allocated bytes (0.907GiB), with every content hash preserved. Paths, source archives, results and scene caches remain intact; no files were deleted. Final verification is `results/safety_dev/v18_development/final_verification.json`. Native versions18/19 are selectable; defaults, constants, checkpoint and Paper2 remain unchanged. Other jobs were not signalled or stopped.
+
+Two further causal physical-model-bank audits (one-step and continuous training objectives) still failed broader held-forward prediction checks. Neither is integrated; stop that family without further weight/window tuning. Citations and evidence are in the plans and `v10_iterations/audits/bootstrap_*bank_cohort/`. The earlier399-run campaign below is a separate completed batch.
+
+## Primary evaluation target: test set v3 (user update, 2026-10-03)
+
+**Test set v3 is now the main evaluation set.** Start with `planning/SAFETY_EVALUATION_PROTOCOL.md` and `results/safety_dev/testset_v3_main/README.md`. The canonical frozen set has 1,000 cases (664 frozen-derived, 336 field-layout); 755 geometry/seed pairs are shared with v2 and 245 are new or changed. It is not wholly unseen because v2 was used for development. Earlier v2/DV3 results below remain historical development evidence, not v3 results.
+
+The generic safety runner now defaults to the complete v3 selection and writes TS3 results under `results/safety_dev/testset_v3_main/runs/<tag>/`. Explicit historical selections keep their old output root. IDs are namespaced `TS3:` and checked against the original cached geometry and episode seeds; no scene regeneration occurs. A `--cases` quick subset is explicitly labelled as a subset, not the full benchmark.
+
+Primary comparison: the unchanged SAC baseline 3 kept best at 3M policy, safety OFF versus frozen V16. The saved v3 SAC result is 853/1,000 goals (71 obstacle, 66 target, 10 boundary contacts), but 755 rows were reused and no source/config/checkpoint archive was saved. Treat it as historical; use fresh matched OFF/V16 for current-runtime comparison. V17 was not promoted. Do not tune on the primary evaluation outcomes without a new explicit change of scope.
+
+The benchmark switch prepares the suite and runner; it does not itself launch a new evaluation. Full paired evaluation means 2,000 episode runs. Keep at most two evaluation processes and protect the active `pilot_v4_A` training. No old queue, constants, checkpoint, Paper 2 folder or completed result ledger is changed.
+
+## Previous completed work: V16, V17 and paired challenge (2026-10-03)
+
+Start with `results/safety_dev/v10_iterations/report.md`, `planning/SAFETY_LAYER_V16_PLAN.md` and `planning/SAFETY_LAYER_V17_PLAN.md`. All **399 new episode runs are complete**, covering 72 distinct scenarios across 19 experiment tags, with no retries or queued evaluations. `final_verification.json` and `campaign_status.json` record completion and unchanged constants/checkpoint hashes. The earlier 96-run V9 pilot and all older ledgers remain separate.
+
+**The user objective is not achieved.** Default V16 reaches 25/32 goals versus SAC/V9 16, rescuing 11 SAC failures and preserving 14/16 SAC successes. All six successful controls remain goals. BAS-HO-NC-059 (target) and BAS-NU-CV-070 (boundary) are the two broken SAC successes. There are four target, two obstacle and one boundary contacts. See `reports/motion_axis32` in the campaign folder for the verified disjoint 5+27 cohort.
+
+On the separate, previously frozen 40-case challenge, fresh SAC reaches 21 goals and V16 reaches 25. V16 rescues 8/19 failures, preserves 17/21 SAC successes and all 10 successful controls. The four lost SAC successes are DV3-CRS-CV-04, P2-L2-CRS-FIX-19 and P2-L3-BO-FIX-09 (boundary), and P2-L3-CRP-FIX-03 (target). Boundary contacts increase 1 to 6. Fresh SAC reproduces all 40 historical outcomes. See `reports/v16_broader40_paired`. These enriched development cohorts do not estimate full-suite success rates; keep their denominators separate.
+
+V16 adds motion-axis known-hull completion for eligible fresh base tracks. V15 adds conditional current-policy-prefix search using the exact parent's selection floor. Earlier versions improve motion admission/persistence and partial-hull estimates. Citations, tests and limitations are in implementations and plans. Runtime truth, scenario IDs and future policy actions are not used. Native versions through 17 are selectable; existing defaults remain unchanged. Native integration occurred after evaluated source freezes, with separate V16/V17 source/newline audits. The diagnostic runner explicitly installed and verified the requested class during evaluation.
+
+Two final shortcuts did not improve the result. V16 with `prefer_any_feasible_policy=True` reaches 3/9 versus default V16 6/9, with zero gains and three losses. V17's fresh measured-yaw option reaches 6/9: it rescues DV3-HO-VS-01 but loses P2-L2-HO-FIX-19, leaving the same two broken SAC successes. Keep V16 as the stronger measured candidate; neither option is promoted. Verified reports are under `reports/v16_feasible_probe9` and `reports/v17_fresh_yaw_probe9`.
+
+Key remaining mechanisms: BAS-NU has own-vessel prediction error against static geometry despite a successful recorded SAC continuation. BAS-HO combines a lower-margin passing policy backup, sharply changing target behaviour on the recorded V16 branch, and delayed persistent-track refresh; future target states on the SAC-only branch were not recorded. Audits: `bas_nu_v15_gate`, `bas070_initial_state_decomposition`, `bas_ho_v16_first_divergence`. A causal past-measurement yaw-response gain fit improved one-step errors but worsened continuous forecasts on most tested V15 cases; it is rejected for production. See `audits/causal_yaw_response_cohort`. Do not turn that diagnostic fit into a released controller or claim the remaining failures are unavoidable.
+
+Tests passed: 184 focused V16/core/report checks, 23 new yaw-observer tests, 28 final native-dispatch checks and 76 reporting checks. Counts overlap. The only warning was a third-party NumPy deprecation. No other training jobs were signalled or stopped.
+
+The latest user request authorizes continuing development evaluations. Earlier saved-only restrictions and numerical caps below are historical and superseded for this continuation; do not ask for the same authorization again. Keep at most two evaluation processes; preserve other jobs, constants, checkpoints, Paper 2 and all old ledgers. Test-set-v2 and DV3 are development data by explicit user instruction; other held-out sets remain unsuitable for tuning.
+
+Runner: `tools/diagnostics/safety/safety_candidate_iteration.py`; saved-data validator: `report_safety_iteration.py`. Every tag reserves attempts and stores source/settings/checkpoint/scene hashes, individual results, decision traces and a completion token. Do not overwrite tags, silently retry failures, restart the old 8,670-record queue, or count repeated versions as extra scenario coverage.
+
+## Historical result: fresh V9 pilot (2026-10-03)
+
+The user explicitly authorized new episodes to compare V9. The separate campaign
+`results/safety_dev/v9_paired_pilot/` is **complete: 96 fresh runs, no retries**,
+32 fixed scenarios x SAC alone/V8/default V9, one process and one Torch thread,
+28 minutes. No older queue or ledger was restarted. Start with its `report.md`
+and `planning/SAFETY_LAYER_V9_PLAN.md`.
+
+**V9 did not improve the net goal count in this pilot:** all three controllers
+reach 16/32. V9 gains six goals over V8 and loses six. Relative to SAC, V8 rescues
+10 failures and loses 10 successes; V9 rescues five and loses five. The cohort
+is enriched for known failures, rescues and broken successes, so 50% is not a
+new full-test-set success estimate. Selected TS2: V8 12/27, V9 15/27; selected
+DV3: V8 4/5, V9 1/5. All six successful controls remain successful.
+
+Eleven goal switches first diverge when V9 rejects `last certificate` (five
+gains, six losses). One further gain first diverges at `policy margin dominates`
+(`P2-L2-HO-FIX-19`). Later decisions also differ; independent guard ablations
+have not been measured. V9 made 106 changed actions versus V8's 393, but lower
+intervention did not increase net success. Three known never-triggered target
+collisions persist. Keep V9 experimental; this does not justify replacing V8.
+
+`paired.csv` records the first different executed command and paired margins;
+`traces/` contains 4,208 decision records. `verification.json` independently
+confirms all96 unique attempts/results/traces, all32 matched triples, all64
+historical SAC/V8 outcomes reproduced, and matching source/cache/model hashes.
+The exact evaluated sources are archived. Reporting tests: 17 passed. No
+controller thresholds, constants, checkpoint, Paper 2 project or other jobs
+were changed. No extra episodes or ablations are queued.
+
+## Prior offline follow-up: V8 audit and experimental V9 (2026-10-03)
+
+The V8 plan was read and the saved counterfactual results were audited; no new
+episodes were run at that stage. Its then-current restriction permitted saved-data
+analysis and code tests only; the later pilot above was separately authorized.
+Do not restart the completed phases or any old
+evaluation queue. Start with `results/safety_dev/v8_followup_offline/report.md`
+and `planning/SAFETY_LAYER_V9_PLAN.md`.
+
+Confirmed saved outcomes: V8 912/1000 test-set-v2 goals, 57 rescues and 17 lost
+SAC successes; DV3 127/150, 20 rescues and four losses. V8's unchecked stored-plan
+fallback remains: `last certificate` first fires produce 0 rescues/3 losses in
+test set v2 but 4 rescues/1 loss in DV3. Removing it has no established net gain.
+Three never-intervened target collisions still show positive predicted margins
+at their last decision; snapshots/tracks needed to diagnose them were not saved.
+
+V8 now disables hold-back using an instance method rather than temporarily
+mutating a shared constant; serial behavior is preserved. Experimental V9
+requires an override's complete proposed backup to pass its current check and
+prefers SAC when the same backup tail after SAC's action also passes with at
+least as much clearance. These guards have separate switches. Optional CV plus
+turning-target hypotheses are implemented but disabled by default (turn rate 0).
+Native runtime `SAFETY_VERSION = 9` and suite CLIs select the candidate; the
+counterfactual runner now instantiates the requested class and records versions.
+
+V9 initially had no episode-level result; the fresh pilot above now supplies one.
+Current model feasibility is not a formal
+safety guarantee, and rejecting an unsafe override can return an unchecked
+policy action. Detailed method citations, synthetic tests, source hashes and
+remaining case inventories are in the linked plan/report. The old V8 episode
+test was not run. Constants, SAC, Paper 2's project and live PPO work are untouched.
 
 ## NEXT DIRECTION (user, 2026-10-03): a trigger that does not fire when the policy would succeed
 
@@ -33,7 +145,7 @@ not fire when the policy would solve the case without it.
 > certified escape, the policy's action stands. Hold-back was the only first-fire reason with more
 > breaks than rescues.
 
-**Run budget:** this plan needs new episode runs. The earlier instruction (saved-data analysis and
+**Historical run budget (superseded by the current authorization above):** this plan needed new episode runs. The earlier instruction (saved-data analysis and
 code tests only) still stands until the user lifts it, so **confirm the run budget with the user
 before starting any episodes.**
 
@@ -144,7 +256,7 @@ Roughly 2–4 h on 2 processes.
 
 The user now explicitly designates the 1,000 test-set-v2 cases for safety-layer
 development, superseding the earlier held-out restriction for those cases only.
-The latest budget answer is **no new runs: saved-data analysis and code tests
+The historical budget answer for this completed phase was **no new runs: saved-data analysis and code tests
 only**. Zero episodes were run in this continuation. Do not consume the old
 remaining V6 slot, restart an evaluation, or count v2 as untouched validation
 for the safety layer developed from it.

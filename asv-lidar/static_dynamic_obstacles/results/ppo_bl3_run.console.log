@@ -3,3 +3,10 @@
 2026-10-03 03:59:24    ppos0_bl3 2.5 M exit 0
 2026-10-03 03:59:25 == ppos0_bl3: 2.5 M -> 3.0 M
 2026-10-03 04:01:58    pinned learner 12172
+2026-10-03 11:37:15    ppos0_bl3 3.0 M exit 0
+2026-10-03 11:38:23 == ppo seed 0: already trained
+2026-10-03 11:44:20    tier 1 ppos0_bl3 supervisor off exit 0
+2026-10-03 11:50:11    tier 1 ppos0_bl3 supervisor on exit 0
+2026-10-03 12:58:42    frozen suite ppos0_bl3 exit 0
+2026-10-03 14:24:41    Paper 2 set ppos0_bl3 exit 0
+2026-10-03 14:24:41 == ppo seed 0 done

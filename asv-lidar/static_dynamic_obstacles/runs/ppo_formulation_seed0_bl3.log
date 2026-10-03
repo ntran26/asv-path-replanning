@@ -13881,3 +13881,139 @@ Early stopping at step 3 due to reaching max kl: 0.05
 |    std                  | 0.451      |
 |    value_loss           | 0.999      |
 ----------------------------------------
+Early stopping at step 1 due to reaching max kl: 0.05
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 50.9        |
+|    ep_rew_mean          | -162        |
+| time/                   |             |
+|    fps                  | 19          |
+|    iterations           | 95          |
+|    time_elapsed         | 25410       |
+|    total_timesteps      | 2986400     |
+| train/                  |             |
+|    approx_kl            | 0.027942678 |
+|    clip_fraction        | 0.207       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.25       |
+|    explained_variance   | 0.786       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.434       |
+|    n_updates            | 2753        |
+|    policy_gradient_loss | 0.00381     |
+|    std                  | 0.451       |
+|    value_loss           | 1.09        |
+-----------------------------------------
+Early stopping at step 1 due to reaching max kl: 0.05
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 49          |
+|    ep_rew_mean          | -143        |
+| time/                   |             |
+|    fps                  | 19          |
+|    iterations           | 96          |
+|    time_elapsed         | 25619       |
+|    total_timesteps      | 2991520     |
+| train/                  |             |
+|    approx_kl            | 0.047609888 |
+|    clip_fraction        | 0.248       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.25       |
+|    explained_variance   | 0.765       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.494       |
+|    n_updates            | 2755        |
+|    policy_gradient_loss | 0.013       |
+|    std                  | 0.452       |
+|    value_loss           | 1.32        |
+-----------------------------------------
+Early stopping at step 4 due to reaching max kl: 0.06
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 52          |
+|    ep_rew_mean          | -133        |
+| time/                   |             |
+|    fps                  | 19          |
+|    iterations           | 97          |
+|    time_elapsed         | 25813       |
+|    total_timesteps      | 2996640     |
+| train/                  |             |
+|    approx_kl            | 0.038019214 |
+|    clip_fraction        | 0.271       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.25       |
+|    explained_variance   | 0.819       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.261       |
+|    n_updates            | 2760        |
+|    policy_gradient_loss | -0.0106     |
+|    std                  | 0.452       |
+|    value_loss           | 0.834       |
+-----------------------------------------
+Early stopping at step 1 due to reaching max kl: 0.05
+[EVAL] t=3,000,000 safety off goal 0.63 collision 0.37 | dev goal 0.80 | field goal 0.50 (NT 0.90 HO 0.38 CRP 0.38 CRS 0.38 OT 0.65 BO 0.38) (277.9 s)
+[EVAL] t=3,000,000 safety on goal 0.63 collision 0.37 | dev goal 0.79 | field goal 0.50 (NT 0.90 HO 0.38 CRP 0.38 CRS 0.38 OT 0.65 BO 0.38) (285.2 s)
+-----------------------------------------
+| eval_supervisor_off/    |             |
+|    collision_rate       | 0.367       |
+|    dev/collision        | 0.2         |
+|    dev/goal             | 0.8         |
+|    episodes             | 270         |
+|    eval_wall_s          | 278         |
+|    field/BO/goal        | 0.385       |
+|    field/CRP/goal       | 0.385       |
+|    field/CRS/goal       | 0.385       |
+|    field/HO/goal        | 0.385       |
+|    field/NT/goal        | 0.9         |
+|    field/OT/goal        | 0.654       |
+|    field/collision      | 0.5         |
+|    field/goal           | 0.5         |
+|    goal_rate            | 0.633       |
+|    intervention_rate    | 0           |
+|    mean_return          | -125        |
+|    timeout_rate         | 0           |
+|    timesteps            | 3000000     |
+| eval_supervisor_on/     |             |
+|    collision_rate       | 0.37        |
+|    dev/collision        | 0.208       |
+|    dev/goal             | 0.792       |
+|    episodes             | 270         |
+|    eval_wall_s          | 285         |
+|    field/BO/goal        | 0.385       |
+|    field/CRP/goal       | 0.385       |
+|    field/CRS/goal       | 0.385       |
+|    field/HO/goal        | 0.385       |
+|    field/NT/goal        | 0.9         |
+|    field/OT/goal        | 0.654       |
+|    field/collision      | 0.5         |
+|    field/goal           | 0.5         |
+|    goal_rate            | 0.63        |
+|    intervention_rate    | 0.00741     |
+|    mean_return          | -129        |
+|    timeout_rate         | 0           |
+|    timesteps            | 3000000     |
+| rollout/                |             |
+|    ep_len_mean          | 51          |
+|    ep_rew_mean          | -138        |
+| time/                   |             |
+|    fps                  | 18          |
+|    iterations           | 98          |
+|    time_elapsed         | 26537       |
+|    total_timesteps      | 3001760     |
+| train/                  |             |
+|    approx_kl            | 0.048320815 |
+|    clip_fraction        | 0.216       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.25       |
+|    explained_variance   | 0.761       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.491       |
+|    n_updates            | 2762        |
+|    policy_gradient_loss | 0.00613     |
+|    std                  | 0.452       |
+|    value_loss           | 1.18        |
+-----------------------------------------
+Early stopping at step 3 due to reaching max kl: 0.05
+[EVAL] t=3,001,760 safety off goal 0.64 collision 0.36 | dev goal 0.80 | field goal 0.51 (NT 0.75 HO 0.42 CRP 0.42 CRS 0.35 OT 0.69 BO 0.46) (269.0 s)
+[EVAL] t=3,001,760 safety on goal 0.63 collision 0.37 | dev goal 0.79 | field goal 0.50 (NT 0.75 HO 0.42 CRP 0.42 CRS 0.35 OT 0.65 BO 0.46) (245.2 s)
+done in 7.52 h -> C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\runs\ppo_formulation_seed0_bl3

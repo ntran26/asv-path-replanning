@@ -1,0 +1,4 @@
+# Optional offline reachability diagnostic; install after project requirements.
+# Already installed during 2026-10-03 validation; no packages were changed.
+# Experimental interval arithmetic, not a certified numerical backend.
+mpmath==1.3.0

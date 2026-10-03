@@ -1,0 +1,3217 @@
+{
+  "scope": "Saved sensor snapshots only; no environment construction/reset/step and no outcome counterfactual. Truth used only to score hypotheses after snapshot().",
+  "module_sha256": "ed3f876f55e8e6f33fbe6b7f5a32c5e626b9cfdcdf98c23bb0ff4a51b9c26e0b",
+  "cases": [
+    {
+      "trace": "results/safety_dev/v10_iterations/missing_target_diagnostics/traces/001_v8.jsonl",
+      "trace_sha256": "f76f2ecc1d3ef80577766da9f40e90f3791330f46cad94b72053bba877d57f06",
+      "records": [
+        {
+          "step": 1,
+          "legacy_tracks": 0,
+          "added": 0,
+          "scoring_only": [],
+          "stats": {
+            "frame": 1,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 0,
+            "updates": [],
+            "hypotheses": [],
+            "rejections": {
+              "unconfirmed": 3
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 20
+          }
+        },
+        {
+          "step": 2,
+          "legacy_tracks": 0,
+          "added": 0,
+          "scoring_only": [],
+          "stats": {
+            "frame": 2,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 0,
+            "updates": [],
+            "hypotheses": [],
+            "rejections": {
+              "invalid_fit": 3
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 23
+          }
+        },
+        {
+          "step": 3,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.05532754666655925,
+              "position": [
+                3.311756276142194,
+                10.791876425661671
+              ],
+              "velocity": [
+                0.3836831176264097,
+                -0.11397178906237684
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 3,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [
+              {
+                "source_id": 3,
+                "synthetic_id": -1000000,
+                "kind": "admission",
+                "base_admitted": false,
+                "observations": 3,
+                "observation_frames": [
+                  1,
+                  2,
+                  3
+                ],
+                "endpoint_translation_m": [
+                  0.36285848549549105,
+                  0.42676960582650314
+                ],
+                "max_translation_residual_m": 0.03320654062327238
+              }
+            ],
+            "hypotheses": [
+              {
+                "source_id": 3,
+                "id": -1000000,
+                "anchor_frame": 3,
+                "age_s": 0.0,
+                "position": [
+                  3.311756276142194,
+                  10.791876425661671
+                ],
+                "velocity": [
+                  0.3836831176264097,
+                  -0.11397178906237684
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 1,
+              "low_or_inconsistent_measured_speed": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 25
+          }
+        },
+        {
+          "step": 4,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.08136996194828695,
+              "position": [
+                3.5035978349553987,
+                10.734890531130484
+              ],
+              "velocity": [
+                0.3836831176264097,
+                -0.11397178906237684
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 4,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 3,
+                "id": -1000000,
+                "anchor_frame": 3,
+                "age_s": 0.5,
+                "position": [
+                  3.5035978349553987,
+                  10.734890531130484
+                ],
+                "velocity": [
+                  0.3836831176264097,
+                  -0.11397178906237684
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "current_extent_partial": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 27
+          }
+        },
+        {
+          "step": 5,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.1119958768773281,
+              "position": [
+                3.695439393768604,
+                10.677904636599294
+              ],
+              "velocity": [
+                0.3836831176264097,
+                -0.11397178906237684
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 5,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 3,
+                "id": -1000000,
+                "anchor_frame": 3,
+                "age_s": 1.0,
+                "position": [
+                  3.695439393768604,
+                  10.677904636599294
+                ],
+                "velocity": [
+                  0.3836831176264097,
+                  -0.11397178906237684
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "current_extent_partial": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 28
+          }
+        },
+        {
+          "step": 6,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.14431616198578967,
+              "position": [
+                3.8872809525818086,
+                10.620918742068106
+              ],
+              "velocity": [
+                0.3836831176264097,
+                -0.11397178906237684
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 6,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 3,
+                "id": -1000000,
+                "anchor_frame": 3,
+                "age_s": 1.5,
+                "position": [
+                  3.8872809525818086,
+                  10.620918742068106
+                ],
+                "velocity": [
+                  0.3836831176264097,
+                  -0.11397178906237684
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "low_or_inconsistent_measured_speed": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 27
+          }
+        },
+        {
+          "step": 7,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.17740717354669353,
+              "position": [
+                4.079122511395013,
+                10.563932847536918
+              ],
+              "velocity": [
+                0.3836831176264097,
+                -0.11397178906237684
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 7,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 3,
+                "id": -1000000,
+                "anchor_frame": 3,
+                "age_s": 2.0,
+                "position": [
+                  4.079122511395013,
+                  10.563932847536918
+                ],
+                "velocity": [
+                  0.3836831176264097,
+                  -0.11397178906237684
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "missed_detection": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 27
+          }
+        },
+        {
+          "step": 8,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.21090644438725678,
+              "position": [
+                4.270964070208218,
+                10.506946953005729
+              ],
+              "velocity": [
+                0.3836831176264097,
+                -0.11397178906237684
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 8,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 3,
+                "id": -1000000,
+                "anchor_frame": 3,
+                "age_s": 2.5,
+                "position": [
+                  4.270964070208218,
+                  10.506946953005729
+                ],
+                "velocity": [
+                  0.3836831176264097,
+                  -0.11397178906237684
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "missed_detection": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 29
+          }
+        },
+        {
+          "step": 9,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.2446463238739854,
+              "position": [
+                4.462805629021423,
+                10.44996105847454
+              ],
+              "velocity": [
+                0.3836831176264097,
+                -0.11397178906237684
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 9,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 3,
+                "id": -1000000,
+                "anchor_frame": 3,
+                "age_s": 3.0,
+                "position": [
+                  4.462805629021423,
+                  10.44996105847454
+                ],
+                "velocity": [
+                  0.3836831176264097,
+                  -0.11397178906237684
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "missed_detection": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 29
+          }
+        },
+        {
+          "step": 10,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.2785393899052088,
+              "position": [
+                4.6546471878346285,
+                10.392975163943353
+              ],
+              "velocity": [
+                0.3836831176264097,
+                -0.11397178906237684
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 10,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 3,
+                "id": -1000000,
+                "anchor_frame": 3,
+                "age_s": 3.5,
+                "position": [
+                  4.6546471878346285,
+                  10.392975163943353
+                ],
+                "velocity": [
+                  0.3836831176264097,
+                  -0.11397178906237684
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "unconfirmed": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 31
+          }
+        },
+        {
+          "step": 11,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.31253580933263714,
+              "position": [
+                4.846488746647832,
+                10.335989269412163
+              ],
+              "velocity": [
+                0.3836831176264097,
+                -0.11397178906237684
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 11,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 3,
+                "id": -1000000,
+                "anchor_frame": 3,
+                "age_s": 4.0,
+                "position": [
+                  4.846488746647832,
+                  10.335989269412163
+                ],
+                "velocity": [
+                  0.3836831176264097,
+                  -0.11397178906237684
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 3
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 33
+          }
+        },
+        {
+          "step": 12,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.3466051715488089,
+              "position": [
+                5.038330305461038,
+                10.279003374880975
+              ],
+              "velocity": [
+                0.3836831176264097,
+                -0.11397178906237684
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 12,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 3,
+                "id": -1000000,
+                "anchor_frame": 3,
+                "age_s": 4.5,
+                "position": [
+                  5.038330305461038,
+                  10.279003374880975
+                ],
+                "velocity": [
+                  0.3836831176264097,
+                  -0.11397178906237684
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "oversized_cluster": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 36
+          }
+        },
+        {
+          "step": 13,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.38072789524315487,
+              "position": [
+                5.230171864274243,
+                10.222017480349788
+              ],
+              "velocity": [
+                0.3836831176264097,
+                -0.11397178906237684
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 13,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 3,
+                "id": -1000000,
+                "anchor_frame": 3,
+                "age_s": 5.0,
+                "position": [
+                  5.230171864274243,
+                  10.222017480349788
+                ],
+                "velocity": [
+                  0.3836831176264097,
+                  -0.11397178906237684
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "low_or_inconsistent_measured_speed": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 41
+          }
+        },
+        {
+          "step": 14,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.41489081446920123,
+              "position": [
+                5.4220134230874475,
+                10.1650315858186
+              ],
+              "velocity": [
+                0.3836831176264097,
+                -0.11397178906237684
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 14,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 3,
+                "id": -1000000,
+                "anchor_frame": 3,
+                "age_s": 5.5,
+                "position": [
+                  5.4220134230874475,
+                  10.1650315858186
+                ],
+                "velocity": [
+                  0.3836831176264097,
+                  -0.11397178906237684
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "low_or_inconsistent_measured_speed": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 45
+          }
+        },
+        {
+          "step": 15,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.44908475601859493,
+              "position": [
+                5.613854981900652,
+                10.10804569128741
+              ],
+              "velocity": [
+                0.3836831176264097,
+                -0.11397178906237684
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 15,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 3,
+                "id": -1000000,
+                "anchor_frame": 3,
+                "age_s": 6.0,
+                "position": [
+                  5.613854981900652,
+                  10.10804569128741
+                ],
+                "velocity": [
+                  0.3836831176264097,
+                  -0.11397178906237684
+                ]
+              }
+            ],
+            "rejections": {
+              "oversized_cluster": 1,
+              "invalid_fit": 1,
+              "insufficient_full_extent_observations": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 43
+          }
+        },
+        {
+          "step": 16,
+          "legacy_tracks": 0,
+          "added": 2,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.48330313540093767,
+              "position": [
+                5.805696540713857,
+                10.051059796756222
+              ],
+              "velocity": [
+                0.3836831176264097,
+                -0.11397178906237684
+              ]
+            },
+            {
+              "synthetic_id": -1000001,
+              "position_error_m": 0.04152054892019925,
+              "position": [
+                5.723094714770101,
+                9.533866246020095
+              ],
+              "velocity": [
+                0.37903613145385323,
+                -0.12658817607725414
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 16,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 2,
+            "updates": [
+              {
+                "source_id": 4,
+                "synthetic_id": -1000001,
+                "kind": "admission",
+                "base_admitted": false,
+                "observations": 3,
+                "observation_frames": [
+                  14,
+                  15,
+                  16
+                ],
+                "endpoint_translation_m": [
+                  0.4542215553723201,
+                  0.3447247683550816
+                ],
+                "max_translation_residual_m": 0.040980119025081405
+              }
+            ],
+            "hypotheses": [
+              {
+                "source_id": 3,
+                "id": -1000000,
+                "anchor_frame": 3,
+                "age_s": 6.5,
+                "position": [
+                  5.805696540713857,
+                  10.051059796756222
+                ],
+                "velocity": [
+                  0.3836831176264097,
+                  -0.11397178906237684
+                ]
+              },
+              {
+                "source_id": 4,
+                "id": -1000001,
+                "anchor_frame": 16,
+                "age_s": 0.0,
+                "position": [
+                  5.723094714770101,
+                  9.533866246020095
+                ],
+                "velocity": [
+                  0.37903613145385323,
+                  -0.12658817607725414
+                ]
+              }
+            ],
+            "rejections": {
+              "current_extent_partial": 1,
+              "invalid_fit": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 41
+          }
+        },
+        {
+          "step": 17,
+          "legacy_tracks": 0,
+          "added": 2,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.5175411053541569,
+              "position": [
+                5.997538099527063,
+                9.994073902225033
+              ],
+              "velocity": [
+                0.3836831176264097,
+                -0.11397178906237684
+              ]
+            },
+            {
+              "synthetic_id": -1000001,
+              "position_error_m": 0.013891050990268017,
+              "position": [
+                5.912612780497027,
+                9.470572157981467
+              ],
+              "velocity": [
+                0.37903613145385323,
+                -0.12658817607725414
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 17,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 2,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 3,
+                "id": -1000000,
+                "anchor_frame": 3,
+                "age_s": 7.0,
+                "position": [
+                  5.997538099527063,
+                  9.994073902225033
+                ],
+                "velocity": [
+                  0.3836831176264097,
+                  -0.11397178906237684
+                ]
+              },
+              {
+                "source_id": 4,
+                "id": -1000001,
+                "anchor_frame": 16,
+                "age_s": 0.5,
+                "position": [
+                  5.912612780497027,
+                  9.470572157981467
+                ],
+                "velocity": [
+                  0.37903613145385323,
+                  -0.12658817607725414
+                ]
+              }
+            ],
+            "rejections": {
+              "low_or_inconsistent_measured_speed": 1,
+              "invalid_fit": 1,
+              "current_extent_partial": 1,
+              "unconfirmed": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 46
+          }
+        },
+        {
+          "step": 18,
+          "legacy_tracks": 0,
+          "added": 2,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.551795019202566,
+              "position": [
+                6.1893796583402665,
+                9.937088007693845
+              ],
+              "velocity": [
+                0.3836831176264097,
+                -0.11397178906237684
+              ]
+            },
+            {
+              "synthetic_id": -1000001,
+              "position_error_m": 0.014921418627943191,
+              "position": [
+                6.102130846223954,
+                9.40727806994284
+              ],
+              "velocity": [
+                0.37903613145385323,
+                -0.12658817607725414
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 18,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 2,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 3,
+                "id": -1000000,
+                "anchor_frame": 3,
+                "age_s": 7.5,
+                "position": [
+                  6.1893796583402665,
+                  9.937088007693845
+                ],
+                "velocity": [
+                  0.3836831176264097,
+                  -0.11397178906237684
+                ]
+              },
+              {
+                "source_id": 4,
+                "id": -1000001,
+                "anchor_frame": 16,
+                "age_s": 1.0,
+                "position": [
+                  6.102130846223954,
+                  9.40727806994284
+                ],
+                "velocity": [
+                  0.37903613145385323,
+                  -0.12658817607725414
+                ]
+              }
+            ],
+            "rejections": {
+              "oversized_cluster": 1,
+              "invalid_fit": 2,
+              "missed_detection": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 54
+          }
+        }
+      ]
+    },
+    {
+      "trace": "results/safety_dev/v10_iterations/missing_target_diagnostics/traces/002_v8.jsonl",
+      "trace_sha256": "811d9f2cc7039c79ba24b496a03daec157224c557f6f35b2e8a865f931e217f7",
+      "records": [
+        {
+          "step": 1,
+          "legacy_tracks": 0,
+          "added": 0,
+          "scoring_only": [],
+          "stats": {
+            "frame": 1,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 0,
+            "updates": [],
+            "hypotheses": [],
+            "rejections": {
+              "unconfirmed": 4
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 24
+          }
+        },
+        {
+          "step": 2,
+          "legacy_tracks": 0,
+          "added": 0,
+          "scoring_only": [],
+          "stats": {
+            "frame": 2,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 0,
+            "updates": [],
+            "hypotheses": [],
+            "rejections": {
+              "invalid_fit": 4
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 30
+          }
+        },
+        {
+          "step": 3,
+          "legacy_tracks": 1,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.03779242103066637,
+              "position": [
+                7.070857746507125,
+                10.955317273990758
+              ],
+              "velocity": [
+                -0.32188165468025837,
+                -0.1891484446139894
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 3,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 1,
+            "added_hypotheses": 1,
+            "updates": [
+              {
+                "source_id": 8,
+                "synthetic_id": -1000000,
+                "kind": "admission",
+                "base_admitted": true,
+                "observations": 3,
+                "observation_frames": [
+                  1,
+                  2,
+                  3
+                ],
+                "endpoint_translation_m": [
+                  0.39127152727612113,
+                  0.35539229726841626
+                ],
+                "max_translation_residual_m": 0.015393246080965586
+              }
+            ],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 3,
+                "age_s": 0.0,
+                "position": [
+                  7.070857746507125,
+                  10.955317273990758
+                ],
+                "velocity": [
+                  -0.32188165468025837,
+                  -0.1891484446139894
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 3
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 33
+          }
+        },
+        {
+          "step": 4,
+          "legacy_tracks": 1,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.1051409816721076,
+              "position": [
+                6.857956922947007,
+                10.819899279744089
+              ],
+              "velocity": [
+                -0.3398372474265495,
+                -0.23536034533377573
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 4,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 1,
+            "added_hypotheses": 1,
+            "updates": [
+              {
+                "source_id": 8,
+                "synthetic_id": -1000000,
+                "kind": "measured_refresh",
+                "base_admitted": true,
+                "observations": 4,
+                "observation_frames": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "endpoint_translation_m": [
+                  0.6605525179627136,
+                  0.5902843442078716
+                ],
+                "max_translation_residual_m": 0.03897162454817986
+              }
+            ],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 4,
+                "age_s": 0.0,
+                "position": [
+                  6.857956922947007,
+                  10.819899279744089
+                ],
+                "velocity": [
+                  -0.3398372474265495,
+                  -0.23536034533377573
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 3
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 36
+          }
+        },
+        {
+          "step": 5,
+          "legacy_tracks": 1,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.0987193039017512,
+              "position": [
+                6.6969132820877455,
+                10.752842694951966
+              ],
+              "velocity": [
+                -0.34154717124152906,
+                -0.2214628466987467
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 5,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 1,
+            "added_hypotheses": 1,
+            "updates": [
+              {
+                "source_id": 8,
+                "synthetic_id": -1000000,
+                "kind": "measured_refresh",
+                "base_admitted": true,
+                "observations": 5,
+                "observation_frames": [
+                  1,
+                  2,
+                  3,
+                  4,
+                  5
+                ],
+                "endpoint_translation_m": [
+                  0.7924056206561438,
+                  0.804423594510677
+                ],
+                "max_translation_residual_m": 0.037710438992957604
+              }
+            ],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 0.0,
+                "position": [
+                  6.6969132820877455,
+                  10.752842694951966
+                ],
+                "velocity": [
+                  -0.34154717124152906,
+                  -0.2214628466987467
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "missed_detection": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 20
+          }
+        },
+        {
+          "step": 6,
+          "legacy_tracks": 1,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.11821831751742093,
+              "position": [
+                6.526139696466981,
+                10.642111271602593
+              ],
+              "velocity": [
+                -0.34154717124152906,
+                -0.2214628466987467
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 6,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 1,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 0.5,
+                "position": [
+                  6.526139696466981,
+                  10.642111271602593
+                ],
+                "velocity": [
+                  -0.34154717124152906,
+                  -0.2214628466987467
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "missed_detection": 1,
+              "current_extent_partial": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 20
+          }
+        },
+        {
+          "step": 7,
+          "legacy_tracks": 1,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.13955583735543714,
+              "position": [
+                6.355366110846217,
+                10.531379848253218
+              ],
+              "velocity": [
+                -0.34154717124152906,
+                -0.2214628466987467
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 7,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 1,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 1.0,
+                "position": [
+                  6.355366110846217,
+                  10.531379848253218
+                ],
+                "velocity": [
+                  -0.34154717124152906,
+                  -0.2214628466987467
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "missed_detection": 1,
+              "current_extent_partial": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 20
+          }
+        },
+        {
+          "step": 8,
+          "legacy_tracks": 1,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.16200705044172822,
+              "position": [
+                6.184592525225452,
+                10.420648424903845
+              ],
+              "velocity": [
+                -0.34154717124152906,
+                -0.2214628466987467
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 8,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 1,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 1.5,
+                "position": [
+                  6.184592525225452,
+                  10.420648424903845
+                ],
+                "velocity": [
+                  -0.34154717124152906,
+                  -0.2214628466987467
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "low_or_inconsistent_measured_speed": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 20
+          }
+        },
+        {
+          "step": 9,
+          "legacy_tracks": 1,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.18516729882785482,
+              "position": [
+                6.013818939604687,
+                10.309917001554473
+              ],
+              "velocity": [
+                -0.34154717124152906,
+                -0.2214628466987467
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 9,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 1,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 2.0,
+                "position": [
+                  6.013818939604687,
+                  10.309917001554473
+                ],
+                "velocity": [
+                  -0.34154717124152906,
+                  -0.2214628466987467
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 3
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 20
+          }
+        },
+        {
+          "step": 10,
+          "legacy_tracks": 1,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.20880077640445496,
+              "position": [
+                5.843045353983923,
+                10.1991855782051
+              ],
+              "velocity": [
+                -0.34154717124152906,
+                -0.2214628466987467
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 10,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 1,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 2.5,
+                "position": [
+                  5.843045353983923,
+                  10.1991855782051
+                ],
+                "velocity": [
+                  -0.34154717124152906,
+                  -0.2214628466987467
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "missed_detection": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 20
+          }
+        },
+        {
+          "step": 11,
+          "legacy_tracks": 1,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.2327633807292872,
+              "position": [
+                5.672271768363158,
+                10.088454154855725
+              ],
+              "velocity": [
+                -0.34154717124152906,
+                -0.2214628466987467
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 11,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 1,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 3.0,
+                "position": [
+                  5.672271768363158,
+                  10.088454154855725
+                ],
+                "velocity": [
+                  -0.34154717124152906,
+                  -0.2214628466987467
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "missed_detection": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 23
+          }
+        },
+        {
+          "step": 12,
+          "legacy_tracks": 1,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.25409118751925347,
+              "position": [
+                5.501498182742393,
+                9.977722731506352
+              ],
+              "velocity": [
+                -0.34154717124152906,
+                -0.2214628466987467
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 12,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 1,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 3.5,
+                "position": [
+                  5.501498182742393,
+                  9.977722731506352
+                ],
+                "velocity": [
+                  -0.34154717124152906,
+                  -0.2214628466987467
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "missed_detection": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 25
+          }
+        },
+        {
+          "step": 13,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.26428565685024635,
+              "position": [
+                5.3307245971216295,
+                9.86699130815698
+              ],
+              "velocity": [
+                -0.34154717124152906,
+                -0.2214628466987467
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 13,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 4.0,
+                "position": [
+                  5.3307245971216295,
+                  9.86699130815698
+                ],
+                "velocity": [
+                  -0.34154717124152906,
+                  -0.2214628466987467
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 36
+          }
+        },
+        {
+          "step": 14,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.26330986730954564,
+              "position": [
+                5.159951011500865,
+                9.756259884807605
+              ],
+              "velocity": [
+                -0.34154717124152906,
+                -0.2214628466987467
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 14,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 4.5,
+                "position": [
+                  5.159951011500865,
+                  9.756259884807605
+                ],
+                "velocity": [
+                  -0.34154717124152906,
+                  -0.2214628466987467
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "unconfirmed": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 39
+          }
+        },
+        {
+          "step": 15,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.25195127860829897,
+              "position": [
+                4.989177425880101,
+                9.645528461458232
+              ],
+              "velocity": [
+                -0.34154717124152906,
+                -0.2214628466987467
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 15,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 5.0,
+                "position": [
+                  4.989177425880101,
+                  9.645528461458232
+                ],
+                "velocity": [
+                  -0.34154717124152906,
+                  -0.2214628466987467
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 3
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 40
+          }
+        },
+        {
+          "step": 16,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.23170686637672944,
+              "position": [
+                4.818403840259336,
+                9.53479703810886
+              ],
+              "velocity": [
+                -0.34154717124152906,
+                -0.2214628466987467
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 16,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 5.5,
+                "position": [
+                  4.818403840259336,
+                  9.53479703810886
+                ],
+                "velocity": [
+                  -0.34154717124152906,
+                  -0.2214628466987467
+                ]
+              }
+            ],
+            "rejections": {
+              "oversized_cluster": 1,
+              "invalid_fit": 1,
+              "current_extent_partial": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 43
+          }
+        },
+        {
+          "step": 17,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.2056563721936955,
+              "position": [
+                4.647630254638571,
+                9.424065614759485
+              ],
+              "velocity": [
+                -0.34154717124152906,
+                -0.2214628466987467
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 17,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 6.0,
+                "position": [
+                  4.647630254638571,
+                  9.424065614759485
+                ],
+                "velocity": [
+                  -0.34154717124152906,
+                  -0.2214628466987467
+                ]
+              }
+            ],
+            "rejections": {
+              "oversized_cluster": 1,
+              "invalid_fit": 1,
+              "low_or_inconsistent_measured_speed": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 50
+          }
+        },
+        {
+          "step": 18,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.18047975810488998,
+              "position": [
+                4.476856669017806,
+                9.313334191410112
+              ],
+              "velocity": [
+                -0.34154717124152906,
+                -0.2214628466987467
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 18,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 6.5,
+                "position": [
+                  4.476856669017806,
+                  9.313334191410112
+                ],
+                "velocity": [
+                  -0.34154717124152906,
+                  -0.2214628466987467
+                ]
+              }
+            ],
+            "rejections": {
+              "oversized_cluster": 1,
+              "invalid_fit": 1,
+              "insufficient_full_extent_observations": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 53
+          }
+        },
+        {
+          "step": 19,
+          "legacy_tracks": 0,
+          "added": 2,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.1697383774968844,
+              "position": [
+                4.306083083397042,
+                9.20260276806074
+              ],
+              "velocity": [
+                -0.34154717124152906,
+                -0.2214628466987467
+              ]
+            },
+            {
+              "synthetic_id": -1000001,
+              "position_error_m": 0.07380860478210316,
+              "position": [
+                4.283371328977512,
+                9.29741072887237
+              ],
+              "velocity": [
+                -0.5180436874505243,
+                -0.22254247634639693
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 19,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 2,
+            "updates": [
+              {
+                "source_id": 10,
+                "synthetic_id": -1000001,
+                "kind": "admission",
+                "base_admitted": false,
+                "observations": 3,
+                "observation_frames": [
+                  17,
+                  18,
+                  19
+                ],
+                "endpoint_translation_m": [
+                  0.5791459029978547,
+                  0.5446196789757209
+                ],
+                "max_translation_residual_m": 0.03170600229390807
+              }
+            ],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 7.0,
+                "position": [
+                  4.306083083397042,
+                  9.20260276806074
+                ],
+                "velocity": [
+                  -0.34154717124152906,
+                  -0.2214628466987467
+                ]
+              },
+              {
+                "source_id": 10,
+                "id": -1000001,
+                "anchor_frame": 19,
+                "age_s": 0.0,
+                "position": [
+                  4.283371328977512,
+                  9.29741072887237
+                ],
+                "velocity": [
+                  -0.5180436874505243,
+                  -0.22254247634639693
+                ]
+              }
+            ],
+            "rejections": {
+              "current_extent_partial": 1,
+              "invalid_fit": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 49
+          }
+        },
+        {
+          "step": 20,
+          "legacy_tracks": 0,
+          "added": 2,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.18590306812535262,
+              "position": [
+                4.135309497776277,
+                9.091871344711365
+              ],
+              "velocity": [
+                -0.34154717124152906,
+                -0.2214628466987467
+              ]
+            },
+            {
+              "synthetic_id": -1000001,
+              "position_error_m": 0.04548404249413339,
+              "position": [
+                4.02434948525225,
+                9.186139490699171
+              ],
+              "velocity": [
+                -0.5180436874505243,
+                -0.22254247634639693
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 20,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 2,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 7.5,
+                "position": [
+                  4.135309497776277,
+                  9.091871344711365
+                ],
+                "velocity": [
+                  -0.34154717124152906,
+                  -0.2214628466987467
+                ]
+              },
+              {
+                "source_id": 10,
+                "id": -1000001,
+                "anchor_frame": 19,
+                "age_s": 0.5,
+                "position": [
+                  4.02434948525225,
+                  9.186139490699171
+                ],
+                "velocity": [
+                  -0.5180436874505243,
+                  -0.22254247634639693
+                ]
+              }
+            ],
+            "rejections": {
+              "low_or_inconsistent_measured_speed": 1,
+              "invalid_fit": 1,
+              "current_extent_partial": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 54
+          }
+        },
+        {
+          "step": 21,
+          "legacy_tracks": 0,
+          "added": 2,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.2238494625138537,
+              "position": [
+                3.964535912155513,
+                8.981139921361992
+              ],
+              "velocity": [
+                -0.34154717124152906,
+                -0.2214628466987467
+              ]
+            },
+            {
+              "synthetic_id": -1000001,
+              "position_error_m": 0.02322100439409532,
+              "position": [
+                3.765327641526987,
+                9.074868252525972
+              ],
+              "velocity": [
+                -0.5180436874505243,
+                -0.22254247634639693
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 21,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 2,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 8,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 8.0,
+                "position": [
+                  3.964535912155513,
+                  8.981139921361992
+                ],
+                "velocity": [
+                  -0.34154717124152906,
+                  -0.2214628466987467
+                ]
+              },
+              {
+                "source_id": 10,
+                "id": -1000001,
+                "anchor_frame": 19,
+                "age_s": 1.0,
+                "position": [
+                  3.765327641526987,
+                  9.074868252525972
+                ],
+                "velocity": [
+                  -0.5180436874505243,
+                  -0.22254247634639693
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "missed_detection": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 54
+          }
+        }
+      ]
+    },
+    {
+      "trace": "results/safety_dev/v10_iterations/missing_target_diagnostics/traces/003_v8.jsonl",
+      "trace_sha256": "42077b0060b81ac33f6742768c5ab98fb4a7b412f758b2466f900bd32d33dc44",
+      "records": [
+        {
+          "step": 1,
+          "legacy_tracks": 0,
+          "added": 0,
+          "scoring_only": [],
+          "stats": {
+            "frame": 1,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 0,
+            "updates": [],
+            "hypotheses": [],
+            "rejections": {
+              "unconfirmed": 4
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 24
+          }
+        },
+        {
+          "step": 2,
+          "legacy_tracks": 0,
+          "added": 0,
+          "scoring_only": [],
+          "stats": {
+            "frame": 2,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 0,
+            "updates": [],
+            "hypotheses": [],
+            "rejections": {
+              "invalid_fit": 3,
+              "missed_detection": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 28
+          }
+        },
+        {
+          "step": 3,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.06502368669281318,
+              "position": [
+                2.703889381758917,
+                10.949487717414648
+              ],
+              "velocity": [
+                0.2821635787367171,
+                -0.25645466011731594
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 3,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [
+              {
+                "source_id": 13,
+                "synthetic_id": -1000000,
+                "kind": "admission",
+                "base_admitted": false,
+                "observations": 3,
+                "observation_frames": [
+                  1,
+                  2,
+                  3
+                ],
+                "endpoint_translation_m": [
+                  0.3703605661286451,
+                  0.3450136761586583
+                ],
+                "max_translation_residual_m": 0.01493085471720833
+              }
+            ],
+            "hypotheses": [
+              {
+                "source_id": 13,
+                "id": -1000000,
+                "anchor_frame": 3,
+                "age_s": 0.0,
+                "position": [
+                  2.703889381758917,
+                  10.949487717414648
+                ],
+                "velocity": [
+                  0.2821635787367171,
+                  -0.25645466011731594
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "missed_detection": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 30
+          }
+        },
+        {
+          "step": 4,
+          "legacy_tracks": 1,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.05389944248644215,
+              "position": [
+                2.889959311824154,
+                10.985612513303362
+              ],
+              "velocity": [
+                0.3064560438281506,
+                -0.1539555977488945
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 4,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 1,
+            "added_hypotheses": 1,
+            "updates": [
+              {
+                "source_id": 13,
+                "synthetic_id": -1000000,
+                "kind": "measured_refresh",
+                "base_admitted": true,
+                "observations": 4,
+                "observation_frames": [
+                  1,
+                  2,
+                  3,
+                  4
+                ],
+                "endpoint_translation_m": [
+                  0.5333473578410715,
+                  0.5000037809485178
+                ],
+                "max_translation_residual_m": 0.06605548107936654
+              }
+            ],
+            "hypotheses": [
+              {
+                "source_id": 13,
+                "id": -1000000,
+                "anchor_frame": 4,
+                "age_s": 0.0,
+                "position": [
+                  2.889959311824154,
+                  10.985612513303362
+                ],
+                "velocity": [
+                  0.3064560438281506,
+                  -0.1539555977488945
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "missed_detection": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 34
+          }
+        },
+        {
+          "step": 5,
+          "legacy_tracks": 1,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.05892241982938733,
+              "position": [
+                3.1437679477379485,
+                10.83664349936134
+              ],
+              "velocity": [
+                0.3468306950863039,
+                -0.1739249971265906
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 5,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 1,
+            "added_hypotheses": 1,
+            "updates": [
+              {
+                "source_id": 13,
+                "synthetic_id": -1000000,
+                "kind": "measured_refresh",
+                "base_admitted": true,
+                "observations": 5,
+                "observation_frames": [
+                  1,
+                  2,
+                  3,
+                  4,
+                  5
+                ],
+                "endpoint_translation_m": [
+                  0.8358615066872552,
+                  0.7797537205148102
+                ],
+                "max_translation_residual_m": 0.07660926636762971
+              }
+            ],
+            "hypotheses": [
+              {
+                "source_id": 13,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 0.0,
+                "position": [
+                  3.1437679477379485,
+                  10.83664349936134
+                ],
+                "velocity": [
+                  0.3468306950863039,
+                  -0.1739249971265906
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 19
+          }
+        },
+        {
+          "step": 6,
+          "legacy_tracks": 1,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.05495596757206349,
+              "position": [
+                3.3171832952811005,
+                10.749681000798045
+              ],
+              "velocity": [
+                0.3468306950863039,
+                -0.1739249971265906
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 6,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 1,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 13,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 0.5,
+                "position": [
+                  3.3171832952811005,
+                  10.749681000798045
+                ],
+                "velocity": [
+                  0.3468306950863039,
+                  -0.1739249971265906
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "current_extent_partial": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 19
+          }
+        },
+        {
+          "step": 7,
+          "legacy_tracks": 1,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.053997845394844854,
+              "position": [
+                3.4905986428242524,
+                10.66271850223475
+              ],
+              "velocity": [
+                0.3468306950863039,
+                -0.1739249971265906
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 7,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 1,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 13,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 1.0,
+                "position": [
+                  3.4905986428242524,
+                  10.66271850223475
+                ],
+                "velocity": [
+                  0.3468306950863039,
+                  -0.1739249971265906
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "low_or_inconsistent_measured_speed": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 20
+          }
+        },
+        {
+          "step": 8,
+          "legacy_tracks": 1,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.05620212064559661,
+              "position": [
+                3.6640139903674043,
+                10.575756003671454
+              ],
+              "velocity": [
+                0.3468306950863039,
+                -0.1739249971265906
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 8,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 1,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 13,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 1.5,
+                "position": [
+                  3.6640139903674043,
+                  10.575756003671454
+                ],
+                "velocity": [
+                  0.3468306950863039,
+                  -0.1739249971265906
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "missed_detection": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 22
+          }
+        },
+        {
+          "step": 9,
+          "legacy_tracks": 1,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.058063407131595295,
+              "position": [
+                3.837429337910556,
+                10.488793505108159
+              ],
+              "velocity": [
+                0.3468306950863039,
+                -0.1739249971265906
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 9,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 1,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 13,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 2.0,
+                "position": [
+                  3.837429337910556,
+                  10.488793505108159
+                ],
+                "velocity": [
+                  0.3468306950863039,
+                  -0.1739249971265906
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "missed_detection": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 22
+          }
+        },
+        {
+          "step": 10,
+          "legacy_tracks": 1,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.05991925997575998,
+              "position": [
+                4.0108446854537085,
+                10.401831006544864
+              ],
+              "velocity": [
+                0.3468306950863039,
+                -0.1739249971265906
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 10,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 1,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 13,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 2.5,
+                "position": [
+                  4.0108446854537085,
+                  10.401831006544864
+                ],
+                "velocity": [
+                  0.3468306950863039,
+                  -0.1739249971265906
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "missed_detection": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 23
+          }
+        },
+        {
+          "step": 11,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.07400324845157584,
+              "position": [
+                4.1842600329968604,
+                10.314868507981569
+              ],
+              "velocity": [
+                0.3468306950863039,
+                -0.1739249971265906
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 11,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 13,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 3.0,
+                "position": [
+                  4.1842600329968604,
+                  10.314868507981569
+                ],
+                "velocity": [
+                  0.3468306950863039,
+                  -0.1739249971265906
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 35
+          }
+        },
+        {
+          "step": 12,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.10783448175394615,
+              "position": [
+                4.357675380540012,
+                10.227906009418273
+              ],
+              "velocity": [
+                0.3468306950863039,
+                -0.1739249971265906
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 12,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 13,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 3.5,
+                "position": [
+                  4.357675380540012,
+                  10.227906009418273
+                ],
+                "velocity": [
+                  0.3468306950863039,
+                  -0.1739249971265906
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 2,
+              "unconfirmed": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 38
+          }
+        },
+        {
+          "step": 13,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.1599425795362057,
+              "position": [
+                4.531090728083164,
+                10.140943510854978
+              ],
+              "velocity": [
+                0.3468306950863039,
+                -0.1739249971265906
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 13,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 13,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 4.0,
+                "position": [
+                  4.531090728083164,
+                  10.140943510854978
+                ],
+                "velocity": [
+                  0.3468306950863039,
+                  -0.1739249971265906
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 3,
+              "unconfirmed": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 41
+          }
+        },
+        {
+          "step": 14,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.22648888836266953,
+              "position": [
+                4.704506075626316,
+                10.053981012291683
+              ],
+              "velocity": [
+                0.3468306950863039,
+                -0.1739249971265906
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 14,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 13,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 4.5,
+                "position": [
+                  4.704506075626316,
+                  10.053981012291683
+                ],
+                "velocity": [
+                  0.3468306950863039,
+                  -0.1739249971265906
+                ]
+              }
+            ],
+            "rejections": {
+              "missed_detection": 1,
+              "invalid_fit": 2,
+              "low_or_inconsistent_measured_speed": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 47
+          }
+        },
+        {
+          "step": 15,
+          "legacy_tracks": 0,
+          "added": 1,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.2972361838533533,
+              "position": [
+                4.877921423169468,
+                9.967018513728387
+              ],
+              "velocity": [
+                0.3468306950863039,
+                -0.1739249971265906
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 15,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 1,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 13,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 5.0,
+                "position": [
+                  4.877921423169468,
+                  9.967018513728387
+                ],
+                "velocity": [
+                  0.3468306950863039,
+                  -0.1739249971265906
+                ]
+              }
+            ],
+            "rejections": {
+              "missed_detection": 1,
+              "invalid_fit": 2,
+              "low_or_inconsistent_measured_speed": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 50
+          }
+        },
+        {
+          "step": 16,
+          "legacy_tracks": 0,
+          "added": 2,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.3691514677712573,
+              "position": [
+                5.05133677071262,
+                9.880056015165092
+              ],
+              "velocity": [
+                0.3468306950863039,
+                -0.1739249971265906
+              ]
+            },
+            {
+              "synthetic_id": -1000001,
+              "position_error_m": 0.048835959506025754,
+              "position": [
+                5.466805887922393,
+                9.852610469111283
+              ],
+              "velocity": [
+                0.5243068088043185,
+                -0.2146671963728679
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 16,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 2,
+            "updates": [
+              {
+                "source_id": 15,
+                "synthetic_id": -1000001,
+                "kind": "admission",
+                "base_admitted": false,
+                "observations": 3,
+                "observation_frames": [
+                  14,
+                  15,
+                  16
+                ],
+                "endpoint_translation_m": [
+                  0.6039003941875375,
+                  0.5260620435430714
+                ],
+                "max_translation_residual_m": 0.08504972586120253
+              }
+            ],
+            "hypotheses": [
+              {
+                "source_id": 13,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 5.5,
+                "position": [
+                  5.05133677071262,
+                  9.880056015165092
+                ],
+                "velocity": [
+                  0.3468306950863039,
+                  -0.1739249971265906
+                ]
+              },
+              {
+                "source_id": 15,
+                "id": -1000001,
+                "anchor_frame": 16,
+                "age_s": 0.0,
+                "position": [
+                  5.466805887922393,
+                  9.852610469111283
+                ],
+                "velocity": [
+                  0.5243068088043185,
+                  -0.2146671963728679
+                ]
+              }
+            ],
+            "rejections": {
+              "missed_detection": 1,
+              "invalid_fit": 2
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 52
+          }
+        },
+        {
+          "step": 17,
+          "legacy_tracks": 0,
+          "added": 2,
+          "scoring_only": [
+            {
+              "synthetic_id": -1000000,
+              "position_error_m": 0.4416645650826714,
+              "position": [
+                5.224752118255772,
+                9.793093516601797
+              ],
+              "velocity": [
+                0.3468306950863039,
+                -0.1739249971265906
+              ]
+            },
+            {
+              "synthetic_id": -1000001,
+              "position_error_m": 0.06608229674382667,
+              "position": [
+                5.728959292324553,
+                9.74527687092485
+              ],
+              "velocity": [
+                0.5243068088043185,
+                -0.2146671963728679
+              ]
+            }
+          ],
+          "stats": {
+            "frame": 17,
+            "pose_stale": false,
+            "enable_admission": true,
+            "enable_persistence": true,
+            "max_coast_s": 8.0,
+            "min_motion_observations": 3,
+            "base_track_count": 0,
+            "added_hypotheses": 2,
+            "updates": [],
+            "hypotheses": [
+              {
+                "source_id": 13,
+                "id": -1000000,
+                "anchor_frame": 5,
+                "age_s": 6.0,
+                "position": [
+                  5.224752118255772,
+                  9.793093516601797
+                ],
+                "velocity": [
+                  0.3468306950863039,
+                  -0.1739249971265906
+                ]
+              },
+              {
+                "source_id": 15,
+                "id": -1000001,
+                "anchor_frame": 16,
+                "age_s": 0.5,
+                "position": [
+                  5.728959292324553,
+                  9.74527687092485
+                ],
+                "velocity": [
+                  0.5243068088043185,
+                  -0.2146671963728679
+                ]
+              }
+            ],
+            "rejections": {
+              "invalid_fit": 3,
+              "unconfirmed": 1
+            },
+            "expired_source_ids": [],
+            "contradicted_source_ids": [],
+            "static_points_preserved": 59
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,336 @@
+{
+  "scope": "OFFLINE NONCAUSAL DIAGNOSTIC: actual future SAC commands are taken from a saved successful episode solely to test predictor feasibility. These actions are unavailable online. No environment construction/reset/step or new episode.",
+  "case": "TS2:BAS-CR-RE-072",
+  "filtered_mode": "v13",
+  "filtered_outcome": "goal",
+  "reference_off_outcome": "goal",
+  "reference_off_steps": 49,
+  "filtered_steps": 103,
+  "first_executed_command_divergence_step": 8,
+  "identical_recorded_pre_state": true,
+  "recorded_pre_state_fields": [
+    "x",
+    "y",
+    "heading_deg",
+    "surge_mps"
+  ],
+  "previous_executed_commands_match": true,
+  "identical_policy_action": true,
+  "unknown_full_state_fields": "Old OFF trace did not record sway/yaw/plant actuator state. Identical scene/seed and executed-command prefix support deterministic alignment; recorded4-field state and policy action match exactly.",
+  "checkpoint_config_match": true,
+  "seed_geometry_match": true,
+  "input_traces": [
+    {
+      "path": "results/safety_dev/v9_paired_pilot/traces/006_off.jsonl",
+      "sha256": "9a4372718f21de23f6d94b6d6714691be5c527e49737552a11546d851cb7f9f4"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/consistent_track_probe8/traces/002_v13.jsonl",
+      "sha256": "54391b7310f138276637f89c84f8f172849d69c3d355150c334bc6ace5d85e3f"
+    }
+  ],
+  "model_source_sha256": {
+    "src/classical/common.py": "456f39769ffa237f826eff8f9852a6d0823a2f975f85d2345ba7b42105e0977d",
+    "src/safety_v2.py": "209195c3b9241dfa6a798b7cfca857dfd14218c38625d99bc2a9c0d97c1b3d55",
+    "src/safety_v3.py": "28efcc06af8ec0ffc0074267b7f1b2e36ba4fd1f6e033900c39b9b96b6d40d0a"
+  },
+  "sequence_decisions": 16,
+  "horizon_s": 8.0,
+  "sequence_from_off_steps": [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23
+  ],
+  "actual_issued_rudder_and_signed_rpm": [
+    [
+      -0.8944952487945557,
+      11.445735454559326
+    ],
+    [
+      -0.9879382252693176,
+      11.561320781707764
+    ],
+    [
+      -0.986920177936554,
+      11.93263292312622
+    ],
+    [
+      -0.9948788285255432,
+      11.89106798171997
+    ],
+    [
+      -0.79430091381073,
+      11.511796474456787
+    ],
+    [
+      -0.4356210231781006,
+      11.741025924682617
+    ],
+    [
+      -0.23385190963745117,
+      7.668688774108887
+    ],
+    [
+      0.17053115367889404,
+      11.664682388305664
+    ],
+    [
+      -0.6642799973487854,
+      10.177519798278809
+    ],
+    [
+      -0.9020053148269653,
+      11.41742491722107
+    ],
+    [
+      -0.7622982263565063,
+      10.602274417877197
+    ],
+    [
+      -0.7221156358718872,
+      10.590909004211426
+    ],
+    [
+      -0.8205392956733704,
+      11.173783779144287
+    ],
+    [
+      -0.6704632639884949,
+      10.68346095085144
+    ],
+    [
+      0.47450363636016846,
+      11.903329610824585
+    ],
+    [
+      0.7928791046142578,
+      11.368293285369873
+    ]
+  ],
+  "normalized_predictor_sequence": [
+    [
+      -0.8944952487945557,
+      0.9076225757598877
+    ],
+    [
+      -0.9879382252693176,
+      0.926886796951294
+    ],
+    [
+      -0.986920177936554,
+      0.9887721538543701
+    ],
+    [
+      -0.9948788285255432,
+      0.9818446636199951
+    ],
+    [
+      -0.79430091381073,
+      0.9186327457427979
+    ],
+    [
+      -0.4356210231781006,
+      0.9568376541137695
+    ],
+    [
+      -0.23385190963745117,
+      0.27811479568481445
+    ],
+    [
+      0.17053115367889404,
+      0.9441137313842773
+    ],
+    [
+      -0.6642799973487854,
+      0.6962532997131348
+    ],
+    [
+      -0.9020053148269653,
+      0.9029041528701782
+    ],
+    [
+      -0.7622982263565063,
+      0.7670457363128662
+    ],
+    [
+      -0.7221156358718872,
+      0.7651515007019043
+    ],
+    [
+      -0.8205392956733704,
+      0.8622972965240479
+    ],
+    [
+      -0.6704632639884949,
+      0.7805768251419067
+    ],
+    [
+      0.47450363636016846,
+      0.9838882684707642
+    ],
+    [
+      0.7928791046142578,
+      0.8947155475616455
+    ]
+  ],
+  "onboard_first_violation_s_including_terminal": 3.375,
+  "onboard_minimum_clearance_m_including_terminal": -0.22557214619940777,
+  "onboard_within_horizon": {
+    "minimum_clearance_m": -0.22557214619940777,
+    "minimum_time_s": 4.0,
+    "first_violation_s": 3.375
+  },
+  "onboard_components": {
+    "static": {
+      "minimum_clearance_m": 0.6572303910762479,
+      "minimum_time_s": 6.875,
+      "first_violation_s": null
+    },
+    "boundary": {
+      "minimum_clearance_m": 1.4103215463159333,
+      "minimum_time_s": 7.0,
+      "first_violation_s": null
+    },
+    "target:10": {
+      "minimum_clearance_m": -0.22557214619940777,
+      "minimum_time_s": 4.0,
+      "first_violation_s": 3.375
+    }
+  },
+  "target_truth_comparison": "Not performed: RE is reactive; the saved OFF trace has no target future states. V13 target truth after divergence is a different closed-loop trajectory and cannot replace missing OFF truth. No constant-velocity ground-truth assumption.",
+  "recorded_actual_own_decision_endpoints_scored_with_same_snapshot": {
+    "static": {
+      "minimum_clearance_m": 0.649708921033927,
+      "first_violation_s": null
+    },
+    "boundary": {
+      "minimum_clearance_m": 1.064652475347556,
+      "first_violation_s": null
+    },
+    "target:10:onboard_cv_not_truth": {
+      "minimum_clearance_m": -0.14976913862682487,
+      "first_violation_s": 4.0
+    }
+  },
+  "own_model_errors_at_decision_endpoints": {
+    "times_s": [
+      0.5,
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0,
+      3.5,
+      4.0,
+      4.5,
+      5.0,
+      5.5,
+      6.0,
+      6.5,
+      7.0,
+      7.5,
+      8.0
+    ],
+    "position_error_m": [
+      0.05728360696158861,
+      0.07940052712752244,
+      0.10758151480152897,
+      0.14733532710341404,
+      0.20098356437571294,
+      0.2601427784240382,
+      0.31774438450317144,
+      0.37259813596588787,
+      0.42485382564057467,
+      0.4716946905633807,
+      0.5122386320717411,
+      0.5519693433269041,
+      0.5940419985926041,
+      0.6369330398510713,
+      0.6779809225054012,
+      0.7171031536892142
+    ],
+    "heading_error_deg": [
+      1.228477970838804,
+      3.706293799071614,
+      8.233230412035587,
+      13.616968215180059,
+      17.396304291772918,
+      17.5928281018601,
+      13.960843778454317,
+      7.657562742982317,
+      0.6671664115151251,
+      5.382974863667843,
+      8.739326329697976,
+      8.439347243636465,
+      6.038289241991977,
+      3.7610793156482076,
+      2.7851956365779813,
+      3.239690137351768
+    ],
+    "final_position_error_m": 0.7171031536892142,
+    "maximum_position_error_m": 0.7171031536892142,
+    "final_heading_error_deg": 3.239690137351768
+  },
+  "original_filter_decision": {
+    "mode": "recovery",
+    "why": "last certificate",
+    "checked_clearance": -0.16704347856341029,
+    "policy_safe": false,
+    "any_safe": false,
+    "v10_proposed_clearance": -0.16704347883735587,
+    "v10_policy_tail_clearance": -0.228736824277583,
+    "v10_proposed_currently_passing": false,
+    "v10_policy_tail_passing": false
+  },
+  "decision_target_views": [
+    {
+      "id": 10,
+      "position": [
+        3.904054515637056,
+        7.583097370083354
+      ],
+      "velocity": [
+        0.6180164421096701,
+        -0.13471060513487182
+      ],
+      "heading": 1.9198621771937625
+    }
+  ],
+  "interpretation": "Model rejects the known-successful recorded16-command continuation; a search-only fix cannot establish this exact sequence as feasible under the unchanged current checks.",
+  "initial_target_state_scoring_only": {
+    "track_id": 10,
+    "position_error_m": 0.4484277608425727,
+    "velocity_error_mps": 0.15617217785552295,
+    "estimated_position": [
+      3.904054515637056,
+      7.583097370083354
+    ],
+    "recorded_current_true_position": [
+      3.541501472824828,
+      7.8469964944507495
+    ],
+    "estimated_velocity": [
+      0.6180164421096701,
+      -0.13471060513487182
+    ],
+    "recorded_current_true_velocity": [
+      0.46809215215481487,
+      -0.17844224605617254
+    ],
+    "scope": "Current matched pre-decision state only; no future reactive-target motion assumed."
+  },
+  "model_sources_match_evaluated_manifest": true
+}

@@ -1,0 +1,108 @@
+{
+  "source_changes": [
+    {
+      "path": "src/field_training.py",
+      "prior_sha256": "cbb7ae5c98cddce8fc1cdfc4578faf9fddeaf4e1698ac584bf5495bd6c6b9302",
+      "current_sha256": "66601e1fc4a730d2e82711bb6151fcebdcca88c1216f8c49f85cff18781bf772",
+      "diff": "--- \n+++ \n@@ -139,11 +139,13 @@\n     return {\"start\": start, \"goal\": goal, \"centres\": centres, \"panels\": panels, \"motif\": str(motif)}\n \n \n-def sample_layout(rng) -> Optional[dict]:\n-    \"\"\"One Paper 2-style layout, or None if this draw failed a check.\"\"\"\n+def sample_layout(rng, straight: bool = False) -> Optional[dict]:\n+    \"\"\"One Paper 2-style layout, or None if this draw failed a check.  `straight`\n+    (test set v3, 2026-10-03) puts the goal straight ahead of the start -- a\n+    boustrophedon survey lane; the default draw and its random stream are unchanged.\"\"\"\n     xs = float(rng.uniform(*LEG_X_RANGE))\n     max_dx = 20.0 * math.tan(math.radians(MAX_SLANT_DEG))\n-    xg = float(np.clip(xs + rng.uniform(-max_dx, max_dx), *LEG_X_RANGE))\n+    xg = xs if straight else float(np.clip(xs + rng.uniform(-max_dx, max_dx), *LEG_X_RANGE))\n     start, goal = (xs, float(cfg.BASIN_START_Y)), (xg, float(cfg.BASIN_GOAL_Y))\n     t = _unit(start, goal)\n     n = np.array([t[1], -t[0]])                          # starboard of the leg\n@@ -195,7 +197,8 @@\n            encounter: Optional[str] = None, varying: Optional[bool] = None,\n            seed_fn=None, weights: Optional[Dict[str, float]] = None,\n            varying_share: Optional[float] = None, solvable_only: bool = False,\n-           near_share: float = 0.0, near: Optional[bool] = None) -> scn.Scenario:\n+           near_share: float = 0.0, near: Optional[bool] = None,\n+           straight: bool = False) -> scn.Scenario:\n     \"\"\"One field-layout scenario.  `encounter` / `varying` force the draw (the\n     validation set); otherwise they are drawn -- from `weights` over \"NT\" and the\n     encounter codes when given (finetune-field-v2's failure weighting), else no\n@@ -214,7 +217,7 @@\n         layout = None\n         use_near = near if near is not None else (near_share > 0.0 and rng.uniform() < near_share)\n         while layout is None:\n-            layout = sample_near_layout(rng) if use_near else sample_layout(rng)\n+            layout = sample_near_layout(rng) if use_near else sample_layout(rng, straight=straight)\n         flags = {\"basin_leg\": [list(layout[\"start\"]), list(layout[\"goal\"])],\n                  \"fixed_obstacles\": [[list(p) for p in poly] for poly in layout[\"panels\"]],\n                  \"set\": \"field_training\", \"motif\": layout[\"motif\"]}\n"
+    }
+  ],
+  "rationale": "Only common-file difference is field_training.py adding opt-in straight=False scene generation. Evaluations load frozen cached BuiltScenario objects and do not call the generator; exact seeds and scenario digests are checked. This is an inspected relevance judgment, not identical full source inventories.",
+  "checkpoint_match": true,
+  "config_match": true,
+  "constants_source_match": true,
+  "new_thread_settings": {
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1"
+  },
+  "fresh_reproduction_probes": [
+    {
+      "folder": "baseline_thread_check",
+      "case": "TS2:CH-CR-CV-073",
+      "mode": "v8",
+      "matching_fields": {
+        "outcome": true,
+        "steps": true,
+        "safety_v2_steps": true,
+        "safety_v2_brake_steps": true
+      },
+      "values": {
+        "outcome": "goal",
+        "steps": "138",
+        "safety_v2_steps": "32",
+        "safety_v2_brake_steps": "9"
+      }
+    },
+    {
+      "folder": "baseline_thread_check",
+      "case": "TS2:P2-L1-CRP-FIX-05",
+      "mode": "v8",
+      "matching_fields": {
+        "outcome": true,
+        "steps": true,
+        "safety_v2_steps": true,
+        "safety_v2_brake_steps": true
+      },
+      "values": {
+        "outcome": "collision:target",
+        "steps": "18",
+        "safety_v2_steps": "0",
+        "safety_v2_brake_steps": "0"
+      }
+    },
+    {
+      "folder": "missing_target_diagnostics",
+      "case": "TS2:P2-L1-CRP-FIX-05",
+      "mode": "v8",
+      "matching_fields": {
+        "outcome": true,
+        "steps": true,
+        "safety_v2_steps": true,
+        "safety_v2_brake_steps": true
+      },
+      "values": {
+        "outcome": "collision:target",
+        "steps": "18",
+        "safety_v2_steps": "0",
+        "safety_v2_brake_steps": "0"
+      }
+    },
+    {
+      "folder": "missing_target_diagnostics",
+      "case": "TS2:P2-L1-CRS-VAR-08",
+      "mode": "v8",
+      "matching_fields": {
+        "outcome": true,
+        "steps": true,
+        "safety_v2_steps": true,
+        "safety_v2_brake_steps": true
+      },
+      "values": {
+        "outcome": "collision:target",
+        "steps": "21",
+        "safety_v2_steps": "0",
+        "safety_v2_brake_steps": "0"
+      }
+    },
+    {
+      "folder": "missing_target_diagnostics",
+      "case": "TS2:P2-L1-CRP-VAR-14",
+      "mode": "v8",
+      "matching_fields": {
+        "outcome": true,
+        "steps": true,
+        "safety_v2_steps": true,
+        "safety_v2_brake_steps": true
+      },
+      "values": {
+        "outcome": "collision:target",
+        "steps": "17",
+        "safety_v2_steps": "0",
+        "safety_v2_brake_steps": "0"
+      }
+    }
+  ],
+  "limits": "Five reproduction runs cover four unique cases, not all32. Runtime thread limits differ; two probes also check exact intervention/step count. Candidate-specific files and runner are separately archived."
+}

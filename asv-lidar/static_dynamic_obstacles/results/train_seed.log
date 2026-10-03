@@ -44,3 +44,35 @@ code matches baseline-v3
 2026-10-03 03:59:24    ppos0_bl3 2.5 M exit 0
 2026-10-03 03:59:25 == ppos0_bl3: 2.5 M -> 3.0 M
 2026-10-03 04:01:58    pinned learner 12172
+2026-10-03 11:37:15    ppos0_bl3 3.0 M exit 0
+code matches baseline-v3
+2026-10-03 11:38:23 == ppo seed 0: already trained
+2026-10-03 11:44:20    tier 1 ppos0_bl3 supervisor off exit 0
+2026-10-03 11:50:11    tier 1 ppos0_bl3 supervisor on exit 0
+2026-10-03 12:58:42    frozen suite ppos0_bl3 exit 0
+2026-10-03 14:24:41    Paper 2 set ppos0_bl3 exit 0
+2026-10-03 14:24:41 == ppo seed 0 done
+2026-10-03 14:28:08    ppos0_bl3 finished; G4 pilots start
+2026-10-03 14:28:08 == G4 pilot A: v4 from 1.5 M to 2.0 M, gamma 0.9509900498999999
+2026-10-03 14:30:41    pinned pilot learner 29856
+2026-10-03 15:49:47 == v4 revision watcher armed: waiting for '== G4 done'
+2026-10-03 15:49:50    v4 draft revision exit 0 (formulation_v4 revised to 4.1-draft)
+2026-10-03 15:51:08    v4 revision watcher misfired (its own note matched); stopped, formulation_v4 restored to 4.0-draft, G3 run stopped
+2026-10-03 15:51:29 == v4 revision watcher armed: waiting for the G4 pilots to finish
+2026-10-03 18:22:40    pilot A exit 0
+2026-10-03 18:22:41 == G4 pilot B: v4 from 1.5 M to 2.0 M, gamma 0.98
+2026-10-03 18:25:15    pinned pilot learner 8088
+2026-10-03 20:59:51    pilot B exit 0
+2026-10-03 21:28:52    G4 evaluation exit 0 (results/v4_gates/g4_summary.txt)
+2026-10-03 21:28:52 == G4 done
+2026-10-03 21:33:03    v4 draft revision exit 0 (formulation_v4 revised to 4.1-draft)
+2026-10-03 21:45:45    G3 on the 4.1 draft exit 0 (results/v4_gates/g3_summary.txt)
+2026-10-03 21:45:45 == v4 revision done
+2026-10-03 22:29:13 == feasibility run: oracle (development sets), crossing trace, oracle (test set v3); 5 processes
+2026-10-03 22:29:14    oracle development sets exit 127 (results/feasibility/oracle_summary.txt)
+2026-10-03 22:29:14    crossing trace exit 127 (results/crossing_trace/summary.txt)
+2026-10-03 22:29:14    oracle test set v3 exit 127 (results/feasibility/oracle_summary.txt)
+2026-10-03 22:29:14 == feasibility run done
+2026-10-03 22:29:27    (the 22:29 feasibility lines above were a false start under WSL bash: python not found, nothing ran; relaunched with Git Bash)
+2026-10-03 22:29:27 == feasibility run: oracle (development sets), crossing trace, oracle (test set v3); 5 processes
+2026-10-03 22:32:50    dev controller outcomes (SAC 3 M, LOS-DWA, COLREGs-VO on the 370 oracle dev episodes; 3 processes) -> results/feasibility/dev_outcomes.csv

@@ -1,0 +1,28 @@
+1000 episode images written
+sheet basin-head_on: 100
+sheet basin-crossing: 100
+sheet basin-overtaking: 100
+sheet basin-being_overtaken: 95
+sheet basin-null: 75
+sheet channel-head_on: 98
+sheet channel-crossing: 100
+sheet channel-overtaking: 93
+sheet L1-HO: 15
+sheet L1-CRP: 17
+sheet L1-CRS: 18
+sheet L1-OT: 15
+sheet L2-HO: 15
+sheet L2-CRP: 15
+sheet L2-CRS: 17
+sheet L2-OT: 15
+sheet L2-BO: 15
+sheet L3-HO: 15
+sheet L3-CRP: 19
+sheet L3-CRS: 15
+sheet L3-OT: 15
+sheet L3-BO: 15
+sheet L1-NT: 1
+sheet L2-NT: 1
+sheet L3-NT: 1
+sheet L1-BO: 15
+done: C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\results\test_set\v2\images

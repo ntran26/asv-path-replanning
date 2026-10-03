@@ -1,0 +1,1966 @@
+{
+  "scope": "Saved-only comparison. Exact-ID duplication is established; causality of the eventual collision requires a paired feature ablation. No episodes or controller calls.",
+  "case": "TS2:BAS-CR-RE-072",
+  "outcomes": {
+    "v10": "goal",
+    "v11": "collision:obstacle"
+  },
+  "source_traces": [
+    {
+      "path": "results/safety_dev/v10_iterations/conditional_policy_32/traces/002_v10.jsonl",
+      "sha256": "e2d58c872d42f1b4961a1fff1f0f9c33db41164d437dcfa4ef95e4f2951c47e1"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/persistence_remaining29/traces/002_v11.jsonl",
+      "sha256": "7b200b9fd7ecf0a4118035829a703128beeeed8bbedbe9fa36d1d74fc27b4520"
+    }
+  ],
+  "first_command_divergence_step": 8,
+  "first_stored_plan_difference_step": 4,
+  "equal_pre_state_at_first_command_divergence": true,
+  "equal_policy_at_first_command_divergence": true,
+  "first_commands": {
+    "v10": [
+      0.09994859993457794,
+      12.0
+    ],
+    "v11": [
+      0.10077382624149323,
+      12.0
+    ]
+  },
+  "duplicated_source_frames": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41
+  ],
+  "frames": [
+    {
+      "step": 1,
+      "target_ids": [],
+      "base_track_count": 0,
+      "hypotheses": [],
+      "updates": [],
+      "why": "nominal",
+      "changed": false
+    },
+    {
+      "step": 2,
+      "target_ids": [],
+      "base_track_count": 0,
+      "hypotheses": [],
+      "updates": [],
+      "why": "nominal",
+      "changed": false
+    },
+    {
+      "step": 3,
+      "target_ids": [
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [],
+      "updates": [],
+      "why": "nominal",
+      "changed": false
+    },
+    {
+      "step": 4,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 4,
+          "age_s": 0.0,
+          "position": [
+            2.5669009643252263,
+            8.055947318284586
+          ],
+          "velocity": [
+            0.4267737449497844,
+            -0.13212939106765514
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.4467594491025041
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "admission",
+          "base_admitted": true,
+          "observations": 3,
+          "observation_frames": [
+            2,
+            3,
+            4
+          ],
+          "endpoint_translation_m": [
+            0.40661158252928753,
+            0.4832263370355321
+          ],
+          "max_translation_residual_m": 0.027894119373860445
+        }
+      ],
+      "why": "searched policy",
+      "changed": false
+    },
+    {
+      "step": 5,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 5,
+          "age_s": 0.0,
+          "position": [
+            2.8356126716586294,
+            7.926265146191916
+          ],
+          "velocity": [
+            0.4799246588910644,
+            -0.08318181139610488
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.4870799646452743
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 4,
+          "observation_frames": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "endpoint_translation_m": [
+            0.6978122754060008,
+            0.7611718354415009
+          ],
+          "max_translation_residual_m": 0.04215039996415892
+        }
+      ],
+      "why": "searched policy",
+      "changed": false
+    },
+    {
+      "step": 6,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 6,
+          "age_s": 0.0,
+          "position": [
+            3.087192904137557,
+            8.002944171597116
+          ],
+          "velocity": [
+            0.4869446659405255,
+            -0.08652201884561493
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.49457170100305065
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "endpoint_translation_m": [
+            0.9315798934297955,
+            0.9981425990450699
+          ],
+          "max_translation_residual_m": 0.041564658885020984
+        }
+      ],
+      "why": "searched policy",
+      "changed": false
+    },
+    {
+      "step": 7,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 7,
+          "age_s": 0.0,
+          "position": [
+            3.338658511491902,
+            7.872094172284662
+          ],
+          "velocity": [
+            0.5051469160821739,
+            -0.1130056690174962
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.5176327733610215
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "endpoint_translation_m": [
+            1.038082760501708,
+            1.031184354893449
+          ],
+          "max_translation_residual_m": 0.050561916288735125
+        }
+      ],
+      "why": "feasible policy backup",
+      "changed": false
+    },
+    {
+      "step": 8,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 7,
+          "age_s": 0.5,
+          "position": [
+            3.5912319695329886,
+            7.815591337775913
+          ],
+          "velocity": [
+            0.5051469160821739,
+            -0.1130056690174962
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.5176327733610215
+        }
+      ],
+      "updates": [],
+      "why": "last certificate",
+      "changed": true
+    },
+    {
+      "step": 9,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 7,
+          "age_s": 1.0,
+          "position": [
+            3.843805427574076,
+            7.759088503267166
+          ],
+          "velocity": [
+            0.5051469160821739,
+            -0.1130056690174962
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.5176327733610215
+        }
+      ],
+      "updates": [],
+      "why": "last certificate",
+      "changed": true
+    },
+    {
+      "step": 10,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 7,
+          "age_s": 1.5,
+          "position": [
+            4.096378885615163,
+            7.7025856687584175
+          ],
+          "velocity": [
+            0.5051469160821739,
+            -0.1130056690174962
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.5176327733610215
+        }
+      ],
+      "updates": [],
+      "why": "last certificate",
+      "changed": true
+    },
+    {
+      "step": 11,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 7,
+          "age_s": 2.0,
+          "position": [
+            4.34895234365625,
+            7.646082834249669
+          ],
+          "velocity": [
+            0.5051469160821739,
+            -0.1130056690174962
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.5176327733610215
+        }
+      ],
+      "updates": [],
+      "why": "last certificate",
+      "changed": true
+    },
+    {
+      "step": 12,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 7,
+          "age_s": 2.5,
+          "position": [
+            4.601525801697337,
+            7.589579999740922
+          ],
+          "velocity": [
+            0.5051469160821739,
+            -0.1130056690174962
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.5176327733610215
+        }
+      ],
+      "updates": [],
+      "why": "no escape",
+      "changed": false
+    },
+    {
+      "step": 13,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 7,
+          "age_s": 3.0,
+          "position": [
+            4.854099259738423,
+            7.533077165232173
+          ],
+          "velocity": [
+            0.5051469160821739,
+            -0.1130056690174962
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.5176327733610215
+        }
+      ],
+      "updates": [],
+      "why": "searched escape",
+      "changed": true
+    },
+    {
+      "step": 14,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 7,
+          "age_s": 3.5,
+          "position": [
+            5.10667271777951,
+            7.476574330723425
+          ],
+          "velocity": [
+            0.5051469160821739,
+            -0.1130056690174962
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.5176327733610215
+        }
+      ],
+      "updates": [],
+      "why": "searched escape",
+      "changed": true
+    },
+    {
+      "step": 15,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 7,
+          "age_s": 4.0,
+          "position": [
+            5.359246175820598,
+            7.4200714962146765
+          ],
+          "velocity": [
+            0.5051469160821739,
+            -0.1130056690174962
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.5176327733610215
+        }
+      ],
+      "updates": [],
+      "why": "turn",
+      "changed": false
+    },
+    {
+      "step": 16,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 7,
+          "age_s": 4.5,
+          "position": [
+            5.611819633861684,
+            7.363568661705929
+          ],
+          "velocity": [
+            0.5051469160821739,
+            -0.1130056690174962
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.5176327733610215
+        }
+      ],
+      "updates": [],
+      "why": "last certificate",
+      "changed": true
+    },
+    {
+      "step": 17,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 17,
+          "age_s": 0.0,
+          "position": [
+            5.75006567566883,
+            7.253390787344473
+          ],
+          "velocity": [
+            0.5184266324450086,
+            -0.0716723655116581
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.5233575271325605
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 3,
+          "observation_frames": [
+            15,
+            16,
+            17
+          ],
+          "endpoint_translation_m": [
+            0.5348588494359721,
+            0.5112980292326128
+          ],
+          "max_translation_residual_m": 0.04880475280316896
+        }
+      ],
+      "why": "last certificate",
+      "changed": true
+    },
+    {
+      "step": 18,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 18,
+          "age_s": 0.0,
+          "position": [
+            5.996209695211702,
+            7.164490444352761
+          ],
+          "velocity": [
+            0.5288282100489835,
+            -0.022083473605096122
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.5292891039404446
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 4,
+          "observation_frames": [
+            15,
+            16,
+            17,
+            18
+          ],
+          "endpoint_translation_m": [
+            0.7566513045691261,
+            0.806692858998467
+          ],
+          "max_translation_residual_m": 0.050037280619488825
+        }
+      ],
+      "why": "last certificate",
+      "changed": true
+    },
+    {
+      "step": 19,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 19,
+          "age_s": 0.0,
+          "position": [
+            6.163906027518694,
+            7.149502025072137
+          ],
+          "velocity": [
+            0.4963597112999964,
+            -0.030884502088024526
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.49731963109356636
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "endpoint_translation_m": [
+            0.9248914685862477,
+            0.9867068098286529
+          ],
+          "max_translation_residual_m": 0.047445332839308796
+        }
+      ],
+      "why": "turn",
+      "changed": true
+    },
+    {
+      "step": 20,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 20,
+          "age_s": 0.0,
+          "position": [
+            6.393940049912811,
+            7.04630458841024
+          ],
+          "velocity": [
+            0.46908724933906254,
+            -0.07051811982188266
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.47435814814937166
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "endpoint_translation_m": [
+            0.9422337018647893,
+            0.9709106174525819
+          ],
+          "max_translation_residual_m": 0.06398004008549449
+        }
+      ],
+      "why": "turn",
+      "changed": true
+    },
+    {
+      "step": 21,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 21,
+          "age_s": 0.0,
+          "position": [
+            6.679309068470644,
+            6.951804121917754
+          ],
+          "velocity": [
+            0.46083695255755835,
+            -0.14105797115000585
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.4819419550812039
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            17,
+            18,
+            19,
+            20,
+            21
+          ],
+          "endpoint_translation_m": [
+            0.9570635163922003,
+            1.0161763152127024
+          ],
+          "max_translation_residual_m": 0.0753994480185515
+        }
+      ],
+      "why": "turn",
+      "changed": false
+    },
+    {
+      "step": 22,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 22,
+          "age_s": 0.0,
+          "position": [
+            6.854204451786792,
+            6.883699846853273
+          ],
+          "velocity": [
+            0.45508216921665046,
+            -0.16792990520324674
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.4850775544183667
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            18,
+            19,
+            20,
+            21,
+            22
+          ],
+          "endpoint_translation_m": [
+            0.9478426897006504,
+            0.910296068723849
+          ],
+          "max_translation_residual_m": 0.04662041325607435
+        }
+      ],
+      "why": "turn",
+      "changed": false
+    },
+    {
+      "step": 23,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 23,
+          "age_s": 0.0,
+          "position": [
+            7.1272617378265615,
+            6.756419115722251
+          ],
+          "velocity": [
+            0.47401274801848275,
+            -0.22352191663225002
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.5240707323434387
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            19,
+            20,
+            21,
+            22,
+            23
+          ],
+          "endpoint_translation_m": [
+            1.077511505275651,
+            1.042512171389839
+          ],
+          "max_translation_residual_m": 0.03639890310010861
+        }
+      ],
+      "why": "last certificate",
+      "changed": true
+    },
+    {
+      "step": 24,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 24,
+          "age_s": 0.0,
+          "position": [
+            7.308110132829452,
+            6.708266085591326
+          ],
+          "velocity": [
+            0.4490392112462075,
+            -0.20569192006768133
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.4939082700438874
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            20,
+            21,
+            22,
+            23,
+            24
+          ],
+          "endpoint_translation_m": [
+            1.005225586257807,
+            0.9662321533347105
+          ],
+          "max_translation_residual_m": 0.0441597802238134
+        }
+      ],
+      "why": "turn",
+      "changed": false
+    },
+    {
+      "step": 25,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 25,
+          "age_s": 0.0,
+          "position": [
+            7.535262203186406,
+            6.589120705994209
+          ],
+          "velocity": [
+            0.4373516741929908,
+            -0.17984542159788988
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.4728856760244856
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            21,
+            22,
+            23,
+            24,
+            25
+          ],
+          "endpoint_translation_m": [
+            0.9601496220914676,
+            0.9172833576793504
+          ],
+          "max_translation_residual_m": 0.048262083411923215
+        }
+      ],
+      "why": "turn",
+      "changed": false
+    },
+    {
+      "step": 26,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 26,
+          "age_s": 0.0,
+          "position": [
+            7.746285879025762,
+            6.484720627201561
+          ],
+          "velocity": [
+            0.41754085811982333,
+            -0.2399751340135702
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.4815894861230563
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            22,
+            23,
+            24,
+            25,
+            26
+          ],
+          "endpoint_translation_m": [
+            0.9851299092273949,
+            0.9693428990918624
+          ],
+          "max_translation_residual_m": 0.08787834590285608
+        }
+      ],
+      "why": "turn",
+      "changed": false
+    },
+    {
+      "step": 27,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 27,
+          "age_s": 0.0,
+          "position": [
+            7.977090887440127,
+            6.411905012434054
+          ],
+          "velocity": [
+            0.3890796865941242,
+            -0.2673828453516402
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.4720980708587158
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            23,
+            24,
+            25,
+            26,
+            27
+          ],
+          "endpoint_translation_m": [
+            0.9507661043466791,
+            0.8877114357608091
+          ],
+          "max_translation_residual_m": 0.09780508124485808
+        }
+      ],
+      "why": "turn",
+      "changed": false
+    },
+    {
+      "step": 28,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 28,
+          "age_s": 0.0,
+          "position": [
+            8.24561158779476,
+            6.361248596160914
+          ],
+          "velocity": [
+            0.4264815205395611,
+            -0.25768350354199465
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.4982843318421855
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            24,
+            25,
+            26,
+            27,
+            28
+          ],
+          "endpoint_translation_m": [
+            1.015339813864661,
+            0.97985003504815
+          ],
+          "max_translation_residual_m": 0.09976441836819558
+        }
+      ],
+      "why": "policy prefix repaired",
+      "changed": false
+    },
+    {
+      "step": 29,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 29,
+          "age_s": 0.0,
+          "position": [
+            8.346171191586258,
+            6.161842801015122
+          ],
+          "velocity": [
+            0.3944051627431811,
+            -0.2625904129653091
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.47382397298972406
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "endpoint_translation_m": [
+            0.9450616859755825,
+            0.8841219213162121
+          ],
+          "max_translation_residual_m": 0.09516052813511532
+        }
+      ],
+      "why": "turn",
+      "changed": true
+    },
+    {
+      "step": 30,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 30,
+          "age_s": 0.0,
+          "position": [
+            8.703310734386616,
+            6.100303588578344
+          ],
+          "velocity": [
+            0.4682284693463499,
+            -0.1771309359078093
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.5006128923250001
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            26,
+            27,
+            28,
+            29,
+            30
+          ],
+          "endpoint_translation_m": [
+            1.06220039725486,
+            0.9990840133385852
+          ],
+          "max_translation_residual_m": 0.12275488802208726
+        }
+      ],
+      "why": "continue",
+      "changed": true
+    },
+    {
+      "step": 31,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 31,
+          "age_s": 0.0,
+          "position": [
+            8.867191721614015,
+            5.9929657468707225
+          ],
+          "velocity": [
+            0.45098293213051915,
+            -0.21094445174645948
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.49787866674085846
+        }
+      ],
+      "updates": [
+        {
+          "source_id": 4,
+          "synthetic_id": -1000000,
+          "kind": "measured_refresh",
+          "base_admitted": true,
+          "observations": 5,
+          "observation_frames": [
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "endpoint_translation_m": [
+            1.0090881344879121,
+            0.9556082292696662
+          ],
+          "max_translation_residual_m": 0.10900447130471948
+        }
+      ],
+      "why": "continue",
+      "changed": true
+    },
+    {
+      "step": 32,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 31,
+          "age_s": 0.5,
+          "position": [
+            9.092683187679274,
+            5.887493520997492
+          ],
+          "velocity": [
+            0.45098293213051915,
+            -0.21094445174645948
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.49787866674085846
+        }
+      ],
+      "updates": [],
+      "why": "turn",
+      "changed": false
+    },
+    {
+      "step": 33,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 31,
+          "age_s": 1.0,
+          "position": [
+            9.318174653744533,
+            5.782021295124263
+          ],
+          "velocity": [
+            0.45098293213051915,
+            -0.21094445174645948
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.49787866674085846
+        }
+      ],
+      "updates": [],
+      "why": "policy prefix repaired",
+      "changed": false
+    },
+    {
+      "step": 34,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 31,
+          "age_s": 1.5,
+          "position": [
+            9.543666119809794,
+            5.676549069251033
+          ],
+          "velocity": [
+            0.45098293213051915,
+            -0.21094445174645948
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.49787866674085846
+        }
+      ],
+      "updates": [],
+      "why": "continue",
+      "changed": true
+    },
+    {
+      "step": 35,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 31,
+          "age_s": 2.0,
+          "position": [
+            9.769157585875053,
+            5.571076843377804
+          ],
+          "velocity": [
+            0.45098293213051915,
+            -0.21094445174645948
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.49787866674085846
+        }
+      ],
+      "updates": [],
+      "why": "policy prefix repaired",
+      "changed": false
+    },
+    {
+      "step": 36,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 31,
+          "age_s": 2.5,
+          "position": [
+            9.994649051940312,
+            5.465604617504574
+          ],
+          "velocity": [
+            0.45098293213051915,
+            -0.21094445174645948
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.49787866674085846
+        }
+      ],
+      "updates": [],
+      "why": "last certificate",
+      "changed": true
+    },
+    {
+      "step": 37,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 31,
+          "age_s": 3.0,
+          "position": [
+            10.220140518005572,
+            5.360132391631344
+          ],
+          "velocity": [
+            0.45098293213051915,
+            -0.21094445174645948
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.49787866674085846
+        }
+      ],
+      "updates": [],
+      "why": "turn",
+      "changed": true
+    },
+    {
+      "step": 38,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 31,
+          "age_s": 3.5,
+          "position": [
+            10.445631984070832,
+            5.254660165758114
+          ],
+          "velocity": [
+            0.45098293213051915,
+            -0.21094445174645948
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.49787866674085846
+        }
+      ],
+      "updates": [],
+      "why": "turn",
+      "changed": true
+    },
+    {
+      "step": 39,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 31,
+          "age_s": 4.0,
+          "position": [
+            10.671123450136092,
+            5.149187939884884
+          ],
+          "velocity": [
+            0.45098293213051915,
+            -0.21094445174645948
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.49787866674085846
+        }
+      ],
+      "updates": [],
+      "why": "turn",
+      "changed": false
+    },
+    {
+      "step": 40,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 31,
+          "age_s": 4.5,
+          "position": [
+            10.89661491620135,
+            5.043715714011655
+          ],
+          "velocity": [
+            0.45098293213051915,
+            -0.21094445174645948
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.49787866674085846
+        }
+      ],
+      "updates": [],
+      "why": "turn",
+      "changed": false
+    },
+    {
+      "step": 41,
+      "target_ids": [
+        -1000000,
+        4
+      ],
+      "base_track_count": 1,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 31,
+          "age_s": 5.0,
+          "position": [
+            11.12210638226661,
+            4.938243488138426
+          ],
+          "velocity": [
+            0.45098293213051915,
+            -0.21094445174645948
+          ],
+          "source_present_in_filter": true,
+          "speed_mps": 0.49787866674085846
+        }
+      ],
+      "updates": [],
+      "why": "turn",
+      "changed": false
+    },
+    {
+      "step": 42,
+      "target_ids": [
+        -1000000
+      ],
+      "base_track_count": 0,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 31,
+          "age_s": 5.5,
+          "position": [
+            11.34759784833187,
+            4.8327712622651955
+          ],
+          "velocity": [
+            0.45098293213051915,
+            -0.21094445174645948
+          ],
+          "source_present_in_filter": false,
+          "speed_mps": 0.49787866674085846
+        }
+      ],
+      "updates": [],
+      "why": "policy margin dominates",
+      "changed": false
+    },
+    {
+      "step": 43,
+      "target_ids": [
+        -1000000
+      ],
+      "base_track_count": 0,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 31,
+          "age_s": 6.0,
+          "position": [
+            11.57308931439713,
+            4.727299036391965
+          ],
+          "velocity": [
+            0.45098293213051915,
+            -0.21094445174645948
+          ],
+          "source_present_in_filter": false,
+          "speed_mps": 0.49787866674085846
+        }
+      ],
+      "updates": [],
+      "why": "continue",
+      "changed": true
+    },
+    {
+      "step": 44,
+      "target_ids": [
+        -1000000
+      ],
+      "base_track_count": 0,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 31,
+          "age_s": 6.5,
+          "position": [
+            11.79858078046239,
+            4.621826810518736
+          ],
+          "velocity": [
+            0.45098293213051915,
+            -0.21094445174645948
+          ],
+          "source_present_in_filter": false,
+          "speed_mps": 0.49787866674085846
+        }
+      ],
+      "updates": [],
+      "why": "last certificate",
+      "changed": true
+    },
+    {
+      "step": 45,
+      "target_ids": [
+        -1000000
+      ],
+      "base_track_count": 0,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 31,
+          "age_s": 7.0,
+          "position": [
+            12.024072246527648,
+            4.516354584645506
+          ],
+          "velocity": [
+            0.45098293213051915,
+            -0.21094445174645948
+          ],
+          "source_present_in_filter": false,
+          "speed_mps": 0.49787866674085846
+        }
+      ],
+      "updates": [],
+      "why": "turn",
+      "changed": true
+    },
+    {
+      "step": 46,
+      "target_ids": [
+        -1000000
+      ],
+      "base_track_count": 0,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 31,
+          "age_s": 7.5,
+          "position": [
+            12.24956371259291,
+            4.410882358772277
+          ],
+          "velocity": [
+            0.45098293213051915,
+            -0.21094445174645948
+          ],
+          "source_present_in_filter": false,
+          "speed_mps": 0.49787866674085846
+        }
+      ],
+      "updates": [],
+      "why": "continue",
+      "changed": true
+    },
+    {
+      "step": 47,
+      "target_ids": [
+        -1000000
+      ],
+      "base_track_count": 0,
+      "hypotheses": [
+        {
+          "source_id": 4,
+          "id": -1000000,
+          "anchor_frame": 31,
+          "age_s": 8.0,
+          "position": [
+            12.475055178658168,
+            4.305410132899047
+          ],
+          "velocity": [
+            0.45098293213051915,
+            -0.21094445174645948
+          ],
+          "source_present_in_filter": false,
+          "speed_mps": 0.49787866674085846
+        }
+      ],
+      "updates": [],
+      "why": "turn",
+      "changed": false
+    },
+    {
+      "step": 48,
+      "target_ids": [],
+      "base_track_count": 0,
+      "hypotheses": [],
+      "updates": [],
+      "why": "turn",
+      "changed": false
+    },
+    {
+      "step": 49,
+      "target_ids": [],
+      "base_track_count": 0,
+      "hypotheses": [],
+      "updates": [],
+      "why": "turn",
+      "changed": false
+    },
+    {
+      "step": 50,
+      "target_ids": [],
+      "base_track_count": 0,
+      "hypotheses": [],
+      "updates": [],
+      "why": "last certificate",
+      "changed": true
+    },
+    {
+      "step": 51,
+      "target_ids": [],
+      "base_track_count": 0,
+      "hypotheses": [],
+      "updates": [],
+      "why": "last certificate",
+      "changed": true
+    },
+    {
+      "step": 52,
+      "target_ids": [],
+      "base_track_count": 0,
+      "hypotheses": [],
+      "updates": [],
+      "why": "last certificate",
+      "changed": true
+    }
+  ],
+  "saved_three_case_priority_effects": [
+    {
+      "trace": "results/safety_dev/v10_iterations/missing_target_diagnostics/traces/001_v8.jsonl",
+      "suppression_frames": [],
+      "frames_still_with_added_hypothesis": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "multiple_absent_source_hypotheses_remaining_frames": [
+        16,
+        17,
+        18
+      ],
+      "note": "Static replay of membership only, not reevaluated policy outcomes."
+    },
+    {
+      "trace": "results/safety_dev/v10_iterations/missing_target_diagnostics/traces/002_v8.jsonl",
+      "suppression_frames": [
+        {
+          "step": 3,
+          "source_ids": [
+            8
+          ]
+        },
+        {
+          "step": 4,
+          "source_ids": [
+            8
+          ]
+        },
+        {
+          "step": 5,
+          "source_ids": [
+            8
+          ]
+        },
+        {
+          "step": 6,
+          "source_ids": [
+            8
+          ]
+        },
+        {
+          "step": 7,
+          "source_ids": [
+            8
+          ]
+        },
+        {
+          "step": 8,
+          "source_ids": [
+            8
+          ]
+        },
+        {
+          "step": 9,
+          "source_ids": [
+            8
+          ]
+        },
+        {
+          "step": 10,
+          "source_ids": [
+            8
+          ]
+        },
+        {
+          "step": 11,
+          "source_ids": [
+            8
+          ]
+        },
+        {
+          "step": 12,
+          "source_ids": [
+            8
+          ]
+        }
+      ],
+      "frames_still_with_added_hypothesis": [
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "multiple_absent_source_hypotheses_remaining_frames": [
+        19,
+        20,
+        21
+      ],
+      "note": "Static replay of membership only, not reevaluated policy outcomes."
+    },
+    {
+      "trace": "results/safety_dev/v10_iterations/missing_target_diagnostics/traces/003_v8.jsonl",
+      "suppression_frames": [
+        {
+          "step": 4,
+          "source_ids": [
+            13
+          ]
+        },
+        {
+          "step": 5,
+          "source_ids": [
+            13
+          ]
+        },
+        {
+          "step": 6,
+          "source_ids": [
+            13
+          ]
+        },
+        {
+          "step": 7,
+          "source_ids": [
+            13
+          ]
+        },
+        {
+          "step": 8,
+          "source_ids": [
+            13
+          ]
+        },
+        {
+          "step": 9,
+          "source_ids": [
+            13
+          ]
+        },
+        {
+          "step": 10,
+          "source_ids": [
+            13
+          ]
+        }
+      ],
+      "frames_still_with_added_hypothesis": [
+        3,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "multiple_absent_source_hypotheses_remaining_frames": [
+        16,
+        17
+      ],
+      "note": "Static replay of membership only, not reevaluated policy outcomes."
+    }
+  ]
+}

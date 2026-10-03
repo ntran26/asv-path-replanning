@@ -1,0 +1,76 @@
+{
+  "scope": "Source-inventory evidence for two disjoint prefix slices. This audit does not waive the report helper's strict cohort guard or create results.",
+  "tags": [
+    "prefix_success16",
+    "prefix_remaining16"
+  ],
+  "case_counts": [
+    16,
+    16
+  ],
+  "combined_distinct_cases": 32,
+  "all_case_seeds_and_scenario_digests_match_canonical_saved_inventory": true,
+  "all_cases_exactly_cover_prior_fixed32": true,
+  "identical_setting_keys": [
+    "modes",
+    "filter_classes",
+    "constructor_options",
+    "checkpoint_sha256",
+    "config_sha256",
+    "constants",
+    "low_speed_start_frac",
+    "filter_installation",
+    "torch_threads",
+    "native_thread_environment"
+  ],
+  "common_sources_identical": 99,
+  "changed_common_sources": [],
+  "removed_sources": [],
+  "added_sources": {
+    "src/dev_set_v4.py": {
+      "sha256": "e86be9d1877d572fab8c21ac26649e4d9a0243ecb0fd820871f3612395612248"
+    },
+    "src/safety_v14.py": {
+      "sha256": "5d50db93850247e4a9e93d0cbe07b2faee82af8f64af3c36f06f6ac24abb04e7"
+    }
+  },
+  "literal_references_in_common_archived_sources": {
+    "dev_set_v4": [],
+    "safety_v14": [],
+    "SafetyFilterV14": []
+  },
+  "cached_loader_source": {
+    "file": "tools/diagnostics/safety/v9_paired_pilot.py",
+    "sha256": "f720c9b4c80ef26a5ca4a94993260dcce0a019bd2b95f31147441c9f4f087e67",
+    "first_line": 57,
+    "source": "def load_scenes(cases):\n    ts_path = ROOT / \"results/test_set/v2/set_v2.0.pkl\"\n    raw = ts_path.read_bytes()\n    kept, _ = pickle.loads(raw)\n    ts = {\"TS2:\" + item[\"test_id\"]: item for item in kept}\n    inventory = json.loads((ROOT / \"results/safety_dev/suites/inventory_v5/manifest.json\").read_text())\n    dv3 = {\"DV3:\" + item[\"case\"]: item for item in inventory[\"cases\"]\n           if item[\"suite\"] == \"dev_field\"}\n    scenes, provenance = {}, {ts_path.relative_to(ROOT).as_posix(): sha(raw)}\n    for row in cases:\n        case = row[\"case\"]\n        if case in ts:\n            entry = ts[case]\n            built, seed = entry[\"built\"], entry[\"episode_seed\"]\n        else:\n            entry = dv3[case]\n            seed = entry[\"seed\"]\n            matches = []\n            for path in sorted((ROOT / \"results/safety_dev/scenario_cache\").glob(f\"*/{entry['case']}.pkl\")):\n                data = path.read_bytes()\n                candidate = pickle.loads(data)\n                if candidate.digest() == entry[\"scenario_sha256\"]:\n                    matches.append((path, data, candidate))\n            if not matches:\n                raise ValueError(f\"No canonical cached scene for {case}; refusing regeneration\")\n            path, data, built = matches[0]\n            provenance[path.relative_to(ROOT).as_posix()] = sha(data)\n        if int(seed) != int(row[\"seed\"]) or built.digest() != row[\"scenario_sha256\"]:\n            raise ValueError(f\"Selection seed/geometry mismatch: {case}\")\n        scenes[case] = built\n    return scenes, provenance"
+  },
+  "generator_inspection": {
+    "function": "extension",
+    "top_level_calls": [],
+    "role": "Defines a separate60-case DV4X generator; generation occurs inside extension(), not while the cached loader reads source archives."
+  },
+  "reasoning": [
+    "The archived runner resolves prebuilt TS2 records from set_v2.0.pkl and DV3 from digest-matching cache files, then checks reset seeds and built.digest before creating its manifest.",
+    "The unchanged load_scenes function contains no fallback generation path; a missing DV3 cache raises refusing regeneration.",
+    "All99 shared archived Python files are byte-identical and contain no literal module/class reference to either added module.",
+    "The selected class/options remain SafetyFilterV11 with track admission/persistence disabled and policy-prefix search enabled.",
+    "These checks support treating the extra generator as unused by these cached-scenario runs, while explicitly retaining the unequal source inventories."
+  ],
+  "limitations": [
+    "A literal reference scan is not a general dynamic-import proof; no runtime import tracing or new simulations were performed.",
+    "This is not a completed-outcome report; each component still requires its own final completion/result/trace validation.",
+    "The strict report cohort API continues to reject dev_set_v4.py; combined outcomes must be labeled as an explicitly disclosed sum of separate validated pieces."
+  ],
+  "input_sha256": {
+    "results/safety_dev/v10_iterations/prefix_success16/manifest.json": "ea9694c325efe572ebd2cf67e9f302ca33fb5008ce2147ed4255ccbf0566e17f",
+    "results/safety_dev/v10_iterations/prefix_remaining16/manifest.json": "d75e21cdca249b9b1abfbd551c1a0a8b2ce7fe100800e89cfd3fa65c70d1de44",
+    "results/safety_dev/v10_iterations/prefix_success16/evaluated_sources.zip": "685f9443661c6f23c57cf608a3b78b2fc9de487ef8cdfca121d8cc1c242c08e3",
+    "results/safety_dev/v10_iterations/prefix_remaining16/evaluated_sources.zip": "8489a18d22ffc2c4c2ca129e16443b7b182b794e0cc82a287dcbb29d88b649ca",
+    "results/safety_dev/v9_paired_pilot/selection.json": "ee04253c16e0dfa7bbca7f2472362e432c5e4fb66fb411bc6c69d84bb3982b3b",
+    "results/test_set/v2/definition.csv": "a5a51b6c6a04762352a746fb90e785798cdb51af5eeb3cfb3fdc0d8e1f47220f",
+    "results/safety_dev/suites/inventory_v5/manifest.json": "a2f8cc2df0a254d3da1d01f3ee84985215f89a87eab9cc7806b59babe20a260e"
+  },
+  "audit_script_sha256": "d82fea42749b509c89dcd3440cb5ca542c270bea954334063057fd2d2419c8e5",
+  "new_episode_runs": 0
+}

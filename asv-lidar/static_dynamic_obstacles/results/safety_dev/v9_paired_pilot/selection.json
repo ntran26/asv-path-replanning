@@ -1,0 +1,1050 @@
+{
+  "schema": 1,
+  "tag": "v9_paired_pilot_fixed32",
+  "scope": "Fixed enriched diagnostic pilot; selection only, no episodes executed by this script",
+  "salt": "v9-paired-pilot-2026-10-03-fixed32",
+  "ranking": "ascending SHA256(UTF8(salt + \"|\" + case)), tie case ascending",
+  "modes": [
+    "off",
+    "v8",
+    "v9"
+  ],
+  "scenarios": 32,
+  "planned_new_episode_runs": 96,
+  "automatic_extra_runs_or_retries": false,
+  "input_sha256": {
+    "results/safety_dev/v8_followup_offline/audit/all_1150.csv": "0329ea7148ae95fc6145368f6c70c04f1165907f3455926ea3a940ea63f238d7",
+    "results/safety_dev/v8_followup_offline/audit/no_fire_last_decisions.json": "b0ea618ffe2c44d19539d8b4a49eea3c02e3de1868ffd7d0e814b8d5f5571add",
+    "results/test_set/v2/definition.csv": "a5a51b6c6a04762352a746fb90e785798cdb51af5eeb3cfb3fdc0d8e1f47220f",
+    "results/safety_dev/suites/inventory_v5/manifest.json": "a2f8cc2df0a254d3da1d01f3ee84985215f89a87eab9cc7806b59babe20a260e"
+  },
+  "cases": [
+    {
+      "case": "TS2:BAS-HO-NC-059",
+      "scenario_id": "BAS-HO-NC-059",
+      "dataset": "ts2",
+      "seed": 400058,
+      "scenario_sha256": "fb19c06cd0042fa9cbef579b8df7015a195330bcbb9c2de11a17cacec6d1e657",
+      "selection_stratum": "expired_consequences",
+      "rationale": "Include every observed consequence-bearing expired-plan case: four rescues and four breaks across DV3/TS2.",
+      "selection_rank_sha256": "0d8f690ce36b45742ae4b23aa06b9d651b1325c77a29567a3c2143cec341f6f5",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "collision:target",
+        "v8_outcome": "collision:target",
+        "v8_category": "broken",
+        "first_reason": "last certificate",
+        "first_fire_step": "20",
+        "selected_clearance": "-0.670574977063368",
+        "policy_prefix_repair_clearance": "-0.9155400386140955"
+      }
+    },
+    {
+      "case": "TS2:BAS-CR-RE-072",
+      "scenario_id": "BAS-CR-RE-072",
+      "dataset": "ts2",
+      "seed": 400171,
+      "scenario_sha256": "76e290782c493cdd5c6f9c7bc823dc954a2b94eae48e3b12720a9156f983934c",
+      "selection_stratum": "expired_consequences",
+      "rationale": "Include every observed consequence-bearing expired-plan case: four rescues and four breaks across DV3/TS2.",
+      "selection_rank_sha256": "1e3804bafcfd437e19bf85036005382b573df404f5e7ed76e67d2632014004d0",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "broken",
+        "first_reason": "last certificate",
+        "first_fire_step": "6",
+        "selected_clearance": "-0.2721243778550626",
+        "policy_prefix_repair_clearance": "0.042976237992692484"
+      }
+    },
+    {
+      "case": "DV3:DV3-BO-CV-04",
+      "scenario_id": "DV3-BO-CV-04",
+      "dataset": "dv3",
+      "seed": 900247,
+      "scenario_sha256": "a9392c7cd3e521bda23fc031c8c58d55debee0259284452bb41f47bb3ef55ba9",
+      "selection_stratum": "expired_consequences",
+      "rationale": "Include every observed consequence-bearing expired-plan case: four rescues and four breaks across DV3/TS2.",
+      "selection_rank_sha256": "2e4d35aa7e1500e5075fe8f64215986ac17188471b0471604940fba087b4278c",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "broken",
+        "first_reason": "last certificate",
+        "first_fire_step": "10",
+        "selected_clearance": "-0.42126009887376215",
+        "policy_prefix_repair_clearance": "-0.42725057676329736"
+      }
+    },
+    {
+      "case": "DV3:DV3-HO-CV-03",
+      "scenario_id": "DV3-HO-CV-03",
+      "dataset": "dv3",
+      "seed": 900142,
+      "scenario_sha256": "902f497799fa504670423e9d81c08e0e193da736889455dee3a9e979a88a1d5e",
+      "selection_stratum": "expired_consequences",
+      "rationale": "Include every observed consequence-bearing expired-plan case: four rescues and four breaks across DV3/TS2.",
+      "selection_rank_sha256": "75fe2e8cbde216216e2478da9ca86b1cb4ea1c1f21299f47c9ad12e72dc081b1",
+      "historical": {
+        "policy_outcome": "collision:obstacle",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "last certificate",
+        "first_fire_step": "15",
+        "selected_clearance": "-0.09763641215411006",
+        "policy_prefix_repair_clearance": "-0.10284106628082701"
+      }
+    },
+    {
+      "case": "TS2:CH-CR-RE-038",
+      "scenario_id": "CH-CR-RE-038",
+      "dataset": "ts2",
+      "seed": 400637,
+      "scenario_sha256": "0b48c0aca882dcfef6fe6d1b6dbcc04a2a2a74595ea820993b564a4f478c7cb2",
+      "selection_stratum": "expired_consequences",
+      "rationale": "Include every observed consequence-bearing expired-plan case: four rescues and four breaks across DV3/TS2.",
+      "selection_rank_sha256": "8af21d2ba2cd3b8abe356be15a2eb4e1b5683c6736eddbe91d869940ff3d5461",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "collision:target",
+        "v8_outcome": "collision:target",
+        "v8_category": "broken",
+        "first_reason": "last certificate",
+        "first_fire_step": "16",
+        "selected_clearance": "-1.2419105971070379",
+        "policy_prefix_repair_clearance": "-1.078314430917633"
+      }
+    },
+    {
+      "case": "DV3:DV3-CRP-CV-04",
+      "scenario_id": "DV3-CRP-CV-04",
+      "dataset": "dv3",
+      "seed": 900169,
+      "scenario_sha256": "bf63ee74573c6c390c645e03dc8ff78af05d6c43e23181af8c58b3670ee775ab",
+      "selection_stratum": "expired_consequences",
+      "rationale": "Include every observed consequence-bearing expired-plan case: four rescues and four breaks across DV3/TS2.",
+      "selection_rank_sha256": "a1233357a5a954f855298d91c801682daffd3ac554faa963bedf39f3ead5483b",
+      "historical": {
+        "policy_outcome": "collision:obstacle",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "last certificate",
+        "first_fire_step": "3",
+        "selected_clearance": "-0.4580115785925105",
+        "policy_prefix_repair_clearance": "-0.3808038874243228"
+      }
+    },
+    {
+      "case": "DV3:DV3-CRP-CV-17",
+      "scenario_id": "DV3-CRP-CV-17",
+      "dataset": "dv3",
+      "seed": 900182,
+      "scenario_sha256": "59bba61884b9c5230c4d5d4c9ce2ce3264b4e5941557094cdf67c96a0dac330f",
+      "selection_stratum": "expired_consequences",
+      "rationale": "Include every observed consequence-bearing expired-plan case: four rescues and four breaks across DV3/TS2.",
+      "selection_rank_sha256": "a4b73763cd535207abf1151d636ed925c80b404470625243d1fc9a794d770a14",
+      "historical": {
+        "policy_outcome": "collision:target",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "last certificate",
+        "first_fire_step": "3",
+        "selected_clearance": "-0.6563386477191813",
+        "policy_prefix_repair_clearance": "-0.6272146334221734"
+      }
+    },
+    {
+      "case": "DV3:DV3-HO-VS-01",
+      "scenario_id": "DV3-HO-VS-01",
+      "dataset": "dv3",
+      "seed": 900160,
+      "scenario_sha256": "4bbbef9b9c2cd521478bbf6774d9a9561062ab1e161ae0d720924879fe53d1a0",
+      "selection_stratum": "expired_consequences",
+      "rationale": "Include every observed consequence-bearing expired-plan case: four rescues and four breaks across DV3/TS2.",
+      "selection_rank_sha256": "d99909add91dce005fade1cf38071772c3f3fa71ff6fe51b4423d6c93059f37c",
+      "historical": {
+        "policy_outcome": "collision:boundary",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "last certificate",
+        "first_fire_step": "15",
+        "selected_clearance": "-0.15520825282217032",
+        "policy_prefix_repair_clearance": "-0.19190623410977267"
+      }
+    },
+    {
+      "case": "TS2:CH-HO-CV-073",
+      "scenario_id": "CH-HO-CV-073",
+      "dataset": "ts2",
+      "seed": 400572,
+      "scenario_sha256": "e9019500f29c085ff4a67a5c479025ec50bfac889214ce487774d981ad00ed68",
+      "selection_stratum": "other_broken_target",
+      "rationale": "Protect successful SAC trajectories across this collision type; current certified first proposals may still lead to later failures.",
+      "selection_rank_sha256": "183571a1a6c5218449a8a32f7a35f9e767f2d0d339697b7abeab6b067c5e7cdd",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "collision:target",
+        "v8_outcome": "collision:target",
+        "v8_category": "broken",
+        "first_reason": "brake",
+        "first_fire_step": "12",
+        "selected_clearance": "0.03445371077977785",
+        "policy_prefix_repair_clearance": "-0.8018640612545971"
+      }
+    },
+    {
+      "case": "TS2:BAS-BO-CV-063",
+      "scenario_id": "BAS-BO-CV-063",
+      "dataset": "ts2",
+      "seed": 400362,
+      "scenario_sha256": "d34350d020af27e2f3e8e3c489ee02aca539391605c7f26fe7e9f3af1157b6bf",
+      "selection_stratum": "other_broken_target",
+      "rationale": "Protect successful SAC trajectories across this collision type; current certified first proposals may still lead to later failures.",
+      "selection_rank_sha256": "45ec835642e49b5714ece7fcab0146d8f2b82f2e20ef4f23a54c1ae22ae46122",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "collision:target",
+        "v8_outcome": "collision:target",
+        "v8_category": "broken",
+        "first_reason": "turn",
+        "first_fire_step": "4",
+        "selected_clearance": "0.049612568100599636",
+        "policy_prefix_repair_clearance": "0.005933773230268641"
+      }
+    },
+    {
+      "case": "TS2:P2-L2-CRP-VAR-16",
+      "scenario_id": "P2-L2-CRP-VAR-16",
+      "dataset": "ts2",
+      "seed": 470135,
+      "scenario_sha256": "bd3eb7ef4bf89e455abf078bb2f6c8c4b0f9d9fae3193f510d00080d87da1f2f",
+      "selection_stratum": "other_broken_obstacle",
+      "rationale": "Protect successful SAC trajectories across this collision type; current certified first proposals may still lead to later failures.",
+      "selection_rank_sha256": "5040527535be4e1ab0a78401287f16b12cc58b77c356b8cd821a5c0005374ad9",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "collision:obstacle",
+        "v7_outcome": "collision:obstacle",
+        "v8_outcome": "collision:obstacle",
+        "v8_category": "broken",
+        "first_reason": "turn",
+        "first_fire_step": "6",
+        "selected_clearance": "0.12441269072379949",
+        "policy_prefix_repair_clearance": "-0.11149829072521414"
+      }
+    },
+    {
+      "case": "TS2:CH-CR-CV-007",
+      "scenario_id": "CH-CR-CV-007",
+      "dataset": "ts2",
+      "seed": 400606,
+      "scenario_sha256": "fc1de99133c054ec01f55f8c6e035181a7626fddc1485941256afb52b4bd7e81",
+      "selection_stratum": "other_broken_obstacle",
+      "rationale": "Protect successful SAC trajectories across this collision type; current certified first proposals may still lead to later failures.",
+      "selection_rank_sha256": "caac08a979f8ffddca5b83ec525237e03fdfd7243e7a6487d22978c645c713cc",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "collision:obstacle",
+        "v7_outcome": "collision:obstacle",
+        "v8_outcome": "collision:obstacle",
+        "v8_category": "broken",
+        "first_reason": "turn",
+        "first_fire_step": "10",
+        "selected_clearance": "0.2910298816789805",
+        "policy_prefix_repair_clearance": "0.0913378939004961"
+      }
+    },
+    {
+      "case": "TS2:CH-CR-CV-031",
+      "scenario_id": "CH-CR-CV-031",
+      "dataset": "ts2",
+      "seed": 400630,
+      "scenario_sha256": "14d98032dc0e68fbe0f94b534c3c723565c3bc04202bb1d1f6d636b746213a12",
+      "selection_stratum": "other_broken_boundary",
+      "rationale": "Protect successful SAC trajectories across this collision type; current certified first proposals may still lead to later failures.",
+      "selection_rank_sha256": "17869af5a5d4dc85f135f68e97e437f32c69c917e152b91828080ac8a214eb82",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "broken",
+        "first_reason": "turn",
+        "first_fire_step": "14",
+        "selected_clearance": "0.2483093436728129",
+        "policy_prefix_repair_clearance": "0.0623686305081986"
+      }
+    },
+    {
+      "case": "TS2:BAS-NU-CV-070",
+      "scenario_id": "BAS-NU-CV-070",
+      "dataset": "ts2",
+      "seed": 400469,
+      "scenario_sha256": "1df385f81fb213531debfb03cfdf7988a26460f5be774b12a7b4d069fd525880",
+      "selection_stratum": "other_broken_boundary",
+      "rationale": "Protect successful SAC trajectories across this collision type; current certified first proposals may still lead to later failures.",
+      "selection_rank_sha256": "27aa674262305130961650e24f560b961f18ccba79059f223c7d5b2ddcf34f66",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "collision:boundary",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "broken",
+        "first_reason": "turn",
+        "first_fire_step": "6",
+        "selected_clearance": "0.06744661225996389",
+        "policy_prefix_repair_clearance": "0.006297536524014755"
+      }
+    },
+    {
+      "case": "TS2:CH-HO-RE-060",
+      "scenario_id": "CH-HO-RE-060",
+      "dataset": "ts2",
+      "seed": 400559,
+      "scenario_sha256": "7d2e22ac489d9cef523dcac645c511b035859fd171f70220d8604fa1a6e7b106",
+      "selection_stratum": "rescued_turn",
+      "rationale": "Regression protection for an existing rescue mechanism, including low-clearance successes.",
+      "selection_rank_sha256": "027dd6fced509f9690e1471bb5ed1b7d57134913dba573fb98f0a8d9c106e0b4",
+      "historical": {
+        "policy_outcome": "collision:target",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "turn",
+        "first_fire_step": "19",
+        "selected_clearance": "0.15925906930530218",
+        "policy_prefix_repair_clearance": "0.1086076277169851"
+      }
+    },
+    {
+      "case": "TS2:P2-L1-OT-VAR-20",
+      "scenario_id": "P2-L1-OT-VAR-20",
+      "dataset": "ts2",
+      "seed": 470079,
+      "scenario_sha256": "64a6175e184e5c2ed7e08949338aa24b1ef73caddff8321efba128da84283e36",
+      "selection_stratum": "rescued_turn",
+      "rationale": "Regression protection for an existing rescue mechanism, including low-clearance successes.",
+      "selection_rank_sha256": "0b39adf615adca5abee6c4a6016ca87aa9ed12027af0f34b76ba49571e9be251",
+      "historical": {
+        "policy_outcome": "collision:obstacle",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "turn",
+        "first_fire_step": "28",
+        "selected_clearance": "0.24729018547504217",
+        "policy_prefix_repair_clearance": "0.04716433752834788"
+      }
+    },
+    {
+      "case": "TS2:P2-L2-CRP-VAR-02",
+      "scenario_id": "P2-L2-CRP-VAR-02",
+      "dataset": "ts2",
+      "seed": 470121,
+      "scenario_sha256": "ae4988a974c901372987e1f7024f5f3be8241b2b39947fd52b0d357b7a51283a",
+      "selection_stratum": "rescued_continue",
+      "rationale": "Regression protection for an existing rescue mechanism, including low-clearance successes.",
+      "selection_rank_sha256": "1241032f493228e22905933b2afb26cf0af3b0f4ca05c33b7569b357090dbb8e",
+      "historical": {
+        "policy_outcome": "collision:target",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "continue",
+        "first_fire_step": "7",
+        "selected_clearance": "0.13092574077745658",
+        "policy_prefix_repair_clearance": "0.10191245930236167"
+      }
+    },
+    {
+      "case": "TS2:P2-L2-HO-FIX-05",
+      "scenario_id": "P2-L2-HO-FIX-05",
+      "dataset": "ts2",
+      "seed": 470104,
+      "scenario_sha256": "2cd901e814524d0449cb94c0094a7e96d0cc1bd66859df7a772c8ceeea92dce6",
+      "selection_stratum": "rescued_continue",
+      "rationale": "Regression protection for an existing rescue mechanism, including low-clearance successes.",
+      "selection_rank_sha256": "442d4ddde06100b345cf7a6fdcf1c2268ed8d1a35e5d6d0e22db6e940d4a74e0",
+      "historical": {
+        "policy_outcome": "collision:boundary",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "continue",
+        "first_fire_step": "19",
+        "selected_clearance": "0.1327273578857498",
+        "policy_prefix_repair_clearance": "0.13134729022353456"
+      }
+    },
+    {
+      "case": "TS2:CH-CR-CV-073",
+      "scenario_id": "CH-CR-CV-073",
+      "dataset": "ts2",
+      "seed": 400672,
+      "scenario_sha256": "50b72491e0ee843f04d964d1b226acc7f2fad86701884f0505b0fdaa37910cea",
+      "selection_stratum": "rescued_brake",
+      "rationale": "Regression protection for an existing rescue mechanism, including low-clearance successes.",
+      "selection_rank_sha256": "085ee450dcecb4c6c2cdac49f3578c606e6af1d6e7f989c5e680d35d4c18d1b8",
+      "historical": {
+        "policy_outcome": "collision:target",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "brake",
+        "first_fire_step": "10",
+        "selected_clearance": "0.3379162224033203",
+        "policy_prefix_repair_clearance": "-0.15684054286136784"
+      }
+    },
+    {
+      "case": "TS2:P2-L1-CRP-VAR-12",
+      "scenario_id": "P2-L1-CRP-VAR-12",
+      "dataset": "ts2",
+      "seed": 470031,
+      "scenario_sha256": "7c56e2bdd8ab8c70ffbf29a0bd97bd767cbae23360db70f2d103474fb40b9f96",
+      "selection_stratum": "rescued_searched_escape",
+      "rationale": "Regression protection for an existing rescue mechanism, including low-clearance successes.",
+      "selection_rank_sha256": "4f434eec67b7dd8d324e3d9666bce2152232b21352c1eb0cc153ba638389fc36",
+      "historical": {
+        "policy_outcome": "collision:obstacle",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "rescued",
+        "first_reason": "searched escape",
+        "first_fire_step": "2",
+        "selected_clearance": "0.2657000105556206",
+        "policy_prefix_repair_clearance": "0.019490192512146662"
+      }
+    },
+    {
+      "case": "TS2:P2-L1-CRP-FIX-05",
+      "scenario_id": "P2-L1-CRP-FIX-05",
+      "dataset": "ts2",
+      "seed": 470024,
+      "scenario_sha256": "b1aae753c8a63ff87e5a751905a9f5187c701301f6d9849b7ffc537a8cd58078",
+      "selection_stratum": "unrescued_optimistic_no_fire",
+      "rationale": "All three no-fire target collisions with positive last-decision margin; check that a decision guard is not credited for fixing absent threat information.",
+      "selection_rank_sha256": "072e49cd8e47544c4d0d32645cf163b6cf2cc41242e1ff2f576ae0e3ff7fa87a",
+      "historical": {
+        "policy_outcome": "collision:target",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "collision:target",
+        "v8_outcome": "collision:target",
+        "v8_category": "both_fail",
+        "first_reason": "no fire",
+        "first_fire_step": "",
+        "selected_clearance": "",
+        "policy_prefix_repair_clearance": ""
+      }
+    },
+    {
+      "case": "TS2:P2-L1-CRS-VAR-08",
+      "scenario_id": "P2-L1-CRS-VAR-08",
+      "dataset": "ts2",
+      "seed": 470047,
+      "scenario_sha256": "3c4c5c9bc51c9c39392569c95091eec2a46d8fc93457de6ea69f7b5805c498d7",
+      "selection_stratum": "unrescued_optimistic_no_fire",
+      "rationale": "All three no-fire target collisions with positive last-decision margin; check that a decision guard is not credited for fixing absent threat information.",
+      "selection_rank_sha256": "6d5fe0c99db8a51193ebec9dbf4f9b01baa4e1f9ceea74731d5bb70c18c2e196",
+      "historical": {
+        "policy_outcome": "collision:target",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "collision:target",
+        "v8_outcome": "collision:target",
+        "v8_category": "both_fail",
+        "first_reason": "no fire",
+        "first_fire_step": "",
+        "selected_clearance": "",
+        "policy_prefix_repair_clearance": ""
+      }
+    },
+    {
+      "case": "TS2:P2-L1-CRP-VAR-14",
+      "scenario_id": "P2-L1-CRP-VAR-14",
+      "dataset": "ts2",
+      "seed": 470033,
+      "scenario_sha256": "0fbc3189b31f3521463576efa766a31cc9e86148f2c22a353977750ce8e4c418",
+      "selection_stratum": "unrescued_optimistic_no_fire",
+      "rationale": "All three no-fire target collisions with positive last-decision margin; check that a decision guard is not credited for fixing absent threat information.",
+      "selection_rank_sha256": "e941003b644a5b6a58dbb5f4d264aa04849ad40fbb228a085df7f9c85519d52b",
+      "historical": {
+        "policy_outcome": "collision:target",
+        "v4_outcome": "collision:target",
+        "v7_outcome": "collision:target",
+        "v8_outcome": "collision:target",
+        "v8_category": "both_fail",
+        "first_reason": "no fire",
+        "first_fire_step": "",
+        "selected_clearance": "",
+        "policy_prefix_repair_clearance": ""
+      }
+    },
+    {
+      "case": "TS2:CH-CR-CV-059",
+      "scenario_id": "CH-CR-CV-059",
+      "dataset": "ts2",
+      "seed": 400658,
+      "scenario_sha256": "5f00b0051b23af0179d81002458667279dd7df0533e55e8d9f0ba552e9d740e0",
+      "selection_stratum": "unrescued_expired",
+      "rationale": "Existing failed rescues through expired plans; classify collision-type changes separately from success.",
+      "selection_rank_sha256": "c08c70b0a11e1ce238407b57e203df7a58026594e83070a7f55e3dfd9a07cf78",
+      "historical": {
+        "policy_outcome": "collision:target",
+        "v4_outcome": "goal",
+        "v7_outcome": "collision:target",
+        "v8_outcome": "collision:target",
+        "v8_category": "both_fail",
+        "first_reason": "last certificate",
+        "first_fire_step": "6",
+        "selected_clearance": "-0.16773669820591958",
+        "policy_prefix_repair_clearance": "-0.15086694199117293"
+      }
+    },
+    {
+      "case": "TS2:P2-L2-HO-FIX-11",
+      "scenario_id": "P2-L2-HO-FIX-11",
+      "dataset": "ts2",
+      "seed": 470110,
+      "scenario_sha256": "50ad1c7ea9bdab0e0dca1f51434230d5614e57f760914860715ee238e5ebe5fb",
+      "selection_stratum": "unrescued_expired",
+      "rationale": "Existing failed rescues through expired plans; classify collision-type changes separately from success.",
+      "selection_rank_sha256": "e83d76c8eb763a39d54bd90bd9efd2ab2214ae3bc565041a441fe699771e4a98",
+      "historical": {
+        "policy_outcome": "collision:obstacle",
+        "v4_outcome": "collision:obstacle",
+        "v7_outcome": "goal",
+        "v8_outcome": "collision:target",
+        "v8_category": "both_fail",
+        "first_reason": "last certificate",
+        "first_fire_step": "13",
+        "selected_clearance": "-0.46722840032701574",
+        "policy_prefix_repair_clearance": "-0.47843918611771297"
+      }
+    },
+    {
+      "case": "TS2:P2-L2-HO-FIX-19",
+      "scenario_id": "P2-L2-HO-FIX-19",
+      "dataset": "ts2",
+      "seed": 470118,
+      "scenario_sha256": "0684ae532678e2b5d8df92a605f7958d1bf13eb85f8bb5b8978eabf98ecb89e1",
+      "selection_stratum": "unrescued_other_active",
+      "rationale": "One hash-ranked active-filter failure outside the expired-plan mechanism.",
+      "selection_rank_sha256": "088f91ce721c129ada7c273f3b9b8893b0e2cca81e3f43788026788730f1a3e6",
+      "historical": {
+        "policy_outcome": "collision:obstacle",
+        "v4_outcome": "collision:boundary",
+        "v7_outcome": "collision:boundary",
+        "v8_outcome": "collision:boundary",
+        "v8_category": "both_fail",
+        "first_reason": "turn",
+        "first_fire_step": "13",
+        "selected_clearance": "0.014810397494786826",
+        "policy_prefix_repair_clearance": "0.040124530918998605"
+      }
+    },
+    {
+      "case": "TS2:P2-L3-CRS-FIX-05",
+      "scenario_id": "P2-L3-CRS-FIX-05",
+      "dataset": "ts2",
+      "seed": 470244,
+      "scenario_sha256": "e3e676e96254d241f786655a97c59bf1787bdf237226ce782893ac0a9c759253",
+      "selection_stratum": "success_expired_repair_true",
+      "rationale": "Successful policy and V8 case exercising expired-plan handling; cover both clearance-comparison directions.",
+      "selection_rank_sha256": "03a28584b7620c70ed6feddcfa6334bb52e670ca0b08c69b6a56ba58c9ad3f65",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "both_goal",
+        "first_reason": "last certificate",
+        "first_fire_step": "3",
+        "selected_clearance": "-0.2977253925271878",
+        "policy_prefix_repair_clearance": "-0.1724651818490219"
+      }
+    },
+    {
+      "case": "TS2:CH-CR-CV-015",
+      "scenario_id": "CH-CR-CV-015",
+      "dataset": "ts2",
+      "seed": 400614,
+      "scenario_sha256": "652dc6f37f0368d570bd4b0eef504d14e636a8e51599a6a86d4a2094400705a2",
+      "selection_stratum": "success_expired_repair_true",
+      "rationale": "Successful policy and V8 case exercising expired-plan handling; cover both clearance-comparison directions.",
+      "selection_rank_sha256": "2188c1bb9131158bb56b735357d8705ad0682a1192456a57a7501988f4bcf91b",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "both_goal",
+        "first_reason": "last certificate",
+        "first_fire_step": "12",
+        "selected_clearance": "-0.08842966232213065",
+        "policy_prefix_repair_clearance": "-0.06273678979897104"
+      }
+    },
+    {
+      "case": "TS2:BAS-HO-NC-071",
+      "scenario_id": "BAS-HO-NC-071",
+      "dataset": "ts2",
+      "seed": 400070,
+      "scenario_sha256": "b9d2e99f7b1d1143177837e8ce3555e8ea71314b10d700b85e634822d5e8cd91",
+      "selection_stratum": "success_expired_repair_false",
+      "rationale": "Successful policy and V8 case exercising expired-plan handling; cover both clearance-comparison directions.",
+      "selection_rank_sha256": "0dcd2b9fc6c9d7954bd7ba4dccf9452f760b97a1ac273af1b1ca4726978ce93a",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "both_goal",
+        "first_reason": "last certificate",
+        "first_fire_step": "18",
+        "selected_clearance": "-0.0546437001820215",
+        "policy_prefix_repair_clearance": "-0.08797399085472743"
+      }
+    },
+    {
+      "case": "TS2:P2-L1-CRP-FIX-03",
+      "scenario_id": "P2-L1-CRP-FIX-03",
+      "dataset": "ts2",
+      "seed": 470022,
+      "scenario_sha256": "b2f111c51c74681e04951b861a92b6ed1694bb14aa7b8cf5fd0f87eeb2d411f7",
+      "selection_stratum": "success_active_turn",
+      "rationale": "Successful ordinary intervention control.",
+      "selection_rank_sha256": "005f347b76c52e0521e106c945911ce8e27a07eae8598b30b0c33558465ff198",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "both_goal",
+        "first_reason": "turn",
+        "first_fire_step": "27",
+        "selected_clearance": "0.12190911985654386",
+        "policy_prefix_repair_clearance": "0.029154921305631007"
+      }
+    },
+    {
+      "case": "TS2:CH-HO-CV-043",
+      "scenario_id": "CH-HO-CV-043",
+      "dataset": "ts2",
+      "seed": 400542,
+      "scenario_sha256": "5206adfd9242edd176492a21796ff13318b2e5114ccc9f1f70b312af25a2b5ee",
+      "selection_stratum": "success_never_fire_frozen",
+      "rationale": "Untouched successful-policy negative control from this scenario source.",
+      "selection_rank_sha256": "0036fc4dd6f965971aaf87810c35c358335e03210433ad2b118d32c36a49041e",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "both_goal",
+        "first_reason": "no fire",
+        "first_fire_step": "",
+        "selected_clearance": "",
+        "policy_prefix_repair_clearance": ""
+      }
+    },
+    {
+      "case": "TS2:P2-L1-CRS-FIX-09",
+      "scenario_id": "P2-L1-CRS-FIX-09",
+      "dataset": "ts2",
+      "seed": 470048,
+      "scenario_sha256": "ecfc8021b54fafb96792d4d5a1e2fe6c58e808cf54d0c4e1a4713188d29ec6c9",
+      "selection_stratum": "success_never_fire_field_layout",
+      "rationale": "Untouched successful-policy negative control from this scenario source.",
+      "selection_rank_sha256": "0bece88b7b169f975117c13c40292099d17c20d941856bfe6ac7a5f3ee45f969",
+      "historical": {
+        "policy_outcome": "goal",
+        "v4_outcome": "goal",
+        "v7_outcome": "goal",
+        "v8_outcome": "goal",
+        "v8_category": "both_goal",
+        "first_reason": "no fire",
+        "first_fire_step": "",
+        "selected_clearance": "",
+        "policy_prefix_repair_clearance": ""
+      }
+    }
+  ],
+  "strata": [
+    {
+      "name": "expired_consequences",
+      "n": 8,
+      "eligible_n": 8,
+      "rule": {
+        "first_reason": "last certificate",
+        "v8_category_in": [
+          "rescued",
+          "broken"
+        ]
+      },
+      "rationale": "Include every observed consequence-bearing expired-plan case: four rescues and four breaks across DV3/TS2.",
+      "selection": "all eligible",
+      "selected_cases": [
+        "TS2:BAS-HO-NC-059",
+        "TS2:BAS-CR-RE-072",
+        "DV3:DV3-BO-CV-04",
+        "DV3:DV3-HO-CV-03",
+        "TS2:CH-CR-RE-038",
+        "DV3:DV3-CRP-CV-04",
+        "DV3:DV3-CRP-CV-17",
+        "DV3:DV3-HO-VS-01"
+      ],
+      "ranked_eligible_case_ids_sha256": "77f0882cecc21a1757005a81e0bcc4cc6c3b10b56ac0dd321cbaf3ca1d731967"
+    },
+    {
+      "name": "other_broken_target",
+      "n": 2,
+      "eligible_n": 5,
+      "rule": {
+        "dataset": "ts2",
+        "v8_category": "broken",
+        "first_reason_not": "last certificate",
+        "v8_outcome": "collision:target"
+      },
+      "rationale": "Protect successful SAC trajectories across this collision type; current certified first proposals may still lead to later failures.",
+      "selection": "lowest SHA256 rank",
+      "selected_cases": [
+        "TS2:CH-HO-CV-073",
+        "TS2:BAS-BO-CV-063"
+      ],
+      "ranked_eligible_case_ids_sha256": "81dcf059156985f0be5e7e947ed2eb143d18d99e1af05c571e7c8fca644cac28"
+    },
+    {
+      "name": "other_broken_obstacle",
+      "n": 2,
+      "eligible_n": 3,
+      "rule": {
+        "dataset": "ts2",
+        "v8_category": "broken",
+        "first_reason_not": "last certificate",
+        "v8_outcome": "collision:obstacle"
+      },
+      "rationale": "Protect successful SAC trajectories across this collision type; current certified first proposals may still lead to later failures.",
+      "selection": "lowest SHA256 rank",
+      "selected_cases": [
+        "TS2:P2-L2-CRP-VAR-16",
+        "TS2:CH-CR-CV-007"
+      ],
+      "ranked_eligible_case_ids_sha256": "595516fdc78d82a162e253366832e176ca404be2ea63842e542a31ea8cd7fad6"
+    },
+    {
+      "name": "other_broken_boundary",
+      "n": 2,
+      "eligible_n": 6,
+      "rule": {
+        "dataset": "ts2",
+        "v8_category": "broken",
+        "first_reason_not": "last certificate",
+        "v8_outcome": "collision:boundary"
+      },
+      "rationale": "Protect successful SAC trajectories across this collision type; current certified first proposals may still lead to later failures.",
+      "selection": "lowest SHA256 rank",
+      "selected_cases": [
+        "TS2:CH-CR-CV-031",
+        "TS2:BAS-NU-CV-070"
+      ],
+      "ranked_eligible_case_ids_sha256": "c94f9093b02c87a7f442a23a7bede516b70ee73d86683a6f85d03a58ef067be7"
+    },
+    {
+      "name": "rescued_turn",
+      "n": 2,
+      "eligible_n": 35,
+      "rule": {
+        "dataset": "ts2",
+        "v8_category": "rescued",
+        "first_reason": "turn"
+      },
+      "rationale": "Regression protection for an existing rescue mechanism, including low-clearance successes.",
+      "selection": "lowest SHA256 rank",
+      "selected_cases": [
+        "TS2:CH-HO-RE-060",
+        "TS2:P2-L1-OT-VAR-20"
+      ],
+      "ranked_eligible_case_ids_sha256": "0c60b1d1fdc0a62c0d3c4203bf9aee90ed7e26c0a8caa5901bdd545dd915f47b"
+    },
+    {
+      "name": "rescued_continue",
+      "n": 2,
+      "eligible_n": 9,
+      "rule": {
+        "dataset": "ts2",
+        "v8_category": "rescued",
+        "first_reason": "continue"
+      },
+      "rationale": "Regression protection for an existing rescue mechanism, including low-clearance successes.",
+      "selection": "lowest SHA256 rank",
+      "selected_cases": [
+        "TS2:P2-L2-CRP-VAR-02",
+        "TS2:P2-L2-HO-FIX-05"
+      ],
+      "ranked_eligible_case_ids_sha256": "e172ae57ccb05eae2a6558aebbb30ebe8c673fbbad8be47f905320921654b872"
+    },
+    {
+      "name": "rescued_brake",
+      "n": 1,
+      "eligible_n": 11,
+      "rule": {
+        "dataset": "ts2",
+        "v8_category": "rescued",
+        "first_reason": "brake"
+      },
+      "rationale": "Regression protection for an existing rescue mechanism, including low-clearance successes.",
+      "selection": "lowest SHA256 rank",
+      "selected_cases": [
+        "TS2:CH-CR-CV-073"
+      ],
+      "ranked_eligible_case_ids_sha256": "cb1267b2c713b0557d53366ed2f3fc3ac6e1ceebacf4a5031755d608d6fb5dac"
+    },
+    {
+      "name": "rescued_searched_escape",
+      "n": 1,
+      "eligible_n": 2,
+      "rule": {
+        "dataset": "ts2",
+        "v8_category": "rescued",
+        "first_reason": "searched escape"
+      },
+      "rationale": "Regression protection for an existing rescue mechanism, including low-clearance successes.",
+      "selection": "lowest SHA256 rank",
+      "selected_cases": [
+        "TS2:P2-L1-CRP-VAR-12"
+      ],
+      "ranked_eligible_case_ids_sha256": "64d36ba9b8ee99cfdeeb3e43a70634055ef4729f9ce2874151ae785a1ffbc6a9"
+    },
+    {
+      "name": "unrescued_optimistic_no_fire",
+      "n": 3,
+      "eligible_n": 3,
+      "rule": {
+        "case_in": [
+          "TS2:P2-L1-CRP-FIX-05",
+          "TS2:P2-L1-CRP-VAR-14",
+          "TS2:P2-L1-CRS-VAR-08"
+        ]
+      },
+      "rationale": "All three no-fire target collisions with positive last-decision margin; check that a decision guard is not credited for fixing absent threat information.",
+      "selection": "all eligible",
+      "selected_cases": [
+        "TS2:P2-L1-CRP-FIX-05",
+        "TS2:P2-L1-CRS-VAR-08",
+        "TS2:P2-L1-CRP-VAR-14"
+      ],
+      "ranked_eligible_case_ids_sha256": "33b301932aa03864cefded5f4188ee69d076d263efefe8d7d2b63ce730f2321b"
+    },
+    {
+      "name": "unrescued_expired",
+      "n": 2,
+      "eligible_n": 2,
+      "rule": {
+        "dataset": "ts2",
+        "v8_category": "both_fail",
+        "first_reason": "last certificate"
+      },
+      "rationale": "Existing failed rescues through expired plans; classify collision-type changes separately from success.",
+      "selection": "all eligible",
+      "selected_cases": [
+        "TS2:CH-CR-CV-059",
+        "TS2:P2-L2-HO-FIX-11"
+      ],
+      "ranked_eligible_case_ids_sha256": "66ade690a6594f71d44a544e33bb9abd10588b4335a836d98bfa84da7f8aeb66"
+    },
+    {
+      "name": "unrescued_other_active",
+      "n": 1,
+      "eligible_n": 52,
+      "rule": {
+        "dataset": "ts2",
+        "v8_category": "both_fail",
+        "first_reason_not_in": [
+          "last certificate",
+          "no fire"
+        ]
+      },
+      "rationale": "One hash-ranked active-filter failure outside the expired-plan mechanism.",
+      "selection": "lowest SHA256 rank",
+      "selected_cases": [
+        "TS2:P2-L2-HO-FIX-19"
+      ],
+      "ranked_eligible_case_ids_sha256": "211789f3f32c1c3e3c07b94ae142059feb04db493ddbf8011fa099ba32d8d3d3"
+    },
+    {
+      "name": "success_expired_repair_true",
+      "n": 2,
+      "eligible_n": 16,
+      "rule": {
+        "dataset": "ts2",
+        "v8_category": "both_goal",
+        "first_reason": "last certificate",
+        "repair_clearance_not_worse": "True"
+      },
+      "rationale": "Successful policy and V8 case exercising expired-plan handling; cover both clearance-comparison directions.",
+      "selection": "lowest SHA256 rank",
+      "selected_cases": [
+        "TS2:P2-L3-CRS-FIX-05",
+        "TS2:CH-CR-CV-015"
+      ],
+      "ranked_eligible_case_ids_sha256": "230522a1bdf5a3b2aa0182adc10912720aa48e4d1b86f5975f282edefa2efcbb"
+    },
+    {
+      "name": "success_expired_repair_false",
+      "n": 1,
+      "eligible_n": 6,
+      "rule": {
+        "dataset": "ts2",
+        "v8_category": "both_goal",
+        "first_reason": "last certificate",
+        "repair_clearance_not_worse": "False"
+      },
+      "rationale": "Successful policy and V8 case exercising expired-plan handling; cover both clearance-comparison directions.",
+      "selection": "lowest SHA256 rank",
+      "selected_cases": [
+        "TS2:BAS-HO-NC-071"
+      ],
+      "ranked_eligible_case_ids_sha256": "4c3858e5931b1a0aa367606d0198838afbaf43890f17d9e03faed6696d9e6392"
+    },
+    {
+      "name": "success_active_turn",
+      "n": 1,
+      "eligible_n": 178,
+      "rule": {
+        "dataset": "ts2",
+        "v8_category": "both_goal",
+        "first_reason": "turn"
+      },
+      "rationale": "Successful ordinary intervention control.",
+      "selection": "lowest SHA256 rank",
+      "selected_cases": [
+        "TS2:P2-L1-CRP-FIX-03"
+      ],
+      "ranked_eligible_case_ids_sha256": "9fc6f2b3add96facc42eb016d88a0142d5d41e89915b46247716b253be4bae4a"
+    },
+    {
+      "name": "success_never_fire_frozen",
+      "n": 1,
+      "eligible_n": 482,
+      "rule": {
+        "dataset": "ts2",
+        "v8_category": "both_goal",
+        "first_reason": "no fire",
+        "source": "frozen"
+      },
+      "rationale": "Untouched successful-policy negative control from this scenario source.",
+      "selection": "lowest SHA256 rank",
+      "selected_cases": [
+        "TS2:CH-HO-CV-043"
+      ],
+      "ranked_eligible_case_ids_sha256": "eb15012a79bb37a8a499b4cd4d981235abcaabd92a24bd33ba3508b5e728a06c"
+    },
+    {
+      "name": "success_never_fire_field_layout",
+      "n": 1,
+      "eligible_n": 80,
+      "rule": {
+        "dataset": "ts2",
+        "v8_category": "both_goal",
+        "first_reason": "no fire",
+        "source": "field_layout"
+      },
+      "rationale": "Untouched successful-policy negative control from this scenario source.",
+      "selection": "lowest SHA256 rank",
+      "selected_cases": [
+        "TS2:P2-L1-CRS-FIX-09"
+      ],
+      "ranked_eligible_case_ids_sha256": "a94764f718e2c1718d377689b7c3d6ac6e54943c2793a97cfb52f6489bac14ca"
+    }
+  ],
+  "historical_category_counts": {
+    "broken": 10,
+    "rescued": 10,
+    "both_fail": 6,
+    "both_goal": 6
+  },
+  "historical_mode_goal_counts": {
+    "policy": 16,
+    "v4": 16,
+    "v7": 17,
+    "v8": 16
+  },
+  "limitations": [
+    "Outcome-enriched development selection; aggregate success rate is not a population or 1000-case estimate.",
+    "Five DV3 and27 TS2 cases; the dataset mixture is intentional and must be reported separately.",
+    "Historical outcomes are selection evidence only; use all three fresh matched results for pilot gains/losses.",
+    "Scenario digests are pinned from canonical saved definitions/inventory, not historical counterfactual source archives.",
+    "Missing/error episodes are incomplete pairs, not failures or successes; no automatic replacement cases."
+  ],
+  "paired_reporting": {
+    "required_pairs": [
+      [
+        "v9",
+        "v8"
+      ],
+      [
+        "v9",
+        "off"
+      ],
+      [
+        "v8",
+        "off"
+      ]
+    ],
+    "per_mode": [
+      "goals",
+      "collision:target",
+      "collision:obstacle",
+      "collision:boundary",
+      "timeout",
+      "errors",
+      "total_runtime_seconds"
+    ],
+    "per_pair": [
+      "matched_case_count",
+      "goal_gains",
+      "goal_losses",
+      "unchanged_goals",
+      "unchanged_failures",
+      "collision_to_goal",
+      "collision_to_timeout",
+      "collision_type_transitions"
+    ],
+    "slices": [
+      "overall",
+      "dataset",
+      "selection_stratum"
+    ],
+    "mechanism": [
+      "guard_evaluated_steps_and_episodes",
+      "policy_preserved_steps_and_episodes",
+      "expired_plan_handling",
+      "same_tail_dominance_reason",
+      "changed_action_steps"
+    ],
+    "baseline_reproduction": "Report every fresh off/V8 outcome differing from its saved historical outcome; do not silently borrow history."
+  }
+}

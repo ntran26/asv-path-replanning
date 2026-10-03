@@ -1,0 +1,914 @@
+{
+  "schema": 1,
+  "verified_utc": "2026-10-03T07:28:13.903144+00:00",
+  "status": "passed",
+  "scope": "Independent saved-artifact audit; no simulator imports or episodes",
+  "episodes_started_by_verifier": 0,
+  "attempts": 96,
+  "results": 96,
+  "csv_rows": 96,
+  "trace_files": 96,
+  "complete_case_triples": 32,
+  "unique_case_mode_results": 96,
+  "outcomes": {
+    "off": {
+      "goal": 16,
+      "collision:obstacle": 6,
+      "collision:target": 8,
+      "collision:boundary": 2
+    },
+    "v8": {
+      "collision:target": 9,
+      "collision:boundary": 5,
+      "goal": 16,
+      "collision:obstacle": 2
+    },
+    "v9": {
+      "goal": 16,
+      "collision:obstacle": 6,
+      "collision:target": 8,
+      "collision:boundary": 2
+    }
+  },
+  "historical_off_v8_checks": 64,
+  "historical_outcome_mismatches": [],
+  "historical_reproduction_passed": true,
+  "current_source_drift": [],
+  "archive_mismatches": [],
+  "cache_mismatches": [],
+  "errors": [],
+  "evidence_sha256": {
+    "selection.json": "ee04253c16e0dfa7bbca7f2472362e432c5e4fb66fb411bc6c69d84bb3982b3b",
+    "manifest.json": "77ad4385f02c000428908ba21f6ef7cdabd42c66406bbe22346f5f94c2928160",
+    "completion.json": "2f76ee3b5b9d0a33d51f4adb6e9f45d97cdae9f7da696b73aac4211639ac90eb",
+    "episodes.csv": "1e4f4a31f8ffd85622cc47847dd2eafbac62cae71137c5cd8d3e3b04f6652f19",
+    "evaluated_sources.zip": "b6b05888833fa415c4907999dfaa4311092a3c5c67a074506712d3833ea52c93"
+  },
+  "verified_source_files": 89,
+  "trace_checks": [
+    {
+      "attempt": 1,
+      "trace_sha256": "ac32a036bd74b23a67e9240a9548426885d796df1a93afcb3bc1f5e4104cfeb3",
+      "steps": 54,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 2,
+      "trace_sha256": "1b3214a23d0701fe503ec13e26b38bba75c9d79e959e7df3907d4134f0490ff4",
+      "steps": 27,
+      "changed": 4,
+      "brake": 4,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 3,
+      "trace_sha256": "533eacd6e855432a17f7e57a7f0a686e94139d56ba3aad5d976c3e35cb99ec52",
+      "steps": 54,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 1,
+      "checked": 1
+    },
+    {
+      "attempt": 4,
+      "trace_sha256": "046a5fe2c336ac8962b6294d77ceb38f0a40a1fdf83ed533a090a8a6d693c854",
+      "steps": 19,
+      "changed": 4,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 5,
+      "trace_sha256": "fa83ea202977250dff4e18d4801adf7bd155381836a63c86edcabef1124382fd",
+      "steps": 49,
+      "changed": 1,
+      "brake": 0,
+      "suppressed": 2,
+      "checked": 3
+    },
+    {
+      "attempt": 6,
+      "trace_sha256": "9a4372718f21de23f6d94b6d6714691be5c527e49737552a11546d851cb7f9f4",
+      "steps": 49,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 7,
+      "trace_sha256": "fd89a4f982bc2baf07cbb179e804ca197f65961768b35a961e7965e594e13e32",
+      "steps": 31,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 1,
+      "checked": 1
+    },
+    {
+      "attempt": 8,
+      "trace_sha256": "bdd558b085fa62952a9fdc3be545af28f3df84a175eadd0964e1b9dfa2abccc7",
+      "steps": 31,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 9,
+      "trace_sha256": "8f38bdbdf549617fedd2e0bc464e1ce0ed398736f0e1c71b03b003cfc5bd24df",
+      "steps": 53,
+      "changed": 12,
+      "brake": 4,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 10,
+      "trace_sha256": "278dfd0c537d9842b7a3993932acd0ad1d5f46854e45717a3c0bec7bcfb5e4af",
+      "steps": 33,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 11,
+      "trace_sha256": "537fe259686969e2571777b7c1e1862cade9a9109d4aa1cf31511f0f657e2c0b",
+      "steps": 78,
+      "changed": 36,
+      "brake": 4,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 12,
+      "trace_sha256": "e40772e1d96d1e601de006f6ce2b2b3d178f4577e39aab3f114f8bf13379bc04",
+      "steps": 54,
+      "changed": 18,
+      "brake": 4,
+      "suppressed": 2,
+      "checked": 20
+    },
+    {
+      "attempt": 13,
+      "trace_sha256": "dfb974cdc51ebad6e45d030c47d568d9b39fc175de827dcc6bc0bd82b7d84d35",
+      "steps": 24,
+      "changed": 4,
+      "brake": 4,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 14,
+      "trace_sha256": "a49f3894b70b3984c006c5e5a9047436e0541d8ab9950a4b177762e4c4d90329",
+      "steps": 51,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 1,
+      "checked": 1
+    },
+    {
+      "attempt": 15,
+      "trace_sha256": "8987c51952b00f9045def7851357b42480087194ae396ebe32514e444f1fb7fb",
+      "steps": 51,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 16,
+      "trace_sha256": "76ef0315165b3ea3c799fbf7d9f6753b9ec5cf9d0b8f2b2d901b0b4ae74330cb",
+      "steps": 31,
+      "changed": 4,
+      "brake": 2,
+      "suppressed": 1,
+      "checked": 5
+    },
+    {
+      "attempt": 17,
+      "trace_sha256": "6077c437399d831e49c54a46353c8527577f9928f15b8a2f53b33e362e09ca6b",
+      "steps": 26,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 18,
+      "trace_sha256": "0f244227983a8e49ed1745cf12b91f637bae2167aed79d7733a7b4d146c4adf6",
+      "steps": 49,
+      "changed": 17,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 19,
+      "trace_sha256": "4cd40ebed53663d97acce713451639553438f90a37f1836c56ed77c1d4019f6a",
+      "steps": 17,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 20,
+      "trace_sha256": "7e3665bcf5ba1426eab38bd77131c8b6bfcff09b2af6cd4ce1b042702e23b06a",
+      "steps": 54,
+      "changed": 10,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 21,
+      "trace_sha256": "465d99782bcbd765f28f7213987f875e753cbcc29bcb41544584fe60e9c84e68",
+      "steps": 17,
+      "changed": 1,
+      "brake": 1,
+      "suppressed": 2,
+      "checked": 3
+    },
+    {
+      "attempt": 22,
+      "trace_sha256": "7bf39c27f67b24b293d443d0f4d43091d5b2bfe9f837c7a628bfd2345277809c",
+      "steps": 119,
+      "changed": 54,
+      "brake": 12,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 23,
+      "trace_sha256": "32da9c9018abaf924111a65bd12134a37b136b4777758e0005790e7b33c795f9",
+      "steps": 37,
+      "changed": 4,
+      "brake": 2,
+      "suppressed": 2,
+      "checked": 6
+    },
+    {
+      "attempt": 24,
+      "trace_sha256": "0e6cf0004c78275711405733e648f1ac58f75ba5ad644ddaaf2ff87c6becb821",
+      "steps": 36,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 25,
+      "trace_sha256": "d3eb9a46f69dd65efc7d617b415198ee58845070d96514f0e0af38ee2425da48",
+      "steps": 26,
+      "changed": 2,
+      "brake": 2,
+      "suppressed": 1,
+      "checked": 3
+    },
+    {
+      "attempt": 26,
+      "trace_sha256": "4a28e386099b9938ca2e36081ce495c5d4a931aed58ba694ef972669e26d7448",
+      "steps": 54,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 27,
+      "trace_sha256": "92f6ab247f1126c048077ef0156efde12cbda3a485ec2b2dc72f8a1ce946cd00",
+      "steps": 28,
+      "changed": 6,
+      "brake": 6,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 28,
+      "trace_sha256": "49cf13aa4662ed0cc5624f71ee6cecd3bf481895dbbda092227d2268dc48e97a",
+      "steps": 28,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 29,
+      "trace_sha256": "39ead40796e2c1b370972c523c8177e1778d7bdced21d6eef6509c7670fe3f28",
+      "steps": 18,
+      "changed": 7,
+      "brake": 6,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 30,
+      "trace_sha256": "15faf4df80c25165230a810d3237802cc2ffe5bdc192151bc3588f5cd59e9287",
+      "steps": 47,
+      "changed": 10,
+      "brake": 5,
+      "suppressed": 5,
+      "checked": 15
+    },
+    {
+      "attempt": 31,
+      "trace_sha256": "5c791c5e64cc7db5dde0e448bf510eccd03a54ca2753524339a19a41d346f91c",
+      "steps": 60,
+      "changed": 31,
+      "brake": 15,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 32,
+      "trace_sha256": "321c8cba5557d1725072aea6ae9bee5410ecaa4122824cff1acd325aa5416442",
+      "steps": 20,
+      "changed": 6,
+      "brake": 2,
+      "suppressed": 1,
+      "checked": 7
+    },
+    {
+      "attempt": 33,
+      "trace_sha256": "439787b1744fdba5edfcdc22a2a7a23ec61fb185da2b081c02197f14d7962fb5",
+      "steps": 49,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 34,
+      "trace_sha256": "125785228506d8061b85b9c7a0ae912015d4f19035a4a2cf22a07b9ef6bd53a7",
+      "steps": 61,
+      "changed": 20,
+      "brake": 6,
+      "suppressed": 2,
+      "checked": 22
+    },
+    {
+      "attempt": 35,
+      "trace_sha256": "d86aa01be10fb94c64626fcd8137171aa4cc1ad081cea235699fb0a4afd1f5a3",
+      "steps": 54,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 36,
+      "trace_sha256": "ab39742c5add588fdc15f83f0f0571fb6caceebd9827b965271a45dca157b7c2",
+      "steps": 74,
+      "changed": 31,
+      "brake": 8,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 37,
+      "trace_sha256": "d2b86682983ec5004c0e1186751a1a9af3479c5621201a0801df4b7fa28aad7c",
+      "steps": 52,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 38,
+      "trace_sha256": "0a79d0fbf9a7f096947230cc0d9ae380641b8484c8d2206f993cf0906e62dbd5",
+      "steps": 116,
+      "changed": 36,
+      "brake": 7,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 39,
+      "trace_sha256": "fb082b49974b84c59938678067fc5247046f74a0adc7bf0136268dc10376818d",
+      "steps": 52,
+      "changed": 2,
+      "brake": 0,
+      "suppressed": 1,
+      "checked": 3
+    },
+    {
+      "attempt": 40,
+      "trace_sha256": "2358da2c107d49d04cdcbceae341f51b82c33d368988451dd0b0c00d07f8dcdb",
+      "steps": 79,
+      "changed": 4,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 41,
+      "trace_sha256": "c09c5bd7aa92629b16fa3544989246af5eeed9bb62d5ce2415d2197ac9ba2f9b",
+      "steps": 79,
+      "changed": 4,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 4
+    },
+    {
+      "attempt": 42,
+      "trace_sha256": "d248d5951c599216a37b06c74df49a79ad54c87e19447e0d47cc0584c81295b3",
+      "steps": 58,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 43,
+      "trace_sha256": "acfd5348eff17a30568ebf39ca5ba094346eb76d654b8efcb03984b50b804d7e",
+      "steps": 59,
+      "changed": 2,
+      "brake": 1,
+      "suppressed": 0,
+      "checked": 2
+    },
+    {
+      "attempt": 44,
+      "trace_sha256": "12e6ab4adcc2f2456937ccfaae68327026e1e94d379074cb6cbe8b07bcbe5303",
+      "steps": 31,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 45,
+      "trace_sha256": "a9b6fabca91dcfd0618a843ce531ba3d72d1260564156d7cd86480e56545b35d",
+      "steps": 59,
+      "changed": 2,
+      "brake": 1,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 46,
+      "trace_sha256": "0e77bd914c83609a2e9a35bd3b197a6f91530eefd0d2b8a82a48618a717bed35",
+      "steps": 33,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 47,
+      "trace_sha256": "7db7978d94c1756696cc859e92b3e6e9044a720e42ab6b6cbc64fcf371c8a225",
+      "steps": 49,
+      "changed": 2,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 48,
+      "trace_sha256": "f1528cbadf21f50b4e21b766cfce0a95533f4283dd5e713105c257c32d212f2e",
+      "steps": 49,
+      "changed": 2,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 2
+    },
+    {
+      "attempt": 49,
+      "trace_sha256": "e372936fef82a6272c60102dfe0d26b36e591e9aa647c65378d7dd43ad92d885",
+      "steps": 78,
+      "changed": 27,
+      "brake": 6,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 50,
+      "trace_sha256": "55be063aab06d54c36fa690867038bbc130383f6a8b4815c345271eab9b14a97",
+      "steps": 64,
+      "changed": 2,
+      "brake": 1,
+      "suppressed": 1,
+      "checked": 3
+    },
+    {
+      "attempt": 51,
+      "trace_sha256": "e9504c8741c1234814455f6955a435be4adae5e7040c629ce2046a9c2767946d",
+      "steps": 15,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 52,
+      "trace_sha256": "cea6ce3d76330e41ec5ec86479f9f527547c8f91dd53472b1a008cea932efbca",
+      "steps": 29,
+      "changed": 2,
+      "brake": 0,
+      "suppressed": 1,
+      "checked": 3
+    },
+    {
+      "attempt": 53,
+      "trace_sha256": "8d12fdcaeb44edeee4bbfe53144e7012d2f4790c0bed00f2178619fdf70303ac",
+      "steps": 29,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 54,
+      "trace_sha256": "d05476466bee6efabff87fe9720fa08a84d96460691f198bf547af824543240a",
+      "steps": 61,
+      "changed": 8,
+      "brake": 3,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 55,
+      "trace_sha256": "dde5e662eb3f2dfbb997cad500c327b420e8015a4a2aeaf46af11f6e270125ea",
+      "steps": 16,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 56,
+      "trace_sha256": "9376fbdcc4ccba46c9dcfddb25d76d37563828f578a365eac4cd2a40ceb4c7d7",
+      "steps": 138,
+      "changed": 32,
+      "brake": 9,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 57,
+      "trace_sha256": "ab8e49a5868331a8bd8d43f0a1c7650ca9d2d6d60d8ab1536951ee3ad23490a3",
+      "steps": 17,
+      "changed": 2,
+      "brake": 1,
+      "suppressed": 1,
+      "checked": 3
+    },
+    {
+      "attempt": 58,
+      "trace_sha256": "a8643b42e888248a672a3013761fb5a9d495d1a135390bd48f1f62934191d46d",
+      "steps": 53,
+      "changed": 8,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 59,
+      "trace_sha256": "8baf84930a1557151b5b5810ec6cfa895ddcf1fca4778948aafcd3f56500f891",
+      "steps": 49,
+      "changed": 3,
+      "brake": 0,
+      "suppressed": 3,
+      "checked": 6
+    },
+    {
+      "attempt": 60,
+      "trace_sha256": "44d2648b3593ae07c69f4a5751f3b02dc55f6e0e73354838a4cdab09c7ca68e7",
+      "steps": 17,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 61,
+      "trace_sha256": "814bd27c6659275348bb7b890a70af11b68a07901c321ad096dff29c29b2035f",
+      "steps": 18,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 62,
+      "trace_sha256": "666189d01a915a7e6cbe17ceedb34e21dd458d0f639ae2485cfead85450573ad",
+      "steps": 18,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 63,
+      "trace_sha256": "180f8ee6069d6aaf5bf34dad5eb40045ba8e67ab34da3a0c63d720f8250f6a8f",
+      "steps": 18,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 64,
+      "trace_sha256": "6f390d705087b524645a91894b52282725d163910c9ed2d937398c24c75bf019",
+      "steps": 21,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 65,
+      "trace_sha256": "1a2cd0b422876b6b84dc5d7bbb9084ea6fc5bb3f7ae2e6b3ffd9d3e20eeba40f",
+      "steps": 21,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 66,
+      "trace_sha256": "70c43d2a7ba39c725007d10533f73f4fff64e1a600eade62cfd651e260bc7edd",
+      "steps": 21,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 67,
+      "trace_sha256": "e02dede17eea3dde16993d44d1cfcd2f740cd5a1a8802e78db87478ed18cf40c",
+      "steps": 17,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 68,
+      "trace_sha256": "ac37d03fa7bd6c0f712a9a38fd45c86cb44c48f231f66cc6deec3a9d2549b799",
+      "steps": 17,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 69,
+      "trace_sha256": "7ffda5ca4866147eb3f175a13762ffa138e8e14732799c7e5a1619abfa84b113",
+      "steps": 17,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 70,
+      "trace_sha256": "da7e5e46b7da7fa538265cec7ac11e4c710aa2361dee73304e36b1218858a966",
+      "steps": 14,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 1,
+      "checked": 1
+    },
+    {
+      "attempt": 71,
+      "trace_sha256": "f7c6a3435c9e2e5632541b8d9364b3f2ba7fd1aab652e424006b818e42d84279",
+      "steps": 14,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 72,
+      "trace_sha256": "37ad1c271afa9737b4d5ab2004dc835c6883e99ee5446286be418e2c8e332201",
+      "steps": 14,
+      "changed": 4,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 73,
+      "trace_sha256": "25ea32c5e28b71b1ffd632659a7b62cac8664cae87ada11846ab69abfc9dd3b7",
+      "steps": 21,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 74,
+      "trace_sha256": "ed42b4038ac02eb187ff2ac1b0f4b012ce66fd199bdd3185a1350ae59be5a9f2",
+      "steps": 28,
+      "changed": 4,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 75,
+      "trace_sha256": "a5bb48452123e5a84504bacec038bd7beaab3e536ad056d6732af122d2db418c",
+      "steps": 21,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 1,
+      "checked": 1
+    },
+    {
+      "attempt": 76,
+      "trace_sha256": "c7553eb856f0e20726254b8960bea3a2c323b134a6607576b508499c093bdbfd",
+      "steps": 52,
+      "changed": 32,
+      "brake": 6,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 77,
+      "trace_sha256": "549296fbc2777f52216254d3c2e446953e59b27e5103d7ec902907c96484cc3e",
+      "steps": 80,
+      "changed": 19,
+      "brake": 5,
+      "suppressed": 4,
+      "checked": 23
+    },
+    {
+      "attempt": 78,
+      "trace_sha256": "c98f44ac0f2ec0a043e595514a967d2dd41a32db91b424d91b5ae5c41c1157d3",
+      "steps": 20,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 79,
+      "trace_sha256": "7c28d3645868be65cc86fad973305b93ab222ad7dfeff11805c382df9fc71e39",
+      "steps": 45,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 2,
+      "checked": 2
+    },
+    {
+      "attempt": 80,
+      "trace_sha256": "27b358383030d9b5b7355e9341d1e8583389a1fc8ffe9847f68101bc584543b3",
+      "steps": 45,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 81,
+      "trace_sha256": "fd8e683c19420ac28223c93d586637393cd357a1d13ef814227df3d570e23e9a",
+      "steps": 52,
+      "changed": 9,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 82,
+      "trace_sha256": "8eb7b6d23022386737382877dd1f3546155d85127e6a09fa3ea88b5751969aa4",
+      "steps": 53,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 83,
+      "trace_sha256": "020db1091024c8e669d2c700099b51ea663685f879012c152189823bca722af1",
+      "steps": 52,
+      "changed": 3,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 84,
+      "trace_sha256": "871404c8fe43bfab11c9b3f9229be3a6dba05d9c9f5a2ef27d78ed91ff82476e",
+      "steps": 53,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 1,
+      "checked": 1
+    },
+    {
+      "attempt": 85,
+      "trace_sha256": "6cb59f76033c25d2822b6e78958ebf5bf0f1f1686394b5b1df68aa8b45a541aa",
+      "steps": 50,
+      "changed": 4,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 86,
+      "trace_sha256": "515533c7e6ab11a0c1ada2f01cb063be5b17af72a228610d670018352ae35552",
+      "steps": 50,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 1,
+      "checked": 1
+    },
+    {
+      "attempt": 87,
+      "trace_sha256": "d004f536aa2ca8f9a1854c3e533f120a4c364ded121347e7003c849886f06391",
+      "steps": 50,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 88,
+      "trace_sha256": "ec733fc533ac622adc5056da742d7b6da6bf61bb8b9b798708000c165a5fdf8b",
+      "steps": 45,
+      "changed": 2,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 2
+    },
+    {
+      "attempt": 89,
+      "trace_sha256": "cbba9b038d5da6a4206b199e4fd211f0221c45f06df9fd69fcf9041734bb8562",
+      "steps": 46,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 90,
+      "trace_sha256": "5fa6323b9d205ac58e821920c55a3c975bc2c7eb2b3c898336ad7502f8db5610",
+      "steps": 45,
+      "changed": 2,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 91,
+      "trace_sha256": "601720c48ddb21c85e6350a74753ccfe15c116c3c9cbddfbe15f467ec0258c0e",
+      "steps": 60,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 92,
+      "trace_sha256": "1134702018591b9ff09b31c1b60cdb15f38a867cb0fa1014b55bab4ce5c4ad04",
+      "steps": 60,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 93,
+      "trace_sha256": "0bb9ae42d0cfec82105827034a07e8b6f385260dbea183035f14ebcdc48eb42b",
+      "steps": 60,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 94,
+      "trace_sha256": "19b5cb702de649970a9dded61047b36ede64e4bfcec1f5601d7199eba5c245ed",
+      "steps": 55,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 95,
+      "trace_sha256": "5a0bf3e59a956728ba404c3fc937eb8436478ee580cea9677b9baf50ee8d068c",
+      "steps": 55,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    },
+    {
+      "attempt": 96,
+      "trace_sha256": "f32a60dea58bd1878889471b0b3c7624b058b1f746b26eb7d44791dba5679d87",
+      "steps": 55,
+      "changed": 0,
+      "brake": 0,
+      "suppressed": 0,
+      "checked": 0
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "primary_scenarios": 18,
+  "shared_v2_geometry_seed": 10,
+  "overlap_with_previous72_development_geometry_seed": 0,
+  "source_counts": {
+    "frozen": 9,
+    "paper2": 9
+  }
+}

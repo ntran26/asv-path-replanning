@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "suite_version": "3.0",
+  "definition_digest": "b8212ecf2a4f2529b6dec3a17dfaf178dabe0cf6590c606dd0d3427afdabb4bb",
+  "episodes": 1000,
+  "source_counts": {
+    "frozen": 664,
+    "paper2": 336
+  },
+  "shared_v2_geometry_and_seed": 755,
+  "new_or_changed_since_v2": 245,
+  "historical_sac": {
+    "path": "results/test_set/v3/sacs0_bl3/episodes.csv",
+    "sha256": "aef01e3be78f880bbb4e1bb799aa533c92dd8f43c5494ff4583d5553b5411ff7",
+    "outcomes": {
+      "goal": 853,
+      "collision:target": 66,
+      "collision:obstacle": 71,
+      "collision:boundary": 10
+    },
+    "evidence": "Historical saved CSV; old run has no frozen checkpoint/config/source provenance. Fresh matched OFF is required for the next candidate comparison."
+  },
+  "recommended_modes": [
+    "off",
+    "v16"
+  ],
+  "episodes_run_by_preparation": 0,
+  "primary_selection": "results/safety_dev/testset_v3_main/selection.json",
+  "input_sha256": {
+    "results/test_set/v3/definition.json": "962d63d4fd38fa7cbdc06fd4e34ef8a8adf535f75db78c4391dc5f1cca0420cd",
+    "results/test_set/v3/definition.csv": "b02eb02924068c842ace00f5e43867bbd19c2286a6dbfb9bc636522fdf117e51",
+    "results/test_set/v3/set_v3.0.pkl": "4f2f2bc781750e0086b2a5e250e1f6221d7b3489ae9654a17a9f17afeda2679e"
+  }
+}

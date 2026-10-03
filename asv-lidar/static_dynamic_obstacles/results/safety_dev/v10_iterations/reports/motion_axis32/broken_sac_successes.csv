@@ -1,0 +1,3 @@
+case,mode,stratum,outcome,off_evidence,off_source
+TS2:BAS-HO-NC-059,v16,expired_consequences,collision:target,fresh_prior_pilot,C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\results\safety_dev\v9_paired_pilot
+TS2:BAS-NU-CV-070,v16,other_broken_boundary,collision:boundary,fresh_prior_pilot,C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\results\safety_dev\v9_paired_pilot

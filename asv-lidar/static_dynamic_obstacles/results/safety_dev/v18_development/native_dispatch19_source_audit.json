@@ -1,0 +1,69 @@
+{
+  "created_utc": "2026-10-03T11:25:31.702902+00:00",
+  "changes": [
+    {
+      "path": "src/env.py",
+      "before_sha256": "e36b0d383dfbcc099fe76f5625c7c4b02fbaa3edf72eebf8d1d20543c83f5ae7",
+      "after_sha256": "ea11983e161910b8105593ff5606a7999059ecf2dd60154056a8840e6af424e1",
+      "crlf_before": 0,
+      "crlf_after": 0,
+      "bare_lf_before": 2066,
+      "bare_lf_after": 2069
+    },
+    {
+      "path": "tools/tiers/frozen_suite.py",
+      "before_sha256": "f211b173bfd83ca08e06c14eda6b08794efcd5116a14dd26c32bd211f6ab7330",
+      "after_sha256": "f52e1f56433cc40c7c97bdb92717169a44918c32545a9cc3ec3b4e54498f4085",
+      "crlf_before": 0,
+      "crlf_after": 0,
+      "bare_lf_before": 205,
+      "bare_lf_after": 205
+    },
+    {
+      "path": "tools/tiers/paper2_suite.py",
+      "before_sha256": "dd76da5d2d1ab067fd1cb715fe0f6a9c379e00623dd3acfc7e2dfb3422bd594d",
+      "after_sha256": "f9911d811e086eefaa5fce7c32705ca8ecd0aca987e3d35cdd3eb419117af373",
+      "crlf_before": 0,
+      "crlf_after": 0,
+      "bare_lf_before": 174,
+      "bare_lf_after": 174
+    },
+    {
+      "path": "tools/tiers/tier1_replay.py",
+      "before_sha256": "a2f43184ece291bf8faa163caf3be4b2eb39990709b743cf7052ff9862b63088",
+      "after_sha256": "82f334dd9182f6d678358399b649ff53882d59ec7942358253c3bcf96ebc4c3f",
+      "crlf_before": 0,
+      "crlf_after": 0,
+      "bare_lf_before": 141,
+      "bare_lf_after": 141
+    },
+    {
+      "path": "tools/diagnostics/safety/trigger_counterfactual.py",
+      "before_sha256": "b35a31b79708d5dd7339f5def07ba1989757fb34e934f94831227a4ed07233ff",
+      "after_sha256": "c6e54d2415d2e58992614f0c67d17021d334fdee51afae66520d09ce463cbafc",
+      "crlf_before": 304,
+      "crlf_after": 304,
+      "bare_lf_before": 0,
+      "bare_lf_after": 0
+    },
+    {
+      "path": "tests/test_safety_v9.py",
+      "before_sha256": "8bf804b6ee1720bdebf629591778c1ed71c7eec112b57c3bac4c8bd97565a0ab",
+      "after_sha256": "3a4c8d6f166edaff09951047305a03eedef537d805636e94bc3b9031a4f48532",
+      "crlf_before": 0,
+      "crlf_after": 0,
+      "bare_lf_before": 246,
+      "bare_lf_after": 246
+    },
+    {
+      "path": "tests/test_trigger_filter_dispatch.py",
+      "before_sha256": "bb03e21fb7df7114cdc404c1a2ae84e2c66d9b93ac3e61f11332f6aa8bc24196",
+      "after_sha256": "63bbf506b5a1ee88a34b8da2e8e96c4941f6f5d1466d1edace6c2b321c099a3c",
+      "crlf_before": 0,
+      "crlf_after": 0,
+      "bare_lf_before": 28,
+      "bare_lf_after": 28
+    }
+  ],
+  "description": "Selectable V19; preserves original EOL and defaults; frozen before evaluation."
+}

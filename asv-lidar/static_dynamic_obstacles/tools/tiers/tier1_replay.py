@@ -50,7 +50,7 @@ def main() -> None:
     ap.add_argument("--per-class", type=int, default=20)
     ap.add_argument("--tag", default="run3")
     ap.add_argument("--processes", type=int, default=None, help="worker processes (default: cores - 2)")
-    ap.add_argument("--safety-version", type=int, choices=(1, 2, 3, 4, 5), default=1,
+    ap.add_argument("--safety-version", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19), default=1,
                     help="runtime filter version when --safety on")
     ap.add_argument("--stop-test-fit", choices=("on", "off"), default=None,
                     help="override STOP_TEST_USES_HULL_FIT in the workers (F66 A/B)")

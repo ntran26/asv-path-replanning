@@ -1,0 +1,2936 @@
+{
+  "schema": 1,
+  "iterations": [
+    {
+      "tag": "margin_only_32",
+      "directory": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\results\\safety_dev\\v10_iterations\\margin_only_32",
+      "complete": true,
+      "planned_runs": 32,
+      "attempted": 32,
+      "completed": 32,
+      "distinct_cases": 32,
+      "filter_error_steps": 0,
+      "groups": [
+        {
+          "mode": "v9_margin",
+          "dimension": "overall",
+          "slice": "all",
+          "n": 32,
+          "outcomes": {
+            "goal": 16,
+            "collision:target": 9,
+            "collision:obstacle": 2,
+            "collision:boundary": 5,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 32,
+              "gained_goals": 10,
+              "lost_goals": 10,
+              "net_goals": 0,
+              "gained_cases": [
+                "DV3:DV3-CRP-CV-04",
+                "DV3:DV3-CRP-CV-17",
+                "DV3:DV3-HO-CV-03",
+                "DV3:DV3-HO-VS-01",
+                "TS2:CH-CR-CV-073",
+                "TS2:CH-HO-RE-060",
+                "TS2:P2-L1-CRP-VAR-12",
+                "TS2:P2-L1-OT-VAR-20",
+                "TS2:P2-L2-CRP-VAR-02",
+                "TS2:P2-L2-HO-FIX-05"
+              ],
+              "lost_cases": [
+                "DV3:DV3-BO-CV-04",
+                "TS2:BAS-BO-CV-063",
+                "TS2:BAS-CR-RE-072",
+                "TS2:BAS-HO-NC-059",
+                "TS2:BAS-NU-CV-070",
+                "TS2:CH-CR-CV-007",
+                "TS2:CH-CR-CV-031",
+                "TS2:CH-CR-RE-038",
+                "TS2:CH-HO-CV-073",
+                "TS2:P2-L2-CRP-VAR-16"
+              ],
+              "collision_to_goal": 10,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:boundary": 4,
+                "collision:obstacle -> goal": 4,
+                "collision:target -> goal": 4,
+                "collision:boundary -> goal": 2,
+                "goal -> collision:target": 4,
+                "goal -> goal": 6,
+                "goal -> collision:obstacle": 2,
+                "collision:target -> collision:target": 4,
+                "collision:obstacle -> collision:target": 1,
+                "collision:obstacle -> collision:boundary": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 32,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:boundary -> collision:boundary": 5,
+                "goal -> goal": 16,
+                "collision:target -> collision:target": 9,
+                "collision:obstacle -> collision:obstacle": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 32,
+              "gained_goals": 6,
+              "lost_goals": 6,
+              "net_goals": 0,
+              "gained_cases": [
+                "DV3:DV3-CRP-CV-04",
+                "DV3:DV3-CRP-CV-17",
+                "DV3:DV3-HO-CV-03",
+                "DV3:DV3-HO-VS-01",
+                "TS2:CH-CR-CV-073",
+                "TS2:P2-L2-HO-FIX-05"
+              ],
+              "lost_cases": [
+                "DV3:DV3-BO-CV-04",
+                "TS2:BAS-CR-RE-072",
+                "TS2:BAS-HO-NC-059",
+                "TS2:CH-CR-CV-031",
+                "TS2:CH-CR-RE-038",
+                "TS2:P2-L2-HO-FIX-19"
+              ],
+              "collision_to_goal": 6,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:boundary": 4,
+                "collision:obstacle -> goal": 3,
+                "collision:target -> goal": 2,
+                "collision:obstacle -> collision:target": 2,
+                "goal -> collision:target": 2,
+                "goal -> goal": 10,
+                "collision:boundary -> collision:boundary": 1,
+                "collision:obstacle -> collision:obstacle": 1,
+                "collision:target -> collision:target": 5,
+                "collision:target -> collision:obstacle": 1,
+                "collision:boundary -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v9_margin",
+          "dimension": "dataset",
+          "slice": "dv3",
+          "n": 5,
+          "outcomes": {
+            "goal": 4,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 1,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 5,
+              "gained_goals": 4,
+              "lost_goals": 1,
+              "net_goals": 3,
+              "gained_cases": [
+                "DV3:DV3-CRP-CV-04",
+                "DV3:DV3-CRP-CV-17",
+                "DV3:DV3-HO-CV-03",
+                "DV3:DV3-HO-VS-01"
+              ],
+              "lost_cases": [
+                "DV3:DV3-BO-CV-04"
+              ],
+              "collision_to_goal": 4,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:boundary": 1,
+                "collision:obstacle -> goal": 2,
+                "collision:target -> goal": 1,
+                "collision:boundary -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 5,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:boundary -> collision:boundary": 1,
+                "goal -> goal": 4
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 5,
+              "gained_goals": 4,
+              "lost_goals": 1,
+              "net_goals": 3,
+              "gained_cases": [
+                "DV3:DV3-CRP-CV-04",
+                "DV3:DV3-CRP-CV-17",
+                "DV3:DV3-HO-CV-03",
+                "DV3:DV3-HO-VS-01"
+              ],
+              "lost_cases": [
+                "DV3:DV3-BO-CV-04"
+              ],
+              "collision_to_goal": 4,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:boundary": 1,
+                "collision:obstacle -> goal": 3,
+                "collision:target -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v9_margin",
+          "dimension": "dataset",
+          "slice": "ts2",
+          "n": 27,
+          "outcomes": {
+            "goal": 12,
+            "collision:target": 9,
+            "collision:obstacle": 2,
+            "collision:boundary": 4,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 27,
+              "gained_goals": 6,
+              "lost_goals": 9,
+              "net_goals": -3,
+              "gained_cases": [
+                "TS2:CH-CR-CV-073",
+                "TS2:CH-HO-RE-060",
+                "TS2:P2-L1-CRP-VAR-12",
+                "TS2:P2-L1-OT-VAR-20",
+                "TS2:P2-L2-CRP-VAR-02",
+                "TS2:P2-L2-HO-FIX-05"
+              ],
+              "lost_cases": [
+                "TS2:BAS-BO-CV-063",
+                "TS2:BAS-CR-RE-072",
+                "TS2:BAS-HO-NC-059",
+                "TS2:BAS-NU-CV-070",
+                "TS2:CH-CR-CV-007",
+                "TS2:CH-CR-CV-031",
+                "TS2:CH-CR-RE-038",
+                "TS2:CH-HO-CV-073",
+                "TS2:P2-L2-CRP-VAR-16"
+              ],
+              "collision_to_goal": 6,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:target": 4,
+                "goal -> collision:boundary": 3,
+                "goal -> goal": 6,
+                "goal -> collision:obstacle": 2,
+                "collision:target -> collision:target": 4,
+                "collision:target -> goal": 3,
+                "collision:obstacle -> goal": 2,
+                "collision:boundary -> goal": 1,
+                "collision:obstacle -> collision:target": 1,
+                "collision:obstacle -> collision:boundary": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 27,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 9,
+                "collision:boundary -> collision:boundary": 4,
+                "goal -> goal": 12,
+                "collision:obstacle -> collision:obstacle": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 27,
+              "gained_goals": 2,
+              "lost_goals": 5,
+              "net_goals": -3,
+              "gained_cases": [
+                "TS2:CH-CR-CV-073",
+                "TS2:P2-L2-HO-FIX-05"
+              ],
+              "lost_cases": [
+                "TS2:BAS-CR-RE-072",
+                "TS2:BAS-HO-NC-059",
+                "TS2:CH-CR-CV-031",
+                "TS2:CH-CR-RE-038",
+                "TS2:P2-L2-HO-FIX-19"
+              ],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:obstacle -> collision:target": 2,
+                "goal -> collision:boundary": 3,
+                "goal -> collision:target": 2,
+                "goal -> goal": 10,
+                "collision:boundary -> collision:boundary": 1,
+                "collision:obstacle -> collision:obstacle": 1,
+                "collision:target -> collision:target": 5,
+                "collision:target -> goal": 1,
+                "collision:target -> collision:obstacle": 1,
+                "collision:boundary -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v9_margin",
+          "dimension": "stratum",
+          "slice": "expired_consequences",
+          "n": 8,
+          "outcomes": {
+            "goal": 4,
+            "collision:target": 2,
+            "collision:obstacle": 0,
+            "collision:boundary": 2,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 8,
+              "gained_goals": 4,
+              "lost_goals": 4,
+              "net_goals": 0,
+              "gained_cases": [
+                "DV3:DV3-CRP-CV-04",
+                "DV3:DV3-CRP-CV-17",
+                "DV3:DV3-HO-CV-03",
+                "DV3:DV3-HO-VS-01"
+              ],
+              "lost_cases": [
+                "DV3:DV3-BO-CV-04",
+                "TS2:BAS-CR-RE-072",
+                "TS2:BAS-HO-NC-059",
+                "TS2:CH-CR-RE-038"
+              ],
+              "collision_to_goal": 4,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:boundary": 2,
+                "collision:obstacle -> goal": 2,
+                "collision:target -> goal": 1,
+                "collision:boundary -> goal": 1,
+                "goal -> collision:target": 2
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 8,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:boundary -> collision:boundary": 2,
+                "goal -> goal": 4,
+                "collision:target -> collision:target": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 8,
+              "gained_goals": 4,
+              "lost_goals": 4,
+              "net_goals": 0,
+              "gained_cases": [
+                "DV3:DV3-CRP-CV-04",
+                "DV3:DV3-CRP-CV-17",
+                "DV3:DV3-HO-CV-03",
+                "DV3:DV3-HO-VS-01"
+              ],
+              "lost_cases": [
+                "DV3:DV3-BO-CV-04",
+                "TS2:BAS-CR-RE-072",
+                "TS2:BAS-HO-NC-059",
+                "TS2:CH-CR-RE-038"
+              ],
+              "collision_to_goal": 4,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:boundary": 2,
+                "collision:obstacle -> goal": 3,
+                "collision:target -> goal": 1,
+                "goal -> collision:target": 2
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v9_margin",
+          "dimension": "stratum",
+          "slice": "other_broken_boundary",
+          "n": 2,
+          "outcomes": {
+            "goal": 0,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 2,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 2,
+              "net_goals": -2,
+              "gained_cases": [],
+              "lost_cases": [
+                "TS2:BAS-NU-CV-070",
+                "TS2:CH-CR-CV-031"
+              ],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:boundary": 2
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:boundary -> collision:boundary": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 1,
+              "net_goals": -1,
+              "gained_cases": [],
+              "lost_cases": [
+                "TS2:CH-CR-CV-031"
+              ],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:boundary -> collision:boundary": 1,
+                "goal -> collision:boundary": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v9_margin",
+          "dimension": "stratum",
+          "slice": "other_broken_obstacle",
+          "n": 2,
+          "outcomes": {
+            "goal": 0,
+            "collision:target": 0,
+            "collision:obstacle": 2,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 2,
+              "net_goals": -2,
+              "gained_cases": [],
+              "lost_cases": [
+                "TS2:CH-CR-CV-007",
+                "TS2:P2-L2-CRP-VAR-16"
+              ],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:obstacle": 2
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:obstacle -> collision:obstacle": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:obstacle -> collision:obstacle": 1,
+                "collision:target -> collision:obstacle": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v9_margin",
+          "dimension": "stratum",
+          "slice": "other_broken_target",
+          "n": 2,
+          "outcomes": {
+            "goal": 0,
+            "collision:target": 2,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 2,
+              "net_goals": -2,
+              "gained_cases": [],
+              "lost_cases": [
+                "TS2:BAS-BO-CV-063",
+                "TS2:CH-HO-CV-073"
+              ],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:target": 2
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:obstacle -> collision:target": 1,
+                "collision:target -> collision:target": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v9_margin",
+          "dimension": "stratum",
+          "slice": "rescued_brake",
+          "n": 1,
+          "outcomes": {
+            "goal": 1,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 1,
+              "lost_goals": 0,
+              "net_goals": 1,
+              "gained_cases": [
+                "TS2:CH-CR-CV-073"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 1,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 1,
+              "lost_goals": 0,
+              "net_goals": 1,
+              "gained_cases": [
+                "TS2:CH-CR-CV-073"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 1,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v9_margin",
+          "dimension": "stratum",
+          "slice": "rescued_continue",
+          "n": 2,
+          "outcomes": {
+            "goal": 2,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 2,
+              "lost_goals": 0,
+              "net_goals": 2,
+              "gained_cases": [
+                "TS2:P2-L2-CRP-VAR-02",
+                "TS2:P2-L2-HO-FIX-05"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> goal": 1,
+                "collision:boundary -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 1,
+              "lost_goals": 0,
+              "net_goals": 1,
+              "gained_cases": [
+                "TS2:P2-L2-HO-FIX-05"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 1,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1,
+                "collision:boundary -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v9_margin",
+          "dimension": "stratum",
+          "slice": "rescued_searched_escape",
+          "n": 1,
+          "outcomes": {
+            "goal": 1,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 1,
+              "lost_goals": 0,
+              "net_goals": 1,
+              "gained_cases": [
+                "TS2:P2-L1-CRP-VAR-12"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 1,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:obstacle -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v9_margin",
+          "dimension": "stratum",
+          "slice": "rescued_turn",
+          "n": 2,
+          "outcomes": {
+            "goal": 2,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 2,
+              "lost_goals": 0,
+              "net_goals": 2,
+              "gained_cases": [
+                "TS2:CH-HO-RE-060",
+                "TS2:P2-L1-OT-VAR-20"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> goal": 1,
+                "collision:obstacle -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 2
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v9_margin",
+          "dimension": "stratum",
+          "slice": "success_active_turn",
+          "n": 1,
+          "outcomes": {
+            "goal": 1,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v9_margin",
+          "dimension": "stratum",
+          "slice": "success_expired_repair_false",
+          "n": 1,
+          "outcomes": {
+            "goal": 1,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v9_margin",
+          "dimension": "stratum",
+          "slice": "success_expired_repair_true",
+          "n": 2,
+          "outcomes": {
+            "goal": 2,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 2
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 2
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v9_margin",
+          "dimension": "stratum",
+          "slice": "success_never_fire_field_layout",
+          "n": 1,
+          "outcomes": {
+            "goal": 1,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v9_margin",
+          "dimension": "stratum",
+          "slice": "success_never_fire_frozen",
+          "n": 1,
+          "outcomes": {
+            "goal": 1,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v9_margin",
+          "dimension": "stratum",
+          "slice": "unrescued_expired",
+          "n": 2,
+          "outcomes": {
+            "goal": 0,
+            "collision:target": 2,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 1,
+                "collision:obstacle -> collision:target": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 1,
+                "collision:obstacle -> collision:target": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v9_margin",
+          "dimension": "stratum",
+          "slice": "unrescued_optimistic_no_fire",
+          "n": 3,
+          "outcomes": {
+            "goal": 0,
+            "collision:target": 3,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 3,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 3
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 3,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 3
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 3,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 3
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v9_margin",
+          "dimension": "stratum",
+          "slice": "unrescued_other_active",
+          "n": 1,
+          "outcomes": {
+            "goal": 0,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 1,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:obstacle -> collision:boundary": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:boundary -> collision:boundary": 1
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 1,
+              "net_goals": -1,
+              "gained_cases": [],
+              "lost_cases": [
+                "TS2:P2-L2-HO-FIX-19"
+              ],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:boundary": 1
+              }
+            }
+          ]
+        }
+      ],
+      "mechanisms": {
+        "v9_margin": {
+          "changed_action_steps": 336,
+          "brake_steps": 99,
+          "decisions": 1698,
+          "decision_reasons": {
+            "nominal": 781,
+            "idle": 180,
+            "policy prefix repaired": 37,
+            "last certificate": 142,
+            "no escape": 161,
+            "searched policy": 85,
+            "turn": 197,
+            "continue": 74,
+            "handback": 3,
+            "searched escape": 11,
+            "policy margin dominates": 10,
+            "brake": 17
+          },
+          "events": {
+            "v9_current_plan_checked": {
+              "steps": 346,
+              "episodes": 27,
+              "observed_steps": 1698,
+              "observed_episodes": 32
+            },
+            "v9_override_suppressed": {
+              "steps": 10,
+              "episodes": 7,
+              "observed_steps": 1698,
+              "observed_episodes": 32
+            },
+            "v10_pair_checked": {
+              "steps": null,
+              "episodes": null,
+              "observed_steps": 0,
+              "observed_episodes": 0
+            },
+            "v10_policy_preserved": {
+              "steps": null,
+              "episodes": null,
+              "observed_steps": 0,
+              "observed_episodes": 0
+            },
+            "v11_policy_prefix_search_checked": {
+              "steps": null,
+              "episodes": null,
+              "observed_steps": 0,
+              "observed_episodes": 0
+            },
+            "v11_policy_prefix_preserved": {
+              "steps": null,
+              "episodes": null,
+              "observed_steps": 0,
+              "observed_episodes": 0
+            }
+          },
+          "track_persistence": {
+            "observed_episodes": 0,
+            "added_hypothesis_decisions": null,
+            "admission_events": null,
+            "coasted_hypothesis_decisions": null,
+            "contradicted_source_events": null,
+            "expired_source_events": null,
+            "measured_refresh_events": null,
+            "observed_decisions": 0
+          },
+          "policy_prefix_search": {
+            "observed_episodes": 0,
+            "accepted_plans": null,
+            "evaluated_plans": null,
+            "hard_passing_plans": null,
+            "observed_decisions": 0
+          }
+        }
+      },
+      "episode_seconds": 1412.350848899965,
+      "campaign_seconds": 1419.307056000005,
+      "pilot_source_differences": {
+        "src/field_training.py": {
+          "candidate": "66601e1fc4a730d2e82711bb6151fcebdcca88c1216f8c49f85cff18781bf772",
+          "reference": "cbb7ae5c98cddce8fc1cdfc4578faf9fddeaf4e1698ac584bf5495bd6c6b9302"
+        },
+        "tools/diagnostics/safety/safety_iteration.py": {
+          "candidate": "6eb975a8dcbdff54733bf7f492c674a85b9818626cdd7cd85fac1b920ee8137e",
+          "reference": null
+        }
+      },
+      "checkpoint_sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+      "config_sha256": "a4df64a97f641de0b1c660b04f73ccc8401a29f7fa48711c2a6ee694dc98ed44",
+      "filter_classes": {
+        "v9_margin": "safety_v9.SafetyFilterV9"
+      },
+      "constructor_options": {
+        "v9_margin": {
+          "require_current_plan": false,
+          "prefer_policy_margin": true
+        }
+      }
+    },
+    {
+      "tag": "conditional_policy_32",
+      "directory": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\results\\safety_dev\\v10_iterations\\conditional_policy_32",
+      "complete": true,
+      "planned_runs": 32,
+      "attempted": 32,
+      "completed": 32,
+      "distinct_cases": 32,
+      "filter_error_steps": 0,
+      "groups": [
+        {
+          "mode": "v10",
+          "dimension": "overall",
+          "slice": "all",
+          "n": 32,
+          "outcomes": {
+            "goal": 18,
+            "collision:target": 9,
+            "collision:obstacle": 2,
+            "collision:boundary": 3,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 32,
+              "gained_goals": 11,
+              "lost_goals": 9,
+              "net_goals": 2,
+              "gained_cases": [
+                "DV3:DV3-CRP-CV-04",
+                "DV3:DV3-CRP-CV-17",
+                "DV3:DV3-HO-CV-03",
+                "DV3:DV3-HO-VS-01",
+                "TS2:CH-CR-CV-073",
+                "TS2:CH-HO-RE-060",
+                "TS2:P2-L1-CRP-VAR-12",
+                "TS2:P2-L1-OT-VAR-20",
+                "TS2:P2-L2-CRP-VAR-02",
+                "TS2:P2-L2-HO-FIX-05",
+                "TS2:P2-L2-HO-FIX-19"
+              ],
+              "lost_cases": [
+                "DV3:DV3-BO-CV-04",
+                "TS2:BAS-BO-CV-063",
+                "TS2:BAS-HO-NC-059",
+                "TS2:BAS-NU-CV-070",
+                "TS2:CH-CR-CV-007",
+                "TS2:CH-CR-CV-031",
+                "TS2:CH-CR-RE-038",
+                "TS2:CH-HO-CV-073",
+                "TS2:P2-L2-CRP-VAR-16"
+              ],
+              "collision_to_goal": 11,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:boundary": 3,
+                "collision:obstacle -> goal": 5,
+                "collision:target -> goal": 4,
+                "collision:boundary -> goal": 2,
+                "goal -> collision:target": 4,
+                "goal -> goal": 7,
+                "goal -> collision:obstacle": 2,
+                "collision:target -> collision:target": 4,
+                "collision:obstacle -> collision:target": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 32,
+              "gained_goals": 2,
+              "lost_goals": 0,
+              "net_goals": 2,
+              "gained_cases": [
+                "TS2:BAS-CR-RE-072",
+                "TS2:P2-L2-HO-FIX-19"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:boundary -> collision:boundary": 3,
+                "goal -> goal": 16,
+                "collision:target -> collision:target": 9,
+                "collision:boundary -> goal": 2,
+                "collision:obstacle -> collision:obstacle": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 32,
+              "gained_goals": 6,
+              "lost_goals": 4,
+              "net_goals": 2,
+              "gained_cases": [
+                "DV3:DV3-CRP-CV-04",
+                "DV3:DV3-CRP-CV-17",
+                "DV3:DV3-HO-CV-03",
+                "DV3:DV3-HO-VS-01",
+                "TS2:CH-CR-CV-073",
+                "TS2:P2-L2-HO-FIX-05"
+              ],
+              "lost_cases": [
+                "DV3:DV3-BO-CV-04",
+                "TS2:BAS-HO-NC-059",
+                "TS2:CH-CR-CV-031",
+                "TS2:CH-CR-RE-038"
+              ],
+              "collision_to_goal": 6,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:boundary": 2,
+                "collision:obstacle -> goal": 3,
+                "collision:target -> goal": 2,
+                "collision:obstacle -> collision:target": 2,
+                "goal -> goal": 12,
+                "goal -> collision:target": 2,
+                "collision:boundary -> collision:boundary": 1,
+                "collision:obstacle -> collision:obstacle": 1,
+                "collision:target -> collision:target": 5,
+                "collision:target -> collision:obstacle": 1,
+                "collision:boundary -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v10",
+          "dimension": "dataset",
+          "slice": "dv3",
+          "n": 5,
+          "outcomes": {
+            "goal": 4,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 1,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 5,
+              "gained_goals": 4,
+              "lost_goals": 1,
+              "net_goals": 3,
+              "gained_cases": [
+                "DV3:DV3-CRP-CV-04",
+                "DV3:DV3-CRP-CV-17",
+                "DV3:DV3-HO-CV-03",
+                "DV3:DV3-HO-VS-01"
+              ],
+              "lost_cases": [
+                "DV3:DV3-BO-CV-04"
+              ],
+              "collision_to_goal": 4,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:boundary": 1,
+                "collision:obstacle -> goal": 2,
+                "collision:target -> goal": 1,
+                "collision:boundary -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 5,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:boundary -> collision:boundary": 1,
+                "goal -> goal": 4
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 5,
+              "gained_goals": 4,
+              "lost_goals": 1,
+              "net_goals": 3,
+              "gained_cases": [
+                "DV3:DV3-CRP-CV-04",
+                "DV3:DV3-CRP-CV-17",
+                "DV3:DV3-HO-CV-03",
+                "DV3:DV3-HO-VS-01"
+              ],
+              "lost_cases": [
+                "DV3:DV3-BO-CV-04"
+              ],
+              "collision_to_goal": 4,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:boundary": 1,
+                "collision:obstacle -> goal": 3,
+                "collision:target -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v10",
+          "dimension": "dataset",
+          "slice": "ts2",
+          "n": 27,
+          "outcomes": {
+            "goal": 14,
+            "collision:target": 9,
+            "collision:obstacle": 2,
+            "collision:boundary": 2,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 27,
+              "gained_goals": 7,
+              "lost_goals": 8,
+              "net_goals": -1,
+              "gained_cases": [
+                "TS2:CH-CR-CV-073",
+                "TS2:CH-HO-RE-060",
+                "TS2:P2-L1-CRP-VAR-12",
+                "TS2:P2-L1-OT-VAR-20",
+                "TS2:P2-L2-CRP-VAR-02",
+                "TS2:P2-L2-HO-FIX-05",
+                "TS2:P2-L2-HO-FIX-19"
+              ],
+              "lost_cases": [
+                "TS2:BAS-BO-CV-063",
+                "TS2:BAS-HO-NC-059",
+                "TS2:BAS-NU-CV-070",
+                "TS2:CH-CR-CV-007",
+                "TS2:CH-CR-CV-031",
+                "TS2:CH-CR-RE-038",
+                "TS2:CH-HO-CV-073",
+                "TS2:P2-L2-CRP-VAR-16"
+              ],
+              "collision_to_goal": 7,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:target": 4,
+                "goal -> goal": 7,
+                "goal -> collision:boundary": 2,
+                "goal -> collision:obstacle": 2,
+                "collision:target -> collision:target": 4,
+                "collision:target -> goal": 3,
+                "collision:obstacle -> goal": 3,
+                "collision:boundary -> goal": 1,
+                "collision:obstacle -> collision:target": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 27,
+              "gained_goals": 2,
+              "lost_goals": 0,
+              "net_goals": 2,
+              "gained_cases": [
+                "TS2:BAS-CR-RE-072",
+                "TS2:P2-L2-HO-FIX-19"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 9,
+                "collision:boundary -> goal": 2,
+                "goal -> goal": 12,
+                "collision:boundary -> collision:boundary": 2,
+                "collision:obstacle -> collision:obstacle": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 27,
+              "gained_goals": 2,
+              "lost_goals": 3,
+              "net_goals": -1,
+              "gained_cases": [
+                "TS2:CH-CR-CV-073",
+                "TS2:P2-L2-HO-FIX-05"
+              ],
+              "lost_cases": [
+                "TS2:BAS-HO-NC-059",
+                "TS2:CH-CR-CV-031",
+                "TS2:CH-CR-RE-038"
+              ],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:obstacle -> collision:target": 2,
+                "goal -> goal": 12,
+                "goal -> collision:target": 2,
+                "collision:boundary -> collision:boundary": 1,
+                "collision:obstacle -> collision:obstacle": 1,
+                "goal -> collision:boundary": 1,
+                "collision:target -> collision:target": 5,
+                "collision:target -> goal": 1,
+                "collision:target -> collision:obstacle": 1,
+                "collision:boundary -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v10",
+          "dimension": "stratum",
+          "slice": "expired_consequences",
+          "n": 8,
+          "outcomes": {
+            "goal": 5,
+            "collision:target": 2,
+            "collision:obstacle": 0,
+            "collision:boundary": 1,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 8,
+              "gained_goals": 4,
+              "lost_goals": 3,
+              "net_goals": 1,
+              "gained_cases": [
+                "DV3:DV3-CRP-CV-04",
+                "DV3:DV3-CRP-CV-17",
+                "DV3:DV3-HO-CV-03",
+                "DV3:DV3-HO-VS-01"
+              ],
+              "lost_cases": [
+                "DV3:DV3-BO-CV-04",
+                "TS2:BAS-HO-NC-059",
+                "TS2:CH-CR-RE-038"
+              ],
+              "collision_to_goal": 4,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:boundary": 1,
+                "collision:obstacle -> goal": 2,
+                "collision:target -> goal": 1,
+                "collision:boundary -> goal": 1,
+                "goal -> goal": 1,
+                "goal -> collision:target": 2
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 8,
+              "gained_goals": 1,
+              "lost_goals": 0,
+              "net_goals": 1,
+              "gained_cases": [
+                "TS2:BAS-CR-RE-072"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 1,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:boundary -> collision:boundary": 1,
+                "goal -> goal": 4,
+                "collision:boundary -> goal": 1,
+                "collision:target -> collision:target": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 8,
+              "gained_goals": 4,
+              "lost_goals": 3,
+              "net_goals": 1,
+              "gained_cases": [
+                "DV3:DV3-CRP-CV-04",
+                "DV3:DV3-CRP-CV-17",
+                "DV3:DV3-HO-CV-03",
+                "DV3:DV3-HO-VS-01"
+              ],
+              "lost_cases": [
+                "DV3:DV3-BO-CV-04",
+                "TS2:BAS-HO-NC-059",
+                "TS2:CH-CR-RE-038"
+              ],
+              "collision_to_goal": 4,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:boundary": 1,
+                "collision:obstacle -> goal": 3,
+                "collision:target -> goal": 1,
+                "goal -> goal": 1,
+                "goal -> collision:target": 2
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v10",
+          "dimension": "stratum",
+          "slice": "other_broken_boundary",
+          "n": 2,
+          "outcomes": {
+            "goal": 0,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 2,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 2,
+              "net_goals": -2,
+              "gained_cases": [],
+              "lost_cases": [
+                "TS2:BAS-NU-CV-070",
+                "TS2:CH-CR-CV-031"
+              ],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:boundary": 2
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:boundary -> collision:boundary": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 1,
+              "net_goals": -1,
+              "gained_cases": [],
+              "lost_cases": [
+                "TS2:CH-CR-CV-031"
+              ],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:boundary -> collision:boundary": 1,
+                "goal -> collision:boundary": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v10",
+          "dimension": "stratum",
+          "slice": "other_broken_obstacle",
+          "n": 2,
+          "outcomes": {
+            "goal": 0,
+            "collision:target": 0,
+            "collision:obstacle": 2,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 2,
+              "net_goals": -2,
+              "gained_cases": [],
+              "lost_cases": [
+                "TS2:CH-CR-CV-007",
+                "TS2:P2-L2-CRP-VAR-16"
+              ],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:obstacle": 2
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:obstacle -> collision:obstacle": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:obstacle -> collision:obstacle": 1,
+                "collision:target -> collision:obstacle": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v10",
+          "dimension": "stratum",
+          "slice": "other_broken_target",
+          "n": 2,
+          "outcomes": {
+            "goal": 0,
+            "collision:target": 2,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 2,
+              "net_goals": -2,
+              "gained_cases": [],
+              "lost_cases": [
+                "TS2:BAS-BO-CV-063",
+                "TS2:CH-HO-CV-073"
+              ],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> collision:target": 2
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:obstacle -> collision:target": 1,
+                "collision:target -> collision:target": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v10",
+          "dimension": "stratum",
+          "slice": "rescued_brake",
+          "n": 1,
+          "outcomes": {
+            "goal": 1,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 1,
+              "lost_goals": 0,
+              "net_goals": 1,
+              "gained_cases": [
+                "TS2:CH-CR-CV-073"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 1,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 1,
+              "lost_goals": 0,
+              "net_goals": 1,
+              "gained_cases": [
+                "TS2:CH-CR-CV-073"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 1,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v10",
+          "dimension": "stratum",
+          "slice": "rescued_continue",
+          "n": 2,
+          "outcomes": {
+            "goal": 2,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 2,
+              "lost_goals": 0,
+              "net_goals": 2,
+              "gained_cases": [
+                "TS2:P2-L2-CRP-VAR-02",
+                "TS2:P2-L2-HO-FIX-05"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> goal": 1,
+                "collision:boundary -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 1,
+              "lost_goals": 0,
+              "net_goals": 1,
+              "gained_cases": [
+                "TS2:P2-L2-HO-FIX-05"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 1,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1,
+                "collision:boundary -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v10",
+          "dimension": "stratum",
+          "slice": "rescued_searched_escape",
+          "n": 1,
+          "outcomes": {
+            "goal": 1,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 1,
+              "lost_goals": 0,
+              "net_goals": 1,
+              "gained_cases": [
+                "TS2:P2-L1-CRP-VAR-12"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 1,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:obstacle -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v10",
+          "dimension": "stratum",
+          "slice": "rescued_turn",
+          "n": 2,
+          "outcomes": {
+            "goal": 2,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 2,
+              "lost_goals": 0,
+              "net_goals": 2,
+              "gained_cases": [
+                "TS2:CH-HO-RE-060",
+                "TS2:P2-L1-OT-VAR-20"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 2,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> goal": 1,
+                "collision:obstacle -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 2
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v10",
+          "dimension": "stratum",
+          "slice": "success_active_turn",
+          "n": 1,
+          "outcomes": {
+            "goal": 1,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v10",
+          "dimension": "stratum",
+          "slice": "success_expired_repair_false",
+          "n": 1,
+          "outcomes": {
+            "goal": 1,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v10",
+          "dimension": "stratum",
+          "slice": "success_expired_repair_true",
+          "n": 2,
+          "outcomes": {
+            "goal": 2,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 2
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 2
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v10",
+          "dimension": "stratum",
+          "slice": "success_never_fire_field_layout",
+          "n": 1,
+          "outcomes": {
+            "goal": 1,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v10",
+          "dimension": "stratum",
+          "slice": "success_never_fire_frozen",
+          "n": 1,
+          "outcomes": {
+            "goal": 1,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v10",
+          "dimension": "stratum",
+          "slice": "unrescued_expired",
+          "n": 2,
+          "outcomes": {
+            "goal": 0,
+            "collision:target": 2,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 1,
+                "collision:obstacle -> collision:target": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 2
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 2,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 1,
+                "collision:obstacle -> collision:target": 1
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v10",
+          "dimension": "stratum",
+          "slice": "unrescued_optimistic_no_fire",
+          "n": 3,
+          "outcomes": {
+            "goal": 0,
+            "collision:target": 3,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 3,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 3
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 3,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 3
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 3,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:target -> collision:target": 3
+              }
+            }
+          ]
+        },
+        {
+          "mode": "v10",
+          "dimension": "stratum",
+          "slice": "unrescued_other_active",
+          "n": 1,
+          "outcomes": {
+            "goal": 1,
+            "collision:target": 0,
+            "collision:obstacle": 0,
+            "collision:boundary": 0,
+            "timeout": 0
+          },
+          "comparisons": [
+            {
+              "reference": "off",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 1,
+              "lost_goals": 0,
+              "net_goals": 1,
+              "gained_cases": [
+                "TS2:P2-L2-HO-FIX-19"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 1,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:obstacle -> goal": 1
+              }
+            },
+            {
+              "reference": "v8",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 1,
+              "lost_goals": 0,
+              "net_goals": 1,
+              "gained_cases": [
+                "TS2:P2-L2-HO-FIX-19"
+              ],
+              "lost_cases": [],
+              "collision_to_goal": 1,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "collision:boundary -> goal": 1
+              }
+            },
+            {
+              "reference": "v9",
+              "evidence": "fresh_prior_pilot",
+              "matched_cases": 1,
+              "gained_goals": 0,
+              "lost_goals": 0,
+              "net_goals": 0,
+              "gained_cases": [],
+              "lost_cases": [],
+              "collision_to_goal": 0,
+              "collision_to_timeout": 0,
+              "transitions": {
+                "goal -> goal": 1
+              }
+            }
+          ]
+        }
+      ],
+      "mechanisms": {
+        "v10": {
+          "changed_action_steps": 354,
+          "brake_steps": 103,
+          "decisions": 1801,
+          "decision_reasons": {
+            "nominal": 820,
+            "idle": 201,
+            "policy prefix repaired": 43,
+            "last certificate": 142,
+            "no escape": 152,
+            "searched policy": 86,
+            "feasible policy backup": 2,
+            "searched escape": 13,
+            "continue": 86,
+            "turn": 224,
+            "policy margin dominates": 12,
+            "handback": 3,
+            "brake": 17
+          },
+          "events": {
+            "v9_current_plan_checked": {
+              "steps": null,
+              "episodes": null,
+              "observed_steps": 0,
+              "observed_episodes": 0
+            },
+            "v9_override_suppressed": {
+              "steps": null,
+              "episodes": null,
+              "observed_steps": 0,
+              "observed_episodes": 0
+            },
+            "v10_pair_checked": {
+              "steps": 368,
+              "episodes": 27,
+              "observed_steps": 1801,
+              "observed_episodes": 32
+            },
+            "v10_policy_preserved": {
+              "steps": 14,
+              "episodes": 8,
+              "observed_steps": 1801,
+              "observed_episodes": 32
+            },
+            "v11_policy_prefix_search_checked": {
+              "steps": null,
+              "episodes": null,
+              "observed_steps": 0,
+              "observed_episodes": 0
+            },
+            "v11_policy_prefix_preserved": {
+              "steps": null,
+              "episodes": null,
+              "observed_steps": 0,
+              "observed_episodes": 0
+            }
+          },
+          "track_persistence": {
+            "observed_episodes": 0,
+            "added_hypothesis_decisions": null,
+            "admission_events": null,
+            "coasted_hypothesis_decisions": null,
+            "contradicted_source_events": null,
+            "expired_source_events": null,
+            "measured_refresh_events": null,
+            "observed_decisions": 0
+          },
+          "policy_prefix_search": {
+            "observed_episodes": 0,
+            "accepted_plans": null,
+            "evaluated_plans": null,
+            "hard_passing_plans": null,
+            "observed_decisions": 0
+          }
+        }
+      },
+      "episode_seconds": 1444.7580729000038,
+      "campaign_seconds": 1448.5313022999908,
+      "pilot_source_differences": {
+        "src/field_training.py": {
+          "candidate": "66601e1fc4a730d2e82711bb6151fcebdcca88c1216f8c49f85cff18781bf772",
+          "reference": "cbb7ae5c98cddce8fc1cdfc4578faf9fddeaf4e1698ac584bf5495bd6c6b9302"
+        },
+        "src/safety_v10.py": {
+          "candidate": "5ee4e28a464b8a1219426e0e86d6af6be74ece56b512fb50d9ad981d64e4a00e",
+          "reference": null
+        },
+        "tools/diagnostics/safety/safety_iteration.py": {
+          "candidate": "6eb975a8dcbdff54733bf7f492c674a85b9818626cdd7cd85fac1b920ee8137e",
+          "reference": null
+        }
+      },
+      "checkpoint_sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+      "config_sha256": "a4df64a97f641de0b1c660b04f73ccc8401a29f7fa48711c2a6ee694dc98ed44",
+      "filter_classes": {
+        "v10": "safety_v10.SafetyFilterV10"
+      },
+      "constructor_options": {
+        "v10": {}
+      }
+    }
+  ],
+  "report_generation_new_episodes": 0,
+  "completed_iteration_records": 64,
+  "distinct_cases": 32,
+  "repeated_case_record_counts": {
+    "DV3:DV3-BO-CV-04": 2,
+    "DV3:DV3-CRP-CV-04": 2,
+    "DV3:DV3-CRP-CV-17": 2,
+    "DV3:DV3-HO-CV-03": 2,
+    "DV3:DV3-HO-VS-01": 2,
+    "TS2:BAS-BO-CV-063": 2,
+    "TS2:BAS-CR-RE-072": 2,
+    "TS2:BAS-HO-NC-059": 2,
+    "TS2:BAS-HO-NC-071": 2,
+    "TS2:BAS-NU-CV-070": 2,
+    "TS2:CH-CR-CV-007": 2,
+    "TS2:CH-CR-CV-015": 2,
+    "TS2:CH-CR-CV-031": 2,
+    "TS2:CH-CR-CV-059": 2,
+    "TS2:CH-CR-CV-073": 2,
+    "TS2:CH-CR-RE-038": 2,
+    "TS2:CH-HO-CV-043": 2,
+    "TS2:CH-HO-CV-073": 2,
+    "TS2:CH-HO-RE-060": 2,
+    "TS2:P2-L1-CRP-FIX-03": 2,
+    "TS2:P2-L1-CRP-FIX-05": 2,
+    "TS2:P2-L1-CRP-VAR-12": 2,
+    "TS2:P2-L1-CRP-VAR-14": 2,
+    "TS2:P2-L1-CRS-FIX-09": 2,
+    "TS2:P2-L1-CRS-VAR-08": 2,
+    "TS2:P2-L1-OT-VAR-20": 2,
+    "TS2:P2-L2-CRP-VAR-02": 2,
+    "TS2:P2-L2-CRP-VAR-16": 2,
+    "TS2:P2-L2-HO-FIX-05": 2,
+    "TS2:P2-L2-HO-FIX-11": 2,
+    "TS2:P2-L2-HO-FIX-19": 2,
+    "TS2:P2-L3-CRS-FIX-05": 2
+  },
+  "scope": "Finite, enriched development cohorts; fresh/historical references remain distinct; no formal safety or population claim.",
+  "baseline_source_audit": {
+    "path": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\results\\safety_dev\\v10_iterations\\baseline_source_audit.json",
+    "sha256": "92a81c373d35d075153e4e3fb6998e8b38c9598387b64451e158866e0c1d6878"
+  }
+}

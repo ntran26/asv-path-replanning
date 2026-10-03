@@ -1,0 +1,33 @@
+{
+  "created_utc": "2026-10-03T09:15:49.161088+00:00",
+  "scope": "saved trace only; zero policy episodes; no env construction/reset/step",
+  "python": "3.10.11 (tags/v3.10.11:7d4cc5a, Apr  5 2023, 00:38:17) [MSC v.1929 64 bit (AMD64)]",
+  "numpy": "1.26.4",
+  "trace_sha256": "a9850fa8c87d1b03967090323f642681761f0f1f65f869cc0a1f07a3bbfe00cc",
+  "manifest_sha256": "6b55983f1283aef2a9947831732cbb7647644b7bdceba1f13a5028ab01e18af1",
+  "script_sha256": "4d2c86f15aa8fa5c45500950c910c47c8c304cf83667961df2ded8b45973f5bc",
+  "script_matches_audit": true,
+  "source_dependencies": {
+    "src/constants.py": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+    "src/constant_temp.py": "85e5dc9992d062466af304f3f3273b249ba16b130c2d89b53fe7cb692b5c81d7",
+    "src/classical/common.py": "456f39769ffa237f826eff8f9852a6d0823a2f975f85d2345ba7b42105e0977d",
+    "src/safety_v2.py": "209195c3b9241dfa6a798b7cfca857dfd14218c38625d99bc2a9c0d97c1b3d55",
+    "src/safety_v3.py": "28efcc06af8ec0ffc0074267b7f1b2e36ba4fd1f6e033900c39b9b96b6d40d0a",
+    "src/safety_v4.py": "0f2bc31c9028c11390bf19e06de89e82e546c184645255aa007921896b649f28",
+    "src/safety_v6.py": "07c1c716aea2c149f7e96a0aede2ab50d99c633706ba6d889e18a02bc52478f6",
+    "src/safety_v7.py": "94a64f2c0914ddafe0cbc8f2d0f3256c4aee99ade16fe796e6d13a095c300444",
+    "src/safety_prediction.py": "1635a91c204fe0a88810abff635e18125cb428f7acfdc7bce58767609d9f1f6b",
+    "src/ship.py": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+    "src/reference_controller.py": "f080cfca745b75b45c93dfca1cf581206908ea4476fc3fede2911f02f066c62b",
+    "bluefin/dynamics.py": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711"
+  },
+  "working_helpers": {
+    "tools\\diagnostics\\safety\\audit_v11_prediction.py": "c0c701ec12a04df645d0ccb7afd7c199281b4d690134cbbebe43a7abbf2b8865",
+    "tools\\diagnostics\\safety\\suite_status.py": "c4cc74d6944c601ce2885c41cfb89cf16e8094432314527433d42301c8e91bb4"
+  },
+  "validation": [
+    "All 33 reconstructed/retained plan clearances reproduce logged checks within 2e-6m.",
+    "All 39 one-step body forecasts agree with rollout endpoint positions/headings at 1e-12 tolerance under both brake models.",
+    "Retained plan padding and NaN astern markers use the original evaluated conventions."
+  ]
+}

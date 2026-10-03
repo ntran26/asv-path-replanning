@@ -1,0 +1,61 @@
+{
+  "scope": "After all133 current continuation episodes completed; no active evaluation source changed. Add experimental native selectors and CLI choices only, leave constants/defaults unchanged. Explicitly injected iteration filters skip native construction; old-version branches are unchanged.",
+  "changes": [
+    {
+      "path": "src\\env.py",
+      "before_sha256": "2b8e1699fe0610c9d5afaeaf96053fbb67aff2bb4986ba14a1057eb964a97d44",
+      "after_sha256": "1602e6c1b7910e564e4f2fd640d4f08b99651f2cb1ba836dc5beb9b122cb3bfb",
+      "crlf_before": 0,
+      "crlf_after": 0,
+      "diff": "--- \n+++ \n@@ -1246,7 +1246,19 @@\n         self.safety_v2_changed = False\n         if self.estop_enabled and getattr(cfg, \"SAFETY_VERSION\", 1) >= 2:\n             if getattr(self, \"_safety_v2\", None) is None:\n-                if getattr(cfg, \"SAFETY_VERSION\", 1) == 9:      # experimental currently checked interventions\n+                if getattr(cfg, \"SAFETY_VERSION\", 1) == 13:\n+                    import safety_v13\n+                    self._safety_v2 = safety_v13.SafetyFilterV13()\n+                elif getattr(cfg, \"SAFETY_VERSION\", 1) == 12:\n+                    import safety_v12\n+                    self._safety_v2 = safety_v12.SafetyFilterV12()\n+                elif getattr(cfg, \"SAFETY_VERSION\", 1) == 11:\n+                    import safety_v11\n+                    self._safety_v2 = safety_v11.SafetyFilterV11()\n+                elif getattr(cfg, \"SAFETY_VERSION\", 1) == 10:\n+                    import safety_v10\n+                    self._safety_v2 = safety_v10.SafetyFilterV10()\n+                elif getattr(cfg, \"SAFETY_VERSION\", 1) == 9:      # experimental currently checked interventions\n                     import safety_v9\n                     self._safety_v2 = safety_v9.SafetyFilterV9()\n                 elif getattr(cfg, \"SAFETY_VERSION\", 1) == 8:    # v8: v7 without hold-back\n"
+    },
+    {
+      "path": "tools/tiers/frozen_suite.py",
+      "before_sha256": "2ee47d00b3e2f99c14a6d45937d74657993571754f0ecce8745036135a8d6f23",
+      "after_sha256": "a5d79ea5f855c84885c9e35f409332e9e6a49c8e5018db822b5d7b4ed4ddc3dd",
+      "crlf_before": 0,
+      "crlf_after": 0,
+      "diff": "--- \n+++ \n@@ -77,7 +77,7 @@\n     ap = argparse.ArgumentParser()\n     ap.add_argument(\"--model\", type=Path, required=True)\n     ap.add_argument(\"--tag\", required=True)\n-    ap.add_argument(\"--safety-version\", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9), default=1,\n+    ap.add_argument(\"--safety-version\", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), default=1,\n                     help=\"safety layer used when it is on: 1 = stop latch, 2/3 = predictive filter, 4 = selected observer/memory filter, 5-7 = development filters, 8 = v7 without hold-back, 9 = experimental current-plan checks\")\n     ap.add_argument(\"--safety\", \"--supervisor\", dest=\"supervisor\", choices=(\"off\", \"on\", \"both\"), default=\"both\")\n     ap.add_argument(\"--tiers\", default=\"b,r\",\n"
+    },
+    {
+      "path": "tools/tiers/paper2_suite.py",
+      "before_sha256": "d0990ee30640e891d3a01cb1ac3485cfeec5f6af5e725f5141ec3ca94883f1b5",
+      "after_sha256": "653b631e58f4a6f0fda19550e34a9706b131f756279a4a4b37771ad23b000bf6",
+      "crlf_before": 0,
+      "crlf_after": 0,
+      "diff": "--- \n+++ \n@@ -138,7 +138,7 @@\n     ap.add_argument(\"--policy\", choices=(\"los_dwa\", \"colregs_vo\", \"encounter_vo\", \"reference\"),\n                     help=\"a classical comparator instead of a model\")\n     ap.add_argument(\"--tag\", help=\"output folder (default for a model: e.g. sacs0_bl2 from its run folder)\")\n-    ap.add_argument(\"--safety-version\", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9), default=1,\n+    ap.add_argument(\"--safety-version\", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), default=1,\n                     help=\"safety layer used when it is on: 1 = stop latch, 2/3 = predictive filter, 4 = selected observer/memory filter, 5-7 = development filters, 8 = v7 without hold-back, 9 = experimental current-plan checks\")\n     ap.add_argument(\"--safety\", \"--supervisor\", dest=\"supervisor\", choices=(\"off\", \"on\", \"both\"), default=\"both\")\n     ap.add_argument(\"--processes\", type=int, default=None)\n"
+    },
+    {
+      "path": "tools/tiers/tier1_replay.py",
+      "before_sha256": "5c47218c2caa82e5fa27bd8cf720ebe16854a7cd2aa5ec162ca1fcc90a3de7d3",
+      "after_sha256": "0c359021010dc37e2fcd408204c274e6b1b61059770e0e181befbd01e9762c43",
+      "crlf_before": 0,
+      "crlf_after": 0,
+      "diff": "--- \n+++ \n@@ -50,7 +50,7 @@\n     ap.add_argument(\"--per-class\", type=int, default=20)\n     ap.add_argument(\"--tag\", default=\"run3\")\n     ap.add_argument(\"--processes\", type=int, default=None, help=\"worker processes (default: cores - 2)\")\n-    ap.add_argument(\"--safety-version\", type=int, choices=(1, 2, 3, 4, 5), default=1,\n+    ap.add_argument(\"--safety-version\", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), default=1,\n                     help=\"runtime filter version when --safety on\")\n     ap.add_argument(\"--stop-test-fit\", choices=(\"on\", \"off\"), default=None,\n                     help=\"override STOP_TEST_USES_HULL_FIT in the workers (F66 A/B)\")\n"
+    },
+    {
+      "path": "tools/diagnostics/safety/trigger_counterfactual.py",
+      "before_sha256": "3b8dc49261da7f3942c838a7c539cac0dd724cf10bdb2e0cc41414d150ecaa7a",
+      "after_sha256": "6d349c60133037373d8797fcbcf0e10a9f9ca9cfd2cbd9db80f25bb1f91b4560",
+      "crlf_before": 304,
+      "crlf_after": 304,
+      "diff": "--- \n+++ \n@@ -141,7 +141,7 @@\n \r\n \r\n def _version_number(version):\r\n-    if version not in (\"v4\", \"v7\", \"v8\", \"v9\"):\r\n+    if version not in (\"v4\", \"v7\", \"v8\", \"v9\", \"v10\", \"v11\", \"v12\", \"v13\"):\r\n         raise ValueError(f\"Unsupported counterfactual filter: {version}\")\r\n     return int(version[1:])\r\n \r\n"
+    },
+    {
+      "path": "tests/test_safety_v9.py",
+      "before_sha256": "2db72e7790986c47a21f38a6509f29b723fe4fe34b2b83ef7d99a3701a2c1fe2",
+      "after_sha256": "466dce4b2667416d28f71495ef0e2880f464ea5e22e6eae26b4bc7726eba3b96",
+      "crlf_before": 0,
+      "crlf_after": 0,
+      "diff": "--- \n+++ \n@@ -223,7 +223,7 @@\n     assert got[0] is first and got[1] is clear\n \n \n-@pytest.mark.parametrize(\"version\", [8, 9])\n+@pytest.mark.parametrize(\"version\", [8, 9, 10, 11, 12, 13])\n def test_native_dispatch_stops_before_physics(monkeypatch, version):\n     from env import ASVLidarEnv\n     calls = []\n"
+    },
+    {
+      "path": "tests/test_trigger_filter_dispatch.py",
+      "before_sha256": "80d3c495deb992b384e26ca4f45cdd4bd5c7aa5d8d60b34177eb50bf5988f890",
+      "after_sha256": "30dba56657db1803db4405e9ee59111307cbc5521ad3a24eb5db1659929c930f",
+      "crlf_before": 0,
+      "crlf_after": 0,
+      "diff": "--- \n+++ \n@@ -13,7 +13,7 @@\n SPEC.loader.exec_module(runner)\n \n \n-@pytest.mark.parametrize(\"version\", [4, 7, 8, 9])\n+@pytest.mark.parametrize(\"version\", [4, 7, 8, 9, 10, 11, 12, 13])\n def test_requested_filter_is_not_silently_replaced_by_v7(monkeypatch, version):\n     sentinel = object()\n     monkeypatch.setitem(sys.modules, f\"safety_v{version}\",\n"
+    }
+  ]
+}

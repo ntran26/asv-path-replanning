@@ -139,11 +139,13 @@ def _checked(start, goal, centres, motif) -> Optional[dict]:
     return {"start": start, "goal": goal, "centres": centres, "panels": panels, "motif": str(motif)}
 
 
-def sample_layout(rng) -> Optional[dict]:
-    """One Paper 2-style layout, or None if this draw failed a check."""
+def sample_layout(rng, straight: bool = False) -> Optional[dict]:
+    """One Paper 2-style layout, or None if this draw failed a check.  `straight`
+    (test set v3, 2026-10-03) puts the goal straight ahead of the start -- a
+    boustrophedon survey lane; the default draw and its random stream are unchanged."""
     xs = float(rng.uniform(*LEG_X_RANGE))
     max_dx = 20.0 * math.tan(math.radians(MAX_SLANT_DEG))
-    xg = float(np.clip(xs + rng.uniform(-max_dx, max_dx), *LEG_X_RANGE))
+    xg = xs if straight else float(np.clip(xs + rng.uniform(-max_dx, max_dx), *LEG_X_RANGE))
     start, goal = (xs, float(cfg.BASIN_START_Y)), (xg, float(cfg.BASIN_GOAL_Y))
     t = _unit(start, goal)
     n = np.array([t[1], -t[0]])                          # starboard of the leg
@@ -195,7 +197,8 @@ def sample(rng, namespace: str = "training", generator: Optional[scn.ScenarioGen
            encounter: Optional[str] = None, varying: Optional[bool] = None,
            seed_fn=None, weights: Optional[Dict[str, float]] = None,
            varying_share: Optional[float] = None, solvable_only: bool = False,
-           near_share: float = 0.0, near: Optional[bool] = None) -> scn.Scenario:
+           near_share: float = 0.0, near: Optional[bool] = None,
+           straight: bool = False, straight_share: Optional[float] = None) -> scn.Scenario:
     """One field-layout scenario.  `encounter` / `varying` force the draw (the
     validation set); otherwise they are drawn -- from `weights` over "NT" and the
     encounter codes when given (finetune-field-v2's failure weighting), else no
@@ -213,8 +216,12 @@ def sample(rng, namespace: str = "training", generator: Optional[scn.ScenarioGen
     while True:
         layout = None
         use_near = near if near is not None else (near_share > 0.0 and rng.uniform() < near_share)
+        # baseline-v4 revision: `straight_share` gives that share of (non-near) layouts a
+        # straight leg; without it the draw and its random stream are unchanged.
+        use_straight = straight or (straight_share is not None and not use_near
+                                    and rng.uniform() < float(straight_share))
         while layout is None:
-            layout = sample_near_layout(rng) if use_near else sample_layout(rng)
+            layout = sample_near_layout(rng) if use_near else sample_layout(rng, straight=use_straight)
         flags = {"basin_leg": [list(layout["start"]), list(layout["goal"])],
                  "fixed_obstacles": [[list(p) for p in poly] for poly in layout["panels"]],
                  "set": "field_training", "motif": layout["motif"]}

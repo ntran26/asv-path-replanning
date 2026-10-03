@@ -1,0 +1,22 @@
+{
+  "verified_utc": "2026-10-03T10:53:16.006828+00:00",
+  "episodes_run": 0,
+  "primary_cases_verified": 1000,
+  "legacy32_serialized_scene_parity": true,
+  "legacy_cache_provenance_parity": true,
+  "old_source_archive": "results\\safety_dev\\v10_iterations\\v17_fresh_yaw_probe9\\evaluated_sources.zip",
+  "archived_loader_sha256": "f720c9b4c80ef26a5ca4a94993260dcce0a019bd2b95f31147441c9f4f087e67",
+  "current_loader_sha256": "9a36a38183a509cbd7eb21e068f85dd13ade9dede21f4780e622f33f1316ab0e",
+  "constants_sha256": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+  "checkpoint_sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+  "tests": {
+    "loader_and_reporting": 93,
+    "primary_routing": 6
+  },
+  "source_sha256": {
+    "tools\\diagnostics\\safety\\safety_candidate_iteration.py": "8448b9d5069625718d7650bf5185eacefe4b7576911a776f1a0167e777a8e78a",
+    "tools\\diagnostics\\safety\\v9_paired_pilot.py": "9a36a38183a509cbd7eb21e068f85dd13ade9dede21f4780e622f33f1316ab0e",
+    "tools\\diagnostics\\safety\\report_safety_iteration.py": "e8f2e28219b5ffb063c347542efc089f65f2a1727c73b5ffd3d0e32305fda824",
+    "tools\\diagnostics\\safety\\prepare_testset_v3.py": "e690405f5b5f34d6569bf6555ecfb9212f2668d13ca41a4fabbf296fdb833b51"
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "verified_files": 495,
+  "physical_sizes_rechecked": 495,
+  "all_paths_regular_resident_compressed": true,
+  "all_logged_sha256_equal": true,
+  "prior_report_trace_hash_checks": 2939,
+  "distinct_traces_covered_by_prior_reports": 495,
+  "prior_provenance_files": [
+    {
+      "path": "results/safety_dev/v10_iterations/reports/baseline_checks/provenance.json",
+      "trace_hash_checks": 101,
+      "sha256": "2f64ce03c47153207a7a6686dc7bc24fce5eec6ea042de63b8a8d531dea1b7d9"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/reports/baseline_checks_v2/provenance.json",
+      "trace_hash_checks": 101,
+      "sha256": "8136f53c2887d8041b0c84fdc952b47140567103164eccaf73ca02b3f4878c32"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/reports/conditional_prefix32/provenance.json",
+      "trace_hash_checks": 224,
+      "sha256": "37b0ab937a0f45035215dcd7bb2a5118c6162861db06af3176d4fb019d578997"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/reports/feasible_policy_32/provenance.json",
+      "trace_hash_checks": 160,
+      "sha256": "b96a21d55b784535481d29a5b97d7e5f686c837a6ef744a2f78ca390b4d45e6b"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/reports/motion_axis32/provenance.json",
+      "trace_hash_checks": 256,
+      "sha256": "83ec61443c66a8dd34d02eb7fc9373699d07e882662dbad457db9bb1c0d3cd41"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/reports/motion_axis_probe5/provenance.json",
+      "trace_hash_checks": 165,
+      "sha256": "d89402fca02ffcc55d54cc8307eeab6d33b407ba3568ee2ebd1e52fa69757059"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/reports/persistence32/provenance.json",
+      "trace_hash_checks": 160,
+      "sha256": "5d5f9d137c897cb7643d94e11252818867ea72d79aca29733d3fda2d63739801"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/reports/persistence_three/provenance.json",
+      "trace_hash_checks": 99,
+      "sha256": "f2820e9f9c34cb6c83dc4e7cf3eb4af6f39e1bc1966eb2e211b8776169f0dac6"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/reports/persistence_three_vs_v10/provenance.json",
+      "trace_hash_checks": 131,
+      "sha256": "8c61f51b4b361333e7c2d2578e9bdffe89a0a4b573dabb5695f6350384b4a08d"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/reports/persistent_preference32/provenance.json",
+      "trace_hash_checks": 192,
+      "sha256": "4c3151b08199a6cfda8e78a4d833afa75ec00e392a08ca2f1ece3bf358597490"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/reports/persistent_preference_probe4/provenance.json",
+      "trace_hash_checks": 172,
+      "sha256": "169297e33f6abdf39db1011f09dd753aaa2495b34967265a435e4974f04165b2"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/reports/persistent_prefix32/provenance.json",
+      "trace_hash_checks": 192,
+      "sha256": "ea7bd744599e47bdf61ef1cd861d3d14c46918bb7cebfec1991141d34e7f7e47"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/reports/prefix32_pieces/provenance.json",
+      "trace_hash_checks": 192,
+      "sha256": "e90322a0c7711b3cf8d187be4f3535a2e5e7c3ae76c0d7eb178b2fb70879f069"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/reports/track_prefix_probes/provenance.json",
+      "trace_hash_checks": 184,
+      "sha256": "1c183c0b50a47136c25001305f7703db04d56abebfefcc4a4dccf7ae313a0f3b"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/reports/v10_comparison/provenance.json",
+      "trace_hash_checks": 160,
+      "sha256": "254ed642f19b6e9ffeb015a297947993c723af253b0e1b21a95f1032752a5011"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/reports/v16_broader40_paired/provenance.json",
+      "trace_hash_checks": 176,
+      "sha256": "95d36b8b504cf7f9466b748ad9518cdee59d41c33c91889e5240e7662f61bfb3"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/reports/v16_feasible_probe9/provenance.json",
+      "trace_hash_checks": 137,
+      "sha256": "45c8a6d0d478cca6b72cecb14619422deb2f1eff246e77c408e8baa6c8eb65cf"
+    },
+    {
+      "path": "results/safety_dev/v10_iterations/reports/v17_fresh_yaw_probe9/provenance.json",
+      "trace_hash_checks": 137,
+      "sha256": "a0704947b8aa0c5496468f5c586f0e56a83c7bb74737747874934560002be1a7"
+    }
+  ],
+  "no_trace_content_reread_in_final_metadata_check": true,
+  "new_policy_episodes": 0
+}

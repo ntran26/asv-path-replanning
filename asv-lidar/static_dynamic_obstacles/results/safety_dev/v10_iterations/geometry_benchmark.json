@@ -1,0 +1,237 @@
+{
+  "scope": "Offline numerical geometry only; no environment construction/reset/step. Timings on shared machine, not end-to-end episode speedups.",
+  "python": "3.10.11 (tags/v3.10.11:7d4cc5a, Apr  5 2023, 00:38:17) [MSC v.1929 64 bit (AMD64)]",
+  "numpy": "1.26.4",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "max_block_elements": 1000000,
+  "threads": {
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1"
+  },
+  "source_sha256": {
+    "src/safety_fast_geometry.py": "4aeddf2d749f9d3ef1724fb929d3d6e1451bf14bfdfa455384072d2786f29ef3",
+    "src/classical/common.py": "456f39769ffa237f826eff8f9852a6d0823a2f975f85d2345ba7b42105e0977d",
+    "src/safety_v2.py": "209195c3b9241dfa6a798b7cfca857dfd14218c38625d99bc2a9c0d97c1b3d55"
+  },
+  "benchmarks": [
+    {
+      "name": "001_v8.jsonl:step18",
+      "shape": [
+        64,
+        120,
+        54
+      ],
+      "post_reach_points": 31,
+      "array_equal": true,
+      "dtypes": [
+        "float64",
+        "float64"
+      ],
+      "seconds": {
+        "classical": [
+          0.02265810000244528,
+          0.029817299990099855,
+          0.021259000001009554,
+          0.02290099998936057,
+          0.024063599994406104,
+          0.023534899999503978,
+          0.024566599997342564,
+          0.024257199998828582,
+          0.025045000002137385
+        ],
+        "tiled": [
+          0.024432200007140636,
+          0.023852300000726245,
+          0.023740100004943088,
+          0.02364569999917876,
+          0.025832699990132824,
+          0.024342199991224334,
+          0.023242700000992045,
+          0.02510880000772886,
+          0.025753900001291186
+        ]
+      },
+      "median_seconds": {
+        "classical": 0.024063599994406104,
+        "tiled": 0.024342199991224334
+      },
+      "speedup": 0.9885548554806604,
+      "full_evaluate_array_equal": true
+    },
+    {
+      "name": "002_v8.jsonl:step20",
+      "shape": [
+        64,
+        120,
+        54
+      ],
+      "post_reach_points": 32,
+      "array_equal": true,
+      "dtypes": [
+        "float64",
+        "float64"
+      ],
+      "seconds": {
+        "classical": [
+          0.2263476000080118,
+          0.08836359999259003,
+          0.2200277000083588,
+          0.07559279999986757,
+          0.07022599999618251,
+          0.07012269999540877,
+          0.06646739999996498,
+          0.06477589999849442,
+          0.07004359998973086
+        ],
+        "tiled": [
+          0.29072990000713617,
+          0.10274119999667164,
+          0.11319730000104755,
+          0.0768895000073826,
+          0.22138400000403635,
+          0.08757869999681134,
+          0.07015580000006594,
+          0.062393299987888895,
+          0.06457960000261664
+        ]
+      },
+      "median_seconds": {
+        "classical": 0.07022599999618251,
+        "tiled": 0.08757869999681134
+      },
+      "speedup": 0.8018616398592281,
+      "full_evaluate_array_equal": true
+    },
+    {
+      "name": "003_v8.jsonl:step17",
+      "shape": [
+        64,
+        120,
+        59
+      ],
+      "post_reach_points": 44,
+      "array_equal": true,
+      "dtypes": [
+        "float64",
+        "float64"
+      ],
+      "seconds": {
+        "classical": [
+          0.2260106000030646,
+          0.09103250000043772,
+          0.26069039999856614,
+          0.22380659999907948,
+          0.14712099998723716,
+          0.1197429000021657,
+          0.09749020000163,
+          0.283517000003485,
+          0.10291950000100769
+        ],
+        "tiled": [
+          0.09858689999964554,
+          0.08107840000593569,
+          0.10140470000624191,
+          0.08362160000251606,
+          0.09106019999308046,
+          0.21202469999843743,
+          0.0876974999991944,
+          0.0902572000049986,
+          0.08762340000248514
+        ]
+      },
+      "median_seconds": {
+        "classical": 0.14712099998723716,
+        "tiled": 0.0902572000049986
+      },
+      "speedup": 1.630019543915492,
+      "full_evaluate_array_equal": true
+    },
+    {
+      "name": "synthetic_64x32x2000",
+      "shape": [
+        64,
+        32,
+        2000
+      ],
+      "post_reach_points": 2000,
+      "array_equal": true,
+      "dtypes": [
+        "float64",
+        "float64"
+      ],
+      "seconds": {
+        "classical": [
+          0.8086870999977691,
+          0.6502150999876903,
+          0.6423633000085829,
+          0.9922403999953531,
+          0.7316692000022158,
+          1.4659201000031317,
+          2.18281259998912
+        ],
+        "tiled": [
+          0.45395740000822116,
+          0.8112728999985848,
+          0.6567168000037782,
+          0.5553232999955071,
+          0.639516100010951,
+          0.5318177000008291,
+          1.3946028999926057
+        ]
+      },
+      "median_seconds": {
+        "classical": 0.8086870999977691,
+        "tiled": 0.639516100010951
+      },
+      "speedup": 1.2645296967252602
+    },
+    {
+      "name": "saved59_points_192_search_trajectories",
+      "shape": [
+        64,
+        192,
+        59
+      ],
+      "post_reach_points": 44,
+      "array_equal": true,
+      "dtypes": [
+        "float64",
+        "float64"
+      ],
+      "seconds": {
+        "classical": [
+          0.76979140000185,
+          0.14478190000227187,
+          0.15183580000302754,
+          0.09086550000938587,
+          0.07149640000716317,
+          0.07158499999786727,
+          0.06736820000514854
+        ],
+        "tiled": [
+          0.24290850000397768,
+          0.1818578999955207,
+          0.1001306999969529,
+          0.152496800001245,
+          0.07131320000917185,
+          0.08253359999798704,
+          0.12292690000322182
+        ]
+      },
+      "median_seconds": {
+        "classical": 0.09086550000938587,
+        "tiled": 0.12292690000322182
+      },
+      "speedup": 0.7391832056856908
+    }
+  ],
+  "float32_note": {
+    "values_equal": true,
+    "original_dtype": "float32",
+    "tiled_dtype": "float64",
+    "production_inputs": "float64"
+  },
+  "integration_note": "fast.evaluate replaces V2 geometric checks only. A V9-derived override must still evaluate its cached optional TargetPredictionEnvelope and take componentwise minima; bypassing that parent extension changes enabled turn-ensemble behavior."
+}

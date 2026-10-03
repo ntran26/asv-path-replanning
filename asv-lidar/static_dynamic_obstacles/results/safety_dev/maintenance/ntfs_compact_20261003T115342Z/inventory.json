@@ -1,0 +1,2655 @@
+{
+  "scope": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\results\\safety_dev",
+  "candidates": [
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/001_off.jsonl",
+      "logical_bytes": 63874,
+      "allocated_before": 63874,
+      "mtime_ns": 1791027893987886200
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/002_v16.jsonl",
+      "logical_bytes": 695887,
+      "allocated_before": 695887,
+      "mtime_ns": 1791027938703449200
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/003_v19.jsonl",
+      "logical_bytes": 729567,
+      "allocated_before": 729567,
+      "mtime_ns": 1791027989107766100
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/004_v16.jsonl",
+      "logical_bytes": 311402,
+      "allocated_before": 311402,
+      "mtime_ns": 1791028000200622400
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/005_v19.jsonl",
+      "logical_bytes": 330427,
+      "allocated_before": 330427,
+      "mtime_ns": 1791028006946690100
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/006_off.jsonl",
+      "logical_bytes": 68639,
+      "allocated_before": 68639,
+      "mtime_ns": 1791028010155965300
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/007_v19.jsonl",
+      "logical_bytes": 2121549,
+      "allocated_before": 2121549,
+      "mtime_ns": 1791028030725680900
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/008_off.jsonl",
+      "logical_bytes": 67011,
+      "allocated_before": 67011,
+      "mtime_ns": 1791028035384360000
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/009_v16.jsonl",
+      "logical_bytes": 2102831,
+      "allocated_before": 2102831,
+      "mtime_ns": 1791028047919299800
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/010_off.jsonl",
+      "logical_bytes": 65662,
+      "allocated_before": 65662,
+      "mtime_ns": 1791028055300037600
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/011_v16.jsonl",
+      "logical_bytes": 2017332,
+      "allocated_before": 2017332,
+      "mtime_ns": 1791028076311090300
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/012_v19.jsonl",
+      "logical_bytes": 2036818,
+      "allocated_before": 2036818,
+      "mtime_ns": 1791028097626331100
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/013_v16.jsonl",
+      "logical_bytes": 2084670,
+      "allocated_before": 2084670,
+      "mtime_ns": 1791028117912872500
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/014_v19.jsonl",
+      "logical_bytes": 2103168,
+      "allocated_before": 2103168,
+      "mtime_ns": 1791028141110535300
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/015_off.jsonl",
+      "logical_bytes": 70543,
+      "allocated_before": 70543,
+      "mtime_ns": 1791028146480437300
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/016_v19.jsonl",
+      "logical_bytes": 305487,
+      "allocated_before": 305487,
+      "mtime_ns": 1791028169465881100
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/017_off.jsonl",
+      "logical_bytes": 45828,
+      "allocated_before": 45828,
+      "mtime_ns": 1791028170947122400
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/018_v16.jsonl",
+      "logical_bytes": 290338,
+      "allocated_before": 290338,
+      "mtime_ns": 1791028189856219100
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/019_off.jsonl",
+      "logical_bytes": 67670,
+      "allocated_before": 67670,
+      "mtime_ns": 1791028193251743800
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/020_v16.jsonl",
+      "logical_bytes": 348769,
+      "allocated_before": 348769,
+      "mtime_ns": 1791028203678816800
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/021_v19.jsonl",
+      "logical_bytes": 369467,
+      "allocated_before": 369467,
+      "mtime_ns": 1791028216673641800
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/022_v16.jsonl",
+      "logical_bytes": 128618,
+      "allocated_before": 128618,
+      "mtime_ns": 1791028235619273300
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/023_v19.jsonl",
+      "logical_bytes": 135083,
+      "allocated_before": 135083,
+      "mtime_ns": 1791028261175267400
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/024_off.jsonl",
+      "logical_bytes": 17187,
+      "allocated_before": 17187,
+      "mtime_ns": 1791028266618424500
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/025_v19.jsonl",
+      "logical_bytes": 387919,
+      "allocated_before": 387919,
+      "mtime_ns": 1791028286037840700
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/026_off.jsonl",
+      "logical_bytes": 68096,
+      "allocated_before": 68096,
+      "mtime_ns": 1791028289971954900
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_a/traces/027_v16.jsonl",
+      "logical_bytes": 368366,
+      "allocated_before": 368366,
+      "mtime_ns": 1791028308123246800
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/001_off.jsonl",
+      "logical_bytes": 61836,
+      "allocated_before": 61836,
+      "mtime_ns": 1791027895654845600
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/002_v16.jsonl",
+      "logical_bytes": 302623,
+      "allocated_before": 302623,
+      "mtime_ns": 1791027900488306200
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/003_v19.jsonl",
+      "logical_bytes": 319454,
+      "allocated_before": 319454,
+      "mtime_ns": 1791027905184273600
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/004_v16.jsonl",
+      "logical_bytes": 356441,
+      "allocated_before": 356441,
+      "mtime_ns": 1791027920551851300
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/005_v19.jsonl",
+      "logical_bytes": 376688,
+      "allocated_before": 376688,
+      "mtime_ns": 1791027928386609400
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/006_off.jsonl",
+      "logical_bytes": 68081,
+      "allocated_before": 68081,
+      "mtime_ns": 1791027930242250400
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/007_v19.jsonl",
+      "logical_bytes": 299442,
+      "allocated_before": 299442,
+      "mtime_ns": 1791027937243020600
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/008_off.jsonl",
+      "logical_bytes": 54971,
+      "allocated_before": 54971,
+      "mtime_ns": 1791027938808446300
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/009_v16.jsonl",
+      "logical_bytes": 286018,
+      "allocated_before": 286018,
+      "mtime_ns": 1791027945193156500
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/010_off.jsonl",
+      "logical_bytes": 62643,
+      "allocated_before": 62643,
+      "mtime_ns": 1791027950996985900
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/011_v16.jsonl",
+      "logical_bytes": 1848933,
+      "allocated_before": 1848933,
+      "mtime_ns": 1791027970511894800
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/012_v19.jsonl",
+      "logical_bytes": 1865278,
+      "allocated_before": 1865278,
+      "mtime_ns": 1791027989443159800
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/013_v16.jsonl",
+      "logical_bytes": 338358,
+      "allocated_before": 338358,
+      "mtime_ns": 1791027997175383900
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/014_v19.jsonl",
+      "logical_bytes": 357987,
+      "allocated_before": 357987,
+      "mtime_ns": 1791028008468151000
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/015_off.jsonl",
+      "logical_bytes": 64651,
+      "allocated_before": 64651,
+      "mtime_ns": 1791028012882245200
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/016_v19.jsonl",
+      "logical_bytes": 242793,
+      "allocated_before": 242793,
+      "mtime_ns": 1791028022617792400
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/017_off.jsonl",
+      "logical_bytes": 42993,
+      "allocated_before": 42993,
+      "mtime_ns": 1791028026778000900
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/018_v16.jsonl",
+      "logical_bytes": 230048,
+      "allocated_before": 230048,
+      "mtime_ns": 1791028036128617600
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/019_off.jsonl",
+      "logical_bytes": 19868,
+      "allocated_before": 19868,
+      "mtime_ns": 1791028037255794300
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/020_v16.jsonl",
+      "logical_bytes": 788001,
+      "allocated_before": 788001,
+      "mtime_ns": 1791028138812775200
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/021_v19.jsonl",
+      "logical_bytes": 828501,
+      "allocated_before": 828501,
+      "mtime_ns": 1791028221498367700
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/022_v16.jsonl",
+      "logical_bytes": 337114,
+      "allocated_before": 337114,
+      "mtime_ns": 1791028231811351200
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/023_v19.jsonl",
+      "logical_bytes": 358280,
+      "allocated_before": 358280,
+      "mtime_ns": 1791028241991894900
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/024_off.jsonl",
+      "logical_bytes": 65837,
+      "allocated_before": 65837,
+      "mtime_ns": 1791028249395797200
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/025_v19.jsonl",
+      "logical_bytes": 463347,
+      "allocated_before": 463347,
+      "mtime_ns": 1791028287958328300
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/026_off.jsonl",
+      "logical_bytes": 86240,
+      "allocated_before": 86240,
+      "mtime_ns": 1791028292776776500
+    },
+    {
+      "path": "testset_v3_main/runs/v19_quick_b/traces/027_v16.jsonl",
+      "logical_bytes": 440253,
+      "allocated_before": 440253,
+      "mtime_ns": 1791028322428816400
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_a/traces/001_v16.jsonl",
+      "logical_bytes": 254141,
+      "allocated_before": 254141,
+      "mtime_ns": 1791027302297782200
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_a/traces/002_v18.jsonl",
+      "logical_bytes": 266854,
+      "allocated_before": 266854,
+      "mtime_ns": 1791027322068022300
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_a/traces/003_v19.jsonl",
+      "logical_bytes": 267568,
+      "allocated_before": 267568,
+      "mtime_ns": 1791027338552480200
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_a/traces/004_v18.jsonl",
+      "logical_bytes": 207468,
+      "allocated_before": 207468,
+      "mtime_ns": 1791027356967036500
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_a/traces/005_v19.jsonl",
+      "logical_bytes": 208081,
+      "allocated_before": 208081,
+      "mtime_ns": 1791027366045302100
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_a/traces/006_v16.jsonl",
+      "logical_bytes": 198252,
+      "allocated_before": 198252,
+      "mtime_ns": 1791027376571760100
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_a/traces/007_v19.jsonl",
+      "logical_bytes": 544210,
+      "allocated_before": 544210,
+      "mtime_ns": 1791027416384233800
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_a/traces/008_v16.jsonl",
+      "logical_bytes": 514319,
+      "allocated_before": 514319,
+      "mtime_ns": 1791027443747025600
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_a/traces/009_v18.jsonl",
+      "logical_bytes": 542374,
+      "allocated_before": 542374,
+      "mtime_ns": 1791027472574845600
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_a/traces/010_v16.jsonl",
+      "logical_bytes": 2121456,
+      "allocated_before": 2121456,
+      "mtime_ns": 1791027503115698800
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_a/traces/011_v18.jsonl",
+      "logical_bytes": 2139618,
+      "allocated_before": 2139618,
+      "mtime_ns": 1791027525601675000
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_a/traces/012_v19.jsonl",
+      "logical_bytes": 2140419,
+      "allocated_before": 2140419,
+      "mtime_ns": 1791027546861470000
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_a/traces/013_v18.jsonl",
+      "logical_bytes": 240775,
+      "allocated_before": 240775,
+      "mtime_ns": 1791027571335849900
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_a/traces/014_v19.jsonl",
+      "logical_bytes": 241679,
+      "allocated_before": 241679,
+      "mtime_ns": 1791027589004045300
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_a/traces/015_v16.jsonl",
+      "logical_bytes": 230020,
+      "allocated_before": 230020,
+      "mtime_ns": 1791027607763082700
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_a/traces/016_v19.jsonl",
+      "logical_bytes": 284615,
+      "allocated_before": 284615,
+      "mtime_ns": 1791027632627503800
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_a/traces/017_v16.jsonl",
+      "logical_bytes": 270800,
+      "allocated_before": 270800,
+      "mtime_ns": 1791027659777605000
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_a/traces/018_v18.jsonl",
+      "logical_bytes": 283948,
+      "allocated_before": 283948,
+      "mtime_ns": 1791027687154735200
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_b/traces/001_v16.jsonl",
+      "logical_bytes": 535390,
+      "allocated_before": 535390,
+      "mtime_ns": 1791027338279058700
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_b/traces/002_v18.jsonl",
+      "logical_bytes": 561047,
+      "allocated_before": 561047,
+      "mtime_ns": 1791027389609732900
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_b/traces/003_v19.jsonl",
+      "logical_bytes": 562342,
+      "allocated_before": 562342,
+      "mtime_ns": 1791027446944605200
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_b/traces/004_v18.jsonl",
+      "logical_bytes": 156051,
+      "allocated_before": 156051,
+      "mtime_ns": 1791027469162857200
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_b/traces/005_v19.jsonl",
+      "logical_bytes": 156831,
+      "allocated_before": 156831,
+      "mtime_ns": 1791027486832023700
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_b/traces/006_v16.jsonl",
+      "logical_bytes": 149280,
+      "allocated_before": 149280,
+      "mtime_ns": 1791027506537919500
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_b/traces/007_v19.jsonl",
+      "logical_bytes": 491008,
+      "allocated_before": 491008,
+      "mtime_ns": 1791027556595647800
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_b/traces/008_v16.jsonl",
+      "logical_bytes": 509670,
+      "allocated_before": 509670,
+      "mtime_ns": 1791027597978312700
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_b/traces/009_v18.jsonl",
+      "logical_bytes": 533921,
+      "allocated_before": 533921,
+      "mtime_ns": 1791027646611526700
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_b/traces/010_v16.jsonl",
+      "logical_bytes": 354649,
+      "allocated_before": 354649,
+      "mtime_ns": 1791027674802614400
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_b/traces/011_v18.jsonl",
+      "logical_bytes": 373327,
+      "allocated_before": 373327,
+      "mtime_ns": 1791027704152745200
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_b/traces/012_v19.jsonl",
+      "logical_bytes": 374609,
+      "allocated_before": 374609,
+      "mtime_ns": 1791027730020727100
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_b/traces/013_v18.jsonl",
+      "logical_bytes": 2378233,
+      "allocated_before": 2378233,
+      "mtime_ns": 1791027750728402900
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_b/traces/014_v19.jsonl",
+      "logical_bytes": 2379827,
+      "allocated_before": 2379827,
+      "mtime_ns": 1791027765068496500
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_b/traces/015_v16.jsonl",
+      "logical_bytes": 2357154,
+      "allocated_before": 2357154,
+      "mtime_ns": 1791027782763897800
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_b/traces/016_v19.jsonl",
+      "logical_bytes": 395578,
+      "allocated_before": 395578,
+      "mtime_ns": 1791027794837567900
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_b/traces/017_v16.jsonl",
+      "logical_bytes": 374359,
+      "allocated_before": 374359,
+      "mtime_ns": 1791027804110332700
+    },
+    {
+      "path": "v10_iterations/v18_v19_probe_b/traces/018_v18.jsonl",
+      "logical_bytes": 394045,
+      "allocated_before": 394045,
+      "mtime_ns": 1791027811483695900
+    }
+  ],
+  "completed_runs": {
+    "testset_v3_main\\runs\\v19_quick_a": {
+      "manifest_sha256": "ddbc436f495c23c6d92fd7718b7d4eba75b4c0a05922fbcd0a2d45d46460a2fc",
+      "completion_sha256": "562f2aa5ca540cfdde47b50f068972d2fe788bc7ccc671fb66d8c29c097adad0",
+      "completed_runs": 27
+    },
+    "testset_v3_main\\runs\\v19_quick_b": {
+      "manifest_sha256": "d690e1521167b517d33f2ecd2a5b66a40314f8e9800bbd66571cf8c4060d931c",
+      "completion_sha256": "b85ffc0cf4f6b3e4f7df7c14e28e187cef0f5ad329cfaaf16a17bf83c45bb0c1",
+      "completed_runs": 27
+    },
+    "v10_iterations\\baseline_thread_check": {
+      "manifest_sha256": "9451f7289256bf5420bb80148f02b0d61a8b85a6c7290248a2024561e16fd903",
+      "completion_sha256": "efd80e6cdf5096793d28744e3fc0c507012463de6482178dbdb17bb40a14516e",
+      "completed_runs": 2
+    },
+    "v10_iterations\\conditional_policy_32": {
+      "manifest_sha256": "5f74dab63a074afbae498e6fef0a53af91111e4bab4ce1d89a6c16e5a9e7d381",
+      "completion_sha256": "92b429359c93827712282acf16a61821c7213403d2142da76faf237fa7ccefdf",
+      "completed_runs": 32
+    },
+    "v10_iterations\\conditional_prefix32": {
+      "manifest_sha256": "e43fadeb0b332189ad138646e20508401ff3998debc40147cfc9a32c6ee402e7",
+      "completion_sha256": "abac525504417a6592fa0aac38215806671c1904ab1501d91e1a0677fb79b756",
+      "completed_runs": 32
+    },
+    "v10_iterations\\consistent_track_probe8": {
+      "manifest_sha256": "6b55983f1283aef2a9947831732cbb7647644b7bdceba1f13a5028ab01e18af1",
+      "completion_sha256": "ebb463b7d7ee17525367674a03a0d6205b28dae08e4ab3e881f00106c3c2aedf",
+      "completed_runs": 8
+    },
+    "v10_iterations\\feasible_policy_32": {
+      "manifest_sha256": "87d6503cdc8ecbf49eaff85483b857a1d8b53419518ef7f471a77a6a529b8c3b",
+      "completion_sha256": "f741dd4bc1d180b93c5bc2617472415c9ddc7af89a54f6b30b10e1eb350a7cd3",
+      "completed_runs": 32
+    },
+    "v10_iterations\\margin_only_32": {
+      "manifest_sha256": "4878d52be8b224c5f847fe2e3e0b8b50aa6aa67af6b69ba729bb1ccd5e119ec9",
+      "completion_sha256": "5902fba07e7b3227713d35a4c5eca246e1e91bcc729ceccc6e6f7515c4930dea",
+      "completed_runs": 32
+    },
+    "v10_iterations\\missing_target_diagnostics": {
+      "manifest_sha256": "a19eb151e6e8e30e82db2a0ca8817a1f8af88c8edda4c0a73e505b9c7f9283ad",
+      "completion_sha256": "0a129c7e3ff2c576290f8bc7098eb4fc9e3b549f3ef40460e0c0fc053f9db77f",
+      "completed_runs": 3
+    },
+    "v10_iterations\\motion_axis_probe5": {
+      "manifest_sha256": "c7e5cb95d796fbaacf7269a29c4892f1af2d844d233b4b71b82d585f87449f97",
+      "completion_sha256": "43f30b9b4e3b6a606439f0e815b9083ce0bc9b28de0584d939e57151a43e8ddc",
+      "completed_runs": 5
+    },
+    "v10_iterations\\motion_axis_remaining27": {
+      "manifest_sha256": "ba5bcf28dc25bad4f5d8a9ab1dbdc43966015c7e12758043b22106918ea7948a",
+      "completion_sha256": "398685ca06facac3ec567d9f7fc8d6739a36be94a4cb264cbdc6aa106e30f7f1",
+      "completed_runs": 27
+    },
+    "v10_iterations\\persistence_remaining29": {
+      "manifest_sha256": "607b0896e0c5a15273717c4bf3357fe0b774753274049fdd20aaad51f09298ec",
+      "completion_sha256": "ba3a6ea5b48255939f77293339fea817324c7f24fa0b05f68ebb597c6178cd21",
+      "completed_runs": 29
+    },
+    "v10_iterations\\persistence_three": {
+      "manifest_sha256": "fc7d04217d2fa505e41356c7954603beb30a2632581359427d1435079a5cd9ca",
+      "completion_sha256": "1aac82899f589ef08f0e9d8e311b2763cb716511feaf0294b49151f61e1bd4d5",
+      "completed_runs": 3
+    },
+    "v10_iterations\\persistent_preference_probe4": {
+      "manifest_sha256": "7ad7244d02841405ebd4825b279b3168bde3c6305f24ed3ec9f5ca02143a1c3f",
+      "completion_sha256": "cbe02306a03ba36b724afe51ae34bcb94138e17accacc30cc957f55306d11551",
+      "completed_runs": 4
+    },
+    "v10_iterations\\persistent_preference_remaining28": {
+      "manifest_sha256": "ffa3fe4d43f01e492bffb9449155f80fa39905773eea05d3ae843c1b94e17b86",
+      "completion_sha256": "dd2af71a2d5f73fc0d91fb3a23c3b1227b0e7997ed7af975acae1708e747176e",
+      "completed_runs": 28
+    },
+    "v10_iterations\\persistent_prefix32": {
+      "manifest_sha256": "1d489bec41c7c76f2292eaa8d39cf0002427a5ad643604959d68137b5bb6bf61",
+      "completion_sha256": "40f229e5ebea3bdce42587319f422d44b6bd8ba9b74a9901c48bc0a4911314d0",
+      "completed_runs": 32
+    },
+    "v10_iterations\\prefix_remaining16": {
+      "manifest_sha256": "d75e21cdca249b9b1abfbd551c1a0a8b2ce7fe100800e89cfd3fa65c70d1de44",
+      "completion_sha256": "2a49952f0f754e8d0504f3959923f5baf5a299f5fcc4ae2fd333cef9a11e9e8a",
+      "completed_runs": 16
+    },
+    "v10_iterations\\prefix_success16": {
+      "manifest_sha256": "ea9694c325efe572ebd2cf67e9f302ca33fb5008ce2147ed4255ccbf0566e17f",
+      "completion_sha256": "c8bfb078d8202d4b2698f601daa7d71fc2e303102851db48fc41306c8b47795b",
+      "completed_runs": 16
+    },
+    "v10_iterations\\v16_broader40_paired": {
+      "manifest_sha256": "f5085abab5f686fc6bd6a8f19bdb06b50e35a76fe7bcd473fee62cd51b35f18d",
+      "completion_sha256": "705209a0f02f9b5130c81ec8f830c02ca2c52835ed4a45f6b21d88caf2c64462",
+      "completed_runs": 80
+    },
+    "v10_iterations\\v16_feasible_probe9": {
+      "manifest_sha256": "99956916a551baec8457ea419e20eb13e60c14685911fef96136b137a0e8fb80",
+      "completion_sha256": "c18c1c4e17b77e3f7c911a56d67a0d26066b6896f9e6f7505b8e771c4d3dc360",
+      "completed_runs": 9
+    },
+    "v10_iterations\\v17_fresh_yaw_probe9": {
+      "manifest_sha256": "c78107bc44038b24458e20d190149209694afc1736afa1bf60710bc4f1355ef0",
+      "completion_sha256": "fd2dce3ee15fbd23568ffa1e087e6c321b9b15e7912bfd21968174253f4439ba",
+      "completed_runs": 9
+    },
+    "v10_iterations\\v18_v19_probe_a": {
+      "manifest_sha256": "7074c27c5a6fe7c1272dde3b21207f5e26062a8f668771b0d7d86073128a101f",
+      "completion_sha256": "35221ad5ec94eaf0bb3f7052c1042e76e9e6bf5ba4dec29461935b3bcb68fac9",
+      "completed_runs": 18
+    },
+    "v10_iterations\\v18_v19_probe_b": {
+      "manifest_sha256": "fab86ef247ff9d1ec0f063c7b645428166f3a8d817f23d85e36aefc2eec3434a",
+      "completion_sha256": "85443c31f5e8acf936be37c7050e4f6aae8d9f10ce7a67cb8008b167890ee309",
+      "completed_runs": 18
+    },
+    "v9_paired_pilot": {
+      "manifest_sha256": "77ad4385f02c000428908ba21f6ef7cdabd42c66406bbe22346f5f94c2928160",
+      "completion_sha256": "2f76ee3b5b9d0a33d51f4adb6e9f45d97cdae9f7da696b73aac4211639ac90eb",
+      "completed_runs": 96
+    }
+  },
+  "skipped": [
+    {
+      "path": "v10_iterations\\baseline_thread_check\\traces\\001_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\baseline_thread_check\\traces\\002_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\001_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\002_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\003_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\004_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\005_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\006_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\007_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\008_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\009_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\010_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\011_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\012_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\013_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\014_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\015_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\016_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\017_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\018_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\019_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\020_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\021_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\022_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\023_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\024_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\025_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\026_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\027_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\028_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\029_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\030_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\031_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_policy_32\\traces\\032_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\001_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\002_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\003_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\004_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\005_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\006_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\007_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\008_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\009_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\010_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\011_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\012_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\013_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\014_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\015_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\016_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\017_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\018_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\019_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\020_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\021_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\022_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\023_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\024_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\025_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\026_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\027_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\028_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\029_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\030_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\031_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\conditional_prefix32\\traces\\032_v15.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\consistent_track_probe8\\traces\\001_v12.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\consistent_track_probe8\\traces\\002_v13.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\consistent_track_probe8\\traces\\003_v13.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\consistent_track_probe8\\traces\\004_v12.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\consistent_track_probe8\\traces\\005_v12.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\consistent_track_probe8\\traces\\006_v13.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\consistent_track_probe8\\traces\\007_v13.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\consistent_track_probe8\\traces\\008_v12.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\001_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\002_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\003_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\004_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\005_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\006_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\007_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\008_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\009_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\010_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\011_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\012_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\013_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\014_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\015_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\016_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\017_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\018_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\019_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\020_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\021_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\022_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\023_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\024_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\025_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\026_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\027_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\028_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\029_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\030_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\031_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\feasible_policy_32\\traces\\032_v10.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\001_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\002_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\003_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\004_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\005_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\006_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\007_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\008_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\009_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\010_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\011_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\012_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\013_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\014_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\015_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\016_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\017_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\018_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\019_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\020_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\021_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\022_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\023_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\024_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\025_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\026_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\027_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\028_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\029_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\030_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\031_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\margin_only_32\\traces\\032_v9_margin.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\missing_target_diagnostics\\traces\\001_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\missing_target_diagnostics\\traces\\002_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\missing_target_diagnostics\\traces\\003_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_probe5\\traces\\001_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_probe5\\traces\\002_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_probe5\\traces\\003_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_probe5\\traces\\004_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_probe5\\traces\\005_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\001_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\002_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\003_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\004_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\005_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\006_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\007_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\008_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\009_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\010_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\011_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\012_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\013_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\014_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\015_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\016_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\017_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\018_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\019_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\020_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\021_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\022_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\023_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\024_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\025_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\026_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\motion_axis_remaining27\\traces\\027_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\001_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\002_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\003_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\004_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\005_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\006_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\007_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\008_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\009_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\010_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\011_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\012_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\013_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\014_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\015_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\016_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\017_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\018_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\019_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\020_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\021_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\022_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\023_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\024_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\025_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\026_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\027_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\028_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_remaining29\\traces\\029_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_three\\traces\\001_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_three\\traces\\002_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistence_three\\traces\\003_v11.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_probe4\\traces\\001_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_probe4\\traces\\002_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_probe4\\traces\\003_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_probe4\\traces\\004_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\001_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\002_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\003_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\004_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\005_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\006_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\007_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\008_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\009_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\010_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\011_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\012_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\013_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\014_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\015_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\016_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\017_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\018_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\019_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\020_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\021_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\022_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\023_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\024_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\025_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\026_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\027_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_preference_remaining28\\traces\\028_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\001_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\002_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\003_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\004_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\005_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\006_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\007_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\008_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\009_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\010_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\011_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\012_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\013_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\014_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\015_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\016_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\017_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\018_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\019_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\020_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\021_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\022_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\023_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\024_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\025_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\026_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\027_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\028_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\029_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\030_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\031_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\persistent_prefix32\\traces\\032_v14.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_remaining16\\traces\\001_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_remaining16\\traces\\002_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_remaining16\\traces\\003_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_remaining16\\traces\\004_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_remaining16\\traces\\005_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_remaining16\\traces\\006_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_remaining16\\traces\\007_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_remaining16\\traces\\008_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_remaining16\\traces\\009_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_remaining16\\traces\\010_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_remaining16\\traces\\011_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_remaining16\\traces\\012_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_remaining16\\traces\\013_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_remaining16\\traces\\014_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_remaining16\\traces\\015_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_remaining16\\traces\\016_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_success16\\traces\\001_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_success16\\traces\\002_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_success16\\traces\\003_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_success16\\traces\\004_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_success16\\traces\\005_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_success16\\traces\\006_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_success16\\traces\\007_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_success16\\traces\\008_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_success16\\traces\\009_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_success16\\traces\\010_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_success16\\traces\\011_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_success16\\traces\\012_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_success16\\traces\\013_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_success16\\traces\\014_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_success16\\traces\\015_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\prefix_success16\\traces\\016_v11_prefix.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\001_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\002_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\003_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\004_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\005_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\006_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\007_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\008_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\009_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\010_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\011_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\012_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\013_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\014_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\015_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\016_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\017_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\018_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\019_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\020_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\021_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\022_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\023_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\024_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\025_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\026_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\027_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\028_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\029_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\030_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\031_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\032_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\033_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\034_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\035_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\036_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\037_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\038_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\039_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\040_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\041_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\042_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\043_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\044_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\045_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\046_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\047_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\048_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\049_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\050_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\051_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\052_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\053_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\054_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\055_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\056_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\057_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\058_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\059_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\060_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\061_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\062_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\063_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\064_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\065_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\066_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\067_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\068_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\069_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\070_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\071_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\072_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\073_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\074_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\075_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\076_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\077_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\078_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\079_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_broader40_paired\\traces\\080_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_feasible_probe9\\traces\\001_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_feasible_probe9\\traces\\002_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_feasible_probe9\\traces\\003_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_feasible_probe9\\traces\\004_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_feasible_probe9\\traces\\005_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_feasible_probe9\\traces\\006_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_feasible_probe9\\traces\\007_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_feasible_probe9\\traces\\008_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v16_feasible_probe9\\traces\\009_v16.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v17_fresh_yaw_probe9\\traces\\001_v17.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v17_fresh_yaw_probe9\\traces\\002_v17.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v17_fresh_yaw_probe9\\traces\\003_v17.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v17_fresh_yaw_probe9\\traces\\004_v17.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v17_fresh_yaw_probe9\\traces\\005_v17.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v17_fresh_yaw_probe9\\traces\\006_v17.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v17_fresh_yaw_probe9\\traces\\007_v17.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v17_fresh_yaw_probe9\\traces\\008_v17.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v10_iterations\\v17_fresh_yaw_probe9\\traces\\009_v17.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\001_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\002_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\003_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\004_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\005_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\006_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\007_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\008_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\009_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\010_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\011_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\012_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\013_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\014_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\015_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\016_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\017_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\018_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\019_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\020_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\021_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\022_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\023_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\024_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\025_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\026_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\027_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\028_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\029_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\030_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\031_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\032_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\033_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\034_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\035_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\036_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\037_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\038_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\039_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\040_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\041_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\042_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\043_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\044_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\045_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\046_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\047_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\048_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\049_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\050_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\051_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\052_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\053_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\054_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\055_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\056_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\057_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\058_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\059_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\060_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\061_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\062_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\063_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\064_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\065_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\066_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\067_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\068_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\069_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\070_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\071_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\072_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\073_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\074_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\075_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\076_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\077_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\078_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\079_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\080_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\081_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\082_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\083_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\084_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\085_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\086_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\087_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\088_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\089_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\090_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\091_off.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\092_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\093_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\094_v8.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\095_v9.jsonl",
+      "reason": "already compressed"
+    },
+    {
+      "path": "v9_paired_pilot\\traces\\096_off.jsonl",
+      "reason": "already compressed"
+    }
+  ],
+  "logical_bytes": 51962805,
+  "allocated_before": 51962805,
+  "created_utc": "2026-10-03T11:53:42Z",
+  "tool_sha256": "6cc4926a508dae5d5e1a8f5c7b6f6d5761aa71c4fcae36e1a7f550e66e2f3ca1",
+  "compact_path": "C:\\WINDOWS\\System32\\compact.exe",
+  "free_bytes_before": 11450634240
+}

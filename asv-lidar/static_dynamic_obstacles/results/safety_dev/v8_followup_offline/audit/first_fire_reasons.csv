@@ -1,0 +1,19 @@
+dataset,reason,n,rescued,broken,both_fail,both_goal,selected_negative,repair_clearance_not_worse
+all,brake,54,15,4,10,25,0,0
+all,continue,73,12,2,10,49,0,11
+all,last certificate,36,4,4,4,24,36,24
+all,no fire,624,0,0,22,602,0,0
+all,searched escape,61,5,0,5,51,0,0
+all,turn,302,41,11,39,211,0,3
+ts2,brake,44,11,2,9,22,0,0
+ts2,continue,49,9,2,6,32,0,6
+ts2,last certificate,27,0,3,2,22,27,19
+ts2,no fire,579,0,0,17,562,0,0
+ts2,searched escape,46,2,0,5,39,0,0
+ts2,turn,255,35,10,32,178,0,3
+dv3,brake,10,4,2,1,3,0,0
+dv3,continue,24,3,0,4,17,0,5
+dv3,last certificate,9,4,1,2,2,9,5
+dv3,no fire,45,0,0,5,40,0,0
+dv3,searched escape,15,3,0,0,12,0,0
+dv3,turn,47,6,1,7,33,0,0

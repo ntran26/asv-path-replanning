@@ -1,0 +1,45 @@
+{
+  "review": "Independent read-only V19 source and focused-test review",
+  "status": "no_blocker_found",
+  "reviewer": "oracle_support",
+  "review_date": "2026-10-03",
+  "scope": [
+    "src/safety_source_points.py",
+    "src/safety_v19.py",
+    "tests/test_safety_v19.py",
+    "src/safety_track_persistence.py motion certificate and publication",
+    "src/safety_v14.py persistent-view ownership",
+    "src/safety_perception.py and src/classical/common.py memory provenance"
+  ],
+  "sha256": {
+    "src/safety_source_points.py": "50790a4c9bbb59a115c611268e7d46b2b82691365a01986e6bcd2cb9a9ac20b3",
+    "src/safety_v19.py": "784696959c57b9d83095c15d081c40645a764cc03139f45fab6a2302d0c258d9",
+    "tests/test_safety_v19.py": "71412433f752ea3928e0ea2a1fe531aee2a11573143e850ea0a8bbe66bbebce4"
+  },
+  "checks": [
+    "The adapter calls its base perception once, reads onboard tracker observations and existing adapter diagnostics, and performs no additional sensor query or hidden-state access.",
+    "A transferred row must exactly equal a current raw-cluster coordinate and a current memory coordinate, and must not equal any coordinate in an older memory batch.",
+    "Fresh confirmed matched detections require unique current scan/source/cluster identity, current positive appear evidence and the existing minimum violation count.",
+    "The existing fitted-hull extent gate, full longitudinal extent, measured-motion observation/end-point/residual certificate and unique age-zero published synthetic hypothesis are all required.",
+    "The published hypothesis position and velocity must equal the current diagnostic values, and the observed cluster must fit inside its oriented hull plus the existing tolerance.",
+    "Overlapping or malformed other raw-source geometry prevents transfer. Missing provenance or coasting/stale evidence retains static points.",
+    "Only the returned snapshot point array changes; older memory, underlying memory arrays, tracks, target views, policy observations, thresholds and action selection are preserved.",
+    "source_owned_points=False retains the V16 perception object and parent controller behavior; V18 heading memory is not implicitly enabled.",
+    "Tests cover exact one-ULP nonmatching, older equal rows, static neighbours, duplicate/missing/stale/ambiguous evidence, fit and certificate failures, nonmutation, hidden-access guards and disabled delegation.",
+    "The saved CRS04 test reconstructs a conservative superset of older memory and checks nine exact current rows removed with 49 retained; it does not run an episode or establish a rescue."
+  ],
+  "limitations": [
+    "A mixed cluster can still include an unrecognised static surface despite the existing motion and hull gates; association is an engineering hypothesis, not proved ownership.",
+    "Exact coordinate matching and retention of all older equal coordinates can conservatively transfer few or no rows.",
+    "Older target returns remain static until the inherited clearing/expiry logic removes them; this adapter does not retroactively reassign memory.",
+    "Missing internal diagnostics normally prevent transfer; malformed internal types may raise rather than provide a general untrusted-input recovery path.",
+    "Source review and saved-state checks do not establish episode improvement, absence of regressions or a safety guarantee."
+  ],
+  "verification": {
+    "reviewer_executed_tests": 0,
+    "reviewer_executed_episodes": 0,
+    "author_reported_focused_tests_passed": 33,
+    "focused_test_scope": "32 synthetic checks and one optional saved-trace perception check; no episodes",
+    "controller_source_edits_by_reviewer": false
+  }
+}

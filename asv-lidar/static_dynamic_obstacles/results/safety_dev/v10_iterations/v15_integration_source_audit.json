@@ -1,0 +1,79 @@
+{
+  "created_utc": "2026-10-03T09:39:35.775465+00:00",
+  "reason": "After all237 completed runs: expose exact current selection diagnostics, add a default-preserving prefix request hook, and add explicit native14/15 selectors. Constants and existing action rules unchanged; V15 implements optional new behavior.",
+  "evaluations_running": false,
+  "files": {
+    "src/safety_v6.py": {
+      "before_sha256": "07c1c716aea2c149f7e96a0aede2ab50d99c633706ba6d889e18a02bc52478f6",
+      "after_sha256": "62a920e4d3d18c77bdbbc51923c05e144f414019f514c76099673982c7ad3f48",
+      "newline": "'\\n'",
+      "before_crlf": 0,
+      "after_crlf": 0,
+      "diff": "--- src/safety_v6.py before\n+++ src/safety_v6.py after\n@@ -130,7 +130,8 @@\n         if not self._threat_in_reach(snap):\n             self._release()\n             self.actuators.issue(env, float(action[0]))\n-            self.last = {\"mode\": \"idle\", \"plan_steps\": 0}\n+            self.last = {\"mode\": \"idle\", \"plan_steps\": 0,\n+                         \"selection_floor\": None, \"selection_best_clearance\": None, \"selection_branch\": None}\n             return action.astype(np.float32), False\n \n         traffic = any(np.hypot(*(t.position - snap.position)) < v2.ENGAGE_RANGE_M\n@@ -171,6 +172,7 @@\n         is_brake = np.isnan(candidates[:, 1])\n         cont_ok = bool(np.isinf(cont_first))\n         diagnostics = {\n+            \"selection_floor\": None, \"selection_best_clearance\": None, \"selection_branch\": None,\n             \"continuation_checked\": continuation is not None,\n             \"continuation_ok\": cont_ok,\n             \"continuation_clearance\": float(cont_clear),\n@@ -247,6 +249,8 @@\n             best = max(float(margin[pool].max()) if len(pool) else -np.inf,\n                        cont_clear if cont_ok else -np.inf)\n             floor = min(v2.TRIGGER_MARGIN_M, best - v2.ROOM_SLACK_M)\n+            diagnostics.update(selection_branch=\"ordinary\", selection_floor=float(floor),\n+                               selection_best_clearance=float(best))\n             pool = pool[margin[pool] >= floor]\n             score = distance(pool) if len(pool) else np.array([])\n             use_continuation = False\n"
+    },
+    "src/safety_v11.py": {
+      "before_sha256": "c15435494f7df9528bf370535ba2143f6a579d45f03532614d3640deb8d624ae",
+      "after_sha256": "892e92377b607997b91d71a06490c1d6aee21bf6e2eae158489b83a26d3f3270",
+      "newline": "'\\n'",
+      "before_crlf": 0,
+      "after_crlf": 0,
+      "diff": "--- src/safety_v11.py before\n+++ src/safety_v11.py after\n@@ -59,6 +59,10 @@\n         # Independent of the inherited bank/escape search and global RNG.\n         self._prefix_rng = np.random.default_rng(prefix_rng_seed)\n \n+    def _prefix_search_request(self):\n+        \"\"\"Default request preserves the original trigger-margin search.\"\"\"\n+        return True, None, \"default_trigger_margin\"\n+\n     def _filter(self, env, action):\n         policy = np.clip(np.asarray(action, dtype=float).reshape(2), -1., 1.).astype(np.float32)\n         if not np.isfinite(policy).all():\n@@ -71,6 +75,7 @@\n             \"v11_track_persistence\": self.enable_persistence,\n             \"v11_policy_prefix_search_enabled\": self.policy_prefix_search,\n             \"v11_policy_prefix_search_checked\": False,\n+            \"v11_prefix_request_checked\": False,\n             \"v11_policy_prefix_preserved\": False,\n             \"v11_parent_why\": parent_why,\n             \"v11_parent_changed\": bool(changed),\n@@ -90,6 +95,13 @@\n         if snap is None:\n             self.last[\"v11_prefix_skip_reason\"] = \"no onboard snapshot\"\n             return out, changed\n+        allowed, minimum_clearance, request_reason = self._prefix_search_request()\n+        details.update(v11_prefix_request_checked=True,\n+                       v11_prefix_minimum_clearance=minimum_clearance,\n+                       v11_prefix_request_reason=request_reason)\n+        if not allowed:\n+            self.last.update(details, v11_prefix_skip_reason=request_reason)\n+            return out, changed\n         traffic = any(np.hypot(*(track.position - snap.position)) < v2.ENGAGE_RANGE_M\n                       for track in snap.tracks)\n         rollout, evaluate = self._rollout, self._evaluate\n@@ -104,7 +116,8 @@\n \n         from safety_policy_prefix import search\n         result = search(snap, before, policy, self.plan, rollout, evaluate,\n-                        self._prefix_rng, traffic=traffic)\n+                        self._prefix_rng, traffic=traffic,\n+                        minimum_clearance=minimum_clearance)\n         details.update(v11_policy_prefix_search_checked=True,\n                        policy_prefix_search=copy.deepcopy(result.diagnostics))\n         if result.plan is None:\n"
+    },
+    "src/env.py": {
+      "before_sha256": "1602e6c1b7910e564e4f2fd640d4f08b99651f2cb1ba836dc5beb9b122cb3bfb",
+      "after_sha256": "1a7eb213d89f980f6a9a681b112be5e76f6000672c4778af9c72d69f0e8f49d7",
+      "newline": "'\\n'",
+      "before_crlf": 0,
+      "after_crlf": 0,
+      "diff": "--- src/env.py before\n+++ src/env.py after\n@@ -1246,7 +1246,13 @@\n         self.safety_v2_changed = False\n         if self.estop_enabled and getattr(cfg, \"SAFETY_VERSION\", 1) >= 2:\n             if getattr(self, \"_safety_v2\", None) is None:\n-                if getattr(cfg, \"SAFETY_VERSION\", 1) == 13:\n+                if getattr(cfg, \"SAFETY_VERSION\", 1) == 15:\n+                    import safety_v15\n+                    self._safety_v2 = safety_v15.SafetyFilterV15()\n+                elif getattr(cfg, \"SAFETY_VERSION\", 1) == 14:\n+                    import safety_v14\n+                    self._safety_v2 = safety_v14.SafetyFilterV14()\n+                elif getattr(cfg, \"SAFETY_VERSION\", 1) == 13:\n                     import safety_v13\n                     self._safety_v2 = safety_v13.SafetyFilterV13()\n                 elif getattr(cfg, \"SAFETY_VERSION\", 1) == 12:\n"
+    },
+    "tools/tiers/frozen_suite.py": {
+      "before_sha256": "a5d79ea5f855c84885c9e35f409332e9e6a49c8e5018db822b5d7b4ed4ddc3dd",
+      "after_sha256": "aa096641cc3ab4f3804788046ac57c5cd5e6868c1fd9f501f8dfc86a449ef104",
+      "newline": "'\\n'",
+      "before_crlf": 0,
+      "after_crlf": 0,
+      "diff": "--- tools/tiers/frozen_suite.py before\n+++ tools/tiers/frozen_suite.py after\n@@ -77,7 +77,7 @@\n     ap = argparse.ArgumentParser()\n     ap.add_argument(\"--model\", type=Path, required=True)\n     ap.add_argument(\"--tag\", required=True)\n-    ap.add_argument(\"--safety-version\", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), default=1,\n+    ap.add_argument(\"--safety-version\", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), default=1,\n                     help=\"safety layer used when it is on: 1 = stop latch, 2/3 = predictive filter, 4 = selected observer/memory filter, 5-7 = development filters, 8 = v7 without hold-back, 9 = experimental current-plan checks\")\n     ap.add_argument(\"--safety\", \"--supervisor\", dest=\"supervisor\", choices=(\"off\", \"on\", \"both\"), default=\"both\")\n     ap.add_argument(\"--tiers\", default=\"b,r\",\n"
+    },
+    "tools/tiers/paper2_suite.py": {
+      "before_sha256": "653b631e58f4a6f0fda19550e34a9706b131f756279a4a4b37771ad23b000bf6",
+      "after_sha256": "12728ce27b41ce1e8781d987f8dbdf543feca3609db28ba88b93ce614045d054",
+      "newline": "'\\n'",
+      "before_crlf": 0,
+      "after_crlf": 0,
+      "diff": "--- tools/tiers/paper2_suite.py before\n+++ tools/tiers/paper2_suite.py after\n@@ -138,7 +138,7 @@\n     ap.add_argument(\"--policy\", choices=(\"los_dwa\", \"colregs_vo\", \"encounter_vo\", \"reference\"),\n                     help=\"a classical comparator instead of a model\")\n     ap.add_argument(\"--tag\", help=\"output folder (default for a model: e.g. sacs0_bl2 from its run folder)\")\n-    ap.add_argument(\"--safety-version\", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), default=1,\n+    ap.add_argument(\"--safety-version\", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), default=1,\n                     help=\"safety layer used when it is on: 1 = stop latch, 2/3 = predictive filter, 4 = selected observer/memory filter, 5-7 = development filters, 8 = v7 without hold-back, 9 = experimental current-plan checks\")\n     ap.add_argument(\"--safety\", \"--supervisor\", dest=\"supervisor\", choices=(\"off\", \"on\", \"both\"), default=\"both\")\n     ap.add_argument(\"--processes\", type=int, default=None)\n"
+    },
+    "tools/tiers/tier1_replay.py": {
+      "before_sha256": "0c359021010dc37e2fcd408204c274e6b1b61059770e0e181befbd01e9762c43",
+      "after_sha256": "d062b7f73154e039f70e027f94203336c9f309328542bafcc64f383ecb8fe9df",
+      "newline": "'\\n'",
+      "before_crlf": 0,
+      "after_crlf": 0,
+      "diff": "--- tools/tiers/tier1_replay.py before\n+++ tools/tiers/tier1_replay.py after\n@@ -50,7 +50,7 @@\n     ap.add_argument(\"--per-class\", type=int, default=20)\n     ap.add_argument(\"--tag\", default=\"run3\")\n     ap.add_argument(\"--processes\", type=int, default=None, help=\"worker processes (default: cores - 2)\")\n-    ap.add_argument(\"--safety-version\", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), default=1,\n+    ap.add_argument(\"--safety-version\", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), default=1,\n                     help=\"runtime filter version when --safety on\")\n     ap.add_argument(\"--stop-test-fit\", choices=(\"on\", \"off\"), default=None,\n                     help=\"override STOP_TEST_USES_HULL_FIT in the workers (F66 A/B)\")\n"
+    },
+    "tools/diagnostics/safety/trigger_counterfactual.py": {
+      "before_sha256": "6d349c60133037373d8797fcbcf0e10a9f9ca9cfd2cbd9db80f25bb1f91b4560",
+      "after_sha256": "df202dceb848604fd330e81d17f276c65b28825d267c9c56c62f0b6453133c36",
+      "newline": "'\\r\\n'",
+      "before_crlf": 304,
+      "after_crlf": 304,
+      "diff": "--- tools/diagnostics/safety/trigger_counterfactual.py before\n+++ tools/diagnostics/safety/trigger_counterfactual.py after\n@@ -141,7 +141,7 @@\n \n \n def _version_number(version):\n-    if version not in (\"v4\", \"v7\", \"v8\", \"v9\", \"v10\", \"v11\", \"v12\", \"v13\"):\n+    if version not in (\"v4\", \"v7\", \"v8\", \"v9\", \"v10\", \"v11\", \"v12\", \"v13\", \"v14\", \"v15\"):\n         raise ValueError(f\"Unsupported counterfactual filter: {version}\")\n     return int(version[1:])\n \n"
+    },
+    "tests/test_safety_v9.py": {
+      "before_sha256": "466dce4b2667416d28f71495ef0e2880f464ea5e22e6eae26b4bc7726eba3b96",
+      "after_sha256": "cb162df02bbc2412263e8d57390a174105fa0717d115d07e2f13d55d94501957",
+      "newline": "'\\n'",
+      "before_crlf": 0,
+      "after_crlf": 0,
+      "diff": "--- tests/test_safety_v9.py before\n+++ tests/test_safety_v9.py after\n@@ -223,7 +223,7 @@\n     assert got[0] is first and got[1] is clear\n \n \n-@pytest.mark.parametrize(\"version\", [8, 9, 10, 11, 12, 13])\n+@pytest.mark.parametrize(\"version\", [8, 9, 10, 11, 12, 13, 14, 15])\n def test_native_dispatch_stops_before_physics(monkeypatch, version):\n     from env import ASVLidarEnv\n     calls = []\n"
+    },
+    "tests/test_trigger_filter_dispatch.py": {
+      "before_sha256": "30dba56657db1803db4405e9ee59111307cbc5521ad3a24eb5db1659929c930f",
+      "after_sha256": "6d5e5ccab8211c184493a1776207a54c1548b492410293664f47414f2a585493",
+      "newline": "'\\n'",
+      "before_crlf": 0,
+      "after_crlf": 0,
+      "diff": "--- tests/test_trigger_filter_dispatch.py before\n+++ tests/test_trigger_filter_dispatch.py after\n@@ -13,7 +13,7 @@\n SPEC.loader.exec_module(runner)\n \n \n-@pytest.mark.parametrize(\"version\", [4, 7, 8, 9, 10, 11, 12, 13])\n+@pytest.mark.parametrize(\"version\", [4, 7, 8, 9, 10, 11, 12, 13, 14, 15])\n def test_requested_filter_is_not_silently_replaced_by_v7(monkeypatch, version):\n     sentinel = object()\n     monkeypatch.setitem(sys.modules, f\"safety_v{version}\",\n"
+    }
+  }
+}

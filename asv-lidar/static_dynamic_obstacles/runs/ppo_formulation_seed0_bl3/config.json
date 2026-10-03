@@ -126,7 +126,7 @@
   "PF_OVERSPEED_TOL": 0.2,
   "PF_OVERSPEED_SPAN": 0.5
  },
- "wall_clock_s": 55725.86840343475,
+ "wall_clock_s": 27057.19758462906,
  "resumes": [
   {
    "from_steps": 2500000,

@@ -1,0 +1,182 @@
+{
+  "schema": 1,
+  "combination": "Explicit descriptive sum of two separately validated16-case pieces with unequal source inventories; strict cohort exception not used.",
+  "completed_records": 32,
+  "distinct_scenarios": 32,
+  "outcomes": {
+    "goal": 17,
+    "collision:target": 9,
+    "collision:obstacle": 2,
+    "collision:boundary": 4,
+    "timeout": 0
+  },
+  "comparisons": [
+    {
+      "reference": "off",
+      "matched_cases": 32,
+      "gained_goals": 8,
+      "lost_goals": 7,
+      "net_goals": 1,
+      "gained_cases": [
+        "DV3:DV3-CRP-CV-04",
+        "DV3:DV3-CRP-CV-17",
+        "DV3:DV3-HO-CV-03",
+        "TS2:CH-CR-CV-073",
+        "TS2:CH-HO-RE-060",
+        "TS2:P2-L1-OT-VAR-20",
+        "TS2:P2-L2-CRP-VAR-02",
+        "TS2:P2-L2-HO-FIX-05"
+      ],
+      "lost_cases": [
+        "DV3:DV3-BO-CV-04",
+        "TS2:BAS-HO-NC-059",
+        "TS2:BAS-NU-CV-070",
+        "TS2:CH-CR-CV-031",
+        "TS2:CH-CR-RE-038",
+        "TS2:CH-HO-CV-073",
+        "TS2:P2-L2-CRP-VAR-16"
+      ],
+      "reference_evidence": [
+        "fresh_prior_pilot"
+      ],
+      "collision_to_goal": 8,
+      "collision_to_timeout": 0
+    },
+    {
+      "reference": "v8",
+      "matched_cases": 32,
+      "gained_goals": 3,
+      "lost_goals": 2,
+      "net_goals": 1,
+      "gained_cases": [
+        "TS2:BAS-BO-CV-063",
+        "TS2:BAS-CR-RE-072",
+        "TS2:CH-CR-CV-007"
+      ],
+      "lost_cases": [
+        "DV3:DV3-HO-VS-01",
+        "TS2:P2-L1-CRP-VAR-12"
+      ],
+      "reference_evidence": [
+        "fresh_prior_pilot"
+      ],
+      "collision_to_goal": 3,
+      "collision_to_timeout": 0
+    },
+    {
+      "reference": "v9",
+      "matched_cases": 32,
+      "gained_goals": 7,
+      "lost_goals": 6,
+      "net_goals": 1,
+      "gained_cases": [
+        "TS2:BAS-BO-CV-063",
+        "TS2:CH-CR-CV-007",
+        "DV3:DV3-CRP-CV-04",
+        "DV3:DV3-CRP-CV-17",
+        "DV3:DV3-HO-CV-03",
+        "TS2:CH-CR-CV-073",
+        "TS2:P2-L2-HO-FIX-05"
+      ],
+      "lost_cases": [
+        "DV3:DV3-BO-CV-04",
+        "TS2:BAS-HO-NC-059",
+        "TS2:CH-CR-CV-031",
+        "TS2:CH-CR-RE-038",
+        "TS2:P2-L1-CRP-VAR-12",
+        "TS2:P2-L2-HO-FIX-19"
+      ],
+      "reference_evidence": [
+        "fresh_prior_pilot"
+      ],
+      "collision_to_goal": 7,
+      "collision_to_timeout": 0
+    },
+    {
+      "reference": "v10",
+      "matched_cases": 32,
+      "gained_goals": 2,
+      "lost_goals": 3,
+      "net_goals": -1,
+      "gained_cases": [
+        "TS2:BAS-BO-CV-063",
+        "TS2:CH-CR-CV-007"
+      ],
+      "lost_cases": [
+        "DV3:DV3-HO-VS-01",
+        "TS2:P2-L1-CRP-VAR-12",
+        "TS2:P2-L2-HO-FIX-19"
+      ],
+      "reference_evidence": [
+        "fresh_reference_iteration"
+      ],
+      "collision_to_goal": 2,
+      "collision_to_timeout": 0
+    },
+    {
+      "reference": "v11",
+      "matched_cases": 32,
+      "gained_goals": 3,
+      "lost_goals": 4,
+      "net_goals": -1,
+      "gained_cases": [
+        "TS2:BAS-BO-CV-063",
+        "TS2:BAS-CR-RE-072",
+        "TS2:CH-CR-CV-007"
+      ],
+      "lost_cases": [
+        "DV3:DV3-HO-VS-01",
+        "TS2:P2-L1-CRP-VAR-12",
+        "TS2:P2-L1-CRP-VAR-14",
+        "TS2:P2-L1-CRS-VAR-08"
+      ],
+      "reference_evidence": [
+        "fresh_reference_iteration"
+      ],
+      "collision_to_goal": 3,
+      "collision_to_timeout": 0
+    }
+  ],
+  "piece_outcomes": {
+    "prefix_success16": {
+      "goal": 9,
+      "collision:target": 3,
+      "collision:obstacle": 1,
+      "collision:boundary": 3,
+      "timeout": 0
+    },
+    "prefix_remaining16": {
+      "goal": 8,
+      "collision:target": 6,
+      "collision:obstacle": 1,
+      "collision:boundary": 1,
+      "timeout": 0
+    }
+  },
+  "episode_seconds": 1050.3875694000308,
+  "dataset_counts": {
+    "dv3": 5,
+    "ts2": 27
+  },
+  "inventory_audit": {
+    "path": "results/safety_dev/v10_iterations/reports/prefix32_inventory_audit/audit.json",
+    "common_identical_sources": 99,
+    "added_sources": {
+      "src/dev_set_v4.py": {
+        "sha256": "e86be9d1877d572fab8c21ac26649e4d9a0243ecb0fd820871f3612395612248"
+      },
+      "src/safety_v14.py": {
+        "sha256": "5d50db93850247e4a9e93d0cbe07b2faee82af8f64af3c36f06f6ac24abb04e7"
+      }
+    }
+  },
+  "input_sha256": {
+    "results/safety_dev/v10_iterations/reports/prefix32_pieces/summary.json": "81b8d336319aa8781aa7eaa5c0a1d3e614ad5f0dd975bdcaa3cfce40c61b5cb2",
+    "results/safety_dev/v10_iterations/reports/prefix32_pieces/provenance.json": "e90322a0c7711b3cf8d187be4f3535a2e5e7c3ae76c0d7eb178b2fb70879f069",
+    "results/safety_dev/v10_iterations/reports/prefix32_pieces/paired.csv": "e23ba1cffcb2dfb2ea52105f2220a308b1dcdbfb75dd32e45511c3f94f54cd37",
+    "results/safety_dev/v10_iterations/reports/prefix32_inventory_audit/audit.json": "7d4e19254b4314cb772846d5d74e81a54e63c0d93cadfd7e468ed196505663fd",
+    "results/safety_dev/v9_paired_pilot/selection.json": "ee04253c16e0dfa7bbca7f2472362e432c5e4fb66fb411bc6c69d84bb3982b3b"
+  },
+  "builder_sha256": "a966be1f01ace6a5bf179acf0c772e8404bb550a889833e75a151d688a4249f0",
+  "new_episode_runs": 0
+}

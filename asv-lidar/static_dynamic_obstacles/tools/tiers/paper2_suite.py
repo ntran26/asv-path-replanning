@@ -138,8 +138,8 @@ def main() -> int:
     ap.add_argument("--policy", choices=("los_dwa", "colregs_vo", "encounter_vo", "reference"),
                     help="a classical comparator instead of a model")
     ap.add_argument("--tag", help="output folder (default for a model: e.g. sacs0_bl2 from its run folder)")
-    ap.add_argument("--safety-version", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8), default=1,
-                    help="safety layer used when it is on: 1 = stop latch, 2/3 = predictive filter, 4 = selected observer/memory filter, 5-7 = development filters, 8 = v7 without hold-back")
+    ap.add_argument("--safety-version", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19), default=1,
+                    help="safety layer used when it is on: 1 = stop latch, 2/3 = predictive filter, 4 = selected observer/memory filter, 5-7 = development filters, 8 = v7 without hold-back, 9 = experimental current-plan checks")
     ap.add_argument("--safety", "--supervisor", dest="supervisor", choices=("off", "on", "both"), default="both")
     ap.add_argument("--processes", type=int, default=None)
     args = ap.parse_args()

@@ -1,0 +1,429 @@
+{
+  "created_utc": "2026-10-03T09:31:45.300138+00:00",
+  "scope": "Score recorded successful SAC commands from an exact shared saved state.\n\nNo environment/reset/step or new policy inference. Future commands are read from\nthe matched completed OFF trace, not predicted SAC behavior. Truth poses score\nprediction error only; the prediction starts from recorded onboard state.\n",
+  "case": {
+    "case": "TS2:BAS-NU-CV-070",
+    "scenario_id": "BAS-NU-CV-070",
+    "dataset": "ts2",
+    "seed": 400469,
+    "scenario_sha256": "1df385f81fb213531debfb03cfdf7988a26460f5be774b12a7b4d069fd525880",
+    "selection_stratum": "other_broken_boundary",
+    "rationale": "Protect successful SAC trajectories across this collision type; current certified first proposals may still lead to later failures.",
+    "selection_rank_sha256": "27aa674262305130961650e24f560b961f18ccba79059f223c7d5b2ddcf34f66",
+    "historical": {
+      "policy_outcome": "goal",
+      "v4_outcome": "collision:boundary",
+      "v7_outcome": "collision:boundary",
+      "v8_outcome": "collision:boundary",
+      "v8_category": "broken",
+      "first_reason": "turn",
+      "first_fire_step": "6",
+      "selected_clearance": "0.06744661225996389",
+      "policy_prefix_repair_clearance": "0.006297536524014755"
+    }
+  },
+  "evaluated_result": {
+    "attempt": 14,
+    "case": "TS2:BAS-NU-CV-070",
+    "mode": "v14",
+    "seed": 400469,
+    "dataset": "ts2",
+    "stratum": "other_broken_boundary",
+    "elapsed_s": 23.234882900011144,
+    "why_counts": {
+      "nominal": 48,
+      "searched policy": 2,
+      "policy prefix searched": 3,
+      "policy prefix repaired": 1,
+      "turn": 1,
+      "idle": 8,
+      "no escape": 10
+    },
+    "policy": "model",
+    "class": "null",
+    "width": 9.446601658569804,
+    "dcpa_m": 9.923392752041597,
+    "ct_deg": -3.9028964394287,
+    "crossing_side": "",
+    "dcpa_below_floor": null,
+    "crossing_escapable": null,
+    "outcome": "collision:boundary",
+    "collided": true,
+    "collided_target": false,
+    "steps": 73,
+    "return": -475.9722770356075,
+    "colregs_integral": 0.0,
+    "frames_v_port": 0,
+    "frames_v_bow": 0,
+    "frames_v_side": 0,
+    "frames_v_hold": 0,
+    "frames_v_r8": 0,
+    "integral_v_port": 0.0,
+    "integral_v_bow": 0.0,
+    "integral_v_side": 0.0,
+    "integral_v_hold": 0.0,
+    "integral_v_r8": 0.0,
+    "mean_speed": 0.6685970090244173,
+    "max_speed": 0.9272249725475215,
+    "min_target_range": 7.6297086128384874,
+    "rms_cte": 2.2099245262713056,
+    "estops": 0,
+    "estop_reasons": "",
+    "safety_v2_steps": 1,
+    "safety_v2_brake_steps": 0,
+    "estop_then_target_collision": false,
+    "first_engaged_cls": "overtaking",
+    "engaged_frames": 3,
+    "p_port_sense": 0.0,
+    "ever_port_sense_non_overtaking": false,
+    "r_path_max": 0.0
+  },
+  "reference_outcome": "goal",
+  "first_divergence_step": 10,
+  "matched_pre_states_absolute_tolerance": 1e-09,
+  "model": "recorded onboard state; identified nominal dynamics; weak brake",
+  "full_horizon_s": 8.0,
+  "fixed_recorded_policy_commands": [
+    [
+      0.8978526592254639,
+      0.8815696239471436
+    ],
+    [
+      0.8456063270568848,
+      0.9734737873077393
+    ],
+    [
+      0.9853103160858154,
+      0.9883790016174316
+    ],
+    [
+      0.9630059003829956,
+      0.9883124828338623
+    ],
+    [
+      0.537822961807251,
+      0.982429027557373
+    ],
+    [
+      0.8107166290283203,
+      0.9931039810180664
+    ],
+    [
+      -0.7178663611412048,
+      0.9498914480209351
+    ],
+    [
+      -0.7446735501289368,
+      0.9114058017730713
+    ],
+    [
+      -0.3219270706176758,
+      0.45054709911346436
+    ],
+    [
+      -0.32424986362457275,
+      0.4979739189147949
+    ],
+    [
+      -0.12593400478363037,
+      0.2186216115951538
+    ],
+    [
+      0.9774271249771118,
+      0.9577467441558838
+    ],
+    [
+      0.9963161945343018,
+      0.9957051277160645
+    ],
+    [
+      0.9859364032745361,
+      0.9918031692504883
+    ],
+    [
+      0.9573268890380859,
+      0.9825408458709717
+    ],
+    [
+      0.8590054512023926,
+      0.9845905303955078
+    ]
+  ],
+  "predicted_first_violation_s": 2.25,
+  "predicted_clearance_m": -0.20810616544157584,
+  "predicted_components": {
+    "static_memory": {
+      "clearance_m": -0.20810616544157584,
+      "minimum_time_s": 3.0,
+      "first_violation_s": 2.25
+    },
+    "boundary": {
+      "clearance_m": 1.483512553119445,
+      "minimum_time_s": 8.0,
+      "first_violation_s": null
+    },
+    "track:86": {
+      "clearance_m": 4.881946138886883,
+      "minimum_time_s": 7.875,
+      "first_violation_s": null
+    }
+  },
+  "actual_recorded_pose_components_against_frozen_onboard_scene": {
+    "static_memory": {
+      "clearance_m": 0.08563290914146908,
+      "minimum_time_s": 3.5,
+      "first_violation_s": null
+    },
+    "boundary": {
+      "clearance_m": 1.247167294159684,
+      "minimum_time_s": 8.0,
+      "first_violation_s": null
+    },
+    "track:86": {
+      "clearance_m": 5.791688073413231,
+      "minimum_time_s": 6.0,
+      "first_violation_s": null
+    }
+  },
+  "actual_pose_check_limits": "0.5s samples only; no terminal check because true sway speed is absent in OFF trace; frozen observed scene, not true future geometry",
+  "prediction_errors": [
+    {
+      "horizon_s": 0.5,
+      "predicted_position": [
+        5.9239562517008535,
+        4.723473622151473
+      ],
+      "actual_position": [
+        5.943556943443723,
+        4.714642238051148
+      ],
+      "position_error_m": 0.021498382774675605,
+      "heading_error_deg": 2.4397795288582227
+    },
+    {
+      "horizon_s": 1.0,
+      "predicted_position": [
+        5.67756979090516,
+        4.960348875762875
+      ],
+      "actual_position": [
+        5.699770879464614,
+        4.9318572881392555
+      ],
+      "position_error_m": 0.03612006227208254,
+      "heading_error_deg": 6.324066341667255
+    },
+    {
+      "horizon_s": 1.5,
+      "predicted_position": [
+        5.406639674667327,
+        5.222061517797064
+      ],
+      "actual_position": [
+        5.420886303860236,
+        5.1600264467000025
+      ],
+      "position_error_m": 0.06364995278378233,
+      "heading_error_deg": 10.244558185055798
+    },
+    {
+      "horizon_s": 2.0,
+      "predicted_position": [
+        5.1262230262090105,
+        5.520891282591643
+      ],
+      "actual_position": [
+        5.117327735335797,
+        5.41075370662732
+      ],
+      "position_error_m": 0.11049620735127588,
+      "heading_error_deg": 13.502136037384366
+    },
+    {
+      "horizon_s": 2.5,
+      "predicted_position": [
+        4.855202698771998,
+        5.8602750426157915
+      ],
+      "actual_position": [
+        4.807555727208417,
+        5.69433330499511
+      ],
+      "position_error_m": 0.17264673232862435,
+      "heading_error_deg": 15.021119154114876
+    },
+    {
+      "horizon_s": 3.0,
+      "predicted_position": [
+        4.609512329156413,
+        6.234006229086292
+      ],
+      "actual_position": [
+        4.513063931413729,
+        6.013000610408479
+      ],
+      "position_error_m": 0.24113435448789491,
+      "heading_error_deg": 14.06356365125705
+    },
+    {
+      "horizon_s": 3.5,
+      "predicted_position": [
+        4.395656196224793,
+        6.631334130621074
+      ],
+      "actual_position": [
+        4.249921921472252,
+        6.358023382996911
+      ],
+      "position_error_m": 0.3097373784426541,
+      "heading_error_deg": 10.360592231794822
+    },
+    {
+      "horizon_s": 4.0,
+      "predicted_position": [
+        4.2108488886724995,
+        7.044487190951177
+      ],
+      "actual_position": [
+        4.026274795317159,
+        6.718747529115727
+      ],
+      "position_error_m": 0.37439808123255575,
+      "heading_error_deg": 5.167096521767148
+    },
+    {
+      "horizon_s": 4.5,
+      "predicted_position": [
+        4.042394486318327,
+        7.45999416177442
+      ],
+      "actual_position": [
+        3.8382865199028906,
+        7.078787267308655
+      ],
+      "position_error_m": 0.43241040498868333,
+      "heading_error_deg": -0.6438701219005296
+    },
+    {
+      "horizon_s": 5.0,
+      "predicted_position": [
+        3.865694135870587,
+        7.86873984480554
+      ],
+      "actual_position": [
+        3.669810237993002,
+        7.433191620554247
+      ],
+      "position_error_m": 0.4775696358607514,
+      "heading_error_deg": -6.92511724298759
+    },
+    {
+      "horizon_s": 5.5,
+      "predicted_position": [
+        3.6684853155989345,
+        8.26267838795859
+      ],
+      "actual_position": [
+        3.5047300655534084,
+        7.780866947775714
+      ],
+      "position_error_m": 0.5088792055179404,
+      "heading_error_deg": -11.123289667358154
+    },
+    {
+      "horizon_s": 6.0,
+      "predicted_position": [
+        3.4488561308364742,
+        8.647718261055605
+      ],
+      "actual_position": [
+        3.326489336330354,
+        8.132948804185546
+      ],
+      "position_error_m": 0.5291136230754213,
+      "heading_error_deg": -11.380685300431063
+    },
+    {
+      "horizon_s": 6.5,
+      "predicted_position": [
+        3.2071180552400524,
+        9.038230670909789
+      ],
+      "actual_position": [
+        3.122293285931475,
+        8.50061644225524
+      ],
+      "position_error_m": 0.5442649174254016,
+      "heading_error_deg": -7.970894116095779
+    },
+    {
+      "horizon_s": 7.0,
+      "predicted_position": [
+        2.9584876835989484,
+        9.444060256546988
+      ],
+      "actual_position": [
+        2.8979826817897063,
+        8.881101699822601
+      ],
+      "position_error_m": 0.5662006639285597,
+      "heading_error_deg": -1.7008093705786027
+    },
+    {
+      "horizon_s": 7.5,
+      "predicted_position": [
+        2.7269288922908976,
+        9.879082243716933
+      ],
+      "actual_position": [
+        2.6683890537124713,
+        9.279049566411413
+      ],
+      "position_error_m": 0.6028815194839027,
+      "heading_error_deg": 5.5939799089333615
+    },
+    {
+      "horizon_s": 8.0,
+      "predicted_position": [
+        2.534121414195338,
+        10.341853792987147
+      ],
+      "actual_position": [
+        2.4515124234372587,
+        9.69834206872488
+      ],
+      "position_error_m": 0.6487924048700504,
+      "heading_error_deg": 10.695385289010074
+    }
+  ],
+  "current_bank": {
+    "traffic": false,
+    "nonbrake_best_margin": 0.18182786571257586,
+    "continuation_clearance": 0.2647659117453218,
+    "ordinary_selection_best": 0.2647659117453218,
+    "ordinary_selection_floor": 0.06476591174532181,
+    "parent_checked_clearance": 0.11817990089062029,
+    "parent_reason": "turn"
+  },
+  "source_sha256": {
+    "src/constants.py": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+    "src/constant_temp.py": "85e5dc9992d062466af304f3f3273b249ba16b130c2d89b53fe7cb692b5c81d7",
+    "src/classical/common.py": "456f39769ffa237f826eff8f9852a6d0823a2f975f85d2345ba7b42105e0977d",
+    "src/safety_v2.py": "209195c3b9241dfa6a798b7cfca857dfd14218c38625d99bc2a9c0d97c1b3d55",
+    "src/safety_v3.py": "28efcc06af8ec0ffc0074267b7f1b2e36ba4fd1f6e033900c39b9b96b6d40d0a",
+    "src/safety_v4.py": "0f2bc31c9028c11390bf19e06de89e82e546c184645255aa007921896b649f28",
+    "src/safety_v7.py": "94a64f2c0914ddafe0cbc8f2d0f3256c4aee99ade16fe796e6d13a095c300444",
+    "src/ship.py": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+    "src/reference_controller.py": "f080cfca745b75b45c93dfca1cf581206908ea4476fc3fede2911f02f066c62b",
+    "bluefin/dynamics.py": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711"
+  },
+  "trace_sha256": "405c2130887e727b180b39da01f99f7d2911a25465ce25e3352dc35ac257c175",
+  "reference_trace_sha256": "d248d5951c599216a37b06c74df49a79ad54c87e19447e0d47cc0584c81295b3",
+  "manifest_sha256": "1d489bec41c7c76f2292eaa8d39cf0002427a5ad643604959d68137b5bb6bf61",
+  "script_sha256": "5b2decb70f568119d0f863b122d1e3d3304e03e52fcc04fdca6a163779d93cf5",
+  "limitations": [
+    "The successful future commands are a recorded counterfactual, not an online-available oracle.",
+    "This does not recreate future policy observations or claim an alternative closed-loop outcome.",
+    "Truth poses score the forecast only; no hidden state initializes or chooses a prediction."
+  ]
+}

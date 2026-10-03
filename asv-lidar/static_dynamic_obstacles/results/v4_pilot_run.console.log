@@ -1,1 +1,10 @@
 2026-10-03 01:41:08 == G4 pilot watcher armed: waiting for ppos0_bl3 (training + evaluations) to finish
+2026-10-03 14:28:08    ppos0_bl3 finished; G4 pilots start
+2026-10-03 14:28:08 == G4 pilot A: v4 from 1.5 M to 2.0 M, gamma 0.9509900498999999
+2026-10-03 14:30:41    pinned pilot learner 29856
+2026-10-03 18:22:40    pilot A exit 0
+2026-10-03 18:22:41 == G4 pilot B: v4 from 1.5 M to 2.0 M, gamma 0.98
+2026-10-03 18:25:15    pinned pilot learner 8088
+2026-10-03 20:59:51    pilot B exit 0
+2026-10-03 21:28:52    G4 evaluation exit 0 (results/v4_gates/g4_summary.txt)
+2026-10-03 21:28:52 == G4 done

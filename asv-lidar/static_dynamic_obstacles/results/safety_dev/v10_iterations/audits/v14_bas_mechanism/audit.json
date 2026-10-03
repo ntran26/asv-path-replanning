@@ -1,0 +1,986 @@
+{
+  "scope": "Saved completed-case analysis only; no episodes, policy calls, environment calls or controller edits. Combined32 campaign is ongoing; only its completed BAS case is included.",
+  "case": "TS2:BAS-CR-RE-072",
+  "provenance": {
+    "same_seed_scene_checkpoint_config": true,
+    "seed": 400171,
+    "scenario_sha256": "76e290782c493cdd5c6f9c7bc823dc954a2b94eae48e3b12720a9156f983934c",
+    "input_traces": {
+      "off": {
+        "path": "results/safety_dev/v9_paired_pilot/traces/006_off.jsonl",
+        "sha256": "9a4372718f21de23f6d94b6d6714691be5c527e49737552a11546d851cb7f9f4"
+      },
+      "v13": {
+        "path": "results/safety_dev/v10_iterations/consistent_track_probe8/traces/002_v13.jsonl",
+        "sha256": "54391b7310f138276637f89c84f8f172849d69c3d355150c334bc6ace5d85e3f"
+      },
+      "v14": {
+        "path": "results/safety_dev/v10_iterations/persistent_preference_probe4/traces/001_v14.jsonl",
+        "sha256": "6616ec3a165664c628cdb0fb3fc70d509e19e9cbf27e7be4588649b26e9c6c3a"
+      },
+      "combined": {
+        "path": "results/safety_dev/v10_iterations/persistent_prefix32/traces/002_v14.jsonl",
+        "sha256": "8c14c1864631c97bb3ee23697e2b2ffbd5d1f8b1cdbd487422efa77ba668c54f"
+      }
+    },
+    "matched_predictor_sources": {
+      "src/constants.py": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+      "src/constant_temp.py": "85e5dc9992d062466af304f3f3273b249ba16b130c2d89b53fe7cb692b5c81d7",
+      "src/classical/common.py": "456f39769ffa237f826eff8f9852a6d0823a2f975f85d2345ba7b42105e0977d",
+      "src/safety_v2.py": "209195c3b9241dfa6a798b7cfca857dfd14218c38625d99bc2a9c0d97c1b3d55",
+      "src/safety_v3.py": "28efcc06af8ec0ffc0074267b7f1b2e36ba4fd1f6e033900c39b9b96b6d40d0a",
+      "src/ship.py": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+      "bluefin/dynamics.py": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711"
+    }
+  },
+  "against_saved_successful_off": {
+    "v13": {
+      "steps": 103,
+      "reference_steps": 49,
+      "changed_steps": [
+        8,
+        9,
+        10,
+        11,
+        13,
+        14,
+        17,
+        18,
+        19,
+        28,
+        30,
+        31,
+        35,
+        36,
+        37,
+        39,
+        41,
+        42,
+        48,
+        64,
+        66,
+        67,
+        68,
+        70,
+        73,
+        75,
+        77,
+        80
+      ],
+      "current_policy_preserved_decisions": 75,
+      "first_command_divergence": 8,
+      "exact_full_field_parity": {
+        "pre_state": false,
+        "post_state": false,
+        "policy_action": false,
+        "rudder_command": false,
+        "signed_rpm_command": false
+      },
+      "first_field_divergence": {
+        "pre_state": 9,
+        "post_state": 8,
+        "policy_action": 9,
+        "rudder_command": 8,
+        "signed_rpm_command": 8
+      }
+    },
+    "v14": {
+      "steps": 49,
+      "reference_steps": 49,
+      "changed_steps": [
+        26
+      ],
+      "current_policy_preserved_decisions": 48,
+      "first_command_divergence": 26,
+      "exact_full_field_parity": {
+        "pre_state": false,
+        "post_state": false,
+        "policy_action": false,
+        "rudder_command": false,
+        "signed_rpm_command": false
+      },
+      "first_field_divergence": {
+        "pre_state": 27,
+        "post_state": 26,
+        "policy_action": 27,
+        "rudder_command": 26,
+        "signed_rpm_command": 26
+      }
+    },
+    "combined": {
+      "steps": 49,
+      "reference_steps": 49,
+      "changed_steps": [],
+      "current_policy_preserved_decisions": 49,
+      "first_command_divergence": null,
+      "exact_full_field_parity": {
+        "pre_state": true,
+        "post_state": true,
+        "policy_action": true,
+        "rudder_command": true,
+        "signed_rpm_command": true
+      },
+      "first_field_divergence": {
+        "pre_state": null,
+        "post_state": null,
+        "policy_action": null,
+        "rudder_command": null,
+        "signed_rpm_command": null
+      }
+    }
+  },
+  "decision8": {
+    "v13": {
+      "identical_recorded_pre_state_and_policy_to_off": true,
+      "recorded_reason": "last certificate",
+      "recorded_checked_clearance_m": -0.16704347856341029,
+      "saved_successful_16_command_sequence": {
+        "first_violation_s": 3.375,
+        "minimum_clearance_m": -0.22557214619940777,
+        "hard_safe": false
+      },
+      "target_view": {
+        "id": 10,
+        "position": [
+          3.904054515637056,
+          7.583097370083354
+        ],
+        "velocity": [
+          0.6180164421096701,
+          -0.13471060513487182
+        ],
+        "heading_rad": 1.9198621771937625
+      },
+      "current_position_error_m_scoring_only": 0.4484277608425727,
+      "current_velocity_error_mps_scoring_only": 0.15617217785552295,
+      "track_persistence": {
+        "frame": 8,
+        "pose_stale": false,
+        "enable_admission": true,
+        "enable_persistence": true,
+        "max_coast_s": 8.0,
+        "min_motion_observations": 3,
+        "base_track_count": 1,
+        "added_hypotheses": 0,
+        "updates": [],
+        "hypotheses": [],
+        "rejections": {
+          "invalid_fit": 3,
+          "current_extent_partial": 1
+        },
+        "expired_source_ids": [],
+        "contradicted_source_ids": [],
+        "static_points_preserved": 31,
+        "geometry_prior": true,
+        "source_ownership": true,
+        "source_owners": {
+          "10": "base"
+        },
+        "base_track_ids": [
+          10
+        ],
+        "generated_hypotheses": 1,
+        "suppressed_hypotheses": [
+          {
+            "source_id": 10,
+            "id": -1000000,
+            "anchor_frame": 7,
+            "age_s": 0.5,
+            "position": [
+              3.5813584841843933,
+              7.781158402360171
+            ],
+            "velocity": [
+              0.5051469160821739,
+              -0.1130056690174962
+            ]
+          }
+        ],
+        "suppressed_source_ids": [
+          10
+        ],
+        "replaced_base_source_ids": []
+      }
+    },
+    "v14": {
+      "identical_recorded_pre_state_and_policy_to_off": true,
+      "recorded_reason": "searched policy",
+      "recorded_checked_clearance_m": 0.31871253812741285,
+      "saved_successful_16_command_sequence": {
+        "first_violation_s": null,
+        "minimum_clearance_m": 0.21481715591461722,
+        "hard_safe": true
+      },
+      "target_view": {
+        "id": -1000000,
+        "position": [
+          3.5813584841843933,
+          7.781158402360171
+        ],
+        "velocity": [
+          0.5051469160821739,
+          -0.1130056690174962
+        ],
+        "heading_rad": 1.8500490071139892
+      },
+      "current_position_error_m_scoring_only": 0.07696256053851096,
+      "current_velocity_error_mps_scoring_only": 0.0751997416501608,
+      "track_persistence": {
+        "frame": 8,
+        "pose_stale": false,
+        "enable_admission": true,
+        "enable_persistence": true,
+        "max_coast_s": 8.0,
+        "min_motion_observations": 3,
+        "base_track_count": 1,
+        "added_hypotheses": 1,
+        "updates": [],
+        "hypotheses": [
+          {
+            "source_id": 3,
+            "id": -1000000,
+            "anchor_frame": 7,
+            "age_s": 0.5,
+            "position": [
+              3.5813584841843933,
+              7.781158402360171
+            ],
+            "velocity": [
+              0.5051469160821739,
+              -0.1130056690174962
+            ]
+          }
+        ],
+        "rejections": {
+          "invalid_fit": 3,
+          "current_extent_partial": 1
+        },
+        "expired_source_ids": [],
+        "contradicted_source_ids": [],
+        "static_points_preserved": 31,
+        "geometry_prior": true,
+        "source_ownership": true,
+        "prefer_persistent_estimates": true,
+        "selection_rule": "persistent_when_valid",
+        "first_admission_owners": {
+          "3": "base"
+        },
+        "source_owners": {
+          "3": "persistent"
+        },
+        "base_track_ids": [
+          3
+        ],
+        "generated_hypotheses": 1,
+        "suppressed_hypotheses": [],
+        "suppressed_source_ids": [],
+        "replaced_base_source_ids": [
+          3
+        ],
+        "replaced_base_view_count": 1,
+        "published_source_ids": [
+          3
+        ],
+        "published_persistent_count": 1
+      }
+    }
+  },
+  "isolated_v14_only_change_step26": {
+    "mode": "recovery",
+    "why": "turn",
+    "policy_margin": 0.01,
+    "best_margin": 0.41,
+    "checked_clearance": 0.16337839319519104,
+    "recovery_template": "v3",
+    "changed": true,
+    "brake": false,
+    "chosen": [
+      0.0,
+      1.0
+    ],
+    "recovery_steps": 0,
+    "uncertified_steps": 0,
+    "nominal_plan_retained": false,
+    "plan_steps": 16,
+    "continuation_checked": false,
+    "continuation_ok": false,
+    "continuation_clearance": "-inf",
+    "policy_safe": true,
+    "any_safe": true,
+    "n_safe_candidates": 18,
+    "countersteer_recovery_enabled": false,
+    "dual_brake_sequences": 0,
+    "fast_brake_rejections": 0,
+    "calibrated_braking": false,
+    "fitted_hull_perception": false,
+    "provisional_tracks": true,
+    "provisional_motion_evidence": true,
+    "trajectory_search": true,
+    "track_history": false,
+    "policy_search": {
+      "fixed_policy": true,
+      "rounds": 3,
+      "sampled_plans": 192,
+      "seed_plans": 6,
+      "dropped_brake_seeds": 0,
+      "evaluated_plans": 198,
+      "accepted_plans": 0,
+      "maximum_clearance": 0.036259106254502876,
+      "accepted": false,
+      "policy_distance": "inf"
+    },
+    "v7_policy_repair_enabled": true,
+    "v7_repair_checked": true,
+    "v7_policy_preserved": false,
+    "v6_proposed_change": true,
+    "v6_proposal_why": "turn",
+    "v6_proposal_action": [
+      0.0,
+      1.0
+    ],
+    "v6_proposal_brake": false,
+    "risk_monitor": {
+      "fresh": true,
+      "horizon_s": 1.0,
+      "urgent": false,
+      "persistent": false,
+      "recommend_rescue": false,
+      "policy_action": [
+        0.564704418182373,
+        0.994512677192688
+      ],
+      "world_velocity_mps": [
+        -0.40181419822849607,
+        0.8538142599596978
+      ],
+      "yaw_rate_rad_s": 0.22510715053015734,
+      "hazards": [
+        {
+          "key": "static_memory",
+          "kind": "static_memory",
+          "current_clearance_m": 0.5903294364238226,
+          "minimum_predicted_clearance_m": 0.46402099813203695,
+          "first_violation_s": null,
+          "measured_closing_rate_mps": -0.11858682933426601,
+          "predicted_closing": true,
+          "threatening": false,
+          "consecutive_fresh_threats": 0,
+          "urgent": false,
+          "persistent": false
+        },
+        {
+          "key": "boundary:0",
+          "kind": "boundary",
+          "current_clearance_m": 10.255596752583525,
+          "minimum_predicted_clearance_m": 10.357825345058895,
+          "first_violation_s": null,
+          "measured_closing_rate_mps": -0.7660371600140685,
+          "predicted_closing": false,
+          "threatening": false,
+          "consecutive_fresh_threats": 0,
+          "urgent": false,
+          "persistent": false
+        },
+        {
+          "key": "boundary:1",
+          "kind": "boundary",
+          "current_clearance_m": 1.5533845448842079,
+          "minimum_predicted_clearance_m": 1.6241847216032796,
+          "first_violation_s": null,
+          "measured_closing_rate_mps": -0.3966210414118132,
+          "predicted_closing": false,
+          "threatening": false,
+          "consecutive_fresh_threats": 0,
+          "urgent": false,
+          "persistent": false
+        },
+        {
+          "key": "boundary:2",
+          "kind": "boundary",
+          "current_clearance_m": 11.76072679565713,
+          "minimum_predicted_clearance_m": 10.843871276557872,
+          "first_violation_s": null,
+          "measured_closing_rate_mps": 0.7874727573079134,
+          "predicted_closing": true,
+          "threatening": false,
+          "consecutive_fresh_threats": 0,
+          "urgent": false,
+          "persistent": false
+        },
+        {
+          "key": "boundary:3",
+          "kind": "boundary",
+          "current_clearance_m": 5.8632729159766654,
+          "minimum_predicted_clearance_m": 5.774929590737034,
+          "first_violation_s": null,
+          "measured_closing_rate_mps": 0.3294933681810086,
+          "predicted_closing": true,
+          "threatening": false,
+          "consecutive_fresh_threats": 0,
+          "urgent": false,
+          "persistent": false
+        },
+        {
+          "key": "track:-1000000",
+          "kind": "target",
+          "current_clearance_m": 3.6730392637967104,
+          "minimum_predicted_clearance_m": 3.7367608643904244,
+          "first_violation_s": null,
+          "measured_closing_rate_mps": -0.5643182947193193,
+          "predicted_closing": false,
+          "threatening": false,
+          "consecutive_fresh_threats": 0,
+          "urgent": false,
+          "persistent": false
+        }
+      ],
+      "shadow_only": true
+    },
+    "v7_rate_limit_skip": false,
+    "v7_repair_first_violation": "inf",
+    "v7_repair_clearance": 0.06041999742129134,
+    "v10_pair_checked": true,
+    "v10_policy_preserved": false,
+    "v10_parent_why": "turn",
+    "v10_parent_action": [
+      0.0,
+      1.0
+    ],
+    "v10_parent_brake": false,
+    "v10_prefer_feasible_policy": true,
+    "v10_prefer_policy_margin": true,
+    "v10_prefer_any_feasible_policy": false,
+    "v10_target_turn_rate_deg_s": 0.0,
+    "v10_proposed_first_violation": "inf",
+    "v10_policy_first_violation": "inf",
+    "v10_proposed_clearance": 0.16337839319519104,
+    "v10_policy_tail_clearance": 0.06041999742129134,
+    "v10_proposed_currently_passing": true,
+    "v10_policy_tail_passing": true,
+    "v11_track_admission": true,
+    "v11_track_persistence": true,
+    "v11_policy_prefix_search_enabled": false,
+    "v11_policy_prefix_search_checked": false,
+    "v11_policy_prefix_preserved": false,
+    "v11_parent_why": "turn",
+    "v11_parent_changed": true,
+    "v11_parent_action": [
+      0.0,
+      1.0
+    ],
+    "v11_parent_brake": false,
+    "track_persistence": {
+      "frame": 26,
+      "pose_stale": false,
+      "enable_admission": true,
+      "enable_persistence": true,
+      "max_coast_s": 8.0,
+      "min_motion_observations": 3,
+      "base_track_count": 1,
+      "added_hypotheses": 1,
+      "updates": [],
+      "hypotheses": [
+        {
+          "source_id": 3,
+          "id": -1000000,
+          "anchor_frame": 24,
+          "age_s": 1.0,
+          "position": [
+            7.509930991615428,
+            6.034436007284264
+          ],
+          "velocity": [
+            0.4049456544300501,
+            -0.2185615182235996
+          ]
+        }
+      ],
+      "rejections": {
+        "oversized_cluster": 1,
+        "invalid_fit": 2,
+        "current_extent_partial": 1,
+        "missed_detection": 1
+      },
+      "expired_source_ids": [],
+      "contradicted_source_ids": [],
+      "static_points_preserved": 39,
+      "geometry_prior": true,
+      "source_ownership": true,
+      "prefer_persistent_estimates": true,
+      "selection_rule": "persistent_when_valid",
+      "first_admission_owners": {
+        "3": "base"
+      },
+      "source_owners": {
+        "3": "persistent"
+      },
+      "base_track_ids": [
+        3
+      ],
+      "generated_hypotheses": 1,
+      "suppressed_hypotheses": [],
+      "suppressed_source_ids": [],
+      "replaced_base_source_ids": [
+        3
+      ],
+      "replaced_base_view_count": 1,
+      "published_source_ids": [
+        3
+      ],
+      "published_persistent_count": 1
+    },
+    "v13_geometry_prior": true,
+    "v13_source_ownership": true,
+    "v14_prefer_persistent_estimates": true,
+    "model_ego_observer": true
+  },
+  "combined_step26": {
+    "mode": "nominal",
+    "why": "policy prefix searched",
+    "policy_margin": 0.01,
+    "best_margin": 0.41,
+    "checked_clearance": 0.22539430523785303,
+    "recovery_template": "v3",
+    "changed": false,
+    "brake": false,
+    "chosen": [
+      0.564704418182373,
+      0.994512677192688
+    ],
+    "recovery_steps": 0,
+    "uncertified_steps": 0,
+    "nominal_plan_retained": true,
+    "plan_steps": 16,
+    "continuation_checked": false,
+    "continuation_ok": false,
+    "continuation_clearance": "-inf",
+    "policy_safe": true,
+    "any_safe": true,
+    "n_safe_candidates": 18,
+    "countersteer_recovery_enabled": false,
+    "dual_brake_sequences": 0,
+    "fast_brake_rejections": 0,
+    "calibrated_braking": false,
+    "fitted_hull_perception": false,
+    "provisional_tracks": true,
+    "provisional_motion_evidence": true,
+    "trajectory_search": true,
+    "track_history": false,
+    "policy_search": {
+      "fixed_policy": true,
+      "rounds": 3,
+      "sampled_plans": 192,
+      "seed_plans": 6,
+      "dropped_brake_seeds": 0,
+      "evaluated_plans": 198,
+      "accepted_plans": 0,
+      "maximum_clearance": 0.036259106254502876,
+      "accepted": false,
+      "policy_distance": "inf"
+    },
+    "v7_policy_repair_enabled": true,
+    "v7_repair_checked": true,
+    "v7_policy_preserved": false,
+    "v6_proposed_change": true,
+    "v6_proposal_why": "turn",
+    "v6_proposal_action": [
+      0.0,
+      1.0
+    ],
+    "v6_proposal_brake": false,
+    "risk_monitor": {
+      "fresh": true,
+      "horizon_s": 1.0,
+      "urgent": false,
+      "persistent": false,
+      "recommend_rescue": false,
+      "policy_action": [
+        0.564704418182373,
+        0.994512677192688
+      ],
+      "world_velocity_mps": [
+        -0.40181419822849607,
+        0.8538142599596978
+      ],
+      "yaw_rate_rad_s": 0.22510715053015734,
+      "hazards": [
+        {
+          "key": "static_memory",
+          "kind": "static_memory",
+          "current_clearance_m": 0.5903294364238226,
+          "minimum_predicted_clearance_m": 0.46402099813203695,
+          "first_violation_s": null,
+          "measured_closing_rate_mps": -0.11858682933426601,
+          "predicted_closing": true,
+          "threatening": false,
+          "consecutive_fresh_threats": 0,
+          "urgent": false,
+          "persistent": false
+        },
+        {
+          "key": "boundary:0",
+          "kind": "boundary",
+          "current_clearance_m": 10.255596752583525,
+          "minimum_predicted_clearance_m": 10.357825345058895,
+          "first_violation_s": null,
+          "measured_closing_rate_mps": -0.7660371600140685,
+          "predicted_closing": false,
+          "threatening": false,
+          "consecutive_fresh_threats": 0,
+          "urgent": false,
+          "persistent": false
+        },
+        {
+          "key": "boundary:1",
+          "kind": "boundary",
+          "current_clearance_m": 1.5533845448842079,
+          "minimum_predicted_clearance_m": 1.6241847216032796,
+          "first_violation_s": null,
+          "measured_closing_rate_mps": -0.3966210414118132,
+          "predicted_closing": false,
+          "threatening": false,
+          "consecutive_fresh_threats": 0,
+          "urgent": false,
+          "persistent": false
+        },
+        {
+          "key": "boundary:2",
+          "kind": "boundary",
+          "current_clearance_m": 11.76072679565713,
+          "minimum_predicted_clearance_m": 10.843871276557872,
+          "first_violation_s": null,
+          "measured_closing_rate_mps": 0.7874727573079134,
+          "predicted_closing": true,
+          "threatening": false,
+          "consecutive_fresh_threats": 0,
+          "urgent": false,
+          "persistent": false
+        },
+        {
+          "key": "boundary:3",
+          "kind": "boundary",
+          "current_clearance_m": 5.8632729159766654,
+          "minimum_predicted_clearance_m": 5.774929590737034,
+          "first_violation_s": null,
+          "measured_closing_rate_mps": 0.3294933681810086,
+          "predicted_closing": true,
+          "threatening": false,
+          "consecutive_fresh_threats": 0,
+          "urgent": false,
+          "persistent": false
+        },
+        {
+          "key": "track:-1000000",
+          "kind": "target",
+          "current_clearance_m": 3.6730392637967104,
+          "minimum_predicted_clearance_m": 3.7367608643904244,
+          "first_violation_s": null,
+          "measured_closing_rate_mps": -0.5643182947193193,
+          "predicted_closing": false,
+          "threatening": false,
+          "consecutive_fresh_threats": 0,
+          "urgent": false,
+          "persistent": false
+        }
+      ],
+      "shadow_only": true
+    },
+    "v7_rate_limit_skip": false,
+    "v7_repair_first_violation": "inf",
+    "v7_repair_clearance": 0.06041999742129134,
+    "v10_pair_checked": true,
+    "v10_policy_preserved": false,
+    "v10_parent_why": "turn",
+    "v10_parent_action": [
+      0.0,
+      1.0
+    ],
+    "v10_parent_brake": false,
+    "v10_prefer_feasible_policy": true,
+    "v10_prefer_policy_margin": true,
+    "v10_prefer_any_feasible_policy": false,
+    "v10_target_turn_rate_deg_s": 0.0,
+    "v10_proposed_first_violation": "inf",
+    "v10_policy_first_violation": "inf",
+    "v10_proposed_clearance": 0.16337839319519104,
+    "v10_policy_tail_clearance": 0.06041999742129134,
+    "v10_proposed_currently_passing": true,
+    "v10_policy_tail_passing": true,
+    "v11_track_admission": true,
+    "v11_track_persistence": true,
+    "v11_policy_prefix_search_enabled": true,
+    "v11_policy_prefix_search_checked": true,
+    "v11_policy_prefix_preserved": true,
+    "v11_parent_why": "turn",
+    "v11_parent_changed": true,
+    "v11_parent_action": [
+      0.0,
+      1.0
+    ],
+    "v11_parent_brake": false,
+    "track_persistence": {
+      "frame": 26,
+      "pose_stale": false,
+      "enable_admission": true,
+      "enable_persistence": true,
+      "max_coast_s": 8.0,
+      "min_motion_observations": 3,
+      "base_track_count": 1,
+      "added_hypotheses": 1,
+      "updates": [],
+      "hypotheses": [
+        {
+          "source_id": 5,
+          "id": -1000000,
+          "anchor_frame": 24,
+          "age_s": 1.0,
+          "position": [
+            7.509930991615428,
+            6.034436007284264
+          ],
+          "velocity": [
+            0.4049456544300501,
+            -0.2185615182235996
+          ]
+        }
+      ],
+      "rejections": {
+        "oversized_cluster": 1,
+        "invalid_fit": 2,
+        "current_extent_partial": 1,
+        "missed_detection": 1
+      },
+      "expired_source_ids": [],
+      "contradicted_source_ids": [],
+      "static_points_preserved": 39,
+      "geometry_prior": true,
+      "source_ownership": true,
+      "prefer_persistent_estimates": true,
+      "selection_rule": "persistent_when_valid",
+      "first_admission_owners": {
+        "5": "base"
+      },
+      "source_owners": {
+        "5": "persistent"
+      },
+      "base_track_ids": [
+        5
+      ],
+      "generated_hypotheses": 1,
+      "suppressed_hypotheses": [],
+      "suppressed_source_ids": [],
+      "replaced_base_source_ids": [
+        5
+      ],
+      "replaced_base_view_count": 1,
+      "published_source_ids": [
+        5
+      ],
+      "published_persistent_count": 1
+    },
+    "policy_prefix_search": {
+      "accepted": true,
+      "fixed_policy_decisions": 1,
+      "fixed_policy_seconds": 0.5,
+      "horizon_decisions": 16,
+      "minimum_clearance": 0.15,
+      "rounds": 3,
+      "seed_plans": 14,
+      "sampled_plans": 178,
+      "evaluated_plans": 192,
+      "maximum_plans": 192,
+      "accepted_plans": 123,
+      "hard_passing_plans": 169,
+      "maximum_clearance": 0.22539430523785303,
+      "maximum_hard_passing_clearance": 0.22539430523785303,
+      "dropped_brake_backup": false,
+      "backup_seed_checked": true
+    },
+    "v13_geometry_prior": true,
+    "v13_source_ownership": true,
+    "v14_prefer_persistent_estimates": true,
+    "model_ego_observer": true
+  },
+  "isolated_four_case_results": [
+    {
+      "case": "TS2:BAS-CR-RE-072",
+      "v13_outcome": "goal",
+      "v14_outcome": "goal",
+      "v13_steps": 103,
+      "v14_steps": 49,
+      "v13_interventions": 28,
+      "v14_interventions": 1,
+      "v14_vs_v13_trace": {
+        "steps": 49,
+        "reference_steps": 103,
+        "changed_steps": [
+          26
+        ],
+        "current_policy_preserved_decisions": 48,
+        "first_command_divergence": 8,
+        "exact_full_field_parity": {
+          "pre_state": false,
+          "post_state": false,
+          "policy_action": false,
+          "rudder_command": false,
+          "signed_rpm_command": false
+        },
+        "first_field_divergence": {
+          "pre_state": 9,
+          "post_state": 8,
+          "policy_action": 9,
+          "rudder_command": 8,
+          "signed_rpm_command": 8
+        }
+      }
+    },
+    {
+      "case": "TS2:P2-L1-CRP-FIX-05",
+      "v13_outcome": "collision:target",
+      "v14_outcome": "collision:target",
+      "v13_steps": 39,
+      "v14_steps": 39,
+      "v13_interventions": 11,
+      "v14_interventions": 11,
+      "v14_vs_v13_trace": {
+        "steps": 39,
+        "reference_steps": 39,
+        "changed_steps": [
+          13,
+          14,
+          15,
+          16,
+          21,
+          25,
+          27,
+          29,
+          30,
+          31,
+          32
+        ],
+        "current_policy_preserved_decisions": 28,
+        "first_command_divergence": null,
+        "exact_full_field_parity": {
+          "pre_state": true,
+          "post_state": true,
+          "policy_action": true,
+          "rudder_command": true,
+          "signed_rpm_command": true
+        },
+        "first_field_divergence": {
+          "pre_state": null,
+          "post_state": null,
+          "policy_action": null,
+          "rudder_command": null,
+          "signed_rpm_command": null
+        }
+      }
+    },
+    {
+      "case": "TS2:P2-L1-CRS-VAR-08",
+      "v13_outcome": "collision:obstacle",
+      "v14_outcome": "goal",
+      "v13_steps": 57,
+      "v14_steps": 91,
+      "v13_interventions": 26,
+      "v14_interventions": 23,
+      "v14_vs_v13_trace": {
+        "steps": 91,
+        "reference_steps": 57,
+        "changed_steps": [
+          13,
+          14,
+          17,
+          19,
+          20,
+          23,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          35,
+          36,
+          37,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "current_policy_preserved_decisions": 68,
+        "first_command_divergence": 13,
+        "exact_full_field_parity": {
+          "pre_state": false,
+          "post_state": false,
+          "policy_action": false,
+          "rudder_command": false,
+          "signed_rpm_command": false
+        },
+        "first_field_divergence": {
+          "pre_state": 14,
+          "post_state": 13,
+          "policy_action": 14,
+          "rudder_command": 13,
+          "signed_rpm_command": 13
+        }
+      }
+    },
+    {
+      "case": "TS2:P2-L1-CRP-VAR-14",
+      "v13_outcome": "goal",
+      "v14_outcome": "goal",
+      "v13_steps": 88,
+      "v14_steps": 73,
+      "v13_interventions": 34,
+      "v14_interventions": 15,
+      "v14_vs_v13_trace": {
+        "steps": 73,
+        "reference_steps": 88,
+        "changed_steps": [
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          18,
+          19,
+          20,
+          40,
+          41,
+          42,
+          43,
+          45
+        ],
+        "current_policy_preserved_decisions": 58,
+        "first_command_divergence": 32,
+        "exact_full_field_parity": {
+          "pre_state": false,
+          "post_state": false,
+          "policy_action": false,
+          "rudder_command": false,
+          "signed_rpm_command": false
+        },
+        "first_field_divergence": {
+          "pre_state": 33,
+          "post_state": 32,
+          "policy_action": 33,
+          "rudder_command": 32,
+          "signed_rpm_command": 32
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Exact state parity concerns recorded x,y,heading,surge fields; the old OFF trace lacks sway/yaw/actuator state and full observations.",
+    "The future16 SAC commands are noncausal saved-data scoring only; unavailable to the online filter.",
+    "Current truth scores estimate errors only. No future reactive-target truth or constant-velocity truth assumption is used.",
+    "One matched case supports this mechanism; it does not establish broad safety improvement."
+  ]
+}

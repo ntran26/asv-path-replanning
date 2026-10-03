@@ -262,6 +262,8 @@ def _g3_stage(job):
                      "field": (sc.flags or {}).get("set") == "field_training",
                      "near": str((sc.flags or {}).get("motif", "")).startswith("near-"),
                      "panels": len(env.obstacles), "start_gap": min(gaps) if gaps else np.inf,
+                     "straight": abs(float(sc.slant_realised_deg)) <= 2.0,
+                     "vs": str(sc.target_behaviour) == "T-VS",
                      "start_contact": env.collision_kind(env.hull_polygon()) is not None,
                      "reset_s": dt})
     rows[-1]["st_redraws"] = getattr(env, "st_redraws", 0)
@@ -281,6 +283,10 @@ def g3(processes, n=200):
         "crossing": g.apply(lambda x: (x["class"] == "crossing").mean(), include_groups=False),
         "head_on": g.apply(lambda x: (x["class"] == "head_on").mean(), include_groups=False),
         "panels3": g.apply(lambda x: (x.panels >= 3).mean(), include_groups=False),
+        "straight_of_3p": g.apply(lambda x: x[x.panels >= 3].straight.mean() if (x.panels >= 3).any() else np.nan,
+                                  include_groups=False),
+        "vs_of_field_targets": g.apply(lambda x: x[x.field & (x["class"] != "no_target")].vs.mean()
+                                       if (x.field & (x["class"] != "no_target")).any() else np.nan, include_groups=False),
         "start_contact": g.start_contact.sum(), "start_gap<0.3": g.apply(lambda x: (x.start_gap < 0.3).sum(), include_groups=False),
         "reset_mean_s": g.reset_s.mean(), "reset_p95_s": g.reset_s.quantile(0.95),
         "st_redraws": g.st_redraws.max()}).round(3)

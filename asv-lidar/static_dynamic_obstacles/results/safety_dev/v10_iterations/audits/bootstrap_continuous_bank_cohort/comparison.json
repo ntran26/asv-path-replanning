@@ -1,0 +1,156 @@
+{
+  "scope": "Saved-only comparison of two prespecified training objectives; no controller or episode changes",
+  "episode_calls": 0,
+  "tests": {
+    "path": "tests/test_bootstrap_continuous_bank.py",
+    "passed": 4,
+    "sha256": "fccfd9a7d8a7fd18690f57c35deeb5079c58be82fbd8b16f887f1d8289afc7b4"
+  },
+  "peer_review": "model_audit reviewed selector timing and diff; no timing/leakage blocker, no episodes/tests by reviewer",
+  "inputs": {
+    "results\\safety_dev\\v10_iterations\\audits\\bootstrap_continuous_bank_cohort\\audit.json": "0c40cea1c3fe547b33aa1166473f0e54bf2d47a746c6b2a538c9ac4bc885b2f8",
+    "results\\safety_dev\\v10_iterations\\audits\\bootstrap_model_bank_cohort\\audit.json": "3e02509979e0a49df6a857d447139701cafa82c70460593968ed38ff4e25d4da"
+  },
+  "comparisons": {
+    "conditional_prefix32": {
+      "record_count": 32,
+      "changed_model_choices": [
+        {
+          "case": "TS2:BAS-HO-NC-059",
+          "one_step_objective": "bootstrap_12",
+          "continuous_objective": "bootstrap_16"
+        },
+        {
+          "case": "TS2:BAS-CR-RE-072",
+          "one_step_objective": "bootstrap_01",
+          "continuous_objective": "bootstrap_05"
+        },
+        {
+          "case": "DV3:DV3-BO-CV-04",
+          "one_step_objective": "bootstrap_16",
+          "continuous_objective": "bootstrap_04"
+        },
+        {
+          "case": "TS2:CH-CR-RE-038",
+          "one_step_objective": "bootstrap_00",
+          "continuous_objective": "bootstrap_08"
+        },
+        {
+          "case": "DV3:DV3-HO-VS-01",
+          "one_step_objective": "bootstrap_01",
+          "continuous_objective": "bootstrap_15"
+        },
+        {
+          "case": "TS2:CH-HO-CV-073",
+          "one_step_objective": "bootstrap_05",
+          "continuous_objective": "bootstrap_12"
+        },
+        {
+          "case": "TS2:BAS-BO-CV-063",
+          "one_step_objective": "bootstrap_11",
+          "continuous_objective": "bootstrap_04"
+        },
+        {
+          "case": "TS2:CH-CR-CV-007",
+          "one_step_objective": "bootstrap_10",
+          "continuous_objective": "bootstrap_00"
+        },
+        {
+          "case": "TS2:CH-CR-CV-031",
+          "one_step_objective": "bootstrap_05",
+          "continuous_objective": "bootstrap_10"
+        },
+        {
+          "case": "TS2:CH-HO-RE-060",
+          "one_step_objective": "bootstrap_05",
+          "continuous_objective": "bootstrap_11"
+        },
+        {
+          "case": "TS2:P2-L1-OT-VAR-20",
+          "one_step_objective": "bootstrap_05",
+          "continuous_objective": "bootstrap_26"
+        },
+        {
+          "case": "TS2:P2-L1-CRP-VAR-12",
+          "one_step_objective": "bootstrap_05",
+          "continuous_objective": "bootstrap_03"
+        },
+        {
+          "case": "TS2:P2-L1-CRP-VAR-14",
+          "one_step_objective": "bootstrap_00",
+          "continuous_objective": "bootstrap_11"
+        },
+        {
+          "case": "TS2:CH-CR-CV-059",
+          "one_step_objective": "bootstrap_05",
+          "continuous_objective": "bootstrap_26"
+        },
+        {
+          "case": "TS2:P2-L3-CRS-FIX-05",
+          "one_step_objective": "bootstrap_05",
+          "continuous_objective": "bootstrap_01"
+        },
+        {
+          "case": "TS2:CH-CR-CV-015",
+          "one_step_objective": "bootstrap_15",
+          "continuous_objective": "bootstrap_05"
+        },
+        {
+          "case": "TS2:BAS-HO-NC-071",
+          "one_step_objective": "bootstrap_22",
+          "continuous_objective": "bootstrap_26"
+        },
+        {
+          "case": "TS2:P2-L1-CRP-FIX-03",
+          "one_step_objective": "bootstrap_05",
+          "continuous_objective": "bootstrap_26"
+        },
+        {
+          "case": "TS2:CH-HO-CV-043",
+          "one_step_objective": "bootstrap_22",
+          "continuous_objective": "bootstrap_05"
+        },
+        {
+          "case": "TS2:P2-L1-CRS-FIX-09",
+          "one_step_objective": "bootstrap_05",
+          "continuous_objective": "bootstrap_10"
+        }
+      ],
+      "exact_unchanged_cases_statuses_and_validation_endpoints": true,
+      "exact_unchanged_identified_and_bootstrap_mean_validation": true
+    },
+    "motion_axis_probe5": {
+      "record_count": 5,
+      "changed_model_choices": [
+        {
+          "case": "TS2:BAS-HO-NC-059",
+          "one_step_objective": "bootstrap_12",
+          "continuous_objective": "bootstrap_16"
+        },
+        {
+          "case": "TS2:BAS-CR-RE-072",
+          "one_step_objective": "bootstrap_01",
+          "continuous_objective": "bootstrap_05"
+        },
+        {
+          "case": "DV3:DV3-BO-CV-04",
+          "one_step_objective": "bootstrap_16",
+          "continuous_objective": "bootstrap_04"
+        },
+        {
+          "case": "TS2:CH-HO-CV-073",
+          "one_step_objective": "bootstrap_05",
+          "continuous_objective": "bootstrap_12"
+        },
+        {
+          "case": "TS2:P2-L2-CRP-VAR-16",
+          "one_step_objective": "bootstrap_05",
+          "continuous_objective": "bootstrap_26"
+        }
+      ],
+      "exact_unchanged_cases_statuses_and_validation_endpoints": true,
+      "exact_unchanged_identified_and_bootstrap_mean_validation": true
+    }
+  },
+  "recommendation": "Do not integrate; stop this model-bank family without further window/weight tuning."
+}
