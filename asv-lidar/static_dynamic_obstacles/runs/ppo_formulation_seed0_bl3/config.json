@@ -1,7 +1,7 @@
 {
  "algorithm": "PPO",
  "seed": 0,
- "timesteps": 2500000,
+ "timesteps": 3000000,
  "algo": "ppo",
  "num_envs": 10,
  "hyperparameters": {
@@ -125,5 +125,14 @@
   "MOTION_CLASSIFIER": "free_space",
   "PF_OVERSPEED_TOL": 0.2,
   "PF_OVERSPEED_SPAN": 0.5
- }
+ },
+ "wall_clock_s": 55725.86840343475,
+ "resumes": [
+  {
+   "from_steps": 2500000,
+   "at": "2026-10-03 04:00:26",
+   "replay_buffer": "n/a",
+   "extended_from": 2500000
+  }
+ ]
 }

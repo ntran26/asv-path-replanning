@@ -1,0 +1,54 @@
+Test set 1.0 (colregs_vo) -- classical: colregs_vo
+1000 episodes, digest 8051b61135d6a974, 2969 s
+
+-- overall
+           n  success  coll_target  coll_other  timeout
+safety                                                 
+off     1000    0.703        0.147        0.15      0.0
+
+-- by source (safety off)
+          n  success  coll_target  coll_other  timeout
+source                                                
+frozen  761     0.77        0.117       0.113      0.0
+paper2  239     0.49        0.243       0.268      0.0
+
+-- by cell (safety off)
+                                n  success  coll_target  coll_other  timeout
+source cell                                                                 
+frozen basin-being_overtaken   95    0.863        0.021       0.116      0.0
+       basin-crossing         100    0.530        0.280       0.190      0.0
+       basin-head_on          100    0.890        0.050       0.060      0.0
+       basin-null              75    0.947        0.000       0.053      0.0
+       basin-overtaking       100    0.740        0.080       0.180      0.0
+       channel-crossing       100    0.570        0.320       0.110      0.0
+       channel-head_on         98    0.878        0.071       0.051      0.0
+       channel-overtaking      93    0.796        0.075       0.129      0.0
+paper2 L1-BO                   15    0.000        0.000       1.000      0.0
+       L1-CRP                  17    0.353        0.471       0.176      0.0
+       L1-CRS                  18    0.444        0.167       0.389      0.0
+       L1-HO                   15    0.867        0.133       0.000      0.0
+       L1-NT                    1    1.000        0.000       0.000      0.0
+       L1-OT                   15    0.267        0.000       0.733      0.0
+       L2-BO                   15    0.600        0.000       0.400      0.0
+       L2-CRP                  15    0.333        0.600       0.067      0.0
+       L2-CRS                  17    0.529        0.412       0.059      0.0
+       L2-HO                   15    0.533        0.067       0.400      0.0
+       L2-NT                    1    1.000        0.000       0.000      0.0
+       L2-OT                   15    0.667        0.067       0.267      0.0
+       L3-BO                   15    1.000        0.000       0.000      0.0
+       L3-CRP                  19    0.211        0.684       0.105      0.0
+       L3-CRS                  15    0.533        0.467       0.000      0.0
+       L3-HO                   15    0.600        0.133       0.267      0.0
+       L3-NT                    1    1.000        0.000       0.000      0.0
+       L3-OT                   15    0.400        0.333       0.267      0.0
+
+-- by variant (safety off)
+                  n  success  coll_target  coll_other  timeout
+source variant                                                
+frozen CV       384    0.711        0.188       0.102      0.0
+       NC        66    0.970        0.000       0.030      0.0
+       RE       311    0.801        0.055       0.145      0.0
+paper2            3    1.000        0.000       0.000      0.0
+       FIX      122    0.492        0.221       0.287      0.0
+       VAR      114    0.474        0.272       0.254      0.0
+

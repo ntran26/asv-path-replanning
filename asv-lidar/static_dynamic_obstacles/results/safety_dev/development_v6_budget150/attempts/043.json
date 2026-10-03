@@ -1,0 +1,11 @@
+{
+  "tag": "legacy_test_verification",
+  "category": "verification",
+  "test_id": "tests/test_safety_v3.py::test_v3_filter_is_selected_and_hands_back_only_with_steerage",
+  "test_source_sha256": "0368e3f40ae6285c6124f933668ac71a0ec45206cd30e03ea2e11233e8d8bf10",
+  "status": "passed",
+  "suite": "legacy_L1_no_target",
+  "mode": "v3",
+  "reservation_timing": "Retrospective conservative charge: executed by expanded pytest before noticing existing tests simulate episodes.",
+  "attempt": 43
+}

@@ -25,7 +25,12 @@ class _WithoutFreshReturns:
         self.gated_ranges = np.full_like(np.asarray(env.lidar.ranges, dtype=float), cfg.LIDAR_RANGE)
 
     def __getattr__(self, name):
-        return getattr(self._env, name)
+        # Guard: during deepcopy/unpickling the delegate is not set yet, and an
+        # unguarded lookup recursed forever (2026-10-03, trigger counterfactuals).
+        delegate = self.__dict__.get("_env")
+        if delegate is None:
+            raise AttributeError(name)
+        return getattr(delegate, name)
 
 
 class SafetyPerception(cc.Perception):

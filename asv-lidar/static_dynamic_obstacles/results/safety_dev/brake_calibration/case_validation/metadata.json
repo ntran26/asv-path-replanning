@@ -1,0 +1,56 @@
+{
+  "utc": "2026-10-02T14:58:37.423027+00:00",
+  "episodes_run": 0,
+  "measured_only_fit": true,
+  "truth_scoring_only": true,
+  "excluded_fit_cases": [
+    "DV3-CRP-VS-04",
+    "DV3-CRS-CV-04"
+  ],
+  "sensor_sigma": [
+    0.05,
+    0.05,
+    0.017453292519943295
+  ],
+  "pulses": 62,
+  "fit_pulses": 53,
+  "fit_cases": [
+    "DV3-BO-CV-04",
+    "DV3-CRP-VS-02",
+    "DV3-CRP-VS-05",
+    "DV3-CRS-CV-06",
+    "DV3-CRS-CV-10",
+    "DV3-CRS-CV-11",
+    "DV3-CRS-CV-19",
+    "DV3-HO-CV-03",
+    "DV3-HO-CV-04",
+    "DV3-HO-VS-01",
+    "DV3-OT-CV-03",
+    "DV3-OT-CV-09",
+    "DV3-OT-CV-16"
+  ],
+  "pulse_decision_counts": {
+    "1": 48,
+    "2": 4,
+    "3": 1
+  },
+  "source_sha256": {
+    "results\\safety_dev\\v4_selected_contacts_steps.csv": "d4a05255da4c8de7588491de10642f15a37e6e361855e5731e71f36e95916cbb",
+    "results\\safety_dev\\wall_oracle_state_steps.csv": "fc66d393c0e81e9395b883f227d64e868067abc660151c11503b9abee766c6b1"
+  },
+  "model_sha256": {
+    "tools\\diagnostics\\safety\\brake_calibration.py": "d62d0503c360eacbc1508bdfb4cf91dfd42d89a05ca8165cc9c9afb448ebddaa",
+    "src\\classical\\common.py": "456f39769ffa237f826eff8f9852a6d0823a2f975f85d2345ba7b42105e0977d",
+    "bluefin\\dynamics.py": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711",
+    "src\\constants.py": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f"
+  },
+  "dropped": [
+    {
+      "source": "wall_oracle_state_steps.csv",
+      "case": "DV3-BO-CV-17",
+      "step": 38,
+      "reason": "no recorded successor measurement"
+    }
+  ],
+  "citation": "Ljung (2002), Prediction Error Estimation Methods, Section 1; DOI 10.1007/BF01211648"
+}

@@ -1,0 +1,67 @@
+{
+  "kind": "verification_runs",
+  "records": [
+    {
+      "tag": "legacy_test_verification",
+      "category": "verification",
+      "test_id": "tests/test_safety_v2.py::test_filter_steers_off_an_obstacle_dead_ahead_and_leaves_open_water_alone",
+      "test_source_sha256": "8baedeeb199c278b810b7b5768733a635dea16fd399af25c2c6785cf20ff50b1",
+      "status": "passed",
+      "suite": "legacy_L1_no_target",
+      "mode": "v2",
+      "reservation_timing": "Retrospective conservative charge: executed by expanded pytest before noticing existing tests simulate episodes.",
+      "attempt": 39
+    },
+    {
+      "tag": "legacy_test_verification",
+      "category": "verification",
+      "test_id": "tests/test_safety_v2.py::test_filter_is_off_with_the_safety_layer_off",
+      "test_source_sha256": "8baedeeb199c278b810b7b5768733a635dea16fd399af25c2c6785cf20ff50b1",
+      "status": "passed",
+      "suite": "legacy_L1_no_target",
+      "mode": "off",
+      "reservation_timing": "Retrospective conservative charge: executed by expanded pytest before noticing existing tests simulate episodes.",
+      "attempt": 40
+    },
+    {
+      "tag": "legacy_test_verification",
+      "category": "verification",
+      "test_id": "tests/test_safety_v3.py::test_filter_steers_off_an_obstacle_dead_ahead_and_leaves_open_water_alone",
+      "test_source_sha256": "0368e3f40ae6285c6124f933668ac71a0ec45206cd30e03ea2e11233e8d8bf10",
+      "status": "failed",
+      "suite": "legacy_L1_no_target",
+      "mode": "v3",
+      "reservation_timing": "Retrospective conservative charge: executed by expanded pytest before noticing existing tests simulate episodes.",
+      "attempt": 41
+    },
+    {
+      "tag": "legacy_test_verification",
+      "category": "verification",
+      "test_id": "tests/test_safety_v3.py::test_filter_is_off_with_the_safety_layer_off",
+      "test_source_sha256": "0368e3f40ae6285c6124f933668ac71a0ec45206cd30e03ea2e11233e8d8bf10",
+      "status": "passed",
+      "suite": "legacy_L1_no_target",
+      "mode": "off",
+      "reservation_timing": "Retrospective conservative charge: executed by expanded pytest before noticing existing tests simulate episodes.",
+      "attempt": 42
+    },
+    {
+      "tag": "legacy_test_verification",
+      "category": "verification",
+      "test_id": "tests/test_safety_v3.py::test_v3_filter_is_selected_and_hands_back_only_with_steerage",
+      "test_source_sha256": "0368e3f40ae6285c6124f933668ac71a0ec45206cd30e03ea2e11233e8d8bf10",
+      "status": "passed",
+      "suite": "legacy_L1_no_target",
+      "mode": "v3",
+      "reservation_timing": "Retrospective conservative charge: executed by expanded pytest before noticing existing tests simulate episodes.",
+      "attempt": 43
+    }
+  ],
+  "pytest_result": {
+    "passed": 208,
+    "failed": 1,
+    "seconds": 43.81
+  },
+  "failure": "Unmodified SafetyFilterV3 collided in existing dead-ahead constant-command test. V6 is not constructed by this test; no legacy source or thresholds changed to fix it.",
+  "accounting": "These five legacy test simulations count toward the new150 cap, but are not SAC/DV3 evaluations and carry no inferred goal outcomes."
+}

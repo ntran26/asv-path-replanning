@@ -1,0 +1,56 @@
+{
+  "scope": "Offline body-velocity prediction-error calibration from existing DV3 development logs only; zero policy episodes and no held-out frozen/field outcomes used.",
+  "recommended_effective_model": {
+    "recorded_rpm": -24.0,
+    "extra_surge_deceleration_mps2": 0.4652061637624849,
+    "effective_delay_s": 0.0,
+    "first_decision_impulse_mps": 0.23260308188124246,
+    "implementation": "After the existing identified-model RK4 substep, subtract acceleration times substep duration from surge, clipped at zero. This is an effective approximation to the recorded response, not an estimate proving the physical delay is zero.",
+    "other_rpm_scaling": "Not identified: every recorded negative command was exactly -24 RPM."
+  },
+  "data": {
+    "training_complete_pulses": 53,
+    "training_cases": 13,
+    "training_pulse_decisions": {"1": 48, "2": 4, "3": 1},
+    "held_complete_pulses": 9,
+    "held_cases": ["DV3-CRP-VS-04", "DV3-CRS-CV-04"],
+    "terminal_pulse_excluded": "DV3-BO-CV-17 step 38 had no recorded successor measurement.",
+    "note": "The two input archives contain trajectories selected for past contact diagnostics, including oracle-state controller trajectories. Only raw onboard velocity measurements and issued commands enter fitting. Oracle/body truth fields enter scoring only. These data are not a representative survey of all development operating states."
+  },
+  "method": {
+    "reference": "Ljung, Prediction Error Estimation Methods, Circuits Systems and Signal Processing 21, 11-21 (2002), Section 1",
+    "doi": "https://doi.org/10.1007/BF01211648",
+    "author_preprint": "https://liu.diva-portal.org/smash/get/diva2%3A316694/FULLTEXT01.pdf",
+    "adaptation": "Batch nonlinear grey-box prediction-error fit with the existing identified forward model held fixed. The sole shared fit parameter is constant additional surge deceleration at -24 RPM. Noise-penalized latent initial u/v/r are nuisance variables for training pulses only; held predictions always begin from raw measurements.",
+    "measurement_sigma": {"u_mps": 0.05, "v_mps": 0.05, "r_degps": 1.0},
+    "actuator_history": "Reconstructed pre-command rudder buffer and servo state from all logged issued rudders starting at decision zero; no true actuator state supplied.",
+    "pose": "Dummy global pose; body equations do not depend on global pose, avoiding true pose as a fitting input.",
+    "physical_clipping": "Surge is clipped at zero inside prediction; negative noisy measurements remain residual targets."
+  },
+  "sensitivity": {
+    "raw_initial_fit_mps2": 0.48737856528001505,
+    "latent_initial_fit_mps2": 0.4652061637624849,
+    "latent_whole_case_deletion_range_mps2": [0.460084, 0.482863],
+    "raw_whole_case_deletion_range_mps2": [0.481310, 0.498736],
+    "delay_profile": "Noise-penalized weighted SSE is 176.89 at delay 0 and 178.67 at 0.125s; corresponding first-decision impulses are 0.23260 and 0.22443m/s. Data support substantial response inside the first decision, but do not resolve zero versus 0.125s physical onset. Delays of 0.5/0.75s have SSE about 543 despite optimizing strength and initial states.",
+    "interpretation": "Case-deletion ranges are empirical parameter sensitivity, not confidence intervals or guaranteed uncertainty bounds. Correlated model error and pulse selection limit inference."
+  },
+  "scoring": {
+    "held_two_case_surge_mae_existing_mps": 0.208909,
+    "held_two_case_surge_mae_fitted_mps": 0.024333,
+    "held_two_case_yaw_mae_existing_degps": 1.187948,
+    "held_two_case_yaw_mae_fitted_degps": 1.041396,
+    "whole_case_cv_surge_mae_fitted_mps": 0.018433,
+    "selected_v4_CR_P_VS_04_surge_mae_existing_fitted_mps": [0.212269, 0.014204],
+    "selected_v4_CR_S_CV_04_surge_mae_existing_fitted_mps": [0.263133, 0.035292],
+    "note": "Velocity errors are scored against truth only after fitting. Cases used for fitting are also reported descriptively, and separate leave-one-case-out scores are supplied. Yaw improvement is mixed by individual held trajectory."
+  },
+  "limitations": [
+    "This identifies effective short-pulse response, with at most three consecutive decisions observed in training; long braking horizons are extrapolation.",
+    "No unseen RPM, sea condition, propulsion variation, or real-vessel response has been identified.",
+    "The model still relies on the existing identified sway/yaw dynamics and imperfect state estimates.",
+    "Neither better prediction error nor an empirical parameter envelope establishes collision avoidance or recursive feasibility.",
+    "No success-rate claim follows from these offline measurements; the parent agent must evaluate any new filter separately."
+  ],
+  "verification": "10 tests passed: fractional onset duration, carried pulse age, nonnegative physical surge with noisy negative targets, immutable inputs, truth-independent fitting, and legacy onset timing."
+}

@@ -1,0 +1,42 @@
+{
+ "version": "2.0",
+ "base": "1.0",
+ "base_digest": "8051b61135d6a9746addc752177628a2a4823874766dbeeb3a895101b7577a61",
+ "episodes": 1000,
+ "distinct_scenarios": 1103,
+ "removed_near_duplicates": 103,
+ "start_in_contact": [
+  "P2-L1-BO-FIX-05",
+  "P2-L1-BO-FIX-07",
+  "P2-L1-BO-FIX-09",
+  "P2-L1-BO-FIX-11",
+  "P2-L1-BO-FIX-13",
+  "P2-L1-BO-FIX-15",
+  "P2-L1-BO-FIX-17",
+  "P2-L1-BO-FIX-19",
+  "P2-L1-BO-VAR-02",
+  "P2-L1-BO-VAR-06",
+  "P2-L1-BO-VAR-10",
+  "P2-L1-BO-VAR-14",
+  "P2-L1-BO-VAR-16",
+  "P2-L1-BO-VAR-18",
+  "P2-L1-BO-VAR-20"
+ ],
+ "replaced_by_cell": {
+  "L1-BO": 15
+ },
+ "regenerated": [
+  {
+   "cell": "L1-BO",
+   "pairs": 20,
+   "seeds_tried": 89,
+   "replaced": 15,
+   "kept": 15,
+   "fix": {
+    "own_start_s": 8.0
+   }
+  }
+ ],
+ "start_gap_m": 0.3,
+ "manifest_digest": "6df8076223414a88ee37a130c2261c7e26b45efba621f34fe024d4065c2cea8c"
+}

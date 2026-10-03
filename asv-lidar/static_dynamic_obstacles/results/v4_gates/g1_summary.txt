@@ -1,0 +1,40 @@
+G1 reward ordering: 40 conflict scenarios x 5 behaviours x fix off/on
+
+-- success by behaviour and group (fix on; outcomes are the same with fix off for scripted runs)
+behaviour   colregs_vo  compliant  los_dwa  slow  wrong_way
+group                                                      
+CRP any           0.50       0.00     0.38  0.12       0.38
+CRS any           0.25       0.12     0.50  0.12       0.00
+HO near-L2        0.25       0.00     0.42  0.08       0.00
+HO other          0.83       0.00     1.00  0.17       0.00
+OT near-L1        0.17       0.00     0.50  0.17       0.17
+
+-- mean discounted return from engagement (gamma 0.951)
+behaviour         colregs_vo  compliant  los_dwa   slow  wrong_way
+fix   group                                                       
+False CRP any          -98.6     -140.1   -104.0 -117.7      -91.7
+      CRS any         -138.8     -126.4   -113.6 -127.9     -184.5
+      HO near-L2       -92.9     -109.2   -102.3  -97.7     -168.2
+      HO other         -64.3     -130.5    -36.6  -92.4     -159.1
+      OT near-L1       -76.9     -107.7    -65.1 -124.2     -114.3
+True  CRP any          -98.6     -140.3   -103.9 -117.2      -91.7
+      CRS any         -138.7     -126.3   -113.5 -127.3     -184.4
+      HO near-L2       -93.0     -109.4   -102.2  -97.4     -168.2
+      HO other         -64.3     -130.5    -36.6  -92.2     -159.0
+      OT near-L1       -69.6     -103.9    -59.6 -115.6     -108.2
+
+fix off (v3): best-return behaviour is safe in 92% of 26 script-solvable scenarios (14 solved by no script)
+   by group: CRP any 100%, CRS any 80%, HO near-L2 100%, HO other 100%, OT near-L1 75%
+   best behaviour counts: {'colregs_vo': 11, 'los_dwa': 10, 'slow': 3, 'wrong_way': 1, 'compliant': 1}
+fix ON (v4): best-return behaviour is safe in 88% of 26 script-solvable scenarios (14 solved by no script)
+   by group: CRP any 100%, CRS any 80%, HO near-L2 100%, HO other 100%, OT near-L1 50%
+   best behaviour counts: {'colregs_vo': 11, 'los_dwa': 10, 'slow': 3, 'wrong_way': 1, 'compliant': 1}
+
+G1 FAIL (threshold 90 % under fix 1)
+
+-- the same ordering at other discounts (fix on)
+   gamma 0.951: best-return behaviour safe in 88% of 26
+   gamma 0.97: best-return behaviour safe in 96% of 26
+   gamma 0.98: best-return behaviour safe in 100% of 26
+   gamma 0.99: best-return behaviour safe in 100% of 26
+(1939 s)

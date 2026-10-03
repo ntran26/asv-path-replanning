@@ -1,0 +1,86 @@
+{
+ "v4": {
+  "q": {
+   "threshold": -2.393351154327392,
+   "fit": {
+    "gained": 36,
+    "broken": 9,
+    "acted": 128,
+    "n": 178
+   },
+   "val": {
+    "gained": 31,
+    "broken": 9,
+    "acted": 121,
+    "n": 159
+   },
+   "val_always_on": {
+    "gained": 31,
+    "broken": 13,
+    "acted": 159
+   }
+  },
+  "q_trend": {
+   "threshold": 6.068138003349304,
+   "fit": {
+    "gained": 37,
+    "broken": 10,
+    "acted": 177,
+    "n": 178
+   },
+   "val": {
+    "gained": 31,
+    "broken": 13,
+    "acted": 159,
+    "n": 159
+   },
+   "val_always_on": {
+    "gained": 31,
+    "broken": 13,
+    "acted": 159
+   }
+  }
+ },
+ "v7": {
+  "q": {
+   "threshold": -1.9982228469848633,
+   "fit": {
+    "gained": 43,
+    "broken": 3,
+    "acted": 127,
+    "n": 163
+   },
+   "val": {
+    "gained": 33,
+    "broken": 6,
+    "acted": 126,
+    "n": 148
+   },
+   "val_always_on": {
+    "gained": 34,
+    "broken": 8,
+    "acted": 148
+   }
+  },
+  "q_trend": {
+   "threshold": 6.068138003349304,
+   "fit": {
+    "gained": 45,
+    "broken": 5,
+    "acted": 162,
+    "n": 163
+   },
+   "val": {
+    "gained": 34,
+    "broken": 8,
+    "acted": 148,
+    "n": 148
+   },
+   "val_always_on": {
+    "gained": 34,
+    "broken": 8,
+    "acted": 148
+   }
+  }
+ }
+}

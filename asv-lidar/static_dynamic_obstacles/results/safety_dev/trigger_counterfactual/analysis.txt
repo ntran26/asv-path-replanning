@@ -1,0 +1,33 @@
+Trigger counterfactuals: 429 episodes (262 policy-alone goals), 819 branches
+
+-- all
+   v4: {"episodes": 429, "policy_fail": 167, "fires_any": 337, "precision": 0.436, "recall": 0.88, "false_alarm_rate": 0.725, "first_fire_branches": 337, "helpful": 68, "harmful": 23, "net_always_on": 45, "net_oracle": 68}
+   v7: {"episodes": 429, "policy_fail": 167, "fires_any": 311, "precision": 0.489, "recall": 0.91, "false_alarm_rate": 0.607, "first_fire_branches": 311, "helpful": 79, "harmful": 13, "net_always_on": 66, "net_oracle": 79}
+-- dv3
+   v4: {"episodes": 150, "policy_fail": 39, "fires_any": 129, "precision": 0.271, "recall": 0.897, "false_alarm_rate": 0.847, "first_fire_branches": 129, "helpful": 19, "harmful": 7, "net_always_on": 12, "net_oracle": 19}
+   v7: {"episodes": 150, "policy_fail": 39, "fires_any": 110, "precision": 0.318, "recall": 0.897, "false_alarm_rate": 0.676, "first_fire_branches": 110, "helpful": 21, "harmful": 4, "net_always_on": 17, "net_oracle": 21}
+-- ts2_failures
+   v4: {"episodes": 128, "policy_fail": 128, "fires_any": 112, "precision": 1.0, "recall": 0.875, "false_alarm_rate": NaN, "first_fire_branches": 112, "helpful": 49, "harmful": 0, "net_always_on": 49, "net_oracle": 49}
+   v7: {"episodes": 128, "policy_fail": 128, "fires_any": 117, "precision": 1.0, "recall": 0.914, "false_alarm_rate": NaN, "first_fire_branches": 117, "helpful": 58, "harmful": 0, "net_always_on": 58, "net_oracle": 58}
+-- ts2_successful_controls
+   v4: {"episodes": 151, "policy_fail": 0, "fires_any": 96, "precision": 0.0, "recall": NaN, "false_alarm_rate": 0.636, "first_fire_branches": 96, "helpful": 0, "harmful": 16, "net_always_on": -16, "net_oracle": 0}
+   v7: {"episodes": 151, "policy_fail": 0, "fires_any": 84, "precision": 0.0, "recall": NaN, "false_alarm_rate": 0.556, "first_fire_branches": 84, "helpful": 0, "harmful": 9, "net_always_on": -9, "net_oracle": 0}
+
+-- v4: first-fire features (median), policy-alone fails vs succeeds
+                 q  q_trend  log_std  speed  policy_margin  best_margin
+policy_goal                                                            
+False       -4.586   -0.691   -0.951   0.60          0.100         0.41
+True        -3.017    0.000   -0.949   0.69          0.095         0.38
+
+   gate on q < -2.393: validation gained 31, broken 9 (acts on 121 of 159); always-on on the same half: gained 31, broken 13
+   gate on q_trend < 6.068: validation gained 31, broken 13 (acts on 159 of 159); always-on on the same half: gained 31, broken 13
+
+-- v7: first-fire features (median), policy-alone fails vs succeeds
+                 q  q_trend  log_std  speed  policy_margin  best_margin
+policy_goal                                                            
+False       -5.237   -0.754   -0.931  0.619           0.05         0.24
+True        -2.910    0.153   -0.908  0.746           0.05         0.25
+
+   gate on q < -1.998: validation gained 33, broken 6 (acts on 126 of 148); always-on on the same half: gained 34, broken 8
+   gate on q_trend < 6.068: validation gained 34, broken 8 (acts on 148 of 148); always-on on the same half: gained 34, broken 8
+

@@ -1,0 +1,10 @@
+{
+  "tag": "broad_v6_50",
+  "mode": "v6",
+  "suite": "dev_field",
+  "case": "DV3-CRS-VS-06",
+  "seed": 900217,
+  "scenario_sha256": "03745828f4400936dcfed31a850c122a61d6d536e7ae86a4669f1f7b8d4a3c62",
+  "run_manifest_sha256": "5f86f112a75955dfa31683c2f648ed158624978797970392eb4b4d334a8f0966",
+  "attempt": 121
+}

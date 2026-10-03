@@ -1,0 +1,486 @@
+{
+  "paired": 735,
+  "off": {
+    "goal": 684,
+    "collision:target": 32,
+    "collision:obstacle": 14,
+    "collision:boundary": 5
+  },
+  "v4": {
+    "goal": 680,
+    "collision:target": 34,
+    "collision:obstacle": 10,
+    "collision:boundary": 11
+  },
+  "off_contacts": 51,
+  "v4_contacts": 55,
+  "transitions": {
+    "preserved_goal": 661,
+    "both_failed": 32,
+    "lost_goal": 23,
+    "rescue": 19
+  },
+  "interventions_by_transition": {
+    "preserved_goal": {
+      "episodes": 661,
+      "episodes_with_recorded_intervention": 262,
+      "recorded_intervention_steps": 1736,
+      "recorded_brake_steps": 176
+    },
+    "lost_goal": {
+      "episodes": 23,
+      "episodes_with_recorded_intervention": 23,
+      "recorded_intervention_steps": 298,
+      "recorded_brake_steps": 99
+    },
+    "rescue": {
+      "episodes": 19,
+      "episodes_with_recorded_intervention": 19,
+      "recorded_intervention_steps": 367,
+      "recorded_brake_steps": 51
+    },
+    "both_failed": {
+      "episodes": 32,
+      "episodes_with_recorded_intervention": 22,
+      "recorded_intervention_steps": 324,
+      "recorded_brake_steps": 55
+    }
+  },
+  "dataset_episodes": 1000,
+  "dataset_sources": {
+    "frozen": 761,
+    "paper2": 239
+  },
+  "coverage": {
+    "paired": 735,
+    "v4_only": 1,
+    "off_only": 25,
+    "unrecorded": 239
+  },
+  "coverage_by_source": {
+    "frozen": {
+      "paired": 735,
+      "v4_only": 1,
+      "off_only": 25
+    },
+    "paper2": {
+      "unrecorded": 239
+    }
+  },
+  "excluded_records": {
+    "not_in_current_v2": 1851
+  },
+  "saved_v2_off_outcome_crosscheck": {
+    "compared": 760,
+    "disagreements": []
+  },
+  "v1_to_v2": {
+    "removed_ids": [
+      "P2-L1-BO-FIX-05",
+      "P2-L1-BO-FIX-07",
+      "P2-L1-BO-FIX-09",
+      "P2-L1-BO-FIX-11",
+      "P2-L1-BO-FIX-13",
+      "P2-L1-BO-FIX-15",
+      "P2-L1-BO-FIX-17",
+      "P2-L1-BO-FIX-19",
+      "P2-L1-BO-VAR-02",
+      "P2-L1-BO-VAR-06",
+      "P2-L1-BO-VAR-10",
+      "P2-L1-BO-VAR-14",
+      "P2-L1-BO-VAR-16",
+      "P2-L1-BO-VAR-18",
+      "P2-L1-BO-VAR-20"
+    ],
+    "added_ids": [
+      "P2v2-L1-BO-FIX-05",
+      "P2v2-L1-BO-FIX-07",
+      "P2v2-L1-BO-FIX-09",
+      "P2v2-L1-BO-FIX-11",
+      "P2v2-L1-BO-FIX-13",
+      "P2v2-L1-BO-FIX-17",
+      "P2v2-L1-BO-FIX-19",
+      "P2v2-L1-BO-VAR-04",
+      "P2v2-L1-BO-VAR-06",
+      "P2v2-L1-BO-VAR-08",
+      "P2v2-L1-BO-VAR-10",
+      "P2v2-L1-BO-VAR-12",
+      "P2v2-L1-BO-VAR-16",
+      "P2v2-L1-BO-VAR-18",
+      "P2v2-L1-BO-VAR-20"
+    ],
+    "shared_ids_with_changed_scene_or_seed": []
+  },
+  "by_cell": {
+    "basin-being_overtaken": {
+      "paired": 95,
+      "off": {
+        "goal": 90,
+        "collision:target": 2,
+        "collision:obstacle": 2,
+        "collision:boundary": 1
+      },
+      "v4": {
+        "goal": 88,
+        "collision:boundary": 3,
+        "collision:obstacle": 3,
+        "collision:target": 1
+      },
+      "off_contacts": 5,
+      "v4_contacts": 7,
+      "transitions": {
+        "preserved_goal": 86,
+        "lost_goal": 4,
+        "both_failed": 3,
+        "rescue": 2
+      },
+      "interventions_by_transition": {
+        "preserved_goal": {
+          "episodes": 86,
+          "episodes_with_recorded_intervention": 41,
+          "recorded_intervention_steps": 199,
+          "recorded_brake_steps": 8
+        },
+        "lost_goal": {
+          "episodes": 4,
+          "episodes_with_recorded_intervention": 4,
+          "recorded_intervention_steps": 123,
+          "recorded_brake_steps": 21
+        },
+        "rescue": {
+          "episodes": 2,
+          "episodes_with_recorded_intervention": 2,
+          "recorded_intervention_steps": 9,
+          "recorded_brake_steps": 3
+        },
+        "both_failed": {
+          "episodes": 3,
+          "episodes_with_recorded_intervention": 3,
+          "recorded_intervention_steps": 68,
+          "recorded_brake_steps": 6
+        }
+      }
+    },
+    "basin-crossing": {
+      "paired": 100,
+      "off": {
+        "goal": 84,
+        "collision:target": 14,
+        "collision:obstacle": 2
+      },
+      "v4": {
+        "collision:target": 15,
+        "goal": 83,
+        "collision:obstacle": 1,
+        "collision:boundary": 1
+      },
+      "off_contacts": 16,
+      "v4_contacts": 17,
+      "transitions": {
+        "lost_goal": 7,
+        "preserved_goal": 77,
+        "rescue": 6,
+        "both_failed": 10
+      },
+      "interventions_by_transition": {
+        "preserved_goal": {
+          "episodes": 77,
+          "episodes_with_recorded_intervention": 42,
+          "recorded_intervention_steps": 355,
+          "recorded_brake_steps": 50
+        },
+        "lost_goal": {
+          "episodes": 7,
+          "episodes_with_recorded_intervention": 7,
+          "recorded_intervention_steps": 53,
+          "recorded_brake_steps": 15
+        },
+        "rescue": {
+          "episodes": 6,
+          "episodes_with_recorded_intervention": 6,
+          "recorded_intervention_steps": 183,
+          "recorded_brake_steps": 22
+        },
+        "both_failed": {
+          "episodes": 10,
+          "episodes_with_recorded_intervention": 3,
+          "recorded_intervention_steps": 40,
+          "recorded_brake_steps": 5
+        }
+      }
+    },
+    "basin-head_on": {
+      "paired": 100,
+      "off": {
+        "goal": 92,
+        "collision:target": 5,
+        "collision:obstacle": 2,
+        "collision:boundary": 1
+      },
+      "v4": {
+        "goal": 89,
+        "collision:target": 9,
+        "collision:obstacle": 1,
+        "collision:boundary": 1
+      },
+      "off_contacts": 8,
+      "v4_contacts": 11,
+      "transitions": {
+        "preserved_goal": 87,
+        "both_failed": 6,
+        "lost_goal": 5,
+        "rescue": 2
+      },
+      "interventions_by_transition": {
+        "preserved_goal": {
+          "episodes": 87,
+          "episodes_with_recorded_intervention": 22,
+          "recorded_intervention_steps": 86,
+          "recorded_brake_steps": 6
+        },
+        "lost_goal": {
+          "episodes": 5,
+          "episodes_with_recorded_intervention": 5,
+          "recorded_intervention_steps": 23,
+          "recorded_brake_steps": 23
+        },
+        "rescue": {
+          "episodes": 2,
+          "episodes_with_recorded_intervention": 2,
+          "recorded_intervention_steps": 17,
+          "recorded_brake_steps": 2
+        },
+        "both_failed": {
+          "episodes": 6,
+          "episodes_with_recorded_intervention": 5,
+          "recorded_intervention_steps": 21,
+          "recorded_brake_steps": 7
+        }
+      }
+    },
+    "basin-null": {
+      "paired": 75,
+      "off": {
+        "goal": 72,
+        "collision:boundary": 3
+      },
+      "v4": {
+        "goal": 71,
+        "collision:boundary": 4
+      },
+      "off_contacts": 3,
+      "v4_contacts": 4,
+      "transitions": {
+        "preserved_goal": 71,
+        "both_failed": 3,
+        "lost_goal": 1
+      },
+      "interventions_by_transition": {
+        "preserved_goal": {
+          "episodes": 71,
+          "episodes_with_recorded_intervention": 19,
+          "recorded_intervention_steps": 67,
+          "recorded_brake_steps": 0
+        },
+        "lost_goal": {
+          "episodes": 1,
+          "episodes_with_recorded_intervention": 1,
+          "recorded_intervention_steps": 8,
+          "recorded_brake_steps": 0
+        },
+        "rescue": {
+          "episodes": 0,
+          "episodes_with_recorded_intervention": 0,
+          "recorded_intervention_steps": 0,
+          "recorded_brake_steps": 0
+        },
+        "both_failed": {
+          "episodes": 3,
+          "episodes_with_recorded_intervention": 3,
+          "recorded_intervention_steps": 26,
+          "recorded_brake_steps": 3
+        }
+      }
+    },
+    "basin-overtaking": {
+      "paired": 100,
+      "off": {
+        "goal": 97,
+        "collision:target": 2,
+        "collision:obstacle": 1
+      },
+      "v4": {
+        "goal": 98,
+        "collision:boundary": 2
+      },
+      "off_contacts": 3,
+      "v4_contacts": 2,
+      "transitions": {
+        "preserved_goal": 96,
+        "rescue": 2,
+        "both_failed": 1,
+        "lost_goal": 1
+      },
+      "interventions_by_transition": {
+        "preserved_goal": {
+          "episodes": 96,
+          "episodes_with_recorded_intervention": 33,
+          "recorded_intervention_steps": 215,
+          "recorded_brake_steps": 4
+        },
+        "lost_goal": {
+          "episodes": 1,
+          "episodes_with_recorded_intervention": 1,
+          "recorded_intervention_steps": 12,
+          "recorded_brake_steps": 6
+        },
+        "rescue": {
+          "episodes": 2,
+          "episodes_with_recorded_intervention": 2,
+          "recorded_intervention_steps": 29,
+          "recorded_brake_steps": 5
+        },
+        "both_failed": {
+          "episodes": 1,
+          "episodes_with_recorded_intervention": 1,
+          "recorded_intervention_steps": 22,
+          "recorded_brake_steps": 9
+        }
+      }
+    },
+    "channel-crossing": {
+      "paired": 99,
+      "off": {
+        "goal": 87,
+        "collision:obstacle": 5,
+        "collision:target": 7
+      },
+      "v4": {
+        "goal": 90,
+        "collision:obstacle": 4,
+        "collision:target": 5
+      },
+      "off_contacts": 12,
+      "v4_contacts": 9,
+      "transitions": {
+        "preserved_goal": 84,
+        "both_failed": 6,
+        "lost_goal": 3,
+        "rescue": 6
+      },
+      "interventions_by_transition": {
+        "preserved_goal": {
+          "episodes": 84,
+          "episodes_with_recorded_intervention": 43,
+          "recorded_intervention_steps": 388,
+          "recorded_brake_steps": 68
+        },
+        "lost_goal": {
+          "episodes": 3,
+          "episodes_with_recorded_intervention": 3,
+          "recorded_intervention_steps": 67,
+          "recorded_brake_steps": 24
+        },
+        "rescue": {
+          "episodes": 6,
+          "episodes_with_recorded_intervention": 6,
+          "recorded_intervention_steps": 105,
+          "recorded_brake_steps": 15
+        },
+        "both_failed": {
+          "episodes": 6,
+          "episodes_with_recorded_intervention": 5,
+          "recorded_intervention_steps": 118,
+          "recorded_brake_steps": 22
+        }
+      }
+    },
+    "channel-head_on": {
+      "paired": 98,
+      "off": {
+        "goal": 94,
+        "collision:obstacle": 2,
+        "collision:target": 2
+      },
+      "v4": {
+        "goal": 93,
+        "collision:target": 4,
+        "collision:obstacle": 1
+      },
+      "off_contacts": 4,
+      "v4_contacts": 5,
+      "transitions": {
+        "preserved_goal": 92,
+        "rescue": 1,
+        "both_failed": 3,
+        "lost_goal": 2
+      },
+      "interventions_by_transition": {
+        "preserved_goal": {
+          "episodes": 92,
+          "episodes_with_recorded_intervention": 29,
+          "recorded_intervention_steps": 232,
+          "recorded_brake_steps": 28
+        },
+        "lost_goal": {
+          "episodes": 2,
+          "episodes_with_recorded_intervention": 2,
+          "recorded_intervention_steps": 12,
+          "recorded_brake_steps": 10
+        },
+        "rescue": {
+          "episodes": 1,
+          "episodes_with_recorded_intervention": 1,
+          "recorded_intervention_steps": 24,
+          "recorded_brake_steps": 4
+        },
+        "both_failed": {
+          "episodes": 3,
+          "episodes_with_recorded_intervention": 2,
+          "recorded_intervention_steps": 29,
+          "recorded_brake_steps": 3
+        }
+      }
+    },
+    "channel-overtaking": {
+      "paired": 68,
+      "off": {
+        "goal": 68
+      },
+      "v4": {
+        "goal": 68
+      },
+      "off_contacts": 0,
+      "v4_contacts": 0,
+      "transitions": {
+        "preserved_goal": 68
+      },
+      "interventions_by_transition": {
+        "preserved_goal": {
+          "episodes": 68,
+          "episodes_with_recorded_intervention": 33,
+          "recorded_intervention_steps": 194,
+          "recorded_brake_steps": 12
+        },
+        "lost_goal": {
+          "episodes": 0,
+          "episodes_with_recorded_intervention": 0,
+          "recorded_intervention_steps": 0,
+          "recorded_brake_steps": 0
+        },
+        "rescue": {
+          "episodes": 0,
+          "episodes_with_recorded_intervention": 0,
+          "recorded_intervention_steps": 0,
+          "recorded_brake_steps": 0
+        },
+        "both_failed": {
+          "episodes": 0,
+          "episodes_with_recorded_intervention": 0,
+          "recorded_intervention_steps": 0,
+          "recorded_brake_steps": 0
+        }
+      }
+    }
+  }
+}

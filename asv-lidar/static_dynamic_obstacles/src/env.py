@@ -374,6 +374,18 @@ class ASVLidarEnv(gym.Env):
             self.obstacles = [[tuple(map(float, p)) for p in poly]
                               for poly in options["obstacles"]]
         self._apply_initial_conditions(options)
+        if (handback is None and options.get("generated") is None and options.get("scenario") is None
+                and self._stage_param("start_clear", False) and not self._start_is_clear()):
+            # baseline-v4 item D: a training draw whose own hull starts in contact with, or
+            # within START_CLEAR_M of, a panel is redrawn (about 1 in 200 stage-7 draws did --
+            # basin being-overtaken starts 6.9 m along the leg, on a panel in L1-like layouts).
+            self.start_redraws = getattr(self, "start_redraws", 0) + 1
+            if getattr(self, "_start_redraw_depth", 0) < 20:
+                self._start_redraw_depth = getattr(self, "_start_redraw_depth", 0) + 1
+                try:
+                    return self.reset(options=options)
+                finally:
+                    self._start_redraw_depth -= 1
         self.asv_path = [(self.asv_x, self.asv_y)]
         self.distance_to_goal = float(np.hypot(self.asv_x - self.goal_x,
                                                self.asv_y - self.goal_y))
@@ -565,6 +577,20 @@ class ASVLidarEnv(gym.Env):
         self.u_body, self.v_body = u, v
         s = self.model._s
         s[0, 0], s[1, 0], s[2, 0], s[3, 0], s[4, 0] = u, v, math.radians(r), math.radians(h), servo
+
+    START_CLEAR_M = 0.30
+
+    def _start_is_clear(self) -> bool:
+        """The own hull at its start: no contact, and START_CLEAR_M from every panel."""
+        hull = self.hull_polygon()
+        if self.collision_kind(hull) is not None:
+            return False
+        if not self.obstacles:
+            return True
+        import paper2_set as p2
+        h = np.asarray(hull, dtype=float)
+        return all(p2.polygon_distance(h, np.asarray(poly, dtype=float)) >= self.START_CLEAR_M
+                   for poly in self.obstacles)
 
     def own_state(self) -> Tuple[float, ...]:
         return (float(self.asv_x), float(self.asv_y), float(self.asv_h), float(self.asv_w),
@@ -1215,7 +1241,16 @@ class ASVLidarEnv(gym.Env):
         self.safety_v2_changed = False
         if self.estop_enabled and getattr(cfg, "SAFETY_VERSION", 1) >= 2:
             if getattr(self, "_safety_v2", None) is None:
-                if getattr(cfg, "SAFETY_VERSION", 1) == 5:
+                if getattr(cfg, "SAFETY_VERSION", 1) == 8:      # v8: v7 without hold-back
+                    import safety_v8
+                    self._safety_v2 = safety_v8.SafetyFilterV8()
+                elif getattr(cfg, "SAFETY_VERSION", 1) == 7:
+                    import safety_v7
+                    self._safety_v2 = safety_v7.SafetyFilterV7()
+                elif getattr(cfg, "SAFETY_VERSION", 1) == 6:
+                    import safety_v6
+                    self._safety_v2 = safety_v6.SafetyFilterV6()
+                elif getattr(cfg, "SAFETY_VERSION", 1) == 5:
                     import safety_v5
                     self._safety_v2 = safety_v5.SafetyFilterV5()
                 elif getattr(cfg, "SAFETY_VERSION", 1) == 4:

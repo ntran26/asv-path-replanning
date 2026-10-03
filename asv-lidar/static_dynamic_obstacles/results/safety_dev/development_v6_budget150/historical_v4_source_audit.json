@@ -1,0 +1,155 @@
+{
+  "schema": "historical-v4-source-audit-v1",
+  "created_utc": "2026-10-02T15:34:25.726543+00:00",
+  "scope": "Read-only archive/source/git inspection, no policy episodes and no restored source.",
+  "reference_metadata": "results/safety_dev/dev_v4_observer_memory.json",
+  "reference_metadata_sha256": "68f882ecbc12f386caba1edeb26b5342dfc19dff0069eb1ceb3213aff8c98bab",
+  "comparison": [
+    {
+      "path": "src/env.py",
+      "historical_sha256": "60b0d47afda0e5ac2fd1f1d1887dd8f332086b3a7347364d3633a5decfb48ee4",
+      "current_sha256": "3664ee0c505fa18f26d7c0250d1ec0fff40f45d83f80c663d22cdda0ede6fb9b",
+      "exact_match": false
+    },
+    {
+      "path": "src/safety_v4.py",
+      "historical_sha256": "c782df4a48b90784a5e6fa86d7391e48a4bead97231d44ebe49de9d60a161567",
+      "current_sha256": "0f2bc31c9028c11390bf19e06de89e82e546c184645255aa007921896b649f28",
+      "exact_match": false
+    },
+    {
+      "path": "src/safety_v3.py",
+      "historical_sha256": "28efcc06af8ec0ffc0074267b7f1b2e36ba4fd1f6e033900c39b9b96b6d40d0a",
+      "current_sha256": "28efcc06af8ec0ffc0074267b7f1b2e36ba4fd1f6e033900c39b9b96b6d40d0a",
+      "exact_match": true
+    },
+    {
+      "path": "src/safety_observer.py",
+      "historical_sha256": "9d5feb13e0b50982c76bb3b0c4af5afea7cef5fa0a2e35e41a23cbced141cb1f",
+      "current_sha256": "9d5feb13e0b50982c76bb3b0c4af5afea7cef5fa0a2e35e41a23cbced141cb1f",
+      "exact_match": true
+    },
+    {
+      "path": "src/safety_perception.py",
+      "historical_sha256": "cf1624ec42e9b3eaafc572aef7d3932c55a90ace39fb5014cc11ba50923b3378",
+      "current_sha256": "cf1624ec42e9b3eaafc572aef7d3932c55a90ace39fb5014cc11ba50923b3378",
+      "exact_match": true
+    }
+  ],
+  "archives_checked": [
+    {
+      "path": "results/safety_dev/cancelled/v4_cancelled_full_sweep_20261002T115051Z.zip",
+      "has_relevant_source": false,
+      "source_hashes": {}
+    },
+    {
+      "path": "results/safety_dev/cancelled/v4_stopped_full_sweep_20261002T132311Z.zip",
+      "has_relevant_source": false,
+      "source_hashes": {}
+    },
+    {
+      "path": "results/safety_dev/development_v6_budget150/runs/provisional_evidence_v2/evaluated_sources.zip",
+      "has_relevant_source": true,
+      "source_hashes": {
+        "src/env.py": "3664ee0c505fa18f26d7c0250d1ec0fff40f45d83f80c663d22cdda0ede6fb9b",
+        "src/safety_v4.py": "0f2bc31c9028c11390bf19e06de89e82e546c184645255aa007921896b649f28"
+      }
+    },
+    {
+      "path": "results/safety_dev/development_v6_budget150/runs/provisional_targets_v1/evaluated_sources.zip",
+      "has_relevant_source": true,
+      "source_hashes": {
+        "src/env.py": "3664ee0c505fa18f26d7c0250d1ec0fff40f45d83f80c663d22cdda0ede6fb9b",
+        "src/safety_v4.py": "0f2bc31c9028c11390bf19e06de89e82e546c184645255aa007921896b649f28"
+      }
+    },
+    {
+      "path": "results/safety_dev/development_v6_budget150/runs/search_calibrated_v1/evaluated_sources.zip",
+      "has_relevant_source": true,
+      "source_hashes": {
+        "src/env.py": "3664ee0c505fa18f26d7c0250d1ec0fff40f45d83f80c663d22cdda0ede6fb9b",
+        "src/safety_v4.py": "0f2bc31c9028c11390bf19e06de89e82e546c184645255aa007921896b649f28"
+      }
+    },
+    {
+      "path": "results/safety_dev/development_v6_budget150/runs/search_evidence_v2/evaluated_sources.zip",
+      "has_relevant_source": true,
+      "source_hashes": {
+        "src/env.py": "3664ee0c505fa18f26d7c0250d1ec0fff40f45d83f80c663d22cdda0ede6fb9b",
+        "src/safety_v4.py": "0f2bc31c9028c11390bf19e06de89e82e546c184645255aa007921896b649f28"
+      }
+    },
+    {
+      "path": "results/safety_dev/development_v6_budget150/runs/trajectory_search_v1/evaluated_sources.zip",
+      "has_relevant_source": true,
+      "source_hashes": {
+        "src/env.py": "3664ee0c505fa18f26d7c0250d1ec0fff40f45d83f80c663d22cdda0ede6fb9b",
+        "src/safety_v4.py": "0f2bc31c9028c11390bf19e06de89e82e546c184645255aa007921896b649f28"
+      }
+    },
+    {
+      "path": "results/safety_dev/development_v6_budget150/runs/v6_calibrated_hulls_pilot/evaluated_sources.zip",
+      "has_relevant_source": true,
+      "source_hashes": {
+        "src/env.py": "3664ee0c505fa18f26d7c0250d1ec0fff40f45d83f80c663d22cdda0ede6fb9b",
+        "src/safety_v4.py": "0f2bc31c9028c11390bf19e06de89e82e546c184645255aa007921896b649f28"
+      }
+    },
+    {
+      "path": "results/safety_dev/quick_v5_budget100/frozen_77_sources.zip",
+      "has_relevant_source": true,
+      "source_hashes": {
+        "src/env.py": "3664ee0c505fa18f26d7c0250d1ec0fff40f45d83f80c663d22cdda0ede6fb9b",
+        "src/safety_v4.py": "0f2bc31c9028c11390bf19e06de89e82e546c184645255aa007921896b649f28"
+      }
+    },
+    {
+      "path": "results/safety_dev/quick_v5_budget100/runs/policy_feedback_v1/evaluated_sources.zip",
+      "has_relevant_source": true,
+      "source_hashes": {
+        "src/env.py": "3664ee0c505fa18f26d7c0250d1ec0fff40f45d83f80c663d22cdda0ede6fb9b",
+        "src/safety_v4.py": "0f2bc31c9028c11390bf19e06de89e82e546c184645255aa007921896b649f28"
+      }
+    }
+  ],
+  "git_history_checked": [
+    {
+      "path": "src/env.py",
+      "commits_checked": [
+        "f59f6cdb38d960cf26bb1633c0c928cd06aad866",
+        "ac82b0e7adfdb8c2a22b1870d5d2c35f6d477a25",
+        "fa5e0048438b9cf80ede93cdaa1482b008836bec",
+        "476897c51945e23e599fca5cf9113227c8e989e1",
+        "b7a31f77b7697a16e853d6eea44ac1abb808dd48",
+        "73c75be744074684ffbc1ab00b3afd91e2eb4089",
+        "6f7d79ff04f56169ff8174b31a41bc8473d28ee9",
+        "2374c05dd5768cbabed8b2fee8228ace381136b8",
+        "a3c52c7bb0b763af706f8ae3e694d524811d25e3",
+        "54d945adb9760e35d4ec8fa4df5ffbb9b86a92e1",
+        "9caa8a05d308c524bb4f7ffa17a1c2b7399a470a",
+        "f75635770776bafc0c25bb71680a734b7fe83be7",
+        "0b70cd169c710c4326c49313729841d5a0e9e663",
+        "2de5a817da9192cb6412439f632136bf0455d8eb"
+      ],
+      "matching_historical_hash": []
+    },
+    {
+      "path": "src/safety_v4.py",
+      "commits_checked": [
+        "f59f6cdb38d960cf26bb1633c0c928cd06aad866"
+      ],
+      "matching_historical_hash": []
+    }
+  ],
+  "conclusion": "Historical env.py and safety_v4.py content was not recovered. Exact diffs cannot be produced, and source changes cannot be proved cosmetic or behavior-preserving. Source archives inspected contain the current versions. v3/observer/perception hashes match historical metadata.",
+  "recommendation": "Keep 123/150 historical result as context; use fresh paired selected-v4 and candidate under the same frozen current source/configuration and original reset seeds/scenario digests.",
+  "current_v6_cem_review": {
+    "observed": "Search accepts only plans passing supplied hard checks and unchanged trigger margin, re-evaluates modified warm seeds, uses a private deterministic Generator, and reads only onboard snapshot/actuator inputs.",
+    "limits": [
+      "Finite eight-second sampled rollout, model and perception errors, and no recursive feasibility guarantee remain.",
+      "Fixed-policy search retains an explicit continuation; this changes future recovery behavior even when its first action equals policy. Search acceptance counts are not intervention-avoidance counts.",
+      "Sampling represents controls in two-decision blocks; a failed search is not evidence no feasible continuous control exists.",
+      "Historical byte-level uncertainty is independent of current all-experiments-disabled v6 unit equivalence tests."
+    ]
+  }
+}

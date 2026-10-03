@@ -31,6 +31,17 @@ Trimming, in two steps:
 Every episode keeps its original episode seed, so a test-set result can be
 checked against the policy's earlier frozen-suite and Paper 2 rows.
 
+**Version 2 (2026-10-02).** v1 held 15 episodes no policy could pass: in the
+basin a being-overtaken own ship starts `BASIN_BEING_OVERTAKEN_START_S` (6.9 m)
+along its leg -- on L1 that is on the (5, 8) panel, so every L1-BO episode
+collided at its first step (the Paper 2 set's 40 L1-BO episodes too).  v2 is v1
+with every episode whose own hull starts in contact with a panel replaced
+(regenerated ones must start `START_GAP_M` clear): the L1-BO cell is regenerated with the start fixed by
+the scenario (`flags["own_start_s"]` = `L1_BO_START_S`, honoured by
+`scenario.own_start_s`) under the Paper 2 field rules plus the start check,
+rotated FIX/VAR and trimmed to the same count.  All other episodes are v1's.
+Default `--version 2`; results in `results/test_set/v2/<tag>/`.
+
     python tools/tiers/test_set.py --build                      # write the definition
     python tools/tiers/test_set.py --model runs/.../best_model.zip --tag sacs0_bl3 --safety off
 
@@ -67,7 +78,16 @@ OUT = ROOT / "results" / "test_set"
 TARGET_EPISODES = 1000
 MAX_CELL_CUT = 0.25
 TIER_B_SEED = 400_000                 # frozen_suite.py's headline seed base
-SET_VERSION = "1.0"
+SET_VERSION = "1.0"                   # the version being built or evaluated (set by --version)
+START_GAP_M = 0.30                    # v2: a regenerated episode's own hull starts this clear of every panel
+L1_BO_START_S = 8.0                   # v2: L1 being-overtaken starts 8 m along the leg (y = 10),
+                                      # its stern 0.6 m past the (5, 8) panel
+CELL_FIXES = {("L1", "BO"): {"own_start_s": L1_BO_START_S}}
+
+
+def out_dir(version=None):
+    version = version or SET_VERSION
+    return OUT if version.startswith("1") else OUT / ("v" + version.split(".")[0])
 
 
 def _features(b) -> np.ndarray:
@@ -166,11 +186,17 @@ def _trim(items, target=TARGET_EPISODES, max_cut=MAX_CELL_CUT):
 
 
 def build(env=None):
-    """The set, from the cache `results/test_set/set_v<version>.pkl` when its digest
-    matches `definition.json`, else built (about 25 min) and cached."""
+    """The set, from the cache `results/test_set[/vN]/set_v<version>.pkl` when its
+    digest matches `definition.json`, else built and cached (v1 about 25 min)."""
+    if not SET_VERSION.startswith("1"):
+        return build_v2(env)
+    return build_v1(env)
+
+
+def build_v1(env=None):
     import pickle
     curriculum.apply_stage(tf.PROPULSION_STAGE)
-    cache, meta = OUT / f"set_v{SET_VERSION}.pkl", OUT / "definition.json"
+    cache, meta = OUT / "set_v1.0.pkl", OUT / "definition.json"
     if cache.exists() and meta.exists():
         with open(cache, "rb") as fh:
             kept, report = pickle.load(fh)
@@ -183,7 +209,7 @@ def build(env=None):
     kept, removed, cut = _trim(items)
     digests = {it["test_id"]: it["built"].digest() for it in kept}
     blob = json.dumps(digests, sort_keys=True, separators=(",", ":"))
-    report.update({"version": SET_VERSION, "distinct_scenarios": len(items), "episodes": len(kept),
+    report.update({"version": "1.0", "distinct_scenarios": len(items), "episodes": len(kept),
                    "removed_near_duplicates": len(removed), "removed_by_cell": cut,
                    "removed": removed, "manifest_digest": hashlib.sha256(blob.encode()).hexdigest()})
     OUT.mkdir(parents=True, exist_ok=True)
@@ -192,12 +218,115 @@ def build(env=None):
     return kept, report
 
 
+
+
+def _start_clear(env, built, seed, gap=START_GAP_M):
+    """The own hull at reset: not in contact with anything, and `gap` clear of every panel."""
+    env.reset(seed=seed, options={"generated": built})
+    hull = np.asarray(env.hull_polygon(), dtype=float)
+    if env.collision_kind(env.hull_polygon()) is not None:
+        return False
+    return all(p2.polygon_distance(hull, np.asarray(poly, dtype=float)) >= gap for poly in env.obstacles)
+
+
+def _paper2_cell(env, layout, code, fix):
+    """One Paper 2 cell regenerated with `fix` in its flags: p2.build's loop (same
+    seed block, episode seeds and field rules) plus the start-clearance check."""
+    import scenario as scn
+    import targets as tgt
+    cells = p2.cells()
+    c_index = next(i for i, c in enumerate(cells) if c["layout"] == layout and c["encounter"] == code)
+    cell = cells[c_index]
+    generator = scn.ScenarioGenerator(stage=5, seed_namespace="frozen_eval")
+    records, got, tries = [], 0, 0
+    while got < p2.PER_CELL and tries < p2.SEEDS_PER_CELL:
+        seed = p2.SEED_BASE + c_index * p2.SEEDS_PER_CELL + tries
+        tries += 1
+        test_id = f"P2v2-{layout}-{code}-FIX-{got + 1:02d}"
+        extra = {"side": cell["side"]} if cell["side"] else {}
+        built = generator.sample(seed, case_id=test_id, encounter_class=cell["class"], behaviour=tgt.T_CV,
+                                 geometry_mode="basin",
+                                 flags=p2._flags(layout, target_stop_box=p2.stop_box(), **extra, **fix))
+        if built is None:
+            continue
+        lo, hi = p2.ct.FIELD_TARGET_SPEED_RANGE
+        if not lo <= float(built.target_speed) <= hi:
+            continue
+        twin = p2.varying_twin(built, seed)
+        if twin is None:
+            continue
+        episode_seed = p2.EPISODE_SEED_BASE + c_index * p2.PER_CELL + got
+        if not all(_start_clear(env, b, episode_seed) for b in (built, twin)):
+            continue
+        if not all(p2.field_feasible(p2.nominal_check(env, b, episode_seed)) for b in (built, twin)):
+            continue
+        for speed, b in (("FIX", built), ("VAR", twin)):
+            records.append({"built": b, "test_id": b.case_id, "speed": speed, "episode_seed": episode_seed,
+                            "twin": built.case_id if speed == "VAR" else ""})
+        got += 1
+    items = []
+    for r in records:
+        k = int(r["test_id"].rsplit("-", 1)[1]) - 1
+        if r["speed"] != ("FIX" if k % 2 == 0 else "VAR"):
+            continue
+        items.append({"built": r["built"], "episode_seed": r["episode_seed"], "source": "paper2",
+                      "cell": f"{layout}-{code}", "class": r["built"].encounter_class, "stratum": "field",
+                      "variant": r["speed"], "test_id": r["test_id"], "origin_id": r["twin"] or r["test_id"]})
+    return items, {"cell": f"{layout}-{code}", "pairs": got, "seeds_tried": tries}
+
+
+def build_v2(env=None):
+    """v1 with every episode that does not start clear replaced (see the docstring)."""
+    import pickle
+    curriculum.apply_stage(tf.PROPULSION_STAGE)
+    out = out_dir("2.0")
+    cache, meta = out / "set_v2.0.pkl", out / "definition.json"
+    if cache.exists() and meta.exists():
+        with open(cache, "rb") as fh:
+            kept, report = pickle.load(fh)
+        if report.get("manifest_digest") == json.loads(meta.read_text()).get("manifest_digest"):
+            return kept, report
+    if env is None:
+        from env import ASVLidarEnv
+        env = ASVLidarEnv(render_mode=None, emergency_stop=False)
+    v1, v1_report = build_v1(env)
+    # Replaced: episodes that start in contact (a tight but clear start, as L3-BO's
+    # ~0.25 m, is a valid if hard case).  Regenerated episodes must start START_GAP_M clear.
+    bad = [it for it in v1 if not _start_clear(env, it["built"], it["episode_seed"], gap=1e-6)]
+    by_cell = Counter(it["cell"] for it in bad)
+    bad_ids = {it["test_id"] for it in bad}
+    kept = [it for it in v1 if it["test_id"] not in bad_ids]
+    regenerated = []
+    for cell, n in by_cell.items():
+        layout, code = cell.split("-", 1)
+        fix = CELL_FIXES.get((layout, code))
+        if fix is None:
+            raise SystemExit(f"{n} episode(s) of {cell} start in contact and no fix is defined")
+        items, info = _paper2_cell(env, layout, code, fix)
+        chosen, _, _ = _trim(items, target=n, max_cut=1.0)
+        kept += chosen
+        regenerated.append({**info, "replaced": n, "kept": len(chosen), "fix": fix})
+    digests = {it["test_id"]: it["built"].digest() for it in kept}
+    blob = json.dumps(digests, sort_keys=True, separators=(",", ":"))
+    report = {"version": "2.0", "base": "1.0", "base_digest": v1_report["manifest_digest"],
+              "episodes": len(kept), "distinct_scenarios": v1_report["distinct_scenarios"],
+              "removed_near_duplicates": v1_report["removed_near_duplicates"],
+              "start_in_contact": sorted(bad_ids), "replaced_by_cell": dict(by_cell),
+              "regenerated": regenerated, "start_gap_m": START_GAP_M,
+              "manifest_digest": hashlib.sha256(blob.encode()).hexdigest()}
+    out.mkdir(parents=True, exist_ok=True)
+    with open(cache, "wb") as fh:
+        pickle.dump((kept, report), fh)
+    return kept, report
+
+
 def _write_definition(kept, report):
-    OUT.mkdir(parents=True, exist_ok=True)
+    out = out_dir()
+    out.mkdir(parents=True, exist_ok=True)
     rows = [{k: it[k] for k in ("test_id", "origin_id", "source", "cell", "class", "stratum", "variant",
                                 "episode_seed", "nn_distance")} | {"digest": it["built"].digest()} for it in kept]
-    pd.DataFrame(rows).to_csv(OUT / "definition.csv", index=False)
-    (OUT / "definition.json").write_text(json.dumps(report, indent=1, default=str))
+    pd.DataFrame(rows).to_csv(out / "definition.csv", index=False)
+    (out / "definition.json").write_text(json.dumps(report, indent=1, default=str))
 
 
 def _summary(d: pd.DataFrame, group) -> pd.DataFrame:
@@ -214,6 +343,7 @@ def _summary(d: pd.DataFrame, group) -> pd.DataFrame:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--build", action="store_true", help="write the set definition only")
+    ap.add_argument("--version", choices=("1", "2"), default="2")
     ap.add_argument("--model", type=Path)
     ap.add_argument("--policy", help="classical comparator(s) instead of a model, comma-separated: "
                                      "los_dwa, colregs_vo, encounter_vo, reference")
@@ -223,10 +353,15 @@ def main() -> int:
     ap.add_argument("--processes", type=int, default=3,
                     help="evaluation processes (default 3: a training run shares the CPU)")
     args = ap.parse_args()
+    global SET_VERSION
+    SET_VERSION = args.version + ".0"
     t0 = time.time()
     kept, report = build()
     _write_definition(kept, report)
     comp = pd.DataFrame([{k: it[k] for k in ("source", "cell", "variant")} for it in kept])
+    if report.get("regenerated"):
+        print(f"v2: {len(report['start_in_contact'])} episodes started in contact and were replaced: "
+              f"{report['regenerated']}", flush=True)
     print(f"test set {SET_VERSION}: {len(kept)} episodes from {report['distinct_scenarios']} distinct "
           f"scenarios ({report['removed_near_duplicates']} near-duplicates removed), digest "
           f"{report['manifest_digest'][:16]}, built in {time.time() - t0:.0f} s", flush=True)
@@ -242,19 +377,42 @@ def main() -> int:
     return 0
 
 
+def _reusable(tag, mode, kept):
+    """v2: the same controller's v1 rows for the episodes v2 shares with v1 (same
+    test id, scenario digest and seed).  Evaluation is deterministic: SAC's v1 run
+    reproduced all 1,000 of its earlier frozen-suite and Paper 2 rows."""
+    if SET_VERSION.startswith("1"):
+        return None
+    v1_rows, v1_def = OUT / tag / "episodes.csv", OUT / "definition.csv"
+    if not (v1_rows.exists() and v1_def.exists()):
+        return None
+    rows = pd.read_csv(v1_rows)
+    if "safety" in rows:
+        rows = rows[rows.safety == mode]
+    same = pd.read_csv(v1_def).set_index("test_id").digest.to_dict()
+    ids = {it["test_id"] for it in kept if same.get(it["test_id"]) == it["built"].digest()}
+    return rows[rows.test_id.isin(ids)]
+
+
 def evaluate(kept, report, *, tag, args, t0, model=None, policy="model"):
-    out = OUT / tag
+    out = out_dir() / tag
     out.mkdir(parents=True, exist_ok=True)
-    jobs = [(it["built"], it["episode_seed"], policy, None,
-             {k: it[k] for k in ("test_id", "origin_id", "source", "cell", "stratum", "variant")})
-            for it in kept]
     frames = []
     for mode in (("off", "on") if args.safety == "both" else (args.safety,)):
+        reuse = _reusable(tag, mode, kept)
+        done = set(reuse.test_id) if reuse is not None else set()
+        jobs = [(it["built"], it["episode_seed"], policy, None,
+                 {k: it[k] for k in ("test_id", "origin_id", "source", "cell", "stratum", "variant")})
+                for it in kept if it["test_id"] not in done]
+        if done:
+            print(f"[{tag}] reusing {len(done)} v1 rows; evaluating {len(jobs)} episodes", flush=True)
         rows = run_pool(jobs, model_path=model, processes=args.processes,
                         overrides={"EMERGENCY_STOP_ENABLED": mode == "on",
-                                   "SAFETY_VERSION": int(args.safety_version)})
+                                   "SAFETY_VERSION": int(args.safety_version)}) if jobs else []
         f = pd.DataFrame(rows)
         f["safety"] = mode
+        if reuse is not None and len(reuse):
+            f = pd.concat([reuse.assign(safety=mode), f], ignore_index=True)
         frames.append(f)
     d = pd.concat(frames, ignore_index=True)
     d.to_csv(out / "episodes.csv", index=False)

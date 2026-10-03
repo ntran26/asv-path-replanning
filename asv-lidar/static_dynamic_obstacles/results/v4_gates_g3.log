@@ -1,0 +1,14 @@
+G3 curriculum draws (200 resets per stage)
+
+                        n  field  near_of_field  crossing  head_on  panels3  start_contact  start_gap<0.3  reset_mean_s  reset_p95_s  st_redraws
+overlay        stage                                                                                                                            
+formulation_v3 5      200  0.000          0.000     0.215    0.185    0.160              0              0         0.246        0.883         0.0
+               6      200  0.200          0.375     0.255    0.200    0.410              0              1         1.544        4.555         0.0
+               7      200  0.465          0.344     0.220    0.190    0.670              1              1         2.346       11.625         0.0
+formulation_v4 5      200  0.185          0.541     0.325    0.240    0.345              0              0         2.564       15.311         0.0
+               6      200  0.385          0.506     0.440    0.170    0.625              0              0         3.582       17.361         0.0
+               7      200  0.580          0.578     0.350    0.220    0.755              1              2         4.499       18.938         0.0
+
+G3 CHECK: v4 own-start contacts 1, mean reset 4.50 s (< 1 s); field shares [0.18, 0.38, 0.58] (design 0.20/0.40/0.55)
+(1818 s)
+

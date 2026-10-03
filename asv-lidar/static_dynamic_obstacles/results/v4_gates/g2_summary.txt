@@ -1,0 +1,14 @@
+G2 fix-1 flags (compliant behaviour; identical trajectories with fix off and on)
+
+-- conflict set: 40 episodes, 34 with an engaged turning encounter
+   compliant run blocked by statics: 22; flagged with fix on: 86% (fix off: 18%)
+   compliant run reaches goal: 1; fix adds a flag in 100%
+   by group (flagged on / added): CRP any 83%/50%, CRS any 57%/29%, HO near-L2 83%/75%, HO other 100%/25%, OT near-L1 80%/40%
+
+-- development set: 120 episodes, 58 with an engaged turning encounter
+   compliant run blocked by statics: 39; flagged with fix on: 49% (fix off: 44%)
+   compliant run reaches goal: 10; fix adds a flag in 10%
+   by group (flagged on / added): dev crossing 25%/6%, dev head_on 30%/0%, dev null 50%/50%, dev overtaking 65%/5%
+
+G2 PASS: recall 86% (>= 80 %), added flags on passed development episodes 10% (<= 10 %)
+(931 s)

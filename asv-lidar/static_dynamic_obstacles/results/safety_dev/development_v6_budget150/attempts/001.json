@@ -1,0 +1,10 @@
+{
+  "tag": "v6_calibrated_hulls_pilot",
+  "mode": "v6",
+  "suite": "dev_field",
+  "case": "DV3-CRP-CV-02",
+  "seed": 900167,
+  "scenario_sha256": "21934d7c10b2b739bb30bd38575f695b10e1010363e17cca2ac1d32c419b9d47",
+  "run_manifest_sha256": "52b5daf29e0e786df4c1b617d6ea310bec6f37a029c8901dc16bad90ea5f75aa",
+  "attempt": 1
+}

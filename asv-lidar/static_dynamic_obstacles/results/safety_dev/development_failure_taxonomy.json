@@ -1,0 +1,588 @@
+{
+  "created_utc": "2026-10-02T14:57:25.234793+00:00",
+  "scope": "ORIGINAL DV3 development only; selected v4 reference. No quick/frozen/field outcomes inspected for this audit or tuning. No policy episodes executed.",
+  "checkpoint_sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+  "total_cases": 150,
+  "goals": 123,
+  "failure_counts": {
+    "collision:boundary": 7,
+    "collision:obstacle": 9,
+    "collision:target": 11
+  },
+  "failure_encounters": {
+    "NT": 4,
+    "HO": 3,
+    "CRP": 8,
+    "CRS": 6,
+    "BO": 6
+  },
+  "failures_with_changed_actions": 23,
+  "failures_without_changed_actions": 4,
+  "policy_goals_lost": 7,
+  "minimum_net_rescues_for_95pct": 20,
+  "minimum_net_rescues_for_100pct": 27,
+  "detailed_selected_v4_failure_traces": 7,
+  "trace_coverage_note": "Only the seven boundary failures have detailed selected-v4 traces here. Four zero-intervention cases additionally have paired full-oracle outcomes, without causal separation.",
+  "synthetic_code_defect": {
+    "type": "deterministic geometry-only computation, no environment reset/step",
+    "track_position": [
+      0.0,
+      0.0
+    ],
+    "track_heading_deg": 0.0,
+    "static_point": [
+      1.6,
+      0.0
+    ],
+    "own_hull_position": [
+      1.6,
+      0.0
+    ],
+    "legacy_current_exclusion_radius_m": 1.8,
+    "legacy_retained_points": 0,
+    "static_point_clearance_before_mask_m": -0.4,
+    "inflated_target_hull_gap_m": 0.8000000000000002,
+    "interpretation": "A separate static point can disappear although the target hull does not cover it. This proves a masking defect, not its frequency or a particular episode cause."
+  },
+  "implemented_optional_adapter": {
+    "file": "src/safety_hull_perception.py",
+    "class": "HullSafetyPerception",
+    "centre_switch": "fitted_track_centre",
+    "mask_switch": "hull_return_mask",
+    "default_in_adapter": true,
+    "legacy_shared_sources_modified": false,
+    "fallback": "unmodified track centre/heading, unassigned returns retained when mask enabled; legacy masking when mask switch disabled",
+    "fit_age_limit": "cfg.TRACK_MAX_MISSES decisions",
+    "measurement_tolerance": "cfg.MOTION_EXPLAIN_M",
+    "validation": "34 tests passed:23 new hull-perception and11 inherited free-space-perception tests; no episodes"
+  },
+  "cases": [
+    {
+      "case": "DV3-NT-CV-04",
+      "outcome": "collision:boundary",
+      "encounter": "NT",
+      "changed_action_steps": 17,
+      "estops": 0,
+      "policy_only_outcome": "collision:obstacle",
+      "reset_seed": 900123,
+      "scenario_sha256": "265ce5fbba83247086f3e0052db4a8a251bc40e9853a191af70a4c90a0626103",
+      "selected_v4_detailed_trace_available": true,
+      "successful_prior_modes": [],
+      "causal_attribution": "unresolved; aggregate result is not a cause label",
+      "selected_trace": {
+        "steps": 48,
+        "first_changed_step": 27,
+        "first_no_escape_step": 40,
+        "last_why": "no escape",
+        "reason_counts": {
+          "nominal": 11,
+          "idle": 16,
+          "turn": 5,
+          "last certificate": 5,
+          "continue": 1,
+          "hold back": 6,
+          "no escape": 4
+        }
+      }
+    },
+    {
+      "case": "DV3-NT-CV-06",
+      "outcome": "collision:obstacle",
+      "encounter": "NT",
+      "changed_action_steps": 18,
+      "estops": 0,
+      "policy_only_outcome": "collision:obstacle",
+      "reset_seed": 900125,
+      "scenario_sha256": "232c44e8a8333ce354524df5d77ab1ba217c44966f2788a2848fbb16df5c4e81",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [],
+      "causal_attribution": "unresolved; aggregate result is not a cause label"
+    },
+    {
+      "case": "DV3-NT-CV-12",
+      "outcome": "collision:obstacle",
+      "encounter": "NT",
+      "changed_action_steps": 11,
+      "estops": 0,
+      "policy_only_outcome": "collision:boundary",
+      "reset_seed": 900131,
+      "scenario_sha256": "47007b33b516b72beb469ca64e087641b25ab3e505e19b3b9468eb4eeb76ada2",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [],
+      "causal_attribution": "unresolved; aggregate result is not a cause label"
+    },
+    {
+      "case": "DV3-NT-CV-15",
+      "outcome": "collision:obstacle",
+      "encounter": "NT",
+      "changed_action_steps": 16,
+      "estops": 0,
+      "policy_only_outcome": "collision:obstacle",
+      "reset_seed": 900134,
+      "scenario_sha256": "a18038f03a1252707c1fded74a34d6c561b5b6e6928acd857fc8d42d5917d20b",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [],
+      "causal_attribution": "unresolved; aggregate result is not a cause label"
+    },
+    {
+      "case": "DV3-HO-CV-04",
+      "outcome": "collision:boundary",
+      "encounter": "HO",
+      "changed_action_steps": 40,
+      "estops": 10,
+      "policy_only_outcome": "collision:obstacle",
+      "reset_seed": 900143,
+      "scenario_sha256": "5d3fadc3fa07e1b7cc4a7f22326234fd7217d47d3f6fc115737bcaa981a4c629",
+      "selected_v4_detailed_trace_available": true,
+      "successful_prior_modes": [
+        "v2_best"
+      ],
+      "causal_attribution": "unresolved; aggregate result is not a cause label",
+      "selected_trace": {
+        "steps": 82,
+        "first_changed_step": 23,
+        "first_no_escape_step": 72,
+        "last_why": "no escape",
+        "reason_counts": {
+          "nominal": 23,
+          "turn": 23,
+          "continue": 15,
+          "brake": 2,
+          "last certificate": 9,
+          "no escape": 9,
+          "hold back": 1
+        }
+      }
+    },
+    {
+      "case": "DV3-HO-CV-10",
+      "outcome": "collision:obstacle",
+      "encounter": "HO",
+      "changed_action_steps": 14,
+      "estops": 7,
+      "policy_only_outcome": "collision:obstacle",
+      "reset_seed": 900149,
+      "scenario_sha256": "dc812fd12e74128e12fb7da8b43c413fae089e9d0174331561a6fabc23de2817",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [
+        "v3",
+        "v4_initial",
+        "v4_memory_dual"
+      ],
+      "causal_attribution": "unresolved; aggregate result is not a cause label"
+    },
+    {
+      "case": "DV3-HO-CV-18",
+      "outcome": "collision:target",
+      "encounter": "HO",
+      "changed_action_steps": 17,
+      "estops": 6,
+      "policy_only_outcome": "goal",
+      "reset_seed": 900157,
+      "scenario_sha256": "07dae5d89238f0fd39bbca57be1cbb487b5dda6580c1e6639765688a7f2578a0",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [
+        "off",
+        "v2_best"
+      ],
+      "causal_attribution": "unresolved; aggregate result is not a cause label"
+    },
+    {
+      "case": "DV3-CRP-CV-02",
+      "outcome": "collision:target",
+      "encounter": "CRP",
+      "changed_action_steps": 0,
+      "estops": 0,
+      "policy_only_outcome": "collision:target",
+      "reset_seed": 900167,
+      "scenario_sha256": "21934d7c10b2b739bb30bd38575f695b10e1010363e17cca2ac1d32c419b9d47",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [],
+      "causal_attribution": "unresolved; aggregate result is not a cause label",
+      "existing_full_oracle_outcome": "goal",
+      "oracle_interpretation": "bundled true ego, target state, and exact geometry; does not isolate any single sensor defect"
+    },
+    {
+      "case": "DV3-CRP-CV-03",
+      "outcome": "collision:target",
+      "encounter": "CRP",
+      "changed_action_steps": 17,
+      "estops": 10,
+      "policy_only_outcome": "goal",
+      "reset_seed": 900168,
+      "scenario_sha256": "afe642bbe85019a3cf259e1ba4f42cd0617896ab466e7612a6895b952435923e",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [
+        "off",
+        "v3"
+      ],
+      "causal_attribution": "unresolved; aggregate result is not a cause label"
+    },
+    {
+      "case": "DV3-CRP-CV-04",
+      "outcome": "collision:target",
+      "encounter": "CRP",
+      "changed_action_steps": 9,
+      "estops": 7,
+      "policy_only_outcome": "collision:obstacle",
+      "reset_seed": 900169,
+      "scenario_sha256": "bf63ee74573c6c390c645e03dc8ff78af05d6c43e23181af8c58b3670ee775ab",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [],
+      "causal_attribution": "unresolved; aggregate result is not a cause label"
+    },
+    {
+      "case": "DV3-CRP-CV-12",
+      "outcome": "collision:target",
+      "encounter": "CRP",
+      "changed_action_steps": 0,
+      "estops": 0,
+      "policy_only_outcome": "collision:target",
+      "reset_seed": 900177,
+      "scenario_sha256": "0b698b07daf443e17c256b57a499509f45ad8c43959a7506c4949df842f478c0",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [],
+      "causal_attribution": "unresolved; aggregate result is not a cause label",
+      "existing_full_oracle_outcome": "goal",
+      "oracle_interpretation": "bundled true ego, target state, and exact geometry; does not isolate any single sensor defect"
+    },
+    {
+      "case": "DV3-CRP-CV-13",
+      "outcome": "collision:target",
+      "encounter": "CRP",
+      "changed_action_steps": 2,
+      "estops": 0,
+      "policy_only_outcome": "collision:target",
+      "reset_seed": 900178,
+      "scenario_sha256": "496ba431ff1725e8e5d5014ddf1e762cbf18b27d8a11920164725781fa3d2446",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [],
+      "causal_attribution": "unresolved; aggregate result is not a cause label"
+    },
+    {
+      "case": "DV3-CRP-CV-17",
+      "outcome": "collision:target",
+      "encounter": "CRP",
+      "changed_action_steps": 7,
+      "estops": 5,
+      "policy_only_outcome": "collision:target",
+      "reset_seed": 900182,
+      "scenario_sha256": "59bba61884b9c5230c4d5d4c9ce2ce3264b4e5941557094cdf67c96a0dac330f",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [
+        "v3",
+        "v4_initial",
+        "v4_memory_dual"
+      ],
+      "causal_attribution": "unresolved; aggregate result is not a cause label"
+    },
+    {
+      "case": "DV3-CRP-VS-02",
+      "outcome": "collision:boundary",
+      "encounter": "CRP",
+      "changed_action_steps": 14,
+      "estops": 4,
+      "policy_only_outcome": "collision:obstacle",
+      "reset_seed": 900187,
+      "scenario_sha256": "c5ce78dea27d4d26d3d1eaf52b76939ed72acc2fca5bede9f924f81e99b054d2",
+      "selected_v4_detailed_trace_available": true,
+      "successful_prior_modes": [],
+      "causal_attribution": "unresolved; aggregate result is not a cause label",
+      "selected_trace": {
+        "steps": 37,
+        "first_changed_step": 18,
+        "first_no_escape_step": 14,
+        "last_why": "no escape",
+        "reason_counts": {
+          "nominal": 14,
+          "no escape": 7,
+          "turn": 7,
+          "continue": 4,
+          "last certificate": 5
+        }
+      }
+    },
+    {
+      "case": "DV3-CRP-VS-04",
+      "outcome": "collision:boundary",
+      "encounter": "CRP",
+      "changed_action_steps": 30,
+      "estops": 4,
+      "policy_only_outcome": "goal",
+      "reset_seed": 900189,
+      "scenario_sha256": "2febc467a9cbb05a7492ddea9b8fe18339d6d27f82b7a49b689b1ba0febd4ea4",
+      "selected_v4_detailed_trace_available": true,
+      "successful_prior_modes": [
+        "off",
+        "v3",
+        "v4_initial",
+        "v4_memory_dual"
+      ],
+      "causal_attribution": "unresolved; aggregate result is not a cause label",
+      "selected_trace": {
+        "steps": 71,
+        "first_changed_step": 1,
+        "first_no_escape_step": 57,
+        "last_why": "no escape",
+        "reason_counts": {
+          "nominal": 16,
+          "turn": 22,
+          "continue": 12,
+          "last certificate": 6,
+          "handback": 1,
+          "no escape": 11,
+          "hold back": 3
+        }
+      }
+    },
+    {
+      "case": "DV3-CRS-CV-02",
+      "outcome": "collision:target",
+      "encounter": "CRS",
+      "changed_action_steps": 2,
+      "estops": 2,
+      "policy_only_outcome": "collision:target",
+      "reset_seed": 900193,
+      "scenario_sha256": "f47277bdc95727326412a2c47f6f2c962883df37877812bfbe96bb8ea3fc378a",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [
+        "v2_best",
+        "v3"
+      ],
+      "causal_attribution": "unresolved; aggregate result is not a cause label"
+    },
+    {
+      "case": "DV3-CRS-CV-04",
+      "outcome": "collision:boundary",
+      "encounter": "CRS",
+      "changed_action_steps": 29,
+      "estops": 3,
+      "policy_only_outcome": "goal",
+      "reset_seed": 900195,
+      "scenario_sha256": "61218205227240a2e85db4ab35e3db161173a3cad9f693e18d2208c54f9d4824",
+      "selected_v4_detailed_trace_available": true,
+      "successful_prior_modes": [
+        "off",
+        "v2_best"
+      ],
+      "causal_attribution": "unresolved; aggregate result is not a cause label",
+      "selected_trace": {
+        "steps": 68,
+        "first_changed_step": 11,
+        "first_no_escape_step": 61,
+        "last_why": "no escape",
+        "reason_counts": {
+          "nominal": 18,
+          "brake": 1,
+          "turn": 19,
+          "continue": 13,
+          "handback": 1,
+          "last certificate": 4,
+          "hold back": 5,
+          "no escape": 7
+        }
+      }
+    },
+    {
+      "case": "DV3-CRS-CV-08",
+      "outcome": "collision:target",
+      "encounter": "CRS",
+      "changed_action_steps": 7,
+      "estops": 5,
+      "policy_only_outcome": "goal",
+      "reset_seed": 900199,
+      "scenario_sha256": "9782f57d25c00a84c142d9229ab334fa51f60be355b2659fdd2b6dcfc3ad4414",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [
+        "off",
+        "v2_best",
+        "v3",
+        "v4_initial",
+        "v4_memory_dual"
+      ],
+      "causal_attribution": "unresolved; aggregate result is not a cause label"
+    },
+    {
+      "case": "DV3-CRS-CV-11",
+      "outcome": "collision:boundary",
+      "encounter": "CRS",
+      "changed_action_steps": 44,
+      "estops": 4,
+      "policy_only_outcome": "collision:obstacle",
+      "reset_seed": 900202,
+      "scenario_sha256": "ea07499730925b8be91d8b8d2c3f212e1036da5ad37d2311a2c94e50589da0d8",
+      "selected_v4_detailed_trace_available": true,
+      "successful_prior_modes": [
+        "v2_best",
+        "v3",
+        "v4_initial",
+        "v4_memory_dual"
+      ],
+      "causal_attribution": "unresolved; aggregate result is not a cause label",
+      "selected_trace": {
+        "steps": 67,
+        "first_changed_step": 9,
+        "first_no_escape_step": null,
+        "last_why": "last certificate",
+        "reason_counts": {
+          "nominal": 11,
+          "hold back": 1,
+          "turn": 22,
+          "continue": 10,
+          "last certificate": 22,
+          "handback": 1
+        }
+      }
+    },
+    {
+      "case": "DV3-CRS-CV-19",
+      "outcome": "collision:boundary",
+      "encounter": "CRS",
+      "changed_action_steps": 27,
+      "estops": 1,
+      "policy_only_outcome": "collision:obstacle",
+      "reset_seed": 900210,
+      "scenario_sha256": "b6f42d0e3589312cf2e1cae1c9ecc0cf68f1aa299a7cf8db7a0aa792184a7e38",
+      "selected_v4_detailed_trace_available": true,
+      "successful_prior_modes": [
+        "v2_best",
+        "v3"
+      ],
+      "causal_attribution": "unresolved; aggregate result is not a cause label",
+      "selected_trace": {
+        "steps": 82,
+        "first_changed_step": 17,
+        "first_no_escape_step": 15,
+        "last_why": "no escape",
+        "reason_counts": {
+          "nominal": 20,
+          "no escape": 12,
+          "hold back": 3,
+          "turn": 31,
+          "continue": 8,
+          "last certificate": 6,
+          "handback": 2
+        }
+      }
+    },
+    {
+      "case": "DV3-CRS-VS-04",
+      "outcome": "collision:target",
+      "encounter": "CRS",
+      "changed_action_steps": 6,
+      "estops": 4,
+      "policy_only_outcome": "goal",
+      "reset_seed": 900215,
+      "scenario_sha256": "32bc24fe239f84da164517a1372c280c1ca640987a44ab6630e91d4c4db2968e",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [
+        "off"
+      ],
+      "causal_attribution": "unresolved; aggregate result is not a cause label"
+    },
+    {
+      "case": "DV3-BO-CV-07",
+      "outcome": "collision:obstacle",
+      "encounter": "BO",
+      "changed_action_steps": 4,
+      "estops": 0,
+      "policy_only_outcome": "collision:obstacle",
+      "reset_seed": 900250,
+      "scenario_sha256": "c64e43262e3748e1216034789d28cef99c8e928924381ca37e5789ea8e5be60d",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [],
+      "causal_attribution": "unresolved; aggregate result is not a cause label"
+    },
+    {
+      "case": "DV3-BO-CV-08",
+      "outcome": "collision:target",
+      "encounter": "BO",
+      "changed_action_steps": 5,
+      "estops": 0,
+      "policy_only_outcome": "collision:target",
+      "reset_seed": 900251,
+      "scenario_sha256": "f4487b3feeb896a9c202859c34e027fde3851fbf6b318bb4ed0ade418b81cf96",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [],
+      "causal_attribution": "unresolved; aggregate result is not a cause label"
+    },
+    {
+      "case": "DV3-BO-CV-10",
+      "outcome": "collision:obstacle",
+      "encounter": "BO",
+      "changed_action_steps": 0,
+      "estops": 0,
+      "policy_only_outcome": "collision:obstacle",
+      "reset_seed": 900253,
+      "scenario_sha256": "283a85ae071a8ee86173bf69c7760708605970b95d099af05697f4146c6b60cb",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [],
+      "causal_attribution": "unresolved; aggregate result is not a cause label",
+      "existing_full_oracle_outcome": "collision:obstacle",
+      "oracle_interpretation": "bundled true ego, target state, and exact geometry; does not isolate any single sensor defect"
+    },
+    {
+      "case": "DV3-BO-CV-18",
+      "outcome": "collision:obstacle",
+      "encounter": "BO",
+      "changed_action_steps": 14,
+      "estops": 2,
+      "policy_only_outcome": "collision:obstacle",
+      "reset_seed": 900261,
+      "scenario_sha256": "05cba6e162c37bb211f68f69cca5a80a3628b40a8664fbc842fbeff3938530b7",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [],
+      "causal_attribution": "unresolved; aggregate result is not a cause label"
+    },
+    {
+      "case": "DV3-BO-CV-20",
+      "outcome": "collision:obstacle",
+      "encounter": "BO",
+      "changed_action_steps": 14,
+      "estops": 3,
+      "policy_only_outcome": "goal",
+      "reset_seed": 900263,
+      "scenario_sha256": "d35135132497d5a30e1ea9f5c091557b77c0a0099b4dcb1436e0ac03bfefdd5c",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [
+        "off",
+        "v2_best",
+        "v3",
+        "v4_memory_dual"
+      ],
+      "causal_attribution": "unresolved; aggregate result is not a cause label"
+    },
+    {
+      "case": "DV3-BO-VS-05",
+      "outcome": "collision:obstacle",
+      "encounter": "BO",
+      "changed_action_steps": 0,
+      "estops": 0,
+      "policy_only_outcome": "collision:obstacle",
+      "reset_seed": 900268,
+      "scenario_sha256": "de7a108ee1ed994e47c8cbb4793e0b84979defb2da04611681c922a02a01e169",
+      "selected_v4_detailed_trace_available": false,
+      "successful_prior_modes": [],
+      "causal_attribution": "unresolved; aggregate result is not a cause label",
+      "existing_full_oracle_outcome": "collision:obstacle",
+      "oracle_interpretation": "bundled true ego, target state, and exact geometry; does not isolate any single sensor defect"
+    }
+  ],
+  "source_sha256": {
+    "results/safety_dev/dev_v4_observer_memory.csv": "60034c3a30fa641c28ff850e1290a4c239d176e396b0850938314508a56386a2",
+    "results/safety_dev/dev_v4_observer_memory.json": "68f882ecbc12f386caba1edeb26b5342dfc19dff0069eb1ceb3213aff8c98bab",
+    "results/safety_dev/final_fullset_comparison.csv": "e44a5e0cdd8216f734b0dd9226021f594b8d01d244d5834acda5ebbf22aae138",
+    "results/safety_dev/final_fullset_comparison_sources.json": "d2b948e9fb754f8f260d8d0c82c2413baa05f7fed4659daffe1809775b6bd046",
+    "results/safety_dev/v4_selected_contacts_steps.csv": "d4a05255da4c8de7588491de10642f15a37e6e361855e5731e71f36e95916cbb",
+    "results/safety_dev/v4_selected_contacts_episodes.csv": "ea9d033386f77d5a5f9c724e02ce6361604c430d90107adee5781ddcd2fae67a",
+    "results/safety_dev/dev_v5_zero_override_oracle.csv": "183ddd1710aae6397f8c060efa8da7c4d0c8aaaaff2ae54a5bf028dfaf46674d",
+    "results/safety_dev/dev_v5_zero_override_oracle.json": "901fb0f4e2fa9aa342c329305af1b006d36a39c5a13db5faedd5497848daa917",
+    "src/classical/common.py": "456f39769ffa237f826eff8f9852a6d0823a2f975f85d2345ba7b42105e0977d",
+    "src/tracking.py": "9929426c0c9aa74bb0846358c0edc73ec5dca817beca755c7fe79d06d4b1d639",
+    "src/safety_perception.py": "cf1624ec42e9b3eaafc572aef7d3932c55a90ace39fb5014cc11ba50923b3378",
+    "src/safety_v4.py": "0f2bc31c9028c11390bf19e06de89e82e546c184645255aa007921896b649f28",
+    "src/safety_v2.py": "209195c3b9241dfa6a798b7cfca857dfd14218c38625d99bc2a9c0d97c1b3d55",
+    "src/safety_hull_perception.py": "533d1acd7a9b9f0a598b8e8a224658f1eda177499f995eb58999eec1bd379f45",
+    "tests/test_safety_hull_perception.py": "cfa690edf343cc0d7f0b19bfc5c0b16cf3e708ef4c13efb43f10af6f443ee02c"
+  }
+}

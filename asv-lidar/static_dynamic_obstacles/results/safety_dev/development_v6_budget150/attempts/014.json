@@ -1,0 +1,10 @@
+{
+  "tag": "provisional_targets_v1",
+  "mode": "v6",
+  "suite": "dev_field",
+  "case": "DV3-NT-CV-01",
+  "seed": 900120,
+  "scenario_sha256": "f9d7a7c86f9c702511ae63a822d14eb638506493ce6f72988ba0f18b848ce484",
+  "run_manifest_sha256": "5e07d276a958c5c14e3b682ad47a73c951ffc47f82de1633af6837b943587b45",
+  "attempt": 14
+}

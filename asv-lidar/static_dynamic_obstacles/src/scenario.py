@@ -265,7 +265,12 @@ class ScenarioGenerator:
             # F75: a named basin case fixes its leg (06 §5.2).
             if flags.get("basin_leg"):
                 start, goal = flags["basin_leg"]
-                return corr.build_basin(tuple(start), tuple(goal))
+                channel = corr.build_basin(tuple(start), tuple(goal))
+                if flags.get("own_start_s") is not None:
+                    # Test set v2 (2026-10-02): a case may fix where the own ship starts
+                    # along its leg (L1 being-overtaken otherwise starts on a panel).
+                    channel.start_s_override = float(flags["own_start_s"])
+                return channel
             return corr.sample_basin(rng, slant_max_deg=stage.get("slant_max"))
         if not width:
             lo, hi = stage["width"]
@@ -588,6 +593,9 @@ def own_start_s(encounter_class: str, channel) -> float:
     perception rather than policy reasons, so losing it to a metre of geometry
     would be an expensive accident.
     """
+    override = getattr(channel, "start_s_override", None)
+    if override is not None:
+        return float(override)                  # a case that fixes its start (flag `own_start_s`)
     if getattr(channel, "mode", "channel") == "basin":
         # 06: the leg starts at Paper 2's start y, already clear of the wall.
         # Being overtaken starts further along it, for water astern.

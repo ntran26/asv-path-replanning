@@ -4,7 +4,261 @@ This is a self-contained brief for continuing the safety-layer work in a new ses
 
 Project root: `asv-lidar/static_dynamic_obstacles`. Run every command from that folder.
 
-## Latest user direction: stop the full sweep; quick v5 test (2026-10-02)
+## NEXT DIRECTION (user, 2026-10-03): a trigger that does not fire when the policy would succeed
+
+**The problem, in the user's words:** how to trigger the safety layer correctly, so that it does
+not fire when the policy would solve the case without it.
+
+> **Status (2026-10-03, 07:00): this plan is being run in the PhD main thread**, which the user
+> asked to continue it. Results and next steps are in `planning/SAFETY_LAYER_V8_PLAN.md`.
+> - Phase 1 done: 429 episodes.
+> - Headline: v7 fires in 61 % of episodes the policy alone solves, but breaks only 13 overall,
+>   against 79 rescues (oracle +79, v7 +66).
+> - A SAC-critic gate does not help.
+> - The breaks are mostly target-model mismatch (reactive or non-compliant targets) and
+>   wall-adjacent crossings.
+>
+> Do not duplicate it. The four perception wrappers' `__getattr__` were guarded for deepcopy
+> (behaviour unchanged).
+>
+> **Update 10:30:** closed loop on all 1,000 test-set-v2 episodes:
+>
+> | | Test set v2 | DV3 |
+> |---|---|---|
+> | SAC alone | 0.872 | – |
+> | SAC + v7 | 0.904 | 128/150 |
+> | **SAC + v8** | **0.912** | 127/150 |
+>
+> **v8** (`src/safety_v8.py`, `SAFETY_VERSION = 8`) is v7 without the hold-back fallback: with no
+> certified escape, the policy's action stands. Hold-back was the only first-fire reason with more
+> breaks than rescues.
+
+**Run budget:** this plan needs new episode runs. The earlier instruction (saved-data analysis and
+code tests only) still stands until the user lifts it, so **confirm the run budget with the user
+before starting any episodes.**
+
+### Why the current trigger fires wrongly
+
+The evidence:
+- Saved v4 against safety off, on the 735 frozen test-set-v2 pairs: **19 rescues, 23 broken
+  successes**.
+- Development set: v4 gains 19 and loses 7.
+
+Every version (v2 to v7) asks: *if the policy takes this action and the filter then runs one of
+its own backup manoeuvres, is the hull clear for 8 s?* That test cannot know what the policy will
+do next:
+- **It is open-loop.** It assumes the policy's future is the filter's backup. The real policy keeps
+  reacting, and often escapes in ways the finite backup library cannot represent.
+- **It is model-based and conservative.** Inflated hull, gaps, an 8 s horizon and hand-set margins
+  make it call states unsafe that the policy can handle.
+- So a fire means "the filter found no way out", not "the policy will fail". V7's re-check of the
+  stored backup after the policy's action is a step towards fixing this, but it still checks only
+  the filter's own plan, not the policy's continuation.
+
+**The criterion to aim for:** fire only when (a) the policy, left alone, would fail, **and** (b) the
+intervention does better. Both are counterfactual questions about the policy, so the trigger must
+be **policy-aware**.
+
+### Verified building blocks (checked 2026-10-03, one L2 head-on episode, SAC 3 M)
+
+- **Environment cloning works.** `copy.deepcopy(env)` mid-episode takes about 4 ms, and the clone's
+  next step is identical: same pose, same reward. So counterfactual branches from the exact same
+  state, RNG included, are cheap.
+- **SAC's critic sees trouble coming.** Policy alone on L2 head-on: Q(s, π(s)) falls steadily from
+  −2.8 (step 0) to −4.3 (step 8) and −7.6 (step 16); obstacle contact at step 19. That is roughly
+  5 s of warning, from one episode, so separability is not yet measured. The values are in
+  VecNormalize-scaled reward units. Code:
+  ```python
+  o, _ = model.policy.obs_to_tensor(obs)
+  with torch.no_grad():
+      a = model.policy.actor(o, deterministic=True)
+      q1, q2 = model.critic(o, a)
+  q = float(torch.min(q1, q2))
+  ```
+  The critic ships with the policy, so a critic gate is deployable. Its horizon is only about 10 s
+  (γ 0.951), it can be miscalibrated in unfamiliar states, and it is a **gate, never a certificate**.
+  Related: learned safety critics switching to a recovery policy (Thananjeyan et al., 2021,
+  *Recovery RL*); the monitor/intervention split of Hsu, Hu and Fisac (2024), already cited in the
+  V7 plan.
+
+### Protocol
+
+1. **Shadow runs: measure the current trigger.**
+   - Run SAC alone (safety off for control), with v4 and v7 computing their decision every step
+     **without acting** (shadow mode).
+   - Run on:
+     - the 150 development episodes;
+     - test-set v2's 113 failures and their 226 matched successful controls
+       (`results/safety_dev/testset_v2_offline/analysis/matched_controls.csv`).
+   - Log every step, using onboard information only:
+     - the would-fire flag and reason;
+     - the filter's margins: policy margin, best backup margin, time to first predicted
+       violation under the policy action;
+     - the V7 risk-monitor fields;
+     - SAC's Q(s, π(s)), Q of the filter's alternative, and action standard deviation;
+     - the step index.
+2. **Counterfactual labels.**
+   - At each episode's first would-fire step, and a sample of later ones (for example every 4th),
+     `deepcopy` the env (and filter state) and run two continuations to the end:
+     - (i) policy alone;
+     - (ii) the filter acting from that step.
+   - Label each fire:
+     - **necessary** if (i) fails, otherwise **unnecessary**;
+     - **helpful** if (ii) succeeds where (i) fails, **harmful** if the reverse.
+3. **Trigger metrics.**
+   - Precision (necessary / all fires) and recall (failures preceded by a fire).
+   - Helpful and harmful counts.
+   - This is the measurement the V7 plan says is missing.
+4. **Fit a policy-aware gate.**
+   - Fire only when the filter says unsafe **and** a gate on onboard features (the critic Q and its
+     trend, the filter margins, time to violation, risk-monitor persistence) predicts that the policy
+     alone will fail.
+   - Start simple: thresholds or a logistic model.
+   - **Split by underlying scenario**, not by frame.
+   - Fit on half, validate on the other half; choose the threshold that maximises rescues minus
+     broken successes on the fitting half.
+5. **Closed-loop check.**
+   - v7 plus the gate on the development set and test set v2, against safety off.
+   - Report rescues and newly broken successes **separately**, and the intervention rate.
+   - The development set and test set v2 are development evidence here (user's designation), so
+     say so.
+6. **Optional upper bound.** Use the cloned env as an oracle trigger: fire only when the
+   policy-alone branch fails within T s. It is not deployable, but it shows how much a perfect
+   trigger could gain, and so whether chasing the gate is worth it.
+
+**Outputs:**
+- data: `results/safety_dev/trigger_counterfactual/`;
+- scripts: `tools/diagnostics/safety/`;
+- notes: a new `planning/SAFETY_LAYER_V8_PLAN.md`, or a section in the V7 plan.
+
+**CPU:**
+- The PPO baseline-v3 run (`runs/ppo_formulation_seed0_bl3`) is training, and the baseline-v4 G4
+  pilots (`results/v4_pilot_run.sh`) start after it.
+- Use **at most 2 processes**, and do not stop either.
+- C: has about 7 GB free. Keep logs compact: per-step CSV, no rollout dumps.
+
+**Estimated cost:** about a normal evaluation (about 490 episodes) plus the branches, which are short.
+Roughly 2–4 h on 2 processes.
+
+## Latest: test-set-v2 analysis and experimental V7 (2026-10-03)
+
+The user now explicitly designates the 1,000 test-set-v2 cases for safety-layer
+development, superseding the earlier held-out restriction for those cases only.
+The latest budget answer is **no new runs: saved-data analysis and code tests
+only**. Zero episodes were run in this continuation. Do not consume the old
+remaining V6 slot, restart an evaluation, or count v2 as untouched validation
+for the safety layer developed from it.
+
+Start with `results/safety_dev/testset_v2_offline/report.md` and
+`planning/SAFETY_LAYER_V7_PLAN.md`. Saved SAC has 872/1000 goals, 61 target,
+55 obstacle and 12 boundary contacts. Crossings contribute 76 failures; L2
+head-on fails 15/15. The offline inventory includes all 128 failures and 151
+nearby successful controls. There are no saved v2 decision traces, so episode
+summaries cannot train an online trigger without future-information leakage.
+
+A scene/seed/provenance-checked join to stopped historical OFF/V4 journals
+finds 735 pairs within v2: OFF 684 goals, V4 680, with 19 rescues and 23 lost
+goals. These archived outcomes strengthen the need to preserve SAC successes;
+they do not identify the exact first harmful override or measure V7.
+
+`src/safety_v7.py`, selected with runtime `SAFETY_VERSION = 7`, first lets V6
+propose an action. For an override with a backup, it substitutes SAC's action
+for the first decision and rechecks the full eight-second plan, preserving
+SAC only when the unchanged checks and 0.15 m margin pass. It restores the
+pre-command actuator history and retains the exact checked replacement plan.
+Failed repairs leave V6's proposal intact. `src/safety_risk_monitor.py` adds
+action-conditioned per-hazard diagnostics only; its recommendations never
+bypass a safety check. Both modules and the plan cite their method sources.
+
+V7 is experimental and has **no measured success rate**. Our environment
+change adds only V7 selection; constants/defaults, Paper 2, SAC and live PPO
+work were not changed by this task. Another task concurrently added training
+start-clearance redraw logic to `env.py`; that change is preserved and isolated
+in the new source audit. 96 focused tests passed, and all 11 native dispatch
+checks were repeated after the concurrent edit, without entering physics.
+Existing V6 results and ledgers remain historical records.
+
+<!-- V6_CONTINUATION_START -->
+## Current continuation completed: experimental V6, target not reached
+
+The user authorized **up to 150 new development runs**, separate from the old
+76/100 quick campaign. **149/150 are consumed: 144 completed SAC evaluations
+and five legacy simulator-test runs. No evaluation remains active.** Do not
+resume the old 8,670 queues or tune on frozen/field outcomes.
+
+Fresh paired results on 50 original DV3 cases:
+
+| Controller | Goals | Obstacle | Boundary | Target |
+| --- | ---: | ---: | ---: | ---: |
+| V4 | 23 | 9 | 7 | 11 |
+| V6 candidate | 33 | 9 | 3 | 5 |
+
+V6 gained 13 goals and lost three: HO-VS-01 (boundary), CRP-CV-16 and CRS-VS-03
+(obstacle). The selection deliberately includes all 27 historical V4 failures
+plus 23 successful controls; its 66% success is not a population estimate.
+Nevertheless, 17 known failures mean this fixed candidate cannot reach 95% on
+the original 150 cases: even 100/100 untested successes would give only
+133/150 (88.67%). No difficult or initially unobservable case was excluded.
+Do not promote it as the established best full-suite controller on this evidence.
+
+The candidate is available through runtime `constants.SAFETY_VERSION = 6`
+with `ASVLidarEnv(..., emergency_stop=True)`. Its source defaults enable
+`PROVISIONAL_TRACKS`, `PROVISIONAL_MOTION_EVIDENCE`, and `TRAJECTORY_SEARCH`.
+Calibration, fitted-hull perception and track history remain disabled. Existing
+version selection/defaults and the SAC baseline 3 3M checkpoint are unchanged;
+`constants.py` was not edited. The ordinary environment has an explicit V6
+branch. An AST audit verifies that integration changed only that new branch
+and the three V6 default switches/docstring, matching the evaluated overrides.
+
+Results, exact source ZIPs, manifests, traces and accounting are under
+`results/safety_dev/development_v6_budget150/`. Start with `report.md`,
+`finite_suite_bound.md`, `integration_audit.json`, and
+`offline/broad_v6_50_failure_classification/REPORT.md`. The completed broad tag
+is `broad_v6_50`. The V6 plan documents every method, primary citations, pilots,
+regressions and limitations. Figures include rescues and a lost-goal example.
+The broad comparison took 283.5 summed episode seconds for V4 and 746.9 for V6
+with tracing; this is evaluation wall time, not a real-time control-latency test.
+
+The reserved final braking-calibration probe **did not run**. Its source guard
+rejected an external `src/scenario.py` edit before reserving an attempt. That
+file changed at 15:58:25 UTC, after the broad worker had imported its sources
+and completed its first case at 15:46:51; the worker does not reload modules.
+The external start-position-override changes were preserved. See the probe's
+`preflight_aborted.json` and the integration audit. Do not silently restore the
+other work or whitelist it into the old benchmark; a future run needs an
+explicitly audited source baseline. One authorized attempt remains unused.
+
+Validation after native integration: 147 focused filter, geometry, calibration
+and mocked-dispatch tests passed. Additional campaign/report/classifier tests
+are recorded in their artifacts. An expanded earlier test command also ran
+five existing V2/V3 L1 simulations, conservatively charged at attempts 39-43:
+four passed, while unchanged V3's dead-ahead collision assertion failed. They
+are verification runs, not SAC goal outcomes, and were not rerun or tuned away.
+
+Of the 17 remaining V6 failures, 10 end in `no escape`, three in an unchecked
+stored continuation, three in a margin-qualified check, and one in a check
+below the trigger margin. All five final target contacts have a snapshot track
+at contact; timing/kinematic errors matter, not just presence. The three new
+regressions follow extended low-margin or infeasible recovery. Offline truth
+replay separately audits the two initially invisible BO panels; it is never
+used by the production filter. Numerical command sampling is not a proof over
+all continuous controls or grounds for changing benchmark geometry.
+
+A next-iteration hypothesis is saved in
+`offline/broad_v6_50_failure_classification/SEARCH_MARGIN_OPPORTUNITIES.md`:
+13 decisions across six failed cases (including all three regressions) have no
+safe original plan but a nonnegative sampled-search clearance below 0.15 m.
+The search rejects these while the inherited fallback proceeds. The maximizing
+plan and its first-contact result were not retained, so this is an opportunity
+to instrument and validate, not evidence that a lower margin would rescue them.
+No acceptance threshold was changed in this iteration.
+
+Historical V4's 123/150 remains contextual: its exact old env/V4 sources were
+not found, despite matching seeds, scene digests, checkpoint/config and other
+physics/filter dependencies. Current comparisons therefore used fresh V4.
+<!-- V6_CONTINUATION_END -->
+
+## Previous completed direction: stop the full sweep; quick v5 test (2026-10-02)
 
 The user cancelled the full 8,670-run evaluation, requested a v4 report, and
 explicitly capped subsequent work at **100 new episode runs total**, then

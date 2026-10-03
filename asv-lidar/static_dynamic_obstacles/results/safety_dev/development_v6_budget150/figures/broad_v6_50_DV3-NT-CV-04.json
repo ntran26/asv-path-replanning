@@ -1,0 +1,36 @@
+{
+  "tag": "broad_v6_50",
+  "case": "DV3-NT-CV-04",
+  "illustration_type": "rescue",
+  "scope": "Offline stored-trace illustration; no simulator construction/reset/step. Selected case, not aggregate proof.",
+  "coordinate_frame": "Recorded simulator world coordinates, metres; equal x/y scale.",
+  "seed": 900123,
+  "scenario_sha256": "265ce5fbba83247086f3e0052db4a8a251bc40e9853a191af70a4c90a0626103",
+  "episodes": {
+    "v4": {
+      "attempt": 54,
+      "outcome": "collision:boundary",
+      "steps": 48,
+      "run_manifest_sha256": "5f86f112a75955dfa31683c2f648ed158624978797970392eb4b4d334a8f0966"
+    },
+    "v6": {
+      "attempt": 55,
+      "outcome": "goal",
+      "steps": 66,
+      "run_manifest_sha256": "5f86f112a75955dfa31683c2f648ed158624978797970392eb4b4d334a8f0966"
+    }
+  },
+  "input_directory": "results/safety_dev/development_v6_budget150/runs/broad_v6_50",
+  "input_sha256": {
+    "manifest.json": "5f86f112a75955dfa31683c2f648ed158624978797970392eb4b4d334a8f0966",
+    "episode_054.json": "000b08aad237c2f7df3b16f87aa4f093ec5ca5b7bf55d6e783150cd109e02395",
+    "trace_054.jsonl": "34378d1417d5c8597bfdc51b7503d98cf15b48bdd00040527a2840302173356e",
+    "episode_055.json": "7edea9ce205998a88a8d278e5bd2b03f9c6dc939369a0f01b428e07d9f37be84",
+    "trace_055.jsonl": "e27a050d21ab9c3b45b453c65e93b7ae902f05260ce97e58ad88f62c01b0dd28"
+  },
+  "plotter_sha256": "c248ae047ff74f6a8378a66627f1ef4d38a1abeb4d067e5e1694d955c8d5bef2",
+  "output_sha256": {
+    "png": "b769a851fd5e418a453f39a8c3f8e587b0112fdca143c24c81d4ea9406f90b0f",
+    "pdf": "e8e157047380d3ec92abafbc4d8373944f324adae9b60f37ed5abfd7e7537411"
+  }
+}

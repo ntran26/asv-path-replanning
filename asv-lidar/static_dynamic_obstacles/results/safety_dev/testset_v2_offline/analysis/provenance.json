@@ -1,0 +1,16 @@
+{
+  "analysis_script_sha256": "e3f8468a4219b74fe4bda11b38c583cb46fc8842a8daa0b33170e1b795953c03",
+  "input_directory": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\results\\test_set\\v2",
+  "input_sha256": {
+    "definition.json": "aefe5439ab3e802061d5d11b5451a70109a8c3717a2f8cd6fddc586c9c529d71",
+    "definition.csv": "a5a51b6c6a04762352a746fb90e785798cdb51af5eeb3cfb3fdc0d8e1f47220f",
+    "set_v2.0.pkl": "565bc55c84ad7f8914b373b221ee1e071ada09ca577e6ed764a4e1e532bbb355",
+    "sacs0_bl3/episodes.csv": "251fa15b3772d53aa0d060e72fb753548cc8450ddc2ad608a9070a1b501e2cea",
+    "sacs0_bl3/summary.txt": "b22da5b3eda9429a9ccc71e5849f5e6ec6c709005c194797744c8c94617349c2"
+  },
+  "new_episode_runs": 0,
+  "environment_construction_or_reset": false,
+  "recorded_checkpoint_path_only": "runs/sac_formulation_seed0_bl3/kept_best_3M/best_model.zip",
+  "historical_checkpoint_source_runtime_hashes_available": false,
+  "classification_normalization": "75 frozen null classes serialized as blank by pandas; matched as null"
+}

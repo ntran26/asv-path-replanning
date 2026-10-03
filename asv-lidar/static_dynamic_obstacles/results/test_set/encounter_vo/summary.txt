@@ -1,0 +1,54 @@
+Test set 1.0 (encounter_vo) -- classical: encounter_vo
+1000 episodes, digest 8051b61135d6a974, 3898 s
+
+-- overall
+           n  success  coll_target  coll_other  timeout
+safety                                                 
+off     1000    0.725        0.121       0.154      0.0
+
+-- by source (safety off)
+          n  success  coll_target  coll_other  timeout
+source                                                
+frozen  761    0.792        0.087       0.121      0.0
+paper2  239    0.510        0.230       0.259      0.0
+
+-- by cell (safety off)
+                                n  success  coll_target  coll_other  timeout
+source cell                                                                 
+frozen basin-being_overtaken   95    0.863        0.021       0.116      0.0
+       basin-crossing         100    0.510        0.260       0.230      0.0
+       basin-head_on          100    0.870        0.050       0.080      0.0
+       basin-null              75    0.947        0.000       0.053      0.0
+       basin-overtaking       100    0.860        0.000       0.140      0.0
+       channel-crossing       100    0.590        0.280       0.130      0.0
+       channel-head_on         98    0.898        0.051       0.051      0.0
+       channel-overtaking      93    0.849        0.000       0.151      0.0
+paper2 L1-BO                   15    0.000        0.000       1.000      0.0
+       L1-CRP                  17    0.471        0.471       0.059      0.0
+       L1-CRS                  18    0.444        0.167       0.389      0.0
+       L1-HO                   15    0.867        0.133       0.000      0.0
+       L1-NT                    1    1.000        0.000       0.000      0.0
+       L1-OT                   15    0.333        0.000       0.667      0.0
+       L2-BO                   15    0.667        0.000       0.333      0.0
+       L2-CRP                  15    0.400        0.533       0.067      0.0
+       L2-CRS                  17    0.529        0.412       0.059      0.0
+       L2-HO                   15    0.467        0.067       0.467      0.0
+       L2-NT                    1    1.000        0.000       0.000      0.0
+       L2-OT                   15    0.800        0.000       0.200      0.0
+       L3-BO                   15    1.000        0.000       0.000      0.0
+       L3-CRP                  19    0.211        0.684       0.105      0.0
+       L3-CRS                  15    0.533        0.467       0.000      0.0
+       L3-HO                   15    0.600        0.133       0.267      0.0
+       L3-NT                    1    1.000        0.000       0.000      0.0
+       L3-OT                   15    0.333        0.267       0.400      0.0
+
+-- by variant (safety off)
+                  n  success  coll_target  coll_other  timeout
+source variant                                                
+frozen CV       384    0.753        0.143       0.104      0.0
+       NC        66    0.985        0.000       0.015      0.0
+       RE       311    0.801        0.035       0.164      0.0
+paper2            3    1.000        0.000       0.000      0.0
+       FIX      122    0.525        0.205       0.270      0.0
+       VAR      114    0.482        0.263       0.254      0.0
+
