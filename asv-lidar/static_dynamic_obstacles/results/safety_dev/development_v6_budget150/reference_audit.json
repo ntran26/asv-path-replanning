@@ -1,0 +1,1288 @@
+{
+  "created_utc": "2026-10-02T15:14:55Z",
+  "scope": "Historical selected-v4 DV3 metadata versus the frozen completed quick reference and current files. Read-only audit; no episodes.",
+  "historical_metadata": {
+    "path": "results\\safety_dev\\dev_v4_observer_memory.json",
+    "sha256": "68f882ecbc12f386caba1edeb26b5342dfc19dff0069eb1ceb3213aff8c98bab"
+  },
+  "quick_reference_metadata": {
+    "path": "results\\safety_dev\\quick_v5_budget100\\runs\\policy_feedback_v1\\metadata.json",
+    "sha256": "7ac6dc28b8cf8a014ef91ee994727690d999628453f9c39efe7db1c65833e07e"
+  },
+  "evaluated_archive_manifest": {
+    "path": "results\\safety_dev\\quick_v5_budget100\\runs\\policy_feedback_v1\\evaluated_sources_manifest.json",
+    "sha256": "b6b4da8ba253acfcd5feb3328d706eb0e606c4353268a080f184e06c0f4013d6",
+    "archived_files": 79
+  },
+  "checkpoint_exact_match": true,
+  "model_config_exact_match": true,
+  "checkpoint_sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+  "model_config_sha256": "a4df64a97f641de0b1c660b04f73ccc8401a29f7fa48711c2a6ee694dc98ed44",
+  "cases": {
+    "historical_count": 150,
+    "canonical_count": 150,
+    "unique_historical_count": 150,
+    "same_case_set": true,
+    "all_recorded_seeds_and_digests_match": true,
+    "canonical_inventory_sha256": "a2f8cc2df0a254d3da1d01f3ee84985215f89a87eab9cc7806b59babe20a260e",
+    "checks": [
+      {
+        "case": "DV3-NT-CV-01",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-02",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-03",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-04",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-05",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-06",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-07",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-08",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-09",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-10",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-11",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-12",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-13",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-14",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-15",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-16",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-17",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-18",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-19",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-NT-CV-20",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-01",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-02",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-03",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-04",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-05",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-06",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-07",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-08",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-09",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-10",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-11",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-12",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-13",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-14",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-15",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-16",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-17",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-18",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-19",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-CV-20",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-VS-01",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-VS-02",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-VS-03",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-VS-04",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-VS-05",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-HO-VS-06",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-01",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-02",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-03",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-04",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-05",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-06",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-07",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-08",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-09",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-10",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-11",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-12",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-13",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-14",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-15",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-16",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-17",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-18",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-19",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-CV-20",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-VS-01",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-VS-02",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-VS-03",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-VS-04",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-VS-05",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRP-VS-06",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-01",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-02",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-03",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-04",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-05",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-06",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-07",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-08",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-09",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-10",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-11",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-12",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-13",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-14",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-15",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-16",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-17",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-18",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-19",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-CV-20",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-VS-01",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-VS-02",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-VS-03",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-VS-04",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-VS-05",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-CRS-VS-06",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-01",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-02",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-03",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-04",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-05",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-06",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-07",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-08",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-09",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-10",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-11",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-12",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-13",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-14",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-15",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-16",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-17",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-18",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-19",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-CV-20",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-VS-01",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-VS-02",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-VS-03",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-VS-04",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-VS-05",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-OT-VS-06",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-01",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-02",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-03",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-04",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-05",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-06",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-07",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-08",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-09",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-10",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-11",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-12",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-13",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-14",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-15",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-16",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-17",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-18",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-19",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-CV-20",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-VS-01",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-VS-02",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-VS-03",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-VS-04",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-VS-05",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      },
+      {
+        "case": "DV3-BO-VS-06",
+        "canonical_present": true,
+        "seed_matches": true,
+        "scenario_matches": true
+      }
+    ]
+  },
+  "effective_safety_modules": {
+    "V2": {
+      "exact_effective_values_match": true,
+      "historical": {
+        "COMMIT_S": "1.0",
+        "HORIZON_S": "8.0",
+        "ENGAGE_RANGE_M": "7.0",
+        "GAP_STATIC_M": "0.05",
+        "GAP_BOUNDARY_M": "0.02",
+        "GAP_TARGET_M": "0.1",
+        "MARGIN_M": "0.1",
+        "TRIGGER_MARGIN_M": "0.15",
+        "ROOM_SLACK_M": "0.2",
+        "TERMINAL_M": "2.0",
+        "TERMINAL_S": "3.0",
+        "TERMINAL_STOP_SPEED": "0.1",
+        "TERMINAL_BOUNDARY": "False",
+        "RUDDERS": "(-1.0, -0.5, 0.0, 0.5, 1.0)",
+        "THROTTLES": "(-1.0, 0.0, 1.0)",
+        "BRAKE": "None",
+        "BRAKE_RUDDERS": "(-1.0, 0.0, 1.0)",
+        "RECOVERY": "((-1.0, 0.0), (1.0, 0.0), (0.0, -1.0), (-1.0, None), (0.0, None), (1.0, None))",
+        "RECOVERY_TURN_S": "2.0",
+        "MEMORY_S": "90.0",
+        "W_THROTTLE": "2.0",
+        "EGO_SMOOTHING": "0.3",
+        "W_PREVIOUS": "0.3",
+        "HOLD_BACK_GAIN_S": "1.0",
+        "HOLD_STEPS": "2",
+        "ASTERN_RPM": "-24.0",
+        "BRAKE_EFFICIENCY": "0.25",
+        "BRAKE_DELAY_S": "0.75"
+      },
+      "current": {
+        "COMMIT_S": "1.0",
+        "HORIZON_S": "8.0",
+        "ENGAGE_RANGE_M": "7.0",
+        "GAP_STATIC_M": "0.05",
+        "GAP_BOUNDARY_M": "0.02",
+        "GAP_TARGET_M": "0.1",
+        "MARGIN_M": "0.1",
+        "TRIGGER_MARGIN_M": "0.15",
+        "ROOM_SLACK_M": "0.2",
+        "TERMINAL_M": "2.0",
+        "TERMINAL_S": "3.0",
+        "TERMINAL_STOP_SPEED": "0.1",
+        "TERMINAL_BOUNDARY": "False",
+        "RUDDERS": "(-1.0, -0.5, 0.0, 0.5, 1.0)",
+        "THROTTLES": "(-1.0, 0.0, 1.0)",
+        "BRAKE": "None",
+        "BRAKE_RUDDERS": "(-1.0, 0.0, 1.0)",
+        "RECOVERY": "((-1.0, 0.0), (1.0, 0.0), (0.0, -1.0), (-1.0, None), (0.0, None), (1.0, None))",
+        "RECOVERY_TURN_S": "2.0",
+        "MEMORY_S": "90.0",
+        "W_THROTTLE": "2.0",
+        "EGO_SMOOTHING": "0.3",
+        "W_PREVIOUS": "0.3",
+        "HOLD_BACK_GAIN_S": "1.0",
+        "HOLD_STEPS": "2",
+        "ASTERN_RPM": "-24.0",
+        "BRAKE_EFFICIENCY": "0.25",
+        "BRAKE_DELAY_S": "0.75"
+      }
+    },
+    "V3": {
+      "exact_effective_values_match": true,
+      "historical": {
+        "HANDBACK_MARGIN_M": "0.3",
+        "HANDBACK_SPEED": "0.3",
+        "HANDBACK_HEADING_DEG": "30.0",
+        "MIN_RECOVERY_STEPS": "4",
+        "REJOIN_THROTTLE": "0.0",
+        "W_CONTINUE": "0.25",
+        "RECOVERY_REFERENCE": "'policy'",
+        "REJOIN_LOOKAHEAD_M": "2.5",
+        "LAST_CERT_MAX_STEPS": "4"
+      },
+      "current": {
+        "HANDBACK_MARGIN_M": "0.3",
+        "HANDBACK_SPEED": "0.3",
+        "HANDBACK_HEADING_DEG": "30.0",
+        "MIN_RECOVERY_STEPS": "4",
+        "REJOIN_THROTTLE": "0.0",
+        "W_CONTINUE": "0.25",
+        "RECOVERY_REFERENCE": "'policy'",
+        "REJOIN_LOOKAHEAD_M": "2.5",
+        "LAST_CERT_MAX_STEPS": "4"
+      }
+    },
+    "V4": {
+      "exact_effective_values_match": true,
+      "historical": {
+        "COUNTERSTEER_RECOVERY": "False",
+        "RETAIN_NOMINAL_PLAN": "False",
+        "DUAL_BRAKE_PREDICTION": "False",
+        "FREE_SPACE_MEMORY": "True",
+        "MODEL_EGO_OBSERVER": "True"
+      },
+      "current": {
+        "COUNTERSTEER_RECOVERY": "False",
+        "RETAIN_NOMINAL_PLAN": "False",
+        "DUAL_BRAKE_PREDICTION": "False",
+        "FREE_SPACE_MEMORY": "True",
+        "MODEL_EGO_OBSERVER": "True"
+      }
+    }
+  },
+  "runtime": {
+    "python_match": true,
+    "torch_match": false,
+    "threads_match": true,
+    "limitation": "Historical metadata does not capture all dependency versions now present in runtime_versions."
+  },
+  "source_checks": [
+    {
+      "path": "src/constants.py",
+      "category": "physics_and_constants",
+      "historical_sha256": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+      "current_disk_sha256": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+      "quick_reference_sha256": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+      "historical_matches_current_disk": true,
+      "historical_matches_quick_reference": true,
+      "current_disk_matches_quick_reference": true
+    },
+    {
+      "path": "src/env.py",
+      "category": "environment_and_dispatch",
+      "historical_sha256": "60b0d47afda0e5ac2fd1f1d1887dd8f332086b3a7347364d3633a5decfb48ee4",
+      "current_disk_sha256": "3664ee0c505fa18f26d7c0250d1ec0fff40f45d83f80c663d22cdda0ede6fb9b",
+      "quick_reference_sha256": "3664ee0c505fa18f26d7c0250d1ec0fff40f45d83f80c663d22cdda0ede6fb9b",
+      "historical_matches_current_disk": false,
+      "historical_matches_quick_reference": false,
+      "current_disk_matches_quick_reference": true
+    },
+    {
+      "path": "src/safety_v2.py",
+      "category": "safety_filter_prediction_perception",
+      "historical_sha256": "209195c3b9241dfa6a798b7cfca857dfd14218c38625d99bc2a9c0d97c1b3d55",
+      "current_disk_sha256": "209195c3b9241dfa6a798b7cfca857dfd14218c38625d99bc2a9c0d97c1b3d55",
+      "quick_reference_sha256": "209195c3b9241dfa6a798b7cfca857dfd14218c38625d99bc2a9c0d97c1b3d55",
+      "historical_matches_current_disk": true,
+      "historical_matches_quick_reference": true,
+      "current_disk_matches_quick_reference": true
+    },
+    {
+      "path": "src/safety_v3.py",
+      "category": "safety_filter_prediction_perception",
+      "historical_sha256": "28efcc06af8ec0ffc0074267b7f1b2e36ba4fd1f6e033900c39b9b96b6d40d0a",
+      "current_disk_sha256": "28efcc06af8ec0ffc0074267b7f1b2e36ba4fd1f6e033900c39b9b96b6d40d0a",
+      "quick_reference_sha256": "28efcc06af8ec0ffc0074267b7f1b2e36ba4fd1f6e033900c39b9b96b6d40d0a",
+      "historical_matches_current_disk": true,
+      "historical_matches_quick_reference": true,
+      "current_disk_matches_quick_reference": true
+    },
+    {
+      "path": "src/safety_v4.py",
+      "category": "safety_filter_prediction_perception",
+      "historical_sha256": "c782df4a48b90784a5e6fa86d7391e48a4bead97231d44ebe49de9d60a161567",
+      "current_disk_sha256": "0f2bc31c9028c11390bf19e06de89e82e546c184645255aa007921896b649f28",
+      "quick_reference_sha256": "0f2bc31c9028c11390bf19e06de89e82e546c184645255aa007921896b649f28",
+      "historical_matches_current_disk": false,
+      "historical_matches_quick_reference": false,
+      "current_disk_matches_quick_reference": true
+    },
+    {
+      "path": "src/safety_prediction.py",
+      "category": "safety_filter_prediction_perception",
+      "historical_sha256": "1635a91c204fe0a88810abff635e18125cb428f7acfdc7bce58767609d9f1f6b",
+      "current_disk_sha256": "1635a91c204fe0a88810abff635e18125cb428f7acfdc7bce58767609d9f1f6b",
+      "quick_reference_sha256": "1635a91c204fe0a88810abff635e18125cb428f7acfdc7bce58767609d9f1f6b",
+      "historical_matches_current_disk": true,
+      "historical_matches_quick_reference": true,
+      "current_disk_matches_quick_reference": true
+    },
+    {
+      "path": "src/safety_perception.py",
+      "category": "safety_filter_prediction_perception",
+      "historical_sha256": "cf1624ec42e9b3eaafc572aef7d3932c55a90ace39fb5014cc11ba50923b3378",
+      "current_disk_sha256": "cf1624ec42e9b3eaafc572aef7d3932c55a90ace39fb5014cc11ba50923b3378",
+      "quick_reference_sha256": "cf1624ec42e9b3eaafc572aef7d3932c55a90ace39fb5014cc11ba50923b3378",
+      "historical_matches_current_disk": true,
+      "historical_matches_quick_reference": true,
+      "current_disk_matches_quick_reference": true
+    },
+    {
+      "path": "src/safety_observer.py",
+      "category": "safety_filter_prediction_perception",
+      "historical_sha256": "9d5feb13e0b50982c76bb3b0c4af5afea7cef5fa0a2e35e41a23cbced141cb1f",
+      "current_disk_sha256": "9d5feb13e0b50982c76bb3b0c4af5afea7cef5fa0a2e35e41a23cbced141cb1f",
+      "quick_reference_sha256": "9d5feb13e0b50982c76bb3b0c4af5afea7cef5fa0a2e35e41a23cbced141cb1f",
+      "historical_matches_current_disk": true,
+      "historical_matches_quick_reference": true,
+      "current_disk_matches_quick_reference": true
+    },
+    {
+      "path": "src/classical/common.py",
+      "category": "shared_prediction_and_perception",
+      "historical_sha256": "456f39769ffa237f826eff8f9852a6d0823a2f975f85d2345ba7b42105e0977d",
+      "current_disk_sha256": "456f39769ffa237f826eff8f9852a6d0823a2f975f85d2345ba7b42105e0977d",
+      "quick_reference_sha256": "456f39769ffa237f826eff8f9852a6d0823a2f975f85d2345ba7b42105e0977d",
+      "historical_matches_current_disk": true,
+      "historical_matches_quick_reference": true,
+      "current_disk_matches_quick_reference": true
+    },
+    {
+      "path": "src/formulation_v3.py",
+      "category": "scenario_generator",
+      "historical_sha256": "0faeb49c3366e97f88cee81c5dfa03c86c9a0a16f3815dc146824cab7a062643",
+      "current_disk_sha256": "0faeb49c3366e97f88cee81c5dfa03c86c9a0a16f3815dc146824cab7a062643",
+      "quick_reference_sha256": "0faeb49c3366e97f88cee81c5dfa03c86c9a0a16f3815dc146824cab7a062643",
+      "historical_matches_current_disk": true,
+      "historical_matches_quick_reference": true,
+      "current_disk_matches_quick_reference": true
+    },
+    {
+      "path": "src/ship.py",
+      "category": "physics_and_constants",
+      "historical_sha256": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+      "current_disk_sha256": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+      "quick_reference_sha256": "f6125e42ead34d5178dad4403f853cde62db727cc0c1c01c46a6a283e6cd890a",
+      "historical_matches_current_disk": true,
+      "historical_matches_quick_reference": true,
+      "current_disk_matches_quick_reference": true
+    },
+    {
+      "path": "bluefin/dynamics.py",
+      "category": "physics_and_constants",
+      "historical_sha256": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711",
+      "current_disk_sha256": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711",
+      "quick_reference_sha256": "aba43cbad252cd6c4ba223640f51bc6c2eb3670016daf76618e9b37d336c3711",
+      "historical_matches_current_disk": true,
+      "historical_matches_quick_reference": true,
+      "current_disk_matches_quick_reference": true
+    },
+    {
+      "path": "bluefin/ship_model_v3.py",
+      "category": "physics_and_constants",
+      "historical_sha256": "21afbc6605035bd905f16db7f1149fec50fc9b73ca0d4bd0a1e76b06b6c4136c",
+      "current_disk_sha256": "21afbc6605035bd905f16db7f1149fec50fc9b73ca0d4bd0a1e76b06b6c4136c",
+      "quick_reference_sha256": "21afbc6605035bd905f16db7f1149fec50fc9b73ca0d4bd0a1e76b06b6c4136c",
+      "historical_matches_current_disk": true,
+      "historical_matches_quick_reference": true,
+      "current_disk_matches_quick_reference": true
+    },
+    {
+      "path": "tools/diagnostics/safety/oracle.py",
+      "category": "diagnostic_runner_or_wrapper",
+      "historical_sha256": "0a5c5035784b0de7b4118b149bbc276d926c4738e2a5cd69529976aeed0f20c2",
+      "current_disk_sha256": "0a5c5035784b0de7b4118b149bbc276d926c4738e2a5cd69529976aeed0f20c2",
+      "quick_reference_sha256": null,
+      "historical_matches_current_disk": true,
+      "historical_matches_quick_reference": null,
+      "current_disk_matches_quick_reference": null
+    },
+    {
+      "path": "tools/diagnostics/safety/paired_eval.py",
+      "category": "diagnostic_runner_or_wrapper",
+      "historical_sha256": "974165edb16954e57033f256c0b8edb78acd576340c8710cbb2c7f5645afad10",
+      "current_disk_sha256": "22c2ce15f256c28f3dd4aa485a1050f0bb8676e8668e3e06b241909cb50544d0",
+      "quick_reference_sha256": null,
+      "historical_matches_current_disk": false,
+      "historical_matches_quick_reference": null,
+      "current_disk_matches_quick_reference": null
+    },
+    {
+      "path": "tools/diagnostics/safety/prediction_audit.py",
+      "category": "diagnostic_runner_or_wrapper",
+      "historical_sha256": "f6a47f8fe6a214340728f9def3c132b6d02e9ba16de506ce84138b35fe618c0d",
+      "current_disk_sha256": "2d13fa1d83965dd27d4a06767918d0f9ab436650c63608805e677b6c38361d6a",
+      "quick_reference_sha256": "2d13fa1d83965dd27d4a06767918d0f9ab436650c63608805e677b6c38361d6a",
+      "historical_matches_current_disk": false,
+      "historical_matches_quick_reference": false,
+      "current_disk_matches_quick_reference": true
+    }
+  ],
+  "historical_source_files": 16,
+  "quick_reference_source_files": 78,
+  "current_disk_drift_from_quick_reference": [],
+  "quick_reference_sources_not_recorded_historically": [
+    "bluefin/acceptance.py",
+    "bluefin/baseline_v2.py",
+    "bluefin/build_dataset.py",
+    "bluefin/figures.py",
+    "bluefin/fit_final.py",
+    "bluefin/fit_model.py",
+    "bluefin/make_model.py",
+    "bluefin/simulate.py",
+    "bluefin/validate.py",
+    "bluefin/vessel_sim.py",
+    "src/asv_lidar.py",
+    "src/baseline_config.py",
+    "src/boundary_raycast.py",
+    "src/classical/__init__.py",
+    "src/classical/colregs_vo.py",
+    "src/classical/encounter_vo.py",
+    "src/classical/los_dwa.py",
+    "src/colregs/__init__.py",
+    "src/colregs/context.py",
+    "src/colregs/geometry.py",
+    "src/compare.py",
+    "src/constant_temp.py",
+    "src/corridor.py",
+    "src/cpa_cri.py",
+    "src/curriculum.py",
+    "src/emergency_stop.py",
+    "src/encounter.py",
+    "src/feasibility.py",
+    "src/feasibility_st.py",
+    "src/features_extractor.py",
+    "src/field_training.py",
+    "src/finetune_field.py",
+    "src/lidar_pooling.py",
+    "src/metrics.py",
+    "src/nominal.py",
+    "src/observation.py",
+    "src/obstacles.py",
+    "src/paper2_set.py",
+    "src/path.py",
+    "src/play.py",
+    "src/reference_controller.py",
+    "src/render.py",
+    "src/reward/__init__.py",
+    "src/reward/audit.py",
+    "src/reward/config.py",
+    "src/reward/reward.py",
+    "src/reward/terms.py",
+    "src/rollout.py",
+    "src/safety_course_backup.py",
+    "src/safety_feedback.py",
+    "src/safety_recovery.py",
+    "src/safety_v5.py",
+    "src/scenario.py",
+    "src/ship_v2.py",
+    "src/stopping.py",
+    "src/suite.py",
+    "src/targets.py",
+    "src/tracking.py",
+    "src/train.py",
+    "src/train_formulation.py",
+    "src/train_ppo_baseline.py",
+    "src/train_sac_baseline.py",
+    "tools/diagnostics/safety/suite_eval.py",
+    "tools/tiers/common.py"
+  ],
+  "conclusion": {
+    "recorded_checkpoint_config_cases_and_v4_effective_constants_match": true,
+    "historical_full_source_byte_equivalence_established": false,
+    "unresolved_production_source_differences": [
+      "src/env.py",
+      "src/safety_v4.py"
+    ],
+    "diagnostic_wrapper_differences": [
+      "tools/diagnostics/safety/paired_eval.py",
+      "tools/diagnostics/safety/prediction_audit.py"
+    ],
+    "interpretation": "Historical outcomes have matching recorded policy/config, all150 original scenario/reset identities, unchanged recorded physics/prediction dependencies and V2/V3/V4 effective constants. env.py and safety_v4.py source bytes differ; this metadata-only audit does not establish their historical behavioral equivalence. Wrapper-only hash differences are reported separately and do not independently invalidate controller comparability. Do not describe this as an exact all-source replication."
+  }
+}

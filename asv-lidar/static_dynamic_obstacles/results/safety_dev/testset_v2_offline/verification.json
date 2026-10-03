@@ -1,0 +1,40 @@
+{
+  "new_episode_runs": 0,
+  "unique_tests_passed": 96,
+  "failed": 0,
+  "checks": [
+    {
+      "command": "python -B -m pytest -q tests/test_safety_v7.py tests/test_safety_v6_hook.py tests/test_safety_v6_search.py",
+      "passed": 56,
+      "seconds": 17.16,
+      "run_by": "root"
+    },
+    {
+      "command": "python -B -m pytest -q tests/test_safety_risk_monitor.py",
+      "passed": 20,
+      "seconds": 0.98,
+      "run_by": "model_audit"
+    },
+    {
+      "command": "python -B -m pytest -q tests/test_safety_testset_v2_analysis.py",
+      "passed": 12,
+      "seconds": 0.22,
+      "run_by": "diagnostic_build"
+    },
+    {
+      "command": "python -B -m pytest -q tests/test_safety_testset_v2_saved.py",
+      "passed": 8,
+      "seconds": 0.23,
+      "run_by": "oracle_support"
+    }
+  ],
+  "additional_source_drift_verification": {
+    "command": "python -B -m pytest -q tests/test_safety_v7.py tests/test_safety_v6_hook.py -k native_dispatch",
+    "passed": 11,
+    "deselected": 22,
+    "seconds": 1.55,
+    "env_sha256": "7f9e391a54ca7a6ec8ffe4394c0d22a3188a0f391736b06ff523ce2b7e0e37d3",
+    "duplicates_of_previously_passing_tests": true
+  },
+  "scope": "Synthetic predictor, mocked filter/dispatch and saved-data validation; no episodes. Monitor tests also exercise the onboard numerical predictor in isolation, without an environment."
+}

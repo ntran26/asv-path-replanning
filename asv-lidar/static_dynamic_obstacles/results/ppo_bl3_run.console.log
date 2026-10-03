@@ -1,2 +1,5 @@
 2026-10-02 12:24:42 == ppos0_bl3: training 0 -> 2.5 M (filter-free, baseline-v3)
 2026-10-02 12:27:14    pinned learner 22752
+2026-10-03 03:59:24    ppos0_bl3 2.5 M exit 0
+2026-10-03 03:59:25 == ppos0_bl3: 2.5 M -> 3.0 M
+2026-10-03 04:01:58    pinned learner 12172

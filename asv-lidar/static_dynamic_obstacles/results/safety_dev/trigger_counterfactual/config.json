@@ -1,0 +1,10 @@
+{
+ "model": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\runs\\sac_formulation_seed0_bl3\\kept_best_3M\\best_model.zip",
+ "versions": [
+  "v4",
+  "v7"
+ ],
+ "branch_every": 4,
+ "max_branches": 1,
+ "started": "2026-10-03 06:33"
+}

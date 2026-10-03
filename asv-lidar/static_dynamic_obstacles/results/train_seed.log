@@ -40,3 +40,7 @@ code matches baseline-v3
 2026-10-02 12:24:24    ppos0_bl3: first start died at 07:58 (killed with the session's shell before training began); restarting detached
 2026-10-02 12:24:42 == ppos0_bl3: training 0 -> 2.5 M (filter-free, baseline-v3)
 2026-10-02 12:27:14    pinned learner 22752
+2026-10-03 01:41:08 == G4 pilot watcher armed: waiting for ppos0_bl3 (training + evaluations) to finish
+2026-10-03 03:59:24    ppos0_bl3 2.5 M exit 0
+2026-10-03 03:59:25 == ppos0_bl3: 2.5 M -> 3.0 M
+2026-10-03 04:01:58    pinned learner 12172

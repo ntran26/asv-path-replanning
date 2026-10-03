@@ -1,0 +1,1263 @@
+{
+  "schema": 1,
+  "scope": "all saved test-set v2 SAC off rows; no new runs",
+  "manifest_digest": "6df8076223414a88ee37a130c2261c7e26b45efba621f34fe024d4065c2cea8c",
+  "groups": [
+    {
+      "group_by": "overall",
+      "group": "all",
+      "n": 1000,
+      "goals": 872,
+      "failures": 128,
+      "target": 61,
+      "obstacle": 55,
+      "boundary": 12,
+      "timeouts": 0,
+      "goal_rate": 0.872,
+      "failure_rate": 0.128
+    },
+    {
+      "group_by": "source",
+      "group": "frozen",
+      "n": 761,
+      "goals": 709,
+      "failures": 52,
+      "target": 33,
+      "obstacle": 14,
+      "boundary": 5,
+      "timeouts": 0,
+      "goal_rate": 0.9316688567674113,
+      "failure_rate": 0.06833114323258871
+    },
+    {
+      "group_by": "source",
+      "group": "paper2",
+      "n": 239,
+      "goals": 163,
+      "failures": 76,
+      "target": 28,
+      "obstacle": 41,
+      "boundary": 7,
+      "timeouts": 0,
+      "goal_rate": 0.6820083682008368,
+      "failure_rate": 0.31799163179916323
+    },
+    {
+      "group_by": "stratum",
+      "group": "basin",
+      "n": 470,
+      "goals": 435,
+      "failures": 35,
+      "target": 23,
+      "obstacle": 7,
+      "boundary": 5,
+      "timeouts": 0,
+      "goal_rate": 0.925531914893617,
+      "failure_rate": 0.07446808510638303
+    },
+    {
+      "group_by": "stratum",
+      "group": "channel",
+      "n": 291,
+      "goals": 274,
+      "failures": 17,
+      "target": 10,
+      "obstacle": 7,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.9415807560137457,
+      "failure_rate": 0.05841924398625431
+    },
+    {
+      "group_by": "stratum",
+      "group": "field",
+      "n": 239,
+      "goals": 163,
+      "failures": 76,
+      "target": 28,
+      "obstacle": 41,
+      "boundary": 7,
+      "timeouts": 0,
+      "goal_rate": 0.6820083682008368,
+      "failure_rate": 0.31799163179916323
+    },
+    {
+      "group_by": "scenario_class",
+      "group": "being_overtaken",
+      "n": 140,
+      "goals": 134,
+      "failures": 6,
+      "target": 2,
+      "obstacle": 2,
+      "boundary": 2,
+      "timeouts": 0,
+      "goal_rate": 0.9571428571428572,
+      "failure_rate": 0.042857142857142816
+    },
+    {
+      "group_by": "scenario_class",
+      "group": "crossing",
+      "n": 301,
+      "goals": 225,
+      "failures": 76,
+      "target": 46,
+      "obstacle": 28,
+      "boundary": 2,
+      "timeouts": 0,
+      "goal_rate": 0.7475083056478405,
+      "failure_rate": 0.25249169435215946
+    },
+    {
+      "group_by": "scenario_class",
+      "group": "head_on",
+      "n": 243,
+      "goals": 214,
+      "failures": 29,
+      "target": 7,
+      "obstacle": 17,
+      "boundary": 5,
+      "timeouts": 0,
+      "goal_rate": 0.8806584362139918,
+      "failure_rate": 0.11934156378600824
+    },
+    {
+      "group_by": "scenario_class",
+      "group": "no_target",
+      "n": 3,
+      "goals": 3,
+      "failures": 0,
+      "target": 0,
+      "obstacle": 0,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 1.0,
+      "failure_rate": 0.0
+    },
+    {
+      "group_by": "scenario_class",
+      "group": "null",
+      "n": 75,
+      "goals": 72,
+      "failures": 3,
+      "target": 0,
+      "obstacle": 0,
+      "boundary": 3,
+      "timeouts": 0,
+      "goal_rate": 0.96,
+      "failure_rate": 0.040000000000000036
+    },
+    {
+      "group_by": "scenario_class",
+      "group": "overtaking",
+      "n": 238,
+      "goals": 224,
+      "failures": 14,
+      "target": 6,
+      "obstacle": 8,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.9411764705882353,
+      "failure_rate": 0.05882352941176472
+    },
+    {
+      "group_by": "source+cell",
+      "group": "frozen / basin-being_overtaken",
+      "n": 95,
+      "goals": 90,
+      "failures": 5,
+      "target": 2,
+      "obstacle": 2,
+      "boundary": 1,
+      "timeouts": 0,
+      "goal_rate": 0.9473684210526315,
+      "failure_rate": 0.052631578947368474
+    },
+    {
+      "group_by": "source+cell",
+      "group": "frozen / basin-crossing",
+      "n": 100,
+      "goals": 84,
+      "failures": 16,
+      "target": 14,
+      "obstacle": 2,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.84,
+      "failure_rate": 0.16000000000000003
+    },
+    {
+      "group_by": "source+cell",
+      "group": "frozen / basin-head_on",
+      "n": 100,
+      "goals": 92,
+      "failures": 8,
+      "target": 5,
+      "obstacle": 2,
+      "boundary": 1,
+      "timeouts": 0,
+      "goal_rate": 0.92,
+      "failure_rate": 0.07999999999999996
+    },
+    {
+      "group_by": "source+cell",
+      "group": "frozen / basin-null",
+      "n": 75,
+      "goals": 72,
+      "failures": 3,
+      "target": 0,
+      "obstacle": 0,
+      "boundary": 3,
+      "timeouts": 0,
+      "goal_rate": 0.96,
+      "failure_rate": 0.040000000000000036
+    },
+    {
+      "group_by": "source+cell",
+      "group": "frozen / basin-overtaking",
+      "n": 100,
+      "goals": 97,
+      "failures": 3,
+      "target": 2,
+      "obstacle": 1,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.97,
+      "failure_rate": 0.030000000000000027
+    },
+    {
+      "group_by": "source+cell",
+      "group": "frozen / channel-crossing",
+      "n": 100,
+      "goals": 88,
+      "failures": 12,
+      "target": 7,
+      "obstacle": 5,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.88,
+      "failure_rate": 0.12
+    },
+    {
+      "group_by": "source+cell",
+      "group": "frozen / channel-head_on",
+      "n": 98,
+      "goals": 94,
+      "failures": 4,
+      "target": 2,
+      "obstacle": 2,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.9591836734693877,
+      "failure_rate": 0.04081632653061229
+    },
+    {
+      "group_by": "source+cell",
+      "group": "frozen / channel-overtaking",
+      "n": 93,
+      "goals": 92,
+      "failures": 1,
+      "target": 1,
+      "obstacle": 0,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.989247311827957,
+      "failure_rate": 0.010752688172043001
+    },
+    {
+      "group_by": "source+cell",
+      "group": "paper2 / L1-BO",
+      "n": 15,
+      "goals": 15,
+      "failures": 0,
+      "target": 0,
+      "obstacle": 0,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 1.0,
+      "failure_rate": 0.0
+    },
+    {
+      "group_by": "source+cell",
+      "group": "paper2 / L1-CRP",
+      "n": 17,
+      "goals": 7,
+      "failures": 10,
+      "target": 4,
+      "obstacle": 6,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.4117647058823529,
+      "failure_rate": 0.5882352941176471
+    },
+    {
+      "group_by": "source+cell",
+      "group": "paper2 / L1-CRS",
+      "n": 18,
+      "goals": 8,
+      "failures": 10,
+      "target": 6,
+      "obstacle": 4,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.4444444444444444,
+      "failure_rate": 0.5555555555555556
+    },
+    {
+      "group_by": "source+cell",
+      "group": "paper2 / L1-HO",
+      "n": 15,
+      "goals": 14,
+      "failures": 1,
+      "target": 0,
+      "obstacle": 0,
+      "boundary": 1,
+      "timeouts": 0,
+      "goal_rate": 0.9333333333333333,
+      "failure_rate": 0.06666666666666665
+    },
+    {
+      "group_by": "source+cell",
+      "group": "paper2 / L1-NT",
+      "n": 1,
+      "goals": 1,
+      "failures": 0,
+      "target": 0,
+      "obstacle": 0,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 1.0,
+      "failure_rate": 0.0
+    },
+    {
+      "group_by": "source+cell",
+      "group": "paper2 / L1-OT",
+      "n": 15,
+      "goals": 8,
+      "failures": 7,
+      "target": 1,
+      "obstacle": 6,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.5333333333333333,
+      "failure_rate": 0.4666666666666667
+    },
+    {
+      "group_by": "source+cell",
+      "group": "paper2 / L2-BO",
+      "n": 15,
+      "goals": 15,
+      "failures": 0,
+      "target": 0,
+      "obstacle": 0,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 1.0,
+      "failure_rate": 0.0
+    },
+    {
+      "group_by": "source+cell",
+      "group": "paper2 / L2-CRP",
+      "n": 15,
+      "goals": 9,
+      "failures": 6,
+      "target": 4,
+      "obstacle": 2,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.6,
+      "failure_rate": 0.4
+    },
+    {
+      "group_by": "source+cell",
+      "group": "paper2 / L2-CRS",
+      "n": 17,
+      "goals": 8,
+      "failures": 9,
+      "target": 3,
+      "obstacle": 4,
+      "boundary": 2,
+      "timeouts": 0,
+      "goal_rate": 0.47058823529411764,
+      "failure_rate": 0.5294117647058824
+    },
+    {
+      "group_by": "source+cell",
+      "group": "paper2 / L2-HO",
+      "n": 15,
+      "goals": 0,
+      "failures": 15,
+      "target": 0,
+      "obstacle": 12,
+      "boundary": 3,
+      "timeouts": 0,
+      "goal_rate": 0.0,
+      "failure_rate": 1.0
+    },
+    {
+      "group_by": "source+cell",
+      "group": "paper2 / L2-NT",
+      "n": 1,
+      "goals": 1,
+      "failures": 0,
+      "target": 0,
+      "obstacle": 0,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 1.0,
+      "failure_rate": 0.0
+    },
+    {
+      "group_by": "source+cell",
+      "group": "paper2 / L2-OT",
+      "n": 15,
+      "goals": 15,
+      "failures": 0,
+      "target": 0,
+      "obstacle": 0,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 1.0,
+      "failure_rate": 0.0
+    },
+    {
+      "group_by": "source+cell",
+      "group": "paper2 / L3-BO",
+      "n": 15,
+      "goals": 14,
+      "failures": 1,
+      "target": 0,
+      "obstacle": 0,
+      "boundary": 1,
+      "timeouts": 0,
+      "goal_rate": 0.9333333333333333,
+      "failure_rate": 0.06666666666666665
+    },
+    {
+      "group_by": "source+cell",
+      "group": "paper2 / L3-CRP",
+      "n": 19,
+      "goals": 11,
+      "failures": 8,
+      "target": 6,
+      "obstacle": 2,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.5789473684210527,
+      "failure_rate": 0.42105263157894735
+    },
+    {
+      "group_by": "source+cell",
+      "group": "paper2 / L3-CRS",
+      "n": 15,
+      "goals": 10,
+      "failures": 5,
+      "target": 2,
+      "obstacle": 3,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.6666666666666666,
+      "failure_rate": 0.33333333333333337
+    },
+    {
+      "group_by": "source+cell",
+      "group": "paper2 / L3-HO",
+      "n": 15,
+      "goals": 14,
+      "failures": 1,
+      "target": 0,
+      "obstacle": 1,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.9333333333333333,
+      "failure_rate": 0.06666666666666665
+    },
+    {
+      "group_by": "source+cell",
+      "group": "paper2 / L3-NT",
+      "n": 1,
+      "goals": 1,
+      "failures": 0,
+      "target": 0,
+      "obstacle": 0,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 1.0,
+      "failure_rate": 0.0
+    },
+    {
+      "group_by": "source+cell",
+      "group": "paper2 / L3-OT",
+      "n": 15,
+      "goals": 12,
+      "failures": 3,
+      "target": 2,
+      "obstacle": 1,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.8,
+      "failure_rate": 0.19999999999999996
+    },
+    {
+      "group_by": "source+variant",
+      "group": "frozen / CV",
+      "n": 384,
+      "goals": 359,
+      "failures": 25,
+      "target": 18,
+      "obstacle": 4,
+      "boundary": 3,
+      "timeouts": 0,
+      "goal_rate": 0.9348958333333334,
+      "failure_rate": 0.06510416666666663
+    },
+    {
+      "group_by": "source+variant",
+      "group": "frozen / NC",
+      "n": 66,
+      "goals": 60,
+      "failures": 6,
+      "target": 5,
+      "obstacle": 1,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.9090909090909091,
+      "failure_rate": 0.09090909090909094
+    },
+    {
+      "group_by": "source+variant",
+      "group": "frozen / RE",
+      "n": 311,
+      "goals": 290,
+      "failures": 21,
+      "target": 10,
+      "obstacle": 9,
+      "boundary": 2,
+      "timeouts": 0,
+      "goal_rate": 0.932475884244373,
+      "failure_rate": 0.067524115755627
+    },
+    {
+      "group_by": "source+variant",
+      "group": "paper2 / ",
+      "n": 3,
+      "goals": 3,
+      "failures": 0,
+      "target": 0,
+      "obstacle": 0,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 1.0,
+      "failure_rate": 0.0
+    },
+    {
+      "group_by": "source+variant",
+      "group": "paper2 / FIX",
+      "n": 121,
+      "goals": 88,
+      "failures": 33,
+      "target": 10,
+      "obstacle": 20,
+      "boundary": 3,
+      "timeouts": 0,
+      "goal_rate": 0.7272727272727273,
+      "failure_rate": 0.2727272727272727
+    },
+    {
+      "group_by": "source+variant",
+      "group": "paper2 / VAR",
+      "n": 115,
+      "goals": 72,
+      "failures": 43,
+      "target": 18,
+      "obstacle": 21,
+      "boundary": 4,
+      "timeouts": 0,
+      "goal_rate": 0.6260869565217392,
+      "failure_rate": 0.3739130434782608
+    },
+    {
+      "group_by": "source+scenario_class",
+      "group": "frozen / being_overtaken",
+      "n": 95,
+      "goals": 90,
+      "failures": 5,
+      "target": 2,
+      "obstacle": 2,
+      "boundary": 1,
+      "timeouts": 0,
+      "goal_rate": 0.9473684210526315,
+      "failure_rate": 0.052631578947368474
+    },
+    {
+      "group_by": "source+scenario_class",
+      "group": "frozen / crossing",
+      "n": 200,
+      "goals": 172,
+      "failures": 28,
+      "target": 21,
+      "obstacle": 7,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.86,
+      "failure_rate": 0.14
+    },
+    {
+      "group_by": "source+scenario_class",
+      "group": "frozen / head_on",
+      "n": 198,
+      "goals": 186,
+      "failures": 12,
+      "target": 7,
+      "obstacle": 4,
+      "boundary": 1,
+      "timeouts": 0,
+      "goal_rate": 0.9393939393939394,
+      "failure_rate": 0.06060606060606055
+    },
+    {
+      "group_by": "source+scenario_class",
+      "group": "frozen / null",
+      "n": 75,
+      "goals": 72,
+      "failures": 3,
+      "target": 0,
+      "obstacle": 0,
+      "boundary": 3,
+      "timeouts": 0,
+      "goal_rate": 0.96,
+      "failure_rate": 0.040000000000000036
+    },
+    {
+      "group_by": "source+scenario_class",
+      "group": "frozen / overtaking",
+      "n": 193,
+      "goals": 189,
+      "failures": 4,
+      "target": 3,
+      "obstacle": 1,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.9792746113989638,
+      "failure_rate": 0.020725388601036232
+    },
+    {
+      "group_by": "source+scenario_class",
+      "group": "paper2 / being_overtaken",
+      "n": 45,
+      "goals": 44,
+      "failures": 1,
+      "target": 0,
+      "obstacle": 0,
+      "boundary": 1,
+      "timeouts": 0,
+      "goal_rate": 0.9777777777777777,
+      "failure_rate": 0.022222222222222254
+    },
+    {
+      "group_by": "source+scenario_class",
+      "group": "paper2 / crossing",
+      "n": 101,
+      "goals": 53,
+      "failures": 48,
+      "target": 25,
+      "obstacle": 21,
+      "boundary": 2,
+      "timeouts": 0,
+      "goal_rate": 0.5247524752475248,
+      "failure_rate": 0.4752475247524752
+    },
+    {
+      "group_by": "source+scenario_class",
+      "group": "paper2 / head_on",
+      "n": 45,
+      "goals": 28,
+      "failures": 17,
+      "target": 0,
+      "obstacle": 13,
+      "boundary": 4,
+      "timeouts": 0,
+      "goal_rate": 0.6222222222222222,
+      "failure_rate": 0.37777777777777777
+    },
+    {
+      "group_by": "source+scenario_class",
+      "group": "paper2 / no_target",
+      "n": 3,
+      "goals": 3,
+      "failures": 0,
+      "target": 0,
+      "obstacle": 0,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 1.0,
+      "failure_rate": 0.0
+    },
+    {
+      "group_by": "source+scenario_class",
+      "group": "paper2 / overtaking",
+      "n": 45,
+      "goals": 35,
+      "failures": 10,
+      "target": 3,
+      "obstacle": 7,
+      "boundary": 0,
+      "timeouts": 0,
+      "goal_rate": 0.7777777777777778,
+      "failure_rate": 0.2222222222222222
+    }
+  ],
+  "retrospective_statistics_not_online_features": {
+    "goal": {
+      "n": 872,
+      "median": {
+        "steps": {
+          "value": 52.0,
+          "finite_n": 872
+        },
+        "mean_speed": {
+          "value": 0.7562101407597903,
+          "finite_n": 872
+        },
+        "max_speed": {
+          "value": 0.9964881937618658,
+          "finite_n": 872
+        },
+        "min_target_range": {
+          "value": 2.8309840779453395,
+          "finite_n": 869
+        },
+        "rms_cte": {
+          "value": 1.4387528437147639,
+          "finite_n": 872
+        },
+        "engaged_frames": {
+          "value": 16.0,
+          "finite_n": 872
+        },
+        "colregs_integral": {
+          "value": -25.277983532410023,
+          "finite_n": 872
+        },
+        "p_port_sense": {
+          "value": 0.0,
+          "finite_n": 872
+        }
+      }
+    },
+    "collision:target": {
+      "n": 61,
+      "median": {
+        "steps": {
+          "value": 19.0,
+          "finite_n": 61
+        },
+        "mean_speed": {
+          "value": 0.577556741107484,
+          "finite_n": 61
+        },
+        "max_speed": {
+          "value": 0.747358757684831,
+          "finite_n": 61
+        },
+        "min_target_range": {
+          "value": 1.3670796279062367,
+          "finite_n": 61
+        },
+        "rms_cte": {
+          "value": 0.5679201390674838,
+          "finite_n": 61
+        },
+        "engaged_frames": {
+          "value": 10.0,
+          "finite_n": 61
+        },
+        "colregs_integral": {
+          "value": -16.897194207244844,
+          "finite_n": 61
+        },
+        "p_port_sense": {
+          "value": 0.0,
+          "finite_n": 61
+        }
+      }
+    },
+    "collision:obstacle": {
+      "n": 55,
+      "median": {
+        "steps": {
+          "value": 25.0,
+          "finite_n": 55
+        },
+        "mean_speed": {
+          "value": 0.6515881550861736,
+          "finite_n": 55
+        },
+        "max_speed": {
+          "value": 0.8475051038112703,
+          "finite_n": 55
+        },
+        "min_target_range": {
+          "value": 3.4758726409380545,
+          "finite_n": 55
+        },
+        "rms_cte": {
+          "value": 1.4141189172988855,
+          "finite_n": 55
+        },
+        "engaged_frames": {
+          "value": 13.0,
+          "finite_n": 55
+        },
+        "colregs_integral": {
+          "value": -19.167628861238825,
+          "finite_n": 55
+        },
+        "p_port_sense": {
+          "value": 0.0,
+          "finite_n": 55
+        }
+      }
+    },
+    "collision:boundary": {
+      "n": 12,
+      "median": {
+        "steps": {
+          "value": 32.5,
+          "finite_n": 12
+        },
+        "mean_speed": {
+          "value": 0.7387106024760235,
+          "finite_n": 12
+        },
+        "max_speed": {
+          "value": 0.951621258386232,
+          "finite_n": 12
+        },
+        "min_target_range": {
+          "value": 2.9254141824907536,
+          "finite_n": 12
+        },
+        "rms_cte": {
+          "value": 2.3234232594077846,
+          "finite_n": 12
+        },
+        "engaged_frames": {
+          "value": 14.5,
+          "finite_n": 12
+        },
+        "colregs_integral": {
+          "value": -17.867551029212315,
+          "finite_n": 12
+        },
+        "p_port_sense": {
+          "value": 0.0,
+          "finite_n": 12
+        }
+      }
+    }
+  },
+  "prior_v1_reuse": {
+    "available": true,
+    "path": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\results\\test_set\\sacs0_bl3\\episodes.csv",
+    "sha256": "6c112ae581b81bb66de3b9121e49a56cc2b20300be99d75567bd437c83ad97f5",
+    "shared_ids": 985,
+    "numerical_tolerance": 1e-12,
+    "substantive_difference_counts": {},
+    "new_ids": [
+      "P2v2-L1-BO-VAR-04",
+      "P2v2-L1-BO-FIX-05",
+      "P2v2-L1-BO-VAR-06",
+      "P2v2-L1-BO-FIX-07",
+      "P2v2-L1-BO-VAR-08",
+      "P2v2-L1-BO-FIX-09",
+      "P2v2-L1-BO-VAR-10",
+      "P2v2-L1-BO-FIX-11",
+      "P2v2-L1-BO-VAR-12",
+      "P2v2-L1-BO-FIX-13",
+      "P2v2-L1-BO-VAR-16",
+      "P2v2-L1-BO-FIX-17",
+      "P2v2-L1-BO-VAR-18",
+      "P2v2-L1-BO-FIX-19",
+      "P2v2-L1-BO-VAR-20"
+    ]
+  },
+  "matching": {
+    "coordinates": [
+      "nominal_width",
+      "width_ratio",
+      "bend_deg",
+      "path_offset_frac",
+      "slant_realised_deg",
+      "target_speed",
+      "speed_ratio",
+      "dcpa_m",
+      "tcpa_s",
+      "spawn_range_m",
+      "ct_deg",
+      "w_eff_at_cpa",
+      "own_start_s_override",
+      "obstacle_count_for_matching",
+      "fixed_obstacle_count",
+      "own_spawn_x",
+      "own_spawn_y",
+      "own_heading_sin",
+      "own_heading_cos",
+      "path_midpoint_x",
+      "path_midpoint_y",
+      "target_spawn_x",
+      "target_spawn_y",
+      "target_heading_sin",
+      "target_heading_cos"
+    ],
+    "scales_by_source_cell": {
+      "frozen/basin-being_overtaken": {
+        "nominal_width": 0.06070381224203707,
+        "slant_realised_deg": 6.110446934074321,
+        "target_speed": 0.06368953983855279,
+        "speed_ratio": 0.11409991451250673,
+        "dcpa_m": 0.24122605240482448,
+        "tcpa_s": 1.594290187126796,
+        "spawn_range_m": 0.5013266765562956,
+        "ct_deg": 5.4476794885835895,
+        "w_eff_at_cpa": 0.06070381224203712,
+        "obstacle_count_for_matching": 1.083034620369851,
+        "own_spawn_x": 1.0261123784740647,
+        "own_spawn_y": 0.04572937312503359,
+        "own_heading_sin": 0.1061834550399265,
+        "own_heading_cos": 0.006480631025352011,
+        "path_midpoint_x": 0.9887413506990629,
+        "target_spawn_x": 1.9863079987845575,
+        "target_spawn_y": 0.7429314787844717,
+        "target_heading_sin": 0.13792556594174507,
+        "target_heading_cos": 0.01285215307732423
+      },
+      "frozen/basin-crossing": {
+        "nominal_width": 0.0497990634547557,
+        "slant_realised_deg": 5.470887169373876,
+        "target_speed": 0.09711683667199275,
+        "speed_ratio": 0.17398497131693585,
+        "dcpa_m": 0.6998183927862396,
+        "tcpa_s": 1.3629259498235806,
+        "spawn_range_m": 1.0123507327241061,
+        "ct_deg": 65.61915340516843,
+        "w_eff_at_cpa": 0.04979906345475537,
+        "obstacle_count_for_matching": 1.0988630487917956,
+        "own_spawn_x": 1.4392550722338218,
+        "own_heading_sin": 0.09514000333840977,
+        "own_heading_cos": 0.005323264924022271,
+        "path_midpoint_x": 1.0089388732618874,
+        "target_spawn_x": 2.9505865793112815,
+        "target_spawn_y": 1.400706814162426,
+        "target_heading_sin": 0.7977030018912058,
+        "target_heading_cos": 0.41415118401944795
+      },
+      "frozen/basin-head_on": {
+        "nominal_width": 0.05335817617761295,
+        "slant_realised_deg": 5.673830783760988,
+        "target_speed": 0.09574092948138864,
+        "speed_ratio": 0.17152003134055938,
+        "dcpa_m": 0.5671049889260507,
+        "tcpa_s": 1.336673992867021,
+        "spawn_range_m": 1.3055382538510556,
+        "ct_deg": 4.981454444843253,
+        "w_eff_at_cpa": 0.053358176177613015,
+        "obstacle_count_for_matching": 1.0590561835898982,
+        "own_spawn_x": 1.5610110192356317,
+        "own_heading_sin": 0.0986465513653886,
+        "own_heading_cos": 0.005694748127371223,
+        "path_midpoint_x": 1.1290901575008734,
+        "target_spawn_x": 1.9020458801425077,
+        "target_spawn_y": 1.317038306409869,
+        "target_heading_sin": 0.14107861944822792,
+        "target_heading_cos": 0.012082787616219079
+      },
+      "frozen/basin-null": {
+        "nominal_width": 0.052256395140557306,
+        "slant_realised_deg": 5.2761649608779155,
+        "target_speed": 0.04576549418102242,
+        "speed_ratio": 0.08198895747895449,
+        "dcpa_m": 3.39059897697795,
+        "tcpa_s": 211.71289824871465,
+        "spawn_range_m": 1.477933914356006,
+        "ct_deg": 5.134246641156424,
+        "w_eff_at_cpa": 0.052256395140557105,
+        "obstacle_count_for_matching": 1.1152279288707458,
+        "own_spawn_x": 1.40974464942906,
+        "own_heading_sin": 0.09173671425260145,
+        "own_heading_cos": 0.005572893485511115,
+        "path_midpoint_x": 1.0853194406874913,
+        "target_spawn_x": 3.34800172013084,
+        "target_spawn_y": 1.5160983359989997,
+        "target_heading_sin": 0.11916788877917969,
+        "target_heading_cos": 0.009946021686740554
+      },
+      "frozen/basin-overtaking": {
+        "nominal_width": 0.055785237310809595,
+        "width_ratio": 0.0016370770393072322,
+        "slant_realised_deg": 5.630828386657966,
+        "target_speed": 0.02463076238339662,
+        "speed_ratio": 0.04412605098808138,
+        "dcpa_m": 0.5757970932604274,
+        "tcpa_s": 2.2921432155579957,
+        "spawn_range_m": 0.7863303211056631,
+        "ct_deg": 5.551488758745439,
+        "w_eff_at_cpa": 0.05579853965162268,
+        "obstacle_count_for_matching": 1.142978564978364,
+        "own_spawn_x": 1.4165765045816516,
+        "own_heading_sin": 0.09787699695794184,
+        "own_heading_cos": 0.005956778421171428,
+        "path_midpoint_x": 1.028729169799509,
+        "target_spawn_x": 1.5950843868232225,
+        "target_spawn_y": 0.8110012616437206,
+        "target_heading_sin": 0.14065936697939754,
+        "target_heading_cos": 0.012463830112445267
+      },
+      "frozen/channel-crossing": {
+        "nominal_width": 0.8408505904259472,
+        "width_ratio": 0.20464289496141008,
+        "path_offset_frac": 0.1412411772125199,
+        "target_speed": 0.10729414317093033,
+        "speed_ratio": 0.19221763251122254,
+        "dcpa_m": 0.6909360202829665,
+        "tcpa_s": 1.886532995414354,
+        "spawn_range_m": 1.1513300968106825,
+        "ct_deg": 82.9139952311156,
+        "w_eff_at_cpa": 0.9524302238368489,
+        "obstacle_count_for_matching": 1.1001818031580053,
+        "own_spawn_x": 0.5340541467239631,
+        "target_spawn_x": 4.512985555583691,
+        "target_spawn_y": 1.3659363818337382,
+        "target_heading_sin": 0.9226143679618772,
+        "target_heading_cos": 0.3492631335404482
+      },
+      "frozen/channel-head_on": {
+        "nominal_width": 0.7450652463053039,
+        "width_ratio": 0.23926632819002722,
+        "path_offset_frac": 0.13392387217305535,
+        "target_speed": 0.08984116859548481,
+        "speed_ratio": 0.16095060008964657,
+        "dcpa_m": 0.6137316775808824,
+        "tcpa_s": 1.2701597716606285,
+        "spawn_range_m": 1.3722499196440356,
+        "ct_deg": 5.553136621996567,
+        "w_eff_at_cpa": 1.0032110077472374,
+        "obstacle_count_for_matching": 1.0324291924797466,
+        "own_spawn_x": 0.4997581945356362,
+        "target_spawn_x": 1.374022038421255,
+        "target_spawn_y": 1.379697841028067,
+        "target_heading_sin": 0.0966294448806581,
+        "target_heading_cos": 0.0045024548254092136
+      },
+      "frozen/channel-overtaking": {
+        "nominal_width": 0.7819417505534285,
+        "width_ratio": 0.24687926122999337,
+        "path_offset_frac": 0.13994969112395456,
+        "target_speed": 0.024364627775342422,
+        "speed_ratio": 0.043649270403627816,
+        "dcpa_m": 0.5600896846628621,
+        "tcpa_s": 2.394352283844767,
+        "spawn_range_m": 0.8458564488012996,
+        "ct_deg": 5.313292749849632,
+        "w_eff_at_cpa": 1.1059136458125316,
+        "obstacle_count_for_matching": 1.2325789144866324,
+        "own_spawn_x": 0.5199356104881391,
+        "target_spawn_x": 1.3749632826680054,
+        "target_spawn_y": 0.8832377315485721,
+        "target_heading_sin": 0.09247552914419199,
+        "target_heading_cos": 0.004194873936120695
+      },
+      "paper2/L1-BO": {
+        "target_speed": 0.053534859576726206,
+        "speed_ratio": 0.0959077882589128,
+        "dcpa_m": 0.15732651217555987,
+        "tcpa_s": 1.7856674896129443,
+        "spawn_range_m": 0.5415149678248031,
+        "ct_deg": 4.380628600902217,
+        "target_spawn_x": 0.7869325403331249,
+        "target_spawn_y": 0.8907976497134235,
+        "target_heading_sin": 0.07624305541882252,
+        "target_heading_cos": 0.004348114683580689
+      },
+      "paper2/L1-CRP": {
+        "target_speed": 0.07129700467639949,
+        "speed_ratio": 0.12772870017896845,
+        "dcpa_m": 0.8197697108890488,
+        "tcpa_s": 1.7123692497346181,
+        "spawn_range_m": 1.0789589075212438,
+        "ct_deg": 27.434277348542683,
+        "target_spawn_x": 0.5202767430080963,
+        "target_spawn_y": 1.2628207806396856,
+        "target_heading_sin": 0.30051913756572113,
+        "target_heading_cos": 0.3465210706029121
+      },
+      "paper2/L1-CRS": {
+        "target_speed": 0.054800405427432794,
+        "speed_ratio": 0.0981750157148391,
+        "dcpa_m": 0.539825413919651,
+        "tcpa_s": 1.5623738319325267,
+        "spawn_range_m": 1.0522519211662358,
+        "ct_deg": 32.10389702729204,
+        "target_spawn_x": 0.6250129319546929,
+        "target_spawn_y": 1.236391299669518,
+        "target_heading_sin": 0.2732642339264572,
+        "target_heading_cos": 0.4518083040422346
+      },
+      "paper2/L1-HO": {
+        "target_speed": 0.08263545186445809,
+        "speed_ratio": 0.14804154681189294,
+        "dcpa_m": 0.3689418916923344,
+        "tcpa_s": 1.3648236374859888,
+        "spawn_range_m": 1.0467583579747515,
+        "ct_deg": 5.584794719269595,
+        "target_spawn_x": 0.881268236687805,
+        "target_spawn_y": 1.034569770982706,
+        "target_heading_sin": 0.09717720456965788,
+        "target_heading_cos": 0.004547956829229087
+      },
+      "paper2/L1-NT": {},
+      "paper2/L1-OT": {
+        "target_speed": 0.022183912708543325,
+        "speed_ratio": 0.03974251580422818,
+        "dcpa_m": 0.5380006971842809,
+        "tcpa_s": 2.552005627388504,
+        "spawn_range_m": 0.9898827382678738,
+        "ct_deg": 5.852000412192679,
+        "target_spawn_x": 1.3952679415919376,
+        "target_spawn_y": 1.0245682785934516,
+        "target_heading_sin": 0.10184436400696065,
+        "target_heading_cos": 0.00395948324261522
+      },
+      "paper2/L2-BO": {
+        "target_speed": 0.06250849797680207,
+        "speed_ratio": 0.1119840760906396,
+        "dcpa_m": 0.2177052575085395,
+        "tcpa_s": 1.4974112071170673,
+        "spawn_range_m": 0.4381299831534999,
+        "ct_deg": 6.417319209268782,
+        "target_spawn_x": 0.5357825966350617,
+        "target_spawn_y": 0.3571641034753791,
+        "target_heading_sin": 0.10810262309907646,
+        "target_heading_cos": 0.028259823450273846
+      },
+      "paper2/L2-CRP": {
+        "target_speed": 0.13076674583813033,
+        "speed_ratio": 0.23426883847852278,
+        "dcpa_m": 0.7559795711351985,
+        "tcpa_s": 0.9748920889911663,
+        "spawn_range_m": 1.0061363634021687,
+        "ct_deg": 20.297491301779157,
+        "target_spawn_x": 0.558846890955072,
+        "target_spawn_y": 1.0300150695963393,
+        "target_heading_sin": 0.24830147224216287,
+        "target_heading_cos": 0.2365861556516075
+      },
+      "paper2/L2-CRS": {
+        "target_speed": 0.07599126938359102,
+        "speed_ratio": 0.13613848305928702,
+        "dcpa_m": 0.7922666164342265,
+        "tcpa_s": 1.388050250622224,
+        "spawn_range_m": 0.8204314057142345,
+        "ct_deg": 25.661052952126873,
+        "target_spawn_x": 0.7385978254815709,
+        "target_spawn_y": 1.3698818399944974,
+        "target_heading_sin": 0.07811381575680798,
+        "target_heading_cos": 0.4228524804980424
+      },
+      "paper2/L2-HO": {
+        "target_speed": 0.09564992131031182,
+        "speed_ratio": 0.17135699005362076,
+        "dcpa_m": 0.3295866001710859,
+        "tcpa_s": 1.1139453413691682,
+        "spawn_range_m": 1.5076465787373343,
+        "ct_deg": 3.1611889370534465,
+        "target_spawn_x": 0.4104330178206017,
+        "target_spawn_y": 1.4818558989936836,
+        "target_heading_sin": 0.05240406678338831,
+        "target_heading_cos": 0.01714756900266152
+      },
+      "paper2/L2-NT": {},
+      "paper2/L2-OT": {
+        "target_speed": 0.025142854762591482,
+        "speed_ratio": 0.04504346532074502,
+        "dcpa_m": 0.5068289801872204,
+        "tcpa_s": 1.9754631540292473,
+        "spawn_range_m": 0.7852706398498266,
+        "ct_deg": 6.343169176392726,
+        "target_spawn_x": 0.7818799953674297,
+        "target_spawn_y": 0.7674939646910776,
+        "target_heading_sin": 0.1065182995161448,
+        "target_heading_cos": 0.029166784413559972
+      },
+      "paper2/L3-BO": {
+        "target_speed": 0.06000763141793524,
+        "speed_ratio": 0.10750376957096267,
+        "dcpa_m": 0.2560975397639442,
+        "tcpa_s": 1.2017653538503574,
+        "spawn_range_m": 0.4799424428512494,
+        "ct_deg": 5.537103519785919,
+        "target_spawn_x": 1.1111675144495563,
+        "target_spawn_y": 0.513545105535558,
+        "target_heading_sin": 0.09359908456063158,
+        "target_heading_cos": 0.023283973090375918
+      },
+      "paper2/L3-CRP": {
+        "target_speed": 0.07538448709184156,
+        "speed_ratio": 0.1350514315938216,
+        "dcpa_m": 0.6204924620665023,
+        "tcpa_s": 0.8927055097759692,
+        "spawn_range_m": 1.4475443864351227,
+        "ct_deg": 31.726153502363612,
+        "target_spawn_x": 0.5594969069509487,
+        "target_spawn_y": 2.354289173594504,
+        "target_heading_sin": 0.19919296483317026,
+        "target_heading_cos": 0.4812367814049064
+      },
+      "paper2/L3-CRS": {
+        "target_speed": 0.10530844737260026,
+        "speed_ratio": 0.18866025524940477,
+        "dcpa_m": 0.4782804588630425,
+        "tcpa_s": 2.1893272150122045,
+        "spawn_range_m": 1.2656465031846036,
+        "ct_deg": 33.509113141362505,
+        "target_spawn_x": 0.7546769255467016,
+        "target_spawn_y": 1.275922066574113,
+        "target_heading_sin": 0.3479886311370745,
+        "target_heading_cos": 0.4220053579419445
+      },
+      "paper2/L3-HO": {
+        "target_speed": 0.08937050588047446,
+        "speed_ratio": 0.16010740706795037,
+        "dcpa_m": 0.34631367132851393,
+        "tcpa_s": 1.3075478212040443,
+        "spawn_range_m": 1.3047710463146036,
+        "ct_deg": 3.686691218948162,
+        "target_spawn_x": 0.5174918423923746,
+        "target_spawn_y": 1.3765038385496364,
+        "target_heading_sin": 0.06244433496117034,
+        "target_heading_cos": 0.015287008787590496
+      },
+      "paper2/L3-NT": {},
+      "paper2/L3-OT": {
+        "target_speed": 0.017655745161467902,
+        "speed_ratio": 0.031630296257198834,
+        "dcpa_m": 0.566591008608193,
+        "tcpa_s": 2.2812501202373503,
+        "spawn_range_m": 0.8460659461703041,
+        "ct_deg": 4.855625252022452,
+        "target_spawn_x": 0.5907571005914303,
+        "target_spawn_y": 0.9477268489148416,
+        "target_heading_sin": 0.08239803303464223,
+        "target_heading_cos": 0.019302574200683115
+      }
+    },
+    "pairs": 226,
+    "unique_controls": 151,
+    "matched_failures": 113,
+    "unmatched_failures": 15,
+    "strict_same_cell_and_variant": true,
+    "maximum_per_failure": 2,
+    "duplicate_controls_allowed": true,
+    "causal_estimate": false
+  },
+  "trajectory_records_available": false
+}

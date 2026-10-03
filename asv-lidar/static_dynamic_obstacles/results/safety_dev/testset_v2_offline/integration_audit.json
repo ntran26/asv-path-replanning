@@ -1,0 +1,71 @@
+{
+  "new_episode_runs": 0,
+  "source_files": {
+    "src/safety_v7.py": {
+      "sha256": "94a64f2c0914ddafe0cbc8f2d0f3256c4aee99ade16fe796e6d13a095c300444",
+      "crlf": 0,
+      "lf": 128
+    },
+    "src/safety_risk_monitor.py": {
+      "sha256": "d8e537b28f3da31563f71de4f2694e926ab58560e1bfa7f089ae71bd1a62d684",
+      "crlf": 0,
+      "lf": 173
+    },
+    "src/env.py": {
+      "sha256": "7f9e391a54ca7a6ec8ffe4394c0d22a3188a0f391736b06ff523ce2b7e0e37d3",
+      "crlf": 0,
+      "lf": 2028
+    },
+    "src/constants.py": {
+      "sha256": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f",
+      "crlf": 1640,
+      "lf": 1640
+    },
+    "src/scenario.py": {
+      "sha256": "a97659d9979b3dd6f4a1d4c131368bfc8d290514994ad188ce83470a9cfd97ba",
+      "crlf": 824,
+      "lf": 824
+    },
+    "tests/test_safety_v7.py": {
+      "sha256": "1b5862d0d4857fea7e1c91384ce76020ed206cd42ebffd3254bcd6b0d30f7c31",
+      "crlf": 0,
+      "lf": 197
+    },
+    "tests/test_safety_risk_monitor.py": {
+      "sha256": "7ea254a2a8255c5b9167d0e005fd55ce335e8e1e8c1e74141bcab11067fa7edf",
+      "crlf": 0,
+      "lf": 200
+    },
+    "tests/test_safety_testset_v2_analysis.py": {
+      "sha256": "c919adc650b01f8af863edf5bfdd6badb8db41683da007ed38ca6ae3f6e6702b",
+      "crlf": 0,
+      "lf": 88
+    },
+    "tests/test_safety_testset_v2_saved.py": {
+      "sha256": "e39ab432431c6eb54a2479dc419ee57cfd74a217ccc9bbb563ae833bb53c41b9",
+      "crlf": 0,
+      "lf": 74
+    },
+    "tools/diagnostics/safety/testset_v2_analysis.py": {
+      "sha256": "e3f8468a4219b74fe4bda11b38c583cb46fc8842a8daa0b33170e1b795953c03",
+      "crlf": 0,
+      "lf": 401
+    },
+    "tools/diagnostics/safety/analyze_testset_v2_saved.py": {
+      "sha256": "e5f822361a3beb07fb26a73280ebbabc9405a96220d88650e90a3284e0c88a05",
+      "crlf": 0,
+      "lf": 306
+    }
+  },
+  "env_before_sha256": "608d2dce1f3e17efa6ff0eadee0831cbb023482c7422f02ac73bdda4bd280ccb",
+  "our_env_change": "only native V7 branch; reconstructed removal isolates separately preserved external changes",
+  "external_env_change": "Concurrent training start_clear reset redraw and _start_is_clear helper; not authored, reverted, or evaluated here",
+  "external_diff": "external_env_change.diff",
+  "env_without_v7_sha256": "de0af44e6103ea64bdea0e19da817e54c14541e81385f7e70243d37392302325",
+  "constants_unchanged": true,
+  "checkpoint_sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+  "old_v6_attempts": 149,
+  "permission_scope": "saved-data analysis and synthetic code tests only",
+  "v7_episode_performance": "unmeasured",
+  "risk_monitor_control_authority": false
+}

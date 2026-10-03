@@ -77,8 +77,8 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", type=Path, required=True)
     ap.add_argument("--tag", required=True)
-    ap.add_argument("--safety-version", type=int, choices=(1, 2, 3, 4, 5), default=1,
-                    help="safety layer used when it is on: 1 = stop latch, 2/3 = predictive filter, 4 = selected observer/memory filter, 5 = next development filter")
+    ap.add_argument("--safety-version", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8), default=1,
+                    help="safety layer used when it is on: 1 = stop latch, 2/3 = predictive filter, 4 = selected observer/memory filter, 5-7 = development filters, 8 = v7 without hold-back")
     ap.add_argument("--safety", "--supervisor", dest="supervisor", choices=("off", "on", "both"), default="both")
     ap.add_argument("--tiers", default="b,r",
                     help="b the headline, r the robustness set (default b,r); a the extended "

@@ -1,0 +1,45 @@
+{
+  "created_utc": "2026-10-02T16:09:27.883207+00:00",
+  "broad_manifest_sha256": "5f86f112a75955dfa31683c2f648ed158624978797970392eb4b4d334a8f0966",
+  "native_env_dispatch_only_change_verified_by_AST": true,
+  "v6_logic_unchanged_except_three_defaults_and_docstring_verified_by_AST": true,
+  "enabled_defaults": [
+    "PROVISIONAL_TRACKS",
+    "PROVISIONAL_MOTION_EVIDENCE",
+    "TRAJECTORY_SEARCH"
+  ],
+  "existing_runtime_default_safety_version_unchanged": true,
+  "source_drift_at_integration": {
+    "src/env.py": {
+      "frozen": "3664ee0c505fa18f26d7c0250d1ec0fff40f45d83f80c663d22cdda0ede6fb9b",
+      "current": "608d2dce1f3e17efa6ff0eadee0831cbb023482c7422f02ac73bdda4bd280ccb"
+    },
+    "src/safety_v6.py": {
+      "frozen": "d81137c86991e027f5f340c6e266f17c9c183fc7731da588503dd72e89665fd3",
+      "current": "9e4573889bb481c8ed106529116fd54031b8aaf9c38557334f9f02845170feb8"
+    },
+    "src/scenario.py": {
+      "frozen": "6aaa6df5878c786fee94e02b8b5ab762c1806dd53338531fe5061391de8fdf15",
+      "current": "a97659d9979b3dd6f4a1d4c131368bfc8d290514994ad188ce83470a9cfd97ba"
+    }
+  },
+  "external_scenario_change": {
+    "modified_utc": "2026-10-02T15:58:25.285625+00:00",
+    "broad_started_utc": "2026-10-02T15:46:43.488644+00:00",
+    "first_episode_finished_utc": "2026-10-02T15:46:51.791784+00:00",
+    "interpretation": "External scenario edit occurred after the broad process imported scenario for its first episode. Python keeps the loaded module; the runner does not reload it. Probe preflight correctly rejected the changed disk source. The external edit is preserved and is not approved as a new frozen baseline."
+  },
+  "runner_reference_guard": {
+    "path": "tools/diagnostics/safety/development_campaign.py",
+    "sha256": "dc7e1d6441a22d37503a7212c96c0ad97a0c21923659886e56d748172db1e8fa",
+    "scope": "Exact frozen hashes everywhere; only the audited old-to-native src/env.py hash pair is additionally accepted. External scenario.py drift still blocks.",
+    "synthetic_tests_passed": 28
+  },
+  "post_integration_validation": {
+    "focused_filter_geometry_calibration_dispatch_tests_passed": 147,
+    "runner_tests_passed": 28,
+    "report_tests_passed": 17,
+    "classifier_tests_passed": 11,
+    "known_legacy_failure": "Unmodified V3 dead-ahead simulator test; recorded separately in verification_runs.json."
+  }
+}

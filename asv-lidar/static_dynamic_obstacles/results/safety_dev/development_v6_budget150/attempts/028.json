@@ -1,0 +1,10 @@
+{
+  "tag": "search_calibrated_v1",
+  "mode": "v6",
+  "suite": "dev_field",
+  "case": "DV3-HO-CV-01",
+  "seed": 900140,
+  "scenario_sha256": "a02d7506c6371505fe3463540272f3755d7973bb4e3f9107616c7a79c0765cec",
+  "run_manifest_sha256": "06ac1e671f1ce92b8f078df6d40febebfb345abe87c1145329ae1648edae5a45",
+  "attempt": 28
+}

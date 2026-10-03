@@ -1,0 +1,106 @@
+{
+  "case": "DV3-CRP-CV-02",
+  "trace": "results\\safety_dev\\development_v6_budget150\\runs\\provisional_targets_v1\\trace_010.jsonl",
+  "trace_sha256": "8edccd6e67606a9e5119ea440546853b6f18a0f4a11f3c8ef1b331db4c73e9fb",
+  "anchor_decision": 4,
+  "anchor_track_view": {
+    "id": 9,
+    "position_m": [
+      2.639389281262517,
+      9.602616173065925
+    ],
+    "velocity_mps": [
+      0.40215337553270775,
+      -0.05377944190740761
+    ],
+    "heading_rad": 1.5707963267948966
+  },
+  "summary": [
+    {
+      "decision": 5,
+      "anchor_age_decisions": 1,
+      "target_constraint_only": true,
+      "current_position_error_m": 0.2531748720346152,
+      "anchor_position_error_m": 0.08025011297523459,
+      "truth_minimum_gap_m": -0.20688294707110463,
+      "truth_first_negative_s": 6.5,
+      "current_minimum_gap_m": 0.15106230488921465,
+      "current_first_negative_s": null,
+      "anchor4_minimum_gap_m": -0.7247051208608034,
+      "anchor4_first_negative_s": 6.0
+    },
+    {
+      "decision": 6,
+      "anchor_age_decisions": 2,
+      "target_constraint_only": true,
+      "current_position_error_m": 0.3158635187922748,
+      "anchor_position_error_m": 0.11842150141960388,
+      "truth_minimum_gap_m": -0.20688294707110463,
+      "truth_first_negative_s": 6.0,
+      "current_minimum_gap_m": 0.9845566109745619,
+      "current_first_negative_s": null,
+      "anchor4_minimum_gap_m": -0.724705120860803,
+      "anchor4_first_negative_s": 5.5
+    },
+    {
+      "decision": 7,
+      "anchor_age_decisions": 3,
+      "target_constraint_only": true,
+      "current_position_error_m": 0.46488200381129763,
+      "anchor_position_error_m": 0.15659497046272897,
+      "truth_minimum_gap_m": -0.20688294707110463,
+      "truth_first_negative_s": 5.5,
+      "current_minimum_gap_m": 1.756227694791552,
+      "current_first_negative_s": null,
+      "anchor4_minimum_gap_m": -0.7247051208608034,
+      "anchor4_first_negative_s": 5.0
+    }
+  ],
+  "false_positive_counterexample": {
+    "scenario": "Target moved1m/s at prior anchor, reached[.5,0] then truly stopped; ego remains[4,0]. Anchor age=.5s, both current positions agree.",
+    "current_minimum_gap_m": 1.9875000000000003,
+    "history_minimum_gap_m": -1.5125000000000002
+  },
+  "target_gap_microbenchmark": [
+    {
+      "rollout_columns": 64,
+      "hull_samples": 64,
+      "hypotheses": 1,
+      "mean_milliseconds": 0.7216099999641301
+    },
+    {
+      "rollout_columns": 64,
+      "hull_samples": 64,
+      "hypotheses": 4,
+      "mean_milliseconds": 3.0418549999740208
+    },
+    {
+      "rollout_columns": 120,
+      "hull_samples": 64,
+      "hypotheses": 1,
+      "mean_milliseconds": 1.3349990000278922
+    },
+    {
+      "rollout_columns": 120,
+      "hull_samples": 64,
+      "hypotheses": 4,
+      "mean_milliseconds": 4.563951999953133
+    }
+  ],
+  "method": "Evaluate unchanged target_gap / hull_separation callback on recorded future ownship decision-boundary poses, comparing current CV forecast versus prior measured TrackView propagated to current time.",
+  "limitations": [
+    "No env.step, physics rollout, policy inference, new episode or budget token.",
+    "Recorded future trajectory is diagnostic hindsight, not an online controller input.",
+    "No full static-point arrays or actuator snapshots were logged; this is not an exact complete-filter or candidate-plan replay.",
+    "Final collided partial-step endpoint excluded; only recorded before-decision states are used.",
+    "One callback at0.5s endpoints does not reconstruct0.05s collision checking.",
+    "History expires after3decisions but any appended CV hypothesis is extrapolated over the filter horizon; old measurements may wrongly block genuinely stopped or turning targets.",
+    "Finite hypotheses are empirical and do not form a certified uncertainty set or guarantee improved closed-loop safety."
+  ],
+  "sources": {
+    "src/classical/common.py": "456f39769ffa237f826eff8f9852a6d0823a2f975f85d2345ba7b42105e0977d",
+    "src/reference_controller.py": "f080cfca745b75b45c93dfca1cf581206908ea4476fc3fede2911f02f066c62b",
+    "src/safety_v2.py": "209195c3b9241dfa6a798b7cfca857dfd14218c38625d99bc2a9c0d97c1b3d55",
+    "src/constants.py": "3d71c76d3abfef1ac86e93afcd8fc0ea686b16b8a8930aa13050ed564c68f23f"
+  }
+}

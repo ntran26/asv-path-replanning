@@ -1,0 +1,10 @@
+{
+  "tag": "broad_v6_50",
+  "mode": "v6",
+  "suite": "dev_field",
+  "case": "DV3-CRP-CV-03",
+  "seed": 900168,
+  "scenario_sha256": "afe642bbe85019a3cf259e1ba4f42cd0617896ab466e7612a6895b952435923e",
+  "run_manifest_sha256": "5f86f112a75955dfa31683c2f648ed158624978797970392eb4b4d334a8f0966",
+  "attempt": 81
+}

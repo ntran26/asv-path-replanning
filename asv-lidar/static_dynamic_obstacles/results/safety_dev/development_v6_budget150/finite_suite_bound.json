@@ -1,0 +1,49 @@
+{
+  "created_utc": "2026-10-02T16:07:49.521097+00:00",
+  "run": "broad_v6_50",
+  "candidate": "Frozen v6 with provisional tracks, motion-evidence admission and trajectory search; no calibrated braking/hull adapter/history.",
+  "full_suite_cases": 150,
+  "selected_evaluated_cases": 50,
+  "selected_candidate_goals": 33,
+  "selected_candidate_failures": 17,
+  "untested_cases": 100,
+  "maximum_full_suite_goals": 133,
+  "maximum_full_suite_success_percent": 88.66666666666667,
+  "goals_required_for_95_percent": 143,
+  "selected_goals_necessary_for_95_percent": 43,
+  "can_reach_95_percent_with_recorded_selected_outcomes": false,
+  "reasoning": "Even if all100 untested cases succeed,33+100=133<143. This deterministic finite-suite bound is not a population estimate or confidence interval; selection bias does not affect the counting argument.",
+  "scope_limit": "Bound applies only to this frozen candidate under the same original case/seed protocol with its recorded50 outcomes; not to future revised methods. Untested failures would lower the full-suite result.",
+  "denominator": "All150 original cases retained, including initially unobservable or potentially unrecoverable starts; no outcome-based exclusions.",
+  "budget_snapshot": {
+    "consumed": 149,
+    "cap": 150,
+    "remaining": 1,
+    "completed_verification_slots": [
+      39,
+      40,
+      41,
+      42,
+      43
+    ]
+  },
+  "source_guard_note": "Coordinator reports the prepared final calibrated-boundary probe was blocked by unexpected external scenario.py source drift before any episode or attempt150 token; no probe outcome inferred.",
+  "sources": {
+    "completion": {
+      "path": "results/safety_dev/development_v6_budget150/runs/broad_v6_50/complete.json",
+      "sha256": "2cdb9a8817285ee8db28ccfaa6dbfe7c25cdde6f3b04f5b409dc9a0f3ee08f07"
+    },
+    "manifest": {
+      "path": "results/safety_dev/development_v6_budget150/runs/broad_v6_50/manifest.json",
+      "sha256": "5f86f112a75955dfa31683c2f648ed158624978797970392eb4b4d334a8f0966"
+    },
+    "selection": {
+      "path": "results/safety_dev/development_v6_budget150/broad_selection50_v2.json",
+      "sha256": "22b31a57038e319b163d293a0da2bc7ec716d3e5d93f1997e3cdbbb25ee444c0"
+    },
+    "original_reference": {
+      "path": "results/safety_dev/dev_v4_observer_memory.json",
+      "sha256": "68f882ecbc12f386caba1edeb26b5342dfc19dff0069eb1ceb3213aff8c98bab"
+    }
+  }
+}

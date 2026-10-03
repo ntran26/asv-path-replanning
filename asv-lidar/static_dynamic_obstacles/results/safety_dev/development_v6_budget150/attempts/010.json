@@ -1,0 +1,10 @@
+{
+  "tag": "provisional_targets_v1",
+  "mode": "v6",
+  "suite": "dev_field",
+  "case": "DV3-CRP-CV-02",
+  "seed": 900167,
+  "scenario_sha256": "21934d7c10b2b739bb30bd38575f695b10e1010363e17cca2ac1d32c419b9d47",
+  "run_manifest_sha256": "5e07d276a958c5c14e3b682ad47a73c951ffc47f82de1633af6837b943587b45",
+  "attempt": 10
+}

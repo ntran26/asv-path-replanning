@@ -1,0 +1,9 @@
+{
+  "status": "aborted_before_reservation",
+  "reason": "Frozen reference source changed: src/scenario.py",
+  "exit_code": 1,
+  "attempts_reserved": 0,
+  "episodes_started": 0,
+  "budget_at_abort": 149,
+  "preservation": "External scenario changes preserved; no automatic source restoration or guard bypass."
+}
