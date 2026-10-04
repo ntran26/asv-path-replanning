@@ -200,7 +200,7 @@ def markdown(summary):
         f"**V9 reached {goals['v9']}/32 goals, V8 {goals['v8']}/32 and SAC alone {goals['off']}/32.** "
         f"V9 achieved {direction} goals {relation} V8 in this fixed cohort: {comparison['gained_goals']} gained and "
         f"{comparison['lost_goals']} lost. This is a diagnostic pilot, not an estimate for all 1,000 test cases.", "",
-        "The user's later request explicitly authorized fresh episodes to determine whether V9 is better or worse, "
+        "A later decision authorized fresh episodes to determine whether V9 is better or worse, "
         "superseding the earlier no-new-runs restriction for this pilot. Selection was fixed before evaluation: "
         "32 scenarios × SAC alone/V8/V9 = **96 new episode runs**, with no historical result reuse or automatic retries. "
         "This report performs no additional runs. Five cases are DV3 and 27 are test-set v2; all are development evidence.", "",

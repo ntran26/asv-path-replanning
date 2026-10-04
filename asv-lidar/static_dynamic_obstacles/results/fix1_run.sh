@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Fix 1 (your call, 2026-10-01; configs/finetune_v3_fix1.json): static obstacles in
+# Fix 1 (decision, 2026-10-01; configs/finetune_v3_fix1.json): static obstacles in
 # the compliant-turn admissibility test, from 2.5 M to 3.0 M, then the frozen
 # suite and the Paper 2 set on its best model, for comparison with the kept 3 M
 # policy (runs/sac_formulation_seed0_bl3/kept_best_3M, sacs0_bl3).

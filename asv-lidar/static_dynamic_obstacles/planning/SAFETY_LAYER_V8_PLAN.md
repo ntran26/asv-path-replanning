@@ -13,9 +13,9 @@ would solve the case without it.
   - `tools/diagnostics/safety/trigger_counterfactual.py` (shadow runs and replays)
   - `tools/diagnostics/safety/trigger_analysis.py` (analysis)
 - Data: `results/safety_dev/trigger_counterfactual/`.
-- Runs were authorised by the user for this plan ("continue improving the safety layer in this
-  thread as planned"). The development set and test set v2 are development evidence for the
-  safety layer (the user's designation).
+- Runs were authorised for this plan (continue improving the safety layer
+  as planned). The development set and test set v2 are development evidence for the
+  safety layer (by designation).
 
 ## Method
 
@@ -54,7 +54,7 @@ would solve the case without it.
 | Test-set-v2 failures (128): rescued | – | 49 | **58** (field 34/76, frozen 24/52) |
 | Test-set-v2 matched controls (151): broken | – | 16 | **9** (field 3/56, frozen 6/95) |
 
-These reproduce the safety chat's earlier DV3 numbers (v4 123), so the method is consistent with
+These reproduce the earlier DV3 numbers (v4 123), so the method is consistent with
 direct evaluation.
 
 **What it shows:**
@@ -122,7 +122,7 @@ direct evaluation.
 - **The ceilings:**
   - **Perfect trigger:** 872 + 58 = 930 (0.930). Better triggering can add at most 2.6 points.
   - **Full rescue reach:** 70 failures stay unrescued. Better rescue is the larger lever.
-- **Caveat:** test set v2 is safety-layer development evidence (the user's designation), so this
+- **Caveat:** test set v2 is safety-layer development evidence (by designation), so this
   is not an untouched test. No v7 setting was tuned on these runs: v7 was designed from saved
   summaries, and this is its first evaluation on them.
 
@@ -180,7 +180,7 @@ are not formal safety certificates. The stricter rule is an experimental V9 abla
 3. V9 implements a current-plan requirement and same-tail improvement comparison (option c).
    Optional turning-target hypotheses (option a) are implemented but disabled by default.
    See its plan for citations, counterexamples and synthetic validation.
-4. The latest user instruction in the safety thread remains **no new runs**. This follow-up
+4. The latest instruction for the safety work remains **no new runs**. This follow-up
    performs saved-data analysis and code tests only; no re-measurement is queued. Any later
    comparison must count lost rescues as well as recovered policy successes.
 

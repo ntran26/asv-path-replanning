@@ -100,6 +100,6 @@ def test_truth_diagnostics_use_physical_own_ship_without_changing_obligation():
     assert context.cls_true == enc.HEAD_ON
     assert (context.rng, context.alpha, context.dcpa, context.cls) == perceived
 
-# A25: CODEX also gated the Rule 8 *speed-reduction credit* on its coast test.
+# A25: the prototype also gated the Rule 8 *speed-reduction credit* on its coast test.
 # That is A24, decided the other way (F70), so its two tests for it are not
 # carried over; `test_5d_...` in `test_reward.py` covers the credit as built.

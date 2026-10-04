@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Queued by the user (2026-10-03): once the G4 pilots are done, revise the
+# Queued (2026-10-03): once the G4 pilots are done, revise the
 # baseline-v4 draft to 4.1 (straight survey lanes for dense draws, more
 # varying-speed field targets, encounter weights -- see
 # tools/diagnostics/v4_gates/revise_v4_after_g4.py) and re-run gate G3 on it.

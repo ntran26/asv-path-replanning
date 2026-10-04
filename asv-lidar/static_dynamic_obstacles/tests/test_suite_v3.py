@@ -1,4 +1,4 @@
-"""The frozen suite, revision 3.0 (06 §5, F75): named cases realise their names."""
+"""The frozen suite, revision 3.0 (06 section 5, F75): named cases realise their names."""
 
 import numpy as np
 import pytest
@@ -71,7 +71,7 @@ def test_tier_a_and_tier_b_seeds_are_disjoint():
 
 
 def test_suite_34_holds_only_what_training_draws():
-    """Suite 3.4 (your call, 2026-09-27): the headline is the development set's
+    """Suite 3.4 (decision, 2026-09-27): the headline is the development set's
     kind of scenario, drawn in the frozen namespace -- constant-velocity targets,
     and class x geometry only where training draws it (every class in the basin,
     `CHANNEL_CLASSES` in a channel), channels 7.5-10 m, 8 balanced cells of 100.

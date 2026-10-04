@@ -12,7 +12,7 @@ the learning input among model-feasible plans without adding a new margin.
 
 Method inspiration: Wabersich & Zeilinger (2021), Sec. 4.1, Eq. (5a)-(5f):
 https://arxiv.org/html/1812.05506v4#S4.SS1 . Their first-action deviation
-objective motivates policy preservation with a feasible backup. Our paired
+objective motivates policy preservation with a feasible backup. The paired
 tail comparison and relative-clearance condition are engineering adaptations,
 not their optimizer, uncertainty bounds or terminal safe-set construction.
 Keeping a currently failing V8 fallback is explicitly uncertified. Sampled

@@ -17,11 +17,11 @@ same principle as the single `EncounterContext`, and the same reason: two
 consumers, one source, or they diverge.
 
 The one idea it is built around is **show the gate, not just the value**.  When
-`v_side` reads `0.000` the number alone cannot tell you whether that is correct
+`v_side` reads `0.000` the number alone cannot show whether that is correct
 (wrong class for this term) or a bug (gate stuck, `rho_t` collapsed, class never
 latched).  Every COLREGs sub-term prints its value *and* the reason it holds it,
-which costs one string per term and is the difference between a panel you glance
-at and a panel you debug with.
+which costs one string per term and is the difference between a panel to glance
+at and a panel to debug with.
 """
 
 from __future__ import annotations
@@ -54,7 +54,7 @@ BEAM_CLEAR = (55, 55, 95)
 BEAM_HIT = (90, 90, 160)
 
 # Panel palette.  Near-monochrome, like the field, with **four** colour rules and
-# no others (RENDER_PANEL_SPEC §5): red for a class mismatch, red for a clip rate
+# no others (RENDER_PANEL_SPEC section 5): red for a class mismatch, red for a clip rate
 # above the threshold, amber for an engaged encounter, amber for a COLREGs
 # sub-term above 0.5.  Colour that means something is worth more than colour that
 # looks organised.
@@ -103,8 +103,8 @@ class Renderer:
 
         self.panel_width = PANEL_WIDTH if panel else 0
         # Tall enough for every block at once.  The default two fit in far
-        # less, but a panel that silently truncates when you press [7] is worse
-        # than a tall window: the block you just asked for is the one that
+        # less, but a panel that silently truncates when [7] is pressed is worse
+        # than a tall window: the block just requested is the one that
         # disappears off the bottom.
         self.window_size = (self.panel_width + self.field_size[0],
                             max(self.field_size[1], PANEL_MIN_HEIGHT))
@@ -139,7 +139,7 @@ class Renderer:
         self.blocks.symmetric_difference_update({name})
 
     def toggle_index(self, index: int) -> None:
-        """Keys 1-7, matching the block numbers in `RENDER_PANEL_SPEC` §2."""
+        """Keys 1-7, matching the block numbers in `RENDER_PANEL_SPEC` section 2."""
         if 1 <= index <= len(BLOCKS):
             self.toggle(BLOCKS[index - 1])
 
@@ -299,9 +299,9 @@ class Renderer:
     def _block_run(self, panel, index) -> None:
         """[1] RUN -- provenance.
 
-        `spawn=COMPLIANT|DISPLACED` is the head-on regime from 02a §2.4.  If
+        `spawn=COMPLIANT|DISPLACED` is the head-on regime from 02a section 2.4.  If
         every frame ever seen says `DISPLACED`, `TARGET_COMPLIANT_SPAWN_PROB` is
-        not wired, and `v_r8`'s zero branch -- the whole point of the 02 §3.2
+        not wired, and `v_r8`'s zero branch -- the whole point of the 02 section 3.2
         head-on rationale -- is never being exercised.
         """
         run = panel["run"]
@@ -360,7 +360,7 @@ class Renderer:
         Under `R-1` the safety terms read truth and the COLREGs gating reads the
         estimate.  The panel must show both or that decision is invisible.  The
         class row goes red on a mismatch, because a misclassification is the
-        failure 04 §6 names as the one that matters -- the agent turns the wrong
+        failure 04 section 6 names as the one that matters -- the agent turns the wrong
         way -- and it is otherwise almost impossible to spot in a replay.
         """
         block = panel.get("perception")
@@ -409,7 +409,7 @@ class Renderer:
         The three numbers behind `A_stbd` (`Dy_req`, `r_stbd`, `r_port`) explain
         *why* it flipped, which is what is actually wanted when the agent does
         something odd near a wall.  `compliant_sense` printed explicitly is the
-        guard against the 02 §4.2 trap: `sense=PORT` on an overtaking encounter,
+        guard against the 02 section 4.2 trap: `sense=PORT` on an overtaking encounter,
         next to a starboard turn and `v_port` rising, is the whole bug in one
         frame.
         """

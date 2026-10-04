@@ -2,11 +2,11 @@
 
 > **Status note (2026-09-22).** Parts of this document are superseded by the implementation, which is frozen as **baseline-v1** (`configs/baseline_v1.json`, git tag `baseline-v1`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here:
 >
-> - §3.5, as amended by your calls (F74): inside the basin **only head-on traffic keeps the path band**; other confined targets use the whole basin (a 2–3 m band left null and overtaking traffic nowhere to go).
+> - Section 3.5, as amended by decisions (F74): inside the basin **only head-on traffic keeps the path band**; other confined targets use the whole basin (a 2–3 m band left null and overtaking traffic nowhere to go).
 >
 > - Tier A has 38 named cases, 35 realised; three are reported infeasible (F75).
 >
-> - §7's edits to `01`, `02a`, `03a`, `04a` are not yet made in those documents; each carries a status note instead.
+> - Section 7's edits to `01`, `02a`, `03a`, `04a` are not yet made in those documents; each carries a status note instead.
 >
 > The rationale below still stands where it is not listed. `F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`.
 >
@@ -19,9 +19,9 @@
 > pinned in `configs/comparators_v1.json` (F97, F98).
 
 **Revision 1.0** — introduces a second navigable-geometry mode and makes it the primary training
-and evaluation geometry. Supersedes the single-corridor assumption in 03a §3 and 04a §3.2.
-**Handover target:** Claude Code (§3–§7, §9), Claude chat (§2 decisions are signed off)
-**Depends on:** 03a §3 (corridor), 04a §3 (generator), 01 §3 (boundary branch), 02a §3 (`r_pf`)
+and evaluation geometry. Supersedes the single-corridor assumption in 03a section 3 and 04a section 3.2.
+**Workstream:** implementation (sections 3–7 and 9), design (section 2 decisions are signed off)
+**Depends on:** 03a section 3 (corridor), 04a section 3 (generator), 01 section 3 (boundary branch), 02a section 3 (`r_pf`)
 **Companion decision:** straight reference paths only (survey-leg framing). Bends are retained as a
 config parameter fixed at zero, not deleted.
 
@@ -31,7 +31,7 @@ config parameter fixed at zero, not deleted.
 
 Two problems, one fix.
 
-**The boundary branch lost its justification.** 01 §3.3 rests the 7-ray boundary branch on three
+**The boundary branch lost its justification.** 01 section 3.3 rests the 7-ray boundary branch on three
 decorrelation mechanisms: varying width, path offset, and bends. Removing bends leaves two, and in a
 straight parallel-walled corridor both are weak: port and starboard clearances remain close to affine
 functions of `e_y`. Acceptance test T3 (`|corr(e_y, b_i)| < 0.9`) then passes only marginally, and the
@@ -74,10 +74,10 @@ width. Channel mode is retained for Study 1 and for the intermediate and narrow 
 |---|---|---|
 | Basin envelope | 10 × 25 m rectangle | Limit of physical water |
 | **Navigable polygon** `P_nav` | Envelope inset by `ι = d_safe + 0.05 = 0.40 m` → 9.20 × 24.20 m | Hard constraint; termination on breach |
-| Facility walls | Envelope + 1.5 m | Returned by the LiDAR, then gated (01 §3.4) |
+| Facility walls | Envelope + 1.5 m | Returned by the LiDAR, then gated (01 section 3.4) |
 
 The inset matches the one the corridor generator already honours, so the two modes share the
-termination test: *hull polygon leaves `P_nav`* (03a §4.4, wording generalised from "corridor polygon").
+termination test: *hull polygon leaves `P_nav`* (03a section 4.4, wording generalised from "corridor polygon").
 
 ### 3.2 The reference path
 
@@ -133,8 +133,8 @@ not a constant in basin mode, so never report basin cases as if they had a singl
 |---|---|---|
 | `ẽ_y` (02a R-1, `r_pf`) | `e_y / h_side(s)`, `h_side` = clearance on the side of the deviation, clipped to `[0.60, 5.00] m` | `h_± = W/2` → identical to current |
 | `r_bnd` (02a) | unchanged: hull-to-`P_nav` distance against `d_safe` | unchanged |
-| `r_stbd`, `r_port` (admissibility, 02a §6) | `min_s (h_±(s) − B/2 − c_wall)` over the stretch to CPA | unchanged |
-| Boundary branch (01 §3.2) | 7 virtual rays cast against `P_nav` from the estimated pose | unchanged |
+| `r_stbd`, `r_port` (admissibility, 02a section 6) | `min_s (h_±(s) − B/2 − c_wall)` over the stretch to CPA | unchanged |
+| Boundary branch (01 section 3.2) | 7 virtual rays cast against `P_nav` from the estimated pose | unchanged |
 | Width stratum | `W_eff` at CPA | `W` |
 
 The clip on `h_side` matters: near the endpoints of a slanted leg the outward clearance grows toward
@@ -142,7 +142,7 @@ the far corner, and an unclipped normalisation would make `r_pf` insensitive the
 
 ### 3.5 Targets in basin mode
 
-The backward solve (04a §3.3) is unchanged — it never referenced the corridor. Only the validity
+The backward solve (04a section 3.3) is unchanged — it never referenced the corridor. Only the validity
 checks change:
 
 - **Containment:** both hulls inside `P_nav` over `[0, min(T_horizon, t_exit)]`.
@@ -200,7 +200,7 @@ never carry.
 **Dropped cells.** Narrow × null and narrow × being-overtaken are removed: at 3.50–4.26 m a null
 encounter is not an encounter, and a target overtaking in a channel of that width has nowhere to
 pass. They are reported as infeasible with their generator rejection rates (0.99 and 0.96 at stage 5),
-which is the §3.5 feasibility argument doing its job rather than a gap in the suite.
+which is the section 3.5 feasibility argument doing its job rather than a gap in the suite.
 
 **CI note.** 20 episodes per cell widens each cell's interval by roughly 12% against 25. Cell-level
 intervals were never the primary endpoint; the primary endpoint aggregates across cells and is
@@ -229,7 +229,7 @@ All six carry `field_replicable = true` and form the basin-session trial list fo
 
 ---
 
-## 6. Scenario record additions (04a §9.1)
+## 6. Scenario record additions (04a section 9.1)
 
 ```
 geometry_mode           "basin" | "channel"
@@ -250,25 +250,25 @@ field_replicable        bool
 
 | Document | Section | Change |
 |---|---|---|
-| **03a** | §3.1 | Add `P_nav` and the two modes to the polygon table; "corridor" becomes "navigable polygon" throughout |
-| 03a | §3.2 | Replace the three decorrelation requirements with: basin mode carries slant, channel mode carries varying width and offset. T3 must pass **per mode** |
-| 03a | §4.4 | Termination row: "leaves the corridor polygon" → "leaves the navigable polygon `P_nav`" |
-| 03a | §5.2 | Confinement is band-based in basin mode (§3.5 here) |
-| 03a | §10 | T7 mode-conditional; add T13–T15 (§8 here) |
-| **04a** | §3.1 | Sampling order: mode is sampled at step 2, before geometry |
-| 04a | §3.2 | Split the geometry table by mode; bend row fixed at 0; add slant row and `θ_max` formula |
-| 04a | §3.3 | Backward solve unchanged; validity checks reference `P_nav` and the path band |
-| 04a | §3.7 | Curriculum table gains `p_basin` (§4 here) |
-| 04a | §4.2–4.3 | Tier B restructure (§5.1 here) |
-| 04a | §5 | Tier A list (§5.2 here) |
-| 04a | §6 | State explicitly: Study 1 is channel mode only |
-| 04a | §7 | Study 2 runs on basin mode plus one channel-narrow level |
-| 04a | §9.1 | Record fields (§6 here); `suite_version = 3.0` |
-| **01** | §3.3 | Rewrite the redundancy argument: slant against fixed basin walls is now the primary decorrelation mechanism; width variation and offset are secondary; bends are gone |
+| **03a** | Section 3.1 | Add `P_nav` and the two modes to the polygon table; "corridor" becomes "navigable polygon" throughout |
+| 03a | Section 3.2 | Replace the three decorrelation requirements with: basin mode carries slant, channel mode carries varying width and offset. T3 must pass **per mode** |
+| 03a | Section 4.4 | Termination row: "leaves the corridor polygon" → "leaves the navigable polygon `P_nav`" |
+| 03a | Section 5.2 | Confinement is band-based in basin mode (section 3.5 here) |
+| 03a | Section 10 | T7 mode-conditional; add T13–T15 (section 8 here) |
+| **04a** | Section 3.1 | Sampling order: mode is sampled at step 2, before geometry |
+| 04a | Section 3.2 | Split the geometry table by mode; bend row fixed at 0; add slant row and `θ_max` formula |
+| 04a | Section 3.3 | Backward solve unchanged; validity checks reference `P_nav` and the path band |
+| 04a | Section 3.7 | Curriculum table gains `p_basin` (section 4 here) |
+| 04a | Section 4.2–4.3 | Tier B restructure (section 5.1 here) |
+| 04a | Section 5 | Tier A list (section 5.2 here) |
+| 04a | Section 6 | State explicitly: Study 1 is channel mode only |
+| 04a | Section 7 | Study 2 runs on basin mode plus one channel-narrow level |
+| 04a | Section 9.1 | Record fields (section 6 here); `suite_version = 3.0` |
+| **01** | Section 3.3 | Rewrite the redundancy argument: slant against fixed basin walls is now the primary decorrelation mechanism; width variation and offset are secondary; bends are gone |
 | **02a** | R-1 / `r_pf` | Side-specific normalisation (M-5). State the channel-mode reduction explicitly so no earlier result is invalidated |
-| 02a | §6 admissibility | `r_stbd`, `r_port` from `P_nav` clearances rather than from a constant half-width |
-| **PROJECT_STATE** | §3.3 F25 | Mark the stage-3 consequence superseded by M-4 and §4 here |
-| PROJECT_STATE | §2 blockers | Add: basin mode implementation and re-freeze; keep B3 and B5 open |
+| 02a | Section 6 admissibility | `r_stbd`, `r_port` from `P_nav` clearances rather than from a constant half-width |
+| **PROJECT_STATE** | Section 3.3 F25 | Mark the stage-3 consequence superseded by M-4 and section 4 here |
+| PROJECT_STATE | Section 2 blockers | Add: basin mode implementation and re-freeze; keep B3 and B5 open |
 | **PAPER3_DRAFT_SKELETON** | problem formulation | Survey leg inside a laterally bounded basin; two geometries, one policy. Own ship does not claim Rule 3(g) status |
 
 ---
@@ -289,7 +289,7 @@ before anything else is reconsidered.
 
 ---
 
-## 9. Implementation handoff — Claude Code
+## 9. Implementation notes
 
 | Module | Work |
 |---|---|
@@ -299,7 +299,7 @@ before anything else is reconsidered.
 | reward module | M-5 normalisation; admissibility from clearances; no other change |
 | `suite.py` | Tier B 48 cells × 20; Tier A 38 cases; `field_replicable`; `suite_version = 3.0`; re-hash and regenerate the manifest |
 | `test_acceptance.py` | T13–T15; amend T3 and T7 to be mode-conditional |
-| `tools/scale_audit.py` | Re-run over both modes; confirm 02a §8.1 orderings hold in basin mode, where `h_side` varies along the leg |
+| `tools/scale_audit.py` | Re-run over both modes; confirm 02a section 8.1 orderings hold in basin mode, where `h_side` varies along the leg |
 
 **Order:** geometry and tests first, then the generator, then the suite rebuild. Do not re-freeze the
 suite until T3 passes in basin mode, since a failing T3 changes the slant range and therefore every
@@ -311,9 +311,9 @@ hash.
 
 | # | Item | Owner |
 |---|---|---|
-| M-a | `w_clear` default: 1.50 m (θ_max 18.1°) or 1.25 m (20.7°). Decide from the T3 result, not by preference | Claude Code measurement, then sign-off |
+| M-a | `w_clear` default: 1.50 m (θ_max 18.1°) or 1.25 m (20.7°). Decide from the T3 result, not by preference | measurement, then sign-off |
 | M-b | Whether Study 2's channel-narrow level is 4.0 m or the 4.26 m stratum edge | open |
-| M-c | Whether the Paper 2 policy is run on basin mode as a comparator, and under which action-space adapter | open, affects §8.2 priority tail |
+| M-c | Whether the Paper 2 policy is run on basin mode as a comparator, and under which action-space adapter | open, affects section 8.2 priority tail |
 | M-d | Basin-session trial list is now the six `A-BSN-*` cases; confirm against basin availability in 05 | open |
 
 Unchanged and still open: B3 (throughput), B5 (curriculum budget, `TODO(04-3)`, `TODO(04-4)`),

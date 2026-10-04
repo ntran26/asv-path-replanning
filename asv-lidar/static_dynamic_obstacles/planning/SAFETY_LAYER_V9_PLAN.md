@@ -1,7 +1,7 @@
 # V9 follow-up to the V8 trigger-counterfactual plan
 
 2026-10-03. **Fresh pilot completed: V9 ties V8 overall, with mixed regressions.**
-The user's later request to run new episodes superseded the earlier no-new-runs
+A later decision to run new episodes superseded the earlier no-new-runs
 restriction for this comparison. The separate fixed pilot completed 96 fresh
 runs; previous campaigns and their ledgers remain untouched.
 
@@ -136,9 +136,9 @@ synthetic-tested, not episode-evaluated.
 *A predictive safety filter for learning-based control of constrained nonlinear
 dynamical systems*, Section 4.1, Eq. (5a): minimal first-action deviation
 subject to feasible backup constraints, <https://arxiv.org/abs/1812.05506v4>.
-Current rechecking and the same-tail preference are our engineering adaptation.
-We do not implement the paper's uncertainty treatment, recursive feasibility
-proof or terminal invariant set. Repeated feasible deferral can still prevent
+Current rechecking and the same-tail preference are an engineering adaptation made here.
+The paper's uncertainty treatment, recursive feasibility
+proof and terminal invariant set are not implemented. Repeated feasible deferral can still prevent
 progress; improved predicted margin does not prove improved episode outcome.
 
 ## Optional target-motion ensemble (disabled by default)
@@ -192,7 +192,7 @@ and was deliberately not run under the no-new-runs restriction. Source hashes,
 test commands and counts are in the follow-up report's verification artifacts.
 
 The frozen-source and simulated field members of test set v2 remain development
-data for this safety layer by the user's designation. No additional held-out
+data for this safety layer by designation. No additional held-out
 set was tuned. Paper 2's project directory, constants, checkpoints, PPO work and
 earlier evaluation ledgers were not modified by this task.
 

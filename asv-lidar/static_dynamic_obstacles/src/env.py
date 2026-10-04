@@ -1,6 +1,6 @@
 """Gymnasium environment: path following with static obstacles and one target vessel.
 
-CODEX revision 3 uses one synchronized perceived state per decision and exposes
+Revision 3 (from the prototype working copy) uses one synchronized perceived state per decision and exposes
 the encounter latch and previous executed action to the policy. Scenarios may
 be supplied explicitly or generated with variable corridor geometry. The
 training wrapper controls the empty/static/dynamic/combined scene mixture.
@@ -16,7 +16,7 @@ policy *sees* and what *counts* as a collision are deliberately separate: the
 policy sees a gated, pooled, noise-perturbed view, while termination uses true
 hull geometry.
 
-Study 2 degradation axes (04 §6) are constructor parameters, all nominal-zero:
+Study 2 degradation axes (04 section 6) are constructor parameters, all nominal-zero:
 pose drift, detection dropout, occlusion duration, velocity noise.
 """
 
@@ -46,8 +46,8 @@ import ship as shipmod
 from ship import HULL_MARGIN, MAX_RUD_ANGLE, VESSEL_LENGTH, VESSEL_WIDTH, ShipModel
 
 
-# 03a §5.1 replaces the four-corner box with an oriented 11-vertex hull, and
-# 03a §5.3 adds the behaviour models.  Both live in `targets.py`; the Paper 2
+# 03a section 5.1 replaces the four-corner box with an oriented 11-vertex hull, and
+# 03a section 5.3 adds the behaviour models.  Both live in `targets.py`; the Paper 2
 # name is kept as an alias because the play harness, the tests and 04a's named
 # cases all construct targets by it, and renaming a constructor across the tree
 # to gain nothing is churn.
@@ -68,7 +68,7 @@ class ASVLidarEnv(gym.Env):
                  n_max_targets: int = cfg.N_MAX_TARGETS,
                  no_target_prob: float = cfg.NO_TARGET_EPISODE_PROB,
                  pose_noise: bool = True,
-                 # --- Study 2 degradation axes (04 §6) ---
+                 # --- Study 2 degradation axes (04 section 6) ---
                  detection_dropout_p: float = cfg.DETECTION_DROPOUT_P,
                  track_velocity_noise: float = cfg.TRACK_VELOCITY_NOISE,
                  lidar_dropout_p: float = cfg.LIDAR_DROPOUT_P,
@@ -92,7 +92,7 @@ class ASVLidarEnv(gym.Env):
         self.map_width = float(map_width)
         self.map_height = float(map_height)
         # Study 1 sweeps this; the corridor is a map polygon inside the basin, so
-        # every simulated width is physically reproducible (03 §5).  F36: a
+        # every simulated width is physically reproducible (03 section 5).  F36: a
         # supplied channel reports its own width, not the default.
         if channel is not None:
             self.corridor_width = float(channel.nominal_width)
@@ -149,7 +149,7 @@ class ASVLidarEnv(gym.Env):
         self._generator: Optional[scn.ScenarioGenerator] = None
         self.scenario = None
         self.observer = ObservationBuilder(self.n_max_targets)
-        # `R-10`: the 04 §4.1 benchmark also runs open water, where `r_pf`
+        # `R-10`: the 04 section 4.1 benchmark also runs open water, where `r_pf`
         # normalises on a reference width, `r_bnd` is zero and both alterations
         # are admissible.  A flag rather than a subclass, because the difference
         # is three constants and not a different environment.
@@ -157,7 +157,7 @@ class ASVLidarEnv(gym.Env):
         self.reward_fn = RewardFunction(reward_config or RewardConfig())
         self._pose_noise = br.PoseNoise(self._rng) if pose_noise else None
 
-        # 03a §3.1: the corridor is a generated channel, not an inset
+        # 03a section 3.1: the corridor is a generated channel, not an inset
         # rectangle.  A fixed one can be passed in for a named evaluation case
         # or a Study 1 width level; otherwise each episode samples one.
         # F74: with neither a channel nor a width given, the default geometry is
@@ -175,7 +175,7 @@ class ASVLidarEnv(gym.Env):
         self.resample_channel = channel is None
         self.boundary_polygon = self.channel.polygon()
 
-        # 03a §1.2: the out-of-corridor world, so the gate has something to do.
+        # 03a section 1.2: the out-of-corridor world, so the gate has something to do.
         self.facility_walls = bool(facility_walls)
         self.wall_polygon = corr.facility_walls((self.map_width, self.map_height))
 
@@ -202,7 +202,7 @@ class ASVLidarEnv(gym.Env):
 
     @property
     def corridor_breadths(self) -> float:
-        """Channel width in ship breadths -- the scale-explicit unit (03 §4)."""
+        """Channel width in ship breadths -- the scale-explicit unit (03 section 4)."""
         return self.corridor_width / cfg.BREADTH
 
     def corridor_bounds_x(self) -> Tuple[float, float]:
@@ -238,7 +238,7 @@ class ASVLidarEnv(gym.Env):
     # ------------------------------------------------------------------
     def _clear_state(self) -> None:
         self.step_count = 0
-        self._confine_geom = None                # 06 §3.5, set by a generated reset
+        self._confine_geom = None                # 06 section 3.5, set by a generated reset
         self._confine_poly = None
         self.elapsed_time = 0.0
         self.asv_x = self.asv_y = 0.0
@@ -307,7 +307,7 @@ class ASVLidarEnv(gym.Env):
         self.tracks: List[trk.Track] = []
         self.true_border_clearance = min(self.corridor_width, self.map_height)
 
-        # Perception metrics (04 §7): reported for the nominal case and across
+        # Perception metrics (04 section 7): reported for the nominal case and across
         # the Study 2 sweep.
         self.acquisition_range: Optional[float] = None
         self.steps_target_visible = 0
@@ -465,19 +465,19 @@ class ASVLidarEnv(gym.Env):
         they are cheap now and expensive later:
 
         * spawned **outside** LiDAR range, so acquisition is part of the task
-          and track acquisition range is a measurable quantity (03 §3);
+          and track acquisition range is a measurable quantity (03 section 3);
         * a fraction of episodes carry **no target at all**, or the static-only
-          configuration is out of distribution (01 §6.2);
-        * the hull is oriented, not a circle (03 §3);
-        * **a spawn lateral offset is sampled** (02a §11.1).
+          configuration is out of distribution (01 section 6.2);
+        * the hull is oriented, not a circle (03 section 3);
+        * **a spawn lateral offset is sampled** (02a section 11.1).
 
         That last one is not cosmetic.  Solving backwards for a spawn position
         without sampling an offset puts the target on the own ship's projected
         track in *every* episode, so `DCPA ~ 0` and the own ship must always
         produce the whole required separation.  The agent then never meets the
-        case 02 §3.2 calls the normal one -- target correctly on its own side,
+        case 02 section 3.2 calls the normal one -- target correctly on its own side,
         channel-keeping already satisfies Rule 14, holding course is right -- and
-        would learn "always alter" rather than "when to alter".  02a §11.1 makes
+        would learn "always alter" rather than "when to alter".  02a section 11.1 makes
         this a blocking hand-off to 04; sampling it here keeps the placeholder
         from baking the same bias into everything built on top of it.
 
@@ -676,7 +676,7 @@ class ASVLidarEnv(gym.Env):
     def _load_generated(self, built=None, _depth: int = 0) -> None:
         """One episode from `scenario.ScenarioGenerator`, or the one supplied.
 
-        Seeds are drawn inside the episode's namespace (04a §9.2) from the
+        Seeds are drawn inside the episode's namespace (04a section 9.2) from the
         environment's own stream, so a seeded reset reproduces the episode.
         """
         drawn = built is None
@@ -724,7 +724,7 @@ class ASVLidarEnv(gym.Env):
         self.channel = built.channel
         self.boundary_polygon = self.channel.polygon()
         self.corridor_width = float(self.channel.nominal_width)
-        # 06 §3.5: confined targets keep the path band in basin mode.
+        # 06 section 3.5: confined targets keep the path band in basin mode.
         self._confine_geom = scn.confinement_geometry(built.encounter_class, self.channel)
         self._confine_poly = self._confine_geom.polygon()
 
@@ -771,11 +771,11 @@ class ASVLidarEnv(gym.Env):
     def _obstacles_clear_of_encounter(self, count: int, built) -> List[List[Tuple[float, float]]]:
         """Static clutter that does not decide the encounter for the policy.
 
-        04a §3.6 keeps `+/- OBSTACLE_CPA_GUARD_FRAC * T_0` of own-ship travel
+        04a section 3.6 keeps `+/- OBSTACLE_CPA_GUARD_FRAC * T_0` of own-ship travel
         around the CPA clear, and a panel on the target's spawn would hide or
         block it.  Obstacles violating either are dropped rather than moved, so
         the realised count can fall short of the request; it is reported in
-        `info["num_obs"]`.  Occlusion and conflict placement (04a §3.6's flagged
+        `info["num_obs"]`.  Occlusion and conflict placement (04a section 3.6's flagged
         cases) are still not written.
         """
         layout = self._feasible_layout(count)
@@ -800,7 +800,7 @@ class ASVLidarEnv(gym.Env):
         return kept + flagged
 
     def _flagged_panels(self, built, layout) -> List[List[Tuple[float, float]]]:
-        """04a §3.6's flagged panels, placed on purpose (F75).
+        """04a section 3.6's flagged panels, placed on purpose (F75).
 
         * `conflict`: a panel beside the path, just before CPA, on the side the
           compliant alteration would use -- so the textbook turn runs out of
@@ -922,7 +922,7 @@ class ASVLidarEnv(gym.Env):
         return start_x, cfg.START_Y, goal_x, goal_y
 
     def _build_path_from_channel(self) -> None:
-        """Reference path from the channel's Rule 9(a) station (03a §3.2).
+        """Reference path from the channel's Rule 9(a) station (03a section 3.2).
 
         The path is the centreline offset by a fraction of the **local**
         half-width, with a positive mean -- so the vessel is trained to hold the
@@ -967,12 +967,12 @@ class ASVLidarEnv(gym.Env):
     def _perceive(self) -> None:
         """Raycast -> gate -> pool -> cluster -> track."""
         self._obs_cache = None
-        # 03a §1.2.  The facility walls are **returned by the sensor and then
+        # 03a section 1.2.  The facility walls are **returned by the sensor and then
         # gated**, which is the whole point: until they existed the gate had
         # nothing to remove in simulation and was load-bearing only in the
-        # field -- a sim-to-real gap in the exact component 01 §3 exists to
+        # field -- a sim-to-real gap in the exact component 01 section 3 exists to
         # remove one from.  The corridor boundary is NOT in this list; it is a
-        # map polygon and is invisible to the sensor (01 §3.1).
+        # map polygon and is invisible to the sensor (01 section 3.1).
         scene = list(self.obstacles) + [t.hull() for t in self.targets]
         if self.facility_walls:
             scene = scene + [self.wall_polygon]
@@ -1006,9 +1006,9 @@ class ASVLidarEnv(gym.Env):
 
         # Gate beyond-boundary returns.  A no-op in simulation, where the
         # raycast never sees the border, and a real filter in the field -- which
-        # is exactly what makes the two pipelines equivalent (01 §3.4).
+        # is exactly what makes the two pipelines equivalent (01 section 3.4).
         #
-        # Note the ordering the field pipeline must follow (01 §3.4): localise
+        # Note the ordering the field pipeline must follow (01 section 3.4): localise
         # on the FULL scan including the facility walls, because their fixed
         # features are the only along-track constraint scan-to-map registration
         # has, and only then gate for the tracker.  The walls are a liability
@@ -1051,7 +1051,7 @@ class ASVLidarEnv(gym.Env):
         self._update_perception_metrics()
 
     def _update_perception_metrics(self) -> None:
-        """Track acquisition range, visibility and track uptime (04 §7).
+        """Track acquisition range, visibility and track uptime (04 section 7).
 
         Tracking is attributed to the target by proximity rather than by "any
         dynamic track exists".  A static panel promoted to a dynamic track by
@@ -1367,7 +1367,7 @@ class ASVLidarEnv(gym.Env):
             for target in self.targets:
                 target.step(h, own=own_state)
                 # Confined classes keep the fairway; a crossing target under Rule
-                # 9(d) is not a channel user and is left alone (03a §5.2).
+                # 9(d) is not a channel user and is left alone (03a section 5.2).
                 tgtmod.clamp_to_corridor(target, self._confine_geom or self.channel,
                                          self._confine_poly or self.boundary_polygon)
             sub_collision = self.collision_kind(self.hull_polygon())
@@ -1404,7 +1404,7 @@ class ASVLidarEnv(gym.Env):
         # **Observation first.**  The per-step `EncounterContext` objects are
         # built while the observation is assembled, and the reward reads them
         # back rather than deriving its own -- which is the whole point of
-        # 02a §10.1.  Building the observation after the reward would mean two
+        # 02a section 10.1.  Building the observation after the reward would mean two
         # derivations of the same encounter from the same inputs.
         obs = self._get_obs()
         self._obs_hold = self._obs_fresh
@@ -1507,7 +1507,7 @@ class ASVLidarEnv(gym.Env):
         """The 02a reward.  Returns the full breakdown, not just the scalar.
 
         02 owns the design; this method owns nothing but the call.  The
-        breakdown is retained because `04 §7`'s metric set is a *read* of these
+        breakdown is retained because `04 section 7`'s metric set is a *read* of these
         keys rather than a separate computation -- Paper 2's concessions came
         from metrics that were not designed in before the campaign ran.
         """
@@ -1545,7 +1545,7 @@ class ASVLidarEnv(gym.Env):
         Restricted to +/-`OBS_SWATH_HALF_DEG`, matching the `c_t` swath, so the
         agent is never charged for proximity it cannot observe and an obstacle
         passed astern generates no signal against an action space with no
-        reverse (02a §5.4).
+        reverse (02a section 5.4).
         """
         best = float("inf")
         for obstacle in self.obstacles:
@@ -1557,7 +1557,7 @@ class ASVLidarEnv(gym.Env):
         return best
 
     def _record_obs_health(self, obs) -> None:
-        """Per-branch clip rate: the F19 detector (RENDER_PANEL_SPEC §6).
+        """Per-branch clip rate: the F19 detector (RENDER_PANEL_SPEC section 6).
 
         A branch pinned at its normaliser's clip carries no gradient.  That is
         exactly the bug where the `ego` surge feature sat at 1.0 for 45% of a
@@ -1608,13 +1608,13 @@ class ASVLidarEnv(gym.Env):
         """One step's `info`: the reward keys, the metrics, and the panel.
 
         **The panel is a view on this, never a separate computation**
-        (`RENDER_PANEL_SPEC` §0).  If the panel needs a number, it is added here
+        (`RENDER_PANEL_SPEC` section 0).  If the panel needs a number, it is added here
         rather than derived in `render.py` -- the same principle as the single
         `EncounterContext`, and for the same reason: two consumers, one source,
         or they diverge.
 
-        The flat `reward/...` and `colregs/...` keys are `02a §10.3`'s logging
-        schema.  `00 §4.2`'s metric set should be a *read* of these keys rather
+        The flat `reward/...` and `colregs/...` keys are `02a section 10.3`'s logging
+        schema.  `00 section 4.2`'s metric set should be a *read* of these keys rather
         than a separate computation; Paper 2's concessions came from metrics
         that were not designed in before the campaign ran.
         """
@@ -1680,7 +1680,7 @@ class ASVLidarEnv(gym.Env):
             "elapsed_time": float(self.elapsed_time),
             "open_water": bool(self.open_water),
             "spawn_regime": str(self.target_spawn_regime),
-            # Perception metrics (04 §7) -- the N1 evidence.
+            # Perception metrics (04 section 7) -- the N1 evidence.
             "n_tracks": int(len(self.tracks)),
             "n_targets": int(len(self.targets)),
             "acquisition_range": (float(self.acquisition_range)
@@ -1739,7 +1739,7 @@ class ASVLidarEnv(gym.Env):
         """Everything `render.py`'s left panel draws, computed once, here.
 
         Structured rather than flat because the panel's blocks are structured;
-        the flat `02a §10.3` keys above are the logging schema and this is the
+        the flat `02a section 10.3` keys above are the logging schema and this is the
         display schema, both read off the same step.
         """
         cfgr = self.reward_fn.cfg
@@ -1841,7 +1841,7 @@ class ASVLidarEnv(gym.Env):
     def _obs_health_rows(self) -> list:
         """Per-branch clip rate, and **which dimension is responsible**.
 
-        `RENDER_PANEL_SPEC` §6 asks for a per-dimension drill-down on a keypress,
+        `RENDER_PANEL_SPEC` section 6 asks for a per-dimension drill-down on a keypress,
         "since a single saturating dimension inside a 27-dim branch will not move
         the branch aggregate much".  Naming the worst dimension inline is better
         than a keypress: it is one string, and it is exactly the thing wanted at
@@ -1907,7 +1907,7 @@ class ASVLidarEnv(gym.Env):
 
         Under `R-1` the safety terms read truth and the COLREGs gating reads the
         estimate.  The panel must show both or that decision is invisible, and a
-        misclassification -- the failure `04 §6` names as the one that matters --
+        misclassification -- the failure `04 section 6` names as the one that matters --
         is otherwise almost impossible to spot in a replay.
         """
         target = self.targets[0] if self.targets else None

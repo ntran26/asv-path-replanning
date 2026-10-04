@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One-off (your call, 2026-09-28): read v1's 2.4 M field evaluation.  If its field
+# One-off (decision, 2026-09-28): read v1's 2.4 M field evaluation.  If its field
 # goal rate beats the best so far (0.54), let v1 run to 3 M and then test it;
 # otherwise stop v1 and start the stronger fine-tune (configs/finetune_field_v2.json)
 # from v1's best checkpoint -- which runs its own tests at the end.

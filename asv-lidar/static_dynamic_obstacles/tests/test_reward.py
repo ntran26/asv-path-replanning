@@ -1,8 +1,8 @@
-"""The reward: 02a §10.4's eleven tests, and the decisions T4 had to make.
+"""The reward: 02a section 10.4's eleven tests, and the decisions T4 had to make.
 
 The eleven are numbered in their docstrings so they can be checked off against
 the specification.  Test 8 is `xfail(strict)` pending 03's corridor generator,
-per 02b §3.3 -- a term that is implemented, untested and silently inert is worse
+per 02b section 3.3 -- a term that is implemented, untested and silently inert is worse
 than one that is missing, so the test exists and fails rather than being omitted.
 """
 
@@ -70,8 +70,8 @@ def state_for(**kwargs) -> T.RewardState:
 # 1. Every term inside its declared range
 # ---------------------------------------------------------------------------
 def test_1_every_term_stays_in_range_across_random_states():
-    """02a §10.4 test 1.  The declared range is what makes the weight the
-    maximum per-step contribution, and therefore what makes the §7 hierarchy a
+    """02a section 10.4 test 1.  The declared range is what makes the weight the
+    maximum per-step contribution, and therefore what makes the section 7 hierarchy a
     property of the coefficient table rather than something to discover."""
     rng = np.random.default_rng(0)
     n = 20_000
@@ -133,7 +133,7 @@ def test_1_every_term_stays_in_range_across_random_states():
 # 2. Coefficient ordering
 # ---------------------------------------------------------------------------
 def test_2_coefficient_ordering_holds_and_is_enforced():
-    """02a §7 and §9.  The hierarchy is a property of the table, and the config
+    """02a section 7 and section 9.  The hierarchy is a property of the table, and the config
     refuses to be built if it is not."""
     assert (CFG.w_bnd > CFG.w_dom > CFG.w_obs > CFG.w_col
             > CFG.w_pf > CFG.w_prog > CFG.w_smooth > CFG.w_exist)
@@ -142,7 +142,7 @@ def test_2_coefficient_ordering_holds_and_is_enforced():
 
 
 def test_2b_a_collision_outranks_a_whole_non_compliant_encounter():
-    """02 §5 / `R-7`: a COLREGs-compliant collision must be worse than a
+    """02 section 5 / `R-7`: a COLREGs-compliant collision must be worse than a
     maximally non-compliant episode that avoids one.  At -200 the margin was 32
     points, which is why the payoff moved to -300."""
     assert abs(CFG.r_collision) > CFG.w_col * CFG.max_encounter_steps
@@ -164,11 +164,11 @@ def _traverse(l_path: float, speeds) -> float:
 
 
 def test_3_progress_telescopes_to_n_ref():
-    """02a §10.4 test 3, and the direct test of `R-9`'s claim.
+    """02a section 10.4 test 3, and the direct test of `R-9`'s claim.
 
     `Sum r_prog` is a constant fixed by the path, so a legal Rule 8(e) slowdown
     costs **zero** progress reward.  That is the whole reason no carve-out is
-    needed, and why the creep exploit 02 §4.4 warns about has no mechanism to
+    needed, and why the creep exploit 02 section 4.4 warns about has no mechanism to
     arise from.
     """
     for l_path in (20.0, 20.2, 20.42):
@@ -240,7 +240,7 @@ def test_3c_n_ref_is_derived_from_the_measured_cruise_speed():
 # 4. Holding course is correct when Rule 9(a) already satisfies Rule 14
 # ---------------------------------------------------------------------------
 def test_4_compliant_head_on_target_holding_course_costs_nothing():
-    """02a §10.4 test 4, and the `02 §3.2` rationale as a regression test.
+    """02a section 10.4 test 4, and the `02 section 3.2` rationale as a regression test.
 
     Target positionally 9(a)-compliant, so the projected pass already clears
     `d_req` and nothing is owed.  **If this fails the agent is being trained to
@@ -265,7 +265,7 @@ def test_4b_a_displaced_target_does_owe_an_alteration():
 
 
 def test_4c_rule_8e_discharges_the_obligation_when_the_turn_does_not_fit():
-    """02 §4.4 as reward structure: with no starboard room, slackening speed is
+    """02 section 4.4 as reward structure: with no starboard room, slackening speed is
     the compliant action and must be able to discharge `v_r8` on its own."""
     common = dict(dcpa=0.2 * D_REQ, a_req=0.8, dy_req=0.8 * D_REQ,
                   psi_engage=0.0, u_engage=cfg.U_REF, tcpa=5.0,
@@ -278,10 +278,10 @@ def test_4c_rule_8e_discharges_the_obligation_when_the_turn_does_not_fit():
 
 
 # ---------------------------------------------------------------------------
-# 5-6. The `02 §4.2` trap, both directions
+# 5-6. The `02 section 4.2` trap, both directions
 # ---------------------------------------------------------------------------
 def test_5_a_port_turn_is_a_violation_head_on_and_compliant_overtaking():
-    """02a §10.4 test 5.  **Overtaking requires a port turn.**
+    """02a section 10.4 test 5.  **Overtaking requires a port turn.**
 
     The same expression penalises opposite turns in the two classes, because
     `compliant_turn_sense` carries the sign.  There is no global "port turns are
@@ -399,7 +399,7 @@ def test_5e_an_engaged_encounter_keeps_its_class_and_sense():
 
 
 def test_6_v_side_inverts_between_head_on_and_overtaking():
-    """02a §10.4 test 6.  Both directions in one test so they cannot drift apart.
+    """02a section 10.4 test 6.  Both directions in one test so they cannot drift apart.
 
     Head-on: port-to-port puts the target on the own ship's PORT at the CPA, so
     `y_rel_CPA > 0` is the violation.  Overtaking: passing to port *of the
@@ -435,7 +435,7 @@ def test_6c_overtaking_side_is_not_charged_when_the_port_pass_does_not_fit():
 # 7. Yaw rate, not rudder
 # ---------------------------------------------------------------------------
 def test_7_v_port_fires_on_yaw_rate_crossing_r_dead_not_on_rudder():
-    """02a §10.4 test 7, and locked principle 5.
+    """02a section 10.4 test 7, and locked principle 5.
 
     A rudder movement that never develops into a turn is not an alteration of
     course.  `v_port` reads the yaw rate and nothing else -- the rudder command
@@ -474,7 +474,7 @@ def test_8_a_compliant_port_bend_costs_nothing_in_the_term():
 
 
 def test_every_generated_reference_path_is_straight():
-    """F59 (your call, 2026-09-16): bends are dropped and the reference path is
+    """F59 (decision, 2026-09-16): bends are dropped and the reference path is
     straight, so `r_path` is zero everywhere in the distribution.
 
     Replaces the T5 check that some episode bends the path.  Width still varies
@@ -513,7 +513,7 @@ def _head_on_admissibility(width: float) -> dict:
 
 
 def test_9_starboard_alteration_fits_at_10_m_and_not_at_3_5_m():
-    """02a §10.4 test 9.  The per-step geometric predicate, which is what makes
+    """02a section 10.4 test 9.  The per-step geometric predicate, which is what makes
     Study 1 a measurement: the width thresholds fall out of the sweep as results
     rather than going in as a lookup table."""
     wide = _head_on_admissibility(10.0)
@@ -548,7 +548,7 @@ def test_9c_admissibility_is_hysteretic_at_the_margin():
 # 10. `in_extremis` suppression
 # ---------------------------------------------------------------------------
 def test_10_in_extremis_releases_the_course_keeping_penalty():
-    """02a §10.4 test 10, and `R-4`.
+    """02a section 10.4 test 10, and `R-4`.
 
     Rule 17(b) requires the stand-on vessel to act when collision cannot be
     avoided by the give-way vessel alone.  That is a different provision from
@@ -578,14 +578,14 @@ def test_10b_the_in_extremis_predicate_is_dcpa_and_tcpa():
 
 
 # ---------------------------------------------------------------------------
-# 11. The §2 invariant
+# 11. The section 2 invariant
 # ---------------------------------------------------------------------------
 def test_11_d_safe_is_below_c_wall_minus_half_breadth():
-    """02a §2's invariant.  Otherwise the geometry that *defines* a compliant
+    """02a section 2's invariant.  Otherwise the geometry that *defines* a compliant
     narrow-channel manoeuvre would itself trigger the boundary penalty -- the
     reward would punish the behaviour the paper exists to elicit.
 
-    02a §5.2's own `d_safe = 0.50 m` breaches it (the ceiling is 0.40 m), which
+    02a section 5.2's own `d_safe = 0.50 m` breaches it (the ceiling is 0.40 m), which
     is why `constants.D_SAFE` is 0.35 and carries a `TODO(decision)`.
     """
     assert CFG.d_safe < CFG.c_wall - 0.5 * cfg.BREADTH
@@ -594,7 +594,7 @@ def test_11_d_safe_is_below_c_wall_minus_half_breadth():
 
 
 def test_11b_the_domain_floor_is_asserted_at_construction():
-    """02b §3.1, and the assertion T4 step 4 asks for.  A domain inside the
+    """02b section 3.1, and the assertion T4 step 4 asks for.  A domain inside the
     sensor's blind zone makes `r_dom` unlearnable, because `R-1` evaluates
     intrusion on ground truth."""
     assert CFG.dom_abeam >= cfg.DOMAIN_ABEAM_FLOOR
@@ -606,7 +606,7 @@ def test_11b_the_domain_floor_is_asserted_at_construction():
 # Group aggregation, and the two speed carve-outs
 # ---------------------------------------------------------------------------
 def test_the_colregs_group_is_clipped_before_the_group_weight():
-    """02a §6.7.  No combination of violations may exceed `w_COL` in one step,
+    """02a section 6.7.  No combination of violations may exceed `w_COL` in one step,
     or the group could silently outrank the safety terms -- which is exactly how
     Paper 2's path term came to outrank its avoidance term."""
     ctx = ctx_for(enc.CROSSING, y_rel_cpa=-3.0, beta_cpa=0.0, dcpa=0.0,
@@ -619,7 +619,7 @@ def test_the_colregs_group_is_clipped_before_the_group_weight():
 
 
 def test_a_single_severe_violation_does_not_saturate_the_group():
-    """02a §6.7's stated design: two concurrent severe violations saturate, one
+    """02a section 6.7's stated design: two concurrent severe violations saturate, one
     does not.  If one did, the group would stop distinguishing severities."""
     ctx = ctx_for(enc.HEAD_ON, y_rel_cpa=0.0)
     group = T.colregs_group(state_for(r=-1.0), {1: ctx}, CFG)
@@ -666,7 +666,7 @@ def test_the_existence_cost_is_suspended_only_by_r5():
 # The dense terms individually
 # ---------------------------------------------------------------------------
 def test_r_pf_is_width_normalised_so_study_1_is_not_confounded():
-    """02a §5.1.  The same *relative* offset must cost the same in a 10 m
+    """02a section 5.1.  The same *relative* offset must cost the same in a 10 m
     channel and a 4 m one, or the path-following gradient changes with corridor
     width and Study 1 measures the reward instead of the geometry."""
     wide = T.r_pf(state_for(e_y=2.5, w_local=10.0), {}, CFG)
@@ -698,7 +698,7 @@ def test_the_overspeed_gate_ignores_the_lowered_reference():
 
 
 def test_r_obs_is_exactly_zero_beyond_the_cut_off():
-    """02a §5.4.  The shift is the point: the unshifted form reads -0.08 at 2 m
+    """02a section 5.4.  The shift is the point: the unshifted form reads -0.08 at 2 m
     and integrates to about -53 over an episode -- larger than the path term,
     constant, and carrying no gradient."""
     assert T.r_obs(state_for(d_clear=cfg.D_CUT), {}, CFG) == 0.0
@@ -718,7 +718,7 @@ def test_r_bnd_reaches_full_penalty_outside_the_channel():
 
 def test_r_bnd_is_zero_in_open_water():
     """`R-10`.  Three terms are undefined without a boundary polygon, and the
-    04 §4.1 benchmark runs an open-water variant."""
+    04 section 4.1 benchmark runs an open-water variant."""
     assert T.r_bnd(state_for(d_bnd=0.0, open_water=True), {}, CFG) == 0.0
 
 
@@ -732,7 +732,7 @@ def test_r_pf_uses_the_reference_width_in_open_water():
 
 
 def test_r_dom_is_evaluated_on_ground_truth_at_the_right_bearing():
-    """02a §5.3, and the asymmetry is the point: the same range ahead and abeam
+    """02a section 5.3, and the asymmetry is the point: the same range ahead and abeam
     is not the same intrusion."""
     class Ghost:
         def __init__(self, x, y):
@@ -770,7 +770,7 @@ def test_r_dom_charges_for_a_target_the_tracker_never_saw():
 
 
 def test_r_smooth_saturates_at_the_actuator_rate_limit():
-    """02a §5.6.  `kappa_delta` is derived from the actuator, so the term
+    """02a section 5.6.  `kappa_delta` is derived from the actuator, so the term
     saturates at exactly the physical limit and self-calibrates when 05 delivers
     the actuator model."""
     assert T.r_smooth(state_for(d_rudder=0.0), {}, CFG) == 0.0
@@ -794,7 +794,7 @@ def test_r_smooth_is_cheap_in_the_free_window_after_engagement():
 # The state machine
 # ---------------------------------------------------------------------------
 def test_engagement_fires_before_the_obligation_does():
-    """02a §6.1.  In Revision 1 `kappa_eng` evaluated to exactly the compliant
+    """02a section 6.1.  In Revision 1 `kappa_eng` evaluated to exactly the compliant
     separation, putting the threshold on a knife-edge at the geometry the agent
     is supposed to achieve.  Watch first, then act."""
     assert CFG.kappa_eng * D_REQ > D_REQ
@@ -809,7 +809,7 @@ def test_engagement_fires_before_the_obligation_does():
 
 
 def test_rho_is_a_third_at_a_compliant_pass_and_every_severity_is_zero_there():
-    """02a §6.1's own worked number.  The gate being non-zero at a compliant
+    """02a section 6.1's own worked number.  The gate being non-zero at a compliant
     pass is fine precisely because nothing it multiplies is non-zero there."""
     manager = ContextManager()
     ctx = ctx_for(enc.HEAD_ON, dcpa=D_REQ)
@@ -839,7 +839,7 @@ def test_a_cleared_encounter_returns_to_idle():
 
 
 def test_the_context_is_the_only_place_the_class_is_decided():
-    """01 §5.3, mechanically.  The observation's class and the reward's gate are
+    """01 section 5.3, mechanically.  The observation's class and the reward's gate are
     the same field of the same object on the same step, not two derivations that
     happen to agree today."""
     env = ASVLidarEnv(render_mode=None)
@@ -881,11 +881,11 @@ def _fake_breakdown(term):
 
 
 def test_the_pre_committed_episode_orderings_hold():
-    """02a §8.1's three orderings, on 02a's own pre-committed integrals.
+    """02a section 8.1's three orderings, on 02a's own pre-committed integrals.
 
     These are the reward's actual contract, and they are the reason
     `R_collision` moved to -300: **a COLREGs-compliant collision must be worse
-    than a maximally non-compliant episode that avoids one** (02 §5).  At -200
+    than a maximally non-compliant episode that avoids one** (02 section 5).  At -200
     the margin was 32 points.
 
     The `prog` row is +52.6 rather than the tabulated +75 (F22).  It is the only
@@ -910,17 +910,17 @@ def test_the_pre_committed_episode_orderings_hold():
     assert collided == pytest.approx(0.5 * (prog - 69.5) + cfg.R_COLLISION, abs=0.2)
 
     assert nominal > violating > collided
-    assert violating - collided > 20.0, "the 02 §5 margin has gone thin"
+    assert violating - collided > 20.0, "the 02 section 5 margin has gone thin"
 
 
 def test_a_cornered_agent_prefers_timeout_to_collision():
-    """02a §8.1's second ordering -- and it has to be tested *discounted*.
+    """02a section 8.1's second ordering -- and it has to be tested *discounted*.
 
     **F23.**  Undiscounted, this ordering does not hold at the environment's
     actual step limit.  A vessel that stops dead in clear water pays
     `w_pf + w_exist = 0.65` every step (`r_pf` is a penalty form, so `g_u = 0`
     gives maximum penalty by design), and over `MAX_EPISODE_STEPS = 700` that is
-    -455 against a collision's -300.  02a §8.1's "-86" assumes its own 300-step
+    -455 against a collision's -300.  02a section 8.1's "-86" assumes its own 300-step
     design point; the environment's 700-step cap is a Paper 2 carry-over that
     was never reconciled with it.
 
@@ -948,7 +948,7 @@ def test_a_cornered_agent_prefers_timeout_to_collision():
     assert sac > cfg.R_COLLISION, (
         f"loitering is worth {sac:.0f} against a collision at {cfg.R_COLLISION:.0f}")
     assert sac == pytest.approx(-65.0, abs=2.0)
-    # The horizon moved from 700 to 900 steps (04a §4.1) and the SAC figure did
+    # The horizon moved from 700 to 900 steps (04a section 4.1) and the SAC figure did
     # not: at gamma = 0.99 the sum has already converged well inside 700 steps,
     # so a longer horizon costs nothing there.  It is the low-discount case that
     # keeps growing, which is the point of the PPO check below.
@@ -956,7 +956,7 @@ def test_a_cornered_agent_prefers_timeout_to_collision():
     # The undiscounted statement, pinned so the margin cannot quietly erode.
     undiscounted = -stopped_per_step * horizon
     assert undiscounted < cfg.R_COLLISION, (
-        "if this ever passes, the step limit and 02a §8.1's design point have "
+        "if this ever passes, the step limit and 02a section 8.1's design point have "
         "been reconciled and this test should assert the ordering directly")
 
     # And the PPO comparator's margin, so a regression is visible as a number.
@@ -977,8 +977,8 @@ def test_the_step_limit_leaves_room_for_a_detour():
     traversal_s = cfg.L_REF_PATH / cfg.U_REF
     assert 30.0 < traversal_s < 40.0, traversal_s
     # 90 s against a ~36 s traversal at 0.55 m/s -- 2.5 times over, which is
-    # 04a §4.1's own sizing at that speed.
-    # 04a §4.1 sizes it for a Rule 8(e) hold rather than for the transit: a
+    # 04a section 4.1's own sizing at that speed.
+    # 04a section 4.1 sizes it for a Rule 8(e) hold rather than for the transit: a
     # horizon tight enough to turn compliant slowing into a timeout would put
     # the horizon in direct conflict with the reward design.
     assert cfg.MAX_EPISODE_STEPS * cfg.UPDATE_RATE > 2.0 * traversal_s
@@ -1023,7 +1023,7 @@ def test_a29_fleeing_an_overtaker_keeps_costing_more(monkeypatch):
 
 
 def test_f91_no_held_heading_charge_where_the_compliant_turn_has_no_room(monkeypatch):
-    """F91.  With no starboard room in a head-on, 02 §4.4's answer is to slacken
+    """F91.  With no starboard room in a head-on, 02 section 4.4's answer is to slacken
     speed and the only lateral room is to port; charging the held heading there
     pushed the policy into the squeeze.  The yaw-rate form still charges a
     wrong-way *turn*."""

@@ -149,7 +149,7 @@ At decision34 the original velocity-course fallback is147.561654°, versus held1
 
 This verifies gated applicability and geometry sensitivity, not rescue. The target centre remains biased; the earlier full-truth-target sensitivity passes the same plan at+0.007051m. A more accurate axis alone therefore does not establish a more accurate complete collision forecast. Future raw observations remain those of the saved V13 episode.
 
-The model separates hull extent/orientation from translational kinematics, inspired by [Granstrom, Baum & Reuter's extended-object tracking overview](https://arxiv.org/abs/1604.00970). Our bounded hold is an engineering adaptation, not that paper's probabilistic estimator or a safety guarantee.
+The model separates hull extent/orientation from translational kinematics, inspired by [Granstrom, Baum & Reuter's extended-object tracking overview](https://arxiv.org/abs/1604.00970). The bounded hold here is an engineering adaptation, not that paper's probabilistic estimator or a safety guarantee.
 
 `audit.json` records source, trace, manifest and original-plan-audit hashes. The evaluated script bytes are preserved beside it. Reproduce from the project directory with a NEW output path:
 

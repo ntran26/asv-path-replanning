@@ -83,13 +83,13 @@ def test_observation_dimension_matches_versioned_space():
 
 
 def test_lidar_branch_is_obstacle_only():
-    """The corridor boundary is never in the scan (01 §3.1, acceptance T6).
+    """The corridor boundary is never in the scan (01 section 3.1, acceptance T6).
 
-    **Narrowed by 03a §1.2.**  It used to assert the scan was empty in a bare
+    **Narrowed by 03a section 1.2.**  It used to assert the scan was empty in a bare
     channel, which stopped being true when the facility walls were added -- and
     the walls are the point: until they existed the boundary gate had nothing to
     remove in simulation and was load-bearing only in the field, a sim-to-real
-    gap in the exact component 01 §3 exists to remove one from.
+    gap in the exact component 01 section 3 exists to remove one from.
 
     What must still hold, and what this now pins, is the narrower claim: the
     *corridor* is a map polygon and the sensor cannot see it.  Walls are
@@ -103,7 +103,7 @@ def test_lidar_branch_is_obstacle_only():
 
 
 def test_facility_walls_are_returned_and_then_gated():
-    """Acceptance T5 (03a §10): the gate has to do real work in training.
+    """Acceptance T5 (03a section 10): the gate has to do real work in training.
 
     With the walls returned, the gate's margin becomes a tunable with measurable
     failure modes in *both* directions -- too tight gates out real obstacles near
@@ -194,7 +194,7 @@ def test_target_collision_is_reported_separately():
     env = make_env()
     env.reset(seed=0)
     env.obstacles = []
-    env.targets = [TargetShip(env.asv_x, env.asv_y, 180.0, 0.0)]   # sitting on us
+    env.targets = [TargetShip(env.asv_x, env.asv_y, 180.0, 0.0)]   # sitting on the own ship
     kind = env.collision_kind(env.hull_polygon())
     assert kind == "target"
 
@@ -237,7 +237,7 @@ def test_the_reward_is_dense_and_decomposed():
 
 
 def test_every_term_stays_inside_its_declared_range():
-    """02a §10.4 test 1, on the trajectories the environment actually produces.
+    """02a section 10.4 test 1, on the trajectories the environment actually produces.
 
     The exhaustive random-state version lives in `test_reward.py`; this one
     catches a term that only leaves its range once it is fed real geometry.
@@ -266,7 +266,7 @@ def test_collision_returns_the_terminal_penalty():
 
 
 def test_a_collision_dominates_everything_dense():
-    """02 §5's ordering, at the step where it has to hold.
+    """02 section 5's ordering, at the step where it has to hold.
 
     The dense terms are bounded by the sum of their weights, so no accumulation
     of shaping can approach the collision payoff in one step.  Asserted rather
@@ -285,9 +285,9 @@ def test_a_collision_dominates_everything_dense():
 
 
 def test_terminal_payoffs_are_the_decided_values():
-    """02b §2 / 02a `R-7`.  -300 rather than -200 because at -200 the margin
+    """02b section 2 / 02a `R-7`.  -300 rather than -200 because at -200 the margin
     between a collision and a maximally non-compliant episode is 32 points,
-    violating the 02 §5 ordering."""
+    violating the 02 section 5 ordering."""
     assert cfg.R_COLLISION == -300.0
     assert cfg.R_GOAL == 100.0
     assert cfg.R_TIMEOUT == 0.0
@@ -298,7 +298,7 @@ def test_timeout_truncates_rather_than_terminating():
 
     That needs `truncated=True, terminated=False` at the step limit.  If the env
     terminated instead, the value of running out of time would be pinned at 0
-    rather than bootstrapped, and 02a §8.1's "a cornered agent prefers timeout
+    rather than bootstrapped, and 02a section 8.1's "a cornered agent prefers timeout
     to collision" argument would be void.
     """
     env = make_env(no_target_prob=1.0)
@@ -320,7 +320,7 @@ def test_timeout_truncates_rather_than_terminating():
 
 
 def test_no_paper_2_reward_terms_survive_in_info():
-    """Kickoff §8 acceptance check, enforced from the outside."""
+    """Kickoff section 8 acceptance check, enforced from the outside."""
     env = make_env()
     env.reset(seed=0)
     _, _, _, _, info = env.step(np.array([0.0, 0.0], np.float32))
@@ -403,7 +403,7 @@ def test_every_sweep_width_runs(width):
 
 
 def test_widths_in_breadths_are_the_declared_sweep():
-    """02a §11.3: 14 B added so the crossing and head-on thresholds separate.
+    """02a section 11.3: 14 B added so the crossing and head-on thresholds separate.
 
     Revision 7 fixed the corridor at 10 m; revision 8 restored the sweep.
     """
@@ -419,7 +419,7 @@ def _brackets():
 def test_the_sweep_brackets_every_predicted_threshold():
     """Each per-class transition must fall strictly inside some bracket.
 
-    02a §2.2 predicts four, and all four move with the ship domain -- so this
+    02a section 2.2 predicts four, and all four move with the ship domain -- so this
     fails loudly when 05 replaces the provisional domain without the sweep
     following it.
     """
@@ -530,7 +530,7 @@ def test_aft_mask_blinds_the_stern_arc():
 
 
 def test_ego_noise_perturbs_the_ego_branch():
-    """No IMU: u, v and r are differentiated from a noisy pose (05 §6)."""
+    """No IMU: u, v and r are differentiated from a noisy pose (05 section 6)."""
     env = make_env(ego_speed_noise=0.05, ego_yaw_rate_noise_dps=2.0)
     env.reset(seed=0)
     env.u_body, env.v_body, env.asv_w = 0.5, 0.0, 0.0
@@ -543,7 +543,7 @@ def test_ego_noise_perturbs_the_ego_branch():
 
 
 def test_perception_metrics_are_reported():
-    """04 §7: acquisition range, occlusion duration, track uptime."""
+    """04 section 7: acquisition range, occlusion duration, track uptime."""
     env = make_env(pose_noise=False)
     env.forced_num_obs = 0
     env.reset(seed=3)

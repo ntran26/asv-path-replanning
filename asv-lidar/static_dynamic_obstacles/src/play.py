@@ -9,7 +9,7 @@
 Two modes:
 
 **manual** -- arrow keys. Left/right work the helm, up/down the throttle. The
-vessel starts at cruise, so it makes way immediately and you steer from there.
+vessel starts at cruise, so it makes way immediately and steering starts from there.
 
     LEFT / RIGHT   rudder to port / starboard   (held, like a real helm)
     UP / DOWN      throttle up / down
@@ -30,8 +30,8 @@ The telemetry panel on the left is described in
 one keypress away.  The scrub keys are `,` and `.` rather than the arrows the
 spec suggests, because the arrows are the helm here.
 
-The helm **holds** where you put it rather than springing back, because holding
-a steady rate of turn is the thing you actually want to test.
+The helm **holds** where it is set rather than springing back, because holding
+a steady rate of turn is the thing actually under test.
 
 **random** -- samples the action space, as an RL rollout would. Use it with
 `--no-render --episodes N` as a smoke test: it validates every observation
@@ -73,7 +73,7 @@ def make_target(env: ASVLidarEnv, kind: str) -> List[TargetShip]:
     """Stage one named encounter geometry, and return the target.
 
     A convenience for eyeballing the classifier, not a scenario generator --
-    03 owns that, with spawn DCPA and TCPA as sampled axes (02a §11.1).
+    03 owns that, with spawn DCPA and TCPA as sampled axes (02a section 11.1).
 
     **This may reposition the own ship**, which is why it takes the whole env.
     `being_overtaken` needs clear water astern, and the default start sits 2 m
@@ -112,12 +112,12 @@ def make_target(env: ASVLidarEnv, kind: str) -> List[TargetShip]:
         return [TargetShip(px - off, py, (course + 90.0) % 360.0, speed)]
 
     if kind == "overtaking":
-        # Slow vessel ahead on our course: we overtake it.
+        # Slow vessel ahead on the own course: the own ship overtakes it.
         near, _, _ = env.path.frame_at_frac(min(1.0, frac * 0.45))
         return [TargetShip(float(near[0]), float(near[1]), course, slower)]
 
     if kind == "being_overtaken":
-        # Faster vessel astern on our course: it overtakes us.
+        # Faster vessel astern on the own course: it overtakes the own ship.
         #
         # Move the own ship up the path first.  The target has to sit inside the
         # boundary polygon or the gate drops it, and it has to start far enough
@@ -227,7 +227,7 @@ class Helm:
 
     Throttle starts at 0.0, which is cruise: `RPM = CRUISE_RPM + RPM_DELTA *
     throttle`, so the vessel makes way from step one and steering is the only
-    thing you have to do to get moving.
+    input needed to get moving.
     """
 
     def __init__(self) -> None:
@@ -390,7 +390,7 @@ def parse_args(argv=None):
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--mode", choices=("manual", "random"), default="manual")
     p.add_argument("--episodes", type=int, default=0,
-                   help="0 = run until you quit (default)")
+                   help="0 = run until quit (default)")
     p.add_argument("--seed", type=int, default=None)
     p.add_argument("--no-render", action="store_true",
                    help="headless; forces random actions")

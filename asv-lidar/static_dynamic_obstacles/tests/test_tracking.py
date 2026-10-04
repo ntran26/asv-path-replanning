@@ -188,7 +188,7 @@ def test_tracker_creates_and_confirms_a_track():
 
 
 def test_tracker_holds_a_track_id_across_steps():
-    """Slot persistence (01 §6.2) depends on ids being stable."""
+    """Slot persistence (01 section 6.2) depends on ids being stable."""
     tracker = trk.Tracker()
     pos = np.array([5.0, 20.0])
     ids = set()
@@ -260,10 +260,10 @@ def test_tracker_reset_clears_state():
 
 
 # ---------------------------------------------------------------------------
-# The 01 §4 coupling to 05
+# The 01 section 4 coupling to 05
 # ---------------------------------------------------------------------------
 def test_pose_drift_creates_false_velocity_on_a_static_object():
-    """01 §4 step 3, made concrete.
+    """01 section 4 step 3, made concrete.
 
     A genuinely static object, observed from a pose that drifts, produces a
     non-zero estimated velocity.  This is why the static/dynamic threshold has
@@ -275,7 +275,7 @@ def test_pose_drift_creates_false_velocity_on_a_static_object():
     drift_per_step = 0.2 * cfg.UPDATE_RATE      # 0.2 m/s of apparent motion
     for k in range(40):
         est_x = 5.0 + k * drift_per_step
-        # The object is truly fixed at (5, 14), but we localise ourselves wrong.
+        # The object is truly fixed at (5, 14), but the own ship's self-localisation is wrong.
         true_range = 4.0
         pts = trk.scan_to_points([true_range], bearings, est_x, 10.0, 0.0)
         tracker.update(list(pts))
@@ -287,7 +287,7 @@ def test_pose_drift_creates_false_velocity_on_a_static_object():
 
 
 # ---------------------------------------------------------------------------
-# Study 2 degradation axes (04 §6)
+# Study 2 degradation axes (04 section 6)
 # ---------------------------------------------------------------------------
 def test_degradation_defaults_are_nominal():
     tracker = trk.Tracker()
@@ -346,7 +346,7 @@ def test_max_coast_records_the_longest_occlusion():
 
 
 def test_min_points_rejects_a_taut_suspension_line():
-    """03 §4a: a rope returns on one or two beams and must not be tracked."""
+    """03 section 4a: a rope returns on one or two beams and must not be tracked."""
     assert cfg.CLUSTER_MIN_POINTS >= 3
     bearings = lp.beam_bearings()
     ranges = np.full(cfg.LIDAR_BEAMS, cfg.LIDAR_RANGE)

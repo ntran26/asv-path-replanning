@@ -1,6 +1,6 @@
 """Boundary raycast: hand-checked ranges, bends, varying width, gating.
 
-Kickoff §7: "known polygon, known pose, hand-checked ranges; correct behaviour
+Kickoff section 7: "known polygon, known pose, hand-checked ranges; correct behaviour
 at a bend and at varying width".
 """
 
@@ -71,7 +71,7 @@ def test_range_is_clipped_to_max():
 def test_narrowing_channel_is_visible_ahead_before_it_is_abeam():
     """A channel that narrows downstream.
 
-    This is the geometry 01 §3.3 says the branch needs in order to carry
+    This is the geometry 01 section 3.3 says the branch needs in order to carry
     information a simple port/starboard pair could not.
     """
     # Width 10 at y=0, tapering to width 4 by y=25.
@@ -107,7 +107,7 @@ def test_bend_produces_asymmetric_forward_rays():
 
 
 def test_constant_width_centreline_is_the_redundancy_trap():
-    """01 §3.3: on a centreline in a constant-width channel the branch is
+    """01 section 3.3: on a centreline in a constant-width channel the branch is
     an affine function of cross-track error and carries nothing new.
 
     This test documents the failure mode rather than guarding against it --
@@ -237,7 +237,7 @@ def test_gate_leaves_no_return_beams_alone():
 
 
 def test_gate_is_a_no_op_on_a_simulated_obstacle_only_scan():
-    """Equivalence of the two pipelines (01 §3.4).
+    """Equivalence of the two pipelines (01 section 3.4).
 
     In simulation the raycast never sees the border, so every return is already
     inside the polygon and gating must change nothing.

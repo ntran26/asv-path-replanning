@@ -34,12 +34,12 @@ CONFIG_ID = "baseline-v2"
 RUN_ARGS = {"timesteps": 2_000_000, "num_envs": 10, "eval_freq": 200_000,
             "eval_per_class": 20, "train_supervisor": "off", "eval_supervisor": "both",
             "low_speed_start_frac": 0.15, "checkpoint_every": 250_000}
-# TD3 dropped from the baseline set (your call, 2026-09-24).  The learner is
+# TD3 dropped from the baseline set (decision, 2026-09-24).  The learner is
 # still implemented in `train_formulation.py` and can be run by hand; it is no
 # longer part of the campaign or the paper's comparison.
 ALGOS = ["ppo", "recurrent_ppo", "sac", "tqc"]
 TAG = "bl2"                        # run-directory suffix for this formulation
-SEEDS = [0, 1, 2]                  # A26: 3 seeds per learner (your call, 2026-09-24;
+SEEDS = [0, 1, 2]                  # A26: 3 seeds per learner (decision, 2026-09-24;
                                    # was 5).  4 learners x 3 seeds = 12 runs, ~10 days.
 # A26: each seed is represented by its best development-set checkpoint (the eval
 # callback's goal - 2 x collision score, safety layer off); Tier B stays held out.
@@ -222,7 +222,7 @@ def write(cfg: ModuleType, tf: ModuleType) -> Dict:
                 "dirty": _code_dirty()},
         "provenance": {
             "formulation_of": "baseline-v1 (run 11) with A15's below-floor "
-                              "being-overtaken draws removed (S5, your call 2026-09-23)",
+                              "being-overtaken draws removed (S5, decision 2026-09-23)",
             "why": "PROJECT_STATE.md F92/F93/F96: run 11 was best on every development-set "
                    "class and consistent across two seeds (run 12's F91 and A31 are off); "
                    "the Rule 17(b) draws S5 put out of scope left training and the suite",

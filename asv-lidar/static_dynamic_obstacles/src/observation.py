@@ -1,4 +1,4 @@
-"""CODEX observation assembly: six branches, 70 dims at one dynamic target.
+"""Observation assembly (revision 3): six branches, 70 dims at one dynamic target.
 
 **Revision 3** retains the 56 revision-2 features and adds the encounter state
 used by the reward plus the previous executed action.  Existing checkpoints
@@ -18,7 +18,7 @@ with a deliberate version bump -- never by editing a loop here.
     context     12 per-slot context features + 2 actions     14
                                                        total 70
 
-Slot management (01 §6.2)
+Slot management (01 section 6.2)
 -------------------------
 * **One target slot.**  `N_MAX_TARGETS` is a config parameter and the branch is
   built as an indexed slot, so a multi-vessel extension costs a retrain rather
@@ -156,7 +156,7 @@ def slot_features(ctx: EncounterContext) -> np.ndarray:
     **A pure read of the `EncounterContext`.**  Until T4 this recomputed the
     bearing, the CPA products and the risk from the track, which meant the
     observation and the reward each derived the same encounter from the same
-    inputs by their own route.  01 §5.3 asks for one module and two consumers;
+    inputs by their own route.  01 section 5.3 asks for one module and two consumers;
     two consumers computing the same thing separately satisfies the letter of
     that and not the point of it -- they would diverge at a threshold eventually,
     and the agent would be penalised for a role it was never shown.
@@ -277,10 +277,10 @@ class ObservationBuilder:
     """Builds the Dict observation from the shared per-step encounter contexts.
 
     **The builder owns the `ContextManager`, and the reward reads it back.**
-    That is the single-object arrangement 02a §10.1 asks for, arranged so there
+    That is the single-object arrangement 02a section 10.1 asks for, arranged so there
     is one place it can be computed: the observation cannot be assembled without
     the contexts, so they always exist and are always the ones the reward sees.
-    An arrangement where the reward built its own would satisfy `01 §5.3` on
+    An arrangement where the reward built its own would satisfy `01 section 5.3` on
     paper and fail it in practice.
 
     The environment passes the map-side arguments (`path`, `boundary_polygon`,
@@ -327,7 +327,7 @@ class ObservationBuilder:
         """`{track_id: "port"|"starboard"|"none"}` as of the last `build`.
 
         Not in the observation -- Rule 9(b) makes the own ship give way from
-        either side, so the side is not a different obligation -- but 02a §6.4's
+        either side, so the side is not a different obligation -- but 02a section 6.4's
         passing-side term needs the geometry.
         """
         return {tid: ctx.crossing_side for tid, ctx in self._last.items()}

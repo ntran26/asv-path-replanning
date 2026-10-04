@@ -4,7 +4,7 @@
 >
 > - The observation: **70** values in six branches (`a25-v3-context`, F72) — a sixth `context` branch (encounter state + previous action) and cross-track error scaled by the local channel half-width. `OBSERVATION_SPEC.md` is current.
 >
-> - "the SAC multi-input policy": the same extractor serves all five learners (`OBSERVATION_SPEC.md` §7).
+> - "the SAC multi-input policy": the same extractor serves all five learners (`OBSERVATION_SPEC.md` section 7).
 >
 > - Pose and ego noise are on at nominal magnitudes (F46); decisions at 2 Hz (F38). Hardware facts (RPLidar C1, 720 beams, 10 Hz scans) are unchanged.
 >
@@ -19,7 +19,7 @@
 > pinned in `configs/comparators_v1.json` (F97, F98).
 
 **Revision 2** — single dynamic target. Supersedes the three-slot version.
-**Handover target:** Claude Code (implementation-heavy)
+**Workstream:** implementation (implementation-heavy)
 **Depends on:** 02 for the encounter classifier definition and the precedence table
 **Consumed by:** 03 (tracker interface), 04 (Study 2 design)
 
@@ -53,8 +53,8 @@ Required so the tracker can detect a vessel overtaking from astern (Rule 13, and
 
 ### 2.2 Pooled `c_t` — forward-biased, obstacles only
 
-`c_t` carries **static obstacles only**. Borders are gated out (§3); the dynamic target
-goes through the target branch (§5). A static obstacle directly astern has been passed,
+`c_t` carries **static obstacles only**. Borders are gated out (section 3); the dynamic target
+goes through the target branch (section 5). A static obstacle directly astern has been passed,
 and the action space has no reverse, so aft sectors would be dead input.
 
 Swath **±135°**; aft 90° reserved for the tracker. 27 sectors:
@@ -171,7 +171,7 @@ implementation detail — they are the object of Study 2.
 
 Stages:
 
-1. **Gate** beyond-boundary returns (§3.4)
+1. **Gate** beyond-boundary returns (section 3.4)
 2. **Cluster** remaining returns (DBSCAN or adaptive breakpoint on range)
 3. **Ego-motion compensate** using odometry. Scan-matching odometry is itself corrupted by
    moving objects in the scan, so drift produces false velocities on *static* objects.
@@ -182,7 +182,7 @@ Stages:
    by localisation quality, not by obstacle behaviour** — field obstacles are confirmed
    stable, so apparent motion of static objects comes almost entirely from ego-pose error,
    which affects every object in the scan identically. Set it from measured pose noise
-   (05 §4) and retighten as registration improves. Bias toward under-detection: promoting a
+   (05 section 4) and retighten as registration improves. Bias toward under-detection: promoting a
    static panel to a target ship is a false positive with COLREGs consequences
 
 Static clusters continue to feed `c_t`; the dynamic track feeds the target branch.
@@ -220,7 +220,7 @@ the *normal* case, so this matters more here than in the open-water literature.
 
 ### 5.2 Collision Risk Index
 
-Follow Waltz & Okhrin (2023) §3.3:
+Follow Waltz & Okhrin (2023) section 3.3:
 
 ```
 CR = 1                    if TS inside OS ship domain
@@ -333,7 +333,7 @@ Angles as sin/cos to avoid wraparound discontinuity.
   re-sorting. CRI-based ordering is moot at one target but the hook stays for extension
 - **Presence bit rather than a mask vector.** Zero-padding alone is dangerous because zero
   is a legitimate value for bearing and relative speed, so a zero-padded empty slot looks
-  like a target on top of you on a matching course
+  like a target on top of the own ship on a matching course
 - **No-target coverage.** A meaningful fraction of training episodes must have no target at
   all, or the static-only configuration is out of distribution
 
@@ -360,7 +360,7 @@ it — and note that if recurrence is added, RecurrentPPO stops being a clean co
 
 | Source | Use |
 |---|---|
-| Waltz & Okhrin (2023) *Neural Networks* 165:634–653 | CPA/CRI (§3.3), encounter table (§4.3), "Around the Clock" benchmark. **Read in full before finalising the observation vector** |
+| Waltz & Okhrin (2023) *Neural Networks* 165:634–653 | CPA/CRI (section 3.3), encounter table (section 4.3), "Around the Clock" benchmark. **Read in full before finalising the observation vector** |
 | Villa, Aaltonen & Koskinen, *IEEE/ASME Trans. Mechatronics* | LiDAR-based path following and avoidance in harbour conditions — closest platform and setting match |
 | Han et al. (2020) *J. Field Robotics* 37(6):987–1002 | LiDAR/radar track fusion feeding COLREGs manoeuvres, field-verified. Benchmark for the perception-to-action pipeline |
 | Kim et al. (2022) *Ocean Engineering* | 2D LiDAR detection embedded in a physical catamaran ASV, simulation and experiment |
@@ -375,7 +375,7 @@ is the harder problem and the basis of N1.
 
 ## 8. Open items
 
-- ~~O5~~ — resolved: software gating, geometric against the pool polygon. Facility walls retained as the localisation reference (05 §4.2)
+- ~~O5~~ — resolved: software gating, geometric against the pool polygon. Facility walls retained as the localisation reference (05 section 4.2)
 - Verify 720 beams against field logs; characterise aft occlusion and scan distortion
 - Re-derive all CRI constants in ship lengths; finalise the ship domain from the identified turning circle (05)
 - Define "being overtaken" thresholds
@@ -383,4 +383,4 @@ is the harder problem and the basis of N1.
 - Expose the Study 2 degradation parameters as environment config
 - Set the clustering minimum-points threshold to reject suspension-line returns (thin, 1–2
   beams) without rejecting genuine small obstacles
-- Set the static/dynamic threshold from measured pose noise once 05 §4 reports it
+- Set the static/dynamic threshold from measured pose noise once 05 section 4 reports it

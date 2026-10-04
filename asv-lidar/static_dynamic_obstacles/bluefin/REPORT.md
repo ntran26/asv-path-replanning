@@ -9,7 +9,7 @@ back until the parameters were frozen.
 **Status: 7/7 acceptance tests pass. Ready to train.**
 
 Part 2 (basin validation) is outstanding, and one part of the model — the
-sustained-turn regime — is currently prior-driven rather than data-driven. See §7.
+sustained-turn regime — is currently prior-driven rather than data-driven. See section 7.
 
 ---
 
@@ -104,7 +104,7 @@ rudder. They appear the moment rudder is held, which training episodes do.
   day, setup, battery and water state.
 - **Objective.** Pooled over 3 s and 10 s prediction windows plus the full free
   run, with heading and position as the only residuals, plus two
-  distribution-matching terms and a manoeuvring constraint (§5, §7).
+  distribution-matching terms and a manoeuvring constraint (sections 5, 7).
 - **Optimiser.** Differential evolution vectorised over runs *and* candidates,
   multiple independent starts converging to the same optimum.
 - **Uncertainty.** 28 run-level bootstrap resamples.
@@ -159,7 +159,7 @@ vessel never turns** (22.9°). Only at 1 s does a naive predictor beat v3.
 | V6 drift-angle sd | 5.39° | **4.78°** | 5.68° |
 
 The V6 regression reported in the previous iteration is gone: constraining the
-manoeuvring behaviour (§7) fixed it as a side effect, and also took the paired
+manoeuvring behaviour (section 7) fixed it as a side effect, and also took the paired
 test from 4/6 (p = 0.078) to 6/6 (p = 0.016).
 
 ---
@@ -263,7 +263,7 @@ their own values, independent draws land off the solution manifold and produce
 simulators that are unstable or turn the wrong way. Blending preserves the
 correlation structure, and every draw starts from a set that satisfied the
 manoeuvring constraints. `scale` > 1 is the honest setting given the caveats in
-§8; re-run acceptance test A5 whenever it changes.
+Section 8; re-run acceptance test A5 whenever it changes.
 
 ### Acceptance tests — run before every training job
 
@@ -305,7 +305,7 @@ Reproduce: `fit_final start {0,1,2} 110` → `fit_final boot 0 28` → `fit_fina
 
 In priority order, set by what these logs cannot reach:
 
-1. **Turning circles** at 25/50/75/100 % helm — replaces the §7 priors, which are
+1. **Turning circles** at 25/50/75/100 % helm — replaces the section 7 priors, which are
    currently the weakest part of the model.
 2. **Thrust vs RPM sweep** — `T12` is anchored at one operating point and the
    square-law exponent is assumed.

@@ -1,7 +1,7 @@
 {
  "id": "v3-stage8-recovery",
  "created": "2026-09-30",
- "purpose": "The agreed back-up plan (planning/SAC_RECOVERY_PLAN.md section 0), run on your call to see whether a focused stage 8 improves on the 3 M policy. Restarts from the 2.5 M checkpoint of baseline-v3 SAC seed 0 and trains to 3.0 M (the 3 M limit): three-panel layouts in 70 % of episodes, weighted to the failing cases, failure replay, and an exploration boost. Reward and observation unchanged. The 3 M policy is kept as the best policy (runs/sac_formulation_seed0_bl3/kept_best_3M/).",
+ "purpose": "The agreed back-up plan (planning/SAC_RECOVERY_PLAN.md section 0), run to see whether a focused stage 8 improves on the 3 M policy. Restarts from the 2.5 M checkpoint of baseline-v3 SAC seed 0 and trains to 3.0 M (the 3 M limit): three-panel layouts in 70 % of episodes, weighted to the failing cases, failure replay, and an exploration boost. Reward and observation unchanged. The 3 M policy is kept as the best policy (runs/sac_formulation_seed0_bl3/kept_best_3M/).",
  "base_config": "configs/baseline_v3.json",
  "start_from": "checkpoint",
  "start_model": "runs/sac_formulation_seed0_bl3/sac_2500000_steps.zip",

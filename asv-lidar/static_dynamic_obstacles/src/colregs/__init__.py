@@ -1,10 +1,10 @@
-"""COLREGs geometry and the per-step encounter context (02a §10.1-10.2).
+"""COLREGs geometry and the per-step encounter context (02a section 10.1-10.2).
 
 Three modules, and the split is by *who owns the definition*:
 
 * `classifier` -- re-exported from the top-level `encounter` module, which 01
-  owns.  It is not copied here: `01 §5.3` requires exactly one definition of the
-  encounter thresholds, and a re-export keeps the import path 02a §10.2 names
+  owns.  It is not copied here: `01 section 5.3` requires exactly one definition of the
+  encounter thresholds, and a re-export keeps the import path 02a section 10.2 names
   without creating a second place the bands could drift.
 * `geometry` -- CPA products, the admissibility predicate, the ship domain
   margins.  Pure functions of geometry, no state.

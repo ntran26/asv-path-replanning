@@ -2,7 +2,7 @@
 
 **V9 reached 16/32 goals, V8 16/32 and SAC alone 16/32.** V9 achieved the same number of goals as V8 in this fixed cohort: 6 gained and 6 lost. This is a diagnostic pilot, not an estimate for all 1,000 test cases.
 
-The user's later request explicitly authorized fresh episodes to determine whether V9 is better or worse, superseding the earlier no-new-runs restriction for this pilot. Selection was fixed before evaluation: 32 scenarios × SAC alone/V8/V9 = **96 new episode runs**, with no historical result reuse or automatic retries. This report performs no additional runs. Five cases are DV3 and 27 are test-set v2; all are development evidence.
+A later decision authorized fresh episodes to determine whether V9 is better or worse, superseding the earlier no-new-runs restriction for this pilot. Selection was fixed before evaluation: 32 scenarios × SAC alone/V8/V9 = **96 new episode runs**, with no historical result reuse or automatic retries. This report performs no additional runs. Five cases are DV3 and 27 are test-set v2; all are development evidence.
 
 ## Outcomes
 

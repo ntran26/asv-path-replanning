@@ -1,10 +1,10 @@
-"""The frozen suite on one policy — the evaluation the paper reports (04a §9).
+"""The frozen suite on one policy — the evaluation the paper reports (04a section 9).
 
 Unlike Tier 0-3, which replay the *development* namespace and exist to debug the
 formulation, this runs the **frozen namespace**: cases no model has been
 selected on.
 
-* **Tier B is the default frozen suite** (your call, 2026-09-23). Suite 3.4: the
+* **Tier B is the default frozen suite** (decision, 2026-09-23). Suite 3.4: the
   headline is 8 cells x 100 = 800 constant-velocity episodes drawn like the
   development set (only positions differ) -- tables R1-R2 -- and the
   **robustness set** reruns the same scenarios and seeds with reactive targets

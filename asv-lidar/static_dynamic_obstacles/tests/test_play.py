@@ -27,7 +27,7 @@ def keys():
 
 
 def test_helm_starts_at_cruise(keys):
-    """The vessel must make way from step one, so steering is all you do."""
+    """The vessel must make way from step one, so steering is the only input."""
     helm = play.Helm()
     assert helm.throttle == 0.0
     rpm = cfg.CRUISE_RPM + cfg.RPM_DELTA * helm.throttle
@@ -51,7 +51,7 @@ def test_left_arrow_puts_the_helm_to_port(keys):
 
 
 def test_the_helm_holds_when_the_key_is_released(keys):
-    """Held, not spring-centred -- a steady rate of turn is what you test."""
+    """Held, not spring-centred -- a steady rate of turn is what is tested."""
     helm = play.Helm()
     for _ in range(4):
         helm.update(FakeKeys({keys.K_RIGHT: True}))
@@ -200,7 +200,7 @@ def test_pose_noise_degrades_tracking_of_a_head_on_target():
     frames at 0.00, 0.10 and 0.25 m, 4 at 0.50 m, and 0 at 0.75 m.  A
     displacement inside the gate and the free-space tolerance costs nothing.
 
-    That matters for choosing Study 2's nominal (04a §7.1 sweeps this axis at
+    That matters for choosing Study 2's nominal (04a section 7.1 sweeps this axis at
     {0, 0.5, 1, 2, 4} x nominal): a nominal at or below 0.10 m puts three of the
     five levels on the flat part of the curve and the axis would report
     robustness that is really insensitivity.
@@ -221,7 +221,7 @@ def test_the_aft_mask_blinds_the_being_overtaken_class():
     A vessel overtaking from astern sits squarely in the masked arc.  Mask it
     and the target is never acquired at all -- so Rule 17 behaviour would fail
     in the field for reasons that have nothing to do with the policy, which is
-    exactly what 01 §2.3 warns about.
+    exactly what 01 section 2.3 warns about.
     """
     seen = _built("being_overtaken")
     blind = _built("being_overtaken", aft_mask=45.0)

@@ -1,13 +1,13 @@
 """Classical baselines on the basin-default development set (F74).
 
-06 and your brief: layouts must be feasible, and still hard enough that a
+06 and the brief: layouts must be feasible, and still hard enough that a
 classical method fails on some of them. This replays the formulation
 development set (now 75 % basin for the width-governed classes, basin for the
 rest) under
 
 * `follower` -- hold the path at cruise, avoid nothing: what the scene costs a
   policy that does not react;
-* `reference` -- the CODEX predictive LOS controller (`src/reference_controller.py`),
+* `reference` -- the prototype's predictive LOS controller (`src/reference_controller.py`),
   perception-only: the classical comparator;
 
 with the safety layer off and nominal noise, seeds as Tier 1. Every layout

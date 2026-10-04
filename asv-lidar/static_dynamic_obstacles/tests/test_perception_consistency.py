@@ -104,6 +104,6 @@ def test_metrics_preserve_physics_collision_kind(kind):
     assert row["border_collision"] == int(kind == "boundary")
     assert not row["timeout"]
 
-# A25: CODEX's goal test assumed its tightened `GOAL_CTE_RADIUS` (0.60 m).
+# A25: the prototype's goal test assumed its tightened `GOAL_CTE_RADIUS` (0.60 m).
 # This project keeps 1.60 m so runs 1-6 stay comparable; the overshoot guard
 # itself is covered by `test_env.py`'s goal tests.

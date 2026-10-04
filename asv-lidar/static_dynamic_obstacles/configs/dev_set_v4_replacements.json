@@ -1,0 +1,443 @@
+{
+ "revision": "4.2",
+ "decided": "2026-10-04",
+ "oracle": "results\\feasibility\\oracle_deveval.csv",
+ "rule": "solved_after_track and margin_after_track (0.2 m)",
+ "replacements": [
+  {
+   "position": 23,
+   "replaces": "dev_v2:023",
+   "seed": 900023,
+   "recipe": {
+    "set": "dev_v2",
+    "class": "crossing",
+    "index": 20
+   }
+  },
+  {
+   "position": 28,
+   "replaces": "dev_v2:028",
+   "seed": 900028,
+   "recipe": {
+    "set": "dev_v2",
+    "class": "crossing",
+    "index": 20
+   }
+  },
+  {
+   "position": 34,
+   "replaces": "dev_v2:034",
+   "seed": 900034,
+   "recipe": {
+    "set": "dev_v2",
+    "class": "crossing",
+    "index": 20
+   }
+  },
+  {
+   "position": 37,
+   "replaces": "dev_v2:037",
+   "seed": 900037,
+   "recipe": {
+    "set": "dev_v2",
+    "class": "crossing",
+    "index": 20
+   }
+  },
+  {
+   "position": 59,
+   "replaces": "dev_v2:059",
+   "seed": 900059,
+   "recipe": {
+    "set": "dev_v2",
+    "class": "overtaking",
+    "index": 20
+   }
+  },
+  {
+   "position": 162,
+   "replaces": "field_dev:DV3-HO-VS-03",
+   "seed": 900162,
+   "recipe": {
+    "set": "field_dev",
+    "code": "HO",
+    "varying": true,
+    "near": true,
+    "i": 20
+   }
+  },
+  {
+   "position": 163,
+   "replaces": "field_dev:DV3-HO-VS-04",
+   "seed": 900163,
+   "recipe": {
+    "set": "field_dev",
+    "code": "HO",
+    "varying": true,
+    "near": false,
+    "i": 20
+   }
+  },
+  {
+   "position": 167,
+   "replaces": "field_dev:DV3-CRP-CV-02",
+   "seed": 900167,
+   "recipe": {
+    "set": "field_dev",
+    "code": "CRP",
+    "varying": false,
+    "near": true,
+    "i": 21
+   }
+  },
+  {
+   "position": 168,
+   "replaces": "field_dev:DV3-CRP-CV-03",
+   "seed": 900168,
+   "recipe": {
+    "set": "field_dev",
+    "code": "CRP",
+    "varying": false,
+    "near": true,
+    "i": 21
+   }
+  },
+  {
+   "position": 169,
+   "replaces": "field_dev:DV3-CRP-CV-04",
+   "seed": 900169,
+   "recipe": {
+    "set": "field_dev",
+    "code": "CRP",
+    "varying": false,
+    "near": false,
+    "i": 21
+   }
+  },
+  {
+   "position": 170,
+   "replaces": "field_dev:DV3-CRP-CV-05",
+   "seed": 900170,
+   "recipe": {
+    "set": "field_dev",
+    "code": "CRP",
+    "varying": false,
+    "near": false,
+    "i": 21
+   }
+  },
+  {
+   "position": 184,
+   "replaces": "field_dev:DV3-CRP-CV-19",
+   "seed": 900184,
+   "recipe": {
+    "set": "field_dev",
+    "code": "CRP",
+    "varying": false,
+    "near": false,
+    "i": 21
+   }
+  },
+  {
+   "position": 187,
+   "replaces": "field_dev:DV3-CRP-VS-02",
+   "seed": 900187,
+   "recipe": {
+    "set": "field_dev",
+    "code": "CRP",
+    "varying": true,
+    "near": true,
+    "i": 20
+   }
+  },
+  {
+   "position": 194,
+   "replaces": "field_dev:DV3-CRS-CV-03",
+   "seed": 900194,
+   "recipe": {
+    "set": "field_dev",
+    "code": "CRS",
+    "varying": false,
+    "near": true,
+    "i": 20
+   }
+  },
+  {
+   "position": 200,
+   "replaces": "field_dev:DV3-CRS-CV-09",
+   "seed": 900200,
+   "recipe": {
+    "set": "field_dev",
+    "code": "CRS",
+    "varying": false,
+    "near": false,
+    "i": 20
+   }
+  },
+  {
+   "position": 203,
+   "replaces": "field_dev:DV3-CRS-CV-12",
+   "seed": 900203,
+   "recipe": {
+    "set": "field_dev",
+    "code": "CRS",
+    "varying": false,
+    "near": true,
+    "i": 20
+   }
+  },
+  {
+   "position": 204,
+   "replaces": "field_dev:DV3-CRS-CV-13",
+   "seed": 900204,
+   "recipe": {
+    "set": "field_dev",
+    "code": "CRS",
+    "varying": false,
+    "near": true,
+    "i": 20
+   }
+  },
+  {
+   "position": 206,
+   "replaces": "field_dev:DV3-CRS-CV-15",
+   "seed": 900206,
+   "recipe": {
+    "set": "field_dev",
+    "code": "CRS",
+    "varying": false,
+    "near": false,
+    "i": 20
+   }
+  },
+  {
+   "position": 212,
+   "replaces": "field_dev:DV3-CRS-VS-01",
+   "seed": 900212,
+   "recipe": {
+    "set": "field_dev",
+    "code": "CRS",
+    "varying": true,
+    "near": true,
+    "i": 20
+   }
+  },
+  {
+   "position": 217,
+   "replaces": "field_dev:DV3-CRS-VS-06",
+   "seed": 900217,
+   "recipe": {
+    "set": "field_dev",
+    "code": "CRS",
+    "varying": true,
+    "near": false,
+    "i": 21
+   }
+  },
+  {
+   "position": 221,
+   "replaces": "field_dev:DV3-OT-CV-04",
+   "seed": 900221,
+   "recipe": {
+    "set": "field_dev",
+    "code": "OT",
+    "varying": false,
+    "near": false,
+    "i": 20
+   }
+  },
+  {
+   "position": 235,
+   "replaces": "field_dev:DV3-OT-CV-18",
+   "seed": 900235,
+   "recipe": {
+    "set": "field_dev",
+    "code": "OT",
+    "varying": false,
+    "near": false,
+    "i": 20
+   }
+  },
+  {
+   "position": 247,
+   "replaces": "field_dev:DV3-BO-CV-04",
+   "seed": 900247,
+   "recipe": {
+    "set": "field_dev",
+    "code": "BO",
+    "varying": false,
+    "near": false,
+    "i": 21
+   }
+  },
+  {
+   "position": 250,
+   "replaces": "field_dev:DV3-BO-CV-07",
+   "seed": 900250,
+   "recipe": {
+    "set": "field_dev",
+    "code": "BO",
+    "varying": false,
+    "near": false,
+    "i": 21
+   }
+  },
+  {
+   "position": 253,
+   "replaces": "field_dev:DV3-BO-CV-10",
+   "seed": 900253,
+   "recipe": {
+    "set": "field_dev",
+    "code": "BO",
+    "varying": false,
+    "near": false,
+    "i": 21
+   }
+  },
+  {
+   "position": 268,
+   "replaces": "field_dev:DV3-BO-VS-05",
+   "seed": 900268,
+   "recipe": {
+    "set": "field_dev",
+    "code": "BO",
+    "varying": true,
+    "near": false,
+    "i": 20
+   }
+  },
+  {
+   "position": 284,
+   "replaces": "dv4x:DV4X-HO-CV-S-05",
+   "seed": 900284,
+   "recipe": {
+    "set": "dv4x",
+    "code": "HO",
+    "varying": false,
+    "straight": true,
+    "i": 10
+   }
+  },
+  {
+   "position": 293,
+   "replaces": "dv4x:DV4X-CRP-VS-L-04",
+   "seed": 900293,
+   "recipe": {
+    "set": "dv4x",
+    "code": "CRP",
+    "varying": true,
+    "straight": false,
+    "i": 10
+   }
+  },
+  {
+   "position": 295,
+   "replaces": "dv4x:DV4X-CRP-VS-S-06",
+   "seed": 900295,
+   "recipe": {
+    "set": "dv4x",
+    "code": "CRP",
+    "varying": true,
+    "straight": true,
+    "i": 10
+   }
+  },
+  {
+   "position": 296,
+   "replaces": "dv4x:DV4X-CRP-CV-L-07",
+   "seed": 900296,
+   "recipe": {
+    "set": "dv4x",
+    "code": "CRP",
+    "varying": false,
+    "straight": false,
+    "i": 10
+   }
+  },
+  {
+   "position": 298,
+   "replaces": "dv4x:DV4X-CRP-CV-S-09",
+   "seed": 900298,
+   "recipe": {
+    "set": "dv4x",
+    "code": "CRP",
+    "varying": false,
+    "straight": true,
+    "i": 10
+   }
+  },
+  {
+   "position": 300,
+   "replaces": "dv4x:DV4X-CRS-CV-L-01",
+   "seed": 900300,
+   "recipe": {
+    "set": "dv4x",
+    "code": "CRS",
+    "varying": false,
+    "straight": false,
+    "i": 10
+   }
+  },
+  {
+   "position": 301,
+   "replaces": "dv4x:DV4X-CRS-VS-S-02",
+   "seed": 900301,
+   "recipe": {
+    "set": "dv4x",
+    "code": "CRS",
+    "varying": true,
+    "straight": true,
+    "i": 11
+   }
+  },
+  {
+   "position": 307,
+   "replaces": "dv4x:DV4X-CRS-VS-S-08",
+   "seed": 900307,
+   "recipe": {
+    "set": "dv4x",
+    "code": "CRS",
+    "varying": true,
+    "straight": true,
+    "i": 10
+   }
+  },
+  {
+   "position": 308,
+   "replaces": "dv4x:DV4X-CRS-CV-S-09",
+   "seed": 900308,
+   "recipe": {
+    "set": "dv4x",
+    "code": "CRS",
+    "varying": false,
+    "straight": true,
+    "i": 11
+   }
+  },
+  {
+   "position": 327,
+   "replaces": "dv4x:DV4X-BO-VS-S-08",
+   "seed": 900327,
+   "recipe": {
+    "set": "dv4x",
+    "code": "BO",
+    "varying": true,
+    "straight": true,
+    "i": 13
+   }
+  },
+  {
+   "position": 329,
+   "replaces": "dv4x:DV4X-BO-VS-S-10",
+   "seed": 900329,
+   "recipe": {
+    "set": "dv4x",
+    "code": "BO",
+    "varying": true,
+    "straight": true,
+    "i": 13
+   }
+  }
+ ],
+ "unfilled": []
+}

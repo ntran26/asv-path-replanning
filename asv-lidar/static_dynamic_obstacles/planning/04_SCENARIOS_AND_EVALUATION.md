@@ -2,7 +2,7 @@
 
 > **Status note (2026-09-22).** Parts of this document are superseded by the implementation, which is frozen as **baseline-v1** (`configs/baseline_v1.json`, git tag `baseline-v1`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here:
 >
-> - Suite 3.0: dev set 120, Tier A 38 named (35 realised), Tier B 48 cells × 20, basin and channel strata (F75, spec 06 §5).
+> - Suite 3.0: dev set 120, Tier A 38 named (35 realised), Tier B 48 cells × 20, basin and channel strata (F75, spec 06 section 5).
 >
 > - Being overtaken: 80 % above a safe DCPA floor, 20 % below, labelled (A15). Crossings: 20 % labelled unescapable (A22); training draws 60 % from port (F84).
 >
@@ -19,7 +19,7 @@
 > pinned in `configs/comparators_v1.json` (F97, F98).
 
 **Revision 2** — single target, "Around the Clock" adopted, width sweep added.
-**Handover target:** Claude chat (design), then Claude Code
+**Workstream:** design, then implementation
 **Depends on:** 03 (target behaviours, corridor geometry), 02 (precedence thresholds)
 
 ---
@@ -48,7 +48,7 @@ produces targets that pose no threat, wasting samples.
 6. Sample corridor width (in ship breadths), bend geometry, and path offset
 7. Add static obstacles independently
 
-This is Waltz & Okhrin's routine (§5.1), which they contrast explicitly with random
+This is Waltz & Okhrin's routine (section 5.1), which they contrast explicitly with random
 spawning that may create no threat.
 
 **Include the null class** — a target on a course similar to the own ship. It never arises
@@ -107,7 +107,7 @@ Run in two variants:
   own right, and where classical VO and APF baselines should begin to fail
 
 This is the principal defence against the criticism that the benchmark was constructed by
-the authors. **Releasing the generator (§4.5) remains mandatory regardless.**
+the authors. **Releasing the generator (section 4.5) remains mandatory regardless.**
 
 ### 4.2 Tier A — deterministic named cases (~30–40)
 
@@ -187,13 +187,13 @@ being conservative and start being unsafe** — a policy that becomes cautious u
 degradation is deployable; one that misclassifies and turns the wrong way is not.
 
 Requires no basin time. Run on the frozen suite with degradation as an environment
-parameter (hooks specified in 03 §7).
+parameter (hooks specified in 03 section 7).
 
 ---
 
 ## 7. Metrics
 
-Full list in `00_PAPER3_INDEX_AND_PROTOCOL.md` §4.2. Suite-specific points:
+Full list in `00_PAPER3_INDEX_AND_PROTOCOL.md` section 4.2. Suite-specific points:
 
 - Per-class violation rates, not a pooled number
 - **Minimum CPA as a CDF**, not a mean — the tail is the safety claim

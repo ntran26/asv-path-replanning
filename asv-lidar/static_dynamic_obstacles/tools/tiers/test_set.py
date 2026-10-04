@@ -1,5 +1,5 @@
 """The test set: the frozen suite and the Paper 2 deployment-layout set merged,
-twins and near-duplicates trimmed, 1,000 episodes (your call, 2026-10-02).
+twins and near-duplicates trimmed, 1,000 episodes (decision, 2026-10-02).
 
 Sources (neither used for training or tuning):
 
@@ -42,7 +42,7 @@ the scenario (`flags["own_start_s"]` = `L1_BO_START_S`, honoured by
 rotated FIX/VAR and trimmed to the same count.  All other episodes are v1's.
 Results in `results/test_set/v2/<tag>/`.
 
-**Version 3 (2026-10-03, the user's call: field deployment runs boustrophedon
+**Version 3 (2026-10-03, decision: field deployment runs boustrophedon
 survey lanes, so straight legs are the common case; vary the obstacle
 arrangements more, keep some slanted legs).** v3 is v2 with:
 * in each Paper 2 layout cell (L1-L3 x HO/CRP/CRS/OT/BO), a share `V3_FIELD_REPLACE`
@@ -61,6 +61,19 @@ arrangements more, keep some slanted legs).** v3 is v2 with:
   238 overtaking episodes had none).
 Everything else is v2's; the development sets are untouched.  Default
 `--version 3`; results in `results/test_set/v3/<tag>/`.
+
+**Version 4 (2026-10-04, decision: near-impossible episodes leave the test set).**
+`src/oracle_feasibility.py` grades every v3 episode with a manoeuvre library rolled
+out under perfect foresight, the true vessel model and the policy's action space
+(`results/feasibility/oracle_test.csv`).  An episode stays only if some manoeuvre
+that starts at or after the onboard perception first tracks the target reaches
+the goal while keeping `V4_MARGIN_M` clearance throughout (`margin_after_track`).
+The 67 that fail -- tight (solvable only under the margin, 35), decided before the
+target can be seen (25) and unsolvable (7) -- are each replaced by a fresh episode
+of the same cell, target behaviour or speed profile and leg type, drawn from new
+seed blocks (`V4_*`) and accepted only if it passes the same oracle test.  The
+1,000 total and the cell balance stay as designed; everything else is v3's.
+Run with `--version 4`; results in `results/test_set/v4/<tag>/`.
 
     python tools/tiers/test_set.py --build                      # write the definition
     python tools/tiers/test_set.py --model runs/.../best_model.zip --tag sacs0_bl3 --safety off
@@ -115,6 +128,16 @@ V3_FS_SEED_BASE = 450_000             # v3 generator seeds (seed_fn adds 200,000
 V3_FS_EPISODE_SEED = 496_000
 V3_FROZEN_SEED_INDEX = 8_500          # frozen_eval namespace index (Tier B uses 0-7,999)
 V3_FROZEN_EPISODE_SEED = 497_000
+V4_ORACLE = ROOT / "results" / "feasibility" / "oracle_test.csv"   # v4: the oracle verdicts on v3
+V4_MARGIN_M = 0.20                    # v4: the clearance a post-tracking solution must keep (oracle MARGIN_M)
+V4_FS_SEED_BASE = 600_000             # v4 replacement seed blocks, unused by every other set
+V4_FS_EPISODE_SEED = 498_000
+V4_FROZEN_SEED_INDEX = 10_500         # frozen_eval index (Tier B 0-7,999; v3 8,500+; Tier A 9,600-9,999)
+V4_FROZEN_EPISODE_SEED = 499_000
+V4_P2_SEED_BASE = 342_000             # + cell index x 1,000 (the Paper 2 set uses 310,000-339,999)
+V4_P2_EPISODE_SEED = 499_500
+V4_CANDIDATES = 2                     # replacement candidates drawn per open slot and round
+V4_ROUNDS = 8
 
 
 def out_dir(version=None):
@@ -220,6 +243,8 @@ def _trim(items, target=TARGET_EPISODES, max_cut=MAX_CELL_CUT):
 def build(env=None):
     """The set, from the cache `results/test_set[/vN]/set_v<version>.pkl` when its
     digest matches `definition.json`, else built and cached (v1 about 25 min)."""
+    if SET_VERSION.startswith("4"):
+        return build_v4(env)
     if SET_VERSION.startswith("3"):
         return build_v3(env)
     if SET_VERSION.startswith("2"):
@@ -367,31 +392,33 @@ def _panels(it):
     return len(fixed) if fixed else int(it["built"].n_obstacles)
 
 
-def _fs_episode(env, code, variant, straight, k):
+def _fs_episode(env, code, variant, straight, k, *, seed_base=V3_FS_SEED_BASE,
+                episode_base=V3_FS_EPISODE_SEED, namespace="test_v3"):
     """One new field-style three-panel episode (see the v3 docstring)."""
     import field_training as ft
     import scenario as scn
     while True:
-        base = V3_FS_SEED_BASE + k * 20
-        built = ft.sample(np.random.default_rng(base), namespace="test_v3", encounter=code,
+        base = seed_base + k * 20
+        built = ft.sample(np.random.default_rng(base), namespace=namespace, encounter=code,
                           varying=(variant == "VAR"),
                           generator=scn.ScenarioGenerator(stage=5, seed_namespace="frozen_eval"),
                           seed_fn=lambda j, base=base: base + 200_000 + j, solvable_only=True,
                           near=False, straight=straight)
-        episode_seed = V3_FS_EPISODE_SEED + k
+        episode_seed = episode_base + k
         k += 1
         if _start_clear(env, built, episode_seed):
             return built, episode_seed, k
 
 
-def _frozen_straight(env, cls, variant, k):
+def _frozen_straight(env, cls, variant, k, *, index_base=V3_FROZEN_SEED_INDEX,
+                     episode_base=V3_FROZEN_EPISODE_SEED):
     """One new straight-leg three-panel frozen-basin episode (see the v3 docstring)."""
     import feasibility_st
     import scenario as scn
     gen = scn.ScenarioGenerator(stage=5, seed_namespace="frozen_eval")
     while True:
-        seed = scn.seed_for("frozen_eval", V3_FROZEN_SEED_INDEX + k)
-        episode_seed = V3_FROZEN_EPISODE_SEED + k
+        seed = scn.seed_for("frozen_eval", index_base + k)
+        episode_seed = episode_base + k
         k += 1
         x = float(np.random.default_rng(seed + 1).uniform(*cfg.BASIN_X_RANGE))
         built = gen.sample(seed, case_id=f"v3-{seed}", encounter_class=cls,
@@ -508,6 +535,200 @@ def build_v3(env=None):
     return kept, report
 
 
+def _frozen_episode(env, item, k):
+    """v4: one new episode of a frozen-suite (Tier B) cell -- the cell's class,
+    geometry and channel-width range, the item's target behaviour -- from the v4
+    frozen_eval index block, start-clear."""
+    import scenario as scn
+    cls, geometry = item["class"], item["built"].geometry_mode
+    cell = next(c for c in suite.tier_b_cells() if c["class"] == cls and c["geometry_mode"] == geometry)
+    gen = scn.ScenarioGenerator(stage=5, seed_namespace="frozen_eval")
+    while True:
+        seed = scn.seed_for("frozen_eval", V4_FROZEN_SEED_INDEX + k)
+        episode_seed = V4_FROZEN_EPISODE_SEED + k
+        k += 1
+        rng = np.random.default_rng(seed + 7)
+        width = None if cell["width_range"] is None else float(rng.uniform(*cell["width_range"]))
+        built = gen.sample(seed, case_id=f"v4-{seed}", encounter_class=cls, width=width,
+                           behaviour=suite.target_model(item["variant"].lower(), cls),
+                           geometry_mode=geometry, flags={"stratum": cell["stratum"]})
+        if built is not None and _start_clear(env, built, episode_seed, gap=1e-6):
+            return built, episode_seed, k
+
+
+def _layout_episode(env, layout, code, variant, k):
+    """v4: one new episode on a Paper 2 deployment layout (L1-L3): p2.build's
+    sampling and field rules from the v4 seed block, the VAR twin when the item
+    was varying speed, plus the v2 start check and cell fixes."""
+    import scenario as scn
+    import targets as tgt
+    cells = p2.cells()
+    c_index = next(i for i, c in enumerate(cells) if c["layout"] == layout and c["encounter"] == code)
+    cell = cells[c_index]
+    fix = CELL_FIXES.get((layout, code), {})
+    generator = scn.ScenarioGenerator(stage=5, seed_namespace="frozen_eval")
+    while True:
+        seed = V4_P2_SEED_BASE + c_index * 1_000 + k
+        episode_seed = V4_P2_EPISODE_SEED + c_index * 100 + k
+        k += 1
+        extra = {"side": cell["side"]} if cell["side"] else {}
+        built = generator.sample(seed, case_id=f"v4-{seed}", encounter_class=cell["class"], behaviour=tgt.T_CV,
+                                 geometry_mode="basin",
+                                 flags=p2._flags(layout, target_stop_box=p2.stop_box(), **extra, **fix))
+        if built is None:
+            continue
+        lo, hi = p2.ct.FIELD_TARGET_SPEED_RANGE
+        if not lo <= float(built.target_speed) <= hi:
+            continue
+        if variant == "VAR":
+            built = p2.varying_twin(built, seed)
+            if built is None:
+                continue
+        if not _start_clear(env, built, episode_seed):
+            continue
+        if not p2.field_feasible(p2.nominal_check(env, built, episode_seed)):
+            continue
+        return built, episode_seed, k
+
+
+_ORACLE = {}
+
+
+def _oracle_init():
+    import torch
+    torch.set_num_threads(1)
+    curriculum.apply_stage(tf.PROPULSION_STAGE)
+    from env import ASVLidarEnv
+    _ORACLE["env"] = ASVLidarEnv(render_mode=None, emergency_stop=False)
+
+
+def _oracle_job(args):
+    import oracle_feasibility as of
+    slot, built, seed = args
+    return slot, of.assess(_ORACLE["env"], built, seed)
+
+
+def _passes(rep) -> bool:
+    return bool(rep["solved_after_track"]) and bool(rep["margin_after_track"])
+
+
+def build_v4(env=None, processes: int = 6):
+    """v3 with every episode that fails the oracle test replaced (see the docstring)."""
+    import pickle
+    from concurrent.futures import ProcessPoolExecutor
+    import oracle_feasibility as of
+    assert abs(of.MARGIN_M - V4_MARGIN_M) < 1e-9, "the oracle's margin is the v4 margin"
+    curriculum.apply_stage(tf.PROPULSION_STAGE)
+    out = out_dir("4.0")
+    cache, meta = out / "set_v4.0.pkl", out / "definition.json"
+    if cache.exists() and meta.exists():
+        with open(cache, "rb") as fh:
+            kept, report = pickle.load(fh)
+        if report.get("manifest_digest") == json.loads(meta.read_text()).get("manifest_digest"):
+            return kept, report
+    if env is None:
+        from env import ASVLidarEnv
+        env = ASVLidarEnv(render_mode=None, emergency_stop=False)
+    v3, v3_report = build_v3(env)
+    verdict = pd.read_csv(V4_ORACLE, keep_default_na=False, na_values=[""]).set_index("key")
+    missing = [it["test_id"] for it in v3 if f"test:{it['test_id']}" not in verdict.index]
+    if missing:
+        raise SystemExit(f"{len(missing)} v3 episodes have no oracle verdict, e.g. {missing[:3]}")
+    def tier(it):
+        r = verdict.loc[f"test:{it['test_id']}"]
+        if not (r.n_success > 0 or r.nominal_outcome == "goal"):
+            return "unsolvable"
+        if not bool(r.solved_after_track):
+            return "decided before tracking"
+        return "tight" if not bool(r.margin_after_track) else "ok"
+    tiers = {it["test_id"]: tier(it) for it in v3}
+    out_items = [it for it in v3 if tiers[it["test_id"]] != "ok"]
+    print(f"[v4] {len(out_items)} of {len(v3)} v3 episodes fail the oracle test: "
+          f"{dict(Counter(tiers[it['test_id']] for it in out_items))}", flush=True)
+    # One open slot per excluded episode; candidates are drawn in the main process
+    # (cheap) and graded by the oracle in a pool (the cost), round after round.
+    slots = {i: it for i, it in enumerate(out_items)}
+    filled, ks, log = {}, {"fs": 0, "frozen": 0, "straight": 0}, []
+    ks_layout = Counter()
+
+    def draw(it):
+        if it["source"] == "frozen":
+            if it["test_id"].rsplit("-", 1)[-1].startswith("S"):
+                b, sd, ks["straight"] = _frozen_straight(env, it["class"], it["variant"], ks["straight"],
+                                                         index_base=V4_FROZEN_SEED_INDEX + 5_000,
+                                                         episode_base=V4_FROZEN_EPISODE_SEED + 300)
+            else:
+                b, sd, ks["frozen"] = _frozen_episode(env, it, ks["frozen"])
+            return b, sd
+        cell = it["cell"]
+        code = cell.split("-", 1)[1]
+        if cell.startswith("FS-"):
+            straight = abs(float(it["built"].slant_realised_deg)) <= 2.0
+            b, sd, ks["fs"] = _fs_episode(env, code, it["variant"], straight, ks["fs"],
+                                          seed_base=V4_FS_SEED_BASE, episode_base=V4_FS_EPISODE_SEED,
+                                          namespace="test_v4")
+            return b, sd
+        layout = cell.split("-", 1)[0]
+        b, sd, ks_layout[cell] = _layout_episode(env, layout, code, it["variant"], ks_layout[cell])
+        return b, sd
+
+    with ProcessPoolExecutor(max_workers=processes, initializer=_oracle_init) as pool:
+        for rnd in range(V4_ROUNDS):
+            open_slots = [i for i in slots if i not in filled]
+            if not open_slots:
+                break
+            jobs = []
+            for i in open_slots:
+                for _ in range(V4_CANDIDATES):
+                    b, sd = draw(slots[i])
+                    jobs.append((i, b, sd))
+            print(f"[v4] round {rnd + 1}: {len(open_slots)} open slots, {len(jobs)} candidates", flush=True)
+            for (i, b, sd), (_, rep) in zip(jobs, pool.map(_oracle_job, jobs, chunksize=1)):
+                ok = _passes(rep)
+                log.append({"slot": i, "replaces": slots[i]["test_id"], "round": rnd + 1, "seed": sd,
+                            "passes": ok, **{k: rep[k] for k in ("solved_after_track", "margin_after_track",
+                                                                 "n_success", "t_track_s", "best_clearance_m")}})
+                if ok and i not in filled:
+                    filled[i] = (b, sd, rep)
+    if len(filled) < len(slots):
+        raise SystemExit(f"[v4] {len(slots) - len(filled)} slots still open after {V4_ROUNDS} rounds")
+    out.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(log).to_csv(out / "replacement_candidates.csv", index=False)
+    new, made = [], Counter()
+    for i, it in slots.items():
+        b, sd, rep = filled[i]
+        if it["source"] == "frozen":
+            stem = it["test_id"].rsplit("-", 1)[0]
+        elif it["cell"].startswith("FS-"):
+            stem = f"FS-{it['cell'].split('-', 1)[1]}-{it['variant']}"
+        else:
+            stem = f"P2v4-{it['cell']}-{it['variant']}"
+        made[stem] += 1
+        tid = f"{stem}-R{made[stem]:03d}"
+        b.case_id = tid
+        new.append({**{k: it[k] for k in ("source", "cell", "class", "stratum", "variant")},
+                    "built": b, "episode_seed": sd, "test_id": tid, "origin_id": tid,
+                    "replaces": it["test_id"], "replaced_tier": tiers[it["test_id"]],
+                    "leg": "straight" if abs(float(b.slant_realised_deg)) <= 2.0 else "slanted"})
+        env.reset(seed=sd, options={"generated": b})
+        new[-1]["panels"] = len(env.obstacles)
+        print(f"[v4] {tid} replaces {it['test_id']} ({tiers[it['test_id']]})", flush=True)
+    drop = {it["test_id"] for it in out_items}
+    kept = [it for it in v3 if it["test_id"] not in drop] + new
+    digests = {it["test_id"]: it["built"].digest() for it in kept}
+    blob = json.dumps(digests, sort_keys=True, separators=(",", ":"))
+    report = {"version": "4.0", "base": "3.0", "base_digest": v3_report["manifest_digest"],
+              "episodes": len(kept), "distinct_scenarios": v3_report.get("distinct_scenarios"),
+              "removed_near_duplicates": v3_report.get("removed_near_duplicates"),
+              "oracle": str(V4_ORACLE.relative_to(ROOT)), "margin_m": V4_MARGIN_M,
+              "excluded_by_tier": dict(Counter(tiers[t] for t in drop)), "replaced": sorted(drop),
+              "new": [it["test_id"] for it in new], "candidates_graded": len(log),
+              "manifest_digest": hashlib.sha256(blob.encode()).hexdigest()}
+    with open(cache, "wb") as fh:
+        pickle.dump((kept, report), fh)
+    return kept, report
+
+
 def _write_definition(kept, report):
     out = out_dir()
     out.mkdir(parents=True, exist_ok=True)
@@ -533,7 +754,7 @@ def _summary(d: pd.DataFrame, group) -> pd.DataFrame:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--build", action="store_true", help="write the set definition only")
-    ap.add_argument("--version", choices=("1", "2", "3"), default="3")
+    ap.add_argument("--version", choices=("1", "2", "3", "4"), default="3")
     ap.add_argument("--model", type=Path)
     ap.add_argument("--policy", help="classical comparator(s) instead of a model, comma-separated: "
                                      "los_dwa, colregs_vo, encounter_vo, reference")
@@ -573,7 +794,7 @@ def _reusable(tag, mode, kept):
     reproduced all 1,000 of its earlier frozen-suite and Paper 2 rows."""
     if SET_VERSION.startswith("1"):
         return None
-    prev = "1.0" if SET_VERSION.startswith("2") else "2.0"          # the version this one is built on
+    prev = {"2": "1.0", "3": "2.0", "4": "3.0"}[SET_VERSION[0]]    # the version this one is built on
     v1_rows, v1_def = out_dir(prev) / tag / "episodes.csv", out_dir(prev) / "definition.csv"
     if not (v1_rows.exists() and v1_def.exists()):
         return None

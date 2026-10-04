@@ -1,4 +1,4 @@
-"""LOS-PID + DWA (the first classical comparator, B8; 04 §5).
+"""LOS-PID + DWA (the first classical comparator, B8; 04 section 5).
 
 LOS guidance and a heading PID follow the path.  A dynamic window approach
 (Fox, Burgard & Thrun 1997) sits over it and chooses the velocity to execute

@@ -7,7 +7,7 @@ episode's scenario plus the replayable prefix up to that step (own-ship state
 before each step, the executed action, the brake flag), which
 `ASVLidarEnv.set_start_pool` replays at reset.
 
-Sources, as decided (your call, 2026-10-01: "the dev set and the field set"):
+Sources, as decided (2026-10-01: "the dev set and the field set"):
 * `dev`   -- the v3 field development set (150), two episode seeds each;
 * `field` -- fresh layouts near the three deployment layouts L1-L3 (training
   seeds, `field_training.sample(near=True)`), every encounter, constant and

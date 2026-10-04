@@ -7,7 +7,7 @@ on the discordant pairs (`src/compare.py`), against the first tag given.
     python tools/tiers/compare_tier1.py --tags run7_supervisor_off los_dwa_supervisor_off \
         encounter_vo_supervisor_off --out results/classical_comparison/supervisor_off.txt
 
-`--reference` adds the CODEX reference controller's development-set replay
+`--reference` adds the prototype reference controller's development-set replay
 (`results/basin_devset_baselines`, safety layer off; goal and collisions only).
 """
 from __future__ import annotations
@@ -39,7 +39,7 @@ def load_reference() -> pd.DataFrame:
     d = pd.read_csv(ROOT / "results" / "basin_devset_baselines" / "episodes.csv",
                     keep_default_na=False, na_values=[""])      # the class "null" is not NaN
     d = d[d.policy == "reference"].copy()
-    d["method"], d["set"] = "reference (CODEX)", "development"
+    d["method"], d["set"] = "reference (prototype)", "development"
     d["goal"] = d.outcome == "goal"
     for kind in ("target", "obstacle", "boundary"):
         d[kind] = d.outcome == f"collision:{kind}"

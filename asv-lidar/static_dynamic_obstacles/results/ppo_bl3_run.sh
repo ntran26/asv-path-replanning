@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PPO baseline-v3 seed 0, filter-free (your call, 2026-10-02): the development
+# PPO baseline-v3 seed 0, filter-free (decision, 2026-10-02): the development
 # policy for safety layer v3 and the planned PPO v3 baseline.  Same protocol as
 # SAC bl3: 2.5 M on the frozen v3 config, extended to 3.0 M (stage 7 continues),
 # then train_seed.sh's evaluations (tier 1, frozen suite, Paper 2 set).  Nothing

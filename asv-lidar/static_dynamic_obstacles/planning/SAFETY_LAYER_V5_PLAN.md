@@ -1,6 +1,6 @@
 # Safety v5: cited methods and expanded evaluation
 
-Continuation of `SAFETY_LAYER_V4_PLAN.md`, 2026-10-02. The user requested further
+Continuation of `SAFETY_LAYER_V4_PLAN.md`, 2026-10-02. Goals: further
 safety improvements, a citation for every implemented method, and evaluation
 over all development, frozen and field sets. Frozen/field evaluation is now
 explicitly authorized. Candidate selection still uses development results;
@@ -34,7 +34,7 @@ motivated by these papers, and their guarantees are not claimed here.
 describes a linear continuous-time observer combining model dynamics with
 measurement-error correction. The architectural connection in
 `src/safety_observer.py` is prediction from issued commands followed by a fresh
-measurement correction. Our implementation advances the identified nonlinear
+measurement correction. The implementation here advances the identified nonlinear
 hull/actuator model and corrects `[u, v, r]` as
 `estimate = prior + EGO_SMOOTHING * (measurement - prior)`. It reuses a fixed
 scalar gain and skips correction for a stale frame. It has no covariance
@@ -64,7 +64,7 @@ decision interval, then predicts a backup. V4 instead requires it to be held
 for one second, although the filter runs again after half a second.
 Inspiration: [Bastani's model-predictive shielding](https://arxiv.org/abs/1905.10691),
 Section III, Algorithm 1, which checks recoverability after one learned-policy
-action. Our sampled backups and finite terminal run-out do not supply that
+action. The sampled backups and finite terminal run-out used here do not supply that
 paper's invariant backup set. This changes commitment, not the eight-second
 prediction horizon or collision margins. Implemented in `safety_v5.plan_for`.
 
@@ -216,7 +216,7 @@ held-out outcomes; a benchmark failure is recorded and does not trigger tuning.
 
 ## Expanded benchmark execution (cancelled by user)
 
-The user stopped this long sweep and requested a quick diagnostic instead,
+This long sweep was stopped in favour of a quick diagnostic,
 with **100 new episode runs total** as an explicit cap. Original execution
 notes below are historical, not instructions to resume. An interim immutable
 snapshot at UTC 2026-10-02 11:50:51 records 3,141 completed rows. The matched
@@ -324,7 +324,7 @@ keep their previous selection behavior. The inspiration is the first-action
 minimum-deviation objective in Wabersich and Zeilinger,
 [A predictive safety filter for learning-based control of constrained nonlinear
 dynamical systems](https://arxiv.org/abs/1812.05506), Section 4.1, Eq. (5a).
-Our finite, approximate predictor inherits no formal guarantee from the paper.
+The finite, approximate predictor used here inherits no formal guarantee from the paper.
 
 The first revised proposal added fresh policy-only references: the SAME 24
 preselected canonical cases x off/v4/v5 = 72 runs, preceded by a two-episode

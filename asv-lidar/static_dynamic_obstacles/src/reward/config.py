@@ -1,10 +1,10 @@
 """`RewardConfig`: the coefficients, and the assertions that fail at build time.
 
-02a §9 is explicit about *when* these should fail: "fail at construction, not at
+02a section 9 is explicit about *when* these should fail: "fail at construction, not at
 step 10,000".  A reward whose hierarchy is silently violated does not crash --
 it trains, for a week, and produces a policy whose behaviour nobody can explain.
 
-Defaults come from `constants.py` §13, which is the single source of truth.
+Defaults come from `constants.py` section 13, which is the single source of truth.
 Nothing here writes a number down that lives there; a config that duplicated the
 values would be a second place for them to drift.
 """
@@ -25,7 +25,7 @@ class RewardConfig:
     than a mutation that leaks between runs.
     """
 
-    # --- weights (02a §7) --------------------------------------------------
+    # --- weights (02a section 7) --------------------------------------------------
     w_pf: float = cfg.W_PF
     w_prog: float = cfg.W_PROG
     w_exist: float = cfg.W_EXIST
@@ -102,7 +102,7 @@ class RewardConfig:
     du_min: float = cfg.DU_MIN
     t_act: float = cfg.T_ACT
 
-    # --- propulsion (03 §6 -- reverse unverified) --------------------------
+    # --- propulsion (03 section 6 -- reverse unverified) --------------------------
     reverse_available: bool = cfg.REVERSE_AVAILABLE
     u_min_reachable: float = cfg.U_MIN_REACHABLE
 
@@ -110,7 +110,7 @@ class RewardConfig:
     open_water_mode: bool = False
     w_ref_open_water: float = cfg.W_REF_OPEN_WATER
 
-    # --- ablation switches (00 §4.3) ---------------------------------------
+    # --- ablation switches (00 section 4.3) ---------------------------------------
     colregs_terms_enabled: bool = True
     encounter_feature_enabled: bool = True
     colregs_term_mask: Tuple[str, ...] = ("port", "bow", "side", "hold", "r8")
@@ -139,8 +139,8 @@ class RewardConfig:
 
     # ------------------------------------------------------------------
     def validate(self) -> None:
-        """02a §9's assertions, plus 02b §3.1's floor.  Raises, deliberately."""
-        # 02b §3.1.  The domain must not sit inside the sensor's blind zone:
+        """02a section 9's assertions, plus 02b section 3.1's floor.  Raises, deliberately."""
+        # 02b section 3.1.  The domain must not sit inside the sensor's blind zone:
         # `r_dom` is evaluated on ground truth per `R-1`, so a domain the
         # sensor cannot resolve would penalise the agent for intrusions it is
         # physically incapable of perceiving, and the term stops being a
@@ -149,18 +149,18 @@ class RewardConfig:
             raise ValueError(
                 f"d_abeam {self.dom_abeam:.3f} m is below the sensor-resolution "
                 f"floor {cfg.DOMAIN_ABEAM_FLOOR:.3f} m "
-                f"(= LIDAR_MIN_RANGE + B/2); r_dom would be unlearnable (02b §3.1)")
+                f"(= LIDAR_MIN_RANGE + B/2); r_dom would be unlearnable (02b section 3.1)")
 
-        # 02a §2.  Otherwise the geometry that *defines* a compliant
+        # 02a section 2.  Otherwise the geometry that *defines* a compliant
         # narrow-channel manoeuvre would itself trigger the boundary penalty --
         # the reward would punish the behaviour the paper exists to elicit.
         ceiling = self.c_wall - 0.5 * self.breadth
         if not self.d_safe < ceiling:
             raise ValueError(
                 f"d_safe {self.d_safe:.3f} m must be below c_wall - B/2 = "
-                f"{ceiling:.3f} m (02a §2 invariant)")
+                f"{ceiling:.3f} m (02a section 2 invariant)")
 
-        # The 02a §7 hierarchy, as an assertion rather than as a table anyone
+        # The 02a section 7 hierarchy, as an assertion rather than as a table anyone
         # has to keep in their head.
         order = [("w_bnd", self.w_bnd), ("w_dom", self.w_dom),
                  ("w_obs", self.w_obs), ("w_col", self.w_col),
@@ -169,15 +169,15 @@ class RewardConfig:
         for (n_hi, hi), (n_lo, lo) in zip(order, order[1:]):
             if not hi > lo:
                 raise ValueError(f"coefficient ordering violated: {n_hi}={hi} "
-                                 f"must exceed {n_lo}={lo} (02a §7)")
+                                 f"must exceed {n_lo}={lo} (02a section 7)")
 
-        # 02 §5: a COLREGs-compliant collision must be worse than a maximally
+        # 02 section 5: a COLREGs-compliant collision must be worse than a maximally
         # non-compliant episode that avoids one.
         if not abs(self.r_collision) > self.w_col * self.max_encounter_steps:
             raise ValueError(
                 f"|r_collision| {abs(self.r_collision)} must exceed "
                 f"w_col * max_encounter_steps = "
-                f"{self.w_col * self.max_encounter_steps} (02 §5, `R-7`)")
+                f"{self.w_col * self.max_encounter_steps} (02 section 5, `R-7`)")
 
         # A stop must cost something and must always beat a collision (A8).
         if not (self.r_collision < self.r_estop <= 0.0):
@@ -196,7 +196,7 @@ class RewardConfig:
         if not self.kappa_eng > 1.0:
             raise ValueError(f"kappa_eng {self.kappa_eng} must exceed 1.0, or "
                              f"engagement fires at the compliant separation "
-                             f"itself (02a §6.1)")
+                             f"itself (02a section 6.1)")
 
         if self.kappa_delta is None or self.kappa_delta <= 0.0:
             raise ValueError("kappa_delta must come from the actuator rate "

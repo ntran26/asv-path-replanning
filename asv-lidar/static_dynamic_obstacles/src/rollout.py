@@ -27,7 +27,7 @@ _INFO_SERIES = (
     "rpm", "min_lidar", "min_sector_range", "max_boundary_closeness",
     "true_border_clearance", "n_tracks", "n_targets",
     # Perception metrics -- the N1 evidence, reported for the nominal case and
-    # across the Study 2 sweep (04 §7).
+    # across the Study 2 sweep (04 section 7).
     "acquisition_range", "max_coast_steps", "dropped_detections",
     "steps_target_visible", "steps_target_tracked",
 )

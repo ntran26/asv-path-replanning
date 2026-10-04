@@ -32,7 +32,7 @@ Structural changes relative to `ship_model.py` (v2)
    `-N_r*r` and `-Y_v*v`, i.e. damping independent of forward speed. Every fit
    then drove `N_r` to its lower bound and routed all yaw damping through the
    drift term, because `N_uv*u*v` was the only damping that scaled with speed.
-   That was the model telling us the structure was wrong: the MMG linear terms
+   That was the model showing that the structure was wrong: the MMG linear terms
    are `0.5*rho*L^2*d*U^2 * Nr' * (rL/U)`, which is proportional to `U*r`, not
    to `r`. The linear terms now carry that `u` factor, which removes the
    degeneracy — `N_r*u*r` and `N_uv*u*v` are the same order and physically

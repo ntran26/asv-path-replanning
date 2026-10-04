@@ -34,7 +34,7 @@ The durable journals contain **3,347 committed records**:
 | Frozen R | 900 | 900 | 856 | 0 | 856 |
 | B + R | 1,700 | 1,699 | 1,648 | 0 | 1,647 |
 
-The policy record for **B-06-040** is absent from the durable journal, although an older CSV reconciliation note contains a row. Its v4 result is excluded from paired analysis; no committed policy result was reconstructed from that note. The note is preserved as historical evidence; its earlier suggestion to rerun the case is superseded by the user's stop request. Both final journals have zero incomplete final-line bytes.
+The policy record for **B-06-040** is absent from the durable journal, although an older CSV reconciliation note contains a row. Its v4 result is excluded from paired analysis; no committed policy result was reconstructed from that note. The note is preserved as historical evidence; its earlier suggestion to rerun the case is superseded by the stop decision. Both final journals have zero incomplete final-line bytes.
 
 The full original completion map records **3,347 of 8,670 planned records** and marks **5,323 not recorded**. The map covers all eight original simulated components and off/v4/v5, including unstarted identities. Only B and R have compatible committed records. No v5 result or result for the unstarted simulated field, development or Tier A continuations is inferred. The original DV3 development table above comes from the earlier development study, is reported separately, and is not counted toward this stopped full-sweep inventory. Simulated field layouts and validation scenarios would not constitute new real-world trials.
 

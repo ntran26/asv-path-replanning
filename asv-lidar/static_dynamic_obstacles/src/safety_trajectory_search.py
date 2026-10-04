@@ -2,8 +2,8 @@
 
 Optimizer motivation: Zheng et al., "Safe Learning-based Gradient-free Model
 Predictive Control Based on Cross-entropy Method", arXiv:2102.12124v3 (2022),
-https://arxiv.org/abs/2102.12124 . We adapt only the sampling/elite-refitting
-optimizer, not that paper's Gaussian-process model, CLF/CBF construction or
+https://arxiv.org/abs/2102.12124 . Only the sampling/elite-refitting
+optimizer is adapted, not that paper's Gaussian-process model, CLF/CBF construction or
 safety claims. A finite search can fail to find an existing feasible plan.
 
 All safety decisions remain in the supplied rollout/evaluate callbacks. A

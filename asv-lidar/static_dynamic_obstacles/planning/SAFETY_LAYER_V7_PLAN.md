@@ -1,13 +1,13 @@
 # V7: preserve feasible SAC actions, diagnose failures in test set v2
 
 Date: 2026-10-03. Status: experimental implementation and saved-data analysis;
-**zero new episode runs**. The user's latest instruction permits saved-data
+**zero new episode runs**. The current instruction permits saved-data
 analysis and code tests only. Do not use the one unused V6 budget slot or start
 a new evaluation. V7 has no measured success rate.
 
 ## Scope and evidence
 
-The user explicitly designated the 1,000-case test set v2 for safety-layer
+The 1,000-case test set v2 is designated for safety-layer
 development. These cases, including their frozen-suite and simulated field
 members, are now development evidence for this work; they cannot subsequently
 serve as untouched safety-layer validation. This does not authorize tuning on
@@ -47,8 +47,8 @@ The v2 files contain episode summaries, not trajectories. Whole-episode
 minimum target range, mean speed, RMS cross-track error and final outcome are
 retrospective statistics. A classifier fed those fields at runtime would leak
 future information. Scenario names, layout IDs and collision labels likewise
-cannot be online triggers. We therefore do not fit or claim a validated
-success/failure classifier from these files.
+cannot be online triggers. No validated
+success/failure classifier is therefore fitted or claimed from these files.
 
 ## Implemented control change: recheck SAC within the proposed backup
 
@@ -81,7 +81,7 @@ lower a clearance threshold, or claim to predict eventual episode success.
 for learning-based control of constrained nonlinear dynamical systems*,
 Section 4.1, Eq. (5a), minimizes deviation of the first action subject to a
 feasible backup: <https://arxiv.org/abs/1812.05506v4>.
-Our single-plan substitution is an engineering adaptation, not their
+The single-plan substitution here is an engineering adaptation, not their
 optimization algorithm, uncertainty treatment or formal guarantee. V6's
 sampled search and provisional-track methods retain their citations in the
 V6 plan and source modules.
@@ -110,7 +110,7 @@ View of Safety-Critical Control in Autonomous Systems*, motivates separating
 the monitoring and intervention components:
 <https://arxiv.org/abs/2309.05837>. Predicted constraint checking follows the
 Wabersich and Zeilinger source above. Persistence and urgency definitions are
-our diagnostic hypotheses; neither paper supplies these thresholds.
+diagnostic hypotheses made here; neither paper supplies these thresholds.
 
 ## Integration and validation
 
@@ -127,7 +127,7 @@ was started. Final test counts and source hashes are recorded with the offline
 report under `results/safety_dev/testset_v2_offline/`.
 
 Another task concurrently added the training start-clearance redraw and helper
-to `src/env.py`. The final audit preserves and isolates that change from our
+to `src/env.py`. The final audit preserves and isolates that change from the
 V7 dispatch branch. Eleven dispatch tests were repeated successfully against
 the current file, stopping before physics; no training behavior was exercised.
 

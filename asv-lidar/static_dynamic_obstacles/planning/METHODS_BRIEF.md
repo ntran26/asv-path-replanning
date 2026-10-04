@@ -6,7 +6,7 @@ Methods, Experimental Setup and Limitations sections. It states the formulation
 `3d697858e95e5adf`), with each design choice tied to the finding that justifies
 it (`F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`).
 
-Written 2026-09-22, revised 2026-09-23 with your three decisions: the Rule 17(b)
+Written 2026-09-22, revised 2026-09-23 with three decisions: the Rule 17(b)
 below-floor draws leave training **and** the suite (S5), field work is **delayed
 within this paper** (not deferred), and the paper is **a formulation plus a
 five-learner comparison**. baseline-v1 (`configs/baseline_v1.json`, git tag
@@ -22,7 +22,7 @@ specs.
 > (predates the A24 stop test, A27 held-heading charge, A29 growing `v_hold`
 > and F88 latched risk); `03a`/`04a` (predate basin mode, F74); the draft
 > skeleton (7 Sep); `RESULT_TABLES.md` (still names a single "Proposed (SAC)"
-> method, see §9). Each stale planning spec now opens with a dated status note
+> method, see section 9). Each stale planning spec now opens with a dated status note
 > listing what is superseded.
 
 ---
@@ -35,12 +35,12 @@ moving vessel in a manner consistent with COLREGs, using only onboard range
 sensing (LiDAR) plus its own navigation state. One end-to-end policy produces
 rudder and throttle commands at 2 Hz.
 
-**In scope:** Rules 8, 9, 13, 14, 15/16 (as a narrow-channel convention, §5.3)
+**In scope:** Rules 8, 9, 13, 14, 15/16 (as a narrow-channel convention, section 5.3)
 and 17 for **one** target at a time; static obstacles; basin and channel
 geometry. **Out of scope (stated in the paper):** multi-target encounters,
 Rule 19 restricted visibility, sound signals, Rule 18 responsibilities, open-water
 Rule 15/17 role tables, and any claim of legal compliance: violation terms are
-proxies (`CLAIM_LEDGER.md` §2).
+proxies (`CLAIM_LEDGER.md` section 2).
 
 ## 2. Vessel and simulation
 
@@ -160,7 +160,7 @@ hierarchy.
 | `r_bnd` boundary | 15 | quadratic inside 0.35 m of a wall; the largest dense weight, so slowing always beats touching the boundary | ground truth |
 | `r_dom` ship domain | 12.5 | intrusion into the target's asymmetric domain | ground truth |
 | `r_obs` obstacles | 11 | shifted exponential, zero beyond 2.0 m | ground truth |
-| `r_col` COLREGs group | 9 | §5.1, clipped to [0, 1] before weighting | perceived encounter |
+| `r_col` COLREGs group | 9 | Section 5.1, clipped to [0, 1] before weighting | perceived encounter |
 | `r_pf` path following | 3 | cross-track and heading error, **width-normalised**, gated by speed | vessel path state |
 | `r_prog` progress | 1.5 | along-path arclength progress (sums to a constant over a completed path) | vessel path state |
 | `r_smooth` smoothness | 0.5 | action change relative to the actuator rate limit | — |
@@ -244,7 +244,7 @@ From the same engagement state, turning the compliant way returns +61
 and from starboard. The reward prefers compliance in every pair that reaches
 the goal either way, and the compliant turn costs nothing on the path terms.
 The reward is therefore symmetric and decisive about the crossing direction;
-see §8 for what the learner makes of it.
+see section 8 for what the learner makes of it.
 
 ## 6. Runtime safety layer (F68, claim C-7)
 
@@ -280,7 +280,7 @@ sb3-contrib 2.3.0):
 **Common:** discount 0.951 per 0.5 s step (0.99 per 0.1 s physics step, a
 ~10 s horizon); reward normalisation only (VecNormalize, clip 10); 10 parallel
 environments; **2 × 10⁶ environment steps**; off-policy learners at **1.0
-gradient step per transition**; **3 seeds** per learner (your call, 2026-09-24;
+gradient step per transition**; **3 seeds** per learner (decision, 2026-09-24;
 was 5); development-set
 evaluation every 2 × 10⁵ steps; each seed represented by its **best
 development-set checkpoint** (score = goal rate − 2 × collision rate,
@@ -289,7 +289,7 @@ safety layer off). The frozen evaluation suite is never used for selection (A26)
 **Development and fairness.** The observation and reward were **specified from
 the rule analysis** (02, 02a, 03a, 04a) and are learner-independent: nothing in
 the formulation references an algorithm. They were **iterated with PPO as the
-development learner** over twelve runs (your decision that PPO is the debug
+development learner** over twelve runs (the decision that PPO is the debug
 vehicle), and several of the checks that drove those iterations are
 learner-free — the scripted-response studies and the A32 reward-gap measurement
 branch scripted manoeuvres with no policy involved (F94). All four learners then
@@ -305,7 +305,7 @@ reported.
 | **COLREGs-VO** (Kuwata et al., 2014) | velocity obstacles plus the give-way constraint that the relative velocity stays to starboard of the bearing line; **open-water** roles, so a crossing target to port makes the own ship stand on | built 2026-09-23 |
 | **Encounter-specific VO** | the same machinery under *this paper's* narrow-channel convention (A17: give way from either side) | built; the pair is what makes the Rule 9 argument measurable |
 | **LOS-PID + DWA** | path following with a dynamic window over yaw rate and speed | built |
-| Reference controller | CODEX predictive LOS | supplementary, not pre-registered |
+| Reference controller | prototype predictive LOS | supplementary, not pre-registered |
 
 All are **perception-only**: same LiDAR, tracker and noise as the policy, so a
 row differs in the avoidance logic and nothing else. Parameters live in
@@ -326,7 +326,7 @@ it is why a search is validated rather than trusted.
 |---|---|---|
 | Development set | 120 episodes (20 per class × 6), development namespace | checkpoint selection, diagnostics |
 | **Tier B — the frozen suite (default)** | **800 episodes** per seed, suite 3.4: 8 cells × 100 = 800 constant-velocity episodes, drawn like the development set (only positions differ) — every class in the basin, head-on / crossing / overtaking in 7.5–10 m channels — plus a robustness set of the same scenarios with reactive (700) and, in head-ons, non-compliant (200) targets | headline results, touched once per policy |
-| Tier A — **out of this paper** (your call, 2026-09-24) | 38 defined (35 realised), incl. basin cases and pre-committed expected failures | kept in the suite, runnable with `--tiers a`; no claim depends on it |
+| Tier A — **out of this paper** (decision, 2026-09-24) | 38 defined (35 realised), incl. basin cases and pre-committed expected failures | kept in the suite, runnable with `--tiers a`; no claim depends on it |
 | **Around the Clock** (O1) | 24 open-water + 24 channel cases × 10 seeds (`suite.around_the_clock`), reported as R8 | the one **externally defined** scenario set in the paper, after Imazu was dropped |
 
 Tier B strata are described by geometry only (basin, channel wide /
@@ -349,8 +349,8 @@ difference between learners there.
 
 ## 9. Status: fixed versus pending
 
-**Fixed (can be written now):** §§1–7, the evaluation design in §8, and the
-limitations in §10.
+**Fixed (can be written now):** sections 1–7, the evaluation design in section 8, and the
+limitations in section 10.
 
 **Decided 2026-09-23:** the paper is **a formulation plus a five-learner
 comparison** (not a proposed learner plus baselines), which is what was
@@ -409,15 +409,15 @@ of 0.92 and 0.88 on two seeds, head-on 1.00 on both, crossing 0.75 and 0.55.
    waterway where an overtaker does not keep clear at close quarters is outside
    what is claimed (F96).
 4. **Rule 9(b) displaces the open-water Rule 15/17 roles** in a narrow channel
-   (§5.3): the own ship gives way to a crossing target from either side. An
+   (Section 5.3): the own ship gives way to a crossing target from either side. An
    interpretation the paper defends, not a role table it claims.
 5. **One target, constant velocity, non-co-operating.**
 6. **Manoeuvring at 0.55 m/s extrapolated** from the field logs (B5), i.e. the
-   identified model is used below its identification band (§2). Field results
+   identified model is used below its identification band (section 2). Field results
    are **pending, not dropped**: two basin sessions (`PART2_BASIN_PLAN.md`) and
    the bridge deployment (C13) deliver N3, RQ4 and claim C-6.
-7. **Formulation developed with PPO** (§7).
-8. **Proxies, not legal compliance** (§1).
+7. **Formulation developed with PPO** (section 7).
+8. **Proxies, not legal compliance** (section 1).
 
 ## 11. Where to find more
 

@@ -4,7 +4,7 @@ Revision 2: **five** classes.  Port and starboard crossing collapse into one
 under Rule 9(b) -- the own ship gives way either way -- but the geometric side
 stays available for 02's passing-side reward term.
 
-Kickoff §7: "one case per class including 'being overtaken'; verify hysteresis
+Kickoff section 7: "one case per class including 'being overtaken'; verify hysteresis
 prevents chatter at sector boundaries".
 
 Frame convention: +y north, +x east, headings compass (0 = +y, clockwise).
@@ -95,7 +95,7 @@ def test_all_five_classes_are_reachable():
 # The two required modifications
 # ---------------------------------------------------------------------------
 def test_head_on_band_is_wider_than_the_source_table():
-    """01 §5.3 modification 2: widen from Waltz & Okhrin's +/-5 deg."""
+    """01 section 5.3 modification 2: widen from Waltz & Okhrin's +/-5 deg."""
     assert cfg.HEAD_ON_BEARING_HALF_DEG > 5.0
     assert 6.0 <= cfg.HEAD_ON_BEARING_HALF_DEG <= 10.0
 
@@ -251,7 +251,7 @@ def test_reset_clears_everything():
 # Single definition
 # ---------------------------------------------------------------------------
 def test_the_wrapper_delegates_to_the_pure_function():
-    """01 §5.3: one module, two consumers.  The thresholds live in exactly one
+    """01 section 5.3: one module, two consumers.  The thresholds live in exactly one
     place, so the wrapper must not carry a second copy of the geometry."""
     import inspect
     source = inspect.getsource(enc.EncounterClassifier)

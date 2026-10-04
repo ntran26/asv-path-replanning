@@ -1,7 +1,7 @@
 # Test-set-v2 safety development: saved-data findings and experimental V7
 
-**No new episodes were run.** This continuation follows the user's request to
-analyze saved data and perform code tests only. V7 is implemented but has no
+**No new episodes were run.** This continuation is limited to
+saved-data analysis and code tests. V7 is implemented but has no
 measured success rate. The old V6 report remains unchanged.
 
 ## What the saved evidence shows

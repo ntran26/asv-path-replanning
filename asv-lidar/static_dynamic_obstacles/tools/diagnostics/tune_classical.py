@@ -11,7 +11,7 @@ the **same score** used to pick an RL checkpoint:
 The search is **coordinate descent over a declared grid**: start from the
 current values, take each parameter in turn, keep the value that scores best,
 move on. It is reported in full (`search.csv`), so the tuning is auditable
-rather than "we tried some numbers".
+rather than "some numbers were tried".
 
     python tools/diagnostics/tune_classical.py --controller colregs_vo
     python tools/diagnostics/tune_classical.py --controller los_dwa --per-class 10

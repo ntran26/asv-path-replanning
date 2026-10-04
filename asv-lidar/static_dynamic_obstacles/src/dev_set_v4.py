@@ -1,5 +1,5 @@
-"""baseline-v4 development-set extension (2026-10-03; the user: "adjust the dev set
-if you find necessary along with the training curriculum").
+"""baseline-v4 development-set extension (2026-10-03; decision: adjust the dev set
+where necessary, along with the training curriculum).
 
 The development set selects the checkpoint that is reported.  The v4.1
 curriculum and test set v3 centre on dense, straight-leg layouts (field survey
@@ -49,3 +49,90 @@ def extension() -> List:
             built.case_id = f"DV4X-{code}-{'VS' if vary else 'CV'}-{'S' if straight else 'L'}-{i + 1:02d}"
             out.append(built)
     return out
+
+
+# ---------------------------------------------------------------------------
+# 4.2 (2026-10-04): near-impossible development episodes replaced.
+# Decision: episodes that fail the oracle test (src/oracle_feasibility.py: no
+# manoeuvre that starts at or after the first track reaches the goal with 0.2 m
+# clearance) leave the development set, as they leave test set v4.  Each is
+# replaced in place, so it keeps its position and evaluation seed, by the next
+# draw of the generator that made its set
+# (tools/diagnostics/feasibility/dev_replacements.py); the accepted recipes are
+# recorded in configs/dev_set_v4_replacements.json.
+# ---------------------------------------------------------------------------
+def dev_v2_used(cls: str, per_class: int = 20) -> int:
+    """The first development-namespace index of `cls` that
+    `train_formulation.development_set(per_class)` does not use."""
+    import scenario as scn
+    import train_formulation as tf
+    generator = scn.ScenarioGenerator(stage=5, seed_namespace="development")
+    index, found = 0, 0
+    while found < per_class and index < 50 * per_class:
+        built = generator.sample(scn.seed_for("development", 10_000 * (tf.EVAL_CLASSES.index(cls) + 1) + index),
+                                 encounter_class=cls)
+        index += 1
+        found += built is not None
+    return index
+
+
+def from_recipe(recipe: dict):
+    """One development scenario from a replacement recipe (None if the draw fails)."""
+    import field_training as ft
+    import scenario as scn
+    s = recipe["set"]
+    if s == "dev_v2":
+        import train_formulation as tf
+        cls = recipe["class"]
+        generator = scn.ScenarioGenerator(stage=5, seed_namespace="development")
+        built = generator.sample(scn.seed_for("development", 10_000 * (tf.EVAL_CLASSES.index(cls) + 1)
+                                              + int(recipe["index"])), encounter_class=cls)
+        if built is not None:
+            built.case_id = f"DEV-{cls}-R{int(recipe['index']):03d}"
+        return built
+    code, vary, i = recipe["code"], bool(recipe["varying"]), int(recipe["i"])
+    if s == "field_dev":
+        import formulation_v3 as fv
+        plan = [("NT", fv.DEV_NO_TARGET, False)]
+        for c in ft.ENCOUNTER_CODES:
+            plan += [(c, fv.DEV_PER_ENCOUNTER_CV, False), (c, fv.DEV_PER_ENCOUNTER_VS, True)]
+        b = next(j for j, (c, _, v) in enumerate(plan) if c == code and v == vary)
+        base = fv.DEV_SEED_BASE + b * 1_000 + i * 20
+        built = ft.sample(np.random.default_rng(base), namespace="dev_v3", encounter=code, varying=vary,
+                          generator=scn.ScenarioGenerator(stage=5, seed_namespace="development"),
+                          seed_fn=lambda k, base=base: base + 200_000 + k, solvable_only=True,
+                          near=bool(recipe["near"]))
+        built.case_id = f"DV3-{code}-{'VS' if vary else 'CV'}-R{i + 1:02d}"
+        return built
+    straight = bool(recipe["straight"])
+    base = EXT_SEED_BASE + CODES.index(code) * 1_000 + i * 20
+    built = ft.sample(np.random.default_rng(base), namespace="dev_v4", encounter=code, varying=vary,
+                      generator=scn.ScenarioGenerator(stage=5, seed_namespace="development"),
+                      seed_fn=lambda k, base=base: base + 200_000 + k, solvable_only=True,
+                      near=False, straight=straight)
+    built.case_id = f"DV4X-{code}-{'VS' if vary else 'CV'}-{'S' if straight else 'L'}-R{i + 1:02d}"
+    return built
+
+
+def development_sets(per_class: int = 20):
+    """(frozen-like, field) development sets of formulation v4.2, in evaluation
+    order, with the recorded replacements applied in place.  Positions run over
+    the frozen-like set first, then the field set (the v3 field development set,
+    then the extension), as `FieldEvalCallback` evaluates them."""
+    import json
+    from pathlib import Path
+    import formulation_v3 as fv
+    import train_formulation as tf
+    frozen_like = list(tf.development_set(per_class))
+    field = list(fv.field_development_set()) + extension()
+    path = Path(__file__).resolve().parents[1] / "configs" / "dev_set_v4_replacements.json"
+    if path.exists():
+        n = len(frozen_like)
+        for r in json.loads(path.read_text(encoding="utf-8"))["replacements"]:
+            pos = int(r["position"])
+            built = from_recipe(r["recipe"])
+            if pos < n:
+                frozen_like[pos] = built
+            else:
+                field[pos - n] = built
+    return frozen_like, field

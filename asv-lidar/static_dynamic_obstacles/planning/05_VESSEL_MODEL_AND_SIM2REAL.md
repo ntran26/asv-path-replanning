@@ -15,7 +15,7 @@ as a domain-randomisation ablation evaluated in the field (Study 3). This docume
 otherwise unchanged by the two-vessel repositioning; the identification work is
 independent of encounter scope.
 
-**Handover target:** Claude chat (planning) + field work
+**Workstream:** planning + field work
 **Depends on:** nothing — **start this in parallel**, it gates on basin booking lead time
 **Feeds:** 03 (domain randomisation parameters), 01 (noise characterisation)
 
@@ -167,13 +167,13 @@ those features are distinctive and irregularly spaced.
 - **Water-surface returns** at grazing angles may produce spurious near-field points.
   Check the existing logs before trusting registration
 - **Operators on the deck** sit at scan height and move. Handled by the geometric gate
-  (01 §3.4), but they must not enter the localisation reference either
+  (01 section 3.4), but they must not enter the localisation reference either
 
 ### 4.7 IMU — CONFIRMED, specification
 
 An IMU will be added. This removes the yaw-rate observability constraint and, via the
 accelerometer, largely rescues the surge measurements that two parallel walls could not
-constrain. The manoeuvre set in §3 is now fully covered.
+constrain. The manoeuvre set in section 3 is now fully covered.
 
 **Log raw gyro and accelerometer, not a fused orientation output.** Fusion firmware applies
 unknown filtering that corrupts exactly the lag and damping parameters being identified.
@@ -191,7 +191,7 @@ estimation.
 **Sensor fusion.** Scan-to-map supplies absolute pose at 10 Hz and is drift-free; the IMU
 supplies yaw rate and acceleration at high rate. The two are complementary — the registration
 anchors, the IMU fills in between and provides the derivatives directly. This also improves the
-`ego` observation branch in the field, reducing the u/v/r sim-to-real gap identified in §6.
+`ego` observation branch in the field, reducing the u/v/r sim-to-real gap identified in section 6.
 
 **Fitting.** With a gyro available, fit to yaw rate *and* heading and cross-check the two.
 Disagreement indicates a synchronisation or mounting error rather than a model deficiency.
@@ -201,7 +201,7 @@ Disagreement indicates a synchronisation or mounting error rather than a model d
 
 **Fit:** prediction-error minimisation over the manoeuvre set. Hold out one zig-zag and
 one turning circle. Report the fit metric and parameter confidence intervals — the CIs
-are needed for §7.
+are needed for section 7.
 
 **Validation (free, do this first):** replay the exact command sequences from the
 existing Paper 2 field logs through the calibrated model and overlay the trajectories
@@ -225,9 +225,9 @@ they are the direct answer to Reviewer 1.4.
 
 | Quantity | Feeds |
 |---|---|
-| rf2o pose drift magnitude and character | boundary raycast noise (01 §3.3), tracker ego-motion compensation |
+| rf2o pose drift magnitude and character | boundary raycast noise (01 section 3.3), tracker ego-motion compensation |
 | Ego velocity error — u, v, r differentiated from noisy pose | `ego` observation branch (a sim-to-real gap in the *observation*, not just the dynamics) |
-| LiDAR returns per revolution and range noise | raw scan simulation (01 §2.3) |
+| LiDAR returns per revolution and range noise | raw scan simulation (01 section 2.3) |
 | Aft self-occlusion sector from mount geometry | masked bearing range in raw scan |
 | Scan motion distortion at realistic yaw rates | tracker velocity estimate noise |
 
@@ -238,11 +238,11 @@ they are the direct answer to Reviewer 1.4.
 **A better nominal model reduces bias but does not create robustness.**
 
 Pair identification with randomisation over the identified parameters ± their confidence
-intervals, plus the noise sources in §6 and disturbance injection (wind, current — Paper
+intervals, plus the noise sources in section 6 and disturbance injection (wind, current — Paper
 2's field tests were calm water with no generated waves or current, and this was
 acknowledged as a limitation).
 
-*"We identified the model and randomised within identification uncertainty"* is a
+*"The model was identified and randomised within identification uncertainty"* is a
 materially stronger claim than either half alone.
 
 ---
@@ -286,7 +286,7 @@ scenario set:
 |---|---|
 | A | Paper 2 nominal model (uncalibrated baseline) |
 | B | Identified nominal model, no randomisation |
-| C | Identified model + randomisation over parameters ± identification CI, plus the §6 perception noise |
+| C | Identified model + randomisation over parameters ± identification CI, plus the section 6 perception noise |
 
 Report the sim-to-field delta per arm on RMS cross-track error, success rate and COLREGs
 compliance. The interesting comparison is B vs C: if B alone closes the gap, better
@@ -302,15 +302,15 @@ deployment-oriented framing after the encounter scope was narrowed.
 
 ## 10. Open items
 
-- ~~IMU feasibility~~ — **confirmed, will be added** (§4.7). Specify part, logging rate and
+- ~~IMU feasibility~~ — **confirmed, will be added** (section 4.7). Specify part, logging rate and
   time-sync method
 - ~~O6 external instrumentation~~ — resolved: scan-to-map pipeline, no purchase
 - ~~O5 physical barrier~~ — resolved: software gating, walls retained for localisation
-- **Measure black-wall return rate from existing logs (§4.5a) — do this first**
+- **Measure black-wall return rate from existing logs (section 4.5a) — do this first**
 - Survey the facility geometry and genuinely fixed features only
 - Check whether suspension lines cross the scan plane near the pool edges
-- Target vessel platform and repeatability protocol (§8)
+- Target vessel platform and repeatability protocol (section 8)
 - Whether Arm A is retained in Study 3, subject to basin time
 - Book basin time for the identification trial
-- Run the log-replay validation (§5) — no booking required, do this first
-- Extract all four noise characterisations (§6) — no booking required
+- Run the log-replay validation (section 5) — no booking required, do this first
+- Extract all four noise characterisations (section 6) — no booking required

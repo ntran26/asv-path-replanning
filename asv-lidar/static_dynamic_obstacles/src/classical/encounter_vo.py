@@ -3,7 +3,7 @@
 After Thyri & Breivik (2022): a velocity-obstacle search whose constraints
 depend on the encounter the own ship is in, rather than one COLREGs rule set
 applied to every target (Kuwata et al. 2014, the COLREGs-VO comparator, which
-is not built here).  **This is our reading of that method, not a port of
+is not built here).  **This is an interpretation of that method, not a port of
 their code**; every choice below is a named constant.
 
 Search space: straight-line velocities, course x speed -- courses around the
@@ -13,7 +13,7 @@ candidate and each tracked target (constant velocity, over `TAU_S`):
 * **hard VO** -- the own hull, held on the candidate course, comes within
   `HARD_GAP_M` of the target's hull (separating-axis gap).  Excluded always.
 * **encounter domain (soft)** -- the target enters the own ship's domain
-  (`DOMAIN_FORE` / `DOMAIN_AFT` / `DOMAIN_LATERAL`, 01 §5.2), scaled per
+  (`DOMAIN_FORE` / `DOMAIN_AFT` / `DOMAIN_LATERAL`, 01 section 5.2), scaled per
   encounter class.  Penalised in proportion to the deepest penetration, so
   in a narrow channel a small intrusion is allowed where a clear pass is not
   available -- the confined-water relaxation that motivates the method.
@@ -48,7 +48,7 @@ from the previous choice, plus the domain penalty.  The chosen `(course,
 speed)` is then flown by a cascaded course autopilot (at the sweep's turn
 rate) and the speed loop the LOS-PID comparator uses.
 
-`select_velocity` is free of the environment on purpose: 03a §5.3 asks that
+`select_velocity` is free of the environment on purpose: 03a section 5.3 asks that
 `T-RE`'s reactive target and this comparator be one implementation, so a
 target can call it with its own state and the own ship as its one obstacle.
 """

@@ -1,6 +1,6 @@
 # V16: measured target geometry and policy-success preservation
 
-Primary benchmark update: the user now designates test set v3 as the main evaluation set. See [the current protocol](SAFETY_EVALUATION_PROTOCOL.md). Results below remain their original v2/DV3 development comparisons.
+Primary benchmark update: test set v3 is now the main evaluation set. See [the current protocol](SAFETY_EVALUATION_PROTOCOL.md). Results below remain their original v2/DV3 development comparisons.
 
 Status: experimental. The 32-case development comparison is complete; the separate40-case paired challenge is complete (V16 25 goals versus freshSAC21, eight rescues and four broken SAC successes). Neither collision avoidance nor preservation of every SAC success has been achieved. Use SAC baseline 3's kept best 3M checkpoint throughout.
 
@@ -20,7 +20,7 @@ V16 adds `src/safety_motion_axis.py`, wrapped by `src/safety_v16.py`. A partiall
 
 The correction changes only the geometry of the matching existing base view. It preserves IDs, ordering, measured velocity, static points, persistent hypotheses and all inherited collision checks. It does not coast its correction when the evidence disappears. Disabling `motion_axis_geometry` reproduces V15. No scenario ID, saved outcome, future policy action or hidden target state is available to this rule.
 
-Inspiration: Granstrom, Baum and Reuter, [Extended Object Tracking: Introduction, Overview and Applications](https://arxiv.org/abs/1604.00970), for spatial measurement and extent modelling; Zhang et al., [Efficient L-Shape Fitting for Vehicle Detection Using Laser Scanners](https://publications.ri.cmu.edu/efficient-l-shape-fitting-for-vehicle-detection-using-laser-scanners), for the project's underlying hull-fit representation. The visible-end completion and evidence gates are our engineering construction, not implementations of the survey's Bayesian estimators. Travel direction can differ from hull heading; partial occlusion can conceal the actual end. The gates do not establish an error bound.
+Inspiration: Granstrom, Baum and Reuter, [Extended Object Tracking: Introduction, Overview and Applications](https://arxiv.org/abs/1604.00970), for spatial measurement and extent modelling; Zhang et al., [Efficient L-Shape Fitting for Vehicle Detection Using Laser Scanners](https://publications.ri.cmu.edu/efficient-l-shape-fitting-for-vehicle-detection-using-laser-scanners), for the project's underlying hull-fit representation. The visible-end completion and evidence gates are an engineering construction made here, not implementations of the survey's Bayesian estimators. Travel direction can differ from hull heading; partial occlusion can conceal the actual end. The gates do not establish an error bound.
 
 ## Evidence behind the change
 
@@ -40,6 +40,6 @@ The separate `selection_broader40.json` was frozen before expanded-candidate out
 
 The additional `v16_feasible_probe9` is an explicit existing-option ablation, `prefer_any_feasible_policy=True`. It checks both remaining broken SAC successes, both geometry rescues and the five cases previously lost by this option under V10. That earlier full ablation reached only 15/32 and was rejected. The probe completed3/9 goals versus defaultV16 6/9, with zero gains and three losses. Reject the option. Do not make it the default or combine its records with defaultV16.
 
-All runs reserve attempts, archive source/settings/checkpoint/scene hashes, write individual results and decision traces, and refuse automatic retries or changed archived sources. Keep at most two evaluation processes and do not disturb training. Constants, checkpoints, Paper 2 and older result ledgers are unchanged. New evaluations are authorized by the user's latest request; earlier saved-only restrictions and numerical run caps belong to completed phases.
+All runs reserve attempts, archive source/settings/checkpoint/scene hashes, write individual results and decision traces, and refuse automatic retries or changed archived sources. Keep at most two evaluation processes and do not disturb training. Constants, checkpoints, Paper 2 and older result ledgers are unchanged. New evaluations are authorized; earlier saved-only restrictions and numerical run caps belong to completed phases.
 
 NativeV16 dispatch was added after all390 then-planned runs completed. Environment, suite CLIs and counterfactual dispatch accept16; defaults are unchanged. See `v16_native_dispatch_source_audit.json`. The diagnostic runner explicitly installed and verified the exactV16 class throughout the earlier runs.

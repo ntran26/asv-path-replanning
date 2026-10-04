@@ -1,6 +1,6 @@
 """Sector pooling: allocation, coverage, and Algorithm 1 behaviour.
 
-Kickoff §7: "beam counts per sector, total = 27, no gaps or overlaps across
+Kickoff section 7: "beam counts per sector, total = 27, no gaps or overlaps across
 +/-135 deg".
 """
 
@@ -20,11 +20,11 @@ def test_sector_count():
 
 
 def test_bands_sum_to_declared_sector_count():
-    """15 bow + 8 mid + 4 outer = 27 (01 §2.2)."""
+    """15 bow + 8 mid + 4 outer = 27 (01 section 2.2)."""
     counts = [int(round((hi - lo) / w)) for lo, hi, w in cfg.POOL_BANDS]
     assert counts == [2, 4, 15, 4, 2]
     assert sum(counts) == 27
-    # Grouped the way 01 §2.2 tabulates them: bow / abeam / quarter.
+    # Grouped the way 01 section 2.2 tabulates them: bow / abeam / quarter.
     assert counts[2] == 15
     assert counts[1] + counts[3] == 8
     assert counts[0] + counts[4] == 4
@@ -65,7 +65,7 @@ def test_beam_resolution_is_half_a_degree():
 
 
 def test_beams_per_sector():
-    """01 §2.2: 12 beams in a 6 deg sector, 22-23 in 11.25 deg, 45 in 22.5 deg."""
+    """01 section 2.2: 12 beams in a 6 deg sector, 22-23 in 11.25 deg, 45 in 22.5 deg."""
     labels = lp.sector_assignment()
     counts = np.array([int(np.sum(labels == s)) for s in range(cfg.LIDAR_SECTORS)])
 
@@ -74,7 +74,7 @@ def test_beams_per_sector():
     assert list(counts[25:]) == [45, 45]                     # stbd outer
 
     # 11.25 deg / 0.5 deg = 22.5 beams, so these sectors MUST alternate 22/23.
-    # 01 §2.2 writes "22-23"; the allocation cannot be constant here.
+    # 01 section 2.2 writes "22-23"; the allocation cannot be constant here.
     mid = np.concatenate([counts[2:6], counts[21:25]])
     assert set(mid.tolist()) == {22, 23}
     assert int(mid.sum()) == 180                             # 90 deg at 0.5 deg

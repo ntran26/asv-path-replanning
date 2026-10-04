@@ -167,7 +167,7 @@ evaluation can be reused.
 
 | Method | Fit | Cost |
 |---|---|---|
-| **Sampled forward simulation (DWA as a filter)** — recommended | Reuses our vessel model and DWA code; handles walls, panels and target together | Lowest |
+| **Sampled forward simulation (DWA as a filter)** — recommended | Reuses the project's vessel model and DWA code; handles walls, panels and target together | Lowest |
 | Velocity-obstacle override | Reuse `colregs_vo` / `encounter_vo` as the fallback controller; rule-aware by construction | Low; point-mass model, needs margins for turning lag. Mind A35 (side rule per candidate) |
 | Control barrier function (CBF-QP) | Minimal change to the policy action with a formal safety condition; "safe RL" framing | Medium; simplified model and careful tuning for an underactuated hull |
 | MPC predictive safety filter | Plans a recoverable trajectory; most principled | Highest; 2 Hz online optimisation is feasible but heavy to build and verify |

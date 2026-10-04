@@ -72,7 +72,7 @@ NVV, NRR, NVR = 482.463882083071e-006, 10.1534803187344e-012, 116.985615725573e-
 # --- Calibrated gains ------------------------------------------------------
 # THRUST_CAL scales the whole thrust map so that steady surge at CRUISE_RPM
 # matches the measured field cruise speed (constants.U_REF).  Paper 2's map was
-# never validated against the trial logs -- 05 §2 lists "Paper 2 used thrust
+# never validated against the trial logs -- 05 section 2 lists "Paper 2 used thrust
 # proportional to RPM^2; verify" -- and mining those logs (02b T1) put the real
 # cruise at 1.14 m/s against the simulator's 1.77.
 #

@@ -8,40 +8,40 @@ the config is right.** The paper-ready statement of the formulation is
 quoted values from the 1.116 m/s plant or from 10 Hz as current (pose noise,
 track gate, DCPA/TCPA clips, being-overtaken speed margin, encounter hold, the
 R-2 speed reference); earlier revision notes are kept as history. New rows since
-2.8 are at the end of §14.1 (A24-A31, F88, F91, baseline-v1).
+2.8 are at the end of section 14.1 (A24-A31, F88, F91, baseline-v1).
 
 **Revision 2.7** — F24 decided: **`CRUISE_RPM = 6`, `U_REF` = 0.558 m/s**. The
 virtual corridor sweep is **restored**. Nominal pose and ego noise and hull
 randomisation (1.0) are on for training, and the emergency stop has its own
-reward treatment (`R_ESTOP`). New values in §14; tables quoting 1.116 m/s
+reward treatment (`R_ESTOP`). New values in section 14; tables quoting 1.116 m/s
 below are updated where they define a current value.
 
 **Revision 2.6** — **everything runs at 2 Hz** to match the vessel
 (`UPDATE_RATE = 0.5`). Every step count is a duration through `steps_for`,
 every dense reward weight is scaled by `REWARD_DT_SCALE = 5` so per-second
-rates and 02a §8.1's episode integrals are unchanged, and the training
+rates and 02a section 8.1's episode integrals are unchanged, and the training
 discounts are converted by `discount()`. The corridor is **fixed at 10 m**,
-which retires the Study 1 sweep (§2). The static/dynamic split is a
-**free-space consistency test** (§7.0). Pose staleness is native to the
-environment (§13.3). Tables carry the 2 Hz values; prose quoting 10 Hz step
+which retires the Study 1 sweep (section 2). The static/dynamic split is a
+**free-space consistency test** (section 7.0). Pose staleness is native to the
+environment (section 13.3). Tables carry the 2 Hz values; prose quoting 10 Hz step
 counts describes revision 2.5 and says so.
 
 **Revision 2.5** — the identified hull from 05 part 1 (`bluefin/`) replaces the
 calibrated v2 model: `U_REF` is now **derived from the plant** (1.116 m/s) and
 `THRUST_CAL` is gone. New constants for the emergency stop and deployment
-timing are in §13. Sections below that quote 1.14 m/s or `THRUST_CAL` describe
+timing are in section 13. Sections below that quote 1.14 m/s or `THRUST_CAL` describe
 revision 2.4 and are marked where it matters.
 
 **Revision 2.4** — tracks `02b_DECISIONS_AND_TASK_ORDER.md` through **T4**.
 The speed calibration is **measured** (T1), the cross-track sign is flipped to
 textbook (T2/C4), `r_path` exists (T3), the width thresholds are **computed**
-rather than listed (C1), the terminal payoffs are decided, and §12 is the
+rather than listed (C1), the terminal payoffs are decided, and section 12 is the
 reward.
 
 Three things moved in T4: **F21 is resolved** — the sensor-resolution floor
-binds, `d_abeam = 1.25 m` (§8.1). **F22** — `N_ref` had to be derived from the
-measured cruise speed or `R-9` inverts (§12.2). **F23** — `02a §5.2`'s `d_safe`
-breaches `02a §2`'s own invariant (§12.3).
+binds, `d_abeam = 1.25 m` (section 8.1). **F22** — `N_ref` had to be derived from the
+measured cruise speed or `R-9` inverts (section 12.2). **F23** — `02a section 5.2`'s `d_safe`
+breaches `02a section 2`'s own invariant (section 12.3).
 
 Mirror of `src/constants.py`, which is the single source of truth. Every
 unresolved value appears there with a `TODO` marker and **nowhere else** — no
@@ -55,7 +55,7 @@ consumer buries a magic number in a function body.
 | `TODO(05)` | `planning/05_VESSEL_MODEL_AND_SIM2REAL.md` |
 | `TODO(decision)` | needs a call no open item currently covers |
 
-**One `TODO(decision)` remains**, and it is `D_SAFE` (§12.3) — 02a's own
+**One `TODO(decision)` remains**, and it is `D_SAFE` (section 12.3) — 02a's own
 value breaches 02a's own invariant, and the resolution changes where the
 boundary penalty begins. Everything else is `TODO(05)` — values that need a
 measurement, not a call — plus three `TODO(03)`/`TODO(04)` items owned by later
@@ -85,23 +85,23 @@ mis-scale the ship domain by 10%. `ship.py` has no `LBP`; it is defined here.
 |---|---|---|
 | `UPDATE_RATE` | **0.5 s** | **2 Hz, the vessel's decision rate** (revision 2.6; was 0.1) |
 | `PHYSICS_DT` | 0.1 s | collision and target motion sub-step inside a decision |
-| `MAX_EPISODE_STEPS` | 180 | 90 s (04a §4.1) |
+| `MAX_EPISODE_STEPS` | 180 | 90 s (04a section 4.1) |
 | `MAP_WIDTH` / `MAP_HEIGHT` | 10.0 / 25.0 m | **O4 resolved** |
 | `CORRIDOR_WIDTHS_M` | **10 m only** | **fixed at the basin** (revision 2.6); was the Study 1 sweep, 10–3.5 m |
-| `PREDICTED_THRESHOLDS_M` | 6.80 / 6.30 / 4.95 / 3.80 m | per-class, 02a §2.2, at the floored domain — **all below 10 m** |
+| `PREDICTED_THRESHOLDS_M` | 6.80 / 6.30 / 4.95 / 3.80 m | per-class, 02a section 2.2, at the floored domain — **all below 10 m** |
 | `HEAD_ON_WALL_CLEARANCE` | 0.65 m | `TODO(05)` |
 
 **Revision 2.6 fixed the corridor at 10 m; revision 2.7 restored the sweep below.** What 2.6 recorded: The generator,
 the virtual-boundary machinery and every width parameter stay in the code, but
 the curriculum, Tier B's strata, Around the Clock and Study 1 are all configured
-at 10 m. Consequences recorded in `PROJECT_STATE.md` §3.14: every class's
+at 10 m. Consequences recorded in `PROJECT_STATE.md` section 3.14: every class's
 compliant alteration fits a 10 m channel, so no width alone makes Rule 8(e) the
 governing rule; no bend fits (F25); Tier B realises one width stratum of three;
 28 of 34 Tier A cases no longer differ in geometry from their 10 m siblings; and
 a crossing target has no water outside the corridor to start from. The sweep
 text below describes revision 2.5.
 
-**O4 resolved (03 §5): simulation matches the basin.** Maximum corridor width
+**O4 resolved (03 section 5): simulation matches the basin.** Maximum corridor width
 10 m = 20 breadths, so every simulated width is physically reproducible — a
 meaningful strengthening of the field-validation argument. The unconfined
 reference case comes instead from the open-water "Around the Clock" variant,
@@ -113,10 +113,10 @@ The sweep, in metres and breadths:
 |---|---|---|---|---|---|---|
 | 20 B | 16 B | 14 B | 12 B | 10 B | 8 B | 7 B |
 
-02a §2.2 predicts **four** per-class transitions, and 02b C1 makes them a
+02a section 2.2 predicts **four** per-class transitions, and 02b C1 makes them a
 computed function of the domain rather than four literals that silently go
 stale. `constants.predicted_thresholds(d_abeam, c_wall, breadth)` implements
-02a §2.2's derivations directly and reproduces its figures to 1 cm:
+02a section 2.2's derivations directly and reproduces its figures to 1 cm:
 
 | Class | Derivation | Computed | 02a |
 |---|---|---|---|
@@ -131,7 +131,7 @@ Re-deriving after 05 is one call.
 centreline head-on share the (6, 7) bracket and cannot be separated by the
 current sweep — but both thresholds derive from `d_abeam` and `c_wall`, and both
 are `TODO(05)`. Adding a level to separate two numbers that will move is
-premature, and it would bake a level into a suite that 04 §4.5 requires frozen
+premature, and it would bake a level into a suite that 04 section 4.5 requires frozen
 and hashed. The sweep holds at seven levels;
 `test_crossing_and_centreline_head_on_still_share_a_bracket` keeps the collision
 documented so it is revisited rather than forgotten.
@@ -151,7 +151,7 @@ documented so it is revisited rather than forgotten.
 | **`U_REF`** | **0.558 m/s** (1.116 at 12 rpm-units) | **derived from the identified plant** at `CRUISE_RPM`; the 1.14 m/s log median corroborates the plant at 12 |
 | ~~`ship.THRUST_CAL`~~ | removed | the identified `T12` reproduces cruise without calibration |
 
-**Propulsion widening is resolved** (03 §6, 02 §4.4). Rule 8(e) speed reduction
+**Propulsion widening is resolved** (03 section 6, 02 section 4.4). Rule 8(e) speed reduction
 is the designated fallback whenever a compliant course alteration would push the
 vessel into the boundary. Staged through the curriculum as in Paper 2, but the
 final stage must expose stage 4 — it is the only one reaching 0 RPM.
@@ -170,7 +170,7 @@ consistent trial to trial. Froude 0.29 — a displacement hull.
 |---|---|---|---|
 | **Measured, this analysis** | **1.14 m/s** | 0.29 | — |
 | 02b C2 "Paper 2 field" | 0.55 m/s | 0.14 | ~2× too low |
-| 02a §1 `U_ref` | 0.80 m/s | 0.20 | assumption |
+| 02a section 1 `U_ref` | 0.80 m/s | 0.20 | assumption |
 | Simulator, pre-calibration | 1.77 m/s | 0.45 | ~1.55× too high |
 
 02b C2's *direction* was right — the simulator was too fast and the thrust map
@@ -230,7 +230,7 @@ Evidence, from all 30 logs under `field_deployment/` (5597 pooled scans):
 
   **This one gates the being-overtaken class.** Train the tracker to see astern
   when the real mount cannot, and Rule 17 behaviour fails in the field for
-  reasons that have nothing to do with the policy (01 §2.3).
+  reasons that have nothing to do with the policy (01 section 2.3).
 * **Motion distortion is not assessable** from these logs: one wall-clock stamp
   per revolution, no per-beam times. Needs a raw bag with `time_increment`.
 
@@ -247,10 +247,10 @@ sensor and was fully visible in Paper 2's simulator.
 | `FEASIBILITY_SAFE_WIDTH` | 0.80 m = `VESSEL_WIDTH + 2 × HULL_MARGIN` |
 
 Allocation 15 + 8 + 4 = 27, covering 540 of 720 beams. Full table in
-`OBSERVATION_SPEC.md` §1. Nothing here is unresolved.
+`OBSERVATION_SPEC.md` section 1. Nothing here is unresolved.
 
 The 11.25° sectors hold 22.5 beams at 0.5° and therefore **alternate 23/22**.
-01 §2.2 writes "22–23", which is consistent, but the allocation cannot be
+01 section 2.2 writes "22–23", which is consistent, but the allocation cannot be
 constant across that band and the tests assert the alternation.
 
 ## 6. Boundary branch
@@ -266,7 +266,7 @@ constant across that band and the tests assert the alternation.
 
 > **Pose noise is on at nominal magnitudes (F46), not measured ones.** Until
 > revision 2.7 all three were 0.0 and this note warned that the sim-to-real gap
-> 01 §3.3 describes was wide open. The nominal values close it in kind; the
+> 01 section 3.3 describes was wide open. The nominal values close it in kind; the
 > measured rf2o drift figures from 05 remain outstanding (B4, `TODO(05)`).
 
 **O5 resolved: software gating, not a physical barrier.** The facility walls
@@ -284,18 +284,18 @@ the deck sit at scan height and move.
 
 | Symbol | Value | Status |
 |---|---|---|
-| `CLUSTER_EPS` | 0.35 m | approved 02b §2 |
-| `CLUSTER_MIN_POINTS` | 4 | approved 02b §2 |
+| `CLUSTER_EPS` | 0.35 m | approved 02b section 2 |
+| `CLUSTER_MIN_POINTS` | 4 | approved 02b section 2 |
 | `TRACK_GATE_DIST` | **0.70 m** | derived, `max(2.5·U_REF·Δt, 0.30)` at Δt = 0.5 s and `U_REF` 0.558 m/s (was 1.40 m at 1.116 m/s) |
 | `TRACK_MAX_MISSES` / `TRACK_MIN_HITS` | 3 / 2 updates | 1.5 s of coasting; published 0.5 s after first sight |
 | `KF_PROCESS_NOISE_ACCEL` | 0.10 m/s² | `TODO(05)` |
 | `KF_MEAS_NOISE_POS` | 0.05 m | `TODO(05)` |
-| `MOTION_CLASSIFIER` | `"free_space"` | F31's fix (§7.0); `"speed"` is 01's original, kept as the ablation |
-| `MOTION_WINDOW_S` | 2.0 s = 4 updates | 03a §6.3's `T_w` |
+| `MOTION_CLASSIFIER` | `"free_space"` | F31's fix (section 7.0); `"speed"` is 01's original, kept as the ablation |
+| `MOTION_WINDOW_S` | 2.0 s = 4 updates | 03a section 6.3's `T_w` |
 | `MOTION_PASS_TOL_M` | 0.25 m | `max(0.25, 5·√2·σ_p)` — `TODO(05)`: σ_p |
 | `MOTION_EXPLAIN_M` | 0.30 m | "a return was near it" |
 | `MOTION_MIN_POINTS` / `MOTION_MIN_FRAC` | 3 / 0.10 | violations in one update that count as motion |
-| `DYNAMIC_PROMOTE_STEPS` / `_DEMOTE_STEPS` | 2 / 4 updates | 03a §6.3's 0.8 s / 2.0 s, asymmetric |
+| `DYNAMIC_PROMOTE_STEPS` / `_DEMOTE_STEPS` | 2 / 4 updates | 03a section 6.3's 0.8 s / 2.0 s, asymmetric |
 | `DYNAMIC_SPEED_ON` / `_OFF` | 0.15 / 0.08 m/s | speed classifier only; `TODO(05)` |
 
 ### 7.0 F31 — static and dynamic by free space, not centroid speed
@@ -325,11 +325,11 @@ sideways lets a ray graze past the corner and return from the wall. Two fixes ro
 lifted from the **sensor**, 0.86 m ahead of the vessel origin (they were lifted
 from the origin, so static objects appeared to move whenever the vessel turned),
 and a stale-pose frame never reaches the tracker. Measured results are in
-`PROJECT_STATE.md` §3.14.
+`PROJECT_STATE.md` section 3.14.
 
 **`CLUSTER_MIN_POINTS` was raised from 3 to 4.** Suspension lines run diagonally
 across the basin and descend toward their anchors, so near the pool edges they
-cross the scan plane; a taut rope returns on one or two beams (03 §4a). Four
+cross the scan plane; a taut rope returns on one or two beams (03 section 4a). Four
 points clears a rope while still admitting a genuine small obstacle — asserted
 in `tests/test_tracking.py::test_min_points_rejects_a_taut_suspension_line`.
 
@@ -337,7 +337,7 @@ in `tests/test_tracking.py::test_min_points_rejects_a_taut_suspension_line`.
 obstacle behaviour.** Field obstacles are suspended panels, confirmed from video
 to hang stably, so apparent motion of a static object comes almost entirely from
 ego-pose error — which affects every object in the scan identically. Set it from
-measured pose noise (05 §4) and retighten as registration improves, and bias it
+measured pose noise (05 section 4) and retighten as registration improves, and bias it
 toward **under**-detection: promoting a static panel to a target ship is a false
 positive with COLREGs consequences.
 
@@ -348,7 +348,7 @@ free-space test ignoring a close pass that fools the speed classifier.
 
 ### 7.1 Study 2 degradation axes
 
-Exposed as environment config so the sweep in 04 can drive them (01 §4.1). All
+Exposed as environment config so the sweep in 04 can drive them (01 section 4.1). All
 nominal-zero, so the tracker is exact unless a sweep asks otherwise.
 
 | Axis | Constant | Injected at |
@@ -358,25 +358,25 @@ nominal-zero, so the tracker is exact unless a sweep asks otherwise.
 | Occlusion duration | scenario geometry | measured as `Tracker.max_coast` |
 | Velocity noise | `TRACK_VELOCITY_NOISE` | tracker velocity estimate |
 
-Plus a fifth that 01 does not list but 05 §6 and 03 §7 do:
+Plus a fifth that 01 does not list but 05 section 6 and 03 section 7 do:
 
 | `EGO_SPEED_NOISE`, `EGO_YAW_RATE_NOISE_DPS` | `ego` observation branch |
 |---|---|
 
-**An IMU is confirmed** (05 §4.7, Revision 2.2). That changes the character of
+**An IMU is confirmed** (05 section 4.7, Revision 2.2). That changes the character of
 this gap rather than closing it:
 
 * `r` comes from the gyro directly, so the residual is the sensor noise floor
-  rather than pose-differentiation error. `r_dead` in 02a §6.2 is now set from
+  rather than pose-differentiation error. `r_dead` in 02a section 6.2 is now set from
   the measured floor rather than guessed, and the yaw-rate-not-rudder criterion
-  02 §4.2 depends on becomes **directly measurable in the field** instead of
+  02 section 4.2 depends on becomes **directly measurable in the field** instead of
   inferred.
 * `u` and `v` are largely rescued by the accelerometer, but are still fused
   rather than measured, so a residual remains.
 
 Scan-to-map supplies drift-free absolute pose at 10 Hz; the IMU fills in between.
 Both magnitudes still come from 05. Log raw gyro and accelerometer at 100 Hz+,
-time-synced to the LiDAR — 05 §4.7 flags the sync as the detail that will bite,
+time-synced to the LiDAR — 05 section 4.7 flags the sync as the detail that will bite,
 because a constant offset appears in the fit as actuator lag.
 
 ## 8. Ship domain — RESOLVED (provisional), with a floor that already bites
@@ -388,7 +388,7 @@ because a constant offset appears in the fit as actuator lag.
 | Abeam (each side) | **0.796 · Lpp** (floored) | **1.25** |
 
 Lateral footprint 2.50 m, about 25% of the widest channel. The abeam extent is
-set by the sensor floor rather than by an Lpp multiple — see §8.1.
+set by the sensor floor rather than by an Lpp multiple — see section 8.1.
 
 Chun et al.'s 3·Lpp fore/aft and 1·Lpp abeam gives 4.71 m fore-aft and 3.14 m
 across at LBP = 1.57 m — nearly a fifth of the 25 m basin lengthwise, and enough
@@ -409,30 +409,30 @@ metric would carry no signal.
 the **lateral semi-axis**, because DCPA is a closest-approach distance and
 closest approach in a channel is overwhelmingly a beam-on passing geometry.
 
-**Resolved (02b §2), and the resolution is that observation and reward normalise
+**Resolved (02b section 2), and the resolution is that observation and reward normalise
 differently on purpose.** This constant scales the observation feature only; the
-reward uses the directional `d_dom(β)` at the target's actual bearing (02a §5.3)
+reward uses the directional `d_dom(β)` at the target's actual bearing (02a section 5.3)
 and gates `ρ_t` on the constant `d_req`. Documented rather than unified, because
 the two serve different jobs.
 
 ### 8.1 F21 — the sensor-resolution floor binds, and it is applied
 
-02b §3.1 sets a hard floor: `d_abeam ≥ LIDAR_MIN_RANGE + B/2 = 1.25 m`. Below
+02b section 3.1 sets a hard floor: `d_abeam ≥ LIDAR_MIN_RANGE + B/2 = 1.25 m`. Below
 it the ship domain sits inside the sensor's blind zone, and because `R-1`
 evaluates domain intrusion on ground-truth geometry, the agent would be
 penalised for intrusions it cannot perceive — `r_dom` stops being a shaping
 signal and becomes unlearnable.
 
-`0.75 · Lpp = 1.18 m` does not clear that floor. §3.1 says the provisional value
+`0.75 · Lpp = 1.18 m` does not clear that floor. Section 3.1 says the provisional value
 "sits 0.18 m outside the sensor blind zone", which compares it to
 `LIDAR_MIN_RANGE` alone (1.0 m) — then defines the floor as 1.25 m. The two
 halves of the section disagree.
 
-**Resolved in favour of the floor**, because §3.1 says what to do in exactly
+**Resolved in favour of the floor**, because section 3.1 says what to do in exactly
 this case: "If the measured manoeuvring performance implies a smaller one, the
 domain is floored at 1.25 m and the paper states why." Applying it executes
 02b's decision rather than overriding 02a's — 02b is the later document and
-declares itself a companion that amends 02a §1.
+declares itself a companion that amends 02a section 1.
 
 `d_abeam = 1.25 m` (0.796 · Lpp), `d_req = 2.50 m`, and all four Study 1
 thresholds move:
@@ -477,7 +477,7 @@ produces a risk index that never decays within anything the vessel can perceive,
 so every target would read as maximum risk at all times.
 
 The constants above are therefore anchored to the **sensor horizon** rather than
-to ship lengths. That is a different choice from the one 01 §5.2 specifies and
+to ship lengths. That is a different choice from the one 01 section 5.2 specifies and
 it needs sign-off. The underlying reason is that it is the *channel* that is
 small, not the sensing: a 320 m ship with 2 NM of radar sees 11.6 hull lengths
 ahead, the Bluefin with 16 m of LiDAR sees 10.2 — close enough that the mismatch
@@ -492,7 +492,7 @@ the normal case rather than the exception.
 
 | Symbol | Value | Status |
 |---|---|---|
-| `HEAD_ON_BEARING_HALF_DEG` | **10.0°** | **resolved** (01 §5.3) — source is 5.0° |
+| `HEAD_ON_BEARING_HALF_DEG` | **10.0°** | **resolved** (01 section 5.3) — source is 5.0° |
 | `HEAD_ON_CT_HALF_DEG` | **10.0°** | kept symmetric — see below |
 | `CROSSING_STBD_MAX_DEG` | 112.5° | source table |
 | `CROSSING_PORT_MIN_DEG` | 247.5° | source table |
@@ -502,13 +502,13 @@ the normal case rather than the exception.
 | `ENCOUNTER_HOLD_STEPS` | **2 steps** | 0.8 s at 2 Hz, `steps_for(0.8)` (was 8 steps at 10 Hz) |
 | `ENCOUNTER_BEARING_HYSTERESIS_DEG` | 3.0° | |
 
-Three modifications to Waltz & Okhrin Table 1 (01 §5.3):
+Three modifications to Waltz & Okhrin Table 1 (01 section 5.3):
 
 1. **Port and starboard crossing collapse into one class** under Rule 9(b). The
    own ship gives way either way, so the side is not a different obligation. The
    geometry is still computed and exposed as `encounter.crossing_side()` for
    02's passing-side reward term — it is simply not observed.
-2. **The head-on band is widened from ±5° to ±10°** — resolved in 01 §5.3
+2. **The head-on band is widened from ±5° to ±10°** — resolved in 01 section 5.3
    Revision 2.2. The source value is tight enough that a small heading error
    flips the classification; ±10° is within common practice and gives the
    hysteresis room to work. 01 resolves "the head-on band" without separating
@@ -551,14 +551,14 @@ placeholder.
 | 16 | `TRACK_VELOCITY_NOISE` | 0.0 | `TODO(05)` |
 | 17–18 | `EGO_SPEED_NOISE` / `EGO_YAW_RATE_NOISE_DPS` | 0.05 m/s / 1.0 °/s (nominal, F46) | `TODO(05)` |
 | 19–20 | `DOMAIN_FORE` / `_AFT` | 3.14 / 1.57 m | `TODO(05)` |
-| 21 | `DOMAIN_LATERAL` | **1.25 m, floored** (§8.1) | `TODO(05)` |
+| 21 | `DOMAIN_LATERAL` | **1.25 m, floored** (section 8.1) | `TODO(05)` |
 | 22 | `TARGET_COMPLIANT_SPAWN_PROB` | 0.5, report realised | `TODO(04)` |
 | 23 | `USE_RECURRENCE` | False | `TODO(04)` |
 | 24 | `KAPPA_N` (throttle rate scale) | 0.30 | `TODO(05)` |
 | 25 | `R_REF` (full-severity yaw) | 0.20 rad/s | `TODO(05)` |
 | 26 | `R_DEAD` (gyro noise floor) | 0.02 rad/s | `TODO(05)` |
 | 27 | `DU_HOLD` | 0.10 m/s | `TODO(05)` |
-| **28** | **`D_SAFE`** | **0.35 m** (§12.3) | **`TODO(decision)`** |
+| **28** | **`D_SAFE`** | **0.35 m** (section 12.3) | **`TODO(decision)`** |
 
 **Closed since Revision 2.2**, all by 02b or T4: the three terminal payoffs,
 `TCPA_CLIP`, `DCPA_CLIP_DOMAINS`, `BEING_OVERTAKEN_SPEED_MARGIN`,
@@ -578,7 +578,7 @@ calibrated actuator model, but it moves as a consequence rather than as a call.
 
 Eight dense terms plus terminals. **Every dense term is normalised to `[-1, 0]`
 before weighting** (`r_prog` to `[-1, +1]`), so the weight *is* the maximum
-per-step contribution and the `02a §7` hierarchy holds by construction rather
+per-step contribution and the `02a section 7` hierarchy holds by construction rather
 than being discovered empirically. That is the direct fix for the Paper 2
 failure, where a path term out-scaled the avoidance term through a factor nobody
 had computed.
@@ -600,7 +600,7 @@ had computed.
 **Revision 2.6:** weights are 02a's per-0.1 s values (in brackets) times
 `REWARD_DT_SCALE = 5`, so each term keeps its per-second rate at the 2 Hz step.
 The ordering is a common factor and unchanged; every episode integral in 02a
-§8.1 is unchanged.
+Section 8.1 is unchanged.
 
 COLREGs sub-weights: `v_port` 0.55, `v_bow` 0.55, `v_side` 0.40, `v_hold` 0.45,
 `v_r8` 0.50. Pre-clip maxima 1.45 / 1.60 / 1.50 / 0.45 by class, so two
@@ -614,10 +614,10 @@ nobody can explain.
 
 | Assertion | Guards against |
 |---|---|
-| `d_abeam ≥ 1.25` | a domain inside the sensor blind zone; `r_dom` unlearnable (02b §3.1) |
+| `d_abeam ≥ 1.25` | a domain inside the sensor blind zone; `r_dom` unlearnable (02b section 3.1) |
 | `d_safe < c_wall − B/2` | the compliant narrow-channel manoeuvre triggering the boundary penalty |
-| `w_bnd > w_dom > w_obs > w_col > w_pf > w_prog > w_smooth > w_exist` | the `02a §7` hierarchy |
-| `\|r_collision\| > w_col · MAX_ENCOUNTER_STEPS` | a compliant collision scoring better than a non-compliant near-miss (`02 §5`); 300 > 9.0 × 20 |
+| `w_bnd > w_dom > w_obs > w_col > w_pf > w_prog > w_smooth > w_exist` | the `02a section 7` hierarchy |
+| `\|r_collision\| > w_col · MAX_ENCOUNTER_STEPS` | a compliant collision scoring better than a non-compliant near-miss (`02 section 5`); 300 > 9.0 × 20 |
 | `t_act < t_engage` | the obligation becoming urgent before the encounter engages |
 | `kappa_eng > 1` | engagement firing at the compliant separation itself |
 | `kappa_rel > kappa_eng` | an encounter clearing at the range it engages; state-machine chatter |
@@ -626,7 +626,7 @@ nobody can explain.
 
 ### 12.2 F22 — `N_ref` is derived, not written down
 
-`02b C3` replaces `02a §5.5`'s progress form with
+`02b C3` replaces `02a section 5.5`'s progress form with
 `clip(N_ref · Δs / L_path, −1, +1)`, so the episode integral stops depending on
 the unresolved cruise speed. The clip binds when `u > L_path / (N_ref · Δt)`.
 
@@ -641,9 +641,9 @@ wrong thing.
 N_REF_PROG = L_REF_PATH / (U_REF · Δt) = 20.0 / (0.558 × 0.5) = 71.7     # 35.8 at 1.116 m/s
 ```
 
-which binds the clip at exactly cruise and restores 02a §5.5's stated intent:
+which binds the clip at exactly cruise and restores 02a section 5.5's stated intent:
 telescoping exact for `u ≤ U_ref`, speeding gains nothing. **`w_prog · Σr_prog`
-is +52.6, not the +75 in the `02a §8.1` table** — the only row it moves. All
+is +52.6, not the +75 in the `02a section 8.1` table** — the only row it moves. All
 three orderings survive with a 44-point margin.
 
 **This puts a constraint on 03's generator**: the clip binds at
@@ -653,8 +653,8 @@ brings F22 back. Today's generator produces 20.00–20.42 m. Pinned by
 
 ### 12.3 F23 — `02a`'s `d_safe` breaches `02a`'s invariant
 
-`02a §2` asserts `d_safe < c_wall − B/2`. With `c_wall = 0.65` and `B = 0.50`
-the ceiling is **0.40 m**, and `02a §5.2`'s stated `d_safe = 0.50 m` does not
+`02a section 2` asserts `d_safe < c_wall − B/2`. With `c_wall = 0.65` and `B = 0.50`
+the ceiling is **0.40 m**, and `02a section 5.2`'s stated `d_safe = 0.50 m` does not
 clear it — in the same sentence that says 0.50 was chosen *because of* this
 invariant.
 
@@ -664,11 +664,11 @@ of the pair: `c_wall` drives all four Study 1 thresholds and is a `TODO(05)`
 measurement, so moving it would move published predictions, whereas `d_safe`
 only sets where the boundary penalty begins.
 
-**A second part, narrower.** `02a §8.1`'s "loitering to timeout ≈ −86" assumes
+**A second part, narrower.** `02a section 8.1`'s "loitering to timeout ≈ −86" assumes
 its own 300-step design point; `MAX_EPISODE_STEPS` is 700, a Paper 2 carry-over
 never reconciled with it. Undiscounted, a vessel stopped dead pays
 `w_pf + w_exist = 0.65` per step and reaches −455 against a collision's −300,
-inverting the `02 §5` ordering. It holds under the discount the agent actually
+inverting the `02 section 5` ordering. It holds under the discount the agent actually
 uses (−65 at the headline SAC `γ = 0.99`) and is **marginal for the PPO
 comparator at `γ = 0.999`**, which reaches −327. Pinned with the numbers rather
 than fixed, because the fix is the step limit and that is a training decision.
@@ -688,7 +688,7 @@ PPO's — the 10 Hz numbers, by construction.
 
 `R-5` also zeroes the existence cost. It is the **one** place that happens, and
 it is gated on a geometric predicate rather than on CRI, which keeps it
-consistent with `R-6` and avoids the degenerate-policy risk `02 §4.4` warns
+consistent with `R-6` and avoids the degenerate-policy risk `02 section 4.4` warns
 about. Without it the narrow overtaking case is not a test of COLREGs reasoning
 but a test of whether the agent tolerates an unwinnable reward — and it would
 resolve it by overtaking anyway.
@@ -703,12 +703,12 @@ resolve it by overtaking anyway.
 |---|---|---|
 | `U_REF` | 0.558 m/s | derived: `steady_speed(CRUISE_RPM = 6)` on the identified hull |
 | `U_REF_LOG_MEDIAN` | 1.14 m/s | measured, 02b T1 — corroboration only |
-| `SUB_DT` | 0.05 s | required by `bluefin/REPORT.md` §9 |
+| `SUB_DT` | 0.05 s | required by `bluefin/REPORT.md` section 9 |
 | `COMMAND_RATE_PCT_S` | 50 %/s | the optional rudder limiter's rate — a true rate limit, identical in bridge and `env.step` |
 | `RUDDER_COMMAND_LIMIT` | **False** | off in bridge and simulator: v3 predicts the raw-command July runs at least as well (holdout heading 9.8° vs 15.1° at 10 s); S1-B measures the servo |
 | `MAX_RUD_RATE_DPS` | 20 °/s | derived from the above; `KAPPA_DELTA` = 0.25 per 2 Hz step |
 | `REVERSE_THRUST_EFFICIENCY` | 0.5 | **`TODO(05)`** — basin S1-C2; T9 at 2 Hz needs ≥ 0.27, or ≥ 0.55 if thrust shares the rudder's 0.73 s delay |
-| `VESSEL_RANDOMISATION_SCALE` | **1.0** | on for training (§14) |
+| `VESSEL_RANDOMISATION_SCALE` | **1.0** | on for training (section 14) |
 
 Identified parameters live in `bluefin/ship_model_v3.py` and are not duplicated
 here: a copy would drift out of step with part 2's refit.
@@ -774,16 +774,16 @@ tracker.
 | training safety layer | **switch** (`--train-supervisor`, default on) | F68: off trains without the latch, so `R_ESTOP` and the gate suspension drop out |
 | low-speed starts | **`low_speed_start_frac`**, env default 0; `LOW_SPEED_START_ZERO_SHARE` 0.5 | F68: from rest, or uniform on (0, 0.5 `U_NOM`] |
 | `R2_SLOWDOWN_TEST` | **"stop"** (A24, decided) | F70/F72: R-2's and the Rule 8 credit's slowing test — "stop" (A23, `stop_clears`, the default) or "coast" (F68, `slowdown_clears`); `train_formulation.py --r2-slowdown-test` |
-| port share (F84) | `CROSSING_PORT_SHARE_TRAINING` **0.60** (run 9 tried 0.50) | your call, 2026-09-19 |
-| A29 (F85) | `V_HOLD_GROWS` (off for run 9, on from run 10), `V_HOLD_EXCESS_SPAN` **0.10 m/s**, `V_HOLD_CAP` **3.0** | your call, 2026-09-19 |
-| A27 (F81) | `V_PORT_HEADING_DEAD_DEG` **5.0** (TODO(05)); `CROSSING_PORT_SHARE_TRAINING` **0.60** (training namespace only); stage 3 classes gain crossing | your call, 2026-09-19 |
+| port share (F84) | `CROSSING_PORT_SHARE_TRAINING` **0.60** (run 9 tried 0.50) | decision, 2026-09-19 |
+| A29 (F85) | `V_HOLD_GROWS` (off for run 9, on from run 10), `V_HOLD_EXCESS_SPAN` **0.10 m/s**, `V_HOLD_CAP` **3.0** | decision, 2026-09-19 |
+| A27 (F81) | `V_PORT_HEADING_DEAD_DEG` **5.0** (TODO(05)); `CROSSING_PORT_SHARE_TRAINING` **0.60** (training namespace only); stage 3 classes gain crossing | decision, 2026-09-19 |
 | F88 | `V_PORT_LATCHED_RHO` **True** | run 11: `v_port` weighted by the peak risk since engagement |
 | F91 / A33 | `V_PORT_HEADING_NEEDS_ADMISSIBLE` **False** in baseline-v1 | on for run 12 only; one seed abandoned the Rule 14 alteration (F92) |
 | A31 | `A31_STAGE3_WEIGHTS` **False** in baseline-v1 (`STAGE3_CROSSING_WEIGHTS` 0.35/0.35/0.15/0.15) | on for run 12 only; falsified (F92) |
 | **baseline-v1** | `configs/baseline_v1.json`, the run 11 formulation; superseded | F93 |
-| **baseline-v2** | **`configs/baseline_v2.json`**, the current frozen formulation: baseline-v1 with `BEING_OVERTAKEN_BELOW_FLOOR_FRAC` **0.20 -> 0.0** (S5, your call); checked by `src/baseline_config.py`, applied by `train_formulation.py --config` | F96 |
+| **baseline-v2** | **`configs/baseline_v2.json`**, the current frozen formulation: baseline-v1 with `BEING_OVERTAKEN_BELOW_FLOOR_FRAC` **0.20 -> 0.0** (S5, decision); checked by `src/baseline_config.py`, applied by `train_formulation.py --config` | F96 |
 | `BEING_OVERTAKEN_BELOW_FLOOR_FRAC` | **0.0** (was 0.20) | F96, S5: the Rule 17(b) last-moment case is out of scope, so no draw sits below the contact-free floor in training or in the suite |
-| geometry | **basin default** (`DEFAULT_GEOMETRY_MODE`); `BASIN_START_Y` 2.0, `BASIN_GOAL_Y` 22.0, `BASIN_X_RANGE` (2.5, 7.5) m, `BASIN_NAV_INSET_M` 0.40, `BASIN_H_SIDE_CLIP` (0.60, 5.00); `p_basin` 1 / 1 / 0.85 / 0.75 / 0.75 by stage, channel only for `CHANNEL_CLASSES` | F74 (06, your calls) |
+| geometry | **basin default** (`DEFAULT_GEOMETRY_MODE`); `BASIN_START_Y` 2.0, `BASIN_GOAL_Y` 22.0, `BASIN_X_RANGE` (2.5, 7.5) m, `BASIN_NAV_INSET_M` 0.40, `BASIN_H_SIDE_CLIP` (0.60, 5.00); `p_basin` 1 / 1 / 0.85 / 0.75 / 0.75 by stage, channel only for `CHANNEL_CLASSES` | F74 (06, decisions) |
 | feasibility | A* grid 0.25 m, walls 0.40 m, panels 0.45 m, route ≤ 2.25 × leg, 20 redraws then thin | F74 (Paper 2's filter) |
 | off-policy learners | SAC / TQC (TD3 implemented, dropped from the baseline 2026-09-24): lr 3e-4, buffer 1 M, batch 256, tau 0.005, learning starts 10 k; TD3 policy delay 2, target noise 0.2 (clip 0.5), exploration 0.1; TQC 2 critics × 25 quantiles, top 2 dropped per critic | F76, F77 |
 | suite | 3.0: Tier A 38 (35 realised), Tier B 48 × 20; `TIER_B_EPISODES_PER_CELL` 20; curriculum `CURRICULUM_STAGE_FRACTIONS` | F75 |
@@ -796,6 +796,6 @@ tracker.
 | confined track check | **hull inside the corridor, every 0.5 s to CPA** (null: 15 s) | F61, A21: the generator rejects draws whose target would breach the channel before CPA |
 | `clamp_to_corridor` | **nudge, not teleport** | F61, A21: heading to the channel tangent, moved inward by the breach + 0.1 m |
 | being-overtaken DCPA floor | **`contact_free_dcpa(ct, k)` + 0.35 m** | F61, A21: hull clearance per draw (0.65 m parallel, ~1.0–1.2 m at 10°) plus `BEING_OVERTAKEN_FLOOR_MARGIN = D_SAFE`; replaces the 1.0 m centre floor; 20 % below, labelled |
-| `CORRIDOR_BENDS` | **False** | F59, your call (2026-09-16): no bends in any curriculum stage; `CORRIDOR_BEND_FRACTION` 0.40 → 0; Tier A's two bend cases withdrawn (34 → 32) |
+| `CORRIDOR_BENDS` | **False** | F59, decision (2026-09-16): no bends in any curriculum stage; `CORRIDOR_BEND_FRACTION` 0.40 → 0; Tier A's two bend cases withdrawn (34 → 32) |
 | `STRAIGHT_REFERENCE_PATH` | **True** | F59: the path's Rule 9(a) offset is constant, `offset_frac · ½ · min(W)`, so a varying-width corridor no longer bends the path; `r_path` ≡ 0 |
 | `N_SWITCH_STEPS` | **retired** (value kept, 2 steps) | F58, A20 **decided** (option 1): an engaged encounter keeps the class, crossing side and turn sense latched at engagement until it clears; a class switch no longer re-engages |

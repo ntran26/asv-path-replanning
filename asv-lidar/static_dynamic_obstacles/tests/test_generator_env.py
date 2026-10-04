@@ -111,7 +111,7 @@ def test_the_being_overtaken_dcpa_is_floored_with_no_draws_below():
         else:
             assert built.dcpa_m >= built.dcpa_floor_m
     assert n >= 100
-    # baseline-v2 (your call, 2026-09-23): nothing below the floor, so the Rule
+    # baseline-v2 (decision, 2026-09-23): nothing below the floor, so the Rule
     # 17(b) case S5 put out of scope is in neither training nor the suite.
     assert below == 0
 
@@ -187,7 +187,7 @@ def test_crossings_are_escapable_except_a_labelled_fraction():
 
 
 def test_obstacles_keep_clear_of_the_encounter():
-    """04a §3.6: the CPA stretch of the own ship's track stays clear."""
+    """04a section 3.6: the CPA stretch of the own ship's track stays clear."""
     env = ASVLidarEnv(render_mode=None, scenario_stage=5)
     env.forced_num_obs = 3
     checked = 0

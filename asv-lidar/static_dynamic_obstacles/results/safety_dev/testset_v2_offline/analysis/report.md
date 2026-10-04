@@ -2,7 +2,7 @@
 
 SAC baseline 3 (3M checkpoint): **872/1000 goals (87.2%)**, with 61 target, 55 obstacle and 12 boundary collisions; 0 timeouts. All saved rows have safety off and zero intervention counters.
 
-This report reads saved data only. No simulator reset, policy inference or new episode was performed. The user has authorized development on this set; any resulting tuning must be described as development, not an untouched test of the tuned filter.
+This report reads saved data only. No simulator reset, policy inference or new episode was performed. Development on this set is authorized; any resulting tuning must be described as development, not an untouched test of the tuned filter.
 
 ## Provenance and limits
 

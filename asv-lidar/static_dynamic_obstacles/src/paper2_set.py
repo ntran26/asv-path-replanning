@@ -32,7 +32,7 @@ Composition (`SET_REVISION`):
   parameters in `constant_temp.TARGET_VS_*`).  Only the speed differs, so the
   pair isolates it.
 
-**Field feasible (revision 2.0, your call, 2026-09-27).**  Every target scenario
+**Field feasible (revision 2.0, decision, 2026-09-27).**  Every target scenario
 is one a second, Bluefin-class model vessel can sail in the 10 x 25 m basin
 (`constant_temp.FIELD_*`):
 

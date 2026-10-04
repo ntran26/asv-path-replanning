@@ -11,8 +11,8 @@ ordering. Changing any index is a version bump, not an edit; a checkpoint from
 an earlier schema cannot be loaded or resumed against this one.
 
 **Updated 2026-09-22** to match the code: this file described v2 until then.
-Also changed since v2 without moving an index: the speed normaliser (§3), the
-cross-track normaliser (§4), and nominal sensor noise, now on (§2, §3).
+Also changed since v2 without moving an index: the speed normaliser (section 3), the
+cross-track normaliser (section 4), and nominal sensor noise, now on (sections 2, 3).
 
 Total **70** dims across **6** branches, as a `gymnasium.spaces.Dict`. The
 machine-readable copy of this layout is `src/observation.py`; the two must
@@ -38,7 +38,7 @@ from the own ship's heading: 0° dead ahead, 90° abeam to starboard.
 **Cross-track error is positive to STARBOARD** — the textbook LOS convention,
 flipped from Paper 2's positive-to-port in 02b C4/T2. Paper 2's own
 `verify_los_apf.py` flagged its convention as non-standard; this paper's
-contribution is COLREGs geometry, and 02a §6.4's passing-side term has two
+contribution is COLREGs geometry, and 02a section 6.4's passing-side term has two
 opposite branches keyed on the sign of the lateral offset, so carrying a
 non-standard sign through them invites exactly the class of error the paper is
 about. **Anything comparing numbers across the two papers must account for it.**
@@ -65,7 +65,7 @@ of analysis, because Rules 13–16 are formulated pairwise; confined geometry
 precludes simultaneous close-quarters conflicts, so encounters are sequential;
 and every reported behaviour becomes physically reproducible in the basin.
 
-v3 (A25, F72, ported from CODEX) addresses two measured problems: the reward
+v3 (A25, F72, ported from the prototype working copy) addresses two measured problems: the reward
 judged an encounter state — engaged or not, the compliant turn direction,
 heading and speed change since engagement — that the policy could not see in a
 single frame; and the cross-track error, scaled by 25 m, used about a tenth of
@@ -146,7 +146,7 @@ for `c_t` (16 m).
 | 5 | +60° |
 | 6 | +90° (abeam starboard) |
 
-This is an **architectural argument, not a workaround** (01 §3.1). In a real
+This is an **architectural argument, not a workaround** (01 section 3.1). In a real
 narrow channel the navigable limit is usually not a physical structure either —
 it is a charted depth contour, a buoyed line or a regulatory limit, none of
 which a LiDAR can see. The basin reproduces that exactly: the sensor sits above
@@ -174,12 +174,12 @@ normaliser covers the operating range without clipping or dead range.
 > `2 × U_REF` = 2.28 m/s while `U_REF` was the 1.14 m/s log median at 12 RPM
 > (02b T1). The factor has been `2 × U_REF` throughout; `U_REF` changed with F24.
 
-**An IMU is confirmed** (05 §4.7). `r` is measured by the gyro rather than
+**An IMU is confirmed** (05 section 4.7). `r` is measured by the gyro rather than
 differentiated, so its residual is the sensor noise floor; `u` and `v` are
 largely rescued by the accelerometer but remain fused rather than measured.
 Nominal noise is on: **0.05 m/s on speed, 1.0 °/s on yaw rate** (F46), measured
 values `TODO(05)`. The branch carries field error Paper 2's simulator did not
-model — a sim-to-real gap in the *observation*, not just the dynamics (05 §6).
+model — a sim-to-real gap in the *observation*, not just the dynamics (05 section 6).
 
 ## 4. `path` — 3 dims
 
@@ -237,7 +237,7 @@ already passed and the range is opening.
 
 Every value is a read of the shared `EncounterContext`, the same object the
 reward reads, so observation and reward cannot derive the same encounter by
-different routes (01 §5.3).
+different routes (01 section 5.3).
 
 ### 5.1 The five encounter classes
 
@@ -267,7 +267,7 @@ find.
 **What changed in v3:** the side still decides the *direction* of the
 give-way turn (A17), and the reward charges a turn against it (`v_port`). Since
 v3 that direction is observable: the `context` branch carries the latched
-**compliant turn sense** (§6), so the policy is shown which way it is being
+**compliant turn sense** (section 6), so the policy is shown which way it is being
 judged (`test_crossing_class_keeps_an_observable_turn_direction`). The
 geometric side itself remains available as `ObservationBuilder.crossing_sides`
 for the passing-side term.
@@ -324,7 +324,7 @@ at engagement are then **latched** (A20) until the target is past and opening.
 |---|---|---|---|
 | 0 | engaged | 1 while the encounter is engaged | {0, 1} |
 | 1 | clearing | 1 while the target is passing clear | {0, 1} |
-| 2 | **compliant turn sense** | +1 starboard, −1 port, 0 none (§5.1) | {−1, 0, 1} |
+| 2 | **compliant turn sense** | +1 starboard, −1 port, 0 none (section 5.1) | {−1, 0, 1} |
 | 3 | heading change since engagement | wrapped deg / 180; 0 unless latched | [−1, 1] |
 | 4 | speed change since engagement | `(u − u_engage) / SPEED_SCALE`; 0 unless latched | [−1, 1] |
 | 5 | turn admissible | 1 if the compliant alteration fits the channel | {0, 1} |

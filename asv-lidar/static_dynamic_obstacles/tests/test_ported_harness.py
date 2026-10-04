@@ -137,7 +137,7 @@ def test_module_imports(module):
 
 
 def test_no_module_reaches_into_the_paper_2_tree():
-    """Kickoff §1: a later edit in Paper 3 must not be able to change Paper 2."""
+    """Kickoff section 1: a later edit in Paper 3 must not be able to change Paper 2."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent / "src"
     for path in root.glob("*.py"):

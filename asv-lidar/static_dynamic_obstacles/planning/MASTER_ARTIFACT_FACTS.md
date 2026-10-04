@@ -1,6 +1,6 @@
 # Paper 3 master artifact — verified technical facts
 
-**Written 2026-09-29 from the project's code**, for Claude Chat to build the
+**Written 2026-09-29 from the project's code**, as the source for the
 master explainer artifact (`MASTER_ARTIFACT_BRIEF.md`). Every number here is
 what the simulator, controllers and tracker actually use. The observation,
 encounter geometry and reward equations are in the companion file
@@ -300,7 +300,7 @@ noise 0.05 m/s, yaw-rate noise 1°/s. One scan per 0.5 s decision.
    branch and the encounter module.
 
 7. **Encounter classification and CPA** — equations in
-   `FORMULATION_EQUATIONS.md` §4 (CPA, ship domain, CRI after Waltz & Okhrin,
+   `FORMULATION_EQUATIONS.md` section 4 (CPA, ship domain, CRI after Waltz & Okhrin,
    2023, classification bands, engagement/latch).
 
 **Sector pooling (feasibility pooling, Paper 2; Meyer et al., 2020a).** 27

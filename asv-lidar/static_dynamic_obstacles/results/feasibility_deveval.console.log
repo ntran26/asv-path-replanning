@@ -1,0 +1,4 @@
+2026-10-04 04:59:05 == development-set oracle (evaluation seeds) queued: waiting for the test set v4 build
+2026-10-04 05:25:15    test set v4 build: test set 4.0: 1000 episodes from 1103 distinct scenarios (103 near-duplicates removed), digest a8c40beb234ea7f9, built in 1674 s
+2026-10-04 06:26:43    development-set oracle exit 0 (results/feasibility/oracle_summary.txt)
+2026-10-04 06:26:44 == development-set oracle done

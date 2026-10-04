@@ -1,10 +1,10 @@
 """Closest-point-of-approach geometry, the ship domain, and the risk index.
 
-Follows Waltz & Okhrin (2023, *Neural Networks* 165:634-653) §3.3 in structure.
-**None of their constants are reused** -- see `constants.py` §9 for why a
+Follows Waltz & Okhrin (2023, *Neural Networks* 165:634-653) section 3.3 in structure.
+**None of their constants are reused** -- see `constants.py` section 9 for why a
 straight re-derivation in ship lengths does not work at this scale.
 
-The known failure mode, and the patch (01 §5.1)
+The known failure mode, and the patch (01 section 5.1)
 ----------------------------------------------
 CPA assumes both vessels hold course and speed.  Two ships on near-parallel
 courses have a CPA far in the past or future, so CPA-based risk reads low --
@@ -59,7 +59,7 @@ def relative_bearing_deg(p_os, heading_os_deg: float, p_ts) -> float:
     """Bearing of the target from the own ship, relative to its heading.
 
     Returned in [0, 360): 0 is dead ahead, 90 is abeam to starboard.  This is
-    the convention the encounter table in 01 §5.3 is written in.
+    the convention the encounter table in 01 section 5.3 is written in.
     """
     d = np.asarray(p_ts, dtype=np.float64) - np.asarray(p_os, dtype=np.float64)
     absolute = math.degrees(math.atan2(float(d[0]), float(d[1])))
@@ -86,7 +86,7 @@ def domain_scale(bearing_deg: float, *, fore: float = cfg.DOMAIN_FORE,
     A half-ellipse fore and a half-ellipse aft, sharing the lateral semi-axis,
     after Chun et al. as used by Waltz & Okhrin -- but compressed.  Their
     3*Lpp fore-aft is 4.71 m at LBP = 1.57 m, which does not fit a 10 m channel
-    (`constants.py` §8 carries the reasoning and the TODO).
+    (`constants.py` section 8 carries the reasoning and the TODO).
     """
     a = math.radians(float(bearing_deg))
     # Body frame: +y is ahead, +x is starboard.
@@ -101,7 +101,7 @@ def distance_to_domain(p_os, heading_os_deg: float, p_ts) -> float:
     """Range from the domain boundary to the target; 0 when inside.
 
     DCPA and the distance feature are both measured to the **domain**, not to
-    the hull (01 §5.2).
+    the hull (01 section 5.2).
     """
     d = float(np.linalg.norm(np.asarray(p_ts, dtype=np.float64)
                              - np.asarray(p_os, dtype=np.float64)))
@@ -147,7 +147,7 @@ def cri(p_os, v_os, heading_os_deg: float, p_ts, v_ts, heading_ts_deg: float) ->
         return 1.0
 
     dcpa, tcpa = cpa(p_os, v_os, p_ts, v_ts)
-    # DCPA is measured to the domain boundary, not to the hull (01 §5.2).
+    # DCPA is measured to the domain boundary, not to the hull (01 section 5.2).
     bearing = relative_bearing_deg(p_os, heading_os_deg, p_ts)
     dcpa_eff = max(0.0, dcpa - domain_scale(bearing))
 

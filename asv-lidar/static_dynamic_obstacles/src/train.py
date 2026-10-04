@@ -122,7 +122,7 @@ def episode_metrics(episode: Episode, env: ASVLidarEnv) -> Dict[str, Any]:
         "min_border_clearance": rollout.smallest(track("true_border_clearance")),
         "max_tracks": rollout.largest(track("n_tracks")),
         "n_targets": rollout.largest(track("n_targets")),
-        # Perception metrics (04 §7).  `track_uptime` is the fraction of the
+        # Perception metrics (04 section 7).  `track_uptime` is the fraction of the
         # steps where the target was within sensor range that it was actually
         # tracked -- the headline detection statistic for N1.
         # NaN until the target is first acquired, so a plain max would poison it.
@@ -311,7 +311,7 @@ class EvalMetricsCallback(BaseCallback):
 # ---------------------------------------------------------------------------
 # Paper 2's `side_path_guard` is deliberately not carried across.  It read
 # `front_clearance`, `side_clearance_diff` and `local_target_cte` -- the three
-# observation fields dropped in 01 §6 -- and it hard-coded a side-choice repair
+# observation fields dropped in 01 section 6 -- and it hard-coded a side-choice repair
 # that Paper 3 expects the policy to learn from `lidar` plus `boundary`.
 # Reinstating it would be a decision for 02, not an inheritance.
 

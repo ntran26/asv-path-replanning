@@ -236,7 +236,7 @@ def render(summary):
         "`steps.csv` records pre-decision summaries along the policy-alone shadow trajectory. `branches.csv` "
         "records final branch outcomes and intervention counts, not branch decision traces. Only the first-fire "
         "branch corresponds to the complete filtered episode; later phase-1 branches are conditioned on a "
-        "different policy-only history. We never pool them as independent closed-loop episodes.", "",
+        "different policy-only history. They are never pooled as independent closed-loop episodes.", "",
         "`checked_clearance` and `v7_repair_clearance` compare selected versus repaired same-tail trajectories, "
         "but the CSV omits repair first-violation time, candidate first-violation time, full controls, actuator "
         "delay buffer, state snapshot, static points and target tracks. The original Python environment/filter "

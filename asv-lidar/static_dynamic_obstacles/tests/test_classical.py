@@ -192,7 +192,7 @@ def test_vo_stand_on_releases_when_holding_would_collide():
 
 
 def test_comparator_settings_come_from_the_staging_constants():
-    """The comparators' parameters live in `constant_temp.py` (your call,
+    """The comparators' parameters live in `constant_temp.py` (decision,
     2026-09-23), staged there rather than in `constants.py` so that tuning one
     cannot change the frozen formulation's digest or halt a campaign.  This
     holds the modules to that single source instead of literals drifting back."""

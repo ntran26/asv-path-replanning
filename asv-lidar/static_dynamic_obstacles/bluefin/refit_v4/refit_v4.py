@@ -1,9 +1,9 @@
 """Refit v4: the v3 identification re-run with the retrieval windows trimmed.
 
-`bluefin/REVIEW.md` §3.5 found that three training segments (`trial`,
+`bluefin/REVIEW.md` section 3.5 found that three training segments (`trial`,
 `trial_2`, `calibration#1`) contain several seconds of sustained motion
 against the heading at the end of the run -- most likely the vessel being
-retrieved -- and §4 found `N_uv` pinned 1.8 % from its lower bound.  Its
+retrieved -- and section 4 found `N_uv` pinned 1.8 % from its lower bound.  Its
 recommendations 1 and 2 are exactly this script:
 
 1. trim the retrieval windows, by a rule applied to every run in both sessions;

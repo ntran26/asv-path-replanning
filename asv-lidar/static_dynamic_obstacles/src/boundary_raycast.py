@@ -1,6 +1,6 @@
 """Boundary branch: a virtual range scan against the known channel polygon.
 
-Why the boundary is not in the LiDAR channel (01 §3.1)
+Why the boundary is not in the LiDAR channel (01 section 3.1)
 -----------------------------------------------------
 The physical LiDAR sits higher than the test-basin wall and cannot be moved, so
 the field scan contains returns from *beyond* the wall -- equipment, railings,
@@ -18,10 +18,10 @@ Two things this module must get right
 1. **Pose noise.**  In the field this scan is computed from map + estimated
    pose, so it inherits localisation error.  A noiseless boundary scan in
    training would open a second sim-to-real gap in the very place this design
-   was meant to close one (01 §3.3).  The hook is here and always on the path;
+   was meant to close one (01 section 3.3).  The hook is here and always on the path;
    the magnitude is `TODO(05)` and currently 0.0.
 2. **Identical gating both sides.**  `gate_beams` is applied to simulated and
-   field scans alike, so the two pipelines cannot diverge (01 §3.4).
+   field scans alike, so the two pipelines cannot diverge (01 section 3.4).
 
 What this module does NOT do: the true collision boundary is still enforced
 geometrically for termination and penalties, exactly as in Paper 2.  What the
@@ -131,7 +131,7 @@ def boundary_scan(x: float, y: float, heading_deg: float, polygon: Polygon, *,
     """The `boundary` observation branch: 7 rays, normalised to closeness.
 
     Normalisation is `lidar_pooling.closeness_from_ranges`, the identical
-    function `c_t` uses, so the two branches cannot drift apart (01 §3.2).
+    function `c_t` uses, so the two branches cannot drift apart (01 section 3.2).
     """
     if pose_noise is not None:
         x, y, heading_deg = pose_noise.perturb(x, y, heading_deg)
@@ -154,7 +154,7 @@ def boundary_ranges(x: float, y: float, heading_deg: float, polygon: Polygon, *,
 
 
 # ---------------------------------------------------------------------------
-# Field-side gating (01 §3.4)
+# Field-side gating (01 section 3.4)
 # ---------------------------------------------------------------------------
 def points_in_polygon(px, py, polygon: Polygon) -> np.ndarray:
     """Vectorised ray-crossing test over many points at once.

@@ -3,7 +3,7 @@
 **Revision 3** — plain concatenation with observable encounter memory.  The shared-encoder-plus-DeepSets
 aggregation comparison from Revision 1 is **not built**: superseded decision D3.
 
-The original architecture used five branches; CODEX adds a sixth for encounter
+The original architecture used five branches; revision 3 adds a sixth for encounter
 memory and executed action within the same `MultiInputPolicy`.  Permutation invariance is meaningless at one
 target, and the measured advantages of attention in the literature come from
 high-density regimes -- dozens of aircraft, eight-ship encounters -- that this
@@ -12,7 +12,7 @@ scope**: restricted waterway, sequential encounters, single target in
 deployment, `N_MAX_TARGETS` configurable.
 
 So why a custom extractor at all, when SB3's `CombinedExtractor` would
-concatenate the branches for us?  Two reasons:
+concatenate the branches?  Two reasons:
 
 * **The presence bit has to gate the slot.**  Zero is a legitimate value for
   bearing and for relative speed, so an unmasked empty slot reads as a target

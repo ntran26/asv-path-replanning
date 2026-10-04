@@ -405,9 +405,9 @@ hit the target. These results improve that selected pilot, not the full set.
 Primary related work is [Yoon, Tang and Barfoot (2018), *Mapless Online Detection
 of Dynamic Objects in 3D Lidar*, Sec. III-C](https://arxiv.org/abs/1809.06972):
 their free-space checks distinguish actual motion from newly visible surfaces
-and viewpoint occlusion. Here we reuse the existing 2D tracker's finite-ray
-evidence and add an admission condition; we do not implement their 3D detection
-pipeline, continuous-time deskewing, or claim its empirical results.
+and viewpoint occlusion. Here the existing 2D tracker's finite-ray
+evidence is reused with an added admission condition; their 3D detection
+pipeline and continuous-time deskewing are not implemented, and its empirical results are not claimed.
 
 CRP-CV-02 has a different remaining failure. Accurate provisional target fits
 appear at decisions 3/4, but published tracking then uses the original centroid

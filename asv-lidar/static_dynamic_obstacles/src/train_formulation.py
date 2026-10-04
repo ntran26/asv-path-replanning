@@ -121,8 +121,8 @@ PPO_HYPERPARAMS = {
     "target_kl": 0.03,
 }
 
-# The off-policy arms (04a §8: SAC is the protected core's method; TQC is the
-# distributional comparator, 04a §8.2 rank 1).  Same discount as PPO, so the three differ in
+# The off-policy arms (04a section 8: SAC is the protected core's method; TQC is the
+# distributional comparator, 04a section 8.2 rank 1).  Same discount as PPO, so the three differ in
 # the learner and nothing else.  One gradient step per transition collected
 # (`gradient_steps = num_envs` per vectorised step) is SAC's usual
 # update-to-data ratio; `--gradient-steps` lowers it if throughput demands.
@@ -157,7 +157,7 @@ TD3_HYPERPARAMS = {
 }
 TD3_ACTION_NOISE_SIGMA = 0.1
 # RecurrentPPO: PPO's settings with an LSTM after the features extractor, for
-# actor and critic separately.  It answers the memory question (04a §8.2, rank 2)
+# actor and critic separately.  It answers the memory question (04a section 8.2, rank 2)
 # the context branch now partly answers by construction (A25).
 RECURRENT_PPO_POLICY = {"lstm_hidden_size": 256, "n_lstm_layers": 1,
                         "enable_critic_lstm": True, "shared_lstm": False}
@@ -165,7 +165,7 @@ ALGORITHMS = {"ppo": PPO, "recurrent_ppo": RecurrentPPO, "td3": TD3,
               "sac": SAC, "tqc": TQC}
 OFF_POLICY = ("td3", "sac", "tqc")
 
-# Replay buffers stay out of the repository (your calls, 2026-09-22): at 1 M
+# Replay buffers stay out of the repository (decisions, 2026-09-22): at 1 M
 # transitions each is ~0.58 GB, past GitHub's file limit.  They go next to the
 # repository -- here `PhD/asv_replay_buffers` in OneDrive; on a cluster clone,
 # beside the clone.  Only the latest per run is kept and it is deleted when the
@@ -309,7 +309,7 @@ def replay_buffer_path(run_dir: Path, algo: str, steps: int, base: Optional[Path
 
 
 def best_replay_buffer_path(run_dir: Path, algo: str, base: Optional[Path] = None) -> Path:
-    """The buffer that goes with `best_model.zip` (your call, 2026-09-23).
+    """The buffer that goes with `best_model.zip` (decision, 2026-09-23).
 
     Off-policy runs keep **two** buffers and no more: the most recent checkpoint,
     so a resume continues on the same data, and the best development-set model,

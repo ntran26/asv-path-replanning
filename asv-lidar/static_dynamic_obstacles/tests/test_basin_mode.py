@@ -1,6 +1,6 @@
-"""Basin mode (06), as amended by your calls in F74.
+"""Basin mode (06), as amended by the decisions in F74.
 
-T13-T15 from 06 §8, T3 and T7 per mode, the default geometry, the
+T13-T15 from 06 section 8, T3 and T7 per mode, the default geometry, the
 side-specific normalisation, and the static-feasibility filter.
 """
 
@@ -60,7 +60,7 @@ def test_t13_a_stage_slant_cap_clamps_and_records_both_slants():
 
 
 def test_clearances_are_affine_with_opposite_slopes_on_a_slanted_leg():
-    """06 §3.3: the property the boundary branch needs."""
+    """06 section 3.3: the property the boundary branch needs."""
     leg = corr.build_basin((2.5, cfg.BASIN_START_Y), (7.5, cfg.BASIN_GOAL_Y))
     s = np.linspace(2.0, leg.length - 2.0, 5)
     hp = np.array([leg.clearances_at_s(v)[0] for v in s])
@@ -102,7 +102,7 @@ def test_basin_normalises_on_the_side_of_the_deviation():
 # T15 -- both hulls stay in the water
 # ---------------------------------------------------------------------------
 def test_t15_basin_targets_stay_inside_the_basin_envelope():
-    """06 §8 asks for 1000 episodes; 120 draws cover every class here."""
+    """06 section 8 asks for 1000 episodes; 120 draws cover every class here."""
     envelope = br.rectangle(cfg.MAP_WIDTH, cfg.MAP_HEIGHT)
     draws = []
     for cls in CLASSES[:-1]:
@@ -147,7 +147,7 @@ def test_t15_confined_basin_traffic_stays_in_the_basin_through_an_episode():
 
 
 # ---------------------------------------------------------------------------
-# T3 per mode (06 §8, amended)
+# T3 per mode (06 section 8, amended)
 # ---------------------------------------------------------------------------
 @pytest.mark.parametrize("mode", ["basin", "channel"])
 def test_t3_boundary_rays_decorrelate_in_each_mode(mode):
@@ -171,7 +171,7 @@ def test_t3_boundary_rays_decorrelate_in_each_mode(mode):
 
 
 # ---------------------------------------------------------------------------
-# T7 per mode, and the confinement rule you set
+# T7 per mode, and the confinement rule as set
 # ---------------------------------------------------------------------------
 def test_t7_basin_head_on_traffic_keeps_the_band_and_the_rest_keep_the_basin():
     leg = corr.build_basin((3.0, cfg.BASIN_START_Y), (6.0, cfg.BASIN_GOAL_Y))
