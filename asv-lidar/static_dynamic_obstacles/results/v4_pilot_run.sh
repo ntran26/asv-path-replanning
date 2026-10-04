@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Gate G4 (your call, 2026-10-03; planning/BASELINE_V4_PLAN.md): after the PPO v3
+# Gate G4 (decision, 2026-10-03; planning/BASELINE_V4_PLAN.md): after the PPO v3
 # run (ppos0_bl3) finishes training and its evaluations, run the two pilot arms
 # from its 1.5 M checkpoint -- A: draft v4 at gamma 0.951; B: draft v4 at gamma
 # 0.98 -- then evaluate both against that run's own 2.0 M checkpoint (control).

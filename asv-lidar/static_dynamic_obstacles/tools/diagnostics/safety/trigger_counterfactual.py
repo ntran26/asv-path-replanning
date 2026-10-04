@@ -1,5 +1,5 @@
 """Trigger counterfactuals: when does the safety layer fire, and was it needed?
-(`planning/SAFETY_LAYER_HANDOFF.md`, "NEXT DIRECTION", 2026-10-03.)
+(`planning/SAFETY_LAYER_NOTES.md`, "NEXT DIRECTION", 2026-10-03.)
 
 For each episode the SAC policy drives **alone** (safety off).  Safety v4 and v7
 run in **shadow mode**: every step a copy of each filter decides on the policy's
@@ -27,7 +27,7 @@ reason and margins, the V7 risk-monitor evidence, SAC's Q(s, pi(s)) and the
 policy's action spread.  No scenario label or future information enters a
 logged feature.
 
-Sets (development evidence by the user's designation): the v3 field development
+Sets (development evidence by designation): the v3 field development
 set (150; episode seeds 900120+i, as `dev_eval.py`), and test set v2's 128 SAC
 failures plus its 151 matched successful controls
 (`results/safety_dev/testset_v2_offline/analysis/`), seeds as in the set.

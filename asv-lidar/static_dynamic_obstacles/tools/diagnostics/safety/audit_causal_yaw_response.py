@@ -220,7 +220,7 @@ def main():
         successful_recorded_policy_future_scoring_only=successful_future,episode_calls=0,
         limitations=["Only one short, selected case; no calibrated uncertainty or population claim.","Raw rate noise appears in both transition endpoints; successive residuals are correlated.","Captured actuator history is the predictor estimate; actual plant servo/delay are unavailable.","Frozen future commands are conditional validation inputs, not known online.","Gain/bias correct total yaw acceleration, not separately identifiable body/actuator coefficients.","Past leave-one-transition ranges are sensitivity, not confidence intervals."],
         provenance=dict(inputs=inputs,source_sha256=sources,script_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()),
-        method_reference="Ljung (2002), Prediction Error Estimation Methods, DOI 10.1007/BF01211648; section1 prediction-error setup; this low-dimensional correction is our diagnostic adaptation.")
+        method_reference="Ljung (2002), Prediction Error Estimation Methods, DOI 10.1007/BF01211648; section 1 prediction-error setup; this low-dimensional correction is a diagnostic adaptation.")
     if args.tag:
         if Path(args.tag).name!=args.tag:
             raise ValueError("Use a simple new tag")

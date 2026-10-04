@@ -1,6 +1,6 @@
-# V4 results from the user-cancelled full sweep
+# V4 results from the cancelled full sweep
 
-This is an **interim cancellation snapshot captured on 2026-10-02 at 11:50:51 UTC**, not a completed benchmark. The user requested evaluation to stop. Process shutdown was unconfirmed at capture; records may have continued to arrive afterward. This report makes no claim about process termination. No missing episodes were replayed or imputed.
+This is an **interim cancellation snapshot captured on 2026-10-02 at 11:50:51 UTC**, not a completed benchmark. Evaluation was stopped. Process shutdown was unconfirmed at capture; records may have continued to arrive afterward. This report makes no claim about process termination. No missing episodes were replayed or imputed.
 
 The selected v4 uses the model-based ego observer and free-space memory. Countersteer recovery, nominal-plan retention and dual-brake prediction are disabled. All comparisons below use the same SAC baseline 3 checkpoint at 3M timesteps.
 

@@ -9,7 +9,7 @@ No extra .15 m floor is imposed on a proposal accepted by V8's hard checks.
 Inspiration: Wabersich & Zeilinger (2021), Sec. 4.1, minimizing deviation of
 the first action subject to a currently feasible backup:
 https://arxiv.org/abs/1812.05506v4 . The comparable-tail margin preference is
-our engineering adaptation of V8 plan option (c), not their optimizer or
+an engineering adaptation of V8 plan option (c), not their optimizer or
 formal guarantee. Rejecting an unchecked override does NOT certify SAC safe.
 
 Optional target hypotheses implement V8 plan option (a), with method sources

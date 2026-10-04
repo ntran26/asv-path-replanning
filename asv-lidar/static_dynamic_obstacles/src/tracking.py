@@ -1,6 +1,6 @@
 """Target tracking: gated returns -> tracks with estimated velocity.
 
-Why this exists (01 §4)
+Why this exists (01 section 4)
 -----------------------
 Sector closeness is velocity-blind.  A wall at 4 m and a vessel closing at
 1 m/s at 4 m produce an identical `c_t`.  Explicit tracking is the chosen
@@ -40,7 +40,7 @@ on its boundary must already have hit it.  A newly revealed face was occluded,
 not empty, so revealing it produces nothing.  Centroid sliding therefore cannot
 reach the classifier at all.  What can is pose error, which moves every point
 by the same amount -- and that is what `MOTION_PASS_TOL_M` is sized from,
-exactly as 03a §6.3 sizes its velocity threshold.  The speed classifier is kept
+exactly as 03a section 6.3 sizes its velocity threshold.  The speed classifier is kept
 (`classifier="speed"`) as 01's original and as the ablation.
 
 The coupling that matters
@@ -426,7 +426,7 @@ class Track:
     """One tracked object: constant-velocity Kalman filter over [x, y, vx, vy].
 
     `slot` is assigned by the observation layer on first publication and held
-    until track loss (01 §6.2), so it is stored here rather than recomputed.
+    until track loss (01 section 6.2), so it is stored here rather than recomputed.
 
     `max_coast` records the longest run of consecutive missed updates: the
     tracker's occlusion tolerance, and a Study 2 reported metric.
@@ -573,7 +573,7 @@ class Track:
             self._pending_steps = 0
 
     def apply_evidence(self, evidence: Optional[MotionEvidence]) -> None:
-        """03a §6.3's asymmetric hysteresis, over free-space evidence.
+        """03a section 6.3's asymmetric hysteresis, over free-space evidence.
 
         Promote after `DYNAMIC_PROMOTE_STEPS` consecutive updates showing motion;
         demote after `DYNAMIC_DEMOTE_STEPS` consecutive updates showing none.
@@ -600,11 +600,11 @@ class Track:
 class Tracker:
     """Nearest-neighbour multi-target tracker.
 
-    Nearest-neighbour rather than JPDA: 01 §4 states it is sufficient at one
+    Nearest-neighbour rather than JPDA: 01 section 4 states it is sufficient at one
     target, and JPDA's advantage appears in clutter densities this problem does
     not reach once beyond-boundary returns are gated out.
 
-    Two Study 2 degradation axes live here (04 §6).  Both default to the nominal
+    Two Study 2 degradation axes live here (04 section 6).  Both default to the nominal
     zero case, so the tracker is exact unless a sweep asks otherwise:
 
     * `dropout_p` -- per-detection probability of a miss, standing in for the

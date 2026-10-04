@@ -1,6 +1,6 @@
 """Every reward term, as a pure function returning a value in its declared range.
 
-02a §4:
+02a section 4:
 
 ```
 r_t =  w_pf*r_pf + w_prog*r_prog + w_exist*r_exist + w_smooth*r_smooth
@@ -9,14 +9,14 @@ r_t =  w_pf*r_pf + w_prog*r_prog + w_exist*r_exist + w_smooth*r_smooth
 
 **Every dense term is normalised to `[-1, 0]` before weighting**, except
 `r_prog` which is `[-1, +1]`.  The weight *is* the maximum per-step
-contribution, so the §7 magnitude hierarchy holds by construction and the §8
+contribution, so the section 7 magnitude hierarchy holds by construction and the section 8
 audit checks realised severity rather than hunting a hidden scale factor.  That
 is the direct fix for the Paper 2 failure, where a path term out-scaled the
 avoidance term through a factor nobody had computed.
 
 Pure functions of `(state, ctx, cfg)` rather than branches inside a step
-function, for two reasons 02a §10.2 gives and one it does not: the leave-one-out
-ablation becomes a mask over a dict; the §10.4 unit tests become trivial; and a
+function, for two reasons 02a section 10.2 gives and one it does not: the leave-one-out
+ablation becomes a mask over a dict; the section 10.4 unit tests become trivial; and a
 term that is wrong can be read in isolation, which is not true of forty lines of
 accumulating `reward +=`.
 """
@@ -107,7 +107,7 @@ def effective_speed_reference(state: RewardState, contexts, cfg) -> dict:
       8(e) would be structurally unlearnable.  `U_ref_eff` drops to
       `0.4 * U_ref` and the legal slowdown costs nothing.
     * **`R-5`** -- narrow-channel overtaking where the port pass does not fit.
-      `02 §3.2` fixes the fallback as "hold astern at reduced speed", which
+      `02 section 3.2` fixes the fallback as "hold astern at reduced speed", which
       under the default terms earns no progress, full path penalty and an
       accruing existence cost, then times out.  Matching the target's speed
       satisfies the gate and the existence cost is suspended, because holding
@@ -118,7 +118,7 @@ def effective_speed_reference(state: RewardState, contexts, cfg) -> dict:
     would resolve it by overtaking anyway.  This is the one place the existence
     cost is suspended, and the suspension is gated on a *geometric* predicate
     rather than on CRI, which keeps it consistent with `R-6` and avoids the
-    degenerate-policy risk 02 §4.4 warns about.
+    degenerate-policy risk 02 section 4.4 warns about.
     """
     result = {"u_ref_eff": float(cfg.u_ref), "w_exist_scale": 1.0,
               "reason": "nominal", "rule": ""}
@@ -168,10 +168,10 @@ def overspeed_gate(u: float, u_ref: float, cfg) -> float:
 
 
 # ---------------------------------------------------------------------------
-# 1.  Task and safety terms  (02a §5)
+# 1.  Task and safety terms  (02a section 5)
 # ---------------------------------------------------------------------------
 def r_pf(state: RewardState, contexts, cfg, u_ref_eff: float = None) -> float:
-    """Unified path following, `[-1, 0]` (02a §5.1).
+    """Unified path following, `[-1, 0]` (02a section 5.1).
 
     ```
     e~_y = e_y / (W_local/2)
@@ -215,13 +215,13 @@ def r_pf(state: RewardState, contexts, cfg, u_ref_eff: float = None) -> float:
 
 
 def r_bnd(state: RewardState, contexts, cfg) -> float:
-    """Channel boundary, `[-1, 0]` (02a §5.2).
+    """Channel boundary, `[-1, 0]` (02a section 5.2).
 
     `r_bnd = -[max(0, 1 - d_b/d_safe)]^2`, with `d_b` the hull-to-boundary
     distance from the map -- ground truth, per `R-1`, because running aground is
     a physical fact and not a matter of what the sensor saw.
 
-    The boundary stays a **hard constraint** per `02 §4.4`: `w_bnd` is the
+    The boundary stays a **hard constraint** per `02 section 4.4`: `w_bnd` is the
     largest dense weight, above the COLREGs group, so slackening speed always
     dominates violating the boundary.  `R-10` zeroes the term in open water,
     where there is no boundary to violate.
@@ -235,12 +235,12 @@ def r_bnd(state: RewardState, contexts, cfg) -> float:
 
 
 def r_dom(state: RewardState, contexts, cfg) -> float:
-    """Target ship-domain intrusion, `[-1, 0]` (02a §5.3).
+    """Target ship-domain intrusion, `[-1, 0]` (02a section 5.3).
 
     `r_dom = -[max(0, 1 - d_TS/d_dom(beta_TS))]^2`, evaluated on **ground
     truth** and with the asymmetric domain taken at the target's actual bearing.
 
-    **Addition beyond the doc's eleven terms, and not optional.**  `00 §4.2`
+    **Addition beyond the doc's eleven terms, and not optional.**  `00 section 4.2`
     reports ship-domain intrusion rate and depth, but nothing in the six carried
     terms or the five COLREGs terms supplies a dense signal for target
     proximity: the only feedback would be the terminal collision penalty.  A
@@ -250,7 +250,7 @@ def r_dom(state: RewardState, contexts, cfg) -> float:
     Reads `state.dom_intrusion`, which the environment computes over its **true**
     targets.  See `domain_intrusion` below for why that is not a detail.
 
-    **Measured centre-to-centre, not hull-to-hull as §5.3's wording says.**  The
+    **Measured centre-to-centre, not hull-to-hull as section 5.3's wording says.**  The
     same document defines `d_req = 2*d_abeam` as the centre separation of two
     vessels passing abeam, and `kappa_eng * d_req` gates engagement against
     `cpa()`, which is centre-to-centre throughout.  Reading `d_dom` as a
@@ -284,7 +284,7 @@ def domain_intrusion(p_os, heading_os_deg: float, true_targets, cfg) -> float:
 
 
 def r_obs(state: RewardState, contexts, cfg) -> float:
-    """Static obstacle proximity, `[-1, 0]` (02a §5.4).
+    """Static obstacle proximity, `[-1, 0]` (02a section 5.4).
 
     A **shifted** exponential: exponential in shape as the source spec asks, but
     exactly zero beyond a cut-off rather than carrying a constant background.
@@ -314,7 +314,7 @@ def r_obs(state: RewardState, contexts, cfg) -> float:
 
 
 def r_prog(state: RewardState, contexts, cfg) -> float:
-    """Progress along the path, `[-1, +1]` (02a §5.5, 02b C3).
+    """Progress along the path, `[-1, +1]` (02a section 5.5, 02b C3).
 
     ```
     r_prog = clip( N_ref * (s_t - s_{t-1}) / L_path, -1, +1 )
@@ -330,13 +330,13 @@ def r_prog(state: RewardState, contexts, cfg) -> float:
     only cost of a legal 8(e) slowdown is the extra steps' path penalty and
     existence cost -- about 4 points for a 3-second reduction, against roughly
     90 for the violation avoided.  That is strictly better than the gated
-    carve-out `02 §4.4` asks for, because it removes the tension without
+    carve-out `02 section 4.4` asks for, because it removes the tension without
     introducing the creep exploit the same section warns about, and it needs no
     CRI threshold, so it stays consistent with `R-6` too.
 
     The clip makes the telescoping exact only for `u <= U_ref`, which is the
     normal regime, and has the useful side effect that speeding gains nothing.
-    See `constants.py` §13.4 (F22) for why `N_ref` must be *derived* from
+    See `constants.py` section 13.4 (F22) for why `N_ref` must be *derived* from
     `U_REF` rather than written down: at a fixed 250 the clip would bind below
     cruise, and slowing down would start to *increase* the integral.
     """
@@ -345,7 +345,7 @@ def r_prog(state: RewardState, contexts, cfg) -> float:
 
 
 def r_exist(state: RewardState, contexts, cfg) -> float:
-    """Existence cost, constant `-1` (02a §5.7).
+    """Existence cost, constant `-1` (02a section 5.7).
 
     Scaled to zero by `R-5` while holding astern in a narrow overtaking, which
     is handled by the weight rather than here so that the term keeps its
@@ -355,7 +355,7 @@ def r_exist(state: RewardState, contexts, cfg) -> float:
 
 
 def r_smooth(state: RewardState, contexts, cfg) -> float:
-    """Action smoothness, `[-1, 0]` (02a §5.6).
+    """Action smoothness, `[-1, 0]` (02a section 5.6).
 
     ```
     r_smooth = -sigma_t * clip( (Da_d/kappa_d)^2 + w_n*(Da_n/kappa_n)^2, 0, 1 )
@@ -366,7 +366,7 @@ def r_smooth(state: RewardState, contexts, cfg) -> float:
     delivers the actuator model.  If `Dact` never approaches the limit in a
     render frame, the term is inert and the panel says so.
 
-    **`sigma_t` resolves the Rule 8 tension** (`02 §4.3`).  Rule 8(b) wants one
+    **`sigma_t` resolves the Rule 8 tension** (`02 section 4.3`).  Rule 8(b) wants one
     large alteration and forbids a succession of small ones; a plain smoothness
     penalty suppresses both.  The first `N_free` steps after engagement are
     charged at `sigma_enc`, so the committed alteration is affordable, and
@@ -391,10 +391,10 @@ def smoothness_scale(state: RewardState, contexts, cfg) -> float:
 
 
 # ---------------------------------------------------------------------------
-# 2.  COLREGs terms  (02a §6)
+# 2.  COLREGs terms  (02a section 6)
 # ---------------------------------------------------------------------------
 def v_port(state: RewardState, ctx, cfg) -> float:
-    """Turning the wrong way while give-way, `[0, 1]` (02a §6.2).
+    """Turning the wrong way while give-way, `[0, 1]` (02a section 6.2).
 
     ```
     r_err  = r - r_path
@@ -405,14 +405,14 @@ def v_port(state: RewardState, ctx, cfg) -> float:
     starboard, `-1` for overtaking and a crossing from port (A17).  Two things this shape fixes, both of them traps the documents
     name explicitly:
 
-    1. **`02 §4.2`'s implementation trap.**  Overtaking *requires* a port turn.
+    1. **`02 section 4.2`'s implementation trap.**  Overtaking *requires* a port turn.
        With `s_c = -1` the same expression penalises a *starboard* turn during
        an overtake, so there is no global "port is bad" constant to miscode.
     2. **The bend problem, and the withdrawal of `R-3`.**  Following a channel
        that bends to port requires a port turn that is path-following, not
        evasion.  Subtracting `r_path` measures only the *excess* yaw rate, so a
        compliant bend costs nothing -- which removes the unwinnable state `R-3`
-       was patching.  `R-3` is now actively wrong: `02 §4.4` resolves the
+       was patching.  `R-3` is now actively wrong: `02 section 4.4` resolves the
        boundary conflict to *slacken speed*, so suppressing the penalty near the
        wall would license a port turn instead.
 
@@ -457,7 +457,7 @@ def v_port(state: RewardState, ctx, cfg) -> float:
 
 
 def v_bow(state: RewardState, ctx, cfg) -> float:
-    """Crossing ahead of the target, `[0, 1]` (02a §6.3).
+    """Crossing ahead of the target, `[0, 1]` (02a section 6.3).
 
     ```
     v_bow = rho_t * sigma_bow(beta_CPA) * clip(1 - DCPA/d_req, 0, 1)
@@ -476,10 +476,10 @@ def v_bow(state: RewardState, ctx, cfg) -> float:
 
 
 def v_side(state: RewardState, ctx, cfg) -> float:
-    """Wrong-side passing, `[0, 1]` (02a §6.4).
+    """Wrong-side passing, `[0, 1]` (02a section 6.4).
 
     **The sign is class-dependent, and the two cases are opposite.**  This is
-    the `02 §4.2` trap in its sharpest form:
+    the `02 section 4.2` trap in its sharpest form:
 
     ```
     head-on:     required TS to port      ->  clip( +y_rel_CPA / d_req, 0, 1 )
@@ -523,11 +523,11 @@ def v_hold(state: RewardState, ctx, cfg) -> float:
     ```
 
     A penalty on deviation rather than a reward for holding, so the whole group
-    stays a penalty group and the §7 hierarchy is uniform.  A positive hold
+    stays a penalty group and the section 7 hierarchy is uniform.  A positive hold
     reward would also duplicate `r_pf`, which already rewards a steady course,
     and would risk paying the agent to hold course into a collision.
 
-    **Path-relative yaw here too.**  `02 §3.2` adds "keep starboard" to the
+    **Path-relative yaw here too.**  `02 section 3.2` adds "keep starboard" to the
     being-overtaken row; an absolute-yaw formulation would penalise the
     corrective alteration needed to regain the starboard side, and `r - r_path`
     does not.
@@ -559,7 +559,7 @@ def v_hold(state: RewardState, ctx, cfg) -> float:
 
 
 def v_r8(state: RewardState, ctx, cfg) -> float:
-    """Rule 8: late or insufficient action, deficit-based, `[0, 1]` (02a §6.6).
+    """Rule 8: late or insufficient action, deficit-based, `[0, 1]` (02a section 6.6).
 
     ```
     A_req   = clip(Dy_req / d_req, 0, 1)                  # 0 when nothing is owed
@@ -571,7 +571,7 @@ def v_r8(state: RewardState, ctx, cfg) -> float:
     ```
 
     **Reformulated in Revision 2, and it is the single most consequential change
-    in that revision.**  `02 §3.2` now states that Rule 9(a) compliance can
+    in that revision.**  `02 section 3.2` now states that Rule 9(a) compliance can
     satisfy Rule 14 without any alteration at all.  A term penalising inaction
     whenever engaged would punish the agent for correctly holding course.
 
@@ -583,7 +583,7 @@ def v_r8(state: RewardState, ctx, cfg) -> float:
     * Target displaced -> `A_req` scales with the deficit, so the obligation is
       proportionate rather than a fixed 20 degrees.
     * Alteration inadmissible -> `A_t` counts the speed reduction only, so Rule
-      8(e) discharges the obligation.  That is `02 §4.4`'s decision expressed as
+      8(e) discharges the obligation.  That is `02 section 4.4`'s decision expressed as
       reward structure rather than as a special case.
     * Counts **only compliant directions**, so a large wrong-way alteration
       discharges nothing.
@@ -598,7 +598,7 @@ def r8_parts(state: RewardState, ctx, cfg) -> dict:
     """`v_r8` and every intermediate, so the panel and the term cannot disagree.
 
     `A_req` is the health check on the deficit reformulation: **if `A_req` reads
-    1.00 in every head-on episode, the spawn-DCPA gap (02a §11.1) is back** and
+    1.00 in every head-on episode, the spawn-DCPA gap (02a section 11.1) is back** and
     the agent is being trained on "always alter" rather than "when to alter".
     That is invisible in the term's value alone, which is why the parts are
     exported rather than recomputed for display.
@@ -635,12 +635,12 @@ def r8_parts(state: RewardState, ctx, cfg) -> dict:
 
 
 def explain_colregs(state: RewardState, ctx, cfg) -> Dict[str, str]:
-    """Why each sub-term holds the value it holds (RENDER_PANEL_SPEC §1).
+    """Why each sub-term holds the value it holds (RENDER_PANEL_SPEC section 1).
 
-    When `v_side` reads 0.000 you cannot tell from the number whether that is
+    When `v_side` reads 0.000 the number alone cannot show whether that is
     correct -- wrong class for this term -- or a bug: gate stuck, `rho_t`
-    collapsed, class never latched.  This is the difference between a panel you
-    glance at and a panel you debug with, and it costs one string per term.
+    collapsed, class never latched.  This is the difference between a panel to
+    glance at and a panel to debug with, and it costs one string per term.
 
     Every string is a statement about the context.  Nothing here re-evaluates a
     term, so the reason and the value cannot drift apart.
@@ -719,7 +719,7 @@ COLREGS_TERMS = {
 
 
 def colregs_group(state: RewardState, contexts, cfg) -> dict:
-    """The weighted, clipped COLREGs group and its parts (02a §6.7).
+    """The weighted, clipped COLREGs group and its parts (02a section 6.7).
 
     ```
     v_col = clip(0.55*v_port + 0.55*v_bow + 0.40*v_side + 0.45*v_hold + 0.50*v_r8, 0, 1)
@@ -735,7 +735,7 @@ def colregs_group(state: RewardState, contexts, cfg) -> dict:
     With one target the outer aggregation is a no-op.  At `N_MAX_TARGETS > 1`
     the *worst* target governs rather than the sum, so meeting two vessels
     cannot exceed the penalty for meeting one badly -- the group weight has to
-    stay the maximum per-step contribution or the §7 hierarchy stops being a
+    stay the maximum per-step contribution or the section 7 hierarchy stops being a
     property of the table.
     """
     sub_w = {"port": cfg.w_port, "bow": cfg.w_bow, "side": cfg.w_side,
@@ -777,7 +777,7 @@ DENSE_TERMS = {
     "col": r_col,
 }
 
-# Declared range per term, asserted by 02a §10.4 test 1.
+# Declared range per term, asserted by 02a section 10.4 test 1.
 TERM_RANGE = {name: (-1.0, 0.0) for name in DENSE_TERMS}
 TERM_RANGE["prog"] = (-1.0, 1.0)
 

@@ -1,6 +1,6 @@
 """CPA geometry, ship domain, and the risk index.
 
-Kickoff §7: "head-on gives TCPA > 0 and DCPA ~ 0; already-passed geometry gives
+Kickoff section 7: "head-on gives TCPA > 0 and DCPA ~ 0; already-passed geometry gives
 TCPA < 0; near-parallel courses give a large |TCPA| and must be caught by the
 Euclidean-distance risk term rather than by CPA".
 
@@ -98,7 +98,7 @@ def test_domain_is_asymmetric_fore_and_aft():
 
 
 def test_domain_matches_the_resolved_multiples():
-    """01 §5.2, resolved: 2.0 / 1.0 x Lpp ahead / astern, abeam at the floor.
+    """01 section 5.2, resolved: 2.0 / 1.0 x Lpp ahead / astern, abeam at the floor.
 
     Provisional -- the final values are an OUTPUT of 05, derived from the
     identified turning circle, not a scaled copy of Chun et al.
@@ -109,10 +109,10 @@ def test_domain_matches_the_resolved_multiples():
 
 
 def test_the_abeam_extent_sits_on_the_sensor_floor_not_on_the_lpp_multiple():
-    """F21: 02b §3.1's floor binds, so `0.75 * Lpp` is not the abeam extent.
+    """F21: 02b section 3.1's floor binds, so `0.75 * Lpp` is not the abeam extent.
 
-    02a §1 states the abeam domain as `0.75 * Lpp = 1.18 m`, which does not
-    clear 02b §3.1's hard floor of `LIDAR_MIN_RANGE + B/2 = 1.25 m`.  §3.1
+    02a section 1 states the abeam domain as `0.75 * Lpp = 1.18 m`, which does not
+    clear 02b section 3.1's hard floor of `LIDAR_MIN_RANGE + B/2 = 1.25 m`.  Section 3.1
     anticipates exactly this case and floors the domain, because `r_dom` is
     evaluated on ground truth per `R-1`: a domain inside the sensor's blind
     zone would penalise the agent for intrusions it cannot perceive, and the
@@ -140,7 +140,7 @@ def test_chun_domain_would_not_fit_but_the_compressed_one_does():
 
 
 def test_the_width_sweep_brackets_the_head_on_threshold():
-    """03 §5: a compliant port-to-port head-on stops fitting between 4.0 and 3.5 m.
+    """03 section 5: a compliant port-to-port head-on stops fitting between 4.0 and 3.5 m.
 
     Two non-overlapping domains abeam plus wall clearance each side.
     """
@@ -215,7 +215,7 @@ def test_cri_drops_quickly_once_the_cpa_is_passed():
 
 
 def test_near_parallel_is_caught_by_the_euclidean_term_not_by_cpa():
-    """01 §5.1's known failure mode, and the reason CR_ED is not optional.
+    """01 section 5.1's known failure mode, and the reason CR_ED is not optional.
 
     Two vessels 2 m apart on near-parallel courses at nearly equal speed have a
     CPA far away in time, so a pure CPA risk reads almost nothing.  In a narrow

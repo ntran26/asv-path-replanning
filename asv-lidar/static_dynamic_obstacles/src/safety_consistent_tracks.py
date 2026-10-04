@@ -10,7 +10,7 @@ Related prior work: Granstrom, Baum & Reuter, "Extended Object Tracking:
 Introduction, Overview and Applications", https://arxiv.org/abs/1604.00970
 (shape and spatial measurement modelling); Nuss et al.,
 https://arxiv.org/abs/1605.02406 (dynamic prediction/measurement updates).
-Our deterministic interval projection and exact-ID ownership are engineering
+The deterministic interval projection and exact-ID ownership here are engineering
 adaptations, not those papers' probabilistic filters or uncertainty guarantees.
 
 A source first admitted independently of the base snapshot uses its persistent

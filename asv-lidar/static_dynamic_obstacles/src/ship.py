@@ -16,7 +16,7 @@ Same public interface as v2, so no call site changes:
 
 What this wrapper adds to the identified model, and nothing else
 ---------------------------------------------------------------
-1. **Substepping.**  `bluefin/REPORT.md` §9 requires `sub_dt <= 0.05`; a single
+1. **Substepping.**  `bluefin/REPORT.md` section 9 requires `sub_dt <= 0.05`; a single
    0.1 s RK4 step drifts about 0.5 m over 30 s of manoeuvring.  `update` splits
    any `dt` into equal substeps no longer than `sub_dt`.
 2. **Reverse braking.**  The identified model cannot represent reverse thrust:
@@ -81,7 +81,7 @@ MAX_RUD_ANGLE = dyn.MAX_RUD_ANGLE_DEG   # 40 deg
 # The rudder rate limit that matters is the **bridge's command limiter**, not a
 # servo property: `udp_live_rl.py` ramps the transmitted rudder at 50 %/s, and
 # the identified servo rate (2985 deg/s) is effectively unconstrained because
-# nothing slower than the bridge limit exists to identify (REPORT §8).
+# nothing slower than the bridge limit exists to identify (REPORT section 8).
 # 50 %/s of a 40 deg rudder is 20 deg/s, the same number v2 carried as a servo
 # rate -- which is why `constants.KAPPA_DELTA` does not move.
 COMMAND_RATE_PCT_S = 50.0
@@ -98,7 +98,7 @@ MAX_RUD_RATE_DPS = COMMAND_RATE_PCT_S / 100.0 * MAX_RUD_ANGLE     # 20 deg/s
 # A crash-stop run in basin session 1 settles both numbers.
 REVERSE_THRUST_EFFICIENCY = 0.5
 
-SUB_DT = 0.05                           # REPORT §9: required <= 0.05
+SUB_DT = 0.05                           # REPORT section 9: required <= 0.05
 
 # --- Identified parameters, re-exported ------------------------------------
 IDENTIFIED: Dict[str, float] = dict(_v3.IDENTIFIED)
@@ -120,7 +120,7 @@ def braking_thrust(rpm: float, params: Optional[Dict[str, float]] = None,
 
     Mirrors the forward law at the same command magnitude, scaled by the
     reverse efficiency.  The square-law RPM exponent is *assumed* in the forward
-    law too (REPORT §8, `T12` anchored at one operating point), so full astern
+    law too (REPORT section 8, `T12` anchored at one operating point), so full astern
     at -24 rpm-units inherits that extrapolation.
     """
     if rpm >= 0.0:

@@ -252,7 +252,7 @@ def markdown(summary):
         f"with {total['target']} target, {total['obstacle']} obstacle and {total['boundary']} boundary collisions; "
         f"{total['timeouts']} timeouts. All saved rows have safety off and zero intervention counters.", "",
         "This report reads saved data only. No simulator reset, policy inference or new episode was performed. "
-        "The user has authorized development on this set; any resulting tuning must be described as development, "
+        "Development on this set is authorized; any resulting tuning must be described as development, "
         "not an untouched test of the tuned filter.", "", "## Provenance and limits", "",
         "The definition, cached scenario digests, seeds and 1,000 unique result IDs agree. "
         f"Manifest SHA256: `{summary['manifest_digest']}`. The recorded checkpoint path is "

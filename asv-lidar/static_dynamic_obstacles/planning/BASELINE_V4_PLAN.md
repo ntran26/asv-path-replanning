@@ -2,7 +2,7 @@
 
 **Status:** plan with validation gates. **Nothing trains until gates G1–G4 pass.**
 
-Goal (your call, 2026-10-02): a policy above **0.90 success on test set v2**. Test set v2 is the
+Goal (decision, 2026-10-02): a policy above **0.90 success on test set v2**. Test set v2 is the
 frozen suite and the Paper 2 set merged and trimmed to 1,000 episodes, with the 15 impossible L1
 being-overtaken starts replaced (`tools/tiers/test_set.py`).
 
@@ -73,7 +73,7 @@ weighting.
 
 ## 4. After the gates: the full run
 
-- **Learner (decided 2026-10-02, your call): develop and test with PPO**, because it is quicker.
+- **Learner (decided 2026-10-02): develop and test with PPO**, because it is quicker.
   - The G4 pilot and the full v4 confirmation run are both PPO. The comparison is against PPO v3
     (running now), on test set v2.
   - **If PPO v4 solves the conflict cases** (L2 head-on, field crossings) with the fix, train **SAC
@@ -186,7 +186,7 @@ How to read it:
 
 ## 5e. Near-impossible episodes and the crossing trace (2026-10-03)
 
-**Your call (2026-10-03):** near-impossible episodes should be left out of the test set and the
+**Decision (2026-10-03):** near-impossible episodes should be left out of the test set and the
 development set, or kept to a very small share. That way they neither confuse the policy nor
 mislead readers of the statistics.
 
@@ -216,7 +216,7 @@ a lower bound on solvability, and its outputs are graded rather than a single ve
 
 **The rule is set on the development side before it is applied to the test set:**
 - Run the oracle on the development sets (`tools/diagnostics/feasibility/oracle_sets.py dev`).
-- Check it against outcomes we already have: any episode the oracle calls unsolvable but a
+- Check it against outcomes already recorded: any episode the oracle calls unsolvable but a
   controller solved is a miss.
 - Fix the threshold, for example "no manoeuvre keeps 0.2 m clearance".
 - Rebuild test set v4 and the development set without these episodes, or with a capped share
@@ -229,6 +229,204 @@ enough.
 
 Both run detached via `results/feasibility_run.sh`; results go to `results/feasibility/` and
 `results/crossing_trace/`.
+
+**Oracle v1 was too weak, so it was replaced (2026-10-03, 23:45).** v1 returned to the reference
+path on a timer and ignored the panels while following it. On the development side, SAC solved
+9 of the 12 episodes v1 called unsolvable. Its rows are kept in `oracle_dev_v1_weak.csv`.
+
+v2 changes three things:
+- It follows an A* route around the panels.
+- It holds each alteration until the target has passed and is clear.
+- Its speed-only manoeuvres stay on that route.
+
+Validation on the 34 episodes v1 found hard, plus 16 others: v2 solves all 50. No controller
+disproves any of its verdicts. Only 4 episodes lack a 0.2 m margin, and SAC solved all 4.
+
+**What this means.** With perfect foresight, nearly every development episode is physically
+solvable. The near-impossible class is therefore not "physically impossible". It is "decided
+before the onboard perception can see the target".
+
+v2 also records, for each episode, when the tracker first tracks the target while the own ship
+follows the route at cruise. This uses the full `env.step` run, so occlusion by panels counts. The
+tracker usually confirms a target about 2 s into the episode. From this, v2 reports:
+- `solved_after_track`: is there any solution that starts at or after that time?
+- `decision_window_s`: the latest feasible start minus the tracking time.
+
+Example: `DV3-CRS-CV-09` is solvable only by manoeuvres starting at t = 0. Nothing that starts
+after tracking at 2 s works. SAC still solved it, but by what it does before it sees anything,
+not by reacting.
+
+**Candidate rule (to fix on the development side):** an episode is near-impossible if no
+manoeuvre that starts at or after the first track avoids collision with 0.2 m clearance, even
+with perfect foresight. Such episodes would be excluded, or capped and reported separately.
+Controller outcomes on the same 370 development episodes (SAC, LOS-DWA and COLREGs-VO, in
+`results/feasibility/dev_outcomes.csv`) show how often a controller "solves" these episodes by
+its behaviour before detection.
+
+**Development-side results (2026-10-04, 02:10; `results/feasibility/oracle_summary.txt`).** Each
+of the 370 episodes falls into one tier:
+
+| Tier | Episodes | Share | SAC 3 M | LOS-DWA | COLREGs-VO |
+|---|---|---|---|---|---|
+| Solvable after the first track, with 0.2 m margin | 324 | 87.6 % | 0.80 | 0.72 | 0.62 |
+| Solvable after the first track, but only under 0.2 m margin | 26 | 7.0 % | 0.73 | 0.23 | 0.15 |
+| Unsolvable once tracked: decided before the target can be seen | 13 | 3.5 % | 0.54 | 0.23 | 0.00 |
+| Unsolvable with perfect foresight (oracle lower bound) | 7 | 1.9 % | 0.14 | 0.14 | 0.00 |
+
+The hard tiers concentrate in the dense field-style sets, mostly in the crossings. Among the
+field-dev, dv4x and G1 crossings, 20–40 % are tight or decided before tracking. The frozen-like
+dev_v2 set has almost none.
+
+SAC "solves" 54 % of the episodes decided before tracking, against at most 23 % for the classical
+methods. It does so through its behaviour before it sees the target, not through any reaction. Excluding these
+episodes therefore removes cases SAC tends to win: it does not favour the policy, and it makes
+the success rate measure reaction rather than luck. The oracle misses at least one solution: SAC
+solved one of the 7 "unsolvable" episodes, and LOS-DWA another.
+
+**Crossing trace results (2026-10-04; `results/crossing_trace/summary.txt`).** SAC 3 M solves
+70 of the 108 development crossings (0.65; port 0.64, starboard 0.65). Each failure is binned
+on its response after the target is first tracked. Turns are measured from the heading held at
+that moment, because every episode opens with a heading transient of about 10° while the own
+ship settles on the path, in successes and failures alike.
+
+| Failure bin | Episodes |
+|---|---|
+| Wrong way: the first 10° turn after tracking is against the compliant side | 17 |
+| Insufficient: acted in time and on the compliant side, but too little | 10 |
+| Decided before tracking | 6 |
+| Late: first action after the oracle's latest feasible start | 3 |
+| Detected late, or no action | 1 each |
+
+What the timing and response data show:
+- **The window is short but usually open.** The target is tracked at a median of about 2 s. The
+  latest feasible start is a median of 4–6 s, which leaves a 2–4 s decision window. SAC's first
+  action comes about 2 s before that limit.
+- **The failures are failures of choice and magnitude, not of timing.** In 27 of 38, SAC turns
+  the wrong way first or turns too little.
+- **Starboard-crossing failures turn little.** They make a median of 6° of compliant alteration
+  in the 4 s after tracking, against 17° in successes.
+- **Failures slow down more.** 11 of 38 drop below 0.4 m/s within 4 s of tracking, against 6 of
+  70 successes. Slowing during a crossing keeps the own ship on the target's track.
+- **Speed changes rarely explain these failures.** Only 1 of the 6 varying-speed failures saw
+  the speed change before SAC acted.
+- **Fix 1 had no part in these results.** The blocked-turn flag is off in the baseline-v3 policy,
+  so its share is 0 throughout.
+
+**Test set v3 tiers (2026-10-04, 04:32; `results/feasibility/oracle_test.csv`).** These counts are
+policy-independent. Five rows lost on the first pass, through appends on OneDrive, were rerun; the
+runner now checks for completeness itself.
+
+| Tier | Episodes | Where |
+|---|---|---|
+| A: solvable after the first track, with 0.2 m margin | 933 | everywhere |
+| B: tight, solvable after the first track but only under 0.2 m margin | 35 | 15 Paper 2 crossings, 7 Paper 2 overtaking, 5 frozen crossings, 8 other |
+| C: decided before tracking | 25 | 12 Paper 2 crossings (FS 6, L2 3, L3 2, L1 1), 6 frozen crossings, 4 Paper 2 head-on, 3 other |
+| D: unsolvable with perfect foresight | 7 | 3 Paper 2 being overtaken (FS), 4 scattered |
+
+- **The hard tiers sit in the Paper 2 crossings.** Of those 101 episodes, 13 % are in C or D and a
+  further 15 % in B.
+- **L2 head-on is not one of them.** All 5 of its episodes are in tier A, so SAC's failures there
+  are policy failures, not infeasibility.
+
+**Decision (2026-10-04): tiers B, C and D leave the test set and the development set, replaced
+so the totals and the cell balance stay.**
+
+- **Test set v4** (`tools/tiers/test_set.py --version 4`). It is v3 with the 67 failing episodes
+  replaced. Each replacement is a fresh draw of the same cell, target behaviour or speed profile,
+  and leg type, from new seed blocks (`V4_*`). A draw is accepted only if it passes the same
+  oracle test (`results/test_set/v4/replacement_candidates.csv`). The default `--version` stays 3
+  until v4 is adopted.
+- **Development set v4.2** (`formulation_v4.development_set`, `field_development_set`). The
+  frozen-like 120, field dev set v3 (150) and the 4.1 extension (60) are graded with the
+  training evaluation's own seeds (`oracle_sets.py deveval`), because the tracking time depends on
+  the seed. Each failing episode is replaced in place, so it keeps its position and seed, by
+  the next draw of its own generator that passes. The accepted recipes are in
+  `configs/dev_set_v4_replacements.json`, written by
+  `tools/diagnostics/feasibility/dev_replacements.py`.
+- **Not filtered:** the G1 conflict set stays as recorded gate evidence.
+- **Training draws are not filtered either.** The oracle costs 10–270 s an episode, against a mean
+  reset of 1.6 s. A validated layout pool built offline is the option if training needs the same
+  rule.
+- **Queue (detached):** the v4 build, then SAC 3 M on v4 (`results/test_v4_sac.sh`; the 933 shared
+  episodes reuse the v3 rows), the development-set oracle (`results/feasibility_deveval.sh`) and
+  the replacements (`results/dev_v4_replace.sh`).
+- **Still to do before a v4 training run:** `train_formulation.py` must install `formulation_v4`
+  and evaluate on `formulation_v4.development_set` and `field_development_set`.
+
+**Built and evaluated (2026-10-04).**
+- **Test set v4.** Digest `a8c40beb234ea7f9`, built in 28 min. 146 candidates were graded over
+  2 rounds and 109 passed.
+- **Development set.** Graded with the evaluation seeds, 37 of the 330 episodes fail. All 37 are
+  replaced (`configs/dev_set_v4_replacements.json`).
+
+SAC 3 M on test set v4, safety off (`results/test_set/v4/sacs0_bl3/`). The 933 shared episodes
+reuse the v3 rows (same id, digest and seed).
+
+| | Test set v3 | Test set v4 |
+|---|---|---|
+| Overall | 0.853 (95 % CI 0.831–0.875) | **0.865** (0.844–0.886) |
+| Frozen suite | 0.922 | 0.931 |
+| Paper 2 (L1–L3 and field-style) | 0.717 | 0.735 |
+| Field-style crossing from port (FS-CRP) | 0.448 | 0.345 |
+| L1-CRP / L2-HO / L2-CRS | 0.27 / 0.00 / 0.33 | 0.18 / 0.00 / 0.33 |
+| Varying-speed Paper 2 targets | 0.613 | 0.620 |
+
+- **The 67 swapped episodes.** SAC solved 35 of the 67 removed episodes (52 %), including 12 of
+  the 25 decided before tracking. It solves 47 of the 67 replacements (70 %).
+- **Every remaining failure is a policy failure.** Each v4 episode has a solution that starts
+  after the first track and keeps 0.2 m. The 135 failures split into 70 obstacle, 53 target and
+  12 boundary contacts.
+- **The FS-CRP drop is real.** SAC had solved 7 of the 11 removed FS-CRP episodes, mostly
+  through its behaviour before detection, but solves 4 of the 11 fair replacements. So the
+  weakness in crossings from port belongs to the policy, not to the test set.
+- **0.90 needs about 35 more successes.**
+
+**Reward check (2026-10-04; `tools/diagnostics/crossing/reward_check.py`, `results/crossing_trace/reward_check_summary.txt`).**
+The question was whether the reward prefers SAC's failing crossing response. Method:
+- In each of the 105 development crossings where the target is tracked, SAC is replayed to the
+  first track and the environment is copied there.
+- From that state, SAC's own continuation is compared with up to 16 oracle manoeuvres that
+  succeed from the same state (starting 0–3 s later). Every run goes through the full
+  `env.step`, so it collects exactly the reward the policy would.
+
+Results:
+
+| | SAC failures (28 with a successful alternative) | SAC successes (65), control |
+|---|---|---|
+| Reward prefers SAC's own continuation, γ 0.951 / 0.98 / 1 | **0 / 0 / 0** | 14 / 26 / 21 |
+| Median return from the first track (γ 0.951): SAC vs best alternative | −161 vs −28 | −23 vs −19 |
+
+Per-term difference for the failures, SAC minus the best alternative at γ 0.951 (means):
+
+| Term | Difference |
+|---|---|
+| Terminal (collision) | −124 |
+| Progress | −8 |
+| Smoothness | −1 |
+| Path following | +5 |
+| Obstacle proximity | +7 |
+| COLREGs | +6 |
+| Existence | +2 |
+
+What the check shows:
+- **The ordering is right.** In every failure, the reward ranks a successful manoeuvre far above
+  what SAC did. The collision term decides it even at the 10 s horizon.
+- **The dense shaping leans the other way, but only slightly.** Path following, obstacle
+  proximity and COLREGs pay SAC's "stay near the path, keep off the panels, small turn" response
+  about 10–20 more over the window, because the successful manoeuvres leave the path and pass
+  closer to panels. That can slow learning; it never flips the preference.
+- **7 of the 35 failures are already lost at the first track.** From SAC's own state at that
+  moment, no manoeuvre succeeds: its behaviour before detection decided them.
+
+**Conclusion.** The crossing failures are a learning problem, not a reward-ranking problem. The
+policy has not found the action the reward already prefers, in rare states with a 2–4 s window.
+
+Candidate levers, in order of expected effect:
+1. **More exposure** to dense crossings (drafts 4.1 and 4.2).
+2. **Oracle demonstrations** in the off-policy replay buffer, with their real rewards (learning
+   from demonstrations, e.g. DDPGfD). The demonstrations must come from training-namespace
+   layouts only.
+3. **Optionally, softer path and obstacle shaping while an encounter is engaged.**
 
 ## 6. Order
 

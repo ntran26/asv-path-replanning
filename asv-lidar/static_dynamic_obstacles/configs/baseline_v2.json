@@ -6,7 +6,7 @@
   "dirty": true
  },
  "provenance": {
-  "formulation_of": "baseline-v1 (run 11) with A15's below-floor being-overtaken draws removed (S5, your call 2026-09-23)",
+  "formulation_of": "baseline-v1 (run 11) with A15's below-floor being-overtaken draws removed (S5, decision 2026-09-23)",
   "why": "PROJECT_STATE.md F92/F93/F96: run 11 was best on every development-set class and consistent across two seeds (run 12's F91 and A31 are off); the Rule 17(b) draws S5 put out of scope left training and the suite",
   "reproduces": [],
   "known_limits": [

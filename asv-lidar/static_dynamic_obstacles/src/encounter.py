@@ -3,13 +3,13 @@
 **Revision 2** — five classes.  Port and starboard crossing collapse into one.
 
 This is the only place the encounter geometry is defined.  The observation
-(01 §6) and the reward gate (02 §4.2) must both call `classify` or
+(01 section 6) and the reward gate (02 section 4.2) must both call `classify` or
 `EncounterClassifier` -- never reimplement the thresholds.  If the two diverge,
 even only at a sector boundary, the agent is penalised for a role it was never
 shown, and that failure is close to undiagnosable from training curves.
 Hysteresis is applied **once**, here, for the same reason.
 
-The five classes and what each obliges the own ship to do (01 §5.3):
+The five classes and what each obliges the own ship to do (01 section 5.3):
 
 | Class           | Governing rule | Own-ship obligation                     |
 |-----------------|----------------|-----------------------------------------|
@@ -20,7 +20,7 @@ The five classes and what each obliges the own ship to do (01 §5.3):
 | being_overtaken | 13, 17(a)(i)   | Hold course and speed                   |
 
 Baseline thresholds are Waltz & Okhrin (2023) Table 1, after Xu et al. (2020),
-with the three modifications 01 §5.3 requires:
+with the three modifications 01 section 5.3 requires:
 
 1. **Port and starboard crossing collapse into one class** under Rule 9(b): a
    vessel under 20 m shall not impede a vessel that can navigate only within a
@@ -190,7 +190,7 @@ def one_hot(name: str):
 class EncounterClassifier:
     """Holds a class per track until a different one has persisted.
 
-    Two mechanisms, both from `constants.py` §10:
+    Two mechanisms, both from `constants.py` section 10:
 
     * **Sticky bands.**  The currently-held class is re-tested with its angular
       bands widened by `ENCOUNTER_BEARING_HYSTERESIS_DEG`, so a target sitting
@@ -232,7 +232,7 @@ class EncounterClassifier:
     def classification_latency(self, track_id: int) -> Optional[int]:
         """Steps between first sight and the first non-`none` class.
 
-        A reported perception metric (04 §7): classification latency and
+        A reported perception metric (04 section 7): classification latency and
         stability are part of the N1 evidence.
         """
         return self._first_seen.get(track_id)

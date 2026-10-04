@@ -1,6 +1,6 @@
-# Paper 3 master artifact — build brief for Claude Chat
+# Paper 3 master artifact — build brief
 
-**Written 2026-09-29.** This file tells Claude Chat what to build. The facts it
+**Written 2026-09-29.** This file specifies what to build. The facts it
 must use are in `MASTER_ARTIFACT_FACTS.md` (vessel model, classical methods,
 learners, perception, data generation, field bridge) and
 `FORMULATION_EQUATIONS.md` (action, observation, encounter geometry, reward).
@@ -63,8 +63,8 @@ one fixed problem formulation, against classical controllers.
 
 ## 3. Structure
 
-Tabs or a sticky side navigation; each section opens with a two-line "What you
-will learn" and ends with a three-bullet "Key takeaways".
+Tabs or a sticky side navigation; each section opens with a two-line "In this section"
+summary and ends with a three-bullet "Key takeaways".
 
 ### 0. Start here
 One-screen summary: the problem, the four ingredients (vessel, sensing,
@@ -78,7 +78,7 @@ equations" box (what bold vectors, hats and subscripts mean).
 - Why onboard LiDAR only (no AIS), and why the navigable boundary comes from a
   map (a channel edge is often a depth contour, not a wall).
 - The workspace: 10 × 25 m basin (model scale) and parallel-walled channels.
-- Objective, the four contributions and the central questions (draft 4, §1.3),
+- Objective, the four contributions and the central questions (draft 4, section 1.3),
   and what is out of scope (multi-target, restricted visibility, Rule 17(b),
   Rule 18, legal compliance).
 - ▶ **Overview animation:** top-down basin; the own ship follows a slanted leg
@@ -92,7 +92,7 @@ equations" box (what bold vectors, hats and subscripts mean).
 - What COLREGs are; Rules 8, 9, 13, 14, 15/16, 17(a)(i) in plain words, each
   with a small diagram.
 - The five encounter classes with their bearing/crossing-angle bands (facts:
-  `FORMULATION_EQUATIONS.md` §4.4) and the required turn sense (+1 starboard,
+  `FORMULATION_EQUATIONS.md` section 4.4) and the required turn sense (+1 starboard,
   −1 port, 0 hold).
 - The narrow-channel convention (give way to a crossing target from either
   side, motivated by Rule 9(b)) and why it differs from the open-water role
@@ -107,7 +107,7 @@ equations" box (what bold vectors, hats and subscripts mean).
 - Coordinate frames (world north-east vs body surge-sway; heading clockwise
   from north) — diagram.
 - From F = ma to three coupled equations: kinematics then kinetics
-  (facts §1). Explain **added mass** (why pushing a hull sideways "feels" twice
+  (facts section 1). Explain **added mass** (why pushing a hull sideways "feels" twice
   as heavy: m₂₂ ≈ 127 kg vs m = 64.6 kg), **damping** (drag grows with speed),
   **Coriolis/centripetal** terms (why turning couples surge and sway), the
   **Munk moment** (why an elongated hull at an angle wants to turn further), the
@@ -120,7 +120,7 @@ equations" box (what bold vectors, hats and subscripts mean).
 - ▶ **Vessel simulator widget:** sliders for rudder command and rpm-units;
   live top-down trajectory plus time plots of u, v, r and actual vs commanded
   rudder (showing the delay and lag). Buttons for a step rudder, a zig-zag and
-  a turning circle. Implement the facts §1 equations directly (RK4, 0.05 s).
+  a turning circle. Implement the facts section 1 equations directly (RK4, 0.05 s).
 - ▶ **Rudder step response:** commanded vs actual rudder angle with delay/lag
   sliders.
 - Sources: Fossen (2021); MMG method (Yasukawa & Yoshimura, 2015 [VERIFY]).
@@ -131,10 +131,10 @@ equations" box (what bold vectors, hats and subscripts mean).
   a point Δ ahead on the path); **PID** (P reacts to error, I to accumulated
   error, D to its rate); **velocity obstacle** (the set of velocities that lead
   to collision within a horizon, drawn as a cone).
-- **LOS-PID + DWA** (facts §2.2): candidate set, closed-loop prediction through
+- **LOS-PID + DWA** (facts section 2.2): candidate set, closed-loop prediction through
   the vessel model, admissibility, objective G, fallback; "knows obstacles, not
   rules".
-- **COLREGs-VO** (facts §2.3): candidates, own-ship turn model, hard velocity
+- **COLREGs-VO** (facts section 2.3): candidates, own-ship turn model, hard velocity
   obstacle, open-water classification, the starboard constraint
   (cross product), stand-on rule, cost J, the drop-the-rule fallback; and the
   narrow-channel variant.
@@ -176,7 +176,7 @@ Build up from zero:
     atoms to drop; show the resulting estimate.
 11. Comparison table of the four (on/off-policy, memory, exploration,
     over-estimation control, sample efficiency, cost per step).
-12. How this study trains them: facts §3 (identical network, defaults,
+12. How this study trains them: facts section 3 (identical network, defaults,
     2.5 M steps, 3 seeds, development-set checkpoint selection, why the test
     suite is touched once). ▶ **Network diagram** of the two-encoder
     architecture with the six observation branches.
@@ -186,8 +186,8 @@ Build up from zero:
 
 ### 6. LiDAR perception — **the most important technical section**
 The paper's Perception subsection currently lacks the governing equations;
-this section must supply them and show how the steps chain together (facts §4,
-equations file §4):
+this section must supply them and show how the steps chain together (facts section 4,
+equations file section 4):
 1. The sensor: 720 beams over 360°, 1–16 m, dead zone; noise model.
    ▶ **Scan viewer:** basin, panels, a moving target, the rays; toggles for
    pose noise and beam dropout.
@@ -208,7 +208,7 @@ equations file §4):
    hysteresis). ▶ **Free-space widget:** two scans 2 s apart over a static
    panel and a moving target; mark appear/vacate points; show the verdict.
 8. From track to encounter: CPA, domain distance, CRI, classification bands,
-   engagement and latching (link to the CPA widget in §2). Show the state
+   engagement and latching (link to the CPA widget in section 2). Show the state
    machine idle → engaged → clearing → idle.
 9. **Sector pooling:** the 27 sectors; max, min and feasibility pooling with
    equations and the algorithm in steps. ▶ **Pooling widget:** one sector with
@@ -261,7 +261,7 @@ Use `FORMULATION_EQUATIONS.md` exactly.
   | Verified property | from one engagement state the compliant 30° crossing turn earns +61 (discounted) over the wrong way, from either side | — |
 
 ### 8. Scenarios, curriculum and data sets
-Use facts §6.
+Use facts section 6.
 - Workspace generation (basin legs, channels, path offset).
 - ▶ **Backward-solve widget:** sliders for crossing angle c, speed ratio k,
   time to CPA T₀, miss distance d₀ and side; draw the spawn point, both tracks
@@ -278,7 +278,7 @@ Use facts §6.
   score.
 
 ### 9. Safety layer and evaluation design (added)
-- The runtime stop safety layer (facts §5): trigger, maneuver, hand-back; off in
+- The runtime stop safety layer (facts section 5): trigger, maneuver, hand-back; off in
   training; learned compliance always reported with it off.
 - What is measured: success; collisions by type; cross-track error; rule
   metrics per encounter; minimum CPA distribution; intervention rate; by
@@ -290,10 +290,10 @@ Use facts §6.
 - ▶ **System diagram and packet animation:** vessel onboard computer ⇄ UDP ⇄
   shore laptop; START registration; pose/LiDAR lines arriving; frame
   assembly; policy; `$CMD,S1,S2` back.
-- Decoding step by step (facts §7): message formats, frame change (−Y, X,
+- Decoding step by step (facts section 7): message formats, frame change (−Y, X,
   −Yaw), range units, beam order and rotation, pose–scan pairing, velocity
   from pose differencing.
-- **Observation conversion updated to Paper 3** (facts §7 table): the same
+- **Observation conversion updated to Paper 3** (facts section 7 table): the same
   perception modules run on the real scan to produce the 70-value
   observation; contrast with Paper 2's observation.
 - Action mapping to S1/S2 (sign reversal; S2 = n/24 × 100), shadow mode,

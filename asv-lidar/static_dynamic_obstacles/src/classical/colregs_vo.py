@@ -107,7 +107,7 @@ def classify(p_own: np.ndarray, heading: float, u_own: float,
     if abs(alpha) >= OVERTAKING_DEG:
         return BEING_OVERTAKEN                      # it comes up from astern: stand on
     if abs(beta) >= OVERTAKING_DEG and u_own > speed_ts:
-        return OVERTAKING                           # we come up from astern: keep clear
+        return OVERTAKING                           # own ship comes up from astern: keep clear
     if abs(alpha) <= HEAD_ON_HALF_DEG and abs(beta) <= HEAD_ON_HALF_DEG:
         return HEAD_ON                              # reciprocal: both alter to starboard
     return CROSSING_GIVE if alpha > 0.0 else CROSSING_STAND

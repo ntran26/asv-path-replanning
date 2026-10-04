@@ -3,7 +3,7 @@
 Carried over from Paper 2 with **one substantive change**: this sensor sees
 obstacles only.  The `map_border` argument and every border-visibility mode are
 gone.  Channel boundaries reach the policy through `boundary_raycast.py`
-instead, computed from the map rather than the sensor (01 §3, decision D5).
+instead, computed from the map rather than the sensor (01 section 3, decision D5).
 
 The raycast maths itself is unchanged from Paper 2's vectorised implementation.
 
@@ -21,7 +21,7 @@ Two sensor properties are modelled here that Paper 2 did not have:
   never arrive.  Collision termination stays geometric and is unaffected.
 * **An aft self-occlusion mask.**  A 360 deg scanner on a hull with
   superstructure has a blind or degraded arc astern.  It is not detectable in
-  the existing logs (see `constants.py` §4), so the mask half-width is 0.0 until
+  the existing logs (see `constants.py` section 4), so the mask half-width is 0.0 until
   a static-spin recording settles it -- but the hook is on the path, because
   this arc gates the **being-overtaken** class.  Train the tracker to see astern
   when the real mount cannot, and Rule 17 behaviour fails in the field for
@@ -86,7 +86,7 @@ class Lidar:
         """Adopt gated ranges and re-pool the sector branch from them.
 
         The pooled `c_t` branch must be built from the **post-gate** scan
-        (01 §3.1).  Until 03a §1.2 put facility walls in the raw scan there was
+        (01 section 3.1).  Until 03a section 1.2 put facility walls in the raw scan there was
         nothing for the gate to remove, so pooling from the raw ranges gave an
         identical answer and the ordering error was invisible -- the walls then
         flooded 624 of 720 beams straight into the obstacle branch, and the

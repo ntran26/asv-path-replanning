@@ -4,7 +4,7 @@
 **Reference read:** `static_obstacles/src/` (read-only). Nothing under `static_obstacles/` was written.
 **Authoritative spec:** `planning/01_PERCEPTION_AND_OBSERVATION.md`.
 
-Step 0 deliverable per `KICKOFF_01_PERCEPTION.md` §2, kept current as the planning set
+Step 0 deliverable per `KICKOFF_01_PERCEPTION.md` section 2, kept current as the planning set
 has moved.
 Sections 0-3 are the pre-build inventory, left as written so the findings can be read
 against what was known at the time. Section 4 records what the build changed, section 5
@@ -25,7 +25,7 @@ the two-vessel repositioning, section 6 the Revision 2.2 reward specification, a
 The kickoff names `src/` and it is the better-factored source. **All porting below is from `src/`.**
 Root-level files are not ported at all — porting them too would duplicate every module.
 
-> `PROJECT_BRIEF.md` §2 calls the codebase `paper_pooling/`. No such directory exists;
+> `PROJECT_BRIEF.md` section 2 calls the codebase `paper_pooling/`. No such directory exists;
 > `static_obstacles/` is it, and `src/README.md` still refers to the old name internally.
 > Naming only, no action needed.
 
@@ -33,7 +33,7 @@ Root-level files are not ported at all — porting them too would duplicate ever
 
 ## 1. Target layout  *(resolved: `src/constants.py`)*
 
-Kickoff §4 lists new modules by bare filename; §5 puts `constants.py` at
+Kickoff section 4 lists new modules by bare filename; section 5 puts `constants.py` at
 `static_dynamic_obstacles/constants.py`. Paper 2 uses a flat `src/` package with flat
 imports (`import config as cfg`), run from the parent directory. The two trees are kept
 symmetric:
@@ -49,14 +49,14 @@ static_dynamic_obstacles/
 ```
 
 `constants.py` sits in `src/` rather than at the package root, so the single-source-of-truth
-property §5 asks for holds without `src/` modules importing from their parent. Confirmed
+property section 5 asks for holds without `src/` modules importing from their parent. Confirmed
 at review.
 
 ---
 
 ## 2. File-by-file assignment
 
-Buckets are the kickoff §3 definitions. **D** is added for files that are out of scope for
+Buckets are the kickoff section 3 definitions. **D** is added for files that are out of scope for
 task 01 and belong to a later task — the kickoff defines only A/B/C, but a third of the
 tree is evaluation and baseline code that 04 owns.
 
@@ -81,8 +81,8 @@ tree is evaluation and baseline code that 04 owns.
 
 | File | Change |
 |---|---|
-| `lidar.py` | **Two changes, not one.** (i) Output becomes obstacles-only: the `map_border` argument and every border-visibility path are deleted (01 §3). (ii) Pooling accepts a **per-sector angular span Φ** and bins beams **by bearing** instead of `np.array_split` over a uniform index grid. See F5 — the second change is larger than the kickoff implies. |
-| `env.py` | Split across buckets; see §2.1. The Bucket-B half is the step loop, action mapping, collision/termination geometry and `info` assembly. |
+| `lidar.py` | **Two changes, not one.** (i) Output becomes obstacles-only: the `map_border` argument and every border-visibility path are deleted (01 section 3). (ii) Pooling accepts a **per-sector angular span Φ** and bins beams **by bearing** instead of `np.array_split` over a uniform index grid. See F5 — the second change is larger than the kickoff implies. |
+| `env.py` | Split across buckets; see section 2.1. The Bucket-B half is the step loop, action mapping, collision/termination geometry and `info` assembly. |
 
 > **Note.** The kickoff lists `asv_lidar.py` and `lidar_pooling.py` as two separate Bucket B
 > items. In `src/` they are merged into the single `lidar.py`. The kickoff's build-order
@@ -96,13 +96,13 @@ Per D10, these are built from 01 alone. New modules, no Paper 2 ancestor:
 
 | File | Source |
 |---|---|
-| `constants.py` + `CONSTANTS_AND_SCALES.md` | Kickoff §5 |
-| `boundary_raycast.py` | 01 §3.2–3.4 — 7 rays, pose-noise hook |
-| `tracking.py` | 01 §4 — gate → cluster → ego-motion compensate → associate → Kalman → static/dynamic split |
-| `cpa_cri.py` | 01 §5.1–5.2 — CPA/DCPA/TCPA, CRI, ship domain |
-| `encounter.py` | 01 §5.3 — one pure classifier + one hysteresis wrapper, single definition |
-| `observation.py` | 01 §6 — 5-branch Dict, slot management, valid mask |
-| `features_extractor.py` | 01 §6.3 — shared per-slot encoder φ, `aggregate` flag |
+| `constants.py` + `CONSTANTS_AND_SCALES.md` | Kickoff section 5 |
+| `boundary_raycast.py` | 01 section 3.2–3.4 — 7 rays, pose-noise hook |
+| `tracking.py` | 01 section 4 — gate → cluster → ego-motion compensate → associate → Kalman → static/dynamic split |
+| `cpa_cri.py` | 01 section 5.1–5.2 — CPA/DCPA/TCPA, CRI, ship domain |
+| `encounter.py` | 01 section 5.3 — one pure classifier + one hysteresis wrapper, single definition |
+| `observation.py` | 01 section 6 — 5-branch Dict, slot management, valid mask |
+| `features_extractor.py` | 01 section 6.3 — shared per-slot encoder φ, `aggregate` flag |
 
 ### Bucket D — out of scope for task 01
 
@@ -113,16 +113,16 @@ Per D10, these are built from 01 alone. New modules, no Paper 2 ancestor:
 | `make_outputs.py`, `plot_success_by_obstacles.py` | 04. |
 | `baselines/los_apf.py`, `tune_los_apf.py`, `verify_los_apf.py` | 04. Paper 3's classical baselines are LOS-PID+DWA, COLREGs-VO (Kuwata), Thyri & Breivik. LOS+APF is not on that list. Its `predict()` reads the Paper 2 observation keys and will not survive the Dict change regardless. |
 | `baselines/__init__.py` | trivial |
-| `config.py` | Superseded by `constants.py`; see §2.2 for the disposition of each block. |
+| `config.py` | Superseded by `constants.py`; see section 2.2 for the disposition of each block. |
 
 ### 2.1 `env.py` breakdown (636 lines, split three ways)
 
 | Region | Bucket |
 |---|---|
-| `hull_polygon`, `_border_clearance`, `_hits_border`, `_collided`, `_polygons_intersect`, `_reached_goal`, `hit_border` | **A** — geometric collision and termination, unchanged (01 §3.4 "unchanged" clause) |
+| `hull_polygon`, `_border_clearance`, `_hits_border`, `_collided`, `_polygons_intersect`, `_reached_goal`, `hit_border` | **A** — geometric collision and termination, unchanged (01 section 3.4 "unchanged" clause) |
 | `step()` action mapping (rudder %, RPM trim around cruise), episode bookkeeping | **A** |
 | `reset()`, `_sample_layout`, `_load_scenario`, `_build_path`, `_scale_position` | **A**, extended by 03 for target spawning |
-| `_scan_lidars`, `_obs_lidar_border`, `_sample_obs_border_mode` | **deleted** — the three-LiDAR scheme and the border-visibility mode both go (01 §3, kickoff §3) |
+| `_scan_lidars`, `_obs_lidar_border`, `_sample_obs_border_mode` | **deleted** — the three-LiDAR scheme and the border-visibility mode both go (01 section 3, kickoff section 3) |
 | `_get_obs`, `_update_local_planner_features` | **C** — rebuilt as `observation.py` |
 | `_reward`, `_wrong_side_penalty`, reward terms in `_build_info` | **02** — not ported in this session |
 
@@ -134,45 +134,45 @@ Per D10, these are built from 01 alone. New modules, no Paper 2 ancestor:
 | Basin + path (`MAP_WIDTH/HEIGHT`, `PATH_MODE`, `LOOKAHEAD_FRACTION`, start/goal) | → `constants.py`, but `MAP_WIDTH`/`MAP_HEIGHT` are **`TODO(O4)`** |
 | Goal acceptance (`GOAL_RADIUS`, `GOAL_ALONG_DIST`, `GOAL_CTE_RADIUS`) | → `constants.py` verbatim |
 | Actuation (`CRUISE_RPM`, `RPM_STAGES`) | → `constants.py` verbatim |
-| **All reward constants** (`R_*`, `K_*`, `GAMMA_E_*`, `W_HEADING`, `U_REWARD_REF`, `DEFAULT_EVAL_LAMBDA`) | **not ported.** 02 owns these. Porting them now would violate the kickoff §8 check on Paper 2 reward names surviving into new code. |
-| `OBS_BORDER_MODE`, `OBS_BORDER_P_*`, `RIGHT_WALL_OFFSET` | **deleted** — concept removed (kickoff §3) |
-| `BLOCK_D_SAFE/CRIT`, `BLOCK_FRONT_DEG`, `SIDE_ARC_*`, `SIDE_CLEAR_TIE`, `BYPASS_CTE` | **deleted** — these parameterise `front_clearance` / `side_clearance_diff` / `local_target_cte`, three observation fields 01 §6 does not carry. See F3. |
+| **All reward constants** (`R_*`, `K_*`, `GAMMA_E_*`, `W_HEADING`, `U_REWARD_REF`, `DEFAULT_EVAL_LAMBDA`) | **not ported.** 02 owns these. Porting them now would violate the kickoff section 8 check on Paper 2 reward names surviving into new code. |
+| `OBS_BORDER_MODE`, `OBS_BORDER_P_*`, `RIGHT_WALL_OFFSET` | **deleted** — concept removed (kickoff section 3) |
+| `BLOCK_D_SAFE/CRIT`, `BLOCK_FRONT_DEG`, `SIDE_ARC_*`, `SIDE_CLEAR_TIE`, `BYPASS_CTE` | **deleted** — these parameterise `front_clearance` / `side_clearance_diff` / `local_target_cte`, three observation fields 01 section 6 does not carry. See F3. |
 | Obstacle curriculum (`TRAIN_OBS_*`, `TRAIN_SCENARIO_*`, gate/target_side/field_repair params) | → copied with `obstacles.py`; 03/04 replace |
 
 ---
 
 ## 3. Findings — things 01 or the kickoff state that the code or the data does not support
 
-Flagged, not resolved, per kickoff §9.
+Flagged, not resolved, per kickoff section 9.
 
 ### F1 — The Paper 2 observation is already a `Dict`, and it has 34 dims, not 31
 
-Kickoff §3 Bucket C: *"Observation assembly — `Box` becomes a 5-branch `Dict`."*
+Kickoff section 3 Bucket C: *"Observation assembly — `Box` becomes a 5-branch `Dict`."*
 There is no `Box` observation. `src/env.py:92` declares a `gymnasium.spaces.Dict` with
 **ten** keys, and the root `rl_env.py:328` is identical. No Box→Dict migration exists;
 the change is Dict(10 flat keys) → Dict(5 branches).
 
-01 §1 gives the superseded observation as
+01 section 1 gives the superseded observation as
 `o_t = [c_t (M=25), u, v, r, e_y, χ̃, χ̃_LA]` — 31 dims. The shipped observation also
 carries `front_clearance`, `side_clearance_diff` and `local_target_cte`, for 34.
-No action on the code; **01 §1 needs a correction before it is quoted in the methods
+No action on the code; **01 section 1 needs a correction before it is quoted in the methods
 section**, since it currently mis-describes the published baseline.
 
 ### F2 — The third LiDAR is not mentioned in 01
 
-01 §3.1 credits Paper 2 with two views (obstacle-only for reward, border-configurable for
+01 section 3.1 credits Paper 2 with two views (obstacle-only for reward, border-configurable for
 observation). There are **three**: `lidar_border_guard` scans walls only and supplies
 `left_clearance`/`right_clearance`, which drive the side-choice bypass cue. Under D5 the
-boundary branch subsumes it. Stating that explicitly is worth one line in 01 §3, because
+boundary branch subsumes it. Stating that explicitly is worth one line in 01 section 3, because
 "the split becomes total" currently reads as a 2-way split.
 
 ### F3 — Three Paper 2 observation fields are dropped silently
 
 `front_clearance`, `side_clearance_diff` and `local_target_cte` (`src/env.py:341-372`) are
-LiDAR-derived local-planner cues, not raw sensor data. 01 §6's five branches do not
+LiDAR-derived local-planner cues, not raw sensor data. 01 section 6's five branches do not
 include them and the dimension arithmetic (27+7+3+3+51=91) has no room for them.
 
-I will treat them as **deliberately dropped** and proceed. Flagging because
+They are treated as **deliberately dropped**. Flagged because
 `local_target_cte` is the bypass side-choice cue that Paper 2's `target_side` and
 `field_repair` curricula were built to repair — dropping it removes an engineered feature
 that a documented failure mode depended on. If that is intended (the position being that
@@ -182,16 +182,16 @@ notice three features disappearing.
 
 ### F4 — Paper 2 simulated 225 beams over 270°, not 720 over 360°
 
-| | Paper 2 sim (`src/lidar.py:28-30`) | 01 §2 |
+| | Paper 2 sim (`src/lidar.py:28-30`) | 01 section 2 |
 |---|---|---|
 | Swath | 270° | 360° raw |
 | Beams | 225 | 720 |
 | Resolution | **1.205°** | 0.5° |
 | Range | 16.0 m | 1–16 m |
 
-01 §2.2's beams-per-sector table (12 beams in a 6° sector, 45 in a 22.5° sector) presumes
+01 section 2.2's beams-per-sector table (12 beams in a 6° sector, 45 in a 22.5° sector) presumes
 0.5°. So Paper 3 is changing the simulated sensor by 5.4× in angular resolution *and*
-1.33× in swath, on top of the re-sectoring. 01 §2.2's implementation note says Algorithm 1
+1.33× in swath, on top of the re-sectoring. 01 section 2.2's implementation note says Algorithm 1
 "carries over unchanged — it computes arc width from the per-beam angular resolution θ,
 which stays constant at 0.5°". θ does not stay constant: it changes from 1.205° to 0.5°.
 That is fine and correct — the real sensor is 0.5° — but it is a change to the published
@@ -212,14 +212,14 @@ sector edges. Worth stating because the kickoff frames this as a signature chang
 `meyer_feasibility_pool`, whereas that function needs no change at all — the change is
 entirely in the beam-to-sector assignment above it.
 
-Sector arithmetic in 01 §2.2 checks out: 15 + 8 + 4 = 27 sectors; 15×6° = 90° (±45°),
+Sector arithmetic in 01 section 2.2 checks out: 15 + 8 + 4 = 27 sectors; 15×6° = 90° (±45°),
 8×11.25° = 90° (2×45°), 4×22.5° = 90° (2×45°); total 270° = ±135°. ✓
 Beam counts at 0.5°: 12, 22.5, 45 per sector. **The 45–90° band gives 22.5 beams per
 sector, not an integer** — 01's table says "22–23", so the allocation must alternate.
 That is a real constraint on the implementation and on the Φ bookkeeping; noting it so the
 unit test asserts the alternating pattern rather than a constant.
 
-### F6 — Field logs: 720 bins confirmed, but 01 §2.3's stated concern is the wrong one
+### F6 — Field logs: 720 bins confirmed, but 01 section 2.3's stated concern is the wrong one
 
 Analysed all 30 logs under `field_deployment/` (5597 pooled scans from the four largest).
 Format is one 720-element integer array per scan, units **decimetres** (values 10–153,
@@ -231,12 +231,12 @@ genuinely 0.5°. Mean **506** bins carry a non-zero return (5th–95th pct 424�
 max run ~260); only ~9 bins per scan look like isolated dropout. So the missing returns are
 out-of-range / no-return arcs, **not** angular under-sampling.
 
-01 §2.3 item 1 asks whether the C1 "may deliver closer to ~500 points/rev (≈0.7°) than the
+01 section 2.3 item 1 asks whether the C1 "may deliver closer to ~500 points/rev (≈0.7°) than the
 nominal 0.5°". The 506 figure matches that number almost exactly, but the mechanism is
 different: the resolution really is 0.5°. **Recommendation: keep 0.5°/720 in simulation
 and instead model a no-return process** (probability of no return vs incidence angle and
 range, plus a sparse isolated-dropout rate). Simulating 500 uniformly-spaced beams would
-reproduce the count while getting the structure wrong. This changes what 01 §2.3 item 1
+reproduce the count while getting the structure wrong. This changes what 01 section 2.3 item 1
 asks for and is worth resolving before the simulator is frozen.
 
 **Item 2 (aft self-occlusion sector).** No evidence of one in these logs. No bin is zero in
@@ -262,7 +262,7 @@ COLREGs behaviour. Recommend a `LIDAR_MIN_RANGE = 1.0` constant applied in both 
 
 ### F7 — The boundary branch carries no information in the current workspace
 
-01 §3.3's redundancy trap is not hypothetical here. Paper 2's basin is a
+01 section 3.3's redundancy trap is not hypothetical here. Paper 2's basin is a
 constant-width 10 × 25 m rectangle and 70% of episodes use a path parallel to the walls
 (`VERTICAL_PATH_PROB = 0.70`, straight paths, `PATH_MODE = "straight"`). Under exactly
 those conditions the 7 boundary rays are an affine function of `e_y` and heading.
@@ -282,15 +282,15 @@ description of the stale repo-root `README.md` the kickoff says to ignore. It do
 an early moving-obstacle TCPA sketch (`DYN_PREDICT_HORIZON`, `DYN_TCPA_EPS`).
 
 Recommend moving it to `archive/` so it is not mistaken for a starting point. **Not moved —
-it is outside the read-only boundary but I would rather not relocate a file without a
+it is outside the read-only boundary, and a file is not relocated without a
 decision.**
 
 ### F9 — Open decisions this session will hit
 
 | | Effect on task 01 |
 |---|---|
-| **O4** (workspace size) | Blocks final values for `d_scale`, TCPA clip bounds, speed normalisers, and the ship-domain extents (01 §5.2's 4.7 m fore-aft in a 10 m channel). Placeholders will be `TODO(O4)`. |
-| **O5** (physical barrier vs software gating) | Does not block — 01 §3.4 requires the gate either way, and the barrier only removes its localisation dependency. |
+| **O4** (workspace size) | Blocks final values for `d_scale`, TCPA clip bounds, speed normalisers, and the ship-domain extents (01 section 5.2's 4.7 m fore-aft in a 10 m channel). Placeholders will be `TODO(O4)`. |
+| **O5** (physical barrier vs software gating) | Does not block — 01 section 3.4 requires the gate either way, and the barrier only removes its localisation dependency. |
 | **05** (rf2o drift) | Blocks the boundary pose-noise magnitude and the Kalman noise matrices. Hooks exist, defaults 0.0 / placeholder. |
 | **O2** (give-way-only vs reciprocity) | Does not block the observation — the 6-way one-hot has the "being overtaken" slot either way — but it decides whether that class is ever populated in training. |
 
@@ -304,9 +304,9 @@ All four questions raised at manifest review were answered:
 2. Constants live at **`src/constants.py`**.
 3. Keep **720 beams at 0.5°** and model no-returns; downsample later if the model is
    overloaded.
-4. `rl_env_dynamic.py` — **deleted** by the user.
+4. `rl_env_dynamic.py` — **deleted**.
 
-Build order followed the kickoff §4 sequence with one reordering: `constants.py` was
+Build order followed the kickoff section 4 sequence with one reordering: `constants.py` was
 written *before* the Bucket A copies rather than after, because every Bucket A module
 imports it (`import config as cfg` → `import constants as cfg`).
 
@@ -423,9 +423,9 @@ changed in the code. Sections 0–4 are left as written.
 | Dynamic targets | up to 3 | **1**, `N_MAX_TARGETS` configurable | S1 |
 | Encounter classes | 6 | **5** — crossing collapsed | S3, S4 |
 | Observation | 91 dims | **56 dims** | S6 |
-| Target branch | 3 × 16 + 3 mask bits | **16, incl. a presence bit** | 01 §6.1 |
+| Target branch | 3 × 16 + 3 mask bits | **16, incl. a presence bit** | 01 section 6.1 |
 | Architecture | shared encoder + DeepSets/attention flag | **plain concatenation** | D3 superseded |
-| Ship domain | `TODO`, compressed | **2.0 / 1.0 / 0.75 · Lpp**, provisional | 01 §5.2 |
+| Ship domain | `TODO`, compressed | **2.0 / 1.0 / 0.75 · Lpp**, provisional | 01 section 5.2 |
 | Workspace | `TODO(O4)` | **basin-matched, 10 m max** | O4 resolved |
 | Boundary gating | `TODO(O5)` | **software gating confirmed** | O5 resolved |
 
@@ -500,7 +500,7 @@ safer than it was. Now measured against `corridor_bounds_x()`.
 
 ### 5.5 F16 — the head-on threshold arithmetic is now a test, not a comment
 
-03 §5 puts the minimum width for a compliant port-to-port head-on at ≈3.66 m
+03 section 5 puts the minimum width for a compliant port-to-port head-on at ≈3.66 m
 (7.3 B) and asks for the arithmetic to be verified once the ship domain is
 finalised. It is encoded as
 `tests/test_cpa_cri.py::test_the_width_sweep_brackets_the_head_on_threshold`,
@@ -539,7 +539,7 @@ perception bug.
 ### 5.7 F17 — `02a_REWARD_SPECIFICATION.md` conflicts with the code on two conventions
 
 `planning/02a_REWARD_SPECIFICATION.md` appeared alongside the Revision 2 planning
-set. It is 02's deliverable and the reward is not built here, but its §1
+set. It is 02's deliverable and the reward is not built here, but its section 1
 conventions table is binding on quantities 01 already produces, and **two of them
 disagree with what the code does**. Both verified empirically, not read off.
 
@@ -547,7 +547,7 @@ disagree with what the code does**. Both verified empirically, not read off.
 
 | Source | Convention |
 |---|---|
-| `02a` §1 | `e_y` positive when the OS is to **starboard** of the path |
+| `02a` section 1 | `e_y` positive when the OS is to **starboard** of the path |
 | `path.py` (Paper 2, Bucket A verbatim) | positive when to **port** |
 
 Measured: a vessel 1 m to starboard of a due-north path reports `e_y = −1.01`.
@@ -578,7 +578,7 @@ decision, not a guess.
 
 | Source | Value |
 |---|---|
-| `02a` §1 | `U_ref = 0.8 m/s` |
+| `02a` section 1 | `U_ref = 0.8 m/s` |
 | `constants.py` | `U_CRUISE = 0.55 m/s` (`TODO(05)`) |
 
 `SPEED_SCALE = 2 · U_CRUISE = 1.10 m/s` normalises the `ego` branch and both
@@ -593,21 +593,21 @@ provisional pending 05, but they should be provisional to the *same* number.
 - `α ∈ (0, 180)` is starboard, `CT = (ψ_TS − ψ_OS) mod 360` — both match
   `cpa_cri.py`.
 - The ship-domain formula and `d_req = 2 · d_abeam = 2.36 m` match exactly.
-- 02a §3.2 keeps CRI in the observation but **removes it from the reward**, to
+- 02a section 3.2 keeps CRI in the observation but **removes it from the reward**, to
   decouple 02 from 01's unfinished CRI constants. No change needed here — the
   CRI feature stays at `target[9]` as specified.
 
 **4. Layout divergence, for whoever starts 02.**
 
-02a §10.2 proposes `colregs/classifier.py`, `colregs/geometry.py`,
+02a section 10.2 proposes `colregs/classifier.py`, `colregs/geometry.py`,
 `colregs/context.py`. The equivalents here are flat: `encounter.py` (classifier
 plus hysteresis) and `cpa_cri.py` (geometry, domain, CRI). The `EncounterContext`
-object 02a §10.1 asks for does not exist yet — `ObservationBuilder` currently
+object 02a section 10.1 asks for does not exist yet — `ObservationBuilder` currently
 computes the class, the crossing side and the risk internally and exposes them
 via `encounter_classes` and `crossing_sides`. Rebuilding that as a single context
 object shared by observation, reward and metrics is the right move and is 02's to
 make; the classifier itself is already a single definition, which is the property
-01 §5.3 actually requires.
+01 section 5.3 actually requires.
 
 ### 5.8 Quick start
 
@@ -623,7 +623,7 @@ python src/play.py --target being_overtaken --aft-mask 45
 ```
 
 Manual control is a **held helm** rather than a spring-centred one — arrow keys
-move the rudder and it stays where you put it, because holding a steady rate of
+move the rudder and it stays where it is set, because holding a steady rate of
 turn is the thing worth testing. Throttle starts at 0.0, which is cruise, so the
 vessel makes way from step one.
 
@@ -642,13 +642,13 @@ the classifier gets eyeballed. It is a convenience, not a scenario generator —
 *The aft mask is not a cosmetic constant.* Running
 `--target being_overtaken --aft-mask 45` and comparing against `--aft-mask 0`:
 the overtaking vessel goes from tracked on 108 of 152 steps to **never acquired
-at all**. That is 01 §2.3's warning made concrete — train the tracker to see
+at all**. That is 01 section 2.3's warning made concrete — train the tracker to see
 astern when the real mount cannot and Rule 17 behaviour fails in the field for
 reasons unrelated to the policy. Locked in as a test.
 
 *The propulsion authority is visibly narrow.* At `RPM_STAGE = 1`, full throttle
 down is 9.0 RPM against a 12.0 cruise. Driving it by hand, slackening speed is
-barely available as an avoidance action — which is exactly what 02 §4.4 flags,
+barely available as an avoidance action — which is exactly what 02 section 4.4 flags,
 since Rule 8(e) makes it a lawful manoeuvre and in a narrow channel often the
 only admissible one.
 
@@ -684,14 +684,14 @@ and two arithmetic problems the changes exposed.
 
 | | Was | Now |
 |---|---|---|
-| Head-on band | `TODO(decision)`, 8.0° placeholder | **±10°** (01 §5.3) |
-| Propulsion authority | `TODO(02)` — may be too narrow for Rule 8(e) | **Widens** (03 §6). Stage 4 is the curriculum endpoint; it is the only stage reaching 0 RPM |
-| IMU | assumed absent; `u, v, r` all differentiated from pose | **Confirmed** (05 §4.7) |
+| Head-on band | `TODO(decision)`, 8.0° placeholder | **±10°** (01 section 5.3) |
+| Propulsion authority | `TODO(02)` — may be too narrow for Rule 8(e) | **Widens** (03 section 6). Stage 4 is the curriculum endpoint; it is the only stage reaching 0 RPM |
+| IMU | assumed absent; `u, v, r` all differentiated from pose | **Confirmed** (05 section 4.7) |
 | `R-3` | pending sign-off | **Withdrawn**, superseded by `R-8` |
 
 **The IMU changes the shape of a gap rather than closing it.** `r` now comes
 from the gyro, so its residual is the sensor noise floor rather than
-pose-differentiation error — and the yaw-rate-not-rudder criterion 02 §4.2
+pose-differentiation error — and the yaw-rate-not-rudder criterion 02 section 4.2
 depends on becomes directly measurable in the field instead of inferred. `u` and
 `v` are largely rescued by the accelerometer but stay fused rather than measured.
 `EGO_SPEED_NOISE` and `EGO_YAW_RATE_NOISE_DPS` keep their hooks; only the
@@ -710,9 +710,9 @@ heading. Kept symmetric at ±10° for both, since the stated rationale — "a sm
 | `play.py` | target speeds expressed relative to cruise; `being_overtaken` staged properly |
 | `tests/` | width-bracket tests rewritten around the four predicted thresholds |
 
-### 6.3 F18 — 02a §11.3's extra sweep level does not do what it says
+### 6.3 F18 — 02a section 11.3's extra sweep level does not do what it says
 
-§11.3 adds 7 m (14 B) "to separate the crossing threshold from the head-on one
+Section 11.3 adds 7 m (14 B) "to separate the crossing threshold from the head-on one
 cleanly". It does not.
 
 | Class | Threshold | Bracket with 7 m added |
@@ -722,7 +722,7 @@ cleanly". It does not.
 | Overtaking | 4.78 m (9.6 B) | (4, 5) |
 | Head-on, compliant target | 3.66 m (7.3 B) | (3.5, 4) |
 
-§11.3's own table places 6.02 m in the "6 → 5" bracket, which only holds if the
+Section 11.3's own table places 6.02 m in the "6 → 5" bracket, which only holds if the
 threshold is read as exactly 12.0 B = 6.00 m. At 6.02 m it is 2 cm *above* the
 6 m sweep level, so the transition effectively coincides with a sample point and
 cannot be resolved in either direction.
@@ -750,12 +750,12 @@ Three figures disagree:
 | Source | Value |
 |---|---|
 | Simulator at `CRUISE_RPM` = 12 | **1.77 m/s** |
-| 02a §1 `U_ref` | 0.80 m/s |
-| 02a §10.5 reachable-surge target | 0.20–0.90 m/s |
+| 02a section 1 `U_ref` | 0.80 m/s |
+| 02a section 10.5 reachable-surge target | 0.20–0.90 m/s |
 
-02a's §10.5 targets sit **below the simulator's stage-1 floor** (1.35 m/s at
-9 RPM), and its entire §8.1 scale-audit table is computed at `U_ref = 0.8`.
-Either the thrust map is wrong — 05 §2 already lists "Paper 2 used thrust ∝ RPM²;
+02a's section 10.5 targets sit **below the simulator's stage-1 floor** (1.35 m/s at
+9 RPM), and its entire section 8.1 scale-audit table is computed at `U_ref = 0.8`.
+Either the thrust map is wrong — 05 section 2 already lists "Paper 2 used thrust ∝ RPM²;
 verify" — or 02a's figures are. This needs settling before the audit means
 anything, because every speed gate in the reward is scaled against it.
 
@@ -773,7 +773,7 @@ rather than buried in a comment.
 
 ### 6.5 The spawn-DCPA bug, and why the placeholder now samples an offset
 
-02a §11.1 promotes this to a **blocking** hand-off to 04: solving backwards for a
+02a section 11.1 promotes this to a **blocking** hand-off to 04: solving backwards for a
 spawn position without sampling a DCPA puts the target on the own ship's
 projected track in every episode, so `Δy_req = d_req` always, `v_r8`'s zero
 branch never fires, and the agent learns "always alter" instead of "when to
@@ -786,7 +786,7 @@ starboard side (DCPA ≥ `d_req`). Measured after the change: 34 of 60 episodes
 have DCPA ≥ `d_req`, so both head-on regimes appear.
 
 This does not discharge 04's obligation — 04 still owns the stratification and
-must report the realised distribution, and 02a §11.1 notes it is an *evaluation*
+must report the realised distribution, and 02a section 11.1 notes it is an *evaluation*
 gap too, since neither Tier A nor Tier B currently has a target-placement axis.
 It only stops the placeholder from baking the bias into everything built on it.
 
@@ -808,7 +808,7 @@ sensible ranges.
 
 ### 6.7 Still open
 
-Unchanged from §5.7 — 02a §1 keeps both conventions that conflict with the code:
+Unchanged from section 5.7 — 02a section 1 keeps both conventions that conflict with the code:
 
 - **`e_y` sign.** 02a says positive to starboard; `path.py` gives positive to
   port. 02's wrong-side and passing-side terms condition on it. Unresolved.
@@ -831,7 +831,7 @@ New, and needed before 02 can be implemented:
 ## 7. `02b_DECISIONS_AND_TASK_ORDER.md` — T1, T2, T3 and the constant decisions
 
 02b decided every open item and gave a task order. T1–T3 are done, along with
-C1–C2, C4 and all of §2's constant decisions. T4 (the reward) is next and is
+C1–C2, C4 and all of section 2's constant decisions. T4 (the reward) is next and is
 untouched.
 
 ### 7.1 T1 — the field logs were mined, and the answer is neither figure
@@ -851,7 +851,7 @@ argument requires.
 |---|---|---|
 | **Measured** | **1.14 m/s** | 0.29 |
 | 02b C2 "Paper 2 field" | 0.55 m/s | 0.14 |
-| 02a §1 `U_ref` | 0.80 m/s | 0.20 |
+| 02a section 1 `U_ref` | 0.80 m/s | 0.20 |
 | Simulator, pre-calibration | 1.77 m/s | 0.45 |
 
 02b C2's direction was right — the simulator was too fast — but by **1.55×, not
@@ -920,7 +920,7 @@ starboard so it matches `r > 0`; `yaw_rate_for_tracking(idx, u)` returns
 `u · κ` in rad/s. Exact against circular arcs of radius 5, 10 and 25 m.
 
 `info` now carries `r_path_radps` **and** `yaw_rate_radps`. The environment's
-own yaw rate is in degrees per second while 02a §6.2 works in rad/s
+own yaw rate is in degrees per second while 02a section 6.2 works in rad/s
 (`r_ref = 0.20`), so emitting both in radians removes a silent unit trap from
 `R-8`'s `r − r_path`.
 
@@ -941,9 +941,9 @@ It asserts `r_path` is non-zero somewhere in the scenario distribution; with
 `κ = 0` everywhere it fails, and it will start passing — and flag itself as
 XPASS — the moment 03 delivers bends.
 
-### 7.4 C1 — thresholds computed, and 02a §2.2's derivations recovered
+### 7.4 C1 — thresholds computed, and 02a section 2.2's derivations recovered
 
-`predicted_thresholds(d_abeam, c_wall, breadth)` implements 02a §2.2's four
+`predicted_thresholds(d_abeam, c_wall, breadth)` implements 02a section 2.2's four
 derivations directly rather than storing its four numbers:
 
 | Class | Derivation | Computed | 02a |
@@ -956,9 +956,9 @@ derivations directly rather than storing its four numbers:
 All four to within 1 cm. Sweep held at seven levels, 6.25 m not added, and the
 bracket-collision test kept as written — per C1.
 
-### 7.5 F21 — 02b §3.1's domain floor already excludes the provisional domain
+### 7.5 F21 — 02b section 3.1's domain floor already excludes the provisional domain
 
-02b §3.1 sets `d_abeam ≥ LIDAR_MIN_RANGE + B/2 = 1.25 m` as a hard floor, and
+02b section 3.1 sets `d_abeam ≥ LIDAR_MIN_RANGE + B/2 = 1.25 m` as a hard floor, and
 the reasoning is right: below it the ship domain sits inside the sensor's blind
 zone, and since `R-1` evaluates intrusion on ground truth, the agent would be
 penalised for intrusions it cannot perceive. `r_dom` would become unlearnable.
@@ -968,7 +968,7 @@ current value "sits 0.18 m outside the sensor blind zone" — comparing it to
 `LIDAR_MIN_RANGE` alone — and then defines a floor that excludes it. The two
 halves disagree.
 
-Not resolved unilaterally, because 02a §1 states the abeam extent explicitly and
+Not resolved unilaterally, because 02a section 1 states the abeam extent explicitly and
 raising it to 1.25 m (0.796 · Lpp) moves `d_req` and all four thresholds:
 
 | | at 1.18 m | at 1.25 m |
@@ -982,7 +982,7 @@ raising it to 1.25 m (0.796 · Lpp) moves `d_req` and all four thresholds:
 impossible to miss but does not block. T4's config validator should raise once
 the domain is final. **This is the only remaining `TODO(decision)` in the tree.**
 
-### 7.6 §2 constant decisions applied
+### 7.6 section 2 constant decisions applied
 
 | Constant | Now |
 |---|---|
@@ -1010,11 +1010,11 @@ model scale, not the sensing.
 
 **251 tests: 250 passing, 1 `xfail`** (the `R-8` bend test, pending 03).
 
-Every `TODO(decision)` was discharged except F21, which §8.3 now resolves. What
+Every `TODO(decision)` was discharged except F21, which section 8.3 now resolves. What
 remained was 20 `TODO(05)` values needing measurement rather than a call, and one
 `TODO(03)` (`REVERSE_AVAILABLE`).
 
-Next per 02b: **T4, the reward** — see §8.
+Next per 02b: **T4, the reward** — see section 8.
 
 ---
 
@@ -1022,8 +1022,8 @@ Next per 02b: **T4, the reward** — see §8.
 
 02b calls T4 "*the main task*". It is built: `EncounterContext` first, then the
 terms as pure functions, then the weighted sum with group clipping, the config
-validators, and all eleven `02a §10.4` tests with test 8 `xfail`. The left
-telemetry panel from `RENDER_PANEL_SPEC` is built alongside it, because §4 of
+validators, and all eleven `02a section 10.4` tests with test 8 `xfail`. The left
+telemetry panel from `RENDER_PANEL_SPEC` is built alongside it, because section 4 of
 that spec is right that the reward's two instrument blocks are worth having
 *while* the reward is being written rather than after.
 
@@ -1043,7 +1043,7 @@ src/reward/
 ```
 
 `encounter.py` stays where it is rather than moving to `colregs/classifier.py`
-as `02a §10.2` names it. It is the single definition of the angular bands, it
+as `02a section 10.2` names it. It is the single definition of the angular bands, it
 has 22 tests against it, and `colregs/__init__.py` re-exports it at the path the
 spec asks for. Moving a tested module to satisfy a filename would be the kind of
 churn that loses a threshold.
@@ -1052,7 +1052,7 @@ churn that loses a threshold.
 
 `ObservationBuilder` used to compute the class, the crossing side and the risk
 itself, from the same track the reward would later re-derive them from.
-`01 §5.3` asks for one module and two consumers; two consumers computing the
+`01 section 5.3` asks for one module and two consumers; two consumers computing the
 same thing separately satisfies the letter of that and not the point of it.
 
 The builder now **owns** a `ContextManager` and the reward reads it back. The
@@ -1077,11 +1077,11 @@ frame. All four are live; none is cosmetic.
 
 #### F21 — resolved, the floor is applied
 
-02b §3.1 sets `d_abeam >= LIDAR_MIN_RANGE + B/2 = 1.25 m` as a hard floor and
+02b section 3.1 sets `d_abeam >= LIDAR_MIN_RANGE + B/2 = 1.25 m` as a hard floor and
 says what to do when the derived value is smaller: "the domain is floored at
 1.25 m and the paper states why". `0.75 * Lpp = 1.18 m` is smaller, so the floor
 binds. Applying it executes 02b's decision rather than overriding 02a's — 02b is
-the later document and declares itself a companion that amends 02a §1.
+the later document and declares itself a companion that amends 02a section 1.
 
 `d_abeam = 1.25 m` (0.796 Lpp), `d_req = 2.50 m`, and the four Study 1
 thresholds move:
@@ -1114,10 +1114,10 @@ thing, and nothing in the audit table would have looked wrong.
 
 The fix is C2's own rule: a speed-scaled constant is *derived* from `U_REF`, not
 written down. `N_REF_PROG = L_REF_PATH / (U_REF * dt) = 175.4` binds the clip at
-exactly cruise, which restores 02a §5.5's stated intent — telescoping exact for
+exactly cruise, which restores 02a section 5.5's stated intent — telescoping exact for
 `u <= U_ref`, speeding gains nothing.
 
-**Consequence for `02a §8.1`:** `w_prog * Sum r_prog` is **+52.6**, not the
+**Consequence for `02a section 8.1`:** `w_prog * Sum r_prog` is **+52.6**, not the
 tabulated +75. It is the only row F22 moves. The three orderings survive with
 room (+83 nominal against −264 and −309, a 44-point margin), and the
 compliance-cost ratio is untouched because progress contributes zero to it by
@@ -1130,11 +1130,11 @@ produces 20.00–20.42 m, binding at 1.140–1.164 m/s.
 `test_3d_the_generator_must_keep_path_length_near_the_design_point` fails if T5
 changes that.
 
-#### F23 — `02a §5.2`'s `d_safe` breaches `02a §2`'s own invariant
+#### F23 — `02a section 5.2`'s `d_safe` breaches `02a section 2`'s own invariant
 
-§2 asserts `d_safe < c_wall − B/2`, so that the geometry defining a compliant
+Section 2 asserts `d_safe < c_wall − B/2`, so that the geometry defining a compliant
 narrow-channel manoeuvre cannot itself trigger the boundary penalty. With
-`c_wall = 0.65` and `B = 0.50` the ceiling is **0.40 m**, and §5.2's stated
+`c_wall = 0.65` and `B = 0.50` the ceiling is **0.40 m**, and section 5.2's stated
 `d_safe = 0.50 m` does not clear it — in the same sentence that says 0.50 was
 chosen *because of* this invariant.
 
@@ -1144,12 +1144,12 @@ four Study 1 thresholds and is a `TODO(05)` measurement, so moving it would move
 published predictions, whereas `d_safe` only sets where the boundary penalty
 begins. The validator raises on 0.50.
 
-**A second, narrower part of F23**, found by the timeout test: `02a §8.1`'s
+**A second, narrower part of F23**, found by the timeout test: `02a section 8.1`'s
 "loitering to timeout ≈ −86" assumes its own 300-step design point, and
 `MAX_EPISODE_STEPS` is **700** — a Paper 2 carry-over never reconciled with it.
 Undiscounted, a vessel stopped dead in clear water pays `w_pf + w_exist = 0.65`
 per step (`r_pf` is a penalty form, so `g_u = 0` is maximum penalty by design)
-and reaches −455 against a collision's −300. The ordering `02 §5` requires would
+and reaches −455 against a collision's −300. The ordering `02 section 5` requires would
 be inverted.
 
 It is sound in practice, because the undiscounted sum is not what the agent
@@ -1161,9 +1161,9 @@ at `gamma = 0.999`**, where the truncated geometric sum reaches −327 and cross
 prefers a collision to holding station in a corner, the reason is on record and
 the fix is the step limit rather than a coefficient.
 
-#### `r_dom`'s datum — `02a §5.3` disagrees with `02a §1`
+#### `r_dom`'s datum — `02a section 5.3` disagrees with `02a section 1`
 
-§5.3 says `r_dom` is measured "hull-to-hull". §1 defines `d_req = 2 * d_abeam`
+Section 5.3 says `r_dom` is measured "hull-to-hull". Section 1 defines `d_req = 2 * d_abeam`
 as the *centre* separation of two vessels passing abeam, and `kappa_eng * d_req`
 gates engagement against `cpa()`, which is centre-to-centre throughout, as is
 the observation's `distance_to_domain`.
@@ -1209,7 +1209,7 @@ is `NO` because `r_stbd = 1.88` against `Dy_req = 2.24`; `R-2` therefore drops
 room, A_t 0.00]`; `v_port = 0.000 [turning STBD or holding, compliant]`;
 `v_side = 0.097 [TS to STBD at CPA, needs PORT]`. Five lines that say what the
 agent is being asked to do and why it is being charged, which is the whole
-argument for `RENDER_PANEL_SPEC` §1.
+argument for `RENDER_PANEL_SPEC` section 1.
 
 ### 8.5 What T4 did not do
 
@@ -1221,8 +1221,8 @@ argument for `RENDER_PANEL_SPEC` §1.
   `reward/audit.py::PREDICTED_NOMINAL`, but running 1,000 random-policy and
   1,000 Paper 2 SAC episodes through the stage-5 distribution is its own task,
   and stage 5 does not exist until T5 and 03's generator do.
-* **`metrics.py` has not been rewritten to read the reward keys.** `02a §10.3`
-  says `00 §4.2`'s metric set should be a read of them rather than a separate
+* **`metrics.py` has not been rewritten to read the reward keys.** `02a section 10.3`
+  says `00 section 4.2`'s metric set should be a read of them rather than a separate
   computation. The keys are emitted; the read is 04's.
 
 ### 8.6 State
@@ -1235,6 +1235,6 @@ waiting on T5.
 of the tree is 20 `TODO(05)` measurements and one `TODO(03)`.
 
 Next per 02b: **T5**, 03's corridor generator — variable width, bends,
-deliberately off-centre reference paths. §3.3 identifies it as blocking three
+deliberately off-centre reference paths. Section 3.3 identifies it as blocking three
 deliverables; it is now blocking four, since `test_3d` makes path length a
 constraint it has to respect.

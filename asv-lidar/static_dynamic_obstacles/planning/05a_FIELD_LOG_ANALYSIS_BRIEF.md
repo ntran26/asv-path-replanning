@@ -2,8 +2,8 @@
 
 > **Status note (2026-09-22).** Historical: this brief was delivered (T1 and the extractions; 05 part 1 validated, F30–F36). Kept as a record; the current method is `planning/METHODS_BRIEF.md` and `configs/baseline_v1.json` (baseline-v1).
 
-**For:** Claude Code, working on `field_deployment/` (30 logs, 5597 pooled scans, 130 KB–2 MB each).
-**Delivers:** T1 in `02b_DECISIONS_AND_TASK_ORDER.md §4`, plus five extractions beyond it.
+**Scope:** implementation work on `field_deployment/` (30 logs, 5597 pooled scans, 130 KB–2 MB each).
+**Delivers:** T1 in `02b_DECISIONS_AND_TASK_ORDER.md section 4`, plus five extractions beyond it.
 **No basin time required.** Everything here comes from logs already on disk.
 
 ---
@@ -18,7 +18,7 @@ Not a list of numbers. Two artefacts:
    form supporting independent reporting. The dataset is the deliverable; the constants are a
    by-product.
 2. **A distribution for every constant, not a point estimate.** Each extracted value needs a
-   confidence interval, because the CI *is* the domain-randomisation range in `03 §7`. A
+   confidence interval, because the CI *is* the domain-randomisation range in `03 section 7`. A
    constant reported without one cannot be randomised over, and system identification without
    randomisation reduces bias but creates no robustness.
 
@@ -35,7 +35,7 @@ answer before proceeding:
 
 | Channel | Needed for | If absent |
 |---|---|---|
-| Commanded RPM | E1, E8 | E1 falls back to §2.3 methods only; say so rather than substituting a guess |
+| Commanded RPM | E1, E8 | E1 falls back to section 2.3 methods only; say so rather than substituting a guess |
 | Commanded rudder | E8 | Drop E8, report it |
 | rf2o pose (x, y, ψ) | E1, E2, E7 | Blocking — flag immediately |
 | Per-scan timestamp | everything | Blocking |
@@ -109,10 +109,10 @@ sanity check that catches a broken pipeline.
 
 ---
 
-## 3. E2 — rf2o pose drift *(the `CONSTANTS §6` zeros)*
+## 3. E2 — rf2o pose drift *(the `CONSTANTS section 6` zeros)*
 
 Currently `BOUNDARY_POSE_NOISE_XY`, `_HEADING_DEG` and `_WALK` are all 0.0, which leaves the
-`01 §3.3` sim-to-real gap wide open. No headline training run should start until these have
+`01 section 3.3` sim-to-real gap wide open. No headline training run should start until these have
 numbers.
 
 ### 3.1 Method — wall-fit residual in the world frame
@@ -129,7 +129,7 @@ a return-to-start check cannot.
 
 **Along-track drift is invisible to this method** — parallel walls again. Do not report a
 number for it. Report instead that it cannot be bounded from these logs, which is precisely the
-justification for the IMU (`05 §4.7`) and for registering against distinctive sparse features
+justification for the IMU (`05 section 4.7`) and for registering against distinctive sparse features
 rather than the wall polygon. A stated unmeasurable is worth more here than an estimate that
 would be silently wrong.
 
@@ -147,7 +147,7 @@ randomisation range.
 ### 3.3 Condition on yaw rate
 
 Scan matching degrades during turns. Report drift separately for straight segments and for
-`|r|` above a threshold. If turning drift is materially worse, `03 §7`'s randomisation should
+`|r|` above a threshold. If turning drift is materially worse, `03 section 7`'s randomisation should
 be yaw-rate-dependent rather than constant, which is a more faithful model and a reportable
 finding in its own right.
 
@@ -163,7 +163,7 @@ constraint that scan-to-map localisation depends on is destroyed on one side.
 
 **The confounder that will ruin this if ignored:** return rate depends strongly on range and on
 incidence angle, independent of reflectivity. A raw return-rate-versus-bearing plot will show
-structure caused by geometry and tell you nothing about the paint.
+structure caused by geometry and say nothing about the paint.
 
 So:
 
@@ -172,7 +172,7 @@ So:
 2. Compute, for each wall, the return rate as a function of **(range bin, incidence-angle bin)**.
 3. Compare the two walls **only in bins both populate**. Report the ratio per bin and pooled.
 4. Report **range noise** per wall as well — residual to the fitted line, remembering the
-   0.029 m quantisation floor from §1. Low-reflectivity surfaces give noisier ranges as well as
+   0.029 m quantisation floor from section 1. Low-reflectivity surfaces give noisier ranges as well as
    more dropouts, and noise may be the more sensitive indicator here.
 
 ### 4.2 What the answer decides
@@ -226,7 +226,7 @@ times. Confirm and do not work around it.
 But do produce the **analytic bound**, which is free: from the rf2o yaw-rate series, the smear
 at a 10 Hz scan rate is `r × 0.1` radians. At 0.2 rad/s that is 1.15°, about 2.3 beams. Report
 the distribution of implied smear across all logs. That bounds the effect without per-beam
-times and tells you whether the missing measurement matters at all.
+times and shows whether the missing measurement matters at all.
 
 ---
 
@@ -237,7 +237,7 @@ Once pose drift is characterised, three more constants follow without new analys
 | Constant | Derivation |
 |---|---|
 | `DYNAMIC_SPEED_ON` / `_OFF` | The dominant source of apparent motion in a static object **is** ego-pose error, which affects every object in the scan identically. So the apparent velocity a fixed object acquires equals the pose drift rate. Set `_ON` above the **99th percentile** of measured drift rate, not the 95th — bias toward under-detection, because promoting a static panel to a target ship is a false positive with COLREGs consequences |
-| `EGO_YAW_RATE_NOISE_DPS`, and `r_dead` in `02a §6.2` | Paper 2 had no IMU, so `r` came from differentiating rf2o heading. The std of `r` over known-straight segments is therefore a **conservative upper bound** on the IMU's noise floor — usable as a placeholder until the gyro lands, and honest about being an upper bound |
+| `EGO_YAW_RATE_NOISE_DPS`, and `r_dead` in `02a section 6.2` | Paper 2 had no IMU, so `r` came from differentiating rf2o heading. The std of `r` over known-straight segments is therefore a **conservative upper bound** on the IMU's noise floor — usable as a placeholder until the gyro lands, and honest about being an upper bound |
 | `KF_MEAS_NOISE_POS` | From E3's range-noise figure, floored at the 0.029 m quantisation limit |
 
 Also worth computing: the drift rate over a typical encounter duration (~100 steps, 10 s). If
@@ -254,9 +254,9 @@ predicted trajectory on the rf2o trajectory. Costs no basin time and produces a 
 figure directly.
 
 Two cautions. Compare **heading and lateral position**, which rf2o constrains, and treat
-along-track agreement as uninformative for the reason in §2.1. And fit to heading directly
+along-track agreement as uninformative for the reason in section 2.1. And fit to heading directly
 rather than to differentiated yaw rate — differentiation amplifies the quantisation noise that
-§1 flags. Cross-check by fitting to yaw rate as well: **disagreement between the two fits
+Section 1 flags. Cross-check by fitting to yaw rate as well: **disagreement between the two fits
 indicates a timestamp or mounting error**, not a hydrodynamic one, and that is worth catching
 before the basin session rather than after.
 
@@ -272,13 +272,13 @@ before the basin session rather than after.
 - **Flag any result outside its plausibility band** rather than adopting it. E1 outside
   0.4–1.0 m/s means the method is broken.
 - **Do not substitute a guess for a missing channel.** If commanded RPM is absent, say E1 ran
-  on §2.3 methods only.
+  on section 2.3 methods only.
 - Every constant lands in `src/constants.py` with its CI in the adjacent comment and its
   figure referenced by name.
 
 ## 10. Do not
 
-- Take surge speed from rf2o (§2.1). This is the one that will silently produce a plausible,
+- Take surge speed from rf2o (section 2.1). This is the one that will silently produce a plausible,
   confident, wrong `U_REF` and propagate it through every speed gate in the reward.
 - Fit a single scalar to pose drift. White noise and random walk are different constants with
   different consequences and the Allan decomposition separates them cheaply.

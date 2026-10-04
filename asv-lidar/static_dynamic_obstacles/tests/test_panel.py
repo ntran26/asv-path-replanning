@@ -51,7 +51,7 @@ def head_on_env(steps: int = cfg.steps_for(4.0), width: float = 8.0) -> ASVLidar
 # The panel is a view on `info`
 # ---------------------------------------------------------------------------
 def test_the_panel_is_carried_in_info_and_is_the_same_object():
-    """RENDER_PANEL_SPEC §0.  Same principle as the single `EncounterContext`:
+    """RENDER_PANEL_SPEC section 0.  Same principle as the single `EncounterContext`:
     two consumers, one source, or they diverge."""
     env = ASVLidarEnv(render_mode=None)
     env.reset(seed=0)
@@ -73,7 +73,7 @@ def test_every_block_is_present_and_populated():
 
 
 def test_the_panel_agrees_with_the_flat_logging_keys():
-    """The display schema and `02a §10.3`'s logging schema are the same step."""
+    """The display schema and `02a section 10.3`'s logging schema are the same step."""
     env = head_on_env()
     _, _, _, _, info = env.step(np.zeros(2, dtype=np.float32))
     rows = {row["name"]: row for row in info["panel"]["reward"]["rows"]}
@@ -84,7 +84,7 @@ def test_the_panel_agrees_with_the_flat_logging_keys():
 
 
 def test_the_colregs_block_explains_every_sub_term():
-    """§1's one idea: show the gate, not just the value.
+    """Section 1's one idea: show the gate, not just the value.
 
     When `v_side` reads 0.000 the number alone cannot say whether that is
     correct or a stuck gate.
@@ -100,7 +100,7 @@ def test_the_colregs_block_explains_every_sub_term():
 
 
 def test_the_admissibility_numbers_explain_the_predicate():
-    """§3's point: the three numbers behind `A_stbd` say *why* it flipped, which
+    """Section 3's point: the three numbers behind `A_stbd` say *why* it flipped, which
     is what is wanted when the agent does something odd near a wall."""
     env = head_on_env()
     block = env.last_panel["colregs"]
@@ -130,7 +130,7 @@ def test_clip_accounting_ignores_the_structurally_bounded_dimensions():
 
 
 def test_a_saturating_dimension_is_named():
-    """§6 asks for a drill-down, because one saturating dimension inside a
+    """Section 6 asks for a drill-down, because one saturating dimension inside a
     27-dim branch will not move the branch aggregate much.
 
     70 steps rather than the fixture default: `cri` pins at 1.0 only once the
@@ -192,7 +192,7 @@ def test_the_field_is_offset_by_the_panel_width(render_mod):
 
 
 def test_blocks_toggle_and_default_to_the_reward_pair(render_mod):
-    """§5: default to [4] and [5] only, so the panel is readable in a short
+    """Section 5: default to [4] and [5] only, so the panel is readable in a short
     window and the rest is opt-in."""
     env = ASVLidarEnv(render_mode=None)
     renderer = render_mod.Renderer(env.map_width, env.map_height)
@@ -206,7 +206,7 @@ def test_blocks_toggle_and_default_to_the_reward_pair(render_mod):
 
 
 def test_scrub_walks_the_ring_buffer_and_clamps(render_mod):
-    """§5's step-back key.  Nearly every question worth asking about an
+    """Section 5's step-back key.  Nearly every question worth asking about an
     encounter is "what was the state four seconds ago"."""
     env = head_on_env(steps=25)
     renderer = render_mod.Renderer(env.map_width, env.map_height)

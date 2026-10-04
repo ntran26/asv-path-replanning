@@ -1,9 +1,9 @@
-"""03a §10's twelve acceptance tests, plus 04a's freeze assertions.
+"""03a section 10's twelve acceptance tests, plus 04a's freeze assertions.
 
 "Committed with the environment, run before the first training run."  They are
 numbered as 03a numbers them so the table can be checked off directly.
 
-`T1` passes since revision 8: F24 was decided for 03a §1.1's 0.55 m/s, which is
+`T1` passes since revision 8: F24 was decided for 03a section 1.1's 0.55 m/s, which is
 `CRUISE_RPM = 6` on the identified plant.
 """
 
@@ -36,7 +36,7 @@ def test_t1_froude_is_self_consistent():
 
 
 def test_t1_froude_at_u_nom_is_0_14():
-    """03a §10 T1.  Fr = 0.14 ± 0.01."""
+    """03a section 10 T1.  Fr = 0.14 ± 0.01."""
     assert cfg.froude() == pytest.approx(0.14, abs=0.01)
 
 
@@ -44,8 +44,8 @@ def test_t1_froude_at_u_nom_is_0_14():
 # T2 — the boundary branch is computed from the estimated pose
 # ---------------------------------------------------------------------------
 def test_t2_boundary_branch_uses_the_noisy_pose():
-    """03a §7: a noiseless boundary scan in training creates a sim-to-real gap
-    in the component introduced to remove one (01 §3.3)."""
+    """03a section 7: a noiseless boundary scan in training creates a sim-to-real gap
+    in the component introduced to remove one (01 section 3.3)."""
     env = ASVLidarEnv(render_mode=None, corridor_width=6.0, pose_noise=True)
     env._pose_noise.sigma_xy = 0.15
     env.forced_num_obs = 0
@@ -64,7 +64,7 @@ def test_t2_boundary_branch_uses_the_noisy_pose():
 # T3 — the boundary branch is not affine in the cross-track error
 # ---------------------------------------------------------------------------
 def test_t3_boundary_rays_are_decorrelated_from_cross_track_error():
-    """03a §3.2 / 04a §3.2, and the reason the generator exists.
+    """03a section 3.2 / 04a section 3.2, and the reason the generator exists.
 
     In a straight centred constant-width channel the port and starboard rays are
     affine functions of `e_y`, so the 7-dimensional branch carries one number
@@ -104,7 +104,7 @@ def test_t3_boundary_rays_are_decorrelated_from_cross_track_error():
 # T5 / T6 — what the sensor sees
 # ---------------------------------------------------------------------------
 def test_t6_the_corridor_boundary_is_never_in_the_raw_scan():
-    """01 §3.1 / 03a §3.1.  The corridor is a map polygon, and the whole D5
+    """01 section 3.1 / 03a section 3.1.  The corridor is a map polygon, and the whole D5
     decision is that it reaches the policy through a virtual raycast rather than
     through the sensor.  A narrow channel inside a wide basin is the case that
     would expose a leak: the walls are 1.5 m outside the basin, so anything
@@ -121,7 +121,7 @@ def test_t6_the_corridor_boundary_is_never_in_the_raw_scan():
 # T7 — class-conditional confinement
 # ---------------------------------------------------------------------------
 def test_t7_crossing_targets_leave_the_corridor_and_others_do_not():
-    """03a §5.2 / 04a §1.3, both directions.
+    """03a section 5.2 / 04a section 1.3, both directions.
 
     A crossing target confined to a 4 m fairway would have to pass through the
     far wall; Rule 9(d) is specifically about vessels crossing a narrow channel,
@@ -157,7 +157,7 @@ def test_t7_crossing_targets_leave_the_corridor_and_others_do_not():
 # T8 — static panels are not promoted to dynamic tracks
 # ---------------------------------------------------------------------------
 def test_t8_static_panels_are_rarely_classified_dynamic():
-    """03a §10 T8 and §6.3: static panels dynamic on fewer than 1 in 10^4 frames.
+    """03a section 10 T8 and section 6.3: static panels dynamic on fewer than 1 in 10^4 frames.
 
     A false promotion creates a phantom give-way obligation with COLREGs
     consequences -- and now a phantom emergency stop: with the safety layer
@@ -246,7 +246,7 @@ def test_t9_coasting_alone_still_misses_the_criterion():
 
     Cutting thrust from cruise coasts **8.5 m (5.4 Lpp) over 19 s** on the
     identified model, against 29.9 m on Paper 2's v2 hull -- the identified surge
-    drag is much stronger -- but still 3.6x 03a §4.3's 2.36 m.  So the paper
+    drag is much stronger -- but still 3.6x 03a section 4.3's 2.36 m.  So the paper
     cannot claim Rule 8(e) "take all way off" by coasting, whichever model is
     right.  Pinned as a failing measurement: if basin S1-C's coast-downs move
     the drag enough to flip it, this test says so.
@@ -268,7 +268,7 @@ def test_t9_coasting_alone_still_misses_the_criterion():
 
 @pytest.mark.parametrize("efficiency", [0.3, 0.5, 1.0])
 def test_t9_the_emergency_stop_meets_the_head_reach_criterion(efficiency):
-    """03a §10 T9: head reach <= 1.5 Lpp, now met by the emergency stop.
+    """03a section 10 T9: head reach <= 1.5 Lpp, now met by the emergency stop.
 
     Full astern (`S2 = -100`) from cruise until stopped, decided at the 2 Hz
     rate with a full interval of reaction latency.  **Meets the criterion
@@ -303,7 +303,7 @@ def test_t9_at_deployment_timing_it_depends_on_reverse_efficiency():
 # T12 — domain intrusion is a metric, not a termination
 # ---------------------------------------------------------------------------
 def test_t12_domain_intrusion_does_not_terminate_the_episode():
-    """03a §3.3 / §4.4.  The two-constraint convention: the ship domain governs
+    """03a section 3.3 / section 4.4.  The two-constraint convention: the ship domain governs
     vessel-to-vessel separation and is *reported*, while clearance to the
     boundary is a separate and harder constraint."""
     env = ASVLidarEnv(render_mode=None, corridor_width=8.0)
@@ -344,7 +344,7 @@ def test_t12_domain_intrusion_does_not_terminate_the_episode():
     # `domain_margin` is `None` -- it is derived from the `EncounterContext`,
     # which is perceived.  So the reward charges for an intrusion the panel
     # cannot display, which is the one case where the panel stops being a
-    # faithful view of the step.  It is also exactly the case 02b §3.1 floored
+    # faithful view of the step.  It is also exactly the case 02b section 3.1 floored
     # the domain to avoid, and it survives because the floor is 1.25 m while the
     # dead zone is 1.0 m: the 0.25 m band between them is perceivable in
     # principle and invisible here in practice.
@@ -353,10 +353,10 @@ def test_t12_domain_intrusion_does_not_terminate_the_episode():
 
 
 # ---------------------------------------------------------------------------
-# 04a §9 — the freeze protocol
+# 04a section 9 — the freeze protocol
 # ---------------------------------------------------------------------------
 def test_seed_namespaces_are_disjoint():
-    """04a §9.2.  The development suite exists so that reward iteration and
+    """04a section 9.2.  The development suite exists so that reward iteration and
     algorithm selection never touch the frozen suite; one suite for both is a
     selection bias that is invisible in the results and fatal if noticed."""
     assert scn.namespaces_are_disjoint(), cfg.SEED_NAMESPACES
@@ -367,13 +367,13 @@ def test_seed_namespaces_are_disjoint():
 
 
 def test_the_suite_structure_matches_the_specification():
-    """04a §4.2 and §5 as amended by 06 §5, as counts."""
-    # 06 M-7: 38 -- the 34 of 04a §5, minus the two bend cases, plus six basin.
+    """04a section 4.2 and section 5 as amended by 06 section 5, as counts."""
+    # 06 M-7: 38 -- the 34 of 04a section 5, minus the two bend cases, plus six basin.
     n_tier_a = 40 if cfg.CORRIDOR_BENDS else 38
     assert len(ste.tier_a()) == n_tier_a
     assert len({c.case_id for c in ste.tier_a()}) == n_tier_a
     assert sum(c.is_basin for c in ste.tier_a()) == 6
-    # 06 M-6 as amended by suite 3.4 (your call 2026-09-27): only the class x
+    # 06 M-6 as amended by suite 3.4 (decision 2026-09-27): only the class x
     # geometry combinations training draws, constant velocity, 8 cells x 100.
     cells = ste.tier_b_cells()
     assert len(cells) == 8
@@ -386,7 +386,7 @@ def test_the_suite_structure_matches_the_specification():
 
 
 def test_the_suite_regenerates_to_the_same_hashes():
-    """04a §9.3's last checklist item: regenerating from seed reproduces every
+    """04a section 9.3's last checklist item: regenerating from seed reproduces every
     hash.  Without it the released archive is a claim rather than an artefact."""
     first = ste.build_tier_a()
     second = ste.build_tier_a()

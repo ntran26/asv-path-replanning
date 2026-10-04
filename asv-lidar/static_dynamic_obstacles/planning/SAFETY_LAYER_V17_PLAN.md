@@ -1,6 +1,6 @@
 # V17: fresh measured yaw ablation
 
-Primary benchmark update: the user now designates test set v3 as the main evaluation set. See [the current protocol](SAFETY_EVALUATION_PROTOCOL.md). Results below remain their original v2/DV3 development comparisons.
+Primary benchmark update: test set v3 is now the main evaluation set. See [the current protocol](SAFETY_EVALUATION_PROTOCOL.md). Results below remain their original v2/DV3 development comparisons.
 
 Status: evaluated on nine targeted development cases; **no net improvement over V16**. Keep V16 as the stronger measured candidate. Neither version reaches the requested collision-free, success-preserving objective.
 

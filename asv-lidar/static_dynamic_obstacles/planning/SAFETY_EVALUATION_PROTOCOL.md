@@ -13,7 +13,7 @@ User decision, 2026-10-03: **test set v3 is the main evaluation set**. It supers
 
 Pair each result by test ID, episode seed and scenario digest. Do not pair by row position or origin ID. Preserve source, encounter cell, target variant, leg and panel count for subgroup reporting. Every original case stays in the denominator; report timeout and each collision type separately.
 
-The primary metrics are completed goals, rescued SAC failures, and lost SAC successes. More goals alone does not satisfy the user's requirement if the filter still loses policy-success cases.
+The primary metrics are completed goals, rescued SAC failures, and lost SAC successes. More goals alone does not satisfy the requirement if the filter still loses policy-success cases.
 
 ## Existing baseline and exposure
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One-off (your call, 2026-09-30): continue baseline-v3 SAC seed 0 from its
+# One-off (decision, 2026-09-30): continue baseline-v3 SAC seed 0 from its
 # 2.5 M checkpoint to 3.0 M steps (stage 7 continues), then run the evaluations
 # train_seed.sh would have run at 2.5 M (tier 1, frozen suite, Paper 2 set) on
 # the run's best development-set checkpoint.  train_seed.sh's wrapper was

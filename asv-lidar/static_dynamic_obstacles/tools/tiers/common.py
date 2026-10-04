@@ -96,7 +96,7 @@ def colregs_action(env, sense_sign: int, alteration_deg: float = 30.0) -> np.nda
     return follower_action(env)
 
 
-# The classical comparators (B8) and the CODEX reference controller: onboard
+# The classical comparators (B8) and the prototype's reference controller: onboard
 # controllers that read the environment's perception, one instance per episode.
 CONTROLLERS = ("los_dwa", "colregs_vo", "encounter_vo", "reference")
 

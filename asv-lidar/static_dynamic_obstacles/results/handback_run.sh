@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Hand-back starts (your call, 2026-10-01; planning/HANDBACK_STARTS_PLAN.md): after
+# Hand-back starts (decision, 2026-10-01; planning/HANDBACK_STARTS_PLAN.md): after
 # the SAC fix-1 fine-tune and its evaluations, collect the states where safety
 # layer v2 hands the helm back (dev set + near-deployment layouts, kept 3 M SAC
 # policy), then train PPO baseline-v3 seed 0 with 25 % of stage-6/7 episodes

@@ -3,7 +3,7 @@ non-compliant cells rely on.
 
 Suite 3.1 labelled the cells `re` / `nc`, names no model recognised, so every
 Tier B target ran at constant velocity.  Pinned here: the labels map to models,
-each model moves the way its row of 03a §5.3 says, and a manoeuvring target
+each model moves the way its row of 03a section 5.3 says, and a manoeuvring target
 stopped by the fairway edge holds its heading instead of saw-toothing.
 """
 

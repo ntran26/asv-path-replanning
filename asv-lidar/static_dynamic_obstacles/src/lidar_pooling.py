@@ -10,7 +10,7 @@ What did NOT change
 between neighbouring beams from the per-beam angular resolution theta, which is
 a constant 0.5 deg across the whole scan.  Only the sector *span* Phi varies, and
 Phi never enters the algorithm: it only decides which beams are in which group.
-That is the point 01 §2.2 makes, and it is why the pooling itself needs no edit.
+That is the point 01 section 2.2 makes, and it is why the pooling itself needs no edit.
 
 What did change, and why it matters
 -----------------------------------
@@ -81,7 +81,7 @@ def closeness_from_ranges(sector_ranges, lidar_range: float = cfg.LIDAR_RANGE) -
     """Map ranges to [0, 1] closeness: 1 = touching, 0 = clear to max range.
 
     Identical to Paper 2, and reused verbatim by the boundary branch so the two
-    normalisations cannot drift apart (01 §3.2).
+    normalisations cannot drift apart (01 section 3.2).
     """
     ranges = np.clip(np.asarray(sector_ranges, dtype=np.float32), 0.0, float(lidar_range))
     return np.clip(1.0 - ranges / float(lidar_range), 0.0, 1.0).astype(np.float32)

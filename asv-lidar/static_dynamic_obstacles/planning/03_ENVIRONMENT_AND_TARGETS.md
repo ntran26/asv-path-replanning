@@ -11,7 +11,7 @@
 > The rationale below still stands where it is not listed. `F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`.
 
 **Revision 2** — one dynamic target, `N_max` configurable.
-**Handover target:** Claude Code
+**Workstream:** implementation
 **Depends on:** 01 (tracker and LiDAR interface), 02 (precedence table for width thresholds)
 **Consumed by:** 04 (target behaviour models drive the scenario generator)
 
@@ -42,7 +42,7 @@ for training; reactive and non-compliant for evaluation only.**
 
 Deterministic geometry, reproducible encounters, and consistent with the maritime DRL
 literature. Training against a reactive opponent makes the environment non-stationary and
-destroys attribution — you cannot tell whether a behaviour change came from the policy or
+destroys attribution — it becomes impossible to tell whether a behaviour change came from the policy or
 the opponent.
 
 ### 2.2 Compliant reactive — evaluation stratum
@@ -90,7 +90,7 @@ The target must respect the channel; no passing through walls.
 
 ## 4. Corridor geometry
 
-**Requirement inherited from 01 §3.3 and now load-bearing for Study 1.**
+**Requirement inherited from 01 section 3.3 and now load-bearing for Study 1.**
 
 The environment must support:
 
@@ -113,13 +113,13 @@ field video: they hang stably and do not swing appreciably while the vessel mano
 Treating them as rigidly static in simulation is therefore correct, and no swing
 randomisation axis is needed.
 
-What does remain is a **jitter threshold** in the static/dynamic classifier (01 §4), and the
+What does remain is a **jitter threshold** in the static/dynamic classifier (01 section 4), and the
 dominant source of jitter is not the obstacle:
 
 - **Ego-pose error dominates.** When the vessel's own position estimate drifts, *every*
   static object in the scan acquires the same apparent velocity. The threshold is therefore
   a property of localisation quality rather than of the obstacles, and it should be set from
-  measured pose noise (05 §4) rather than from a nominal value — retightening it as
+  measured pose noise (05 section 4) rather than from a nominal value — retightening it as
   scan-to-map registration improves
 - A false promotion of a static panel to a target ship is a false positive with COLREGs
   consequences, so bias the threshold and hysteresis toward under-detection of motion
@@ -136,11 +136,11 @@ Every simulated width is therefore physically reproducible — a meaningful stre
 the field-validation argument.
 
 The unconfined reference case is supplied instead by the **open-water "Around the Clock"
-variant** (04 §4.1), which is unbounded by construction. Study 1 then sweeps degrees of
+variant** (04 section 4.1), which is unbounded by construction. Study 1 then sweeps degrees of
 confinement, with a published benchmark anchoring the open-water end. Arguably cleaner than
-one continuous sweep, since the wide end is not a case you defined.
+one continuous sweep, since the wide end is not a defined case.
 
-With the compressed ship domain from 01 §5.2, the sweep brackets the transition:
+With the compressed ship domain from 01 section 5.2, the sweep brackets the transition:
 
 | Width | Breadths | Compliant head-on fits? |
 |---|---|---|
@@ -166,7 +166,7 @@ the answer belongs in the paper rather than in the rebuttal.
 ## 6. Action space
 
 Structure unchanged (continuous rudder + propulsion). **Propulsion authority widens — resolved
-(02 §4.4).** Rule 8(e) speed reduction is now the designated fallback whenever a compliant
+(02 section 4.4).** Rule 8(e) speed reduction is now the designated fallback whenever a compliant
 course alteration would push the vessel into the boundary, so the agent must be able to slow
 substantially and ideally stop.
 
@@ -193,8 +193,8 @@ Build as environment parameters from the start, populated by 05 and swept by Stu
 | Vessel model parameters ± identification CI | dynamics |
 | Actuator lag and delay | actuator model |
 
-First-class config rather than hardcoded values is what turns "we identified the model"
-into "we identified the model and randomised within identification uncertainty" — and it is
+First-class config rather than hardcoded values is what turns "the model was identified"
+into "the model was identified and randomised within identification uncertainty" — and it is
 what makes Studies 2 and 3 possible at all.
 
 ---
@@ -202,8 +202,8 @@ what makes Studies 2 and 3 possible at all.
 ## 8. Open items
 
 - Reconcile `dynamic_obstacles/rl_env_dynamic.py` against this specification
-- Decide propulsion authority (coupled to 02 §4.4)
-- Define the target hull polygon and ship domain at model scale (coupled to 01 §5.2)
+- Decide propulsion authority (coupled to 02 section 4.4)
+- Define the target hull polygon and ship domain at model scale (coupled to 01 section 5.2)
 - Speed threshold and hysteresis for static/dynamic classification
 - Verify the episode horizon: 700 steps at 0.1 s = 70 s. Confirm this is long enough for
   acquisition, classification, manoeuvre and clearing in the longest corridor

@@ -1,8 +1,8 @@
 # Hand-back starts — training the policy on the states the safety layer leaves (option, 2026-10-01)
 
-**Status: ON HOLD (your call, 2026-10-01 21:30).** The watcher that would have run it after the
+**Status: ON HOLD (decision, 2026-10-01 21:30).** The watcher that would have run it after the
 SAC fix-1 fine-tune was stopped before it did anything; to resume, `bash results/handback_run.sh`.
-Saved as an option (your call, 2026-10-01), planned as a PPO baseline-v3 run of 3 M steps. Code is built and tested:
+Saved as an option (decision, 2026-10-01), planned as a PPO baseline-v3 run of 3 M steps. Code is built and tested:
 `ASVLidarEnv.set_start_pool`, `tools/diagnostics/harvest_handback_starts.py`,
 `train_formulation.py --start-pool`, `tests/test_handback_starts.py`, and the chain
 `results/handback_run.sh`.
@@ -38,7 +38,7 @@ with a target close by.
    - the executed actions and the brake flags.
    A hand-back state can be escaped by construction: the filter passed the policy's
    action there, so a safe recovery existed.
-2. **Sources (your call: "the dev set and the field set"):**
+2. **Sources (decision: "the dev set and the field set"):**
    - `dev`: the v3 field development set, 150 scenarios × 2 episode seeds.
    - `field`: 220 fresh layouts near the deployment layouts L1–L3
      (`field_training.sample(near=True)`, training generator, seeds from 380,000).
@@ -49,7 +49,7 @@ with a target close by.
      layouts give "field-set" states without that. To use the exact Paper 2 episodes
      anyway, add them as a third source; the Paper 2 result for this run then stops
      being a held-out test.
-   - The **dev set is used, as you asked.** It is also what selects the best
+   - The **dev set is used, as decided.** It is also what selects the best
      checkpoint during training (`[EVAL] dev goal`). Training sees only mid-episode
      states from those scenarios, not whole episodes, but the dev-goal selection is
      mildly optimistic for this run. The frozen suite is untouched either way.
@@ -73,7 +73,7 @@ with a target close by.
 
 - **A PPO baseline-v3 control without hand-back starts** (same seed, same 3 M). No PPO
   v3 run exists yet. This control is also the planned PPO v3 seed-0 baseline, so it is
-  not extra work if v3 is adopted. **Not queued; your call** (about 7–8 h of training).
+  not extra work if v3 is adopted. **Not queued; a decision is pending** (about 7–8 h of training).
 - **The current SAC v3 policy is not a valid control**: it is a different learner.
 
 ## 4. Caveats

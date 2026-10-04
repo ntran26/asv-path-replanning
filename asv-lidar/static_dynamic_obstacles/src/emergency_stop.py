@@ -198,7 +198,7 @@ def stop_required(contexts) -> Optional[str]:
     * **read ground truth.**  The contexts are perceived.  A controller on the
       water has nothing else, and a safety layer that read truth in training
       would hand the evaluated system information the comparators never get
-      (04 §8).
+      (04 section 8).
 
     **A18 (decided, option 1): and only when stopping clears.**  A stop cannot
     change a reciprocal head-on target's DCPA -- the target runs onto the

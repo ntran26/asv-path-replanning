@@ -2,7 +2,7 @@
 
 > **Status note (2026-09-22).** Parts of this document are superseded by the implementation, which is frozen as **baseline-v1** (`configs/baseline_v1.json`, git tag `baseline-v1`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here:
 >
-> - Suite 3.0 per spec 06 §5 (Tier A 38, Tier B 48 × 20), built in `src/suite.py` (F75); spec 06 §7 lists the edits this document still needs.
+> - Suite 3.0 per spec 06 section 5 (Tier A 38, Tier B 48 × 20), built in `src/suite.py` (F75); spec 06 section 7 lists the edits this document still needs.
 >
 > - Curriculum: five stages at 0 / 8 / 18 / 32 / 50 % of the budget (F75); stage 3 adds crossings from both sides (A27).
 >
@@ -22,8 +22,8 @@
 
 **Revision 2.0** — first full specification. Expands `04_SCENARIOS_AND_EVALUATION.md` into an
 implementable spec and closes its six open items.
-**Handover target:** Claude Code (§3, §4, §9), Claude chat (§2 findings need your sign-off first)
-**Depends on:** 02 §3.2 precedence structure, 01 §5.2–5.3 domain and classifier, 03 §2–§5 targets
+**Workstream:** implementation (sections 3, 4 and 9), design (section 2 findings need sign-off first)
+**Depends on:** 02 section 3.2 precedence structure, 01 section 5.2–5.3 domain and classifier, 03 sections 2–5 targets
 and corridor
 **Status of numbers:** every derived threshold below is a function of the ship domain and the
 pose-noise characterisation. Both are provisional. All are written as formulae with the current
@@ -34,11 +34,11 @@ inputs substituted, so they recompute when 05 lands.
 ## 1. Four findings that change the design
 
 These came out of writing the generator's feasibility constraints. Three of them change decisions
-already recorded elsewhere. Read this section before §3.
+already recorded elsewhere. Read this section before section 3.
 
 ### 1.1 The binding width threshold is crossing, not head-on — and it sits at 7.6 m
 
-Document 04 §5 frames Study 1 as sweeping "down to the point at which the Rule 14 starboard
+Document 04 section 5 frames Study 1 as sweeping "down to the point at which the Rule 14 starboard
 alteration no longer fits". Working the geometry through, Rule 14 is the *last* manoeuvre to become
 inadmissible, not the first.
 
@@ -68,7 +68,7 @@ W_overtake  ≈  W_headon + 2 · ρ_pose · t_exp  =  3.80 + 0.46  =  4.26 m   (
 
 Two consequences:
 
-- The sweep in 03 §5 (10, 8, 6, 5, 4, 3.5 m) brackets the head-on transition well and steps straight
+- The sweep in 03 section 5 (10, 8, 6, 5, 4, 3.5 m) brackets the head-on transition well and steps straight
   over the crossing transition between 8 m and 6 m. **Add a 7 m and a 4.5 m level.**
 - The headline Study 1 figure is the *crossing* transition — the width at which give-way stops being
   executed by alteration and starts being executed by speed reduction under 8(e). That is a
@@ -83,7 +83,7 @@ decision, not an accident.
 
 ### 1.2 The ship domain currently has two incompatible readings, worth 1.2 m of channel width
 
-03 §5 computes the head-on minimum as `2 × 1.18 + 2 × 0.65 = 3.66 m`, which treats the ship domain
+03 section 5 computes the head-on minimum as `2 × 1.18 + 2 × 0.65 = 3.66 m`, which treats the ship domain
 as governing vessel-to-vessel separation only, with a separate and smaller physical clearance to the
 wall. The alternative reading — the domain is inviolable by *anything*, walls included — gives
 `1.25 + 2.50 + 1.25 = 5.00 m`. That is one of the sweep levels, and it would move the head-on
@@ -105,7 +105,7 @@ cheap to declare and awkward if a reviewer derives the 5.00 m figure independent
 
 ### 1.3 A 90° crossing is not realisable with a channel-confined target — Rule 9(d) fixes it
 
-03 §3 requires the target to respect the channel and not pass through walls. Applied to a crossing
+03 section 3 requires the target to respect the channel and not pass through walls. Applied to a crossing
 target in a straight corridor, that constraint is unsatisfiable: a vessel crossing a 4 m fairway at
 90° runs into the far wall. Generating crossings on bends instead needs a heading change of at least
 67.5° to reach the crossing band, and an L-bend of that angle does not fit a 10 m-wide basin.
@@ -121,14 +121,14 @@ confined to the channel in head-on, overtaking, being-overtaken and null, and cr
 the crossing class.
 
 This is field-reproducible without modification. The corridor is virtual — a map polygon enforced in
-software (01 §3.4) — inside a 10 m basin. A target vessel can physically cross a 4 m virtual corridor
+software (01 section 3.4) — inside a 10 m basin. A target vessel can physically cross a 4 m virtual corridor
 and continue into water the own ship treats as non-navigable. It also tightens the Rule 9 argument:
 9(b) carries head-on and overtaking precedence, 9(d) carries crossing. Both are cited, neither is
 stretched.
 
 ### 1.4 Spawning outside sensor range is only possible for head-on
 
-03 §3 requires the target to spawn beyond `D_max` so that acquisition is part of the task. For
+03 section 3 requires the target to spawn beyond `D_max` so that acquisition is part of the task. For
 head-on that is comfortable. For every other class it is geometrically impossible in a 25 m basin,
 because closing speed is a difference rather than a sum:
 
@@ -143,7 +143,7 @@ Forcing out-of-range spawning everywhere would need a target moving at under 0.1
 overtaking — below steerageway for a model hull — or a corridor two to three times the basin length,
 which forfeits the physical-reproducibility argument that O4 was resolved to protect.
 
-**Specify spawn range per class (§3.4) and report track acquisition range per class.** It will be
+**Specify spawn range per class (section 3.4) and report track acquisition range per class.** It will be
 structurally different across classes, and that is a property of confined-water encounter geometry,
 not a defect in the perception pipeline. One sentence in the results pre-empts the question.
 
@@ -151,44 +151,44 @@ not a defect in the perception pipeline. One sentence in the results pre-empts t
 0.83–1.21 m/s. Whether the target platform can do that is open (05). If it cannot, run field
 being-overtaken trials at a reduced own-ship reference speed of ≈0.35 m/s rather than dropping the
 class. Acquisition range astern is 4–6 m and further degraded by the aft self-occlusion sector
-(01 §2.3), so this is the class most likely to fail in the field for perception rather than policy
+(01 section 2.3), so this is the class most likely to fail in the field for perception rather than policy
 reasons — which makes it the most informative one to run.
 
 ---
 
-## 2. Decisions closing 04 §9
+## 2. Decisions closing 04 section 9
 
 | Open item | Decision |
 |---|---|
-| Episodes per Tier B cell | **25**, over 39 cells = 975 episodes per policy per seed. Evaluation is not the compute bottleneck (§8.3); do not cut this to buy training runs |
-| Corridor width thresholds | **Derived in §1.1.** Wide ≥ 7.60 m, intermediate 4.26–7.60 m, narrow 3.50–4.26 m. Strata are defined by the predicted governing rule, not by round numbers |
-| Tier A case list | **§5, 34 named cases** |
-| Presentation format for multi-axis results | **One pre-registered primary endpoint — compliant success rate — plus a per-axis table and a two-panel Pareto. No weighted scalar** (§7.1) |
-| Channel-constrained "Around the Clock" placement | **Main text, both variants in one figure.** The open-water/constrained contrast *is* the evidence for N2; splitting it across the appendix wastes it (§4.3) |
-| Comparator list | **Protected core plus a pre-committed priority tail, gated on measured throughput** (§8) |
+| Episodes per Tier B cell | **25**, over 39 cells = 975 episodes per policy per seed. Evaluation is not the compute bottleneck (section 8.3); do not cut this to buy training runs |
+| Corridor width thresholds | **Derived in section 1.1.** Wide ≥ 7.60 m, intermediate 4.26–7.60 m, narrow 3.50–4.26 m. Strata are defined by the predicted governing rule, not by round numbers |
+| Tier A case list | **section 5, 34 named cases** |
+| Presentation format for multi-axis results | **One pre-registered primary endpoint — compliant success rate — plus a per-axis table and a two-panel Pareto. No weighted scalar** (section 7.1) |
+| Channel-constrained "Around the Clock" placement | **Main text, both variants in one figure.** The open-water/constrained contrast *is* the evidence for N2; splitting it across the appendix wastes it (section 4.3) |
+| Comparator list | **Protected core plus a pre-committed priority tail, gated on measured throughput** (section 8) |
 
 ---
 
 ## 3. Scenario generator
 
 One generator, three consumers (training distribution, frozen suite, sweeps), one seed namespace
-scheme (§9.2).
+scheme (section 9.2).
 
 ### 3.1 Sampling order
 
 1. Sample encounter class `k ∈ {head-on, crossing, overtaking, being overtaken, null, no-target}`
-2. Sample corridor geometry: width profile, bend, path offset (§3.2)
+2. Sample corridor geometry: width profile, bend, path offset (section 3.2)
 3. Sample target kinematics: heading intersection angle `CT`, speed ratio, desired `DCPA`, desired
-   spawn `TCPA` — all from class-conditional intervals (§3.4)
-4. **Solve backwards** for the spawn position (§3.3)
-5. Validate against class bands, channel containment, and range rules; reject and resample (§3.5)
-6. Place static obstacles subject to non-interference constraints (§3.6)
-7. Emit a scenario record (§9.1)
+   spawn `TCPA` — all from class-conditional intervals (section 3.4)
+4. **Solve backwards** for the spawn position (section 3.3)
+5. Validate against class bands, channel containment, and range rules; reject and resample (section 3.5)
+6. Place static obstacles subject to non-interference constraints (section 3.6)
+7. Emit a scenario record (section 9.1)
 
 ### 3.2 Corridor geometry
 
 The boundary branch only earns its 7 dimensions when width varies, the path is off-centre, or the
-channel bends (01 §3.3). This is a hard requirement on the generator, not a nicety.
+channel bends (01 section 3.3). This is a hard requirement on the generator, not a nicety.
 
 | Parameter | Range | Notes |
 |---|---|---|
@@ -217,7 +217,7 @@ R_0       = |p_TS(0) − p_OS(0)|
 ```
 
 Then recompute `(α, CT, DCPA, TCPA)` forward from the resulting state and confirm they land in the
-intended class bands (01 §5.3). This round-trip check is not optional — the sampled `CT` and the
+intended class bands (01 section 5.3). This round-trip check is not optional — the sampled `CT` and the
 realised `α` are independent, and a fraction of draws will produce a different class than intended,
 particularly near band edges and on bends.
 
@@ -244,7 +244,7 @@ class-conditional spawner but is common in practice, and it is the case where a 
 learned "target present ⇒ manoeuvre" will visibly overreact.
 
 **No-target episodes: 15–20% of training.** Below that the static-only configuration drifts out of
-distribution and the Paper 2 comparison degrades for the wrong reason (01 §6.2).
+distribution and the Paper 2 comparison degrades for the wrong reason (01 section 6.2).
 
 ### 3.5 Rejection accounting is a result, not a diagnostic
 
@@ -252,8 +252,8 @@ Log rejections by `(class, width, reason)`. The rejection rate per cell is an an
 measure — it says at what width each encounter class stops being constructible at all, entirely
 independently of any policy's performance. Plotted against width alongside the Study 1 outcome
 curves, it separates "the method fails here" from "the geometry is infeasible here", which is
-exactly the distinction §4.4 of the parent document asks for and the strongest available answer to
-"you designed the benchmark to produce the conclusion."
+exactly the distinction section 4.4 of the parent document asks for and the strongest available answer to
+the objection that the benchmark was designed to produce the conclusion.
 
 Cap at 200 attempts per scenario; record the cap-out rate.
 
@@ -268,8 +268,8 @@ Cap at 200 attempts per scenario; record the cap-out rate.
 - **Occlusion cases (flagged):** one obstacle placed on the OS→TS line of sight for a specified
   duration `t_occ ∈ {1, 2, 4} s`. Occlusion becomes a controlled variable rather than an accident,
   which is what makes it usable as a Study 2 axis and as the evidence for or against recurrence
-  (01 §6.3).
-- Minimum cluster size must exceed the suspension-line rejection threshold (03 §4a).
+  (01 section 6.3).
+- Minimum cluster size must exceed the suspension-line rejection threshold (03 section 4a).
 
 ### 3.7 Curriculum parameters
 
@@ -292,14 +292,14 @@ geometry where the textbook manoeuvre is inadmissible.
 ### 4.1 Episode horizon — increase to 900 steps
 
 700 steps at 0.1 s is 70 s. Own ship at 0.55 m/s covers the 20 m path in 36 s, but Rule 8(e) is now a
-*designated compliant behaviour* (02 §4.4): a correct narrow-channel give-way may involve slowing to
+*designated compliant behaviour* (02 section 4.4): a correct narrow-channel give-way may involve slowing to
 0.2 m/s for 20 s or more. A horizon tight enough to turn compliant slowing into a timeout puts the
 horizon in direct conflict with the reward design.
 
 **Set the horizon to 900 steps (90 s) for all cells, training and evaluation.** Fixed rather than
 width-conditional, so timeout rates remain comparable across the sweep. Report timeout separately
 from failure — under this reward they mean different things. Cost: +28.6% training wall-clock, which
-is accounted for in §8.
+is accounted for in section 8.
 
 ### 4.2 Structure
 
@@ -325,7 +325,7 @@ reports one draw from the perception noise, not the behaviour.
 
 `4 × 3 × 3 + 1 × 3 = 39` cells. At 25 episodes, 975 per policy per seed.
 
-Width strata are cut at the derived thresholds (§1.1) rather than at round numbers, so each stratum
+Width strata are cut at the derived thresholds (section 1.1) rather than at round numbers, so each stratum
 has a distinct predicted governing rule: wide = alteration admissible for all classes; intermediate =
 crossing resolves under 8(e) while head-on and overtaking still alter; narrow = only head-on
 channel-keeping and 8(e) remain. If the measured behaviour matches that partition, the precedence
@@ -346,7 +346,7 @@ rather than adopting their 2 NM scaling.
 ### 4.5 The deliberate-failure stratum
 
 Narrow width with a non-compliant target is the natural candidate and it must be *reported*, not
-merely present. Two Tier A cases (§5, `A-FAIL-*`) and the narrow × non-compliant Tier B cells carry
+merely present. Two Tier A cases (section 5, `A-FAIL-*`) and the narrow × non-compliant Tier B cells carry
 it. Pre-commit in the claim ledger that this stratum is reported at whatever level it comes out.
 
 Framing rule, applied throughout: no stratum is described as "challenging for classical methods".
@@ -396,7 +396,7 @@ The two added levels bracket the crossing transition at 7.60 m and the overtakin
 
 **Base constellations:** 12, drawn from Tier A — one per class per behaviour for the four
 non-null classes, held fixed across widths so the sweep is interpretable. No retraining: the policy
-is trained across the full width range (§3.7 stage 5) and evaluated per width.
+is trained across the full width range (section 3.7 stage 5) and evaluated per width.
 
 **Reported per width:**
 
@@ -406,7 +406,7 @@ is trained across the full width range (§3.7 stage 5) and evaluated per width.
 - Collision rate split static / boundary / target
 - **Manoeuvre-mode share** — fraction of give-way events resolved by course alteration vs by speed
   reduction under 8(e). This is the headline curve
-- Generator rejection rate per class (§3.5) on the same axis — the feasibility envelope
+- Generator rejection rate per class (section 3.5) on the same axis — the feasibility envelope
 - Width at which each classical comparator becomes inadmissible
 
 **Predicted result to pre-register:** the crossing manoeuvre-mode share crosses 50% between 8 m and
@@ -436,9 +436,9 @@ Cost is 5 additional training runs and it is the single highest-value addition t
 
 | Axis | Nominal source | Failure endpoint |
 |---|---|---|
-| Pose drift magnitude | rf2o characterisation, 05 §4 | Boundary raycast becomes unusable |
+| Pose drift magnitude | rf2o characterisation, 05 section 4 | Boundary raycast becomes unusable |
 | Detection dropout rate | Returns-per-revolution analysis | Track loss |
-| Occlusion duration | Scenario-controlled (§3.6) | Beyond tracker coast time |
+| Occlusion duration | Scenario-controlled (section 3.6) | Beyond tracker coast time |
 | Velocity estimate noise | Scan-distortion analysis | Encounter misclassification |
 
 Plus one joint corner at 2× on all four axes. **21 conditions.** Evaluated on the 12-constellation
@@ -540,8 +540,8 @@ bias that is invisible in the results and fatal if noticed.
 - [ ] `SUITE_MANIFEST.json` committed: version, hashes, seed ranges, generator SHA, constants snapshot
 - [ ] `constants.py` snapshot with every `TODO(04-*)` resolved or explicitly deferred
 - [ ] Empty result tables committed matching the draft skeleton
-- [ ] Claim ledger committed, including the Study 1 predictions from §6
-- [ ] Comparator priority order (§8.2) committed
+- [ ] Claim ledger committed, including the Study 1 predictions from section 6
+- [ ] Comparator priority order (section 8.2) committed
 - [ ] Regeneration test: regenerating from seed reproduces every hash
 
 ### 9.4 Release artefact
@@ -554,17 +554,17 @@ archive. With Imazu dropped this is not optional — it is the only structural d
 
 ## 10. Metrics — suite-specific additions
 
-Full list in `00` §4.2. New or refined here:
+Full list in `00` section 4.2. New or refined here:
 
 | Metric | Definition | Carries |
 |---|---|---|
 | **Compliant success** | Goal reached, no collision, no COLREGs violation. **Primary endpoint** | Everything |
 | Manoeuvre-mode share | Give-way events resolved by alteration vs by 8(e) speed reduction | Study 1, N2 |
-| Failure-mode ratio `FMR` | §7.2 | Study 2, N1 |
-| Track acquisition range | Reported **per class** (§1.4) | N1 |
+| Failure-mode ratio `FMR` | Section 7.2 | Study 2, N1 |
+| Track acquisition range | Reported **per class** (section 1.4) | N1 |
 | Generator rejection rate | Per `(class, width)` | Study 1 feasibility envelope |
-| Speed-reduction events | Count, timing, and whether class and geometry made them appropriate (02 §4.4) | Study 1, N2 |
-| Timeout rate | Reported separately from failure (§4.1) | — |
+| Speed-reduction events | Count, timing, and whether class and geometry made them appropriate (02 section 4.4) | Study 1, N2 |
+| Timeout rate | Reported separately from failure (section 4.1) | — |
 
 ### 10.1 Presentation
 
@@ -587,20 +587,20 @@ weights, and there is no defensible way to choose them.
 | `TODO(04-2)` | `D_max` effective, including the black-wall side | 05 |
 | `TODO(04-3)` | Curriculum steps per stage | 04 → after throughput measurement |
 | `TODO(04-4)` | Training steps per run, total budget hours | 04 |
-| — | Confirm the §1.1 threshold ordering against 02a | 02 |
-| — | Confirm the two-constraint domain convention (§1.2) and restate 03 §5 arithmetic | 01 / 03 |
-| — | Revise 03 §3 target-confinement rule for the crossing class (§1.3) | 03 |
-| — | Target platform top speed — gates the being-overtaken class (§1.4) | 05 |
+| — | Confirm the section 1.1 threshold ordering against 02a | 02 |
+| — | Confirm the two-constraint domain convention (section 1.2) and restate 03 section 5 arithmetic | 01 / 03 |
+| — | Revise 03 section 3 target-confinement rule for the crossing class (section 1.3) | 03 |
+| — | Target platform top speed — gates the being-overtaken class (section 1.4) | 05 |
 | — | Whether the sub-threshold width `X` = 3.5 m is also added to the Tier B narrow stratum | 04 |
 
 ### Changes this document requires elsewhere
 
-1. **03 §3** — target confinement becomes class-conditional; crossing targets cross the fairway
+1. **03 section 3** — target confinement becomes class-conditional; crossing targets cross the fairway
    under Rule 9(d)
-2. **03 §5** — width table gains 7.0 m and 4.5 m levels; head-on minimum recomputed to 3.80 m under
+2. **03 section 5** — width table gains 7.0 m and 4.5 m levels; head-on minimum recomputed to 3.80 m under
    the two-constraint convention; the 3.66 m figure is superseded
-3. **03 §8** — episode horizon resolved: 900 steps
-4. **02 §3.2** — precedence table gains numeric width thresholds and a Rule 9(d) row for crossing
-5. **01 §6.3** — the recurrence decision is now gated by the Study 2 occlusion axis and the
+3. **03 section 8** — episode horizon resolved: 900 steps
+4. **02 section 3.2** — precedence table gains numeric width thresholds and a Rule 9(d) row for crossing
+5. **01 section 6.3** — the recurrence decision is now gated by the Study 2 occlusion axis and the
    RecurrentPPO tail entry, both specified here
-6. **00 §2** — "width thresholds" moves from *still open* to *derived, pending Study 1 confirmation*
+6. **00 section 2** — "width thresholds" moves from *still open* to *derived, pending Study 1 confirmation*

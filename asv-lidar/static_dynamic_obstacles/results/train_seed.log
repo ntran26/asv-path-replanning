@@ -76,3 +76,21 @@ code matches baseline-v3
 2026-10-03 22:29:27    (the 22:29 feasibility lines above were a false start under WSL bash: python not found, nothing ran; relaunched with Git Bash)
 2026-10-03 22:29:27 == feasibility run: oracle (development sets), crossing trace, oracle (test set v3); 5 processes
 2026-10-03 22:32:50    dev controller outcomes (SAC 3 M, LOS-DWA, COLREGs-VO on the 370 oracle dev episodes; 3 processes) -> results/feasibility/dev_outcomes.csv
+2026-10-03 23:45:42    feasibility run stopped at 118/370 dev episodes: the single-manoeuvre oracle missed solutions (SAC solved 9 of its 12 'unsolved'); oracle being revised
+2026-10-04 00:18:38 == feasibility run: oracle (development sets), crossing trace, oracle (test set v3); 6 processes
+2026-10-04 02:10:46    oracle development sets exit 0 (results/feasibility/oracle_summary.txt)
+2026-10-04 02:13:04    crossing trace exit 0 (results/crossing_trace/summary.txt)
+2026-10-04 04:32:44    oracle test set v3 exit 0 (results/feasibility/oracle_summary.txt)
+2026-10-04 04:32:44 == feasibility run done
+2026-10-04 04:56:54    test set v4 build: v3 with the 67 oracle-failing episodes (tight, decided before tracking, unsolvable) replaced by same-cell draws that pass (results/test_set_v4_build.log)
+2026-10-04 04:59:05 == development-set oracle (evaluation seeds) queued: waiting for the test set v4 build
+2026-10-04 04:59:51 == SAC on test set v4 queued: waiting for the build
+2026-10-04 05:02:19 == development-set replacements queued: waiting for the development-set oracle
+2026-10-04 05:25:15    test set v4 build: test set 4.0: 1000 episodes from 1103 distinct scenarios (103 near-duplicates removed), digest a8c40beb234ea7f9, built in 1674 s
+2026-10-04 05:29:57    SAC on test set v4 exit 0 (results/test_set/v4/sacs0_bl3/summary.txt)
+2026-10-04 05:29:58 == SAC on test set v4 done
+2026-10-04 06:26:43    development-set oracle exit 0 (results/feasibility/oracle_summary.txt)
+2026-10-04 06:26:44 == development-set oracle done
+2026-10-04 06:45:41    development-set replacements exit 0 ([dev v4] 37 of 37 replaced in 1069 s -> configs\dev_set_v4_replacements.json)
+2026-10-04 06:45:41 == development-set replacements done
+2026-10-04 07:41:30    reward check: SAC's continuation from the first track vs successful oracle manoeuvres, development crossings (results/crossing_trace/reward_check_summary.txt)

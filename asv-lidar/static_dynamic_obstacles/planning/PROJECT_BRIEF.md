@@ -1,8 +1,8 @@
-# PROJECT BRIEF — Paste at thread start
+# PROJECT BRIEF — read at the start of each work session
 
 > **Status note (2026-09-22).** Parts of this document are superseded by the implementation, which is frozen as **baseline-v1** (`configs/baseline_v1.json`, git tag `baseline-v1`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here:
 >
-> - "SAC primary; PPO, RecurrentPPO, TQC as …": the baseline set is PPO, RecurrentPPO, TD3, SAC and TQC on one frozen formulation (F76, F77, F93); the framing is open (`METHODS_BRIEF.md` §9).
+> - "SAC primary; PPO, RecurrentPPO, TQC as …": the baseline set is PPO, RecurrentPPO, TD3, SAC and TQC on one frozen formulation (F76, F77, F93); the framing is open (`METHODS_BRIEF.md` section 9).
 >
 > - S6: the observation is **70** values (F72), not ≈56.
 >
@@ -22,7 +22,7 @@
 > pinned in `configs/comparators_v1.json` (F97, F98).
 
 **Last updated:** 2026-09-04
-**This thread's task:** `______________________________________________`
+**Current task:** `______________________________________________`
 
 ---
 
@@ -41,7 +41,7 @@ path following combined with real-time obstacle avoidance via deep RL. Multi-pap
 | **Paper 3** | **In design — this is the current work** |
 
 Paper 2 is settled. Don't re-open its design; it's the baseline and the source of the
-review lessons in §7.
+review lessons in section 7.
 
 ---
 
@@ -63,8 +63,8 @@ comparators.
 behaviourally identical to the original scripts). Do **not** work from the top-level
 `rl_env.py` or `rl_env_reward_v2.py` — superseded. `dynamic_obstacles/rl_env_dynamic.py`
 already contains early Paper 3 work. `bluefin_modelling/` holds the system-ID pipeline.
-`field_deployment/` holds the hardware stack and trial logs (logs are Claude Code
-territory only — 130 KB to 2 MB each).
+`field_deployment/` holds the hardware stack and trial logs (logs are processed in the
+repository only — 130 KB to 2 MB each).
 
 **Known gaps carried forward:** field RMS cross-track error roughly 2× simulation. The LiDAR
 does not register the pool edge at all — it registers the facility walls 1–2 m beyond it, which
@@ -201,10 +201,10 @@ VO (Thyri & Breivik, which also serves as the reactive target model).
 
 ---
 
-## 8. How to work with me
+## 8. Working practices
 
-**Workstream separation.** Claude chat = thinking and decisions. Claude Code = anything
-touching the repository. Cowork = document deliverables and formatting.
+**Workstream separation.** Design and decisions are recorded in `planning/`; anything
+touching the repository is implementation work; document deliverables and formatting are separate.
 
 **Output style.** Structured, technically grounded drafts with explicit decision points
 flagged. Not exhaustive option lists — give a recommendation and the reasoning, then the
@@ -213,8 +213,8 @@ alternatives.
 **Literature.** Q1 or high-ranking journals, recent. Avoid arXiv unless strongly justified.
 Separate "cite for framing" from "read intensively for implementation."
 
-**Key sources.** Waltz & Okhrin (2023, *Neural Networks* 165:634–653) — §3.3 CPA/CRI and
-§4.3 encounter table are reusable, **but constants are tuned for a 320 m KVLCC2 and must be
+**Key sources.** Waltz & Okhrin (2023, *Neural Networks* 165:634–653) — section 3.3 CPA/CRI and
+Section 4.3 encounter table are reusable, **but constants are tuned for a 320 m KVLCC2 and must be
 re-derived in ship lengths for the 1.57 m Bluefin; the 3·Lpp ship domain does not fit the
 channel.** Also Waltz, Paulig & Okhrin (2025, *ESWA* 274:126933); Heiberg et al. (2022,
 *Neural Networks* 152:17–33); Hansen et al. (2022, *IFAC-PapersOnLine* 55(31):222–228);
@@ -231,7 +231,7 @@ Skjetne, Smogeli & Fossen (2004, *MIC* 25(1):3–27).
 `03_ENVIRONMENT_AND_TARGETS` · `04_SCENARIOS_AND_EVALUATION` ·
 `05_VESSEL_MODEL_AND_SIM2REAL`. Plus `PAPER3_DRAFT_SKELETON.md` when drafting.
 
-Repository files: see `00` §5 for the per-thread attachment sets.
+Repository files: see `00` section 5 for the per-session reading sets.
 
 Work order: **02 first** (the precedence table now gates several other decisions),
 05 in parallel (gates on basin booking), then 01 → 03 → 04.

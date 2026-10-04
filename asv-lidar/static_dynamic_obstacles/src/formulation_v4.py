@@ -17,8 +17,9 @@ Changes from v3:
 
 | E | (4.1, after G4) Straight survey lanes for 70 % of dense draws and field layouts; field targets varying speed 20 / 50 / 50 %; field weights NT .15 HO .20 CRP .175 CRS .175 OT .15 BO .15 -- test set v3: varying-speed 0.61, FS-CRP 0.45, FS-BO 0.64 |
 
-Unchanged: reward, observation, learners, stage step fractions, budget, the
-development set (v3's).  The discount is tested separately in pilot arm B
+| F | (4.2, 2026-10-04) Near-impossible development episodes replaced in place: no manoeuvre that starts at or after the first track reaches the goal with 0.2 m clearance (`src/oracle_feasibility.py`); same rule as test set v4 |
+
+Unchanged: reward, observation, learners, stage step fractions, budget.  The discount is tested separately in pilot arm B
 (gamma 0.98; gate G1: the best-return behaviour is safe in 88 % of solvable
 conflict scenarios at 0.951, 100 % at 0.98).
 """
@@ -30,7 +31,7 @@ from typing import Dict
 import formulation_v3 as v3
 
 ID = "baseline-v4"
-REVISION = "4.1-draft"                 # 4.1: straight legs, more varying-speed targets, weights
+REVISION = "4.2-draft"                 # 4.1: straight legs, more varying-speed targets, weights; 4.2: feasible dev set
 
 TIMESTEPS = v3.TIMESTEPS
 STAGE_FRACTIONS = v3.STAGE_FRACTIONS
@@ -57,12 +58,20 @@ FIELD_PREFETCH = v3.FIELD_PREFETCH
 ST_MAX_REDRAWS = v3.ST_MAX_REDRAWS
 
 def field_development_set():
-    """4.1: v3's field development set (150, unchanged) plus the v4 extension
+    """4.1: v3's field development set (150) plus the v4 extension
     (`dev_set_v4.extension`: 60 dense field-style episodes, 70 % straight legs,
-    half the targets varying speed), so checkpoints are selected where test set
-    v3 is hardest; the frozen-like 120 stay as they are."""
+    half the targets varying speed), so checkpoints are selected where the test
+    set is hardest.  4.2: near-impossible episodes replaced in place
+    (`dev_set_v4.development_sets`, `configs/dev_set_v4_replacements.json`)."""
     import dev_set_v4
-    return v3.field_development_set() + dev_set_v4.extension()
+    return dev_set_v4.development_sets()[1]
+
+
+def development_set(per_class: int = 20):
+    """4.2: the frozen-like development set (`train_formulation.development_set`)
+    with its near-impossible episodes replaced in place."""
+    import dev_set_v4
+    return dev_set_v4.development_sets(per_class)[0]
 
 
 def stages(cfg) -> Dict[int, dict]:

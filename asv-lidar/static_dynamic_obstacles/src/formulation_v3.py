@@ -1,6 +1,6 @@
 """baseline-v3: baseline-v2 plus field-layout curriculum stages (prepared 2026-09-28).
 
-Prepared on your call ("create baseline-v3 in case I change my mind"), **not
+Prepared as a fallback (baseline-v3 kept ready in case the baseline changes), **not
 trained**.  It is an *overlay* on baseline-v2: the reward, observation, vessel
 model, learners and stages 1-4 are v2's unchanged; what changes is what training
 sees after stage 4, and the development set that selects the checkpoint.

@@ -4,7 +4,7 @@
 >
 > - S6: the observation is **70** values in six branches (`a25-v3-context`, F72), not ≈56 — see `OBSERVATION_SPEC.md`.
 >
-> - Learners: five on one frozen formulation — PPO, RecurrentPPO, TD3, SAC, TQC (TQC replaced SAC-IQN, F77). Whether the paper presents a proposed learner or a five-learner comparison is open (`METHODS_BRIEF.md` §9).
+> - Learners: five on one frozen formulation — PPO, RecurrentPPO, TD3, SAC, TQC (TQC replaced SAC-IQN, F77). Whether the paper presents a proposed learner or a five-learner comparison is open (`METHODS_BRIEF.md` section 9).
 >
 > - Decisions at **2 Hz** with 0.1 s physics (F38); basin mode is the default geometry (F74, spec 06).
 >
@@ -33,21 +33,21 @@ journal paper (Paper 2 — LiDAR sector pooling, staged curriculum, sim-to-field
 ## 1. How to use this set
 
 Six documents plus a draft skeleton. This one is the anchor; the others are
-self-contained handovers intended to be opened in **separate threads**.
+self-contained handovers each covering **one workstream**.
 
-| # | Document | Target surface | Depends on |
+| # | Document | Workstream | Depends on |
 |---|---|---|---|
 | 00 | `00_PAPER3_INDEX_AND_PROTOCOL.md` | — (anchor) | — |
-| 01 | `01_PERCEPTION_AND_OBSERVATION.md` | Claude Code | 02 (classifier definition) |
-| 02 | `02_REWARD_AND_COLREGS.md` | Claude chat, then Code | — |
-| 03 | `03_ENVIRONMENT_AND_TARGETS.md` | Claude Code | 01 (tracker interface) |
-| 04 | `04_SCENARIOS_AND_EVALUATION.md` | Claude chat, then Code | 03 (target behaviours) |
-| 05 | `05_VESSEL_MODEL_AND_SIM2REAL.md` | Claude chat + field work | — (parallel track) |
-| — | `PAPER3_DRAFT_SKELETON.md` | Cowork | all (revision 4, 2026-09-28: six sections; literature review in §1.2) |
+| 01 | `01_PERCEPTION_AND_OBSERVATION.md` | implementation | 02 (classifier definition) |
+| 02 | `02_REWARD_AND_COLREGS.md` | design, then implementation | — |
+| 03 | `03_ENVIRONMENT_AND_TARGETS.md` | implementation | 01 (tracker interface) |
+| 04 | `04_SCENARIOS_AND_EVALUATION.md` | design, then implementation | 03 (target behaviours) |
+| 05 | `05_VESSEL_MODEL_AND_SIM2REAL.md` | design + field work | — (parallel track) |
+| — | `PAPER3_DRAFT_SKELETON.md` | author | all (revision 4, 2026-09-28: six sections; literature review in section 1.2) |
 | — | `Paper3_Introduction_draft4.docx` | author | Section 1, authoritative text (2026-09-28) |
 
-Also carry `PROJECT_BRIEF.md` into every thread — file contents do not persist across
-Claude conversations.
+Also keep `PROJECT_BRIEF.md` as the entry point for every work session; it holds the
+context the other documents assume.
 
 **Work order.** `02` moved to the front in this revision: the Rule 9 precedence table is
 now the deliverable that gates the encounter classifier, the reward terms, and the
@@ -101,8 +101,8 @@ width-sweep design. Then `05` in parallel (basin booking lead time), then `01 �
 | O6 | Ground-truth instrumentation | **Reframed** — no external instrumentation. Scan-to-map registration against surveyed facility geometry, validated by static tests and closed-loop drift. A software deliverable, not a purchase; removes the longest lead time in the project |
 | — | Ship domain geometry | **Resolved (provisional)** — compressed asymmetric: 2.0·Lpp ahead, 1.0·Lpp astern, 0.75·Lpp abeam. Final values derived from the identified turning circle in 05 |
 
-| IMU | **Confirmed — will be added.** Removes the yaw-rate observability constraint and, via the accelerometer, rescues surge measurement. Specification in 05 §4.7 | 05 |
-| Precedence | **Structure resolved** (02 §3.2). Rule 9 constrains the space; Rule 8(e) supplies the action when space is unavailable. Width thresholds remain an output of Study 1 | 02 |
+| IMU | **Confirmed — will be added.** Removes the yaw-rate observability constraint and, via the accelerometer, rescues surge measurement. Specification in 05 section 4.7 | 05 |
+| Precedence | **Structure resolved** (02 section 3.2). Rule 9 constrains the space; Rule 8(e) supplies the action when space is unavailable. Width thresholds remain an output of Study 1 | 02 |
 | Boundary conflict | **Resolved** — when compliance would push the vessel into the boundary, slacken speed or stop under Rule 8(e). Boundary stays a hard constraint | 02 |
 | Overtaking | **Resolved** — overtake whenever geometry allows, passing to port of the target (follows from 9(a)). Fallback: hold astern at reduced speed | 02 |
 | Head-on band | **Resolved** — ±10°, widened from the source value of ±5° | 01 |
@@ -216,7 +216,7 @@ late scope cut.
 
 Repository: `github.com/ntran26/asv-path-replanning`, directory `asv-lidar/`.
 
-**Core set — every thread:** `paper_pooling/README.md`, `paper_pooling/src/README.md`,
+**Core set — every work session:** `paper_pooling/README.md`, `paper_pooling/src/README.md`,
 `paper_pooling/src/config.py`, `requirements.txt` (~26 KB).
 
 | Doc | Add |
@@ -229,7 +229,7 @@ Repository: `github.com/ntran26/asv-path-replanning`, directory `asv-lidar/`.
 
 **Notes.** `src/` is the authoritative code surface — do not attach the superseded
 top-level `rl_env.py` (60 KB) or `rl_env_reward_v2.py` (64 KB). Field logs are 130 KB to
-2 MB and are Claude Code territory only, never chat attachments. `REWARD_ANALYSIS.md`,
+2 MB and are processed in the repository only. `REWARD_ANALYSIS.md`,
 `REWARD_REDESIGN.md` and `PAPER3_BASELINES.md` are referenced but not committed — commit
 them so the repository is self-describing.
 

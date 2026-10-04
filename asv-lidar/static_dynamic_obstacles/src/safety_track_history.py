@@ -3,7 +3,7 @@
 Motivation: Wabersich & Zeilinger (2021), predictive safety filtering with
 uncertainty, Sec.4.2, https://arxiv.org/abs/1812.05506 ; Granstrom, Baum & Reuter
 (2017), extended-object kinematics/extent estimation from partial measurements,
-https://arxiv.org/abs/1604.00970 . The history rule below is our empirical
+https://arxiv.org/abs/1604.00970 . The history rule below is an empirical
 engineering approximation, not either paper's algorithm or a certified error
 set. An old velocity can be wrong after a real manoeuvre and reject a safe plan.
 

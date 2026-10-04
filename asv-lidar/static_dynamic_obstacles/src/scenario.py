@@ -1,11 +1,11 @@
-"""The scenario generator (04a §3): one generator, three consumers.
+"""The scenario generator (04a section 3): one generator, three consumers.
 
 The training distribution, the frozen evaluation suite and the sweeps all come
-out of here, under one seed-namespace scheme (04a §9.2).  A second generator for
+out of here, under one seed-namespace scheme (04a section 9.2).  A second generator for
 evaluation would be the single easiest way to make the two distributions differ
 in a way nobody noticed.
 
-Sampling order (04a §3.1):
+Sampling order (04a section 3.1):
 
 1. encounter class
 2. corridor geometry — width profile, bend, path offset
@@ -22,12 +22,12 @@ bends.  Without the round-trip check the generator would quietly mislabel them,
 and every per-class result in the paper would be computed over a contaminated
 partition.
 
-**Rejection accounting is a result, not a diagnostic** (04a §3.5).  The rejection
+**Rejection accounting is a result, not a diagnostic** (04a section 3.5).  The rejection
 rate per `(class, width)` is an analytic feasibility measure: it says at what
 width each encounter class stops being constructible *at all*, independently of
 any policy.  Plotted against the Study 1 outcome curves it separates "the method
 fails here" from "the geometry is infeasible here" — which is the strongest
-available answer to "you designed the benchmark to produce the conclusion".
+available answer to the objection that the benchmark was designed to produce the conclusion.
 """
 
 from __future__ import annotations
@@ -52,7 +52,7 @@ from ship import HULL_MARGIN, VESSEL_LENGTH, VESSEL_WIDTH, ShipModel
 
 @dataclass
 class Scenario:
-    """One generated episode, serialisable to the 04a §9.1 record."""
+    """One generated episode, serialisable to the 04a section 9.1 record."""
 
     case_id: str
     encounter_class: str
@@ -83,7 +83,7 @@ class Scenario:
     flags: Dict[str, object] = field(default_factory=dict)
     rejection_count: int = 0
     suite_version: str = cfg.SUITE_VERSION
-    # geometry mode (06 §6)
+    # geometry mode (06 section 6)
     geometry_mode: str = "channel"
     slant_requested_deg: float = 0.0
     slant_realised_deg: float = 0.0
@@ -93,7 +93,7 @@ class Scenario:
     field_replicable: bool = True
 
     def to_record(self) -> dict:
-        """Canonical JSON-ready dict with sorted keys (04a §9.1)."""
+        """Canonical JSON-ready dict with sorted keys (04a section 9.1)."""
         record = asdict(self)
         record["obstacles"] = [[list(map(float, p)) for p in poly]
                                for poly in self.obstacles]
@@ -107,7 +107,7 @@ class Scenario:
 
 @dataclass
 class RejectionLog:
-    """Rejections by `(class, width_bucket, reason)` — 04a §3.5's result."""
+    """Rejections by `(class, width_bucket, reason)` — 04a section 3.5's result."""
 
     counts: Counter = field(default_factory=Counter)
     attempts: Counter = field(default_factory=Counter)
@@ -140,7 +140,7 @@ class RejectionLog:
 
 
 def _width_bucket(width) -> str:
-    """04a §4.3's three strata, cut at the §1.1 derived thresholds.
+    """04a section 4.3's three strata, cut at the section 1.1 derived thresholds.
 
     06: a basin draw has no single width, so the generator passes the string
     "basin" and the ledger keys it as its own stratum.
@@ -156,13 +156,13 @@ def _width_bucket(width) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Width thresholds  (04a §1.1)
+# Width thresholds  (04a section 1.1)
 # ---------------------------------------------------------------------------
 def width_thresholds(a_abeam: float = None, w_wall: float = None,
                      u_nom: float = None, k: float = 0.5) -> dict:
     """The three predicted governing-rule transitions, as formulae.
 
-    **04a §1.1 supersedes 02a §2.2 for crossing**, and by 0.8 m.  02a assumes the
+    **04a section 1.1 supersedes 02a section 2.2 for crossing**, and by 0.8 m.  02a assumes the
     own ship has `W/2` of starboard room; 04a observes that a vessel stationed at
     the starboard quarter-width under Rule 9(a) has only `W/4`, so
 
@@ -171,7 +171,7 @@ def width_thresholds(a_abeam: float = None, w_wall: float = None,
     That is 02a's own N2 insight carried one step further: a vessel already
     keeping starboard has *spent* its starboard room before the Rule 14
     alteration becomes tight.  Both derivations are reported by
-    `constants.predicted_thresholds()`; 04a §11 leaves reconciling them as an
+    `constants.predicted_thresholds()`; 04a section 11 leaves reconciling them as an
     open item owned by 02, and it is not this module's to close.
 
     The overtaking margin is an **exposure** term: the abreast configuration is
@@ -213,10 +213,10 @@ class ScenarioGenerator:
                behaviour: str = tgt.T_CV,
                flags: Optional[dict] = None,
                geometry_mode: Optional[str] = None) -> Optional[Scenario]:
-        """Generate one scenario, or `None` if it capped out (04a §3.5).
+        """Generate one scenario, or `None` if it capped out (04a section 3.5).
 
         `geometry_mode` forces "basin" or "channel"; otherwise the stage's
-        `p_basin` decides (06 M-1, §4).  A forced `width` implies a channel.
+        `p_basin` decides (06 M-1, section 4).  A forced `width` implies a channel.
         """
         rng = np.random.default_rng(int(seed))
         stage = cfg.CURRICULUM_STAGES[self.stage]
@@ -226,7 +226,7 @@ class ScenarioGenerator:
         self._want_unescapable = (cls == "crossing"
                                   and bool(rng.uniform() < cfg.CROSSING_UNESCAPABLE_FRAC))
 
-        # **The corridor is sampled once.**  04a §3.1 puts the geometry at step 2
+        # **The corridor is sampled once.**  04a section 3.1 puts the geometry at step 2
         # and the target kinematics at step 3, so a rejected draw rejects the
         # *kinematics*, not the channel.  Resampling the corridor per attempt
         # would also bias the width distribution toward whatever widths happen
@@ -259,7 +259,7 @@ class ScenarioGenerator:
         return None
 
     def _sample_geometry(self, rng, stage, width, cls, geometry_mode, flags=None):
-        """Basin or channel for this episode (06 §4).
+        """Basin or channel for this episode (06 section 4).
 
         Basin draws Paper 2's leg.  Channel draws keep 03a's corridor, with the
         narrow stratum reserved for the classes whose rules the width decides
@@ -273,7 +273,7 @@ class ScenarioGenerator:
                     "basin" if rng.uniform() < p_basin else "channel")
         flags = flags or {}
         if mode == "basin":
-            # F75: a named basin case fixes its leg (06 §5.2).
+            # F75: a named basin case fixes its leg (06 section 5.2).
             if flags.get("basin_leg"):
                 start, goal = flags["basin_leg"]
                 channel = corr.build_basin(tuple(start), tuple(goal))
@@ -348,7 +348,7 @@ class ScenarioGenerator:
             target_behaviour=behaviour, flags=dict(flags),
         )
         # The corridor itself, for the environment.  An attribute, not a field,
-        # so the 04a §9.1 record and its hash are unchanged.
+        # so the 04a section 9.1 record and its hash are unchanged.
         scenario.channel = channel
         _record_geometry(scenario, channel, start_s)
 
@@ -362,7 +362,7 @@ class ScenarioGenerator:
             self.rejections.record(cls, width, "spawn_unsolvable")
             return None
 
-        # --- the round-trip check (04a §3.3) ------------------------------
+        # --- the round-trip check (04a section 3.3) ------------------------------
         # 04a's "null" is the classifier's `none`: a target present, tracked and
         # observed, but in no encounter geometry.  Two vocabularies for one
         # state, so the check maps between them rather than comparing strings --
@@ -399,7 +399,7 @@ class ScenarioGenerator:
         # A22's label: can a lawful escape clear this crossing?  None otherwise.
         scenario.crossing_escapable = escapable
         scenario.n_obstacles = self._obstacle_count(rng)
-        # 06 §3.3: the clear width where the encounter happens.
+        # 06 section 3.3: the clear width where the encounter happens.
         scenario.w_eff_at_cpa = float(channel.width_at_s(
             start_s + cfg.U_NOM * max(float(solved.get("tcpa", 0.0)), 0.0)))
         return scenario
@@ -407,7 +407,7 @@ class ScenarioGenerator:
     # ------------------------------------------------------------------
     def _backward_solve(self, rng, cls, own, own_heading, channel,
                         flags: Optional[dict] = None) -> Optional[dict]:
-        """04a §3.3: solve for the spawn that produces the sampled `(DCPA, TCPA)`.
+        """04a section 3.3: solve for the spawn that produces the sampled `(DCPA, TCPA)`.
 
         ```
         psi_TS    = psi_OS + CT
@@ -417,11 +417,11 @@ class ScenarioGenerator:
         p_TS(0)   = p_TS(T_0) - U_TS * T_0 * h_TS
         ```
 
-        **Sampling `DCPA` explicitly is what 02a §11.1 calls a blocking
+        **Sampling `DCPA` explicitly is what 02a section 11.1 calls a blocking
         hand-off.**  Solving backwards without it puts the target on the own
         ship's projected track in every episode, so `Dy_req = d_req` always,
         `A_req = 1` always, and `v_r8`'s zero branch — the whole point of the
-        02 §3.2 head-on rationale — never fires.  The agent would learn "always
+        02 section 3.2 head-on rationale — never fires.  The agent would learn "always
         alter" rather than "when to alter", and the M5 ablation could not tell
         the two apart.
         """
@@ -480,7 +480,7 @@ class ScenarioGenerator:
     def _place_null(self, rng, own, own_heading) -> Optional[dict]:
         """The null class is **placed**, not solved backwards.
 
-        **F26 -- 04a §3.4's null row is internally inconsistent.**  It asks for
+        **F26 -- 04a section 3.4's null row is internally inconsistent.**  It asks for
         no CPA in the horizon *and* a spawn range of 8-15 m.  With no CPA there
         is no `T_0` to solve backwards from, so the backward solve degenerates to
         `R_0 = DCPA`, which 04a caps at 4-7 m: the two windows are disjoint and
@@ -526,15 +526,15 @@ class ScenarioGenerator:
 
     # ------------------------------------------------------------------
     def _classify(self, own, own_heading, solved) -> str:
-        """Forward-recompute the class from the realised state (04a §3.3)."""
+        """Forward-recompute the class from the realised state (04a section 3.3)."""
         return enc.classify(
             (float(own[0]), float(own[1])), own_heading, cfg.U_NOM,
             (solved["x"], solved["y"]), solved["heading"], solved["speed"])
 
     def _containment_ok(self, cls, solved, channel) -> bool:
-        """Confined classes spawn inside; crossing spawns outside (03a §5.2)."""
+        """Confined classes spawn inside; crossing spawns outside (03a section 5.2)."""
         import boundary_raycast as br
-        # 06 §3.5: in basin mode confined traffic keeps the path band, and a
+        # 06 section 3.5: in basin mode confined traffic keeps the path band, and a
         # crossing target is anything that starts off it.  In a channel the
         # band is the channel.
         band = confinement_geometry(cls, channel)
@@ -597,16 +597,16 @@ class ScenarioGenerator:
 def own_start_s(encounter_class: str, channel) -> float:
     """How far along the corridor the own ship starts, metres.
 
-    **F27 -- being-overtaken does not fit the corridor as specified.**  04a §3.4
+    **F27 -- being-overtaken does not fit the corridor as specified.**  04a section 3.4
     puts the target 4-6 m astern of the own ship and "inside" the channel, while
-    §3.2 sets the corridor at 25 m and the reference path at 20 m.  Starting the
+    Section 3.2 sets the corridor at 25 m and the reference path at 20 m.  Starting the
     own ship at the corridor mouth leaves 5 m astern, so a 6 m spawn is outside
     the water and every draw was rejected on containment.  20 + 6 = 26 > 25.
 
     The own ship therefore starts **`astern_room` metres along** for this class,
     which costs nothing — the reference path still has its full 20 m — and the
     spawn window is capped at what the channel actually provides.  The class is
-    the one 04a §1.4 already identifies as most likely to fail in the field for
+    the one 04a section 1.4 already identifies as most likely to fail in the field for
     perception rather than policy reasons, so losing it to a metre of geometry
     would be an expensive accident.
     """
@@ -636,12 +636,12 @@ def own_start_s(encounter_class: str, channel) -> float:
 
 
 def confinement_geometry(encounter_class: str, channel):
-    """The water a confined target keeps to (06 §3.5, as amended in F74).
+    """The water a confined target keeps to (06 section 3.5, as amended in F74).
 
     Channel mode: the channel.  Basin mode: **the whole navigable basin**, which
     at 10 m is already narrow water -- except head-on traffic, which keeps the
     path band, because Rule 9(a) with Rule 14 is about each vessel keeping to
-    its own side of the fairway the leg defines.  06 §3.5 banded every confined
+    its own side of the fairway the leg defines.  06 section 3.5 banded every confined
     class; on a 2-3 m band null traffic could not be placed at all (37 of 40
     draws capped out) and overtaking traffic had nowhere to pass.
     """
@@ -656,7 +656,7 @@ def _ledger_key(channel):
 
 
 def _record_geometry(scenario: Scenario, channel, start_s: float) -> None:
-    """06 §6's record fields, and 06 M-8's field-replicable flag."""
+    """06 section 6's record fields, and 06 M-8's field-replicable flag."""
     scenario.geometry_mode = getattr(channel, "mode", "channel")
     if scenario.geometry_mode == "basin":
         scenario.slant_requested_deg = float(channel.slant_requested_deg)
@@ -830,7 +830,7 @@ def _sample_ct(rng, cls: str, side: Optional[str] = None,
 
 
 def seed_for(namespace: str, index: int) -> int:
-    """A seed inside a namespace, so the five uses can never collide (04a §9.2)."""
+    """A seed inside a namespace, so the five uses can never collide (04a section 9.2)."""
     lo, hi = cfg.SEED_NAMESPACES[namespace]
     span = hi - lo + 1
     return int(lo + (int(index) % span))

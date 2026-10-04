@@ -2,7 +2,7 @@
 
 V16 improves the completed 32-case development comparison to **25 goals**, up from **16 with SAC alone or V9**. It rescues 11 SAC failures and preserves 14 of SAC's 16 successes. **Seven contacts remain, including two cases SAC solves. The requested 100% safety and no-regression target is not met.** On the separate, previously selected 40-case paired challenge, V16 reaches 25 goals versus fresh SAC 21, with eight rescues and four broken SAC successes.
 
-The fixed policy is SAC baseline 3, kept best at 3M timesteps. The user explicitly designated test-set-v2 and DV3 for development. No retraining, constants changes or tuning on other held-out sets is involved. These cohorts deliberately emphasize failures and broken successes; their percentages are not full-suite success rates.
+The fixed policy is SAC baseline 3, kept best at 3M timesteps. Test-set-v2 and DV3 are designated for development. No retraining, constants changes or tuning on other held-out sets is involved. These cohorts deliberately emphasize failures and broken successes; their percentages are not full-suite success rates.
 
 ## Matched 32-case comparison
 

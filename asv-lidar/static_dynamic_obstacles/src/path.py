@@ -106,7 +106,7 @@ class ReferencePath:
         port is not scored as an evasive port turn -- which is what withdrew
         `R-3` and removed the unwinnable state it was patching.
 
-        Returns rad/s to match `r_ref = 0.20 rad/s` in 02a §6.2.  Note the
+        Returns rad/s to match `r_ref = 0.20 rad/s` in 02a section 6.2.  Note the
         environment reports its own yaw rate in **degrees** per second; `info`
         emits both in rad/s so the difference cannot be taken in mixed units.
         """
@@ -119,7 +119,7 @@ class ReferencePath:
         spacing is ~0.2 m and a step at cruise covers ~0.11 m, so the nearest
         vertex advances on some steps and not others.  The increment would then
         be 0 or 0.2 m rather than a smooth 0.11, `r_prog` would alternate
-        between 0 and its clip, and 02a §10.4 test 3 -- the direct test of
+        between 0 and its clip, and 02a section 10.4 test 3 -- the direct test of
         `R-9`'s telescoping claim -- would fail for a purely numerical reason.
 
         Projecting onto the two segments adjacent to the nearest vertex and
@@ -176,7 +176,7 @@ class ReferencePath:
         #
         # Paper 2 used positive-to-port, which its own `verify_los_apf.py`
         # flagged as non-standard.  Flipped here because this paper's
-        # contribution is COLREGs *geometry*: 02a §6.4's passing-side term has
+        # contribution is COLREGs *geometry*: 02a section 6.4's passing-side term has
         # two opposite branches keyed on the sign of the lateral offset
         # (head-on penalises one, overtaking the other), and carrying a
         # non-standard lateral sign through them invites exactly the class of

@@ -17,10 +17,10 @@ goals: it traded the contacts for wall contacts and stalls. Two causes, both tra
    again. That was often when the boat was slow, off the path and next to a wall. The policy was
    trained without a safety layer and rarely saw such states.
 
-The design follows the literature summary from Claude Chat (2026-10-02): model-predictive
+The design follows the literature summary (2026-10-02): model-predictive
 shielding (Bastani et al.), backup control barrier functions (Gurriet, Ames et al.), the gatekeeper
 idea of keeping a verified continuation, and predictive safety filters (Wabersich & Zeilinger).
-Only the parts that fit our timeline and vessel are taken.
+Only the parts that fit the project's timeline and vessel are taken.
 
 ## What v3 does
 

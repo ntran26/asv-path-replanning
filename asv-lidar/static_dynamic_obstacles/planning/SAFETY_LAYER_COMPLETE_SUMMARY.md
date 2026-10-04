@@ -1,16 +1,16 @@
-# Safety controller development: complete research handoff, V1-V19
+# Safety controller development: complete research record, V1-V19
 
-**Evidence cutoff: 2026-10-03. Prepared for a new chat to research and design the next solution.**
+**Evidence cutoff: 2026-10-03. Prepared as the starting point for researching and designing the next solution.**
 
 **Subsequent research continuation:** [Reachability stage-1 plan](SAFETY_REACHABILITY_STAGE1_PLAN.md) and [saved-data results](../results/safety_dev/reachability_stage1/README.md) document the new offline conditional interval prototype, 101 passing tests, remaining interval overexpansion and a falsified smooth target-turn bound. No new controller or mission certificate was added, no episodes were run, and the V1-V19 performance history below remains unchanged.
 
 This document is self-contained: it describes the task, simulator, controller architecture, every numbered version, measured successes and failures, rejected approaches, diagnostic evidence, and the gap between empirical improvement and a safety guarantee. Repository paths below are relative to `asv-lidar/static_dynamic_obstacles/` unless stated otherwise. External references are listed with method mappings in the bibliography. The preparation of this document ran **zero new episodes** and changed no controller.
 
-Navigation: [current result](#1-present-conclusion-and-the-users-objective), [project setup](#2-project-mission-and-physical-setup), [evidence definitions](#3-how-to-interpret-the-evidence), [architecture](#4-architecture-and-version-lineage), [V1-V5](#5-version-history-v1-v5), [V6-V9](#6-version-history-v6-v9), [V10-V19](#7-version-history-v10-v19), [trigger studies](#8-failure-pattern-analysis-and-trigger-experiments), [diagnosed cases](#9-detailed-mechanism-cases-to-carry-into-the-next-research-session), [rejected model work](#10-model-audits-and-rejected-approaches-that-should-not-be-repeated-blindly), [remaining limitations](#11-why-it-still-does-not-work-reliably), [guarantee requirements](#12-what-could-justify-a-safety-guarantee-and-what-can-be-claimed-now), [constraints and files](#13-operational-constraints-evaluation-tools-and-artifact-map), [citations](#14-method-bibliography-and-exact-scope-of-attribution), [next-chat instruction](#15-suggested-opening-instruction-for-the-next-chat).
+Navigation: [current result](#1-present-conclusion-and-the-objective), [project setup](#2-project-mission-and-physical-setup), [evidence definitions](#3-how-to-interpret-the-evidence), [architecture](#4-architecture-and-version-lineage), [V1-V5](#5-version-history-v1-v5), [V6-V9](#6-version-history-v6-v9), [V10-V19](#7-version-history-v10-v19), [trigger studies](#8-failure-pattern-analysis-and-trigger-experiments), [diagnosed cases](#9-detailed-mechanism-cases-to-carry-into-the-next-research-session), [rejected model work](#10-model-audits-and-rejected-approaches-that-should-not-be-repeated-blindly), [remaining limitations](#11-why-it-still-does-not-work-reliably), [guarantee requirements](#12-what-could-justify-a-safety-guarantee-and-what-can-be-claimed-now), [constraints and files](#13-operational-constraints-evaluation-tools-and-artifact-map), [citations](#14-method-bibliography-and-exact-scope-of-attribution), [next-phase brief](#15-starting-brief-for-the-next-phase).
 
-## 1. Present conclusion and the user's objective
+## 1. Present conclusion and the objective
 
-The fixed learning policy is **SAC baseline 3, seed 0, kept-best checkpoint at 3 million training timesteps**. The safety layer should prevent contact with static obstacles, the target vessel, and navigable boundaries, while retaining the policy's ability to finish missions. The user ultimately requested 100% safety and preservation of the episodes SAC already solves.
+The fixed learning policy is **SAC baseline 3, seed 0, kept-best checkpoint at 3 million training timesteps**. The safety layer should prevent contact with static obstacles, the target vessel, and navigable boundaries, while retaining the policy's ability to finish missions. The objective is 100% safety and preservation of the episodes SAC already solves.
 
 **That objective has not been achieved. V16 is the strongest currently supported reference candidate; V17, V18 and V19 have not demonstrated an incremental net improvement. No version is a certified collision-avoidance controller.** “Reference” here is an experimental choice, not a change to the global runtime default or a deployment approval.
 
@@ -183,7 +183,7 @@ Rejected ablations included throttle weight 0.5 (101 goals), no room slack (108)
 
 **Implementation:** `src/safety_v4.py`, `src/safety_observer.py`, `src/safety_perception.py`, optional `src/safety_prediction.py`; plan `planning/SAFETY_LAYER_V4_PLAN.md`.
 
-V4 followed the diagnostic order requested in the original handoff: compare forecasts with actual motion, use truth-only oracles to separate perception from prediction, classify failures, then test changes.
+V4 followed the diagnostic order set in the original notes: compare forecasts with actual motion, use truth-only oracles to separate perception from prediction, classify failures, then test changes.
 
 The selected configuration adds two methods. A command-driven nonlinear model observer advances the previous body velocity/yaw state and applies the existing 0.3 measurement correction. It uses the actual issued rudder and signed RPM after environment conversion, and avoids re-assimilating a stale measurement. This is retrospectively related to model-plus-output-error observers (Luenberger, R6); it is not a Kalman filter or a convergence proof. Static-memory clearing removes an old point only when a fresh finite ray gives contradicting free-space evidence and current returns do not support occupancy. No-return, stale, occluded, aft-masked and dead-zone regions do not count as free. This is retrospectively related to ray-based occupancy updates (Hornung et al., R7), without using an octree or probabilistic log-odds map.
 
@@ -207,7 +207,7 @@ Verification at this stage included 69 passing focused tests. An existing V3 dea
 
 ### The stopped 8,670-record sweep: final accounting
 
-The user requested evaluation beyond 150 development episodes and later explicitly stopped it. The original inventory contained DV3 150 + legacy development 120 + Tier-1 head-on 100 + frozen B 800 + frozen R 900 + frozen A 35 + field deployment layouts 630 + field validation layouts 155 = **2,890 scenarios**. OFF, V4 and proposed V5 made **8,670 planned controller/scenario records**. “Field” means simulated field layouts here, not new physical trials.
+Evaluation beyond 150 development episodes was started and later stopped. The original inventory contained DV3 150 + legacy development 120 + Tier-1 head-on 100 + frozen B 800 + frozen R 900 + frozen A 35 + field deployment layouts 630 + field validation layouts 155 = **2,890 scenarios**. OFF, V4 and proposed V5 made **8,670 planned controller/scenario records**. “Field” means simulated field layouts here, not new physical trials.
 
 The authoritative final snapshot is `results/safety_dev/v4_stopped_full_sweep_report.md`: **3,347 committed records, 5,323 absent**. Only B and R ran; **zero V5 records** were completed in this old sweep. B has OFF 799 and V4 792 records, giving 791 pairs; R has OFF 900 and V4 856, giving 856 pairs. OFF `B-06-040` is absent from the durable journal and was excluded rather than reconstructed.
 
@@ -317,7 +317,7 @@ Two independent guards were added. First, recheck the actual proposed action plu
 
 An optional target ensemble samples CV plus immediate port/starboard constant turns (Li and Jilkov, R17; Johansen et al., R18). Default turn rate is **zero**, so this is disabled in the reported defaults. It is not an IMM tracker or a reachable set; delayed turns, accelerations and missing targets are outside its sampled hypotheses, and the chosen turn rate is uncalibrated. No formal guarantee is claimed. Adding a union of motion hypotheses can increase conservatism and cannot remove a false rejection already caused by the retained CV hypothesis.
 
-The initial follow-up used only saved data and code tests (134 focused plus three supplemental checks). Those older logs lacked complete snapshots/plans, so they could not retrospectively measure V9. After the user authorized fresh episodes, a separate pilot ran **96 episodes = 32 scenarios x OFF/V8/V9**, one process/one Torch thread, about 28 minutes, with no retries.
+The initial follow-up used only saved data and code tests (134 focused plus three supplemental checks). Those older logs lacked complete snapshots/plans, so they could not retrospectively measure V9. Once fresh episodes were authorized, a separate pilot ran **96 episodes = 32 scenarios x OFF/V8/V9**, one process/one Torch thread, about 28 minutes, with no retries.
 
 | Fresh pilot, N=32 | Goals | Rescues of 16 SAC failures | Lost of 16 SAC successes | Changed-action steps |
 | --- | ---: | ---: | ---: | ---: |
@@ -454,7 +454,7 @@ The V18/V19 continuation completed **90 new runs**: 36 development (12 x V16/V18
 
 ### 8.1 What the 1,000 saved TS2 episodes reveal
 
-The user specifically requested developing on failed TS2 episodes while retaining successful controls. The initial stage was saved-data-only, producing `results/safety_dev/testset_v2_offline/report.md` and `analysis/`.
+Development targeted failed TS2 episodes while retaining successful controls. The initial stage was saved-data-only, producing `results/safety_dev/testset_v2_offline/report.md` and `analysis/`.
 
 There are **128 SAC failures: 61 target, 55 obstacle, 12 boundary**. Crossings contribute 76 failures, including 46 of the 61 target contacts. Deployment-layout cases contribute 76 failures among 239; frozen-source cases contribute 52 among 761. All 15 L2 head-on cases fail (12 obstacle, three boundary). These are descriptive concentrations, not causal online trigger rules.
 
@@ -704,7 +704,7 @@ An unavoidable-collision argument requires quantification over admissible contro
 
 If uncertainty bounds are statistical, the claim must be probabilistic and specify whether risk is per decision or per mission; repeatedly applying a per-step confidence level does not automatically give the same mission confidence. Even zero collisions in 1,000 independent identically distributed trials would only yield an approximately 0.3% one-sided 95% upper failure-probability bound, not a proof of zero risk. These development-enriched, overlapping scenario sets do not meet that simple sampling interpretation.
 
-### 12.3 Research questions for the next chat
+### 12.3 Research questions for the next phase
 
 The next session should perform an in-depth literature/design investigation against the following concrete questions, rather than continue changing a global trigger threshold:
 
@@ -755,7 +755,7 @@ The information needed to reason about the work is embedded above. These links p
 
 | Evidence | Primary artifact |
 | --- | --- |
-| Historical chronology / original constraints | [SAFETY_LAYER_HANDOFF.md](SAFETY_LAYER_HANDOFF.md) |
+| Historical chronology / original constraints | [SAFETY_LAYER_NOTES.md](SAFETY_LAYER_NOTES.md) |
 | Early V2/V3 experiments | [V2 plan](SAFETY_LAYER_V2_PLAN.md), [V3 plan](SAFETY_LAYER_V3_PLAN.md), `results/safety_v2_dev_*.csv` |
 | V4 observer/perception and oracles | [V4 plan](SAFETY_LAYER_V4_PLAN.md), `results/safety_dev/final_fullset_summary.csv` |
 | Final stopped sweep | [Final stopped report](../results/safety_dev/v4_stopped_full_sweep_report.md) |
@@ -778,7 +778,7 @@ Test files are in `tests/`; important newer suites cover prefix search/requests,
 
 Native-dispatch integration sometimes happened after a candidate's evaluation freeze. The runner already installed the exact candidate explicitly; source/newline integration audits record the later native changes. Use each run's archived evaluated source, not just the current working-tree version number, to reproduce its behavior. The project contains other work and uncommitted changes; do not reset the tree to make it look clean.
 
-The user also requested reducing disk use. Completed trace JSONL dominated safety-result storage. Instead of deleting evidence or old modules needed by inheritance, `compact_safety_artifacts.py` applied transparent NTFS compression to **585 completed traces across 24 runs**: the 96-run V9 pilot, 399-run campaign and 90 latest runs. It reclaimed **974,323,274 allocated bytes (0.907 GiB)**, with every before/after SHA-256 identical and all paths/source archives/caches/results retained. **Zero files were deleted.** A 28,852-byte bytecode deletion preflight stopped on OneDrive reparse attributes, leaving those files intact.
+Disk use also had to be reduced. Completed trace JSONL dominated safety-result storage. Instead of deleting evidence or old modules needed by inheritance, `compact_safety_artifacts.py` applied transparent NTFS compression to **585 completed traces across 24 runs**: the 96-run V9 pilot, 399-run campaign and 90 latest runs. It reclaimed **974,323,274 allocated bytes (0.907 GiB)**, with every before/after SHA-256 identical and all paths/source archives/caches/results retained. **Zero files were deleted.** A 28,852-byte bytecode deletion preflight stopped on OneDrive reparse attributes, leaving those files intact.
 
 Maintenance audits are under `results/safety_dev/maintenance/ntfs_compact_20261003T111517Z/` (495 old traces; 945,003,157 bytes reclaimed) and `ntfs_compact_20261003T115342Z/` (90 new traces; 29,320,117 bytes). Hashes were also checked against prior reports. Allocation savings are not the same as net whole-drive free-space change because new files and other jobs also use disk. Fifteen synthetic maintenance guard tests passed. Do not delete old controller modules merely because a newer version exists: they remain in the inheritance/import chain.
 
@@ -845,6 +845,6 @@ The R-numbers used above map to primary papers or official sources below. Attrib
 
 **R23. Fossen, T. I.; Breivik, M.; Skjetne, R. (2003).** [Line-of-Sight Path Following of Underactuated Marine Craft](https://doi.org/10.1016/S1474-6670(17)37809-6); [author's publication record](https://www.fossen.biz/php/research/path_following.php). Shared LOS guidance used by classical comparators and the initial V3 path-rejoin reference. Path following alone cannot route around panels on the reference path.
 
-## 15. Suggested opening instruction for the next chat
+## 15. Starting brief for the next phase
 
 > Read this document as the complete safety-controller history. Research a defensible way to improve collision avoidance for the unchanged SAC baseline-3/3M ASV policy while preserving certifiably safe SAC actions. Start from V16 as the reference, not V19 as an assumed improvement. Address nominal multi-step own-dynamics error, partial/maneuvering-target estimation, and loss of backup feasibility; explain the assumptions required for any guarantee. Use the saved BAS-NU, BAS-HO, FIX05, BO04, CH-HO and DV3-CRS cases as falsifiable mechanism tests, retain all six policy-success regressions and prior rescues, and do not tune on primary TS3 outcomes. Distinguish diagnostic truth/future commands from deployable information. Propose and cite a method before implementing a new candidate, and state how it differs from the rejected approaches above. Respect the source, benchmark, training-process and disk-preservation constraints in section 13.

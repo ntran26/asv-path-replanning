@@ -1,6 +1,6 @@
 """Classical comparator settings — staging file, to be merged into `constants.py`.
 
-**Why this is separate (your call, 2026-09-23).** Every constant in this project
+**Why this is separate (decision, 2026-09-23).** Every constant in this project
 lives in `constants.py`, and these belong there too. They are staged here until
 the baseline-v2 campaign finishes, for one mechanical reason: the frozen
 formulation's digest is computed over *every* upper-case name in `constants.py`
@@ -8,7 +8,7 @@ formulation's digest is computed over *every* upper-case name in `constants.py`
 digest, fail the pre-run check and halt the campaign mid-flight.
 
 Nothing in training reads this file. It holds the parameters of the classical
-comparators (04a §5):
+comparators (04a section 5):
 
 * **LOS-PID** — the shared path follower and its controller gains;
 * **LOS-PID + DWA** — dynamic-window sampling, horizons and clearance scoring;

@@ -1,9 +1,9 @@
-"""The dynamic target: hull geometry, behaviour models, confinement (03a §5).
+"""The dynamic target: hull geometry, behaviour models, confinement (03a section 5).
 
 Five behaviour models.  **Only `T-CV` is used in training** (decision D1); the
 other four are evaluation-only, and the split matters — a policy trained against
 reactive targets learns to rely on the other vessel co-operating, which is the
-assumption COLREGs exists because you cannot make.
+assumption COLREGs exists because no vessel can make.
 
 | ID | Model | Used in |
 |---|---|---|
@@ -14,16 +14,16 @@ assumption COLREGs exists because you cannot make.
 | `T-NC3` | Positionally non-compliant — holds the wrong side of the fairway | Evaluation only |
 | `T-VS` | Constant heading, **varying speed** — one speed change on the approach | Evaluation only (Paper 2 layout set) |
 
-**`T-NC3` is new in 03a §5.3 and it is not optional.**  The head-on precedence
-argument (02 §3.2) is that Rule 9(a) channel-keeping satisfies Rule 14 *without*
+**`T-NC3` is new in 03a section 5.3 and it is not optional.**  The head-on precedence
+argument (02 section 3.2) is that Rule 9(a) channel-keeping satisfies Rule 14 *without*
 an alteration.  If every head-on target is where 9(a) says it should be, the
 policy is never asked to execute Rule 14 at all, and the head-on class is never
 exercised as an avoidance problem.  `T-NC3` is the only case in the suite where
 a head-on alteration is actually required, which makes it the case that decides
 whether the precedence argument is testable.
 
-**Confinement is class-conditional (03a §5.2, 04a §1.3).**  This supersedes
-03 §3's blanket "the target must respect the channel", which is unsatisfiable
+**Confinement is class-conditional (03a section 5.2, 04a section 1.3).**  This supersedes
+03 section 3's blanket "the target must respect the channel", which is unsatisfiable
 for a crossing target: a vessel crossing a 4 m fairway at 90° runs into the far
 wall.  The resolution is in the rulebook rather than the geometry — **Rule 9(d)
 is specifically about vessels crossing a narrow channel**, and such a vessel is
@@ -43,7 +43,7 @@ import numpy as np
 
 import constants as cfg
 
-# Behaviour identifiers, as 03a §5.3 names them.
+# Behaviour identifiers, as 03a section 5.3 names them.
 T_CV = "T-CV"
 T_RE = "T-RE"
 T_NC1 = "T-NC1"
@@ -55,11 +55,11 @@ BEHAVIOURS = (T_CV, T_RE, T_NC1, T_NC2, T_NC3, T_VS)
 TRAINING_BEHAVIOURS = (T_CV,)                      # D1
 NON_COMPLIANT = (T_NC1, T_NC2, T_NC3)
 
-# Which classes confine the target to the corridor (03a §5.2).
+# Which classes confine the target to the corridor (03a section 5.2).
 CONFINED_CLASSES = ("head_on", "overtaking", "being_overtaken", "null")
 UNCONFINED_CLASSES = ("crossing",)                 # Rule 9(d)
 
-# Oriented hull, body frame at midships, x forward, y starboard (03a §5.1).
+# Oriented hull, body frame at midships, x forward, y starboard (03a section 5.1).
 # LOA 1.73 m, maximum breadth 0.50 m.  Own ship and target share this polygon --
 # they are the same class of vessel, which is the premise on which S3 rejected
 # the Rule 18 route in favour of Rule 9(b).
@@ -196,7 +196,7 @@ class Target:
 
         if self.behaviour == T_NC2:
             # Alters to PORT in a head-on -- the classic wrong-way violation,
-            # and the reason 04a §11.4 requires passing-side correctness to be
+            # and the reason 04a section 11.4 requires passing-side correctness to be
             # reported conditioned on target compliance.  Scored against the own
             # ship it would otherwise read as a policy failure.
             if self.encounter_class == "head_on" and not self._edge_hold:
@@ -217,7 +217,7 @@ class Target:
 
     def _react_vo(self, dt: float, own) -> None:
         """`T-RE`: the COLREGs-VO comparator's rule, applied from the target's side
-        (03a §5.3 asks for one implementation, A34).
+        (03a section 5.3 asks for one implementation, A34).
 
         Every decision interval the target classifies the encounter by the
         open-water roles, with the own ship as *its* traffic, and takes the
@@ -285,7 +285,7 @@ TURN_RATE_DPS = 8.0                      # deg/s, TODO(05)
 # Confinement
 # ---------------------------------------------------------------------------
 def is_confined(encounter_class: str) -> bool:
-    """Does this class keep the target inside the corridor? (03a §5.2)"""
+    """Does this class keep the target inside the corridor? (03a section 5.2)"""
     return str(encounter_class) not in UNCONFINED_CLASSES
 
 
@@ -300,7 +300,7 @@ def confinement_violation(target: Target, corridor,
     if not target.confined or corridor is None:
         return None
     import boundary_raycast as br
-    # Pass the polygon when you have it.  `Corridor.polygon()` rebuilds the
+    # Pass the polygon when available.  `Corridor.polygon()` rebuilds the
     # outline from 500 stations on every call, and testing the 11 hull vertices
     # one call at a time multiplied that: together they were 40 % of every
     # environment step, the single largest cost in the simulator.

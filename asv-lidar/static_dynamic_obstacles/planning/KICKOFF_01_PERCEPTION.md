@@ -1,4 +1,4 @@
-# Claude Code Kickoff — Paper 3, Perception and Observation Rebuild
+# Kickoff — Paper 3, Perception and Observation Rebuild
 
 > **Status note (2026-09-22).** Historical: the kickoff for the perception rebuild, delivered (observation v2, since extended to v3, F72). Kept as a record; the current method is `planning/METHODS_BRIEF.md` and `configs/baseline_v1.json` (baseline-v1).
 
@@ -40,7 +40,7 @@ eighteen months.
   across the directory boundary — a later edit in Paper 3 must not be able to change
   Paper 2 behaviour.
 - Before starting, confirm the working tree is clean and note the current commit SHA
-  in your first report.
+  in the first report.
 
 **Ignore the repo-root `README.md`.** It describes a much earlier iteration (63 beams,
 270° swath, MultiDiscrete observation, 150 m ranges, discrete rudder). That is not the
@@ -53,7 +53,7 @@ actually does.
 
 Read `static_obstacles/src/` and produce
 `static_dynamic_obstacles/PORTING_MANIFEST.md`: every source file, one line on what it
-does, and a bucket assignment (§3). Expected files include the environment (~1400
+does, and a bucket assignment (section 3). Expected files include the environment (~1400
 lines), `ship_model.py`, `asv_lidar.py`, and `lidar_pooling.py`, but **verify the
 actual filenames** rather than assuming them.
 
@@ -77,7 +77,7 @@ a recalibration pass on the hydrodynamic coefficients comes later under 05.
 ### Bucket B — copy and modify, one stated change each
 
 - **`asv_lidar.py`** — raycast engine unchanged. Output becomes **obstacles only**;
-  border geometry moves out of the LiDAR channel entirely (01 §3).
+  border geometry moves out of the LiDAR channel entirely (01 section 3).
 - **`lidar_pooling.py`** — Algorithm 1 (feasibility sector pooling) is unchanged in
   substance, but must accept **per-sector angular span Φ** instead of assuming a
   constant interval. Per-beam resolution θ stays 0.5°; only the sector span varies.
@@ -85,7 +85,7 @@ a recalibration pass on the hydrodynamic coefficients comes later under 05.
 
 ### Bucket C — rebuild from specification
 
-For these, **build from `01_PERCEPTION_AND_OBSERVATION.md` and §5 below. Do not open
+For these, **build from `01_PERCEPTION_AND_OBSERVATION.md` and section 5 below. Do not open
 the Paper 2 equivalents for reference.** Decision D10 in the protocol document is that
 the observation is redesigned from scratch, not patched. Reading the old version first
 reliably produces a patched version.
@@ -107,7 +107,7 @@ concept no longer exists.
 
 1. `PORTING_MANIFEST.md` — then stop and report
 2. Bucket A copies; confirm the ported environment still steps end-to-end
-3. `constants.py` + `CONSTANTS_AND_SCALES.md` (§5) — before any consumer is written
+3. `constants.py` + `CONSTANTS_AND_SCALES.md` (section 5) — before any consumer is written
 4. `lidar_pooling.py` with per-sector Φ; unit-test sector/beam counts
 5. `boundary_raycast.py` — 7 rays at {−90, −60, −30, 0, +30, +60, +90}°, normalised
    identically to `c_t`, with a pose-noise injection hook
@@ -146,7 +146,7 @@ Known-unresolved, at minimum:
 | Boundary raycast pose-noise magnitude | `TODO(05)` — default 0.0 for now, but the hook must exist |
 | Kalman process and measurement noise | `TODO(05)` |
 
-Placeholders must make the code run, not make it look finished. Anything you assume
+Placeholders must make the code run, not make it look finished. Every assumption
 goes in the report.
 
 ---
@@ -207,7 +207,7 @@ Before reporting complete:
 2. `PORTING_MANIFEST.md` bucket assignments
 3. Every `TODO` constant, with the placeholder used
 4. Any place where 01's specification was ambiguous or internally inconsistent, and
-   what you assumed
+   the assumption made
 5. Anything in the Paper 2 code that contradicts 01's description of it
 
 Flag disagreements rather than resolving them silently. Unresolved decisions here are

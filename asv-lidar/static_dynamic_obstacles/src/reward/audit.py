@@ -1,6 +1,6 @@
-"""Per-term accumulators and the Table R7 generator (02a §8).
+"""Per-term accumulators and the Table R7 generator (02a section 8).
 
-`02 §6` makes the scale audit mandatory and `02a §8` pre-commits the numbers, so
+`02 section 6` makes the scale audit mandatory and `02a section 8` pre-commits the numbers, so
 that a mismatch is diagnostic rather than something to explain away afterwards.
 This module is what makes that cheap: the accumulators run during every episode,
 so the audit is a read of state that already exists.
@@ -22,7 +22,7 @@ import constants as cfg_mod
 from reward.terms import TERM_RANGE
 
 # A term is "flat" when its realised episode range spans less than this fraction
-# of its declared span.  5% is 02a §8's figure, and it is deliberately generous:
+# of its declared span.  5% is 02a section 8's figure, and it is deliberately generous:
 # a term at 6% is not healthy either, but at 5% it is certainly broken.
 FLAT_FRACTION = 0.05
 
@@ -67,7 +67,7 @@ class TermStats:
 
     @property
     def flat(self) -> bool:
-        """Realised range under 5% of the declared span (02a §8.1).
+        """Realised range under 5% of the declared span (02a section 8.1).
 
         **A term that is identically zero is inactive, not flat.**  `r_bnd` on
         an episode that never approached a wall should read `0.000` with no
@@ -134,9 +134,9 @@ class TermAudit:
         return max(self.stats, key=lambda n: abs(self.stats[n].total_weighted))
 
     def hierarchy_violations(self) -> List[str]:
-        """Where the *realised* per-step magnitudes invert the §7 ordering.
+        """Where the *realised* per-step magnitudes invert the section 7 ordering.
 
-        **This is allowed to fire, and that is the point.**  `02 §5` and `02 §6`
+        **This is allowed to fire, and that is the point.**  `02 section 5` and `02 section 6`
         ask for different things and can conflict, because terms have very
         different natural durations -- a boundary excursion lasts seconds, a
         COLREGs violation lasts a whole encounter.  A rarely-active term
@@ -194,9 +194,9 @@ class TermAudit:
 # ---------------------------------------------------------------------------
 # Table R7
 # ---------------------------------------------------------------------------
-# 02a §8.1's pre-committed episode-integrated contributions, at the nominal
+# 02a section 8.1's pre-committed episode-integrated contributions, at the nominal
 # success design point.  `prog` is +52.6 rather than the tabulated +75: see
-# `constants.py` §13.4 (F22), where `N_ref` had to be derived from the measured
+# `constants.py` section 13.4 (F22), where `N_ref` had to be derived from the measured
 # cruise speed rather than fixed at 250.
 PREDICTED_NOMINAL = {
     # Derived, not written down: `W_PROG * N_REF_PROG`, and `N_REF_PROG` moves
@@ -213,14 +213,14 @@ PREDICTED_NOMINAL = {
 }
 
 # Outside a factor of 3 means the coefficient is wrong regardless of what the
-# ratios say on paper (02a §8.2 step 3).
+# ratios say on paper (02a section 8.2 step 3).
 AUDIT_TOLERANCE = 3.0
 
 
 def check_against_prediction(sums: Dict[str, float],
                              predicted: Dict[str, float] = None,
                              tolerance: float = AUDIT_TOLERANCE) -> List[str]:
-    """Compare realised episode integrals against `02a §8.1`.
+    """Compare realised episode integrals against `02a section 8.1`.
 
     Terms predicted to be exactly zero are skipped rather than compared: a
     factor-of-3 band around zero is empty, and `bnd`, `dom` and `col` are all
@@ -246,7 +246,7 @@ def check_against_prediction(sums: Dict[str, float],
 
 
 def compliance_cost_ratio(violation_return: float, compliance_cost: float) -> float:
-    """`02a §8.1`'s single most important number.
+    """`02a section 8.1`'s single most important number.
 
     Cost of complying against cost of violating, over one encounter.  Predicted
     about 3.1.  **Below roughly 1.5 and `w_COL` is too low for compliance to be

@@ -2,7 +2,7 @@
 
 Revision 3: target slots plus explicit encounter memory and previous action.
 
-Kickoff §7, restated for the new scope:
+Kickoff section 7, restated for the new scope:
 * shape and dtype exactly match `observation_space`; 0- and 1-target cases both
   produce finite values with the correct presence bit
 * an absent slot filled with arbitrary garbage produces byte-identical extractor
@@ -200,7 +200,7 @@ def test_feature_names_match_the_frozen_layout():
 # Slot management
 # ---------------------------------------------------------------------------
 def test_slot_is_held_across_steps():
-    """01 §6.2: track-ID persistence, so discontinuities are real events."""
+    """01 section 6.2: track-ID persistence, so discontinuities are real events."""
     builder = obs.ObservationBuilder()
     track = make_track(5.0, 18.0, 0.0, -0.2)
     builder.build(**base_kwargs([track]))
@@ -232,7 +232,7 @@ def test_a_reused_slot_does_not_inherit_the_old_encounter_class():
     assert builder.encounter_classes[a.id] == enc.HEAD_ON
 
     builder.build(**base_kwargs([]))                    # a is lost
-    b = make_track(5.0, 4.0, 0.0, 0.9)                  # overtaking us from astern
+    b = make_track(5.0, 4.0, 0.0, 0.9)                  # overtaking the own ship from astern
     o = builder.build(**base_kwargs([b]))
 
     assert builder.encounter_classes[b.id] != enc.HEAD_ON

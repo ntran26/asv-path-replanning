@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # A29 (F85): after run 9's analysis, switch the growing v_hold on, audit, launch run 10, analyse it.
 cd "$(dirname "$0")/.."
-F9="C:/Users/hntran/AppData/Local/Temp/claude/C--Users-hntran-OneDrive---University-of-Tasmania-Documents-PhD-asv-path-replanning-asv-lidar/d009229f-c16f-485d-a74a-0d08e9ebc0f5/tasks/bqmecqwqh.output"
+F9="${RUN9_ANALYSIS_LOG:?set RUN9_ANALYSIS_LOG to the run 9 analysis output}"
 until grep -qxE "== ANALYSIS DONE|RUN9 FAILED" "$F9"; do sleep 120; done
 grep -qx "RUN9 FAILED" "$F9" && { echo "RUN9 FAILED -- run 10 not started"; exit 1; }
 # Run 9's stand-on diagnosis, for the run 8 comparison -- before the switch, so

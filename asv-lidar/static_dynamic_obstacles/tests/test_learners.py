@@ -63,7 +63,7 @@ def test_recurrent_evaluation_carries_the_lstm_state_through_the_episode():
 
 
 def test_replay_buffers_live_outside_the_repository_and_only_the_latest_is_kept(tmp_path):
-    """Your call (2026-09-22): ~0.5 GB buffers never enter the repository."""
+    """Decision (2026-09-22): ~0.5 GB buffers never enter the repository."""
     from pathlib import Path
     import gymnasium as gym
     from stable_baselines3 import SAC
@@ -82,7 +82,7 @@ def test_replay_buffers_live_outside_the_repository_and_only_the_latest_is_kept(
 
 
 def test_off_policy_keeps_exactly_two_buffers_best_and_latest(tmp_path):
-    """Your call (2026-09-23): SAC and TQC keep the buffer of the most recent
+    """Decision (2026-09-23): SAC and TQC keep the buffer of the most recent
     checkpoint, so a resume continues on the same data, and the buffer of the
     best development-set model, so it can be fine-tuned from the state it was
     in.  Nothing else -- at ~0.58 GB each, a buffer per checkpoint would fill

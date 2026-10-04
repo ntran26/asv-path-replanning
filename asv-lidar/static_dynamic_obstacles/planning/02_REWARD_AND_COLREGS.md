@@ -6,13 +6,13 @@
 >
 > - Rule 17: only 17(a)(i) course-keeping is rewarded; an earlier 17(a)(ii) release is open (A30).
 >
-> - Term definitions and weights: see `02a` as amended below, and `METHODS_BRIEF.md` §5.
+> - Term definitions and weights: see `02a` as amended below, and `METHODS_BRIEF.md` section 5.
 >
 > The rationale below still stands where it is not listed. `F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`.
 
 **Revision 2** — Rules 13–16 with Rule 9 precedence; Rule 17 active release removed.
-**Handover target:** Claude chat (design), then Claude Code
-**Depends on:** nothing — **start here.** The precedence table produced in §3 gates the
+**Workstream:** design, then implementation
+**Depends on:** nothing — **start here.** The precedence table produced in section 3 gates the
 encounter classifier in 01, the reward terms below, and the width sweep in 04
 **Carry in:** `REWARD_REDESIGN.md` (the existing 6-term specification)
 
@@ -40,7 +40,7 @@ end-to-end framing and moves the interesting behaviour out of the learned policy
 
 **Chosen middle path:** classify the encounter deterministically each step (module defined
 here, implemented in 01), then apply a **class-conditional** penalty. The discontinuity
-lives in a classifier under your control rather than in learned features.
+lives in an explicit classifier rather than in learned features.
 
 Precedent: Waltz & Okhrin include the encounter situation directly in the observation
 vector *and* condition their COLREGs reward on it — useful cover when a reviewer asks
@@ -99,7 +99,7 @@ practice and it makes Rule 9 precedence concrete rather than abstract.
 **Overtaking side.** Follows from 9(a): if the overtaken vessel keeps to its starboard side,
 the room is on its port side, so overtaking means altering **to port**.
 
-Width thresholds remain open — they are an output of the Study 1 sweep (04 §5), not an input.
+Width thresholds remain open — they are an output of the Study 1 sweep (04 section 5), not an input.
 The table structure is complete, which is what 01 and the reward terms were waiting on.
 
 Define "narrow" **geometrically** — in ship breadths, and in terms of the lateral excursion
@@ -146,7 +146,7 @@ is out of scope (S5). Only 17(a)(i) passive course-keeping survives, as the
 course-keeping hold term above.
 
 **Implementation trap — port turns are not globally bad.** The head-on term penalises altering
-to port, but overtaking in a narrow channel *requires* altering to port (§3.2). Class-conditional
+to port, but overtaking in a narrow channel *requires* altering to port (section 3.2). Class-conditional
 gating handles this in principle, but it is exactly the kind of thing that gets miscoded into a
 global "port turns are penalised" term. Assert it in a unit test.
 
@@ -221,7 +221,7 @@ and invisible until audited.
    instantaneous values
 3. Run a random policy and the Paper 2 SAC baseline through the new reward; tabulate
    effective contribution per term
-4. Verify the empirical ordering matches §5. If not, the coefficients are wrong regardless
+4. Verify the empirical ordering matches section 5. If not, the coefficients are wrong regardless
    of what the ratios say on paper
 5. Repeat after any coefficient change
 
@@ -253,11 +253,11 @@ watchkeeper operates.
 
 ## 8. Open items
 
-- ~~Produce the precedence table~~ — **structure resolved (§3.2)**. Width thresholds remain
+- ~~Produce the precedence table~~ — **structure resolved (section 3.2)**. Width thresholds remain
   open but are an output of Study 1, not an input
-- Verify whether the vessel can reverse thrust (§4.4)
-- Design the progress-penalty carve-out and its gating conditions (§4.4)
+- Verify whether the vessel can reverse thrust (section 4.4)
+- Design the progress-penalty carve-out and its gating conditions (section 4.4)
 - Re-verify the six carried-over terms against the new observation, especially the border
   penalty
-- Check the Rule 8 / smoothness tension explicitly (§4.3)
+- Check the Rule 8 / smoothness tension explicitly (section 4.3)
 - Set per-term normalisation ranges before any coefficient tuning

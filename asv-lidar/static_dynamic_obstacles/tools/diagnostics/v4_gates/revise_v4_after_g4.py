@@ -1,4 +1,4 @@
-"""Revise the baseline-v4 draft after G4 (queued 2026-10-03 by the user).
+"""Revise the baseline-v4 draft after G4 (queued 2026-10-03).
 
 Test set v3 showed SAC weakest on varying-speed targets (0.61 vs 0.78 constant),
 dense crossing-from-port (FS-CRP 0.45) and dense being-overtaken (FS-BO 0.64),

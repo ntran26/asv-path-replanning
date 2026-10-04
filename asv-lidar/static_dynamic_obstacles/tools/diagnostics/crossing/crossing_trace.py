@@ -1,4 +1,4 @@
-"""Crossing trace on the development side (the user, 2026-10-03; BASELINE_V4_PLAN.md section 3).
+"""Crossing trace on the development side (2026-10-03; BASELINE_V4_PLAN.md section 3).
 
 Why does the policy fail crossings it can see coming?  For every development
 crossing (field_dev and dv4x CRP/CRS, G1's crossing conflicts, the frozen-like
@@ -12,15 +12,27 @@ manoeuvre still solves the episode.  Each SAC failure is put in one bin, in
 this order:
 
 * infeasible   -- the oracle finds no solution at all;
+* decided before tracking -- solutions exist only for manoeuvres that start
+                  before the onboard perception first tracks the target
+                  (oracle `solved_after_track` False): near-impossible onboard;
+* detected late -- the policy's own perception tracked the target after
+                  `latest_start_s`;
 * engaged late -- the encounter engaged after `latest_start_s` (the policy's
                   encounter context arrives when no manoeuvre works any more);
-* wrong way    -- a 10 deg alteration against the compliant sense came first;
+* wrong way    -- after tracking, a 10 deg alteration against the compliant
+                  sense came first;
+* slowed instead of turning -- within 4 s of tracking the speed fell below
+                  `SLOW_SPEED` with less than `TURN_DEG` + 5 deg of compliant alteration;
 * no action    -- neither a 10 deg compliant alteration nor a slow-down;
 * late         -- the first avoidance action came after `latest_start_s`;
 * insufficient -- it acted in time, yet failed (too small, or undone).
 
     python tools/diagnostics/crossing/crossing_trace.py run --processes 5
     python tools/diagnostics/crossing/crossing_trace.py report
+
+Alterations and slow-downs count only from the first track on: every episode
+opens with a heading transient of about 10 deg while the own ship settles on the
+path (successes and failures alike), which is not a response to the target.
 
 Results: `results/crossing_trace/` (steps.csv.gz, episodes.csv, summary.txt).
 The test set is never used.
@@ -48,6 +60,8 @@ OUT = ROOT / "results" / "crossing_trace"
 TURN_DEG = 10.0                    # an alteration counts from 10 deg off the path heading
 SLOW_THROTTLE = -0.3               # a slow-down counts from this throttle command
 VS_DELTA = 0.05                    # m/s: the target's speed change has started
+SLOW_SPEED = 0.40                  # m/s: "slowed" in the response window
+RESPONSE_S = 4.0                   # the response window after the first track
 
 
 def _wrap180(a: float) -> float:
@@ -131,19 +145,28 @@ def episode_metrics(ep: pd.Series, st: pd.DataFrame) -> dict:
     sense = int(eng.sense.iloc[0]) if len(eng) else {"CRP": -1, "CRS": 1}.get(ep.code, 0)
     if sense == 0:                                # never engaged, frozen-like CR: the generated geometry
         sense = -1 if float(ep.get("ct_deg", 180.0)) < 180.0 else 1     # (common.run_episode's convention)
-    turn = _first(st.t, sense * st.hdev >= TURN_DEG)
-    wrong = _first(st.t, -sense * st.hdev >= TURN_DEG)
-    slow = _first(st.t, st.throttle <= SLOW_THROTTLE)
+    t_det = _first(st.t, st.tracked.astype(bool))
+    seen = st.t >= t_det if not math.isnan(t_det) else pd.Series(False, index=st.index)
+    # Alterations are measured from the heading held when the target is first tracked.
+    h0 = float(st[st.t <= t_det].hdev.iloc[-1]) if not math.isnan(t_det) and (st.t <= t_det).any() else float("nan")
+    turn = _first(st.t, seen & (sense * (st.hdev - h0) >= TURN_DEG))
+    wrong = _first(st.t, seen & (-sense * (st.hdev - h0) >= TURN_DEG))
+    slow = _first(st.t, seen & (st.throttle <= SLOW_THROTTLE))
+    win = st[seen & (st.t <= t_det + RESPONSE_S)] if not math.isnan(t_det) else st.iloc[:0]
     t_eng = float(eng.t.iloc[0]) if len(eng) else float("nan")
     at_eng = eng.iloc[0] if len(eng) else None
     v0 = float(st.tspeed.iloc[0]) if "tspeed" in st else float("nan")
     return {
-        "sense": sense, "t_detect": _first(st.t, st.tracked.astype(bool)), "t_engage": t_eng,
+        "sense": sense, "t_detect": t_det, "t_engage": t_eng,
+        "dpsi_compliant_resp": float(sense * (win.hdev.iloc[-1] - h0)) if len(win) else float("nan"),
+        "max_abs_dpsi_resp": float((win.hdev - h0).abs().max()) if len(win) else float("nan"),
+        "u_min_resp": float(win.u.min()) if len(win) else float("nan"),
         "tcpa_true_at_engage": float(at_eng.tcpa_true) if at_eng is not None else float("nan"),
         "range_at_engage": float(at_eng.range) if at_eng is not None else float("nan"),
         "t_turn": turn, "t_wrong": wrong, "t_slow": slow, "t_action": np.nanmin([turn, slow]) if not (
             math.isnan(turn) and math.isnan(slow)) else float("nan"),
-        "max_compliant_dev_deg": float((sense * st.hdev).max()), "min_speed": float(st.u.min()),
+        "max_compliant_dev_deg": float((sense * (st.hdev - h0))[seen].max()) if seen.any() else float("nan"),
+        "min_speed": float(st.u.min()),
         "mean_throttle_engaged": float(eng.throttle.mean()) if len(eng) else float("nan"),
         "blocked_flag_share": float((~eng.turn_admissible.astype(bool)).mean()) if len(eng) else float("nan"),
         "t_vs": _first(st.t, (st.tspeed - v0).abs() > VS_DELTA) if "tspeed" in st else float("nan"),
@@ -156,11 +179,18 @@ def _bin(r) -> str:
         return "success"
     if r.n_success == 0 and r.nominal_outcome != "goal":
         return "infeasible"
+    if not bool(r.solved_after_track):
+        return "decided before tracking"
     L = r.latest_start_s
+    if not math.isnan(r.t_detect) and r.t_detect > L:
+        return "detected late"
     if not math.isnan(r.t_engage) and r.t_engage > L:
         return "engaged late"
     if not math.isnan(r.t_wrong) and (math.isnan(r.t_turn) or r.t_wrong < r.t_turn):
         return "wrong way"
+    if (not math.isnan(r.u_min_resp) and r.u_min_resp < SLOW_SPEED
+            and not (r.dpsi_compliant_resp >= TURN_DEG + 5.0)):
+        return "slowed instead of turning"
     if math.isnan(r.t_action):
         return "no action"
     if r.t_action > L:
@@ -175,7 +205,8 @@ def report():
     steps = pd.read_csv(OUT / "steps.csv.gz")
     ora = pd.read_csv(ROOT / "results" / "feasibility" / "oracle_dev.csv")
     keep = ["key", "nominal_outcome", "n_success", "n_success_margin", "best_clearance_m", "latest_start_s",
-            "latest_start_margin_s", "n_success_port", "n_success_starboard", "n_success_speed", "complete"]
+            "latest_start_margin_s", "n_success_port", "n_success_starboard", "n_success_speed", "complete",
+            "t_track_s", "solved_after_track", "margin_after_track", "decision_window_s"]
     m = pd.DataFrame([{**r._asdict(), **episode_metrics(pd.Series(r._asdict()), steps[steps.key == r.key])}
                       for r in eps.itertuples(index=False)])
     m = m.merge(ora[keep], on="key", how="left")
@@ -194,7 +225,12 @@ def report():
              "", "-- failure bins", pd.crosstab([m.set, m.side], m.bin).to_string(), "",
              "-- bins overall", m.bin.value_counts().to_string(), "",
              "-- timing (s from the start; medians); latest_start = oracle's latest feasible manoeuvre start",
-             m.groupby(["side", "goal"])[["t_detect", "t_engage", "tcpa_true_at_engage", "t_action", "t_turn", "t_slow",
+             "-- response in the 4 s after the first track (medians)",
+             m.groupby(["side", "goal"])[["dpsi_compliant_resp", "max_abs_dpsi_resp", "u_min_resp"]].median().round(2).to_string(),
+             f"slowed below {SLOW_SPEED} m/s within {RESPONSE_S:g} s of tracking: failures "
+             f"{int(((~m.goal) & (m.u_min_resp < SLOW_SPEED)).sum())} of {int((~m.goal).sum())}, successes "
+             f"{int((m.goal & (m.u_min_resp < SLOW_SPEED)).sum())} of {int(m.goal.sum())}", "",
+             m.groupby(["side", "goal"])[["t_detect", "t_track_s", "decision_window_s", "t_engage", "tcpa_true_at_engage", "t_action", "t_turn", "t_slow",
                                           "latest_start_s", "lateness_s", "max_compliant_dev_deg", "min_speed",
                                           "blocked_flag_share"]].median().round(2).to_string(), "",
              "-- varying-speed targets: speed change before / after the first action (failures)",
@@ -202,7 +238,9 @@ def report():
                  vs_first=lambda x: np.where(x.t_vs < x.t_action, "VS before action", "VS after action / none")
              ).groupby(["side", "vs_first"]).size().to_string(), "",
              "-- oracle check: SAC solved an episode the oracle calls infeasible (the oracle missed a solution)",
-             str(int(((m.n_success == 0) & (m.nominal_outcome != "goal") & m.goal).sum())), ""]
+             str(int(((m.n_success == 0) & (m.nominal_outcome != "goal") & m.goal).sum())),
+             "-- SAC solved an episode decided before tracking (pre-detection behaviour, not reaction)",
+             str(int((~m.solved_after_track.astype(bool) & m.goal).sum())), ""]
     text = "\n".join(lines) + "\n"
     (OUT / "summary.txt").write_text(text, encoding="utf-8")
     print(text)

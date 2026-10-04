@@ -1,1 +1,5 @@
-2026-10-03 22:29:27 == feasibility run: oracle (development sets), crossing trace, oracle (test set v3); 5 processes
+2026-10-04 00:18:38 == feasibility run: oracle (development sets), crossing trace, oracle (test set v3); 6 processes
+2026-10-04 02:10:46    oracle development sets exit 0 (results/feasibility/oracle_summary.txt)
+2026-10-04 02:13:04    crossing trace exit 0 (results/crossing_trace/summary.txt)
+2026-10-04 04:32:44    oracle test set v3 exit 0 (results/feasibility/oracle_summary.txt)
+2026-10-04 04:32:44 == feasibility run done

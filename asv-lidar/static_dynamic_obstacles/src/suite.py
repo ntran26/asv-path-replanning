@@ -1,6 +1,6 @@
-"""The frozen evaluation suite (04a §4-§9): Tier A, Tier B, Around the Clock.
+"""The frozen evaluation suite (04a sections 4-9): Tier A, Tier B, Around the Clock.
 
-Structure (04a §4.2):
+Structure (04a section 4.2):
 
 | Component | Cases | Rollouts per case per seed |
 |---|---|---|
@@ -14,7 +14,7 @@ Structure (04a §4.2):
 whole point of N1: a single rollout of a named case reports one draw from the
 perception noise, not the behaviour.
 
-**The freeze protocol is not paperwork** (04a §9.4).  With Imazu dropped, the
+**The freeze protocol is not paperwork** (04a section 9.4).  With Imazu dropped, the
 released generator plus the frozen suite plus the manifest is the only
 structural defence against "the authors built their own benchmark, then showed
 classical methods fail on it".  Every case serialises to canonical JSON, every
@@ -36,10 +36,10 @@ import constants as cfg
 import scenario as scn
 import targets as tgt
 
-# Width codes for the Tier A case table (04a §5).  "B" is a basin case (06 §5.2).
+# Width codes for the Tier A case table (04a section 5).  "B" is a basin case (06 section 5.2).
 WIDTH_CODES = {"W": 10.0, "I": 6.0, "N": 4.0, "X": 3.5, "B": 0.0}
 
-# 06 §5.2: basin cases run one fixed leg at the widest slant Paper 2's layout
+# 06 section 5.2: basin cases run one fixed leg at the widest slant Paper 2's layout
 # allows (14.0 deg, x 2.5 -> 7.5 m), so the leg closes on the starboard wall and
 # the two clearances differ most at mid-leg.  06 asked for 15 deg; the fixed-y
 # layout's endpoint box caps it at 14.0.
@@ -76,16 +76,16 @@ def _c(case_id, cls, code, behaviour=tgt.T_CV, k=None, **flags) -> Case:
 
 
 # ---------------------------------------------------------------------------
-# Tier A — 34 named cases (04a §5)
+# Tier A — 34 named cases (04a section 5)
 # ---------------------------------------------------------------------------
 def tier_a() -> List[Case]:
-    """The 34 named cases, in the order 04a §5 tabulates them.
+    """The 34 named cases, in the order 04a section 5 tabulates them.
 
     `A-8E-HO-N` is the one that carries the head-on precedence argument: its
     target is **positionally** non-compliant (`T-NC3`), which is the only case
     in the suite where a Rule 14 alteration is actually required.  Without it
     the head-on class is never exercised as an avoidance problem at all, because
-    02 §3.2's whole point is that 9(a) channel-keeping satisfies Rule 14.
+    02 section 3.2's whole point is that 9(a) channel-keeping satisfies Rule 14.
     """
     cases: List[Case] = []
 
@@ -96,8 +96,8 @@ def tier_a() -> List[Case]:
     for code in ("W", "I", "N"):
         cases.append(_c(f"A-CRP-{code}", "crossing", code, side="port"))
     for code in ("W", "I", "N"):
-        # 04a §11 change 2: mid-window rather than at the floor, because 03a
-        # §1.3 raised the floor to 0.40 and a case sitting exactly on a bound is
+        # 04a section 11 change 2: mid-window rather than at the floor, because 03a
+        # Section 1.3 raised the floor to 0.40 and a case sitting exactly on a bound is
         # a case that stops existing the next time the bound moves.
         cases.append(_c(f"A-OT-{code}", "overtaking", code, k=0.45))
     for code in ("W", "I", "N"):
@@ -125,13 +125,13 @@ def tier_a() -> List[Case]:
     cases.append(_c("A-OFF-CRP-I", "crossing", "I", side="port", offset=-0.30))
     cases.append(_c("A-OFF-OT-I", "overtaking", "I", k=0.45, offset=0.30))
 
-    # Pre-committed expected failures (04a §4.5).  Reported at whatever level
+    # Pre-committed expected failures (04a section 4.5).  Reported at whatever level
     # they come out; the framing rule is that strata are described by geometry
     # only, never as "challenging for classical methods".
     cases.append(_c("A-FAIL-CRS-X", "crossing", "X", tgt.T_NC1, expected_failure=1))
     cases.append(_c("A-FAIL-HO-X", "head_on", "X", tgt.T_NC2, expected_failure=1))
 
-    # 06 §5.2 / M-7: six basin cases, all field-replicable -- the basin-session
+    # 06 section 5.2 / M-7: six basin cases, all field-replicable -- the basin-session
     # trial list.  A-BSN-CLT-CRS puts the conflict panel on the side the
     # compliant alteration would use, where the slanted leg is closing on a wall.
     cases.append(_c("A-BSN-HO", "head_on", "B"))
@@ -145,9 +145,9 @@ def tier_a() -> List[Case]:
 
 
 # ---------------------------------------------------------------------------
-# Tier B — 39 stratified cells (04a §4.3)
+# Tier B — 39 stratified cells (04a section 4.3)
 # ---------------------------------------------------------------------------
-# Suite 3.1 (your call, 2026-09-23): Tier B channels stop at 7.5 m.  The 10 m
+# Suite 3.1 (decision, 2026-09-23): Tier B channels stop at 7.5 m.  The 10 m
 # basin is already narrow water for a 1.7 m vessel, and below ~7.5 m a channel
 # leaves a two-vessel encounter no room that a lawful manoeuvre can use: PPO's
 # 3.5-4.25 m stratum failed 0.57 of the time and a third of those were wall
@@ -165,8 +165,8 @@ TIER_B_MIN_WIDTH_M = 7.5
 # Revision 3.2 (A34, 2026-09-26): the behaviour cells realise their target
 # models (`target_model`); 3.1 passed the cell label, which no model knew, so
 # every Tier B target ran at constant velocity (F99).
-# Revision 3.3 (your call, 2026-09-27): every channel 10 m.  Superseded by 3.4.
-# Revision 3.4 (your call, 2026-09-27): **the headline holds only scenarios of
+# Revision 3.3 (decision, 2026-09-27): every channel 10 m.  Superseded by 3.4.
+# Revision 3.4 (decision, 2026-09-27): **the headline holds only scenarios of
 # the kind the policies were trained and selected on** -- the development set's
 # distribution, drawn in the frozen namespace, so only the positions differ:
 #
@@ -262,7 +262,7 @@ def robustness_variants(tier_b: Sequence[scn.Scenario]) -> List[Tuple[scn.Scenar
 
 
 # ---------------------------------------------------------------------------
-# Around the Clock (04a §4.4)
+# Around the Clock (04a section 4.4)
 # ---------------------------------------------------------------------------
 def around_the_clock(open_water: bool = True) -> List[dict]:
     """24 constellations, both vessels set to meet at the origin.
@@ -296,7 +296,7 @@ def around_the_clock(open_water: bool = True) -> List[dict]:
 
 
 # ---------------------------------------------------------------------------
-# Study 2 conditions (04a §7.1)
+# Study 2 conditions (04a section 7.1)
 # ---------------------------------------------------------------------------
 def study2_conditions() -> List[dict]:
     """5 levels x 4 axes, minus the shared nominal, plus one joint corner = 21."""
@@ -336,7 +336,7 @@ def build_tier_a(generator: Optional[scn.ScenarioGenerator] = None,
 # function of the namespace.  Cases that fail all of them are reported by
 # `tier_a_shortfall()`, never dropped silently.
 TIER_A_SEED_RETRIES = 8
-# The frozen namespace holds 10,000 seeds (04a §9.2).  Tier B takes a block per
+# The frozen namespace holds 10,000 seeds (04a section 9.2).  Tier B takes a block per
 # cell -- 1,000 since suite 3.4 (8 cells, indices 0-7,999; 100 scenarios a cell
 # need the room); 200 before -- and Tier A the block from 9,600, 9 per case.
 # Disjoint, where `index + 10,000 * retry` wrapped back onto the same seed.
@@ -375,7 +375,7 @@ def _build_case(generator, namespace, index, case):
 def build_tier_b(generator: Optional[scn.ScenarioGenerator] = None,
                  namespace: str = "frozen_eval",
                  cells: Optional[Sequence[int]] = None) -> Tuple[List[scn.Scenario], List[dict]]:
-    """Realise the Tier B cells (06 §5.1).  Returns (scenarios, shortfalls).
+    """Realise the Tier B cells (06 section 5.1).  Returns (scenarios, shortfalls).
 
     `cells` realises only those cell indices, for replaying one test: each cell
     draws from its own seed block, so a cell comes out identical alone or in the
@@ -474,7 +474,7 @@ def resolve_test(ref: str) -> Tuple[int, int, str]:
 
 def manifest(scenarios: Sequence[scn.Scenario], *, generator_sha: str = "",
              version: str = None) -> dict:
-    """`SUITE_MANIFEST.json` (04a §9.3): version, hashes, seeds, constants.
+    """`SUITE_MANIFEST.json` (04a section 9.3): version, hashes, seeds, constants.
 
     The constants snapshot is part of the hash-bearing record on purpose.  A
     suite is only reproducible against the constants it was generated under, and
@@ -495,7 +495,7 @@ def manifest(scenarios: Sequence[scn.Scenario], *, generator_sha: str = "",
 
 
 def constants_snapshot() -> dict:
-    """Every constant the suite's geometry depends on (04a §9.3)."""
+    """Every constant the suite's geometry depends on (04a section 9.3)."""
     thresholds = scn.width_thresholds()
     return {
         "U_NOM": cfg.U_NOM,
@@ -514,7 +514,7 @@ def constants_snapshot() -> dict:
 
 
 def freeze_checklist() -> List[Tuple[str, bool, str]]:
-    """04a §9.3, as machine-checked state rather than a list to tick by hand.
+    """04a section 9.3, as machine-checked state rather than a list to tick by hand.
 
     Returns `(item, satisfied, note)`.  The unsatisfied entries are the honest
     answer to "can the headline training run start" -- and today several of them
@@ -536,7 +536,7 @@ def freeze_checklist() -> List[Tuple[str, bool, str]]:
                    (", ".join(unresolved) if unresolved else "none outstanding") + deferred))
     checks.append(("operating speed settled (F24)", True,
                    f"decided: CRUISE_RPM = {cfg.CRUISE_RPM:g}, U_NOM = {cfg.U_NOM:.3f} m/s"))
-    checks.append(("throughput measured (04a §8.3)", True,
+    checks.append(("throughput measured (04a section 8.3)", True,
                    "F75, 10 workers, 12 cores: PPO ~108 steps/s; SAC 12 (1 gradient step per "
                    "transition) / 38 (0.2); TD3 18 / 53; TQC 13 / 32; RecurrentPPO 61 (F80)"))
     for item, rel in (("claim ledger committed", "planning/CLAIM_LEDGER.md"),
@@ -566,7 +566,7 @@ def _uncommitted(paths) -> List[str]:
 
 
 def unresolved_todos() -> List[str]:
-    """The `TODO(04-*)` items 04a §11 leaves open."""
+    """The `TODO(04-*)` items 04a section 11 leaves open."""
     open_items = []
     if cfg.CURRICULUM_STAGE_STEPS is None:
         open_items.append("TODO(04-3) curriculum steps per stage")

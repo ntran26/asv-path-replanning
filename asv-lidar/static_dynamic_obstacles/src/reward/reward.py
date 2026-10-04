@@ -6,8 +6,8 @@ r_t =  w_pf*r_pf + w_prog*r_prog + w_exist*r_exist + w_smooth*r_smooth
 ```
 
 The object returned by one call carries every intermediate value, not just the
-scalar.  That is not instrumentation added afterwards -- `02 §6` makes the scale
-audit mandatory and `04 §7` reads its metric set off these keys, so a reward
+scalar.  That is not instrumentation added afterwards -- `02 section 6` makes the scale
+audit mandatory and `04 section 7` reads its metric set off these keys, so a reward
 that could only report its total would have to be rebuilt to be measured.
 `RENDER_PANEL_SPEC` then makes the same struct a view rather than a second
 computation.
@@ -48,7 +48,7 @@ class RewardBreakdown:
     dominant: str = ""
 
     def as_info(self, prefix: str = "reward") -> Dict[str, float]:
-        """Flatten to the `02a §10.3` logging keys."""
+        """Flatten to the `02a section 10.3` logging keys."""
         out: Dict[str, float] = {}
         for name, value in self.term.items():
             out[f"{prefix}/term/{name}"] = float(value)
@@ -149,7 +149,7 @@ class RewardFunction:
 
     # ------------------------------------------------------------------
     def _terminal(self, collision, reached_goal, truncated) -> float:
-        """The one-shot payoffs (02a §5.7, 02b §2).
+        """The one-shot payoffs (02a section 5.7, 02b section 2).
 
         Uniform across the three collision types: they are reported separately
         as metrics but not weighted separately, so the reward makes no claim

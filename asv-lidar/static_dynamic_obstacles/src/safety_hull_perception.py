@@ -6,7 +6,7 @@ feeds that correction into the track's Kalman filter, velocity or contexts.
 The fit uses Zhang et al., "Efficient L-shape fitting for vehicle detection
 using laser scanners", IV 2017, DOI:10.1109/IVS.2017.7995698:
 https://publications.ri.cmu.edu/efficient-l-shape-fitting-for-vehicle-detection-using-laser-scanners
-Our fitted-footprint return mask is an engineering association rule, not that
+The fitted-footprint return mask here is an engineering association rule, not that
 paper's algorithm or a safety guarantee.  Unexplained returns remain static
 evidence.  Historical memory is only permanently cleared by SafetyPerception's
 existing finite-ray evidence or normal expiry.

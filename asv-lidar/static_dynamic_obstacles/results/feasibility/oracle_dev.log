@@ -1,5 +1,43 @@
-[oracle dev] 370 episodes, 0 done, 370 to run, 5 processes
-[oracle dev] 25/370 in 769 s
-[oracle dev] 50/370 in 1625 s
-[oracle dev] 75/370 in 2602 s
-[oracle dev] 100/370 in 3482 s
+[oracle dev] 370 episodes, 0 done, 370 to run, 6 processes
+[oracle dev] 25/370 in 589 s
+[oracle dev] 50/370 in 1517 s
+[oracle dev] 75/370 in 2479 s
+[oracle dev] 100/370 in 3356 s
+[oracle dev] 125/370 in 3823 s
+[oracle dev] 150/370 in 4237 s
+[oracle dev] 175/370 in 4979 s
+[oracle dev] 200/370 in 5154 s
+[oracle dev] 225/370 in 5574 s
+[oracle dev] 250/370 in 5766 s
+[oracle dev] 275/370 in 5922 s
+[oracle dev] 300/370 in 5984 s
+[oracle dev] 325/370 in 6138 s
+[oracle dev] 350/370 in 6500 s
+[oracle dev] 370/370 in 6720 s
+[oracle dev] done in 6723 s
+== dev: 370 episodes; oracle-unsolved 7, no solution with 0.2 m margin 17, unsolvable once tracked 20, no margin once tracked 46
+                   n  solved  with_margin  after_track  margin_after_track  median_t_track_s  median_window_s  oracle_s
+set         code                                                                                                       
+dev_v2      BO    20    0.95         0.95         0.95                0.95              1.00              NaN     14.28
+            CR    20    1.00         1.00         0.95                0.95              2.00             6.00    271.84
+            HO    20    1.00         1.00         1.00                0.95              1.50              NaN     42.03
+            NT    20    1.00         1.00         1.00                1.00              0.00            14.00     27.33
+            OT    20    1.00         0.95         1.00                0.95              2.00            12.00     88.55
+dv4x        BO    10    0.80         0.80         0.80                0.80              1.00              NaN     27.80
+            CRP   10    0.90         0.90         0.80                0.60              1.75             0.00    157.27
+            CRS   10    1.00         0.80         0.80                0.60              2.25             3.50    261.09
+            HO    10    1.00         1.00         1.00                0.90              2.00             4.50     83.07
+            NT    10    1.00         1.00         1.00                1.00              0.00              NaN     34.20
+            OT    10    1.00         1.00         1.00                1.00              2.00              NaN    112.21
+field_dev   BO    26    0.88         0.85         0.85                0.85              1.00             1.00     33.66
+            CRP   26    1.00         0.96         0.88                0.73              2.00             2.50    138.61
+            CRS   26    1.00         1.00         0.92                0.69              1.75             2.25    214.30
+            HO    26    1.00         0.92         1.00                0.88              1.50             5.50    111.31
+            NT    20    1.00         1.00         1.00                1.00              0.00            14.00     44.87
+            OT    26    1.00         0.92         1.00                0.92              2.00             9.00    161.12
+g1_conflict CRP    8    1.00         1.00         0.88                0.75              2.25             2.50    238.85
+            CRS    8    1.00         0.88         0.88                0.62              1.75             1.25    204.03
+            HO    18    1.00         1.00         0.94                0.94              2.00             4.50     91.15
+            OT     6    1.00         1.00         1.00                0.83              2.00             6.00    145.36
+
+

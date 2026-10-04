@@ -15,7 +15,7 @@ The recorded partial decisions are reproduced to numerical precision; durations 
 
 An empty rudder delay line initially fills with the first command (ship.py:219–234); the initial test therefore already permits immediate arrival at the servo. Later commands retain the randomized actuator delay. All source, cache, trace and scenario hashes plus the exact seeds and oracle parameters are in results.json.
 
-The remaining lateral-drift issue is a terminal viability gap. A safe terminal region with a known controller is required by [Wabersich–Zeilinger, §4.1 Eq. 5f and Assumption 4.2](https://arxiv.org/html/1812.05506v4). Low surge speed or an additional 3 s predicted tail does not establish it. Terminal changes are deferred pending the broader trajectory-search screen; extending a tail alone largely repeats a previously unsuccessful horizon extension.
+The remaining lateral-drift issue is a terminal viability gap. A safe terminal region with a known controller is required by [Wabersich–Zeilinger, section 4.1 Eq. 5f and Assumption 4.2](https://arxiv.org/html/1812.05506v4). Low surge speed or an additional 3 s predicted tail does not establish it. Terminal changes are deferred pending the broader trajectory-search screen; extending a tail alone largely repeats a previously unsuccessful horizon extension.
 
 Reproduce from the project directory with a fresh output tag:
 

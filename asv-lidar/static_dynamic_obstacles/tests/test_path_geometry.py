@@ -20,7 +20,7 @@ def test_cross_track_sign_is_positive_to_starboard():
     """02b C4 / F17.1, the exact case that was measured.
 
     Paper 2 used positive-to-port, which its own `verify_los_apf.py` flagged as
-    non-standard.  Flipped because 02a §6.4's passing-side term has two opposite
+    non-standard.  Flipped because 02a section 6.4's passing-side term has two opposite
     branches keyed on the sign of the lateral offset.
     """
     p = north_path()

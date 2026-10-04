@@ -6,7 +6,7 @@
 How to train, check, pause, resume and evaluate the baseline runs (PPO,
 RecurrentPPO, SAC, TQC × 3 seeds) on the frozen formulation **baseline-v2**
 (`configs/baseline_v2.json`). **Each run is trained on demand, one learner and
-seed at a time** (your call, 2026-09-27): the campaign script that chained all
+seed at a time** (decision, 2026-09-27): the campaign script that chained all
 twelve is gone. Runs on the previous formulation -- run 11 and the `_bl1`
 folders -- are not part of the baseline (F96).
 
@@ -58,10 +58,10 @@ plus about 40 min for the evaluations afterwards.
    in, put my device to sleep after* → **Never**. A sleeping machine pauses
    training. Keep it **plugged in**: on battery it slows to about two thirds.
 2. **Windows Update.** Set active hours or pause updates while a run trains. A
-   restart stops training; see §6 to continue.
+   restart stops training; see section 6 to continue.
 3. **Disk space.** C: needs a few GB free. Each off-policy replay buffer is
    ~0.58 GB; a buffer is not saved below 3 GB free.
-4. **Only one run at a time.** Check nothing is training (§4, last item).
+4. **Only one run at a time.** Check nothing is training (section 4, last item).
 5. **Check the code matches baseline-v2** (the script also does this and
    refuses to start otherwise):
 
@@ -94,16 +94,16 @@ It is safe to start again at any time with the same learner and seed: it picks u
 where it stopped. (`bash results/train_seed.sh tqc 0` would, for instance, run
 the one thing left for TQC seed 0 -- its Tier 1.)
 
-**Detached (recommended)** — keeps running if the terminal or the Claude app
+**Detached (recommended)** — keeps running if the terminal or the editor
 closes. In PowerShell from this folder, replacing the learner and seed:
 
 ```powershell
 Start-Process -FilePath "$env:LOCALAPPDATA\Programs\Git\bin\bash.exe" -ArgumentList '-lc', '"bash results/train_seed.sh sac 1"' -WorkingDirectory (Get-Location) -WindowStyle Hidden -RedirectStandardOutput results\train_seed.console.log -RedirectStandardError results\train_seed.console.err
 ```
 
-There is no window: check it with §4.
+There is no window: check it with section 4.
 
-**Several runs in a row**, if you ever want them, are just one call after
+**Several runs in a row**, if ever needed, are just one call after
 another:
 
 ```bash
@@ -185,7 +185,7 @@ Stop the script and all its processes:
 Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'train_seed\.sh' } | ForEach-Object { taskkill /PID $_.ProcessId /T /F }
 ```
 
-Resume by starting the same command again (§3). The run continues from its
+Resume by starting the same command again (section 3). The run continues from its
 last 250 k-step checkpoint, so up to 250 k steps are redone (about 1 h for
 RecurrentPPO, up to ~6 h for SAC). Off-policy runs also reload their replay
 buffer from `PhD/asv_replay_buffers/`; the run's `config.json` records each
@@ -198,7 +198,7 @@ To lose less, stop just after a checkpoint appears in the run folder
 
 ## 6. After a reboot, crash or power cut
 
-Start the same command again (§3). It resumes the run from its last checkpoint,
+Start the same command again (section 3). It resumes the run from its last checkpoint,
 or restarts it if it had not reached one (the old folder is kept as
 `<run>_incomplete_<date>` and can be deleted).
 
@@ -315,7 +315,7 @@ a run trains is safe (training only writes its own run folder).
    runs are done.
 2. On the cluster: clone the repository, install `requirements.txt` (the
    software versions each run used are in its `config.json` → `platform`), and
-   run `bash results/train_seed.sh <learner> <seed>` or the pieces in §7.
+   run `bash results/train_seed.sh <learner> <seed>` or the pieces in section 7.
 3. Replay buffers go next to the clone by default (`asv_replay_buffers/`
    beside the repository); set `ASV_REPLAY_BUFFER_DIR` to put them elsewhere,
    e.g. on scratch storage. An off-policy run stopped here mid-way can only
@@ -331,14 +331,14 @@ a run trains is safe (training only writes its own run folder).
 
 | Message or symptom | Meaning | What to do |
 |---|---|---|
-| `BASELINE CHECK FAILED` (`results/train_seed.log`) | the code differs from baseline-v2 | run `python src/baseline_config.py --check` to see what changed; undo it (§8) |
+| `BASELINE CHECK FAILED` (`results/train_seed.log`) | the code differs from baseline-v2 | run `python src/baseline_config.py --check` to see what changed; undo it (section 8) |
 | `<learner> SEED <N> FAILED (see ...log)` | a run crashed | read the end of that run's log; start the same command again — it resumes from the last checkpoint |
 | `note: ... is outside the planned learners x seeds` | a learner or seed not in the config's plan | fine for an extra run; it is simply not one of the twelve |
 | `[BUFFER] ... GB free -- replay buffer NOT saved` | C: is nearly full | free disk space; training continues, but a resume from that checkpoint refills the buffer |
 | `[BUFFER] a replay-buffer file stayed locked` | OneDrive held a file | harmless; an older buffer may be left in `PhD/asv_replay_buffers/` — delete it once that run is finished |
 | `<run>_incomplete_<date>` folder | a run died before its first checkpoint and was restarted | delete it |
 | log quiet for a few minutes | a development-set evaluation (every 200 k steps) | wait; `[EVAL]` lines follow |
-| nothing in the log for much longer, no CPU use | the processes are stuck or paused | `pause_run.ps1 ... -Action status`; if paused, resume (§5a); otherwise stop and restart (§5b) |
+| nothing in the log for much longer, no CPU use | the processes are stuck or paused | `pause_run.ps1 ... -Action status`; if paused, resume (section 5a); otherwise stop and restart (section 5b) |
 | steps/s falls to a third (e.g. TQC 14 → 4) with the learner on CPUs 4–11 and CPUs 0–3 idle | Windows moved the hidden process to the efficiency cores (EcoQoS), not heat; `CurrentClockSpeed` 1600 MHz is only the base clock and always reads that | runs opt out at start (`_no_efficiency_mode`, 2026-09-26); anything else heavy running beside a training (evaluations, figure generation, OneDrive uploading many files) also slows it |
 | steps/s falls to about two thirds | the laptop is on battery | plug it in |
 | `Get-Process python` finds nothing | the Store Python's processes are named `python3.10` | use `Get-Process python3.10`, or `pause_run.ps1 ... -Action status` |

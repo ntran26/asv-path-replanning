@@ -1,9 +1,9 @@
-"""The navigable corridor: centreline, width profile, and the polygon (03a §3).
+"""The navigable corridor: centreline, width profile, and the polygon (03a section 3).
 
 A corridor is a centreline polyline `C(s)` with a width profile `W(s)`.  The
 navigable polygon is the offset of `C` by `±W(s)/2`.  Three distinct geometries
 live in this project and conflating them is the failure this module exists to
-prevent (03a §3.1):
+prevent (03a section 3.1):
 
 | Polygon | Role | Visible to LiDAR? |
 |---|---|---|
@@ -11,17 +11,17 @@ prevent (03a §3.1):
 | **Basin envelope** | 10 x 25 m; limit of the physical water | No |
 | **Facility walls** | basin envelope + 1.5 m | **Yes** -- returned, then gated |
 
-**Why this replaces the straight inset rectangle.**  01 §3.3 records that in a
+**Why this replaces the straight inset rectangle.**  01 section 3.3 records that in a
 constant-width centred channel the port and starboard boundary rays are affine
 functions of the cross-track error, so the 7-dimensional boundary branch carries
 one number and an ablation of it would return a null result for a reason that
-has nothing to do with the branch.  04a §3.2 makes variable width, bends and an
+has nothing to do with the branch.  04a section 3.2 makes variable width, bends and an
 off-centre path a *hard requirement* on the generator for exactly that reason,
 and asserts it: `|corr(e_y, b_i)| < 0.9` for every ray over 1000 episodes.
 
 It also unblocks `r_path`.  With `kappa = 0` everywhere, 02a's `R-8` silently
 reduces to the absolute yaw form and the term looks implemented while being
-untested (02b §3.3).
+untested (02b section 3.3).
 
 **F25 -- bend magnitude is capped by channel width, and 04a does not say so.**
 The corridor has to stay inside a 10 m basin, so a wide channel cannot bend.
@@ -242,7 +242,7 @@ class Corridor:
         import boundary_raycast as br
         return br.point_in_polygon(float(x), float(y), self.polygon())
 
-    # --- the interface basin mode shares (06 §9) -------------------------
+    # --- the interface basin mode shares (06 section 9) -------------------------
     def clearances_at_s(self, s_query: float) -> Tuple[float, float]:
         """(starboard, port) clearance at a station: `W/2` each in a channel."""
         half = 0.5 * self.width_at_s(s_query)
@@ -322,7 +322,7 @@ def _width_profile(s: np.ndarray, nominal: float, ratio: float,
     hi = ratio * lo
     profile = np.interp(s, knots, lo + values * (hi - lo))
 
-    # **Smooth the corners out of the profile.**  04a §3.2 asks for
+    # **Smooth the corners out of the profile.**  04a section 3.2 asks for
     # "piecewise-linear over 2-4 control points", and taken literally that puts
     # a kink at every knot.  The reference path is the centreline offset by a
     # fraction of the *local* half-width, so a kink in the width becomes a
@@ -485,7 +485,7 @@ def sample(rng, *, width_range: Tuple[float, float] = None,
            force_bend: Optional[bool] = None,
            length: float = None,
            basin: Tuple[float, float] = None) -> Corridor:
-    """Sample one corridor from the 04a §3.2 distribution.
+    """Sample one corridor from the 04a section 3.2 distribution.
 
     `force_bend` asks for a bend of at least `CORRIDOR_BEND_MIN_DEG` if the
     width admits one; the caller uses it to hit 04a's ">= 40% of episodes"
@@ -557,7 +557,7 @@ def rectangle(width: float, *, length: float = None,
 # Basin mode  (06)
 # ---------------------------------------------------------------------------
 def nav_polygon(basin: Tuple[float, float] = None, inset: float = None) -> list:
-    """`P_nav`: the basin envelope inset by `d_safe + 0.05` (06 §3.1)."""
+    """`P_nav`: the basin envelope inset by `d_safe + 0.05` (06 section 3.1)."""
     w, h = (cfg.MAP_WIDTH, cfg.MAP_HEIGHT) if basin is None else basin
     i = cfg.BASIN_NAV_INSET_M if inset is None else float(inset)
     return [(i, i), (w - i, i), (w - i, h - i), (i, h - i)]
@@ -609,7 +609,7 @@ def _clip_convex(subject: list, clip: list) -> list:
 
 
 class _Band(Corridor):
-    """The path band confined targets keep to in basin mode (06 §3.5).
+    """The path band confined targets keep to in basin mode (06 section 3.5).
 
     A constant-width strip along the leg's line, clipped to `P_nav`, so a
     head-on, overtaking, being-overtaken or null target behaves as channel
@@ -625,7 +625,7 @@ class _Band(Corridor):
 
 @dataclass
 class Basin(Corridor):
-    """A straight survey leg inside the whole basin (06 §3).
+    """A straight survey leg inside the whole basin (06 section 3).
 
     `centre` is the leg itself, start to goal; `width` holds `W_eff(s) =
     h_+(s) + h_-(s)`, the clear width across the leg, so every consumer that
@@ -748,7 +748,7 @@ def sample_basin(rng, *, slant_max_deg: Optional[float] = None,
                  basin: Tuple[float, float] = None) -> Basin:
     """Paper 2's layout: fixed start and goal y, both x drawn independently.
 
-    With a stage slant cap (06 §4, stage 1), the goal x is pulled toward the
+    With a stage slant cap (06 section 4, stage 1), the goal x is pulled toward the
     start x until the cap holds, and the requested and realised slants are both
     recorded -- the F25 clamp-and-record pattern.
     """
@@ -763,16 +763,16 @@ def sample_basin(rng, *, slant_max_deg: Optional[float] = None,
 
 
 # ---------------------------------------------------------------------------
-# The out-of-corridor world  (03a §1.2)
+# The out-of-corridor world  (03a section 1.2)
 # ---------------------------------------------------------------------------
 def facility_walls(basin: Tuple[float, float] = None,
                    margin: float = None) -> list:
     """The physical room the vessel sits in: basin envelope plus a margin.
 
     **Returned in the raw scan and then gated**, which is the whole point.  Until
-    03a §1.2 the simulated sensor saw only panels and the target, so the boundary
+    03a section 1.2 the simulated sensor saw only panels and the target, so the boundary
     gate had nothing to remove and passed everything through -- a no-op in
-    simulation and load-bearing in the field, in the one component 01 §3 exists
+    simulation and load-bearing in the field, in the one component 01 section 3 exists
     to remove a sim-to-real gap from.
 
     With walls present the gate does real work in training, its margin becomes a

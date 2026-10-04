@@ -1,7 +1,7 @@
 {
  "id": "v3-fix1-admissibility-static",
  "created": "2026-10-01",
- "purpose": "Fix 1 (your call, 2026-10-01): the compliant-turn admissibility test also counts perceived static obstacles (src/colregs/geometry.py obstacle_room; switch ADMISSIBILITY_STATIC). Diagnosis: the test saw only the map boundary, so near a static obstacle the context said the compliant turn was fine and the R-2 slowdown credit never switched on (L2 head-on 0/20: the policy turned starboard into the gate obstacle, never slowing). This run repeats the exact 2.5 M -> 3.0 M stage-7 continuation that produced the kept 3 M policy, with only fix 1 switched on, so the comparison isolates the fix.",
+ "purpose": "Fix 1 (decision, 2026-10-01): the compliant-turn admissibility test also counts perceived static obstacles (src/colregs/geometry.py obstacle_room; switch ADMISSIBILITY_STATIC). Diagnosis: the test saw only the map boundary, so near a static obstacle the context said the compliant turn was fine and the R-2 slowdown credit never switched on (L2 head-on 0/20: the policy turned starboard into the gate obstacle, never slowing). This run repeats the exact 2.5 M -> 3.0 M stage-7 continuation that produced the kept 3 M policy, with only fix 1 switched on, so the comparison isolates the fix.",
  "base_config": "configs/baseline_v3.json",
  "start_from": "checkpoint",
  "start_model": "runs/sac_formulation_seed0_bl3/sac_2500000_steps.zip",

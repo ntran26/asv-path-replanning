@@ -5,7 +5,7 @@ r_t =  w_pf*r_pf + w_prog*r_prog + w_exist*r_exist + w_smooth*r_smooth
      + w_obs*r_obs + w_bnd*r_bnd + w_dom*r_dom + w_COL*r_col + r_term
 ```
 
-Four modules, and the split is the one 02a §10.2 asks for:
+Four modules, and the split is the one 02a section 10.2 asks for:
 
 * `config`  -- coefficients and the assertions that fail at *construction*
 * `terms`   -- every term as a pure function of `(state, ctx, cfg)`

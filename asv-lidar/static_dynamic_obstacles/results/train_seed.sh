@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Train one learner x seed on the frozen formulation baseline-v2, on demand, then
-# evaluate it -- what the campaign did for each run, one run at a time (your call,
+# evaluate it -- what the campaign did for each run, one run at a time (decision,
 # 2026-09-27: the campaign mechanism is gone).
 #
 #   bash results/train_seed.sh sac 1

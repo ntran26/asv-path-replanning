@@ -1,0 +1,41 @@
+[reward check] 105 development crossings (35 SAC failures)
+[reward check] done in 2791 s
+Reward check: SAC's continuation from the first track vs successful oracle manoeuvres from the same state
+(development crossings; returns from the first-track step; 105 episodes)
+
+-- SAC failures: 28 with a successful alternative from the first track (7 without)
+   reward prefers SAC's own continuation over the best successful alternative at g951: 0 of 28
+   reward prefers SAC's own continuation over the best successful alternative at g98: 0 of 28
+   reward prefers SAC's own continuation over the best successful alternative at g1: 0 of 28
+   median discounted return (gamma 0.951): SAC -161.1, best alternative -27.8, best port -40.5, best starboard -30.4, best speed-only -31.2
+
+-- SAC successes (control): 65 with a successful alternative from the first track (5 without)
+   reward prefers SAC's own continuation over the best successful alternative at g951: 14 of 65
+   reward prefers SAC's own continuation over the best successful alternative at g98: 26 of 65
+   reward prefers SAC's own continuation over the best successful alternative at g1: 21 of 65
+   median discounted return (gamma 0.951): SAC -23.2, best alternative -19.3, best port -27.3, best starboard -20.8, best speed-only -31.5
+
+-- SAC failures: per-term discounted return, SAC minus best successful alternative (gamma 0.951)
+   (positive: the term pays SAC's failing response more)
+terminal   -140.47
+prog         -6.74
+smooth       -1.32
+bnd           0.00
+dom           0.00
+col           0.00
+exist         2.10
+pf            5.23
+obs           5.25
+
+   mean:
+terminal   -123.58
+prog         -7.60
+smooth       -0.96
+bnd          -0.04
+dom           0.05
+exist         1.78
+pf            5.37
+col           5.72
+obs           7.29
+
+

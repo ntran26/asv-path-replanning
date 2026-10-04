@@ -44,7 +44,7 @@ Five disjoint integer ranges (`constants.SEED_NAMESPACES`):
 $$\text{seed}(\text{ns}, i) = \mathrm{lo}_{\text{ns}} + \big(i \bmod (\mathrm{hi}_{\text{ns}} - \mathrm{lo}_{\text{ns}} + 1)\big)$$
 
 A test asserts the ranges never overlap. This is the machine-checkable version
-of "we did not train on the test set".
+of "the test set was not used in training".
 
 **Animation 2 — the number line.** Show 0 … 500,000 as a line with five coloured
 bands. Sample dots fall into the training band during a training montage; when
@@ -57,7 +57,7 @@ tables are produced, only in the frozen band. No dot ever crosses a boundary.
 
 ### 3.1 Geometry: basin or channel
 
-With probability `p_basin` (per stage, §4) the scene is the **basin** — the
+With probability `p_basin` (per stage, section 4) the scene is the **basin** — the
 10 × 25 m field site — otherwise a **channel** of sampled width.
 
 Basin: start and goal have fixed along-basin positions and sampled lateral ones,
@@ -103,7 +103,7 @@ Per-class ranges as coded:
 | head-on | reciprocal sector | 0.7 – 1.3 | 12.3 – 17.0 | 2.0 |
 | crossing | ±(22.5°, 112.5°) | 0.6 – 1.4 | 7.9 – 14.8 | 2.5 |
 | overtaking | narrow astern sector | 0.4 – 0.55 | 19.7 – 31.5 | 2.0 |
-| being overtaken | mirror of overtaking | 1.5 – 2.2 | 9.9 – 15.8 | 2.0, floored (§3.3) |
+| being overtaken | mirror of overtaking | 1.5 – 2.2 | 9.9 – 15.8 | 2.0, floored (section 3.3) |
 | null | any | 0.85 – 1.15 | — | ≥ 4.0 (no encounter) |
 
 **Animation 4 — the backward solve.** Place the own ship; draw its track; mark

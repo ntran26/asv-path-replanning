@@ -70,7 +70,7 @@
 % These references document architectural relationships, not the historical
 % motivation of the earlier implementation or transferred formal guarantees.
 % luenberger1971observers: model dynamics plus output-error correction;
-% our observer uses nonlinear prediction and a fixed scalar measurement gain,
+% the observer here uses nonlinear prediction and a fixed scalar measurement gain,
 % without covariance propagation, Kalman gain calculation, or pole placement.
 % Publisher metadata: https://ieeexplore.ieee.org/document/1099826/
 % Paper: https://lab.prd.vanderbilt.edu/taha/wp-content/uploads/sites/154/2017/10/Observers_Original_Paper.pdf
@@ -88,7 +88,7 @@
 }
 
 % hornung2013octomap: range-ray free-space evidence and occupied-return priority;
-% our implementation deletes contradicted 2D memory points directly, without
+% this implementation deletes contradicted 2D memory points directly, without
 % an occupancy grid, octree, probabilistic log-odds update, or OctoMap dependency.
 % Publisher metadata: https://link.springer.com/article/10.1007/s10514-012-9321-0
 % Author's paper: https://www.arminhornung.de/Research/pub/hornung13auro.pdf

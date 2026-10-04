@@ -1,28 +1,28 @@
 # SAC seed 0 (baseline-v3): diagnosis and recovery plan within 3 M steps
 
-**Written 2026-09-30** while the run continues 2.5 M → 3.0 M. Constraint (your
-call): no restart from scratch; any improvement starts from an existing
+**Written 2026-09-30** while the run continues 2.5 M → 3.0 M. Constraint
+(decision): no restart from scratch; any improvement starts from an existing
 checkpoint and the total stays at 3 M steps.
 
-## 0. Agreed back-up plan (your call, 2026-09-30)
+## 0. Agreed back-up plan (decision, 2026-09-30)
 
-> **Outcome and status (2026-09-30 21:45).** The 3 M policy passed the §3 bar
+> **Outcome and status (2026-09-30 21:45).** The 3 M policy passed the section 3 bar
 > (frozen headline 0.935 vs 0.892; Paper 2 set 0.64 vs 0.45, no-target 30/30,
 > fixed-speed target cases 0.63) and is **kept as the best policy**:
 > `runs/sac_formulation_seed0_bl3/kept_best_3M/` (best_model.zip,
 > best_vecnormalize.pkl, eval_summary.json, config.json). Stage 8 was run anyway
-> on your call, to see whether it improves further: `configs/finetune_v3_stage8.json`,
+> to see whether it improves further: `configs/finetune_v3_stage8.json`,
 > `results/stage8_run.sh`, run folder `runs/sac_formulation_seed0_bl3_stage8`
 > (launched 21:42; ~9 h training, then the frozen suite and Paper 2 set). It
 > replaces the 3 M policy only if it beats it.
 
 **Trigger:** the 3 M evaluation (Tier 1, frozen suite, Paper 2 set) comes out
-"bad" by the criteria in §3.
+"bad" by the criteria in section 3.
 
 **Then:**
 
 1. **Option 0 first** — score the 2.0–3.0 M checkpoints on the three-panel
-   development set; if one meets §3, select it and stop.
+   development set; if one meets section 3, select it and stop.
 2. **Otherwise, a focused stage 8 from the 2.5 M checkpoint to 3.0 M**
    (0.5 M steps, about 9 h training plus 3–4 h evaluation):
    - three-panel layouts in **70 %** of episodes (stage 7: 45 %), weighted

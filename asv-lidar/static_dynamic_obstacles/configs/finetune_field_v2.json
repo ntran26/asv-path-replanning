@@ -1,7 +1,7 @@
 {
  "id": "finetune-field-v2",
  "created": "2026-09-28",
- "purpose": "The stronger field fine-tune, started if v1 does not improve on the field validation set by 2.4 M (your call, 2026-09-28). v1 lifted the field score 0.48 -> 0.54 by 2.1 M and then held at 0.54 / 0.54 / 0.52 (2.2 M, 2.3 M) with SAC's entropy coefficient at 0.0025. v2 starts from v1's best checkpoint and pushes harder on the field layouts, on the cases that fail most, with more exploration.",
+ "purpose": "The stronger field fine-tune, started if v1 does not improve on the field validation set by 2.4 M (decision, 2026-09-28). v1 lifted the field score 0.48 -> 0.54 by 2.1 M and then held at 0.54 / 0.54 / 0.52 (2.2 M, 2.3 M) with SAC's entropy coefficient at 0.0025. v2 starts from v1's best checkpoint and pushes harder on the field layouts, on the cases that fail most, with more exploration.",
  "base_config": "configs/baseline_v2.json",
  "start_from": "best",
  "total_timesteps": 3000000,

@@ -4,7 +4,7 @@
 modes this project has already hit visible without opening a log.
 
 The panel is a **view on `info`**, never a separate computation. Every field below is a key
-emitted by `env.step()` per `02a §10.3`. If the panel needs a number `info` does not carry,
+emitted by `env.step()` per `02a section 10.3`. If the panel needs a number `info` does not carry,
 add it to `info` — do not compute it in `render.py`. Same principle as the single
 `EncounterContext`: two consumers, one source, or they diverge.
 
@@ -14,10 +14,10 @@ add it to `info` — do not compute it in `render.py`. Same principle as the sin
 
 **Show the gate, not just the value.**
 
-When `v_side` reads `0.000` you cannot tell whether that is correct (wrong class for this
+When `v_side` reads `0.000` it is impossible to tell whether that is correct (wrong class for this
 term) or a bug (gate stuck, `ρ_t` collapsed, class never latched). Every COLREGs sub-term
 should print its value *and* the reason it holds that value. This is the difference between a
-panel you glance at and a panel you debug with, and it costs one string per term.
+panel to glance at and a panel to debug with, and it costs one string per term.
 
 Same idea applies to the speed gate: `g_u = 1.00 [SAT]` immediately says the gate is dead,
 which is the exact shape of the F19 bug that pinned the `ego` surge feature at 1.0 for 45% of
@@ -99,13 +99,13 @@ rho=0.73   A_req=0.60  A_t=0.21  urgency=0.55
 ## 3. What each block is for
 
 ### [1] RUN — provenance
-`seed`, scenario name and **suite hash** matter more here than they look. `04 §4.5` requires
+`seed`, scenario name and **suite hash** matter more here than they look. `04 section 4.5` requires
 the evaluation suite frozen and hashed; putting the hash on screen makes a screenshot
-reproducible, which is worth a lot when you are comparing two policies on one geometry three
+reproducible, which is worth a lot when comparing two policies on one geometry three
 weeks apart.
 
-`spawn=COMPLIANT|DISPLACED` is the head-on regime from `02a §2.4`. If every frame you ever
-look at says `DISPLACED`, `TARGET_COMPLIANT_SPAWN_PROB` is not wired.
+`spawn=COMPLIANT|DISPLACED` is the head-on regime from `02a section 2.4`. If every frame ever
+inspected says `DISPLACED`, `TARGET_COMPLIANT_SPAWN_PROB` is not wired.
 
 ### [2] EGO — the speed gate, and `r_path`
 `U_ref_eff` next to `U_ref` shows `R-2` firing. `g_u` with a `[SAT]` flag catches a dead gate.
@@ -122,7 +122,7 @@ Under `R-1`, safety terms read truth and COLREGs gating reads the estimate. The 
 show both or that decision is invisible.
 
 **Highlight the class row in red whenever `est ≠ true`.** A misclassification is the failure
-`04 §6` names as the one that matters — the agent turns the wrong way — and it is otherwise
+`04 section 6` names as the one that matters — the agent turns the wrong way — and it is otherwise
 almost impossible to spot in a replay. Also print a running count of mismatched steps this
 episode.
 
@@ -131,13 +131,13 @@ the occlusion failure mode.
 
 ### [4] COLREGS — the state machine and the admissibility predicate
 The three numbers behind `A_stbd` (`Dy_req`, `r_stbd`, `r_port`) explain *why* it flipped,
-which is what you actually need when the agent does something odd near a wall.
+which is what is actually needed when the agent does something odd near a wall.
 
-`A_req` is the health check on my deficit reformulation of Rule 8. **If `A_req` is 1.00 in
-every head-on episode you look at, the spawn-DCPA bug is back** and the agent is learning
+`A_req` is the health check on the deficit reformulation of Rule 8. **If `A_req` is 1.00 in
+every head-on episode inspected, the spawn-DCPA bug is back** and the agent is learning
 "always alter" instead of "when to alter".
 
-`compliant_sense` printed explicitly is the guard against the `02 §4.2` trap. Seeing
+`compliant_sense` printed explicitly is the guard against the `02 section 4.2` trap. Seeing
 `sense=PORT` on an overtaking encounter, next to a starboard turn and `v_port` rising, is the
 whole bug in one frame.
 
@@ -152,11 +152,11 @@ is `[-0.44, -0.41]` "varies by less than 10% of its own value" — it is a const
 wearing a shaping term's costume, and it is invisible in the other three columns. Print
 `[flat]` when the range is below 5% of the term's declared span.
 
-`dominant:` on both the step and episode lines tells you instantly when one term is eating the
+`dominant:` on both the step and episode lines shows instantly when one term is eating the
 signal, which is what happened with the unshifted obstacle exponential.
 
 The panel should also **assert the coefficient ordering live** and flag it if the realised
-per-step magnitudes invert — cheap insurance that the `02a §7` hierarchy survives contact.
+per-step magnitudes invert — cheap insurance that the `02a section 7` hierarchy survives contact.
 
 ### [6] OBS HEALTH — `clip%`
 Fraction of episode steps at the normaliser's clip, per branch. This is the F19 detector: the
@@ -168,7 +168,7 @@ Worth a per-dimension drill-down on a keypress, since a single saturating dimens
 
 ### [7] CLEARANCE — how close to which terminal
 `domain margin` signed, so negative means intruding. Four numbers that say which termination
-is nearest, which is the context you want when a run ends abruptly.
+is nearest, which is the context needed when a run ends abruptly.
 
 ---
 
@@ -196,14 +196,14 @@ red for `est ≠ true` on the class row; red for `clip% > 10`; amber for `state=
 for any COLREGs sub-term above 0.5. Nothing else.
 
 **Toggles.** `1`–`7` show/hide blocks, matching the field render's `M`/`G`/`F` convention.
-Default to `[4]` and `[5]` only, so the panel is readable in a short window and you opt into
-the rest.
+Default to `[4]` and `[5]` only, so the panel is readable in a short window; the other blocks
+are opt-in.
 
 **Add a step-back key.** Hold the last ~200 steps of `info` in a ring buffer and let
 `←`/`→` scrub. Nearly every question worth asking about a COLREGs encounter is "what was the
 state four seconds ago", and re-running with a breakpoint to find out is the slow way.
 
-**Sparklines, if you want them.** A 40 px polyline per reward term over the last 100 steps,
+**Sparklines, optional.** A 40 px polyline per reward term over the last 100 steps,
 drawn to the right of the `Sep` column. Cheap in pygame, and a flat line is the same bug the
 `range(ep)` column catches — belt and braces on the failure mode that cost Paper 2 the most.
 
@@ -217,4 +217,4 @@ transport and hardware plumbing with no simulator analogue. The line budget they
 
 Keep the sector-distance dump, but **as pooled `c_t` in observation units, not metres**. What
 matters is what the policy actually receives after pooling and normalisation, not the raw
-ranges. Put raw metres behind the drill-down key for when you suspect the pooling itself.
+ranges. Put raw metres behind the drill-down key for when the pooling itself is suspect.

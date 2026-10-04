@@ -1,6 +1,6 @@
 """CPA products, the ship domain, and the Rule 8 admissibility predicate.
 
-`02 §3.2` fixes the structure of the precedence table and defers the width
+`02 section 3.2` fixes the structure of the precedence table and defers the width
 thresholds to Study 1.  The reward therefore needs a **per-step geometric
 predicate**, not a width lookup: one predicate drives every row of the table,
 and the width thresholds fall out of the sweep as *results* rather than going in
@@ -74,7 +74,7 @@ def cpa_products(p_os, v_os, heading_os_deg: float,
     Both are evaluated at the constant-velocity projected CPA rather than now,
     consistently with DCPA and TCPA, because the question a passing-side term
     has to answer is which side the vessels *will* pass on.  A realised version
-    measured at actual minimum range is a reported metric (02a §6.3) and must
+    measured at actual minimum range is a reported metric (02a section 6.3) and must
     not be fed back into the reward -- it only exists after the fact.
     """
     dcpa, tcpa = cc.cpa(p_os, v_os, p_ts, v_ts)
@@ -99,7 +99,7 @@ def cpa_products(p_os, v_os, heading_os_deg: float,
 
 
 def sigma_bow(beta_cpa_deg: float, beta_bow_deg: float = cfg.BETA_BOW_DEG) -> float:
-    """Severity of crossing ahead, smooth in the bearing (02a §6.3).
+    """Severity of crossing ahead, smooth in the bearing (02a section 6.3).
 
     ```
     sigma_bow = clip( (cos beta_CPA - cos beta_bow) / (1 - cos beta_bow), 0, 1 )
@@ -209,7 +209,7 @@ def lateral_deficit(dcpa: float, d_required: float = None) -> float:
     """`Dy_req = max(0, d_req - DCPA)`: how much lateral offset is still owed.
 
     Zero when the projected pass already clears the required separation -- the
-    case `02 §3.2` calls the normal one in a channel, where Rule 9(a)
+    case `02 section 3.2` calls the normal one in a channel, where Rule 9(a)
     compliance satisfies Rule 14 without any alteration at all.
     """
     d_required = d_req() if d_required is None else float(d_required)

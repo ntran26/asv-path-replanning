@@ -1,6 +1,6 @@
 # Safety layer v4: prediction audit and onboard estimation corrections
 
-Development continuation, 2026-10-02. Read `SAFETY_LAYER_HANDOFF.md` first.
+Development continuation, 2026-10-02. Read `SAFETY_LAYER_NOTES.md` first.
 
 **Selected v4 preset:** model-based ego observer + free-space memory clearing.
 The other three experimental switches are disabled. This gives **123/150 goals,

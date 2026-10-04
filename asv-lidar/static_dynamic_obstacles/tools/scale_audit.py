@@ -1,10 +1,10 @@
-"""The reward scale audit (02a §8.2, 02b T6; `OPEN_PROBLEMS.md` C7).
+"""The reward scale audit (02a section 8.2, 02b T6; `OPEN_PROBLEMS.md` C7).
 
     python tools/scale_audit.py --episodes 240 --workers 10
 
 Runs three fixed policies over the scenario generator at curriculum stage 5 and
-reports, per term, the realised episode integral against 02a §8.1's predictions,
-the outcome rates, and the orderings §8.1 requires:
+reports, per term, the realised episode integral against 02a section 8.1's predictions,
+the outcome rates, and the orderings section 8.1 requires:
 
 * **random**      -- uniform actions: the floor, and every term's worst case;
 * **follower**    -- a line-of-sight path follower at cruise that ignores
@@ -61,7 +61,7 @@ def run_chunk(args):
     from env import ASVLidarEnv
 
     curriculum.apply_stage(4)           # full propulsion authority, as training uses
-    # Nominal hull: 02a §8.1's design point is defined on the identified plant.
+    # Nominal hull: 02a section 8.1's design point is defined on the identified plant.
     env = ASVLidarEnv(render_mode=None, scenario_stage=5, scenario_namespace="development",
                       vessel_randomisation=None)
     rng = np.random.default_rng(seeds[0])
@@ -133,7 +133,7 @@ def summarise(rows):
         block["by_class"] = by_class
         report[policy] = block
 
-    # 02a §8.1 against the nominal design point: follower successes with no target.
+    # 02a section 8.1 against the nominal design point: follower successes with no target.
     nominal = [r for r in rows if r["policy"] == "follower" and r["outcome"] == "goal"
                and r["class"] == "no_target"]
     if nominal:

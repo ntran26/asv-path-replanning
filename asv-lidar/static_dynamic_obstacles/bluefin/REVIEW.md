@@ -1,8 +1,8 @@
 # Review of `REPORT.md` — 05 part 1, vessel model identification
 
 An independent check of the identification report against its own code, its
-own `validation.json`, and the raw July logs. Written by Claude Code on
-2026-09-13. `REPORT.md` is left unedited; corrections are listed in §5 for
+own `validation.json`, and the raw July logs. Written on
+2026-09-13. `REPORT.md` is left unedited; corrections are listed in section 5 for
 whoever owns it.
 
 **Verdict.** The model is sound and better than v2 on every horizon, and the
@@ -19,7 +19,7 @@ several items should be fixed before any of it is quoted in the paper.
 | What | How |
 |---|---|
 | Acceptance suite | re-ran `acceptance.py` unmodified (10.5 min) |
-| Holdout tables | compared every cell of §6 against `validation.json` |
+| Holdout tables | compared every cell of section 6 against `validation.json` |
 | Deployment parity | parsed all 19 July logs directly: `#CONFIG`, `#ACTION`, raw pose and LiDAR lines |
 | Pose staleness | matched each `#ACTION` to its own frame's pose line by timestamp, and recorded which arrived first in the file |
 | Drift anomaly | recomputed course − heading per segment with the report's own 0.5 m/s gate, then inspected step lengths, run lengths and snap-back |
@@ -37,17 +37,17 @@ several items should be fixed before any of it is quoted in the paper.
 | `$CMD` carries `limited_rudder` | log 07-03/1, frame 1: `raw_rudder` −64.99, `limited_rudder` −5.00 at `dt_cmd` 0.1 — the 50 %/s limiter visible on the first step |
 | Sign chain `raw = −100·a0` | `a0` +0.6499 → `raw_rudder` −64.988 |
 | RPM 12 ↔ S2 50 | `rpm=12.000,S2=50.000`; bridge maps `S2 = rpm/24·100` |
-| §6 V1 holdout table | every cell matches `validation.json` to the printed precision |
+| Section 6 V1 holdout table | every cell matches `validation.json` to the printed precision |
 | v3 beats v2 at every horizon | heading and position, all six horizons |
-| V3: v3 better on 6/6 holdout runs | confirmed — see §4 for how much |
-| Turning is prior-driven, not identified (§7) | the report is explicit and correct about this |
+| V3: v3 better on 6/6 holdout runs | confirmed — see section 4 for how much |
+| Turning is prior-driven, not identified (section 7) | the report is explicit and correct about this |
 
 **One result the report does not claim, and should.** The fitted surge balance
 gives a steady speed at 12 rpm-units of **`sqrt(T12/X_uu)` = 1.116 m/s**. The
 02b T1 log-mining task, which never saw the fit, measured a speed-over-ground
 median of **1.14 m/s** across 18 runs. Two independent methods agree to 2 %.
 That settles what the vessel does at 12 RPM, and it bears directly on F24: the
-"0.55 m/s field measurement" cited in 02b C2 and 03a §1.1 is not a measurement,
+"0.55 m/s field measurement" cited in 02b C2 and 03a section 1.1 is not a measurement,
 and 0.55 m/s corresponds to 6 rpm-units on this plant (0.558 m/s).
 
 ---
@@ -69,7 +69,7 @@ From `validation.json`, holdout V1, heading RMSE:
 
 ### 3.2 v3's free-run heading is worse than assuming the vessel never turns
 
-§6 observes that v2's free-run error (33.2°) "is worse than assuming the vessel
+Section 6 observes that v2's free-run error (33.2°) "is worse than assuming the vessel
 never turns (22.9°)". **So is v3's**: 23.53° against 22.94°. The report states
 the failure only for v2. v3 beats every naive baseline at 3, 5 and 10 s, and at
 no other horizon.
@@ -78,13 +78,13 @@ no other horizon.
 
 Drift-angle SD on the holdout: measured **5.68°**, v2 5.39°, v3 **4.78°**. v3 is
 0.89° from the measurement, v2 is 0.28°. v3 is bolded as the better model in the
-§6 table; by this metric it is the worse one. The previous iteration
+Section 6 table; by this metric it is the worse one. The previous iteration
 over-drifted (IQR 14° against 8.5°); this one under-drifts. The regression
 changed sign rather than disappearing.
 
 ### 3.4 "Controller pose is one frame old" — it is on 41 % of frames
 
-§9's parity table, and `VesselSim(obs_delay_steps=1)`, model the controller's
+Section 9's parity table, and `VesselSim(obs_delay_steps=1)`, model the controller's
 pose as always one frame stale. Matching each `#ACTION` to its own frame's pose
 line across all 1,085 July frames:
 
@@ -124,12 +124,12 @@ constant heading), or a sustained 180° yaw ambiguity in scan matching.
 `calibration.mp4` and `trial_2.mp4` at t ≈ 20 s would settle which. The bridge
 clips S2 at zero, so the vessel cannot have reversed under its own power.
 
-§3's "no localisation jumps" is not contradicted — these are not jumps. §3's
+Section 3's "no localisation jumps" is not contradicted — these are not jumps. Section 3's
 "heading is consistent with direction of travel" does not hold for these
 windows. **All three segments are in `train_runs`**, so the replay fit
 integrates forward commands through windows where the vessel moved backwards,
 residuals no hull parameter can absorb. How much that biased the yaw and sway
-parameters — seven of which sit at their bounds (§4) — is unknown until the fit
+parameters — seven of which sit at their bounds (section 4) — is unknown until the fit
 is re-run with the windows trimmed.
 
 ### 3.6 `ship_model_v3.py`: "`rud_tau` sits at its lower bound"
@@ -154,10 +154,10 @@ A6 guards `abs(mean(...))`, the cancellation-prone form.
 
 **Seven of fifteen free parameters sit within 3 % of a bound**: `X_rr`,
 `X_delta`, `Y_v`, `k_race`, `N_r`, `N_rr` at their lower bounds, `rud_rate` at
-its upper. §8 discusses the wide intervals and the `rud_rate` saturation. It
+its upper. Section 8 discusses the wide intervals and the `rud_rate` saturation. It
 does not mention **`N_uv` = −84.0 against a lower bound of −90** (1.8 % of the
 range), with its 5 % interval at −86.8. `N_uv` belongs to the correlated yaw trio
-§8 warns about, and its drift moment `−N_uv·u·v = +84·u·v` more than cancels the
+Section 8 warns about, and its drift moment `−N_uv·u·v = +84·u·v` more than cancels the
 Munk moment `(M11 − M22)·u·v = −59.1·u·v`. With the bound active, the bound is
 shaping the solution. Worth refitting with it widened to see whether `N_uv`, `N_r`
 and `k_R` move.
@@ -166,19 +166,19 @@ and `k_R` move.
 
 ## 5. Corrections for `REPORT.md`
 
-1. §6: "Only at 1 s does a naive predictor beat v3" → "at 1 s and 2 s"
-2. §6: state that v3's free-run heading error (23.5°) is also worse than the
+1. Section 6: "Only at 1 s does a naive predictor beat v3" → "at 1 s and 2 s"
+2. Section 6: state that v3's free-run heading error (23.5°) is also worse than the
    freeze-heading baseline (22.9°)
-3. §6: V6 — v3 under-drifts (4.78° vs measured 5.68°) and is further from the
+3. Section 6: V6 — v3 under-drifts (4.78° vs measured 5.68°) and is further from the
    measurement than v2; the regression changed sign, it did not go away
-4. §9 parity table: staleness is 40.8 %, not every frame; change
+4. Section 9 parity table: staleness is 40.8 %, not every frame; change
    `obs_delay_steps=1` to a per-frame probability of 0.41
-5. §3 and `simulate.py`: the training-day drift outliers are not low-speed
+5. Section 3 and `simulate.py`: the training-day drift outliers are not low-speed
    wrap-around; three training segments contain sustained motion against the
    heading at t ≈ 18–24 s
-6. §6: V3 p-value is one-sided; two of the six wins are ties
-7. §6: report V5 as mean-absolute error (1.76 m vs 3.89 m)
-8. §8: note `N_uv` against its bound
+6. Section 6: V3 p-value is one-sided; two of the six wins are ties
+7. Section 6: report V5 as mean-absolute error (1.76 m vs 3.89 m)
+8. Section 8: note `N_uv` against its bound
 9. `ship_model_v3.py` docstring: `rud_tau` is not at its lower bound
 
 ---
@@ -215,12 +215,12 @@ In priority order:
 | 2 Hz decisions + 41 % staleness | **native to the environment since revision 7**: `UPDATE_RATE = 0.5`, physics and collision sub-stepped at 0.1 s, and a stale frame repeats every pose-derived observation and skips the tracker (the `DeploymentTiming` wrapper is gone) | on; staleness **0.0 since the bridge waits for each pose line**, 0.408 available |
 | Reverse thrust | braking force by operator splitting, `REVERSE_THRUST_EFFICIENCY` = 0.5 (`TODO(05)`); the astern impulse the clip at zero discards is reported as `estop/reverse_dv_est_mps` | used only by the emergency stop |
 | Emergency stop | `src/emergency_stop.py`, env-free; **the bridge now imports it** (revision 7) | on; trigger default in `PROJECT_STATE.md` revision 7 |
-| Refit v4 (§8) | `refit_v4/refit_v4.py`, pre-registered | **not adopted** — the simulator keeps v3 |
+| Refit v4 (section 8) | `refit_v4/refit_v4.py`, pre-registered | **not adopted** — the simulator keeps v3 |
 
 Not integrated: `VesselSim` itself (the environment already owns stepping,
 observation and actuation, and wrapping a second stepper inside it would
-duplicate all three), `obs_delay_steps=1` (contradicted, §3.4), and the v2
-MMG derivative block (inert, as §1.3 correctly says).
+duplicate all three), `obs_delay_steps=1` (contradicted, section 3.4), and the v2
+MMG derivative block (inert, as section 1.3 correctly says).
 
 ---
 
@@ -228,7 +228,7 @@ MMG derivative block (inert, as §1.3 correctly says).
 
 ### 8.1 The three windows are retrievals
 
-§3.5 left it at "most consistent with an un-trimmed retrieval" and pointed at the
+Section 3.5 left it at "most consistent with an un-trimmed retrieval" and pointed at the
 videos. The July `.mp4` files turn out to be recordings of the **bridge's own
 display**, not a camera, so they cannot show the vessel. They show its telemetry,
 and that settles it anyway. At t = 21.0 s of `trial_2` the display reads surge
@@ -246,7 +246,7 @@ resamples), and the adoption rule — no holdout metric more than 5 % worse than
 v3's, and acceptance tests A1–A5 passing on the new parameters and bootstrap.
 
 **The trim rule** — three consecutive pose steps of at least 0.15 m whose course
-is more than 90° off the heading — fired on exactly the three segments §3.5
+is more than 90° off the heading — fired on exactly the three segments section 3.5
 found, all at t = 18.5 s, and on nothing in the holdout. Removing those 41
 samples lowers v3's own training objective from 1.041 to 0.905.
 
@@ -271,9 +271,9 @@ heading RMSE in degrees:
 
 v4 is better than v3 at every windowed horizon from 2 s and in position, and at
 2 s it now beats the constant-rate predictor (4.98°) as well. Free-run heading
-is still worse than assuming the vessel never turns (§3.2 stands).
+is still worse than assuming the vessel never turns (section 3.2 stands).
 
-**The parameters moved wholesale.** `N_uv` left its bound as §4 suspected
+**The parameters moved wholesale.** `N_uv` left its bound as section 4 suspected
 (−84.0 → −45.5), but the yaw subsystem re-routed rather than settled: `N_r`
 1.04 → 17.9, `k_R` 2.18 → 2.96, `N_rr` 0.017 → **59.6 against an upper bound of
 60**, `Y_vv` 221 → 108, `X_vv` 50.6 → 59.7 (bound 60), and the actuator traded
@@ -286,7 +286,7 @@ lag for delay — `rud_tau` 0.895 → **0.010** (lower bound), `rud_delay`
 **What it shows** is more useful than the parameters. Removing 41 samples of
 hauled motion moved the yaw and actuator parameters by more than their own
 bootstrap intervals, so the identification is not robust to data selection —
-`REPORT.md` §8's "do not quote their individual values" is, if anything, too
+`REPORT.md` section 8's "do not quote their individual values" is, if anything, too
 mild. The lag-for-delay trade is exactly what S1-B's servo steps separate, and
 the `N_r`/`N_rr`/`k_R` re-routing is what S1-D's turning circles constrain.
 
@@ -315,7 +315,7 @@ and the best at every heading horizon from 2 s. The actuator went back to v3's
 decomposition (`rud_tau` 1.04 s, `rud_delay` 0.725 s), so v4's lag-for-delay
 trade was an artefact of `N_rr` at its bound. The yaw damping now sits in `N_r`
 (25.9) and `k_R` rose to 5.1, while `N_uv` held at -47 -- off its old bound in
-both refits, so REVIEW §4's suspicion about -84 is confirmed.
+both refits, so REVIEW section 4's suspicion about -84 is confirmed.
 
 **Not adopted, on two counts:** path-length error is 37 % worse than v3's,
 beyond the 5 % tolerance, and A5 again passes 11 of 12 draws. The surge fit
@@ -333,10 +333,10 @@ terms. That fit then has a pre-registered structure rather than a post-hoc one.
 The bridge now holds each LiDAR frame until its own pose line arrives
 (`udp_live_rl.PoseSync`). Replayed through all 19 July logs it releases 1,085
 frames with **0 stale**, against the 443 (40.8 %) the unmodified decoder
-produces on the same lines -- the §3.4 count, reproduced by a second method --
-at 6.3 ms worst added latency. The rudder limiter the report's §9 counts as
+produces on the same lines -- the section 3.4 count, reproduced by a second method --
+at 6.3 ms worst added latency. The rudder limiter the report's section 9 counts as
 part of the deployment plant was, in the bridge as found, overwritten to off.
-It is now a true 50 %/s rate limit, **off by default**: §9 treated it as part of
+It is now a true 50 %/s rate limit, **off by default**: section 9 treated it as part of
 the plant, but 8 of the 19 July runs never had it, and v3 predicts those runs at
 least as well as the limited ones, so the identified model needs no stand-in
 servo limit.

@@ -8,7 +8,7 @@ or sensors. It changes no rollout dynamics, margins or collision checks.
 
 Luenberger (1971), An introduction to observers, Section II.B, Eq. (2.6),
 https://doi.org/10.1109/TAC.1971.1099826, is related prior work for model dynamics
-plus measurement-error correction. The gain-one yaw choice is our engineering
+plus measurement-error correction. The gain-one yaw choice is an engineering
 ablation, not that paper's design, a Kalman filter or an uncertainty bound.
 Saved development measurements motivate testing model-versus-sensor weighting;
 they do not establish improved episode outcomes or observer convergence.

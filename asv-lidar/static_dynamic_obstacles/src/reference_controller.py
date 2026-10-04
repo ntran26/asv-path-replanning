@@ -1,4 +1,4 @@
-"""Perception-only predictive LOS baseline (ported from CODEX/, F71; the C3 comparator), independent of a trained policy.
+"""Perception-only predictive LOS baseline (ported from the prototype working copy, F71; the C3 comparator), independent of a trained policy.
 
 This is a diagnostic comparator, not a certified COLREG controller. It uses
 the known path/map, cached localiser/IMU estimates, gated scans and tracks.

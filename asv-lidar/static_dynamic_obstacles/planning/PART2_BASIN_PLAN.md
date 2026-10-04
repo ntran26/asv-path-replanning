@@ -4,7 +4,7 @@ Two sessions, which is the hard constraint. Session 1 identifies, session 2
 validates. **Session 2 must not become a second identification session** — with
 no independent check, the model's accuracy claim rests on the same data that
 produced it, which is the Reviewer 1.4 concession from Paper 2 repeating itself.
-The contingency ordering in §6 exists so that a bad session 1 does not silently
+The contingency ordering in section 6 exists so that a bad session 1 does not silently
 consume session 2.
 
 Everything here is driven by what the July logs cannot reach. Part 1 identified
@@ -47,7 +47,7 @@ effective lumped delay and part 1's limitation stands.**
 
 **P-4 Rate-limiter switch.** The bridge's 50 %/s command limiter must be
 disableable by a config flag, not a code edit. S1-B needs it off; every other
-block needs it on (it is part of the deployment plant — see part 1 §9). Log the
+block needs it on (it is part of the deployment plant — see part 1 section 9). Log the
 flag state in `#CONFIG`. **Done, and inverted:** the limiter is off by default (`--rudder-limit` enables
 it) and logged as `rudder_limit`. The identified model needs no stand-in servo
 limit, so every block runs without it; S1-B's steps measure the real servo rate.
@@ -59,7 +59,7 @@ tidiness issue. Log a stationary period for gyro bias and a sharp yaw impulse
 visible in both streams at the start and end of every session.
 
 **P-6 Pre-register the analysis.** Per the Paper 2 lesson: write the empty
-tables, the metric definitions and the acceptance thresholds (§5) *before* the
+tables, the metric definitions and the acceptance thresholds (section 5) *before* the
 session, and commit the fit script that will be run. Session 1's mid-session
 check (S1-F) executes that committed script unchanged.
 
@@ -159,7 +159,7 @@ measured rather than simulated.
 
 Yields: steady turn rate, turning radius, speed loss in the turn, and the
 advance/transfer/tactical diameter set. This replaces the imposed prior bands in
-part 1 §7 with measurements, and is the single most valuable block in either
+part 1 section 7 with measurements, and is the single most valuable block in either
 session. Both signs matter — the fitted model has a drift-moment term whose
 asymmetry is currently unconstrained.
 
@@ -180,7 +180,7 @@ directly. Overshoot angles are a standard reportable quantity.
 ### S1-F Mid-session check (25 min) — **do not skip**
 
 Run the P-6 committed script on the data just collected, in the basin, before
-packing up. Check the §5 acceptance thresholds. Anything that fails gets
+packing up. Check the section 5 acceptance thresholds. Anything that fails gets
 re-shot now. This block is why session 2 stays free for validation.
 
 ---
@@ -201,7 +201,7 @@ turns `scale > 1` from a judgement call into a measurement.
 
 Replay fixed command sequences — recorded from session 1 and from the trained
 policy — with no feedback, and compare against the model's free-run prediction.
-Same metric as part 1 §6 V1: heading and position RMSE vs horizon, against the
+Same metric as part 1 section 6 V1: heading and position RMSE vs horizon, against the
 naive freeze-heading and constant-rate baselines.
 
 This is the honest sim-to-real number and it uses data the model never saw.

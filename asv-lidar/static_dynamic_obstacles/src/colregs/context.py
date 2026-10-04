@@ -1,7 +1,7 @@
 """`EncounterContext`: one object per target per step, three consumers.
 
-02a §10.1 asks for a single per-step context read by the observation builder,
-the reward and the metrics logger.  The mechanical reason is `01 §5.3`'s "one
+02a section 10.1 asks for a single per-step context read by the observation builder,
+the reward and the metrics logger.  The mechanical reason is `01 section 5.3`'s "one
 module, two consumers": if each recomputes the class, the risk and the CPA
 products from the same inputs, they will eventually disagree at a threshold --
 and an agent penalised for a role it was never shown is close to undiagnosable
@@ -21,7 +21,7 @@ perception while physical safety obligations do not -- which is the real
 situation at sea, and turns Study 2 into a study of obligation under
 uncertainty rather than a robustness curve.
 
-**This is not a breach of the information-parity argument in `04 §8`.** The
+**This is not a breach of the information-parity argument in `04 section 8`.** The
 ground-truth fields are consumed by the *reward*, which exists only at training
 time.  At evaluation the policy reads the observation and nothing else, so it
 consumes the same tracked target state -- errors included -- as the comparators.
@@ -41,7 +41,7 @@ import cpa_cri as cc
 import encounter as enc
 from colregs import geometry as geo
 
-# Engagement states (02a §6.1).
+# Engagement states (02a section 6.1).
 IDLE = "idle"
 ENGAGED = "engaged"
 CLEARING = "clearing"
@@ -50,8 +50,8 @@ CLEARING = "clearing"
 # stand-on; `none` is nothing.
 GIVE_WAY_CLASSES = (enc.HEAD_ON, enc.CROSSING, enc.OVERTAKING)
 
-# `02 §3.2`'s precedence table, as a lookup rather than as branching.  **This
-# single field is the mechanism that prevents the `02 §4.2` implementation
+# `02 section 3.2`'s precedence table, as a lookup rather than as branching.  **This
+# single field is the mechanism that prevents the `02 section 4.2` implementation
 # trap** -- overtaking requires a PORT turn, so there is no global "port turns
 # are penalised" constant anywhere in this tree, and nothing to miscode.
 _TURN_SENSE = {
@@ -64,7 +64,7 @@ _TURN_SENSE = {
 
 
 def compliant_turn_sense(encounter_class: str, crossing_side: str = enc.SIDE_NONE) -> int:
-    """`+1` starboard, `-1` port, `0` no alteration required (02a §2.1).
+    """`+1` starboard, `-1` port, `0` no alteration required (02a section 2.1).
 
     **A17 (decided): a crossing's sense depends on the side it crosses from.**
     S3 keeps the own ship give-way either way, and giving way to a crossing
@@ -95,7 +95,7 @@ class EncounterContext:
     beta_cpa: float = 0.0              # bearing of OS from TS at the CPA, deg
     rng: float = float("inf")          # present range, perceived
     speed_ts: float = 0.0
-    # Both measured to the ship domain rather than to the hull (01 §5.2), and
+    # Both measured to the ship domain rather than to the hull (01 section 5.2), and
     # both perceived.  Held here so `observation.slot_features` is a pure
     # function of the context and cannot drift from the reward's view of the
     # same encounter.
@@ -149,9 +149,9 @@ class EncounterContext:
     def turn_admissible(self) -> bool:
         """Is the *compliant* alteration for this class admissible?
 
-        `A_stbd` for head-on and crossing, `A_port` for overtaking (02a §6.6).
+        `A_stbd` for head-on and crossing, `A_port` for overtaking (02a section 6.6).
         Read off `compliant_turn_sense` rather than off the class name, which
-        keeps the `02 §4.2` trap closed in one more place.
+        keeps the `02 section 4.2` trap closed in one more place.
         """
         if self.compliant_turn_sense > 0:
             return bool(self.a_stbd)
@@ -163,7 +163,7 @@ class EncounterContext:
     def misclassified(self) -> bool:
         """Perceived class differs from the true one.
 
-        `04 §6` names turning the wrong way after a misclassification as the
+        `04 section 6` names turning the wrong way after a misclassification as the
         failure that matters, so it is counted rather than inferred.
         """
         return self.cls != self.cls_true
@@ -550,7 +550,7 @@ class ContextManager:
             ctx.state = latch["state"]
             # A20: the latched class is *the* class while the encounter is
             # engaged or clearing, so the observation's one-hot and every
-            # reward gate still read one field (01 §5.3).
+            # reward gate still read one field (01 section 5.3).
             ctx.cls = latch["cls"]
             ctx.crossing_side = latch.get("crossing_side", ctx.crossing_side)
             ctx.psi_engage = latch["psi_engage"]

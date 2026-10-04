@@ -1,0 +1,104 @@
+[v4] 67 of 1000 v3 episodes fail the oracle test: {'decided before tracking': 25, 'tight': 35, 'unsolvable': 7}
+[v4] round 1: 67 open slots, 134 candidates
+[v4] round 2: 6 open slots, 12 candidates
+[v4] BAS-CR-CV-R001 replaces BAS-CR-CV-001 (decided before tracking)
+[v4] BAS-CR-CV-R002 replaces BAS-CR-CV-019 (decided before tracking)
+[v4] BAS-CR-CV-R003 replaces BAS-CR-CV-025 (tight)
+[v4] BAS-CR-CV-R004 replaces BAS-CR-CV-031 (tight)
+[v4] BAS-CR-CV-R005 replaces BAS-CR-CV-045 (decided before tracking)
+[v4] BAS-CR-CV-R006 replaces BAS-CR-CV-049 (decided before tracking)
+[v4] BAS-CR-CV-R007 replaces BAS-CR-CV-053 (decided before tracking)
+[v4] BAS-BO-CV-R001 replaces BAS-BO-CV-021 (tight)
+[v4] BAS-BO-RE-R001 replaces BAS-BO-RE-044 (unsolvable)
+[v4] BAS-BO-CV-R002 replaces BAS-BO-CV-093 (decided before tracking)
+[v4] BAS-NU-CV-R001 replaces BAS-NU-CV-086 (decided before tracking)
+[v4] CH-HO-CV-R001 replaces CH-HO-CV-067 (tight)
+[v4] CH-CR-CV-R001 replaces CH-CR-CV-043 (tight)
+[v4] CH-CR-RE-R001 replaces CH-CR-RE-056 (tight)
+[v4] CH-CR-CV-R002 replaces CH-CR-CV-085 (decided before tracking)
+[v4] CH-CR-CV-R003 replaces CH-CR-CV-093 (tight)
+[v4] P2v4-L1-HO-FIX-R001 replaces P2-L1-HO-FIX-05 (tight)
+[v4] P2v4-L1-HO-FIX-R002 replaces P2-L1-HO-FIX-17 (decided before tracking)
+[v4] P2v4-L1-CRP-FIX-R001 replaces P2-L1-CRP-FIX-01 (tight)
+[v4] P2v4-L1-CRP-VAR-R001 replaces P2-L1-CRP-VAR-08 (decided before tracking)
+[v4] P2v4-L1-CRP-VAR-R002 replaces P2-L1-CRP-VAR-12 (tight)
+[v4] P2v4-L1-CRS-VAR-R001 replaces P2-L1-CRS-VAR-18 (tight)
+[v4] P2v4-L1-CRS-VAR-R002 replaces P2-L1-CRS-VAR-20 (tight)
+[v4] P2v4-L1-OT-VAR-R001 replaces P2-L1-OT-VAR-14 (tight)
+[v4] P2v4-L1-OT-FIX-R001 replaces P2-L1-OT-FIX-15 (tight)
+[v4] P2v4-L2-CRP-FIX-R001 replaces P2-L2-CRP-FIX-03 (tight)
+[v4] P2v4-L2-CRP-VAR-R001 replaces P2-L2-CRP-VAR-06 (decided before tracking)
+[v4] P2v4-L2-CRS-VAR-R001 replaces P2-L2-CRS-VAR-02 (decided before tracking)
+[v4] P2v4-L2-CRS-FIX-R001 replaces P2-L2-CRS-FIX-09 (decided before tracking)
+[v4] P2v4-L3-CRP-FIX-R001 replaces P2-L3-CRP-FIX-01 (tight)
+[v4] P2v4-L3-CRP-FIX-R002 replaces P2-L3-CRP-FIX-07 (decided before tracking)
+[v4] P2v4-L3-CRP-FIX-R003 replaces P2-L3-CRP-FIX-09 (tight)
+[v4] P2v4-L3-CRP-FIX-R004 replaces P2-L3-CRP-FIX-17 (decided before tracking)
+[v4] P2v4-L3-CRS-FIX-R001 replaces P2-L3-CRS-FIX-19 (tight)
+[v4] FS-BO-FIX-R001 replaces FS-BO-FIX-002 (unsolvable)
+[v4] FS-BO-VAR-R001 replaces FS-BO-VAR-004 (unsolvable)
+[v4] FS-BO-FIX-R002 replaces FS-BO-FIX-005 (unsolvable)
+[v4] FS-CRP-FIX-R001 replaces FS-CRP-FIX-001 (tight)
+[v4] FS-CRP-FIX-R002 replaces FS-CRP-FIX-003 (unsolvable)
+[v4] FS-CRP-FIX-R003 replaces FS-CRP-FIX-004 (tight)
+[v4] FS-OT-VAR-R001 replaces FS-OT-VAR-001 (tight)
+[v4] FS-BO-FIX-R003 replaces FS-BO-FIX-011 (tight)
+[v4] FS-BO-VAR-R002 replaces FS-BO-VAR-012 (tight)
+[v4] FS-BO-VAR-R003 replaces FS-BO-VAR-015 (tight)
+[v4] FS-CRP-VAR-R001 replaces FS-CRP-VAR-008 (tight)
+[v4] FS-CRP-VAR-R002 replaces FS-CRP-VAR-009 (decided before tracking)
+[v4] FS-CRP-FIX-R004 replaces FS-CRP-FIX-010 (tight)
+[v4] FS-CRP-FIX-R005 replaces FS-CRP-FIX-011 (decided before tracking)
+[v4] FS-CRP-FIX-R006 replaces FS-CRP-FIX-013 (decided before tracking)
+[v4] FS-CRP-VAR-R003 replaces FS-CRP-VAR-015 (decided before tracking)
+[v4] FS-CRS-VAR-R001 replaces FS-CRS-VAR-011 (tight)
+[v4] FS-HO-FIX-R001 replaces FS-HO-FIX-008 (decided before tracking)
+[v4] FS-HO-FIX-R002 replaces FS-HO-FIX-013 (decided before tracking)
+[v4] FS-OT-FIX-R001 replaces FS-OT-FIX-007 (unsolvable)
+[v4] FS-OT-FIX-R002 replaces FS-OT-FIX-012 (tight)
+[v4] FS-BO-FIX-R004 replaces FS-BO-FIX-019 (decided before tracking)
+[v4] FS-BO-FIX-R005 replaces FS-BO-FIX-022 (tight)
+[v4] FS-CRP-VAR-R004 replaces FS-CRP-VAR-025 (decided before tracking)
+[v4] FS-CRP-FIX-R007 replaces FS-CRP-FIX-027 (tight)
+[v4] FS-CRS-FIX-R001 replaces FS-CRS-FIX-022 (decided before tracking)
+[v4] FS-CRS-FIX-R002 replaces FS-CRS-FIX-025 (tight)
+[v4] FS-HO-VAR-R001 replaces FS-HO-VAR-018 (decided before tracking)
+[v4] FS-HO-FIX-R003 replaces FS-HO-FIX-019 (tight)
+[v4] FS-OT-VAR-R002 replaces FS-OT-VAR-022 (tight)
+[v4] BAS-CR-CV-R008 replaces BAS-CR-CV-S001 (unsolvable)
+[v4] FS-OT-FIX-R003 replaces FS-OT-FIX-048 (tight)
+[v4] FS-OT-FIX-R004 replaces FS-OT-FIX-072 (tight)
+test set 4.0: 1000 episodes from 1103 distinct scenarios (103 near-duplicates removed), digest a8c40beb234ea7f9, built in 1674 s
+source  cell                 
+frozen  basin-being_overtaken     95
+        basin-crossing           100
+        basin-head_on            100
+        basin-null                75
+        basin-overtaking          54
+        channel-crossing         100
+        channel-head_on           98
+        channel-overtaking        42
+paper2  FS-BO                     25
+        FS-CRP                    29
+        FS-CRS                    27
+        FS-HO                     25
+        FS-NT                     27
+        FS-OT                     95
+        L1-BO                     10
+        L1-CRP                    11
+        L1-CRS                    12
+        L1-HO                     10
+        L1-NT                      1
+        L1-OT                     10
+        L2-BO                      5
+        L2-CRP                     5
+        L2-CRS                     6
+        L2-HO                      5
+        L2-NT                      1
+        L2-OT                      5
+        L3-BO                      5
+        L3-CRP                     6
+        L3-CRS                     5
+        L3-HO                      5
+        L3-NT                      1
+        L3-OT                      5
