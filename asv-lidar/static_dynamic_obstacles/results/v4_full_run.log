@@ -1,0 +1,3 @@
+2026-10-05 13:02:33 == SAC baseline-v4.3 full run: seed 0, 3 M steps from scratch (configs/baseline_v4.json)
+2026-10-05 13:02:39 == sac seed 0: training
+2026-10-05 13:07:36    pinned learner 26252

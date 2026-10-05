@@ -1,0 +1,23 @@
+{
+ "id": "v4-pair-v3",
+ "tag": "v3pair",
+ "created": "2026-10-04",
+ "base_config": "configs/baseline_v3.json",
+ "start_from": "final",
+ "total_timesteps": 3500000,
+ "scenario_stage": 7,
+ "eval_freq": 100000,
+ "checkpoint_every": 250000,
+ "reset_seed_offset": 77777,
+ "dev_set": "v4",
+ "eval_supervisor": "off",
+ "selection": "goal - 2 x collision over formulation v4.2's development sets (frozen-like 120 + field 210, near-impossible episodes replaced), safety layer off; the 3.0 M start model is evaluated first",
+ "pair": "v4.3 arm (finetune_v4_pair_v43.json) against v3 arm (finetune_v4_pair_v3.json): same start (SAC baseline-v3 seed 0, final 3.0 M model and replay buffer), same budget (+0.5 M), same reset seeds, same development sets; only the stage-7 curriculum and the hard-state starts differ",
+ "gate": "v4.3 minus v3 at the best checkpoint on the development sets: field set (210) >= +5 points and frozen-like set (120) >= -2 points; reported with the crossing subset; test set v4 is reported, not used for the decision",
+ "purpose": "Control arm of the v4.3 SAC pair (decision, 2026-10-04): the same +0.5 M continuation under baseline-v3's own stage 7, no hard-state starts, so the comparison isolates the v4.3 curriculum and starts from extra training.",
+ "stage_definition": {
+  "base_stage": 7,
+  "overrides": {}
+ },
+ "constant_overrides": {}
+}

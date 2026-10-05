@@ -8,7 +8,7 @@ candidate library and selection thresholds remain unchanged.
 Countersteering backups, retention of checked nominal plans, and a second
 braking response remain disabled experimental ablations. Set module switches
 before constructing the filter; observer and perception are selected then.
-See planning/SAFETY_LAYER_V4_PLAN.md for paired results and remaining wall
+See planning/archive/safety/SAFETY_LAYER_V4_PLAN.md for paired results and remaining wall
 failures. These finite-horizon checks do not guarantee collision avoidance.
 """
 from __future__ import annotations

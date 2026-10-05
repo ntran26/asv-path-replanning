@@ -1,0 +1,26 @@
+[hard starts] 1200 candidate layouts, 6 processes
+[hard starts] 100/1200: 35 kept, 425 s
+[hard starts] 200/1200: 69 kept, 916 s
+[hard starts] 300/1200: 98 kept, 1408 s
+[hard starts] 400/1200: 138 kept, 1811 s
+[hard starts] 500/1200: 182 kept, 2202 s
+[hard starts] 600/1200: 219 kept, 2719 s
+[hard starts] 700/1200: 257 kept, 3197 s
+[hard starts] 800/1200: 297 kept, 3728 s
+[hard starts] 900/1200: 345 kept, 4457 s
+[hard starts] 1000/1200: 410 kept, 5485 s
+[hard starts] 1100/1200: 465 kept, 6720 s
+[hard starts] 1200/1200: 505 kept, 7295 s
+[hard starts] 505 of 1200 kept in 7297 s -> C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\results\hard_starts\pool_v4.pkl
+      size  sum
+code           
+BO      84   27
+CRP    420  148
+CRS    420  160
+HO     180  112
+OT      96   58
+why
+action required and possible                    505
+no solution with margin from the start state    342
+standing on succeeds                            332
+ended before the start state                     21

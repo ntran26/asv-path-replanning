@@ -1,0 +1,19 @@
+v4.3 SAC pair re-scored on three new seed sets (decision on these seeds only)
+330 development episodes x 3 seed sets per checkpoint, safety off
+
+               field  frozen_like  field_crossing    all  no_target_rate
+v3   final     0.738        0.911           0.639  0.801           0.860
+     selected  0.708        0.936           0.606  0.791           0.860
+v4.3 final     0.738        0.925           0.616  0.806           0.887
+     selected  0.759        0.931           0.648  0.821           0.913
+
+selected: v4.3 minus v3 -- field +5.1% (95 % CI +0.2% to +10.5%), frozen-like -0.6% (95 % CI -3.3% to +2.2%), field crossings +4.2%; episodes gained 111, lost 81 of 990  -> gate PASS (field >= +5, frozen-like >= -2 points)
+final: v4.3 minus v3 -- field +0.0% (95 % CI -4.3% to +4.3%), frozen-like +1.4% (95 % CI -1.7% to +4.4%), field crossings -2.3%; episodes gained 78, lost 73 of 990
+
+-- no-target (development, 50 episodes x 3 seeds)
+                 sum  size
+arm  checkpoint           
+v3   final       129   150
+     selected    129   150
+v4.3 final       133   150
+     selected    137   150

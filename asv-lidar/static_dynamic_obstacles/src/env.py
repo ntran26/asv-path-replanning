@@ -540,7 +540,7 @@ class ASVLidarEnv(gym.Env):
         for name, value in (overrides or {}).items():
             setattr(cfg, name, value)
 
-    # -- Hand-back starts (planning/HANDBACK_STARTS_PLAN.md, 2026-10-01) --------
+    # -- Hand-back starts (planning/archive/HANDBACK_STARTS_PLAN.md, 2026-10-01) --------
     # A share of episodes begins where safety layer v2 handed the helm back to a
     # policy (recorded by tools/diagnostics/harvest_handback_starts.py), so the
     # policy -- trained without the safety layer -- learns to recover from the
@@ -680,7 +680,7 @@ class ASVLidarEnv(gym.Env):
         environment's own stream, so a seeded reset reproduces the episode.
         """
         drawn = built is None
-        # Stage 8 of the SAC recovery plan (`planning/SAC_RECOVERY_PLAN.md`): re-issue a
+        # Stage 8 of the SAC recovery plan (`planning/archive/SAC_RECOVERY_PLAN.md`): re-issue a
         # field layout this worker collided in.  A stage without `failure_replay`
         # draws nothing extra from the stream, so every other run is unchanged.
         replay_p = float(self._stage_param("failure_replay", 0.0))

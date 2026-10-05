@@ -1,4 +1,4 @@
-"""Hand-back starts (planning/HANDBACK_STARTS_PLAN.md, 2026-10-01)."""
+"""Hand-back starts (planning/archive/HANDBACK_STARTS_PLAN.md, 2026-10-01)."""
 import pickle
 import sys
 from pathlib import Path

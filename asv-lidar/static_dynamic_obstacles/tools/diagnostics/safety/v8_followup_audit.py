@@ -287,7 +287,7 @@ def analyze(output):
     for name, content in raw.items():
         if input_paths[name].read_bytes() != content:
             raise ValueError("Input changed while reading")
-    review_paths = [ROOT / name for name in ("planning/SAFETY_LAYER_V8_PLAN.md", "src/safety_v6.py",
+    review_paths = [ROOT / name for name in ("planning/archive/safety/SAFETY_LAYER_V8_PLAN.md", "src/safety_v6.py",
         "src/safety_v7.py", "src/safety_v8.py", "tools/diagnostics/safety/trigger_counterfactual.py")]
     review_paths += [DATA / name for name in ("config.json", "config_phase1.json", "v7_nohold/config.json")]
     provenance = {"inputs_sha256": {str(input_paths[k].relative_to(ROOT)): sha(v) for k, v in raw.items()},

@@ -53,7 +53,7 @@ diagnostic horizon and persistence labels remain unvalidated engineering choices
 Code: `src/safety_v7.py`, `src/safety_risk_monitor.py`; experimental runtime
 selection is `SAFETY_VERSION = 7`. Existing defaults are unchanged. Detailed
 method citations, behavior, limitations and integration are in the
-[V7 plan](../../../planning/SAFETY_LAYER_V7_PLAN.md).
+[V7 plan](../../../planning/archive/safety/SAFETY_LAYER_V7_PLAN.md).
 
 ## Why there is no learned success/failure trigger yet
 

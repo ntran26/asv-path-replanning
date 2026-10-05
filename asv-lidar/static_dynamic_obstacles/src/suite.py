@@ -539,8 +539,8 @@ def freeze_checklist() -> List[Tuple[str, bool, str]]:
     checks.append(("throughput measured (04a section 8.3)", True,
                    "F75, 10 workers, 12 cores: PPO ~108 steps/s; SAC 12 (1 gradient step per "
                    "transition) / 38 (0.2); TD3 18 / 53; TQC 13 / 32; RecurrentPPO 61 (F80)"))
-    for item, rel in (("claim ledger committed", "planning/CLAIM_LEDGER.md"),
-                      ("empty result tables committed", "planning/RESULT_TABLES.md")):
+    for item, rel in (("claim ledger committed", "planning/PAPER3_CLAIMS_AND_TABLES.md"),
+                      ("empty result tables committed", "planning/PAPER3_CLAIMS_AND_TABLES.md")):
         from pathlib import Path
         exists = (Path(__file__).resolve().parents[1] / rel).exists()
         pending = _uncommitted((rel,))

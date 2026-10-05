@@ -177,7 +177,7 @@ To the authors' knowledge this is the first learned COLREGs collision-avoidance 
 
 What the paper does not claim
 
-- Multi-target encounters, Rule 19 restricted visibility, sound signals, Rule 18 responsibilities, the open-water Rule 15/17 role table, or legal compliance / certification: violation terms are declared behavioural proxies (`CLAIM_LEDGER.md` section 2).
+- Multi-target encounters, Rule 19 restricted visibility, sound signals, Rule 18 responsibilities, the open-water Rule 15/17 role table, or legal compliance / certification: violation terms are declared behavioural proxies (`PAPER3_CLAIMS_AND_TABLES.md` section 2).
 - That operating bounds establish the legal applicability of Rule 9, or that a width is a universal legal criterion for a narrow channel (draft 4).
 - Rule 17(b) last-moment action: out of scope by construction (S5).
 - That every dynamic encounter is avoidable: the A* route check is static (S9); the Paper 2 set's space-time check (F107) is not applied to the headline suite.
@@ -544,7 +544,7 @@ P.6 Results
 
 5.2 Claim ledger
 
-*Every claim in the abstract and conclusion maps to a table or figure. Complete this before writing either. The working ledger is `planning/CLAIM_LEDGER.md`.*
+*Every claim in the abstract and conclusion maps to a table or figure. Complete this before writing either. The working ledger is `planning/PAPER3_CLAIMS_AND_TABLES.md`.*
 
 | **\#** | **Claim** | **Evidence** | **Status** |
 |--------|-----------|--------------|------------|

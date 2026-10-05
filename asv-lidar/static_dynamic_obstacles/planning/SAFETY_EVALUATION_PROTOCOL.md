@@ -1,6 +1,6 @@
 # Main safety evaluation: test set v3
 
-User decision, 2026-10-03: **test set v3 is the main evaluation set**. It supersedes the earlier v2/DV3 challenge cohorts as the primary benchmark. Their results remain development history; they are not v3 results.
+Decision (2026-10-03): **test set v3 is the main evaluation set** for the safety layer. (Test set v4, 2026-10-04, is v3 with the 67 near-impossible episodes replaced; see `planning/BASELINE_V4_PLAN.md`.) It supersedes the earlier v2/DV3 challenge cohorts as the primary benchmark. Their results remain development history; they are not v3 results.
 
 ## Frozen benchmark and controllers
 

@@ -1,4 +1,4 @@
-"""Harvest hand-back starts (planning/HANDBACK_STARTS_PLAN.md, 2026-10-01).
+"""Harvest hand-back starts (planning/archive/HANDBACK_STARTS_PLAN.md, 2026-10-01).
 
 Runs a policy with safety layer v2 on and records every state where the filter,
 having overridden the policy, hands the helm back -- the slow, off-heading,

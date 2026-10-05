@@ -1,5 +1,7 @@
 # Paper 3 master artifact — verified technical facts
 
+> **Kept current (decision, 2026-10-04).** This file describes only the best formulation: **baseline-v3**, the kept SAC 3 M policy (`configs/baseline_v3.json`, `src/formulation_v3.py`). Earlier versions are not described. If baseline-v4.3 passes its SAC pair (`planning/BASELINE_V4_PLAN.md`), this file is updated to v4.3.
+
 **Written 2026-09-29 from the project's code**, as the source for the
 master explainer artifact (`MASTER_ARTIFACT_BRIEF.md`). Every number here is
 what the simulator, controllers and tracker actually use. The observation,
@@ -210,8 +212,8 @@ context; it is not a Paper 3 comparator.
 
 - Library: Stable-Baselines3 2.3.2 / sb3-contrib 2.3.0 (Raffin et al., 2021).
 - **Common:** discount γ = 0.951 per 0.5 s step; reward normalization only
-  (running scale, clip 10); 10 parallel simulators; 2.5 × 10⁶ environment
-  steps (baseline-v3 curriculum, Section 6); development-set evaluation every
+  (running scale, clip 10); 10 parallel simulators; 3.0 × 10⁶ environment
+  steps (baseline-v3 curriculum, Section 6; stage 7 runs from 2.0 M to the end); development-set evaluation every
   2 × 10⁵ steps; each seed represented by its best development-set checkpoint
   (score = goal rate − 2 × collision rate); 3 seeds per learner; learners use
   their original papers' default hyperparameters, no per-learner tuning.
@@ -371,7 +373,7 @@ only for head-on, crossing and overtaking.
    be ≤ 2.25 × the leg length; otherwise redraw (up to 20 times, then thin
    the obstacles).
 
-**6.3 Curriculum (baseline-v3, 2.5 × 10⁶ steps).**
+**6.3 Curriculum (baseline-v3, 3.0 × 10⁶ steps; stage 7 continues to 3.0 M).**
 
 | Stage | From | Episodes | Obstacles | Channel widths |
 |---|---|---|---|---|
@@ -415,13 +417,24 @@ selection and testing never share an episode:
 | Training | generated on the fly | seeds 0–99,999 |
 | Development | 120 episodes: 20 per episode type × 6 (stage-5 generator) | checkpoint selection |
 | Three-obstacle development set | 150 episodes: 20 no-target + per encounter (head-on, crossing from port, crossing from starboard, overtaking, being overtaken) 20 constant-speed + 6 varying-speed, all space-time solvable | checkpoint selection, with the development set |
-| Frozen test suite (headline) | 800 per seed: 8 cells × 100 — every encounter type in the basin, and head-on, crossing, overtaking in 7.5–10 m channels; constant-velocity targets | touched once per policy |
+| Test set (headline) | 1,000 held-out episodes: basin and channel encounters of every type (constant-velocity, reactive and non-compliant targets) and three-obstacle layouts with constant- and varying-speed targets; near-duplicates trimmed; every episode passes the fairness check (6.5) | touched once per policy |
+| Frozen benchmark | the 800 basin and channel encounter episodes the test set draws its encounter cells from (8 cells × 100) | continuity with earlier tables |
 | Robustness set | the same scenarios with a reactive target (700; it follows the COLREGs-VO rule from its own side) and, in head-ons, a non-compliant target that turns to port (200) | robustness to target behavior |
 | Width sweep | channels 10, 8, 7, 6, 5, 4.5, 4, 3.5 m | how the response changes with room |
 | Perception degradation | pose drift, detection dropout, occlusion, velocity-estimate noise, separately and jointly | robustness to sensing |
 
 Selection score: goal rate − 2 × collision rate on the development sets,
 safety layer off.
+
+**6.5 Fairness check on the test set (oracle feasibility).** For each test episode, a library of
+up to 574 manoeuvres is rolled out with perfect knowledge of the target's future motion, the
+true vessel model and the policy's own action space: follow an A\* route around the panels,
+then hold a course alteration (−70° to +70°) or a speed change (throttle −1 to +1) for 4, 8 or
+14 s and until the target has passed, then return to the route. The check also finds when the
+onboard perception first tracks the target (about 2 s in). An episode stays in the test set
+only if some manoeuvre that starts at or after that moment reaches the goal with 0.2 m
+clearance throughout; otherwise it is replaced by a fresh episode of the same kind that passes.
+Of the 1,000 episodes, 67 were replaced (`src/oracle_feasibility.py`).
 
 ## 7. Field trials and the UDP bridge (Section 8)
 

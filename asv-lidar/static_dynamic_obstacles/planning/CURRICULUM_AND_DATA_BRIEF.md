@@ -1,13 +1,16 @@
 # Curriculum, scenario generation, and the three data sets — a visualisation brief
 
+> **Kept current (decision, 2026-10-04).** This file describes only the best formulation: **baseline-v3**, the kept SAC 3 M policy (`configs/baseline_v3.json`, `src/formulation_v3.py`). Earlier versions are not described. If baseline-v4.3 passes its SAC pair (`planning/BASELINE_V4_PLAN.md`), this file is updated to v4.3.
+
 **Purpose.** A self-contained description of how scenarios are made, how the
 curriculum orders them, and how the training / development / frozen sets are kept
 disjoint — written so it can be turned into an explanatory artifact with
-equations and animations. Every number is read from the code as of 2026-09-25
-(`src/scenario.py`, `src/suite.py`, `src/constants.py`, `src/train_formulation.py`).
+equations and animations. Every number is read from the code (`src/scenario.py`,
+`src/field_training.py`, `src/formulation_v3.py`, `src/constants.py`,
+`tools/tiers/test_set.py`); sections 4, 5 and 7 updated 2026-10-04 for baseline-v3.
 
 Companion documents: `planning/METHODS_BRIEF.md` (the method as frozen),
-`configs/baseline_v2.json` (every constant), `PROJECT_STATE.md` (findings).
+`configs/baseline_v3.json` (every constant), `PROJECT_STATE.md` (findings).
 
 ---
 
@@ -37,7 +40,7 @@ Five disjoint integer ranges (`constants.SEED_NAMESPACES`):
 |---|---|---|
 | `training` | 0 – 99,999 | every training episode |
 | `development` | 200,000 – 209,999 | the 120-episode development set ("validation") |
-| `frozen_eval` | 300,000 – 309,999 | the frozen suite ("test") |
+| `frozen_eval` | 300,000 – 309,999 | the frozen benchmark: the test set's encounter cells ("test") |
 | `study1` | 400,000 – 409,999 | the channel-width sweep (R4) |
 | `study2` | 500,000 – 509,999 | perception degradation (R5) |
 
@@ -145,92 +148,97 @@ A counter ticks up the rejections. It makes the point that difficulty is
 
 ## 4. The curriculum
 
-Five stages, switched on **fraction of the training budget**, not on performance:
+Seven stages, switched on **fraction of the training budget**, not on performance (3.0 M steps;
+stage 7 runs from 2.0 M to the end):
 
-| Stage | From | Classes | Obstacles | Channel width (m) | `p_basin` | TCPA draw |
-|---|---|---|---|---|---|---|
-| 1 | 0 % | no target | 0–1 | 8–10 | 1.00 | full |
-| 2 | 8 % | no target | 0–3 | 5–10 | 1.00 | full |
-| 3 | 18 % | head-on, crossing, null, no-target | 0–1 | 7–10 | 0.85 | upper half |
-| 4 | 32 % | all six | 0–2 | 4.5–10 | 0.75 | full |
-| 5 | 50 % | all six | 0–3 | 3.5–10 | 0.75 | full |
+| Stage | From | Classes | Obstacles | Channel width (m) | Three-obstacle spread layouts |
+|---|---|---|---|---|---|
+| 1 | 0 | no target | 0–1 | basin only | — |
+| 2 | 0.16 M | no target | 0–3 | basin only | — |
+| 3 | 0.36 M | head-on, crossing (both sides), null, no target; longer times to CPA | 0–1 | 7–10 (15 %) | — |
+| 4 | 0.64 M | all six | 0–2 | 4.5–10 (25 %) | — |
+| 5 | 1.00 M | all six | 0–3, weighted to 3 | 3.5–10 (25 %) | — |
+| 6 | 1.50 M | all six | 1–3, weighted to 3 | 3.5–10 | 25 % of episodes; CPA guard halved |
+| 7 | 2.00 M | all six | 1–3, weighted to 3 | 3.5–10 | 45 % of episodes; CPA guard removed; 30 % of their targets change speed once |
 
-With a 2 M-step budget the switches fall at 0, 160 k, 360 k, 640 k and 1.0 M steps.
-
-Two details worth showing:
-- **Stage 3 introduces encounters with the *easy half* of the TCPA range** (more
-  time to react), then stage 4 opens the full range.
-- **Stage 3 teaches head-on and crossing together**, deliberately: teaching
-  head-on alone first taught "give way = turn starboard", which then had to be
-  unlearned for port crossings.
+Details worth showing:
+- **Stage 3 introduces encounters with the *easy half* of the TCPA range** (more time to react),
+  then stage 4 opens the full range.
+- **Stage 3 teaches head-on and crossing together**, deliberately: teaching head-on alone first
+  taught "give way = turn starboard", which then had to be unlearned for port crossings.
+- **Stages 6–7 add spread three-obstacle layouts** in three motifs: gate + on-path, slalom, and
+  side + on-path. The encounter happens on the leg with the panels fixed, so it may happen beside
+  a panel. Every such episode is checked for space-time solvability: some trajectory reaches the
+  goal while keeping clear of the panels and the moving target.
 
 Within a stage the class is drawn from fixed shares:
 
 $$P(\text{class}) = \{\text{head-on } 0.20,\ \text{crossing } 0.22,\ \text{overtaking } 0.16,\ \text{being overtaken } 0.14,\ \text{null } 0.11,\ \text{no-target } 0.17\}$$
 
-**Animation 6 — the curriculum ladder.** A progress bar across 2 M steps with
-five coloured segments. As the bar fills, a small scene panel updates: empty
-channel → clutter → first encounters → all classes → narrow water. A live pie
-chart shows the class mixture switching on at stage 3.
+**Animation 6 — the curriculum ladder.** A progress bar across 3 M steps with seven coloured
+segments. As the bar fills, a small scene panel updates: empty water → clutter → first
+encounters → all classes → narrow water → dense three-obstacle layouts → targets that change
+speed. A live pie chart shows the class mixture switching on at stage 3.
 
-**Measured side effect worth animating:** the step rate falls as the stages
-advance — 17.3 steps/s in stage 1 down to 15.4 in stage 5 — because each added
-target and obstacle costs raycasting and collision work.
+**Measured side effect worth animating:** the step rate falls as the stages advance, because each
+added target and obstacle costs raycasting and collision work.
 
 ---
 
-## 5. The three sets
+## 5. The data sets
 
-| | Training | Development ("validation") | Frozen suite ("test") |
+| | Training | Development | Test set |
 |---|---|---|---|
-| Seeds | `training` | `development` | `frozen_eval` |
-| Size | unbounded — a fresh draw every episode | **120** (20 per class × 6) | **800** (8 cells × 100) + robustness set 900 |
-| Sampling | curriculum stage of the moment | stage 5, fixed list | stratified cells |
+| Seeds | `training` | `development` | `frozen_eval` and dedicated test blocks |
+| Size | unbounded — a fresh draw every episode | **120** (20 per class × 6) + **150** three-obstacle layouts | **1,000** |
+| Sampling | curriculum stage of the moment | fixed lists | stratified cells, near-duplicates trimmed |
 | Used for | gradient updates | **checkpoint selection** and all diagnostics | the paper's tables |
 | Seen how often | continuously | every 200 k steps | **once per policy** |
 
-### 5.1 Development set — the selection instrument
+### 5.1 Development sets — the selection instrument
 
-120 fixed episodes, drawn once at stage 5. Every 200 k steps the current policy
-is replayed over all of them, with the safety safety layer **off** and **on**, and
-the checkpoint is kept if it improves
+120 fixed episodes drawn at stage 5, plus 150 three-obstacle layouts: 20 with no target, and 20
+constant-speed plus 6 varying-speed episodes for each of head-on, crossing from port, crossing
+from starboard, overtaking and being overtaken. Every 200 k steps the current policy is replayed
+over all of them with the safety layer **off**, and the checkpoint is kept if it improves
 
 $$\text{score} = P(\text{goal}) - 2\,P(\text{collision})$$
 
-That factor of 2 is the whole selection rule: a policy that reaches the goal by
-taking risks scores worse than a cautious one.
+That factor of 2 is the whole selection rule: a policy that reaches the goal by taking risks
+scores worse than a cautious one.
 
-**Animation 7 — best-on-dev selection.** Plot the 10 evaluation points of a real
-run as a noisy curve; drop a marker each time a new best appears; show the final
-"best" marker being copied to `best_model.zip` while later, worse points are
-ignored.
+**Animation 7 — best-on-dev selection.** Plot the evaluation points of a real run as a noisy
+curve; drop a marker each time a new best appears; show the final "best" marker being copied to
+`best_model.zip` while later, worse points are ignored.
 
-### 5.2 Frozen suite — the evidence
+### 5.2 Test set — the evidence
 
-**Tier B, suite 3.4**: the development set's kind of scenario in the frozen namespace — 8 cells × 100 = 800 constant-velocity episodes per seed — plus a robustness set (the same scenarios with reactive and, in head-ons, non-compliant targets). A cell is
+1,000 held-out episodes. The cells are:
+- **Basin and channel encounters** of every class: the frozen benchmark, 8 cells × 100, with
+  constant-velocity, reactive (`T-RE`) and non-compliant (`T-NC`) targets.
+- **Three-obstacle layouts** with constant-speed and varying-speed targets.
 
-$$\text{cell} = (\text{geometry stratum}) \times (\text{encounter class}) \times (\text{target behaviour})$$
+Two steps prepare the set:
+- **Trimming.** Twins (the same scenario with only the target behaviour changed) are collapsed.
+  The scenario whose nearest neighbour in its own cell is closest is then removed, repeatedly,
+  until 1,000 remain.
+- **The fairness check.** Every episode must be solvable, by some manoeuvre started after the
+  onboard perception first tracks the target, with 0.2 m clearance, even with perfect knowledge of
+  the target's future motion (`src/oracle_feasibility.py`). The 67 that were not were replaced by
+  fresh episodes of the same kind that pass.
 
-- **Strata (2):** basin (all five classes); channel, 7.5–10 m, for head-on, crossing and overtaking only — the combinations training draws (suite 3.4).
-  Channels stop at 7.5 m because below that a two-vessel encounter has no room a
-  lawful manoeuvre can use.
-- **Classes (5):** head-on, crossing, overtaking, being overtaken, null.
-- **Behaviours (3):** `cv` constant velocity (`T-CV`), `re` compliant reactive (`T-RE`, the COLREGs-VO rule from the target's side), `nc` non-compliant (`T-NC2`, alters to port, in head-on; `T-NC1`, stands on when give-way, elsewhere). Suite 3.2 (A34) is the first in which `re` and `nc` targets actually manoeuvre; `T-NC1` moves like `T-CV`, so outside head-on `nc` differs only in the role the target should have taken.
+Each version records a **manifest digest**, a hash over every scenario, so a table can be traced
+to the exact episodes.
 
-Each run records a **manifest digest** — a hash over every case together with
-the constants that generated them — so a table can be traced to the exact
-scenarios.
-
-**Animation 8 — the cell grid.** A 3 × 5 × 3 cube of cells, each lighting up
-with 20 dots as episodes run, then colouring by success rate. Rotating the cube
-to face "stratum" shows the headline finding: performance falls as the channel
-narrows.
+**Animation 8 — the cell grid.** A grid of cells (stratum × class × target behaviour, plus the
+three-obstacle layouts), each lighting up with dots as episodes run, then colouring by success
+rate.
 
 ### 5.3 What is *not* in the paper
 
-**Tier A** (38 named deterministic cases, 35 realisable) exists in the suite but
-is out of this paper. **Around the Clock** (24 constellations at equally spaced
-bearings) is defined but has no builder yet.
+**Tier A** (38 named deterministic cases, 35 realisable) exists in the suite but is out of this
+paper. **Around the Clock** (24 constellations at equally spaced bearings) is defined but has no
+builder yet.
 
 ---
 
@@ -300,7 +308,8 @@ no longer fits, leaving only speed reduction at the end.
 - Decision rate **2 Hz**, physics 0.1 s, episode cap **180 steps (90 s)**.
 - Cruise **0.558 m/s**; vessel **1.725 m × 0.5 m**.
 - Observation **70 values in 6 branches**; action = (rudder, throttle) ∈ [−1, 1]².
-- Training: **10 parallel environments**, 2 M steps, **3 seeds** per learner.
+- Training: **10 parallel environments**, **3 M steps**, seven curriculum stages, **3 seeds** per learner.
 - Learners compared: **PPO, RecurrentPPO, SAC, TQC** on the identical formulation.
-- Development set **120**; frozen suite **780**; disjoint seed ranges.
-- Measured example (SAC seed 0): development score 0.53 at 200 k → **0.92 at 2 M**.
+- Development sets **120 + 150**; test set **1,000**; disjoint seed ranges.
+- Measured example (SAC seed 0): development score −1.22 at 200 k steps → **0.41 at 3.0 M**
+  (goal rate 0.80 over both development sets: 0.88 on the 120, 0.74 on the three-obstacle 150).

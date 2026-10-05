@@ -1,5 +1,0 @@
-[FINETUNE] sac_formulation_seed0_bl2_ftfield1 2,100,000 -> 3,000,000 steps, field share 0.8, into sac_formulation_seed0_bl2_ftfield2
-[FINETUNE] replay buffer restored (sac_replay_buffer_best.pkl, 100,000 transitions)
-[FIELD] building the field validation set ...
-Logging to C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\runs\tensorboard\sac_formulation_seed0_bl2_ftfield2_0
-[ENTROPY] coefficient -> 0.01, target -2.0 -> -1.0 until t=2,300,000

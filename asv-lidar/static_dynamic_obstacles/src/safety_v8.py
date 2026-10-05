@@ -1,6 +1,6 @@
 """Safety layer v8: v7 with the hold-back fallback disabled (2026-10-03).
 
-`planning/SAFETY_LAYER_V8_PLAN.md`.  Every filter since v2 has a **hold-back**
+`planning/archive/safety/SAFETY_LAYER_V8_PLAN.md`.  Every filter since v2 has a **hold-back**
 fallback: when no candidate passes the check, it still replaces the policy's
 action with whichever candidate delays the first predicted contact by at least
 `HOLD_BACK_GAIN_S`.  The trigger counterfactuals (shadow runs plus replays, test

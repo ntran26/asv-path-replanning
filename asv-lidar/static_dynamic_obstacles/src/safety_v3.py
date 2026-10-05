@@ -1,6 +1,6 @@
 """Safety layer v3: committed backup and a recovery mode (2026-10-02).
 
-`planning/SAFETY_LAYER_V3_PLAN.md`.  v2 (`safety_v2.py`) checks every step
+`planning/archive/safety/SAFETY_LAYER_V3_PLAN.md`.  v2 (`safety_v2.py`) checks every step
 whether the policy's action leaves an escape manoeuvre, and replaces it with the
 nearest action that does.  On the development set it removed obstacle contacts
 but traded them for wall contacts and stalls: (a) when no new candidate passed

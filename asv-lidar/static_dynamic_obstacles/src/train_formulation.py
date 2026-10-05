@@ -269,11 +269,11 @@ def stage_at(fraction: float) -> int:
 
 def make_env(rank: int, seed: int, stage: int, randomisation, torch_threads: int = 0,
              supervisor: bool = True, low_speed_start_frac: float = 0.0,
-             r2_slowdown_test: str = None, overlay: bool = False):
+             r2_slowdown_test: str = None, overlay=False):
     def _init():
-        if overlay:                  # baseline-v3: every worker installs the overlay too
-            import formulation_v3
-            formulation_v3.apply(cfg)
+        if overlay:                  # baseline-v3/v4: every worker installs the overlay too
+            import importlib
+            importlib.import_module("formulation_v3" if overlay is True else str(overlay)).apply(cfg)
         if torch_threads:
             import torch
             torch.set_num_threads(torch_threads)
@@ -597,6 +597,17 @@ def _eval_callback(args, run_dir, resume_steps, baseline):
     """The development-set evaluation.  baseline-v3 adds its field development
     set (`formulation_v3.field_development_set`) and reports it apart."""
     modes = ("off", "on") if args.eval_supervisor == "both" else (args.eval_supervisor,)
+    import baseline_config
+    if baseline and baseline_config.overlay_module(baseline) == "formulation_v4":
+        # baseline-v4: formulation v4.2's development sets (frozen-like 120 and field 210,
+        # near-impossible episodes replaced in place), built once.
+        import dev_set_v4
+        from finetune_field import FieldEvalCallback
+        frozen_like, field = dev_set_v4.development_sets(args.eval_per_class)
+        cb = FieldEvalCallback(run_dir, args.eval_freq, args.eval_freq, modes, args.algo,
+                               args.eval_per_class, extra=lambda: field, resume_from=resume_steps)
+        cb.scenarios[:cb.n_dev] = frozen_like
+        return cb
     if baseline and "overlay" in baseline.get("formulation", {}):
         import formulation_v3
         from finetune_field import FieldEvalCallback
@@ -652,7 +663,7 @@ def main() -> None:
                     help="F93: a frozen baseline (configs/baseline_v1.json) -- applies its run "
                          "arguments and refuses to start if the code no longer matches it")
     ap.add_argument("--start-pool", type=Path, default=None,
-                    help="hand-back starts (planning/HANDBACK_STARTS_PLAN.md): a pool from "
+                    help="hand-back starts (planning/archive/HANDBACK_STARTS_PLAN.md): a pool from "
                          "tools/diagnostics/harvest_handback_starts.py; a run-time variant, recorded")
     ap.add_argument("--start-share", type=float, default=0.25,
                     help="share of episodes that start from the pool (from --start-min-stage)")
@@ -673,11 +684,19 @@ def main() -> None:
         if args.fixed_stage or args.init_model or args.r2_slowdown_test:
             raise SystemExit("--config runs the frozen formulation; drop --fixed-stage, "
                              "--init-model and --r2-slowdown-test")
-        if "overlay" in baseline.get("formulation", {}):
-            # baseline-v3: install the overlay (v3 stages, schedule) before the check.
-            import formulation_v3
-            formulation_v3.apply(cfg)
+        overlay = baseline_config.overlay_module(baseline)
+        if overlay:
+            # baseline-v3/v4: install the overlay (its stages, schedule) before the check.
+            import importlib
+            ov = importlib.import_module(overlay)
+            ov.apply(cfg)
             sys.modules[__name__].STAGE_SCHEDULE = cfg.CURRICULUM_STAGE_FRACTIONS
+            pool = getattr(ov, "START_POOL", None)
+            if pool and args.start_pool is None and not args.resume:
+                # baseline-v4.3: hard-state starts are part of the formulation.
+                args.start_pool = Path(__file__).resolve().parents[1] / pool["pool"]
+                args.start_share, args.start_min_stage = float(pool["share"]), int(pool["min_stage"])
+                args.start_jitter = "on" if pool.get("jitter", True) else "off"
         problems = baseline_config.check(cfg, sys.modules[__name__], baseline)
         if problems:
             raise SystemExit(f"code does not match {baseline['id']}: " + "; ".join(problems))
@@ -820,7 +839,7 @@ def main() -> None:
                                   supervisor=args.train_supervisor == "on",
                                   low_speed_start_frac=args.low_speed_start_frac,
                                   r2_slowdown_test=args.r2_slowdown_test,
-                                  overlay=bool(baseline and "overlay" in baseline.get("formulation", {})))
+                                  overlay=__import__("baseline_config").overlay_module(baseline) if baseline else False)
                          for i in range(args.num_envs)])
     if args.start_pool is not None:
         for i in range(args.num_envs):

@@ -236,6 +236,23 @@ def main() -> None:
     base_seed = 100_000 * (seed + 1) + int(spec["reset_seed_offset"])
     stage = int(spec["scenario_stage"])
     definition = spec.get("stage_definition")
+    overlay_stage = spec.get("overlay_stage")
+    if overlay_stage:
+        # Another overlay's stage (2026-10-04, the v4.3 SAC pair), built exactly as that
+        # overlay builds it -- from baseline-v2's stage 5, read from constants.py as
+        # written, plus the overlay's stage overrides and class weights -- without
+        # its constant overrides (those go through "constant_overrides", if wanted).
+        import copy as _copy
+        import importlib
+        import importlib.util
+        mod = importlib.import_module(overlay_stage["module"])
+        src = importlib.util.spec_from_file_location("_constants_as_written", ROOT / "src" / "constants.py")
+        c2 = importlib.util.module_from_spec(src)
+        src.loader.exec_module(c2)
+        built_stage = {**_copy.deepcopy(c2.CURRICULUM_STAGES[5]),
+                       **_copy.deepcopy(mod.STAGE_OVERRIDES[int(overlay_stage["stage"])])}
+        built_stage["weights"] = {c: w for c, w in mod.CLASS_WEIGHTS_567.items() if c in built_stage["classes"]}
+        definition = {"base_stage": int(overlay_stage["stage"]), "overrides": {}, "_full": built_stage}
     # A spec-defined stage is installed after the workers start (it does not exist
     # in `constants` yet), so they start one stage earlier.
     start_stage = int(definition["base_stage"]) if definition else stage
@@ -248,15 +265,28 @@ def main() -> None:
         vec.env_method("set_constants", overrides)
         print(f"[FINETUNE] run-time switches in every worker: {overrides}", flush=True)
     if definition:
-        full = {**cfg.CURRICULUM_STAGES[int(definition["base_stage"])], **definition["overrides"]}
+        full = definition.get("_full") or {**cfg.CURRICULUM_STAGES[int(definition["base_stage"])],
+                                           **definition["overrides"]}
         vec.env_method("define_stage", stage, full)
         config["stage_definition_resolved"] = {k: v for k, v in full.items()}
         (run_dir / "config.json").write_text(json.dumps(config, indent=1, default=str))
-        print(f"[FINETUNE] stage {stage} installed in every worker: base stage "
-              f"{definition['base_stage']} + {sorted(definition['overrides'])}", flush=True)
+        print(f"[FINETUNE] stage {stage} installed in every worker: "
+              + (f"{overlay_stage['module']} stage {overlay_stage['stage']}" if overlay_stage else
+                 f"base stage {definition['base_stage']} + {sorted(definition['overrides'])}"), flush=True)
     else:
         vec.env_method("set_field_mix", float(spec["field_share"]), spec.get("encounter_weights"),
                        int(spec.get("prefetch", 0)))
+    pool = spec.get("start_pool")
+    if pool:
+        # Hard-state starts (v4.3 item G): the hand-back mechanism, a seeded draw per worker.
+        path = Path(pool["pool"]) if Path(pool["pool"]).is_absolute() else ROOT / pool["pool"]
+        if not path.exists():
+            raise SystemExit(f"start pool not found: {path}")
+        for i in range(num_envs):
+            vec.env_method("set_start_pool", str(path), float(pool["share"]), int(pool["min_stage"]),
+                           bool(pool.get("jitter", True)), seed=base_seed + 7_000 + i, indices=[i])
+        print(f"[FINETUNE] {float(pool['share']):.0%} of episodes from stage {pool['min_stage']} start from {path.name}",
+              flush=True)
     vec = tf.RetryingVecMonitor(vec, filename=str(run_dir / "monitor.csv"),
                                 info_keywords=("reached_goal", "collided", "scenario_class"))
     vec = VecNormalize.load(str(start_vecnorm), vec)
@@ -276,13 +306,23 @@ def main() -> None:
     if boost and algo in ("sac", "tqc"):
         callbacks.append(EntropyBoost(boost["initial_ent_coef"], boost["target_entropy"], boost["steps"]))
     if not args.smoke:
-        modes = ("off", "on") if previous.get("eval_supervisor") == "both" else (previous.get("eval_supervisor", "on"),)
-        extra_set = None
-        if overlay:
+        supervisor = spec.get("eval_supervisor", previous.get("eval_supervisor", "on"))
+        modes = ("off", "on") if supervisor == "both" else (supervisor,)
+        extra_set, frozen_like = None, None
+        if spec.get("dev_set") == "v4":
+            # Formulation v4.2's development sets (near-impossible episodes replaced in
+            # place), so both arms of a pair are selected on the same episodes.
+            import dev_set_v4
+            frozen_like, field_v4 = dev_set_v4.development_sets(int(previous.get("eval_per_class", 20)))
+            extra_set = lambda: field_v4
+        elif overlay:
             import formulation_v3
             extra_set = formulation_v3.field_development_set
-        callbacks.append(FieldEvalCallback(run_dir, int(spec["eval_freq"]), start_steps, modes, algo,
-                                           int(previous.get("eval_per_class", 20)), extra=extra_set))
+        cb = FieldEvalCallback(run_dir, int(spec["eval_freq"]), start_steps, modes, algo,
+                               int(previous.get("eval_per_class", 20)), extra=extra_set)
+        if frozen_like is not None:
+            cb.scenarios[:cb.n_dev] = frozen_like
+        callbacks.append(cb)
     started = time.time()
     model.learn(total_timesteps=extra, reset_num_timesteps=False, callback=CallbackList(callbacks),
                 tb_log_name=run_dir.name, progress_bar=False)

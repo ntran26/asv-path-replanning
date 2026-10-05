@@ -1,5 +1,7 @@
 # Paper 3 — Section 2 equations: action, observation, encounter geometry and reward
 
+> **Status note (2026-10-04).** Still current for baseline-v3, a curriculum overlay that changes none of these equations. If baseline-v4 is adopted, its fix 1 changes how the compliant-turn admissibility flag is computed (static obstacles count), and its curriculum and training starts change; the equations are otherwise unchanged (`planning/BASELINE_V4_PLAN.md`).
+
 **Written 2026-09-29** from the code of the frozen formulation baseline-v2
 (`configs/baseline_v2.json`, formulation `3d697858e95e5adf`). Every expression
 below is what the code computes, with the constant values in force during

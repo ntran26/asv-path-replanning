@@ -428,6 +428,226 @@ Candidate levers, in order of expected effect:
    layouts only.
 3. **Optionally, softer path and obstacle shaping while an encounter is engaged.**
 
+**Decisions (2026-10-04).**
+- **The collision penalty stays at −300.** Under the reward normalisation, −300 already
+  normalises to −9.1, just inside the clip at ±10; −1000 would be clipped to −10. The larger value
+  would also inflate the return spread, so the other terms would shrink. In the reward check the
+  ordering is already decided by the collision term.
+- **No demonstrations in the learner comparison.** Replay-buffer demonstrations reach only the
+  off-policy learners. The on-policy routes, a behaviour-cloning warm start or DAPG, are different
+  mechanisms, so the four-learner comparison would confound learner and demonstration method.
+- **Item G (draft 4.3): hard-state starts, the same for every learner.**
+  - **The share.** 15 % of episodes from stage 6 start at the first track of a dense
+    training-namespace encounter. In that state, standing on fails and a manoeuvre started 0–2 s
+    later still succeeds with 0.2 m margin (`tools/diagnostics/feasibility/harvest_hard_starts.py`,
+    `results/hard_starts/pool_v4.pkl`).
+  - **The candidates.** 1,200 layouts: crossings 70 %, head-on 15 %, overtaking 8 %, being
+    overtaken 7 %. Straight legs 70 %, varying speed 50 %, near-deployment 50 %.
+  - **The approach.** The oracle's route follower at cruise, so no learner chooses the states.
+  - **The replay.** The hand-back mechanism replays each record, with ±10° and ±20 % jitter on the
+    last state. The pool gives practice in these states and never supplies an action.
+- **The recommended baseline is v4.3:** v4.1 (exposure, E) plus 4.2 (feasible development set,
+  F) plus 4.3 (hard starts, G). None of 4.1–4.3 has trained yet; G4 tested 4.0 only.
+
+**The hard-state pool (2026-10-04, 13:35).** 505 of 1,200 candidates were kept:
+
+| Encounter | Kept |
+|---|---|
+| Crossing from port | 148 |
+| Crossing from starboard | 160 |
+| Head-on | 112 |
+| Overtaking | 58 |
+| Being overtaken | 27 |
+
+Of the rest, 332 needed no action (standing on succeeds), 342 had no solution with margin from
+the start state, and 21 ended before reaching it.
+
+**The v4.3 SAC pair (decision, 2026-10-04: a short SAC test before a full run).**
+- **Why SAC, and why short.** PPO is a weak proxy for these cases: on the field development set
+  it scores 0.47 at 2 M, against SAC's 0.71. The 2.5 M SAC checkpoint no longer exists, so both
+  arms continue SAC baseline-v3 seed 0 from its final 3.0 M model and replay buffer, by +0.5 M.
+- **What the two arms share.** Reset seeds (offset 77777), safety off, and selection on
+  formulation v4.2's development sets (`dev_set: "v4"`).
+- **The v4.3 arm** (`configs/finetune_v4_pair_v43.json`). v4's stage 7, built as the overlay
+  builds it, plus 15 % hard-state starts. Fix 1 stays off.
+- **The v3 arm** (`configs/finetune_v4_pair_v3.json`). v3's stage 7: the control.
+- **The runner.** `src/finetune_field.py` gained the opt-in spec keys `overlay_stage`,
+  `start_pool`, `dev_set` and `eval_supervisor`. Both arms passed a 4,096-step smoke test, and the
+  resolved stage 7 matches v4.1.
+- **The gate, fixed before the runs** (`tools/diagnostics/v4_gates/pair_compare.py`). At the
+  selected checkpoints, v4.3 minus v3 must reach field set +5 points or more, with the
+  frozen-like set no worse than −2 points. Test set v4 is reported for both, but not used for the
+  decision.
+- **Requirement for SAC v4 (decision, 2026-10-04, revised the same day): no regression on
+  no-target episodes against the v3 SAC 3 M baseline**, on the same episodes and seeds. An earlier
+  "pass every no-target episode" was judged too harsh.
+
+  | No-target set | v3 SAC 3 M, to match or beat | When checked |
+  |---|---|---|
+  | Development set 4.2, evaluation seeds (50) | **44 of 50**: frozen-like 20/20, field dev set v3 14/20, 4.1 extension 10/10 | during development |
+  | Test set v4 (30) | **28 of 30**: field-style 25/27, L1–L3 3/3 | once, at the end |
+  | Paper 2 set, safety off (L1–L3 × 10 noise seeds) | **30 of 30** | once, at the end |
+
+  - **Null episodes** (a target present but never in conflict) are tracked alongside, against v3's
+    71 of 75 on test set v4.
+  - **The misses v3 already has.** On the test set they are FS-NT-014 and FS-NT-023, both obstacle
+    contacts. On the development set they are 6 field dev set v3 layouts with gates, on-path panels
+    or slaloms, mostly on slanted legs. The route follower clears 8 of the 9 failing development
+    layouts with 0.34–1.2 m margin, and LOS-DWA and COLREGs-VO each solve 8.
+  - **The pair is not gated on this.** `pair_compare.py` reports the no-target counts for both arms
+    and the start model. The pair's gate stays as fixed before the runs.
+  - **Two baselines.** The pair's start model is the final 3.0 M model, which passes 43 of 50 on the
+    development set. The reference above is the kept best 3 M model behind the v3 results: 44 of
+    50. The two differ by one frozen-like no-target episode.
+  - Diagnosis: `tools/diagnostics/static/nt_trace.py` (`results/static_trace/summary.txt`). SAC 3 M
+    was traced on all 80 no-target episodes (development and test set v4) and the 75 null
+    episodes of test set v4, and each run was compared with the oracle's A* route.
+
+**The v4.3 SAC pair: result (2026-10-05, 10:11; `results/v4_gates/pair_summary.txt`).** Both arms
+are scored on development set 4.2 with the same seeds. The 3.0 M start evaluations are identical,
+which confirms the pairing.
+
+| | v4.3 arm | v3 arm (control) |
+|---|---|---|
+| Selected checkpoint | 3.4 M | 3.0 M (the start; never improved on) |
+| Field set (210) | 0.776 | 0.738 |
+| Frozen-like set (120) | 0.908 | 0.892 |
+| Field crossings | 0.653 | 0.611 |
+| No-target (50) | 45 | 43 |
+
+- **Gate: FAIL.** The field set gains +3.8 points against the +5 required. The frozen-like set
+  gains +1.7, which passes its −2 limit. Over the 330 episodes, 35 were gained and 25 lost.
+- **The final checkpoints are level.** At 3.5 M against 3.5 M, the field set is −0.2 points and
+  frozen-like +6.2. The v4.3 advantage depends on its peak at 3.4 M.
+- **Test set v4, reported only and not used for the decision:**
+
+  | Selected models | Overall | Paper 2 part | FS-CRP | Varying speed | No-target |
+  |---|---|---|---|---|---|
+  | v4.3 arm | **0.886** (±0.020) | 0.798 | 0.62 | 0.713 | 30/30 |
+  | v3 arm | 0.859 | 0.720 | 0.31 | 0.633 | 26/30 |
+
+  Paired, the v4.3 arm gains 71 episodes and loses 44. The frozen part is unchanged (0.931 against
+  0.929). The kept SAC 3 M scores 0.865.
+- **The tension.** By the rule fixed before the runs, v4.3 is not adopted. Adopting it because of
+  the test-set numbers would make the test set a selection instrument. Any revision of the
+  decision has to rest on development evidence only, for example the same checkpoints scored on
+  more development seeds.
+- **A counting bug.** The final 3.5 M checkpoint was evaluated twice, so the "final" rows count
+  each episode twice (no-target n = 100). Their rates are unaffected.
+
+**Added analysis: re-scoring on new seeds (decision, 2026-10-05; declared before it runs).**
+- **Why.** The gate failed narrowly, and development evidence only may revise the decision.
+- **Checkpoints.** The same ones the gate compared: the v4.3 arm's selected 3.4 M model and the
+  v3 arm's selected model, which is its 3.0 M start. Both arms' final 3.5 M models are scored as
+  secondary.
+- **Episodes.** The same 330 development episodes (formulation v4.2) under three new episode-seed
+  sets (1,100,000 / 1,200,000 / 1,300,000 + position), 990 episodes per checkpoint, safety off
+  (`tools/diagnostics/v4_gates/pair_reseed.py`).
+- **The decision uses the new seeds only.** The 3.4 M checkpoint was chosen as the best of six
+  evaluations on the original seeds, so those seeds flatter it.
+- **The rule is unchanged.** v4.3 minus v3 at the selected checkpoints: field set +5 points or
+  more and frozen-like set −2 or better, reported with a 95 % interval from a bootstrap over
+  development scenarios.
+- **Outcomes.** If it passes, the full SAC v4.3 3 M run is the next step. If not, v3 stays.
+
+**Result (2026-10-05, 12:15; `results/v4_gates/pair_reseed_summary.txt`). Gate PASS, narrowly.**
+
+| New seeds, 990 episodes per checkpoint | v4.3 selected (3.4 M) | v3 selected (3.0 M) | Difference (95 % CI) |
+|---|---|---|---|
+| Field set | 0.759 | 0.708 | **+5.1** (+0.2 to +10.5) |
+| Frozen-like set | 0.931 | 0.936 | −0.6 (−3.3 to +2.2) |
+| Field crossings | 0.648 | 0.606 | +4.2 |
+| No-target | 137 of 150 | 129 of 150 | +8 |
+
+- **The margin sits at the threshold.** The field gain is +5.1 against the +5 required, and its
+  interval reaches down to +0.2. v4.3 is better by this protocol, but the size of the gain is
+  uncertain. Over the 990 episodes, 111 were gained and 81 lost.
+- **The final 3.5 M checkpoints are level.** The field difference is +0.0 (−4.3 to +4.3). The
+  advantage depends on the selected checkpoint, chosen by the rule that applies to both arms.
+- **No regression on no-target.**
+- **Consequence.** v4.3 is adopted as the formulation for the next full run. A SAC v4.3 run of
+  3 M steps from scratch confirms it, after `train_formulation.py` is wired to `formulation_v4`.
+
+**Full run launched (2026-10-05, 13:02).** `configs/baseline_v4.json` (digest 851e5baf06bc088a;
+fix 1 off; hard-state starts at 15 % from stage 6; stage switches at the kept SAC v3 absolute
+steps) through `results/v4_full_run.sh`: training, then Tier 1, the frozen suite and the Paper 2
+set on the best checkpoint, then test set v4 (report only). Run directory
+`runs/sac_formulation_seed0_bl4`.
+- **Wiring checks.** A 4,096-step smoke run passed all 7 stages with the pool on and finished its
+  final evaluation. The trainer's development set (120 frozen-like + 210 field) matches the pair's
+  re-scoring set at all 330 positions, with the 37 replacements in place.
+- **Fix in `dev_set_v4.development_sets`.** Replacement positions are recorded on the
+  20-per-class set. A smaller frozen-like set (the smoke run's 1 per class) now keeps the field
+  replacements and skips the frozen-like ones, instead of indexing past the end.
+- **Acceptance after the run.** No-target non-regression against the kept SAC v3 3 M: development
+  at least 44 of 50, test set v4 at least 28 of 30, Paper 2 set 30 of 30. The explainer-artifact
+  briefs switch to v4.3 only if it becomes the best formulation.
+
+**Why the no-target failures happen (2026-10-04).**
+
+Where they fail. The failures are dense field-style layouts, mostly on slanted legs:
+
+| No-target set | Success |
+|---|---|
+| Development: field dev set v3 (20; 16 slanted) | 14 of 20 |
+| Test set v4: field-style FS-NT (27; mostly straight) | 25 of 27 |
+| Development: frozen-like (20) | all |
+| Development: 4.1 extension (10; mostly straight) | all |
+| Test set v4: Paper 2 layouts L1–L3 (3) | all |
+
+By motif, gate plus on-path panel scores 0.69 on slanted legs and 0.93 on straight ones.
+
+What the failures are not:
+- **Not infeasible.** The route follower clears these layouts, and LOS-DWA and COLREGs-VO
+  solve 8 of the 9.
+- **Not the wrong side.** SAC passes every panel it reaches on the side the A* route takes.
+- **Not unseen.** The panel that is hit shows on the LiDAR 2–4 m ahead, 3–6 s before the contact.
+
+What they are: late, wavering and slowed avoidance close to the panels. The no-target failures
+against the successes:
+
+| | Failures | Successes |
+|---|---|---|
+| Rudder sign reversals per step within 1.5 m of a panel | 0.38 | 0.13 |
+| Rudder hard over (|command| > 0.95) within 1 m of a panel | 55 % of steps | 10 % |
+| Speed within 1 m of a panel | 0.59 m/s | 0.92 m/s |
+| Median peak cross-track error | 2.9 m (up to 4 m) | — |
+
+Typical cases:
+- **FS-NT-023** swings the rudder from one side to the other in front of an on-path panel and
+  hits it.
+- **FS-NT-014** holds a grazing course with the rudder near zero until one step before the
+  contact.
+- **DV3-NT-CV-12** squeezes between a panel and the wall on the side the route avoids.
+
+Slowing near a panel costs the turn rate the manoeuvre then needs. Cutting back toward the path
+is not more common in failures (0.25 against 0.42).
+
+The null failures on test set v4 have a different pattern. Three of the four are wall contacts
+about 30 s in. Each follows a heading excursion of 20–48° off the path, with full astern throttle
+and a reversing rudder, while the non-conflicting target is 2–5 m away: the policy answers a
+target that needs no answer and runs out of room at the wall. The fourth cuts back into a panel
+on a straight three-panel basin leg.
+
+Likely causes, in order of evidence:
+1. **Exposure.** In stages 6–7, slanted dense no-target layouts are about 4–9 % of episodes. v4.1
+   lowers the no-target field weight (0.20 → 0.15) and straightens 70 % of legs, so it moves away
+   from this failure.
+2. **Reactive control without a route, which is an interpretation.** The policy steers from
+   pooled LiDAR and path errors. In tight motifs, the path term pulling back and the obstacle term
+   pushing away would explain the wavering.
+
+Remedies after the pair, cheapest and fairest first:
+- **Static hard-state starts.** Pool G gains no-target and static states just before an on-path
+  panel or gate, oracle-checked, mostly on slanted legs.
+- **More slanted dense no-target layouts in stages 6–7.** The no-target weight goes back up, and
+  no-target layouts are exempt from the 70 % straight share.
+- **Only if those fall short:** a stronger rudder-reversal (smoothness) cost near panels, or a
+  free-side cue in the observation. Both are formulation changes.
+- **Launch.** Started 13:47 (`results/v4_pair_run.sh`), arms one at a time, each about 11–13 h.
+  0.5 M steps at roughly 12–15 steps/s plus development evaluations is slower than the earlier
+  9 h estimate.
+
 ## 6. Order
 
 1. Test set v2 and its SAC and classical results (running).

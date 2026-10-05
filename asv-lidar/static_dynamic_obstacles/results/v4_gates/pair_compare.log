@@ -1,0 +1,16 @@
+v4.3 SAC pair: development sets of formulation v4.2 (frozen-like 120 + field 210), safety off
+
+                 timesteps    all  field  frozen_like  field_crossing  collision  no_target_passed  no_target_n
+arm  checkpoint                                                                                                
+v4.3 start         3000010  0.794  0.738        0.892           0.611      0.206                43           50
+     selected      3400000  0.824  0.776        0.908           0.653      0.176                45           50
+     final         3500000  0.795  0.724        0.921           0.604      0.205                88          100
+v3   start         3000010  0.794  0.738        0.892           0.611      0.206                43           50
+     selected      3000010  0.794  0.738        0.892           0.611      0.206                43           50
+     final         3500000  0.774  0.726        0.858           0.618      0.226                84          100
+
+selected: v4.3 3,400,000 vs v3 3,000,010 -- field +3.8%, frozen-like +1.7%, field crossings +4.2%; episodes gained 35, lost 25 of 330  -> gate FAIL (field >= +5, frozen-like >= -2 points)
+final: v4.3 3,500,000 vs v3 3,500,000 -- field -0.2%, frozen-like +6.2%, field crossings -1.4%; episodes gained 68, lost 54 of 660
+no-target, v4.3 selected checkpoint: 45 of 50 (v3 start model 43 of 50) -> ok
+no-target, v3 selected checkpoint: 43 of 50 (v3 start model 43 of 50) -> ok
+
