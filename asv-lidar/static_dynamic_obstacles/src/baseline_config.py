@@ -91,19 +91,30 @@ def learners(tf: ModuleType, num_envs: int) -> Dict:
     })
 
 
-def snapshot(cfg: ModuleType, tf: ModuleType, overlay: bool = False) -> Dict:
+OVERLAYS = {"baseline-v3": "formulation_v3", "baseline-v4": "formulation_v4"}
+
+
+def overlay_module(saved: Dict):
+    """The overlay module a saved config names (False for baseline-v1/v2)."""
+    ov = (saved or {}).get("formulation", {}).get("overlay")
+    return OVERLAYS[ov["id"]] if ov else False
+
+
+def snapshot(cfg: ModuleType, tf: ModuleType, overlay=False) -> Dict:
     """Everything the code decides; `--check` compares exactly this.
 
-    `overlay` (baseline-v3): install `formulation_v3` first, so the curriculum
-    schedule is v3's, and record the overlay in the formulation block.  The
-    constants block is read from `constants.py` as written, so it is v2's either
-    way -- v3 changes what training sees, not a constant."""
+    `overlay`: True or "formulation_v3" (baseline-v3), "formulation_v4"
+    (baseline-v4): install that overlay first, so the curriculum schedule is its
+    own, and record it in the formulation block.  The constants block is read from
+    `constants.py` as written, so it is v2's either way -- an overlay changes what
+    training sees, not a constant."""
+    import importlib
     run_args, tag = dict(RUN_ARGS), TAG
     if overlay:
-        import formulation_v3 as fv
+        fv = importlib.import_module("formulation_v3" if overlay is True else str(overlay))
         fv.apply(cfg)
         tf.STAGE_SCHEDULE = cfg.CURRICULUM_STAGE_FRACTIONS
-        run_args["timesteps"], tag = fv.TIMESTEPS, "bl3"
+        run_args["timesteps"], tag = fv.TIMESTEPS, getattr(fv, "TAG", "bl3")
     body = {"formulation": formulation(cfg, tf), "run_args": _plain(run_args),
             "learners": learners(tf, run_args["num_envs"]),
             "campaign": {"algos": ALGOS, "seeds": SEEDS, "checkpoint": CHECKPOINT,
@@ -151,7 +162,7 @@ def load() -> Dict:
 
 def check(cfg: ModuleType, tf: ModuleType, saved: Dict | None = None) -> List[str]:
     saved = saved if saved is not None else load()
-    now = snapshot(cfg, tf, overlay="overlay" in saved.get("formulation", {}))
+    now = snapshot(cfg, tf, overlay=overlay_module(saved))
     return diff({k: saved[k] for k in now}, now)
 
 
@@ -242,6 +253,38 @@ def write(cfg: ModuleType, tf: ModuleType) -> Dict:
     return config
 
 
+V4_PATH = ROOT / "configs" / "baseline_v4.json"
+
+
+def write_v4(cfg: ModuleType, tf: ModuleType) -> Dict:
+    """configs/baseline_v4.json: baseline-v2 plus the `formulation_v4` overlay, frozen
+    at revision 4.3 (2026-10-05)."""
+    import formulation_v4 as fv
+    body = snapshot(cfg, tf, overlay="formulation_v4")
+    config = {
+        "id": fv.ID,
+        "frozen_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "git": {"head": _git("rev-parse", "HEAD"), "dirty": _code_dirty()},
+        "provenance": {
+            "formulation_of": "baseline-v2 plus the v4.3 overlay: dense field-style layouts from stage 5, "
+                              "crossing-weighted encounters, straight survey lanes in 70 % of dense draws, "
+                              "varying-speed field targets, a start-clear rule, the feasibility-filtered "
+                              "development set (4.2) and hard-state starts (15 % from stage 6); fix 1 off "
+                              "(src/formulation_v4.py)",
+            "why": "planning/BASELINE_V4_PLAN.md section 5e: the v4.3 SAC pair passed its gate on "
+                   "re-scored development seeds (field +5.1 points, frozen-like -0.6)",
+            "base": "baseline-v2 (formulation 3d697858e95e5adf): reward, observation, vessel model and "
+                    "learners unchanged; 3 M steps with stage switches at the kept SAC v3 policy's steps",
+        },
+        "formulation_digest": digest(body["formulation"]),
+        **body,
+    }
+    with open(V4_PATH, "w", newline="\n") as fh:
+        json.dump(config, fh, indent=1, sort_keys=False)
+        fh.write("\n")
+    return config
+
+
 def main() -> int:
     sys.path.insert(0, str(ROOT / "src"))
     import constants as cfg
@@ -253,9 +296,16 @@ def main() -> int:
     group.add_argument("--verify-run", type=Path, nargs="+")
     group.add_argument("--write-v3", action="store_true",
                        help="write configs/baseline_v3.json (the v3 overlay on baseline-v2)")
+    group.add_argument("--write-v4", action="store_true",
+                       help="write configs/baseline_v4.json (the v4.3 overlay on baseline-v2)")
     ap.add_argument("--config", type=Path, default=None,
                     help="check against this config instead of baseline-v2 (e.g. configs/baseline_v3.json)")
     args = ap.parse_args()
+    if args.write_v4:
+        config = write_v4(cfg, tf)
+        print(f"wrote {V4_PATH.relative_to(ROOT)} ({config['id']}, "
+              f"formulation {config['formulation_digest']})")
+        return 0
     if args.write_v3:
         config = write_v3(cfg, tf)
         print(f"wrote {V3_PATH.relative_to(ROOT)} ({config['id']}, "

@@ -1,5 +1,7 @@
 # Paper 3 master artifact — build brief
 
+> **Kept current (decision, 2026-10-04).** This file describes only the best formulation: **baseline-v3**, the kept SAC 3 M policy (`configs/baseline_v3.json`, `src/formulation_v3.py`). Earlier versions are not described. If baseline-v4.3 passes its SAC pair (`planning/BASELINE_V4_PLAN.md`), this file is updated to v4.3.
+
 **Written 2026-09-29.** This file specifies what to build. The facts it
 must use are in `MASTER_ARTIFACT_FACTS.md` (vessel model, classical methods,
 learners, perception, data generation, field bridge) and
@@ -56,7 +58,7 @@ one fixed problem formulation, against classical controllers.
    its identified parameters; (b) do not mention any field-deployment test set;
    describe curriculum stages 6–7 as training on more, and more evenly spread,
    three-obstacle layouts.
-9. **The curriculum described is baseline-v3** (seven stages, 2.5 M steps).
+9. **The curriculum described is baseline-v3** (seven stages, 3 M steps).
 10. **Spelling:** American ("maneuver", "behavior"), matching the paper.
 11. **Nomenclature** at the end: every symbol (with unit and the section where
     it first appears) and every abbreviation. Group by topic.
@@ -177,7 +179,7 @@ Build up from zero:
 11. Comparison table of the four (on/off-policy, memory, exploration,
     over-estimation control, sample efficiency, cost per step).
 12. How this study trains them: facts section 3 (identical network, defaults,
-    2.5 M steps, 3 seeds, development-set checkpoint selection, why the test
+    3 M steps, 3 seeds, development-set checkpoint selection, why the test
     suite is touched once). ▶ **Network diagram** of the two-encoder
     architecture with the six observation branches.
 - Sources: Sutton & Barto (2018); Schulman et al. (2016, 2017); Haarnoja et
@@ -272,14 +274,18 @@ Use facts section 6.
 - Curriculum: ▶ **timeline chart** of the seven stages (what is added when).
   Stages 6–7: more, and more evenly spread, three-obstacle layouts in three
   motifs (gallery), CPA guard relaxed then removed, varying-speed targets.
-- Data sets: training / development / three-obstacle development / frozen test
-  suite / robustness set / width sweep / perception degradation, with a
-  seed-namespace diagram showing they never overlap; checkpoint selection
-  score.
+- Data sets: training / development / three-obstacle development / the
+  1,000-episode held-out test set / robustness set / width sweep / perception
+  degradation, with a seed-namespace diagram showing they never overlap;
+  checkpoint selection score.
 
 ### 9. Safety layer and evaluation design (added)
 - The runtime stop safety layer (facts section 5): trigger, maneuver, hand-back; off in
   training; learned compliance always reported with it off.
+- ▶ **Fairness check widget:** for one test episode, the manoeuvres tried by
+  the perfect-foresight checker (facts section 6.5), coloured by outcome, and
+  the moment the target is first seen; an episode solvable only before that
+  moment is replaced.
 - What is measured: success; collisions by type; cross-track error; rule
   metrics per encounter; minimum CPA distribution; intervention rate; by
   target behavior; by width; by perception quality. No values.

@@ -20,7 +20,7 @@ Zhang et al. (2017), https://doi.org/10.1109/IVS.2017.7995698, and attributes
 LiDAR returns to the target's fitted footprint rather than a surrounding disk.
 Optional provisional targets and bounded cross-entropy trajectory search are
 separate ablations; their modules document method citations and limits.
-See planning/SAFETY_LAYER_V6_PLAN.md and the development calibration artifacts.
+See planning/archive/safety/SAFETY_LAYER_V6_PLAN.md and the development calibration artifacts.
 """
 from __future__ import annotations
 

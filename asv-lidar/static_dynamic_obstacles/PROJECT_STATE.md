@@ -1916,8 +1916,8 @@ cell and Tier A a disjoint block above. Draft manifest:
 rather than asserted): TODO(04-3) **resolved** (stage fractions of the budget,
 `CURRICULUM_STAGE_FRACTIONS`); TODO(04-1) and (04-2) **explicitly deferred** to
 basin session 1 at their nominal values; claim ledger and result tables
-**drafted** (`planning/CLAIM_LEDGER.md` with the 04a section 6 predictions,
-`planning/RESULT_TABLES.md`). Open decisions: TODO(04-4) budget (A26),
+**drafted** (`planning/PAPER3_CLAIMS_AND_TABLES.md` with the 04a section 6 predictions,
+`planning/PAPER3_CLAIMS_AND_TABLES.md`). Open decisions: TODO(04-4) budget (A26),
 sign-off of the ledger and tables, and a commit so the generator has a SHA.
 
 *Run 7* (`runs/ppo_formulation_seed0_v7/`): run 6's setup on the basin-default
@@ -2777,7 +2777,7 @@ costs hours instead of weeks.
 and the "physically reproducible" clause that justified the two-vessel scope all
 stand, and the basin sessions (`PART2_BASIN_PLAN.md`) remain on the critical
 path. **The paper is a formulation plus a five-learner comparison**, so
-`RESULT_TABLES.md`'s "Proposed (SAC, full)" row and the ablation rows need
+`PAPER3_CLAIMS_AND_TABLES.md`'s "Proposed (SAC, full)" row and the ablation rows need
 restating before sign-off, and the classical comparators (C3-C6) become
 essential rather than optional -- they carry N2.
 

@@ -1,6 +1,6 @@
 # PROJECT BRIEF — read at the start of each work session
 
-> **Status note (2026-09-22).** Parts of this document are superseded by the implementation, which is frozen as **baseline-v1** (`configs/baseline_v1.json`, git tag `baseline-v1`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here:
+> **Status note (2026-09-22, updated 2026-10-04).** Parts of this brief are superseded. The formulation was frozen as **baseline-v1** (`configs/baseline_v1.json`), then **baseline-v2** (`configs/baseline_v2.json`; reward and observation unchanged since), **baseline-v3** (a curriculum overlay, `src/formulation_v3.py`; the kept SAC 3 M policy) and the **baseline-v4** draft (`src/formulation_v4.py`, `planning/BASELINE_V4_PLAN.md`). Current state: `planning/BASELINE_V4_PLAN.md` (formulation, test set v4, the v4.3 SAC pair) and `PROJECT_STATE.md` (findings). Superseded here (as of baseline-v1):
 >
 > - "SAC primary; PPO, RecurrentPPO, TQC as …": the baseline set is PPO, RecurrentPPO, TD3, SAC and TQC on one frozen formulation (F76, F77, F93); the framing is open (`METHODS_BRIEF.md` section 9).
 >

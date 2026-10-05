@@ -1,5 +1,7 @@
 # Paper 3 — Section 2 (Formulation): writing plan and verified facts
 
+> **Status note (2026-10-04).** The facts below are baseline-v2's and still hold for baseline-v3. The evaluation now uses the 1,000-episode test set (version 4), and the claims and tables are in `planning/PAPER3_CLAIMS_AND_TABLES.md`. Baseline-v4 is under test (`planning/BASELINE_V4_PLAN.md`).
+
 **Written 2026-09-28** for drafting Section 2 in the six-section structure of
 Introduction draft 4 (`planning/Paper3_Introduction_draft4.docx`; skeleton
 revision 4). Every number below was read from the frozen config
@@ -316,7 +318,7 @@ Eq. 6–8, Table 5) — **the heart of contribution C2**
 training, evaluated separately, interventions not attributed to the policy
 (S10, C-7). Rule 8(e) in two layers: the learned policy slackens speed; the
 engineered layer takes all way off. **[Open, A38:]** the current safety layer
-lowers success slightly (`planning/SAFETY_LAYER_V2_PLAN.md`). Describe the layer
+lowers success slightly (`planning/archive/safety/SAFETY_LAYER_V2_PLAN.md`). Describe the layer
 that is actually evaluated; if safety layer v2 is adopted, it goes here instead.
 
 **2.3.5 Curriculum** (~350 words, Table 8)

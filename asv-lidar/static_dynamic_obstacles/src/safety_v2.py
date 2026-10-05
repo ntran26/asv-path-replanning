@@ -1,6 +1,6 @@
 """Safety layer v2: a predictive safety filter around the policy (2026-10-01).
 
-`planning/SAFETY_LAYER_V2_PLAN.md`.  Safety layer v1 (`emergency_stop.py`) fires
+`planning/archive/safety/SAFETY_LAYER_V2_PLAN.md`.  Safety layer v1 (`emergency_stop.py`) fires
 on a rule test -- a give-way encounter in extremis whose compliant turn is
 inadmissible -- and can only stop.  On the seed-0 frozen suite it stopped mostly
 narrow-channel overtakes that would have passed clear, lost about one point of

@@ -1,5 +1,7 @@
 # Methods brief — Paper 3, formulation baseline-v1
 
+> **Status note (2026-10-04).** Written for the baseline-v1/v2 formulation. Reward, observation, vessel model and learners are unchanged through baseline-v3, which adds a curriculum overlay (field layouts in stages 6-7). The headline evaluation is now the 1,000-episode test set (version 4; `tools/tiers/test_set.py`). The baseline-v4 draft (4.3) changes the curriculum, the development set and the training starts, and switches fix 1 on (`planning/BASELINE_V4_PLAN.md`); this brief is restated once the final formulation is fixed.
+
 **Purpose.** One current, paper-ready statement of the method, for drafting the
 Methods, Experimental Setup and Limitations sections. It states the formulation
 **as frozen** in `configs/baseline_v2.json` (formulation digest
@@ -21,7 +23,7 @@ specs.
 > observation, not the current 70); `02a_REWARD_SPECIFICATION.md`
 > (predates the A24 stop test, A27 held-heading charge, A29 growing `v_hold`
 > and F88 latched risk); `03a`/`04a` (predate basin mode, F74); the draft
-> skeleton (7 Sep); `RESULT_TABLES.md` (still names a single "Proposed (SAC)"
+> skeleton (7 Sep); `PAPER3_CLAIMS_AND_TABLES.md` (still names a single "Proposed (SAC)"
 > method, see section 9). Each stale planning spec now opens with a dated status note
 > listing what is superseded.
 
@@ -40,7 +42,7 @@ and 17 for **one** target at a time; static obstacles; basin and channel
 geometry. **Out of scope (stated in the paper):** multi-target encounters,
 Rule 19 restricted visibility, sound signals, Rule 18 responsibilities, open-water
 Rule 15/17 role tables, and any claim of legal compliance: violation terms are
-proxies (`CLAIM_LEDGER.md` section 2).
+proxies (`PAPER3_CLAIMS_AND_TABLES.md` section 2).
 
 ## 2. Vessel and simulation
 
@@ -331,7 +333,7 @@ it is why a search is validated rather than trusted.
 
 Tier B strata are described by geometry only (basin, channel wide /
 intermediate / narrow), never as "hard for classical methods". Every result
-reports the seed spread. `RESULT_TABLES.md` still says "mean over 5 seeds with
+reports the seed spread. `PAPER3_CLAIMS_AND_TABLES.md` still says "mean over 5 seeds with
 a 95 % CI" and needs restating for **3 seeds** (B6), with the wider interval
 that implies. Pre-registered metrics: success;
 collisions by type (static, boundary, target); RMS cross-track error; path
@@ -368,7 +370,7 @@ access and on deployment (C13).
 - **Evaluation machinery.** The Tier B runner and the classical comparators
   (encounter-specific VO, COLREGs-VO, LOS-PID + DWA; C3–C6) are not built. The
   suite freeze, claim ledger and result tables are unsigned drafts.
-- **A framing decision.** `RESULT_TABLES.md` still names a single "Proposed
+- **A framing decision.** `PAPER3_CLAIMS_AND_TABLES.md` still names a single "Proposed
   (SAC, full)" method and pre-registers runs outside the campaign — "SAC, no
   COLREGs terms", the 2 × 2 feature/reward ablation (C-4), randomisation-off
   (C-6) — plus Paper 2's SAC and the three classical comparators. The paper is
@@ -428,5 +430,5 @@ of 0.92 and 0.88 on two seeds, head-on 1.00 on both, crossing 0.75 and 0.55.
 | Findings F1–F95 (full rationale, chronological) | `PROJECT_STATE.md` |
 | Open decisions and known limits | `OPEN_PROBLEMS.md` |
 | Basin geometry | `planning/06_BASIN_MODE_SPECIFICATION.md` |
-| Claims and pre-committed tables | `planning/CLAIM_LEDGER.md`, `planning/RESULT_TABLES.md` |
+| Claims and pre-committed tables | `planning/PAPER3_CLAIMS_AND_TABLES.md`, `planning/PAPER3_CLAIMS_AND_TABLES.md` |
 | Running the campaign | `TRAINING_GUIDE.md` |

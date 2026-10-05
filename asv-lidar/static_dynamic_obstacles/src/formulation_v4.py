@@ -9,7 +9,7 @@ Changes from v3:
 
 | | Change |
 |---|---|
-| A | `ADMISSIBILITY_STATIC` on from step 0 (fix 1): a compliant turn blocked by a perceived static obstacle is inadmissible, so the context says so and R-2 / the Rule 8 credit pay for slowing |
+| A | `ADMISSIBILITY_STATIC` on from step 0 (fix 1): a compliant turn blocked by a perceived static obstacle is inadmissible, so the context says so and R-2 / the Rule 8 credit pay for slowing **Removed in the frozen 4.3 (decision, 2026-10-05): off, as the pair tested.** |
 | B | Field layouts from stage 5 and denser: 20 % (stage 5, CPA guard 0.2), 40 % (stage 6, guard off), 55 % (stage 7); encounter weights HO .25, CRS .20, CRP .20, OT .10, BO .10, NT .15; near-deployment share 0.5 |
 | C | Crossings weighted up in the generator stages 5-7 (`weights`, as A31 does for stage 3) |
 
@@ -19,7 +19,10 @@ Changes from v3:
 
 | F | (4.2, 2026-10-04) Near-impossible development episodes replaced in place: no manoeuvre that starts at or after the first track reaches the goal with 0.2 m clearance (`src/oracle_feasibility.py`); same rule as test set v4 |
 
-Unchanged: reward, observation, learners, stage step fractions, budget.  The discount is tested separately in pilot arm B
+| G | (4.3, 2026-10-04) Hard-state starts: 15 % of episodes from stage 6 begin at the first track of a dense training-namespace encounter where standing on fails and a manoeuvre still succeeds (`START_POOL`) -- the reward check found the reward already ranks the successful manoeuvre first in every failed crossing, so the policy needs practice in these states, not a new reward |
+
+Budget (frozen 4.3): 3 M steps, stage switches at the absolute steps of the kept SAC v3 policy
+(stage 7 from 2.0 M to the end). Unchanged: reward, observation, learners.  The discount is tested separately in pilot arm B
 (gamma 0.98; gate G1: the best-return behaviour is safe in 88 % of solvable
 conflict scenarios at 0.951, 100 % at 0.98).
 """
@@ -31,10 +34,14 @@ from typing import Dict
 import formulation_v3 as v3
 
 ID = "baseline-v4"
-REVISION = "4.2-draft"                 # 4.1: straight legs, more varying-speed targets, weights; 4.2: feasible dev set
+REVISION = "4.3"                       # 4.1: straight legs, varying speed, weights; 4.2: feasible dev set; 4.3: hard starts
+TAG = "bl4"
 
-TIMESTEPS = v3.TIMESTEPS
-STAGE_FRACTIONS = v3.STAGE_FRACTIONS
+# 3 M steps, with the stage switches at the absolute steps of the kept SAC v3 policy (its 2.5 M
+# run extended in stage 7 to 3.0 M): stage 7 runs from 2.0 M to the end.
+TIMESTEPS = 3_000_000
+STAGE_FRACTIONS = tuple((step / TIMESTEPS, stage) for step, stage in (
+    (0, 1), (160_000, 2), (360_000, 3), (640_000, 4), (1_000_000, 5), (1_500_000, 6), (2_000_000, 7)))
 
 FIELD_WEIGHTS = {"NT": 0.15, "HO": 0.20, "CRP": 0.175, "CRS": 0.175, "OT": 0.15, "BO": 0.15}
 NEAR_SHARE = 0.50
@@ -53,7 +60,17 @@ STAGE_OVERRIDES: Dict[int, dict] = {
     7: {"clutter": (1, 3), "clutter_weights": v3.CLUTTER_WEIGHTS_67, "cpa_guard": 0.0,
         "field_share": 0.55, "field_varying_share": 0.50, **_FIELD},
 }
-CONSTANT_OVERRIDES = {"ADMISSIBILITY_STATIC": True}
+# Fix 1 (item A, ADMISSIBILITY_STATIC) is off in the frozen 4.3 (decision, 2026-10-05): the v4.3 SAC
+# pair passed with it off, and it has no positive evidence of its own (gates G1, G4).
+CONSTANT_OVERRIDES = {}
+# 4.3 (G): a share of episodes from stage 6 starts in a hard state -- a dense
+# training-namespace crossing (mostly) at the moment the target is first tracked,
+# where standing on fails and a manoeuvre still succeeds (oracle-checked;
+# tools/diagnostics/feasibility/harvest_hard_starts.py).  Replayed by the
+# hand-back mechanism (`ASVLidarEnv.set_start_pool`), the same for every learner;
+# no action is supplied.  Passed to train_formulation as --start-pool / --start-share
+# / --start-min-stage.
+START_POOL = {"pool": "results/hard_starts/pool_v4.pkl", "share": 0.15, "min_stage": 6, "jitter": True}
 FIELD_PREFETCH = v3.FIELD_PREFETCH
 ST_MAX_REDRAWS = v3.ST_MAX_REDRAWS
 
@@ -100,10 +117,25 @@ def apply(cfg) -> None:
     cfg.FORMULATION_OVERLAY = ID
 
 
+def _dev_record() -> dict:
+    """The 4.2 development set as recorded (digest-bearing): the extension's seeds and the
+    replacement recipes, so a changed development set changes the formulation digest."""
+    import json
+    from pathlib import Path
+    import dev_set_v4
+    rec = json.loads((Path(__file__).resolve().parents[1] / "configs" / "dev_set_v4_replacements.json").read_text(encoding="utf-8"))
+    return {"extension": {"seed_base": dev_set_v4.EXT_SEED_BASE, "per_code": dev_set_v4.EXT_PER_CODE,
+                          "straight": dev_set_v4.EXT_STRAIGHT, "varying": dev_set_v4.EXT_VARYING},
+            "replacements": [{"position": r["position"], "recipe": r["recipe"]} for r in rec["replacements"]]}
+
+
 def snapshot() -> dict:
     base = v3.snapshot()
     base.update({"id": ID, "revision": REVISION,
                  "stage_overrides": {str(k): {kk: (list(v) if isinstance(v, tuple) else v)
                                               for kk, v in d.items()} for k, d in STAGE_OVERRIDES.items()},
-                 "class_weights_567": CLASS_WEIGHTS_567, "constant_overrides": CONSTANT_OVERRIDES})
+                 "class_weights_567": CLASS_WEIGHTS_567, "constant_overrides": CONSTANT_OVERRIDES,
+                 "start_pool": START_POOL, "timesteps": TIMESTEPS,
+                 "stage_fractions": [list(x) for x in STAGE_FRACTIONS],
+                 "dev_v4": _dev_record()})
     return base

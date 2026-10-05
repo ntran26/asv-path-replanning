@@ -94,3 +94,22 @@ code matches baseline-v3
 2026-10-04 06:45:41    development-set replacements exit 0 ([dev v4] 37 of 37 replaced in 1069 s -> configs\dev_set_v4_replacements.json)
 2026-10-04 06:45:41 == development-set replacements done
 2026-10-04 07:41:30    reward check: SAC's continuation from the first track vs successful oracle manoeuvres, development crossings (results/crossing_trace/reward_check_summary.txt)
+2026-10-04 11:33:59    hard-state start pool for v4.3: 1,200 training-namespace dense layouts, route-follower approach to the first track, oracle-checked (results/hard_starts/harvest.log)
+2026-10-04 13:47:53 == v4.3 SAC pair queued: waiting for the hard-state pool
+2026-10-04 13:47:54    pool: [hard starts] 505 of 1200 kept in 7297 s -> C:\Users\hntran\OneDrive - University of Tasmania\Docume
+2026-10-04 13:47:54 == v4.3 SAC pair, arm v43: 3.0 M -> 3.5 M (configs/finetune_v4_pair_v43.json)
+2026-10-04 13:51:57    pinned learner 9240
+2026-10-04 15:55:26    baseline-v1/v2 removed (decision): run folders and logs via git rm (recoverable from git history); their replay buffers (sac bl2 kept, tqc bl2) to the Recycle Bin; configs/baseline_v1.json, baseline_v2.json and result summaries kept
+2026-10-04 23:58:38    arm v43 exit 0
+2026-10-04 23:58:38 == v4.3 SAC pair, arm v3: 3.0 M -> 3.5 M (configs/finetune_v4_pair_v3.json)
+2026-10-05 00:02:41    pinned learner 25412
+2026-10-05 09:54:18    arm v3 exit 0
+2026-10-05 09:54:27    pair comparison exit 0 (results/v4_gates/pair_summary.txt)
+2026-10-05 10:03:10    test set v4, arm v43 exit 0 (results/test_set/v4/sacs0_bl3_v43pair/summary.txt)
+2026-10-05 10:11:29    test set v4, arm v3 exit 0 (results/test_set/v4/sacs0_bl3_v3pair/summary.txt)
+2026-10-05 10:11:29 == v4.3 SAC pair done
+2026-10-05 11:24:16    pair re-scoring on three new seed sets (declared before running; decision on these seeds only) -> results/v4_gates/pair_reseed_summary.txt
+2026-10-05 13:02:33 == SAC baseline-v4.3 full run: seed 0, 3 M steps from scratch (configs/baseline_v4.json)
+code matches baseline-v4
+2026-10-05 13:02:39 == sac seed 0: training
+2026-10-05 13:07:36    pinned learner 26252

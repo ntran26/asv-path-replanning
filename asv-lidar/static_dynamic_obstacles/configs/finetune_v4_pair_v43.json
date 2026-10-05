@@ -1,0 +1,29 @@
+{
+ "id": "v4-pair-v43",
+ "tag": "v43pair",
+ "created": "2026-10-04",
+ "base_config": "configs/baseline_v3.json",
+ "start_from": "final",
+ "total_timesteps": 3500000,
+ "scenario_stage": 7,
+ "eval_freq": 100000,
+ "checkpoint_every": 250000,
+ "reset_seed_offset": 77777,
+ "dev_set": "v4",
+ "eval_supervisor": "off",
+ "selection": "goal - 2 x collision over formulation v4.2's development sets (frozen-like 120 + field 210, near-impossible episodes replaced), safety layer off; the 3.0 M start model is evaluated first",
+ "pair": "v4.3 arm (finetune_v4_pair_v43.json) against v3 arm (finetune_v4_pair_v3.json): same start (SAC baseline-v3 seed 0, final 3.0 M model and replay buffer), same budget (+0.5 M), same reset seeds, same development sets; only the stage-7 curriculum and the hard-state starts differ",
+ "gate": "v4.3 minus v3 at the best checkpoint on the development sets: field set (210) >= +5 points and frozen-like set (120) >= -2 points; reported with the crossing subset; test set v4 is reported, not used for the decision",
+ "purpose": "Short SAC test of formulation v4.3 before a full run (decision, 2026-10-04): v4's stage 7 (dense field layouts 55 %, crossing-weighted encounters, straight survey lanes 70 %, varying-speed field targets 50 %, start-clear rule) and hard-state starts (15 % of episodes, results/hard_starts/pool_v4.pkl). Fix 1 (ADMISSIBILITY_STATIC) stays off: switching it on mid-training cost the frozen-like set 4.2 and 5.7 points in earlier fine-tunes.",
+ "overlay_stage": {
+  "module": "formulation_v4",
+  "stage": 7
+ },
+ "start_pool": {
+  "pool": "results/hard_starts/pool_v4.pkl",
+  "share": 0.15,
+  "min_stage": 6,
+  "jitter": true
+ },
+ "constant_overrides": {}
+}

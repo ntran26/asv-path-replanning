@@ -1,0 +1,12 @@
+2026-10-04 13:47:53 == v4.3 SAC pair queued: waiting for the hard-state pool
+2026-10-04 13:47:54    pool: [hard starts] 505 of 1200 kept in 7297 s -> C:\Users\hntran\OneDrive - University of Tasmania\Docume
+2026-10-04 13:47:54 == v4.3 SAC pair, arm v43: 3.0 M -> 3.5 M (configs/finetune_v4_pair_v43.json)
+2026-10-04 13:51:57    pinned learner 9240
+2026-10-04 23:58:38    arm v43 exit 0
+2026-10-04 23:58:38 == v4.3 SAC pair, arm v3: 3.0 M -> 3.5 M (configs/finetune_v4_pair_v3.json)
+2026-10-05 00:02:41    pinned learner 25412
+2026-10-05 09:54:18    arm v3 exit 0
+2026-10-05 09:54:27    pair comparison exit 0 (results/v4_gates/pair_summary.txt)
+2026-10-05 10:03:10    test set v4, arm v43 exit 0 (results/test_set/v4/sacs0_bl3_v43pair/summary.txt)
+2026-10-05 10:11:29    test set v4, arm v3 exit 0 (results/test_set/v4/sacs0_bl3_v3pair/summary.txt)
+2026-10-05 10:11:29 == v4.3 SAC pair done

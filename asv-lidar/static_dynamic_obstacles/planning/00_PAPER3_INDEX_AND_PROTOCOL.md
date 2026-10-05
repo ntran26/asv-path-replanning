@@ -1,6 +1,6 @@
 # Paper 3 — Index and Experiment Protocol
 
-> **Status note (2026-09-22).** Parts of this document are superseded by the implementation, which is frozen as **baseline-v1** (`configs/baseline_v1.json`, git tag `baseline-v1`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here:
+> **Status note (2026-09-22, updated 2026-10-04).** A design record: the code cites its sections. Parts are superseded by the implementation. The formulation was frozen as **baseline-v1** (`configs/baseline_v1.json`), then **baseline-v2** (`configs/baseline_v2.json`; reward and observation unchanged since), **baseline-v3** (a curriculum overlay, `src/formulation_v3.py`; the kept SAC 3 M policy) and the **baseline-v4** draft (`src/formulation_v4.py`, `planning/BASELINE_V4_PLAN.md`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here (as of baseline-v1):
 >
 > - S6: the observation is **70** values in six branches (`a25-v3-context`, F72), not ≈56 — see `OBSERVATION_SPEC.md`.
 >
@@ -32,22 +32,23 @@ journal paper (Paper 2 — LiDAR sector pooling, staged curriculum, sim-to-field
 
 ## 1. How to use this set
 
-Six documents plus a draft skeleton. This one is the anchor; the others are
-self-contained handovers each covering **one workstream**.
+The planning folder (reorganised 2026-10-04). Finished or superseded documents are in
+`archive/`, and the safety-layer version plans in `archive/safety/`; both keep their history.
 
-| # | Document | Workstream | Depends on |
-|---|---|---|---|
-| 00 | `00_PAPER3_INDEX_AND_PROTOCOL.md` | — (anchor) | — |
-| 01 | `01_PERCEPTION_AND_OBSERVATION.md` | implementation | 02 (classifier definition) |
-| 02 | `02_REWARD_AND_COLREGS.md` | design, then implementation | — |
-| 03 | `03_ENVIRONMENT_AND_TARGETS.md` | implementation | 01 (tracker interface) |
-| 04 | `04_SCENARIOS_AND_EVALUATION.md` | design, then implementation | 03 (target behaviours) |
-| 05 | `05_VESSEL_MODEL_AND_SIM2REAL.md` | design + field work | — (parallel track) |
-| — | `PAPER3_DRAFT_SKELETON.md` | author | all (revision 4, 2026-09-28: six sections; literature review in section 1.2) |
-| — | `Paper3_Introduction_draft4.docx` | author | Section 1, authoritative text (2026-09-28) |
+| Role | Document |
+|---|---|
+| Entry point for every work session | `PROJECT_BRIEF.md` |
+| This anchor: scope, decisions, protocol | `00_PAPER3_INDEX_AND_PROTOCOL.md` |
+| Design records (the code cites their sections) | `01`-`06` specifications |
+| Current work: baseline-v4, test set v4, the v4.3 SAC pair, requirements | `BASELINE_V4_PLAN.md` |
+| Method statement for the paper | `METHODS_BRIEF.md`, with `FORMULATION_EQUATIONS.md` and `FORMULATION_PLAN.md` |
+| Paper drafting | `PAPER3_DRAFT_SKELETON.md`, `Paper3_Introduction_draft4.docx`, `PAPER3_CLAIMS_AND_TABLES.md`, `READING_LIST.md` |
+| Field trials | `05_VESSEL_MODEL_AND_SIM2REAL.md`, `PART2_BASIN_PLAN.md` |
+| Explainer artifact (kept current with the best formulation) | `MASTER_ARTIFACT_BRIEF.md`, `MASTER_ARTIFACT_FACTS.md`, `CURRICULUM_AND_DATA_BRIEF.md` |
+| Safety layer | `SAFETY_LAYER_COMPLETE_SUMMARY.md` (V1-V19), `SAFETY_EVALUATION_PROTOCOL.md`, `SAFETY_REACHABILITY_STAGE1_PLAN.md`, `SAFETY_LAYER_REFERENCES.bib` |
 
-Also keep `PROJECT_BRIEF.md` as the entry point for every work session; it holds the
-context the other documents assume.
+The original work order and hand-over table of Revision 2 (documents 00-05 and the skeleton)
+is complete; the decision log below is kept as the record.
 
 **Work order.** `02` moved to the front in this revision: the Rule 9 precedence table is
 now the deliverable that gates the encounter classifier, the reward terms, and the

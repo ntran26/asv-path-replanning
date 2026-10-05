@@ -25,7 +25,7 @@ vessel starts at cruise, so it makes way immediately and steering starts from th
     E              emergency stop: full astern until stopped, then hold
 
 The telemetry panel on the left is described in
-`planning/RENDER_PANEL_SPEC.md`.  It opens on blocks [4] COLREGS and
+`planning/archive/RENDER_PANEL_SPEC.md`.  It opens on blocks [4] COLREGS and
 [5] REWARD, which are the two the reward is being built against; the rest are
 one keypress away.  The scrub keys are `,` and `.` rather than the arrows the
 spec suggests, because the arrows are the helm here.

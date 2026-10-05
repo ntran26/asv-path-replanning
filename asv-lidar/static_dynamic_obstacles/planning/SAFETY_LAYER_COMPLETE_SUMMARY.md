@@ -1,6 +1,6 @@
 # Safety controller development: complete research record, V1-V19
 
-**Evidence cutoff: 2026-10-03. Prepared as the starting point for researching and designing the next solution.**
+**Evidence cutoff: 2026-10-03. Prepared as the starting point for researching and designing the next solution.** The per-version plans (V2-V19) and the chronological debugging notes are archived in [archive/safety/](archive/safety/) (2026-10-04); this file consolidates them.
 
 **Subsequent research continuation:** [Reachability stage-1 plan](SAFETY_REACHABILITY_STAGE1_PLAN.md) and [saved-data results](../results/safety_dev/reachability_stage1/README.md) document the new offline conditional interval prototype, 101 passing tests, remaining interval overexpansion and a falsified smooth target-turn bound. No new controller or mission certificate was added, no episodes were run, and the V1-V19 performance history below remains unchanged.
 
@@ -85,7 +85,7 @@ The checkpoint config has no `constant_overrides`. SAC was trained with the supe
 | --- | --- |
 | DV3 / development-150 | The 150-case field-layout development set used for the early 111/150 SAC reference and later V7/V8 comparisons. DV3 is a development-set version, not safety V3. |
 | Old frozen / field sweep | Original broad comparison inventory: 2,890 scenarios x OFF/V4/V5 = 8,670 planned records. Stopped early. Details below. |
-| TS2 | Test set v2, 1,000 saved cases. User explicitly requested development on its failures; it is now development-exposed. |
+| TS2 | Test set v2, 1,000 saved cases. Designated for development on its failures; it is now development-exposed. |
 | 32-case cohort | 27 TS2 + 5 DV3 cases, deliberately enriched for failures, rescues, lost SAC successes and six successful controls. Same identities used in V9-V16 comparisons. |
 | 40-case challenge | 30 TS2 + 10 DV3, disjoint from the 32, frozen before expanded-candidate results but still an enriched development selection. |
 | 12-case probe | Selected from the preceding development history, intentionally retaining all six V16 regressions. |
@@ -131,7 +131,7 @@ The numbered versions below describe the tested ideas and their limitations. Ext
 
 ### V1: encounter-rule emergency-stop latch
 
-**Implementation:** `src/emergency_stop.py`; early evidence is preserved in `planning/SAFETY_LAYER_V2_PLAN.md`.
+**Implementation:** `src/emergency_stop.py`; early evidence is preserved in `planning/archive/safety/SAFETY_LAYER_V2_PLAN.md`.
 
 V1 used an `IDLE -> BRAKING -> HOLDING -> policy` latch. A give-way encounter had to be judged in extremis, lack an admissible compliant maneuver, and have a predicted stop that cleared. It changed propulsion only; SAC continued steering. Minimum/maximum hold durations and a braking timeout governed release. COLREG Rules 8(e) and 17(b) were the stated rationale; this was a hand-built rule supervisor, not a barrier-function certificate. The selected COLREG context in the project is not a legal-compliance proof. See reference R1.
 
@@ -141,7 +141,7 @@ V1 used an `IDLE -> BRAKING -> HOLDING -> policy` latch. A give-way encounter ha
 
 ### V2: sampled predictive filter with recoveries
 
-**Implementation:** `src/safety_v2.py`, `src/classical/common.py`; plan `planning/SAFETY_LAYER_V2_PLAN.md`; tests `tests/test_safety_v2.py`.
+**Implementation:** `src/safety_v2.py`, `src/classical/common.py`; plan `planning/archive/safety/SAFETY_LAYER_V2_PLAN.md`; tests `tests/test_safety_v2.py`.
 
 For each candidate, V2 simulated a committed command followed by a recovery maneuver. It tested the policy action, a rudder/throttle grid, braking candidates and sometimes the previous override. Recoveries included left/right powered turns, low-propulsion continuation and braking. It selected a passing action close to SAC, with more penalty for changing throttle because thrust supplies steerage. This is related to sampled forward simulation in the Dynamic Window Approach (R2), but is not an implementation of that original algorithm. Testing a learning input followed by a backup is also related to model-predictive shielding and predictive safety filtering (R3-R4); these are architectural relationships, not claims that V2 implemented their proofs.
 
@@ -167,7 +167,7 @@ Best iteration 2 rescues **16** SAC failures and loses **12** SAC successes: net
 
 ### V3: committed backup and recovery/hand-back mode
 
-**Implementation:** `src/safety_v3.py`; plan `planning/SAFETY_LAYER_V3_PLAN.md`; tests `tests/test_safety_v3.py`.
+**Implementation:** `src/safety_v3.py`; plan `planning/archive/safety/SAFETY_LAYER_V3_PLAN.md`; tests `tests/test_safety_v3.py`.
 
 V3 stored the full selected plan, shifted it one decision each step, rechecked it against the new state and added a continuation preference. Recovery initially used the shared line-of-sight path-rejoin reference (Fossen, Breivik and Skjetne, R23), and hand-back required adequate policy clearance, steerage speed, alignment and a minimum recovery duration. The design was inspired by model-predictive shielding, backup controllers and predictive safety filters (R3-R5). The initial plan also mentioned a gatekeeper concept through a secondary literature summary; no specific gatekeeper theorem was implemented or verified.
 
@@ -181,7 +181,7 @@ Rejected ablations included throttle weight 0.5 (101 goals), no room slack (108)
 
 ### V4: ego-motion observer and evidence-based static-memory clearing
 
-**Implementation:** `src/safety_v4.py`, `src/safety_observer.py`, `src/safety_perception.py`, optional `src/safety_prediction.py`; plan `planning/SAFETY_LAYER_V4_PLAN.md`.
+**Implementation:** `src/safety_v4.py`, `src/safety_observer.py`, `src/safety_perception.py`, optional `src/safety_prediction.py`; plan `planning/archive/safety/SAFETY_LAYER_V4_PLAN.md`.
 
 V4 followed the diagnostic order set in the original notes: compare forecasts with actual motion, use truth-only oracles to separate perception from prediction, classify failures, then test changes.
 
@@ -223,7 +223,7 @@ An earlier cancellation snapshot reports 3,141 records, 1,441 pairs and V4 1,327
 
 ### V5: feedback backups, soft recovery and policy-preservation experiments
 
-**Implementation:** `src/safety_v5.py` and its helper modules; plan `planning/SAFETY_LAYER_V5_PLAN.md`; method bibliography `planning/SAFETY_LAYER_REFERENCES.bib`.
+**Implementation:** `src/safety_v5.py` and its helper modules; plan `planning/archive/safety/SAFETY_LAYER_V5_PLAN.md`; method bibliography `planning/SAFETY_LAYER_REFERENCES.bib`.
 
 V5 explored several separately switchable changes rather than one universally enabled method:
 
@@ -250,7 +250,7 @@ V5 gains/loses 3/2 against SAC and 0/0 against V4. Changed-action steps fall fro
 
 ### V6: evidence-qualified provisional targets and trajectory search
 
-**Implementation:** `src/safety_v6.py`, provisional-track/search/geometry/calibration helpers; plan `planning/SAFETY_LAYER_V6_PLAN.md`; report `results/safety_dev/development_v6_budget150/report.md`.
+**Implementation:** `src/safety_v6.py`, provisional-track/search/geometry/calibration helpers; plan `planning/archive/safety/SAFETY_LAYER_V6_PLAN.md`; report `results/safety_dev/development_v6_budget150/report.md`.
 
 V6 branches from selected V4 and does not implicitly enable V5. Its accepted preset adds (a) safety-only provisional views of moving clusters before ordinary dynamic-track publication, requiring existing finite-ray motion evidence, and (b) a bounded cross-entropy-method (CEM) trajectory search when the rigid recovery bank is insufficient. The search expands the maneuver family but remains a finite sampler. CEM inspiration is Zheng et al. (R11), without their Gaussian-process or barrier-function construction. Motion evidence follows the free-space consistency idea of Yoon et al. (R12). Optional hull-fit/center methods relate to Zhang et al. and extended-object modeling (R13-R14).
 
@@ -280,7 +280,7 @@ The then-authorized 150-attempt campaign consumed **149 attempts: 144 policy epi
 
 ### V7: check SAC's current action with the proposed backup tail
 
-**Implementation:** `src/safety_v7.py`, `src/safety_risk_monitor.py`; plan `planning/SAFETY_LAYER_V7_PLAN.md`.
+**Implementation:** `src/safety_v7.py`, `src/safety_risk_monitor.py`; plan `planning/archive/safety/SAFETY_LAYER_V7_PLAN.md`.
 
 Before a V6 override, V7 substitutes the current SAC command for **only the first 0.5 s decision** of the proposed backup, retaining/padding the rest to the full eight-second horizon. It evaluates from pre-command actuator history and preserves SAC only if the complete sequence satisfies the existing hard checks and 0.15 m margin. It retains that checked plan. This is a local feasible-first-input adaptation of predictive safety filtering (R4), not a prediction of future SAC actions.
 
@@ -292,7 +292,7 @@ Full saved outcome reconstruction: **904/1,000 TS2 goals**, 58 SAC failures resc
 
 ### V8: remove the harmful hold-back fallback
 
-**Implementation:** `src/safety_v8.py`; plan `planning/SAFETY_LAYER_V8_PLAN.md`; saved audit `results/safety_dev/v8_followup_offline/`.
+**Implementation:** `src/safety_v8.py`; plan `planning/archive/safety/SAFETY_LAYER_V8_PLAN.md`; saved audit `results/safety_dev/v8_followup_offline/`.
 
 V7's hold-back first-fire branch had **three rescues but eight lost successes** in the analyzed branch study. That branch selected a presently failing candidate because it delayed predicted contact by enough. V8 disables it: if no acceptable alternative exists, SAC stands unless the separate stored-continuation fallback applies. This is an empirical ablation of the inherited sampled filter, not a new formal method. Its architectural citations remain R3-R4/R11; the reason for removing this particular branch is the project evidence.
 
@@ -311,7 +311,7 @@ TS2 rescue/loss pairs versus SAC are V4 49/41, V7 58/26, V8 **57/17**. DV3 pairs
 
 ### V9: currently recheck overrides and compare policy clearance
 
-**Implementation:** `src/safety_v9.py`, optional `src/safety_target_prediction.py`; plan `planning/SAFETY_LAYER_V9_PLAN.md`.
+**Implementation:** `src/safety_v9.py`, optional `src/safety_target_prediction.py`; plan `planning/archive/safety/SAFETY_LAYER_V9_PLAN.md`.
 
 Two independent guards were added. First, recheck the actual proposed action plus complete backup using the current snapshot and pre-command actuator history, suppressing an override if it fails. Second, test SAC followed by the same tail, preserving SAC if it passes and its minimum clearance is at least that of the proposal. The second rule is related to feasible first-input filtering (R4). Suppressing a failed override does **not** certify the returned policy action.
 
@@ -350,7 +350,7 @@ All rows have zero timeouts. **V12, V13 and V17 have only smaller probe results 
 
 ### V10: retain useful V8 fallbacks and preserve only a passing SAC backup
 
-**Implementation:** `src/safety_v10.py`; history `planning/SAFETY_LAYER_V11_PLAN.md`.
+**Implementation:** `src/safety_v10.py`; history `planning/archive/safety/SAFETY_LAYER_V11_PLAN.md`.
 
 V10 uses V8's action proposal and V9's paired checker. It preserves SAC if SAC+the same full backup tail passes while the proposal fails, or both pass and SAC has at least as much clearance. If both fail, it retains V8's action, stored plan and bounded fallback counters. Unlike V9, a failed proposed backup alone is not treated as sufficient reason to return SAC. The first-input preservation motivation is R4; the same-tail comparison and relative-margin rule are project heuristics.
 
@@ -358,7 +358,7 @@ It reaches **18/32**, rescuing 11 SAC failures but breaking nine successes. A gu
 
 ### V11: independently observed target motion and bounded persistence
 
-**Implementation:** `src/safety_v11.py`, `src/safety_track_persistence.py`; history `planning/SAFETY_LAYER_V11_PLAN.md`.
+**Implementation:** `src/safety_v11.py`, `src/safety_track_persistence.py`; history `planning/archive/safety/SAFETY_LAYER_V11_PLAN.md`.
 
 V11 admits a moving hull after at least three actually observed suitable clusters, full-length extent, coherent translation of both fitted endpoints and acceptable regression residuals. It anchors measured center/velocity and coasts for at most eight seconds, even if the raw tracker deletes its ID. Finite-ray contradiction removes a hypothesis; a missing/no-return/stale observation is not proof of empty space. Synthetic persistent views use separate negative IDs. At this stage static points are retained, even if target-related, which later motivates V19.
 
@@ -402,7 +402,7 @@ It reaches **23/32** with 11 rescues and four lost SAC successes. Versus V14 it 
 
 ### V16: motion-axis hull completion for eligible partial base tracks
 
-**Implementation:** `src/safety_v16.py`, `src/safety_motion_axis.py`; plan `planning/SAFETY_LAYER_V16_PLAN.md`; 24 targeted tests.
+**Implementation:** `src/safety_v16.py`, `src/safety_motion_axis.py`; plan `planning/archive/safety/SAFETY_LAYER_V16_PLAN.md`; 24 targeted tests.
 
 V16 corrects eligible fresh nonnegative-ID base views using measured velocity direction and known hull dimensions. It requires a unique confirmed source, current pose, no missed detection, finite estimates, enough current/history points, speed above the existing 0.15 m/s threshold, and motion evidence. The observed beam must agree with known beam within the existing 0.15 m tolerance, while length is partial; the observer must lie outside the observed longitudinal span, and dead-zone clipping must be absent. At least three actual observations in a two-second window must support forward endpoint translation above 0.25 m with residual/velocity consistency. No serial-number gaps are invented as elapsed observations.
 
@@ -418,7 +418,7 @@ The existing any-feasible-policy option was retested on nine targeted cases: **3
 
 ### V17: fresh measured yaw instead of model-corrected yaw
 
-**Implementation:** `src/safety_v17.py`, `src/safety_yaw_observer.py`; plan `planning/SAFETY_LAYER_V17_PLAN.md`; 23 tests. Independent V16 branch.
+**Implementation:** `src/safety_v17.py`, `src/safety_yaw_observer.py`; plan `planning/archive/safety/SAFETY_LAYER_V17_PLAN.md`; 23 tests. Independent V16 branch.
 
 Saved observer evidence showed u/v filtering helps but filtered yaw can be worse than the raw gyro. V17 retains the ordinary observer validation, u/v correction, reset and stale-frame prior, but uses the raw measured yaw rate on fresh frames. This is a gain-one measurement ablation related to the observer correction structure of Luenberger (R6), not fitted dynamics, a Kalman redesign, or a proved gain choice. Later u/v can change through coupled dynamics. Disabling it reproduces the parent observer.
 
@@ -426,7 +426,7 @@ Saved observer evidence showed u/v filtering helps but filtered yaw can be worse
 
 ### V18: bounded memory of a validated hull heading
 
-**Implementation:** `src/safety_v18.py`, `src/safety_heading_memory.py`; plan `planning/SAFETY_LAYER_V18_PLAN.md`; 26 tests. Independent V16 branch; it does not include V17.
+**Implementation:** `src/safety_v18.py`, `src/safety_heading_memory.py`; plan `planning/archive/safety/SAFETY_LAYER_V18_PLAN.md`; 26 tests. Independent V16 branch; it does not include V17.
 
 V18 retains the last validated fitted hull axis for the same source when a fresh observed target loses its fitted heading and would otherwise fall back to noisy velocity course. Only fresh matched confirmed new-serial observations update/use it. Expiry is the existing `TRACK_MAX_MISSES` budget, three decisions / 1.5 s. Missing IDs, detectable identity reset, duplicates, expiry or a finite but rejected fit clear/reject memory. Persistent synthetic views and a current V16 geometry correction have priority. Positions, velocities, static points and context are unchanged. The inspiration is separating object kinematics and extent from individual observations (R14); this deterministic hold can still be wrong for a turning target.
 
@@ -436,7 +436,7 @@ The motivating saved FIX05 recheck changed a nominally passing margin into a fai
 
 ### V19: transfer exact current returns already owned by a moving target
 
-**Implementation:** `src/safety_v19.py`, `src/safety_source_points.py`; plan `planning/SAFETY_LAYER_V19_PLAN.md`; 33 tests. Independent V16 branch, not combined with V18.
+**Implementation:** `src/safety_v19.py`, `src/safety_source_points.py`; plan `planning/archive/safety/SAFETY_LAYER_V19_PLAN.md`; 33 tests. Independent V16 branch, not combined with V18.
 
 Some targets admitted by the safety wrapper still have current returns in static memory because ordinary dynamic classification did not publish that object. V19 removes only exact current point rows already owned by a qualified freshly updated moving hypothesis, avoiding simultaneous treatment as moving hull and stationary cloud. It requires fresh unique raw ID/scan evidence, existing full-extent and coherent endpoint-translation gates, a measured admission/refresh, a corresponding final age-zero hypothesis, and exact float64 point membership in the current base-memory batch. Points present in any older batch, shared with another cluster, ambiguous or unrelated are retained. There is no radius/grid/tolerance deletion; underlying memory, tracker and policy observation remain unchanged.
 
@@ -553,7 +553,7 @@ V18's saved replay holds heading on decisions 34-36 and expires at 37 while leav
 
 ### 9.6 DV3-CRS-CV-04: dynamic returns also constrain the boat as static points
 
-Sources: `planning/SAFETY_LAYER_V19_PLAN.md` and `results/safety_dev/v18_development/probe12_trace_audit/REPORT.md`.
+Sources: `planning/archive/safety/SAFETY_LAYER_V19_PLAN.md` and `results/safety_dev/v18_development/probe12_trace_audit/REPORT.md`.
 
 At decision 13, raw source 77 is absent from the ordinary published track list but is present as a freshly admitted persistent target. Nine of 58 static snapshot points are exact current returns of that target; the worst static-contact point is about **2.645 m from every true static obstacle**, measured offline only. Removing those nine changes static clearance of the recorded successful SAC tail from **-0.430486 to +0.118128 m**, retaining the other 49 points. The target-CV constraint still fails at **-0.235371 m**.
 
@@ -726,7 +726,7 @@ Potential families to assess include robust predictive filters, backup-CBF/reach
 - Put controller code in `src/`, diagnostics in `tools/diagnostics/safety/`, results in `results/safety_dev/`, plans in `planning/`, and focused tests in `tests/test_safety_*.py`.
 - TS2 and DV3 were explicitly authorized for development. **TS3 is now the primary evaluation set**; do not tune from its results. Other held-out sets are not development data without an explicit scope change. TS3's 755-case overlap with TS2 must still be disclosed.
 - Keep at most **one or two evaluation processes**, each with one Torch/native numerical thread. Protect other training jobs, including the previously observed `pilot_v4_A` work; no training process was signaled or stopped. Check current process state rather than assume it is still running.
-- Historical 100-run/150-run caps and saved-only restrictions applied to their respective stages and were superseded by later user authorization to continue testing. They are documented for accounting, not a reason to retroactively relabel completed runs. This wrap-up itself adds no evaluation and queues nothing.
+- Historical 100-run/150-run caps and saved-only restrictions applied to their respective stages and were superseded by a later authorization to continue testing. They are documented for accounting, not a reason to retroactively relabel completed runs. This wrap-up itself adds no evaluation and queues nothing.
 - No old queue should resume automatically, especially the stopped 8,670-record campaign. Never silently retry/overwrite a failed or partial attempt. Inspect and preserve unrelated concurrent source changes.
 
 ### 13.2 Primary test-set-v3 preparation and provenance
@@ -755,19 +755,19 @@ The information needed to reason about the work is embedded above. These links p
 
 | Evidence | Primary artifact |
 | --- | --- |
-| Historical chronology / original constraints | [SAFETY_LAYER_NOTES.md](SAFETY_LAYER_NOTES.md) |
-| Early V2/V3 experiments | [V2 plan](SAFETY_LAYER_V2_PLAN.md), [V3 plan](SAFETY_LAYER_V3_PLAN.md), `results/safety_v2_dev_*.csv` |
-| V4 observer/perception and oracles | [V4 plan](SAFETY_LAYER_V4_PLAN.md), `results/safety_dev/final_fullset_summary.csv` |
+| Historical chronology / original constraints | [SAFETY_LAYER_NOTES.md](archive/safety/SAFETY_LAYER_NOTES.md) |
+| Early V2/V3 experiments | [V2 plan](archive/safety/SAFETY_LAYER_V2_PLAN.md), [V3 plan](archive/safety/SAFETY_LAYER_V3_PLAN.md), `results/safety_v2_dev_*.csv` |
+| V4 observer/perception and oracles | [V4 plan](archive/safety/SAFETY_LAYER_V4_PLAN.md), `results/safety_dev/final_fullset_summary.csv` |
 | Final stopped sweep | [Final stopped report](../results/safety_dev/v4_stopped_full_sweep_report.md) |
-| V5 variants / original inventory | [V5 plan](SAFETY_LAYER_V5_PLAN.md), [quick report](../results/safety_dev/quick_v5_budget100/runs/policy_feedback_v1/report.md) |
-| V6 149-attempt accounting | [V6 report](../results/safety_dev/development_v6_budget150/report.md), [V6 plan](SAFETY_LAYER_V6_PLAN.md) |
-| TS2 failure analysis / initial V7 | [Saved-data report](../results/safety_dev/testset_v2_offline/report.md), [failure-pattern report](../results/safety_dev/testset_v2_offline/analysis/report.md), [V7 plan](SAFETY_LAYER_V7_PLAN.md) |
-| Branch/critic studies | `results/safety_dev/trigger_counterfactual/`, [V8 plan](SAFETY_LAYER_V8_PLAN.md) |
+| V5 variants / original inventory | [V5 plan](archive/safety/SAFETY_LAYER_V5_PLAN.md), [quick report](../results/safety_dev/quick_v5_budget100/runs/policy_feedback_v1/report.md) |
+| V6 149-attempt accounting | [V6 report](../results/safety_dev/development_v6_budget150/report.md), [V6 plan](archive/safety/SAFETY_LAYER_V6_PLAN.md) |
+| TS2 failure analysis / initial V7 | [Saved-data report](../results/safety_dev/testset_v2_offline/report.md), [failure-pattern report](../results/safety_dev/testset_v2_offline/analysis/report.md), [V7 plan](archive/safety/SAFETY_LAYER_V7_PLAN.md) |
+| Branch/critic studies | `results/safety_dev/trigger_counterfactual/`, [V8 plan](archive/safety/SAFETY_LAYER_V8_PLAN.md) |
 | Full V8 reconstruction and fallback inventory | [V8 saved audit](../results/safety_dev/v8_followup_offline/report.md), `audit/all_1150.csv`, `audit/summary.json` within that directory |
-| Fresh OFF/V8/V9 pilot | [Pilot report](../results/safety_dev/v9_paired_pilot/report.md), [V9 plan](SAFETY_LAYER_V9_PLAN.md) |
-| V10-V17 campaign | [Campaign report](../results/safety_dev/v10_iterations/report.md), [V10-V15 history](SAFETY_LAYER_V11_PLAN.md), [V16 plan](SAFETY_LAYER_V16_PLAN.md), [V17 plan](SAFETY_LAYER_V17_PLAN.md) |
+| Fresh OFF/V8/V9 pilot | [Pilot report](../results/safety_dev/v9_paired_pilot/report.md), [V9 plan](archive/safety/SAFETY_LAYER_V9_PLAN.md) |
+| V10-V17 campaign | [Campaign report](../results/safety_dev/v10_iterations/report.md), [V10-V15 history](archive/safety/SAFETY_LAYER_V11_PLAN.md), [V16 plan](archive/safety/SAFETY_LAYER_V16_PLAN.md), [V17 plan](archive/safety/SAFETY_LAYER_V17_PLAN.md) |
 | Strict 32/40-case comparisons | [V16 32-case report](../results/safety_dev/v10_iterations/reports/motion_axis32/report.md), [40-case report](../results/safety_dev/v10_iterations/reports/v16_broader40_paired/report.md) |
-| V18/V19 latest 90 runs | [Latest report](../results/safety_dev/v18_development/report.md), [V18 plan](SAFETY_LAYER_V18_PLAN.md), [V19 plan](SAFETY_LAYER_V19_PLAN.md), `final_verification.json` in latest report directory |
+| V18/V19 latest 90 runs | [Latest report](../results/safety_dev/v18_development/report.md), [V18 plan](archive/safety/SAFETY_LAYER_V18_PLAN.md), [V19 plan](archive/safety/SAFETY_LAYER_V19_PLAN.md), `final_verification.json` in latest report directory |
 | Primary protocol and 18-case results | [Protocol](SAFETY_EVALUATION_PROTOCOL.md), [TS3 README](../results/safety_dev/testset_v3_main/README.md), [fresh quick report](../results/safety_dev/testset_v3_main/quick_v19_report/report.md) |
 
 The original scratch diagnostics remain `dev_eval.py`, `trace_case.py` and `trace_dead_ahead.py` under `tools/diagnostics/safety/`. They can run episodes: do not mistake them for saved-only analysis. Saved-only tools include the appropriately named `audit_saved_policy_future.py`, `audit_saved_policy_initial_state.py`, `audit_ego_observer.py`, `audit_causal_yaw_cohort.py`, `audit_bootstrap_model_bank.py`, `audit_bootstrap_continuous_bank.py` and `audit_heading_memory_saved.py`. Consult their CLI/default inputs before using them; archived `reproducer_evaluated_bytes.py` files preserve exact evaluated diagnostics.

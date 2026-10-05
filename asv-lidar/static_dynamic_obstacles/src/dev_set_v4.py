@@ -127,12 +127,15 @@ def development_sets(per_class: int = 20):
     field = list(fv.field_development_set()) + extension()
     path = Path(__file__).resolve().parents[1] / "configs" / "dev_set_v4_replacements.json"
     if path.exists():
-        n = len(frozen_like)
+        # Positions were recorded on the full set: 20 per class, so the field set starts
+        # at 120.  A smaller frozen-like set (a smoke run's per_class=1) keeps the field
+        # replacements and skips the frozen-like ones, whose positions do not exist there.
+        n_full = 20 * len(tf.EVAL_CLASSES)
         for r in json.loads(path.read_text(encoding="utf-8"))["replacements"]:
             pos = int(r["position"])
-            built = from_recipe(r["recipe"])
-            if pos < n:
-                frozen_like[pos] = built
+            if pos < n_full:
+                if per_class == 20:
+                    frozen_like[pos] = from_recipe(r["recipe"])
             else:
-                field[pos - n] = built
+                field[pos - n_full] = from_recipe(r["recipe"])
     return frozen_like, field

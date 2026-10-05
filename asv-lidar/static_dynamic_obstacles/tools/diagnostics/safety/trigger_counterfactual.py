@@ -1,5 +1,5 @@
 """Trigger counterfactuals: when does the safety layer fire, and was it needed?
-(`planning/SAFETY_LAYER_NOTES.md`, "NEXT DIRECTION", 2026-10-03.)
+(`planning/archive/safety/SAFETY_LAYER_NOTES.md`, "NEXT DIRECTION", 2026-10-03.)
 
 For each episode the SAC policy drives **alone** (safety off).  Safety v4 and v7
 run in **shadow mode**: every step a copy of each filter decides on the policy's

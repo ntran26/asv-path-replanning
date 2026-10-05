@@ -58,7 +58,7 @@ adaptations, with no imported formal safety guarantee.
 
 Implementation: `src/safety_v9.py`, `src/safety_target_prediction.py`.
 Experimental selection: runtime `SAFETY_VERSION = 9`; target-turn rate defaults
-to zero. Details and limitations are in the [V9 plan](../../../planning/SAFETY_LAYER_V9_PLAN.md).
+to zero. Details and limitations are in the [V9 plan](../../../planning/archive/safety/SAFETY_LAYER_V9_PLAN.md).
 
 ## Verification and limits
 

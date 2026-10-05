@@ -25,7 +25,7 @@ Methods are independently switchable for paired development ablations:
 
 These are finite-bank adaptations, without the invariant terminal sets or
 uncertainty assumptions required by the cited safety guarantees. V4 remains
-unchanged. See planning/SAFETY_LAYER_V5_PLAN.md for provenance and ablations.
+unchanged. See planning/archive/safety/SAFETY_LAYER_V5_PLAN.md for provenance and ablations.
 """
 from __future__ import annotations
 

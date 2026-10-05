@@ -1,0 +1,1201 @@
+case,code,varying,straight,near,lead,episode_seed,kept,why,k,t_start_s,nominal_outcome,solutions_found,latest_screened_start_s
+HS-CRP-CV-L-001,CRP,False,False,False,0,940000,False,no solution with margin from the start state,5.0,2.5,obstacle,0.0,
+HS-CRP-VS-S-002,CRP,True,True,False,2,940001,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-S-003,CRP,False,True,True,0,940002,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-L-004,CRP,True,False,True,2,940003,False,no solution with margin from the start state,9.0,4.5,target,0.0,
+HS-CRP-CV-S-005,CRP,False,True,False,0,940004,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRP-VS-S-006,CRP,True,True,False,2,940005,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-CRP-CV-L-007,CRP,False,False,True,0,940006,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-S-008,CRP,True,True,True,2,940007,False,no solution with margin from the start state,19.0,9.5,target,0.0,
+HS-CRP-CV-S-009,CRP,False,True,False,0,940008,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRP-VS-S-010,CRP,True,True,False,2,940009,False,standing on succeeds,9.0,4.5,goal,,
+HS-CRP-CV-L-011,CRP,False,False,True,0,940010,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRP-VS-S-012,CRP,True,True,True,2,940011,True,action required and possible,13.0,6.5,goal,3.0,0.0
+HS-CRP-CV-S-013,CRP,False,True,False,0,940012,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-VS-L-014,CRP,True,False,False,2,940013,False,no solution with margin from the start state,14.0,7.0,target,0.0,
+HS-CRP-CV-S-015,CRP,False,True,True,0,940014,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRP-VS-S-016,CRP,True,True,True,2,940015,True,action required and possible,12.0,6.0,goal,3.0,0.0
+HS-CRP-CV-L-017,CRP,False,False,False,0,940016,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-S-018,CRP,True,True,False,2,940017,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRP-CV-S-019,CRP,False,True,True,0,940018,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRP-VS-S-020,CRP,True,True,True,2,940019,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-L-021,CRP,False,False,False,0,940020,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRP-VS-S-022,CRP,True,True,False,2,940021,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-S-023,CRP,False,True,True,0,940022,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-L-024,CRP,True,False,True,2,940023,False,standing on succeeds,16.0,8.0,goal,,
+HS-CRP-CV-S-025,CRP,False,True,False,0,940024,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-S-026,CRP,True,True,False,2,940025,True,action required and possible,5.0,2.5,obstacle,2.0,1.0
+HS-CRP-CV-L-027,CRP,False,False,True,0,940026,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRP-VS-S-028,CRP,True,True,True,2,940027,True,action required and possible,16.0,8.0,target,3.0,0.0
+HS-CRP-CV-S-029,CRP,False,True,False,0,940028,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRP-VS-S-030,CRP,True,True,False,2,940029,True,action required and possible,5.0,2.5,goal,3.0,1.0
+HS-CRP-CV-L-031,CRP,False,False,True,0,940030,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-CRP-VS-S-032,CRP,True,True,True,2,940031,False,standing on succeeds,14.0,7.0,goal,,
+HS-CRP-CV-S-033,CRP,False,True,False,0,940032,True,action required and possible,3.0,1.5,obstacle,3.0,1.0
+HS-CRP-VS-L-034,CRP,True,False,False,2,940033,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRP-CV-S-035,CRP,False,True,True,0,940034,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-VS-S-036,CRP,True,True,True,2,940035,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-CV-L-037,CRP,False,False,False,0,940036,True,action required and possible,2.0,1.0,target,2.0,1.0
+HS-CRP-VS-S-038,CRP,True,True,False,2,940037,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRP-CV-S-039,CRP,False,True,True,0,940038,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRP-VS-S-040,CRP,True,True,True,2,940039,False,standing on succeeds,11.0,5.5,goal,,
+HS-CRP-CV-L-041,CRP,False,False,False,0,940040,True,action required and possible,7.0,3.5,target,3.0,0.0
+HS-CRP-VS-S-042,CRP,True,True,False,2,940041,False,no solution with margin from the start state,8.0,4.0,target,0.0,
+HS-CRP-CV-S-043,CRP,False,True,True,0,940042,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-L-044,CRP,True,False,True,2,940043,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-045,CRP,False,True,False,0,940044,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-S-046,CRP,True,True,False,2,940045,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-CV-L-047,CRP,False,False,True,0,940046,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRP-VS-S-048,CRP,True,True,True,2,940047,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-049,CRP,False,True,False,0,940048,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-S-050,CRP,True,True,False,2,940049,True,action required and possible,6.0,3.0,obstacle,3.0,2.0
+HS-CRP-CV-L-051,CRP,False,False,True,0,940050,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRP-VS-S-052,CRP,True,True,True,2,940051,False,no solution with margin from the start state,16.0,8.0,target,0.0,
+HS-CRP-CV-S-053,CRP,False,True,False,0,940052,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-L-054,CRP,True,False,False,2,940053,False,no solution with margin from the start state,15.0,7.5,target,0.0,
+HS-CRP-CV-S-055,CRP,False,True,True,0,940054,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-VS-S-056,CRP,True,True,True,2,940055,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRP-CV-L-057,CRP,False,False,False,0,940056,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-S-058,CRP,True,True,False,2,940057,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRP-CV-S-059,CRP,False,True,True,0,940058,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRP-VS-S-060,CRP,True,True,True,2,940059,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRP-CV-L-061,CRP,False,False,False,0,940060,False,no solution with margin from the start state,14.0,7.0,target,0.0,
+HS-CRP-VS-S-062,CRP,True,True,False,2,940061,True,action required and possible,7.0,3.5,obstacle,3.0,0.0
+HS-CRP-CV-S-063,CRP,False,True,True,0,940062,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRP-VS-L-064,CRP,True,False,True,2,940063,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-065,CRP,False,True,False,0,940064,True,action required and possible,4.0,2.0,goal,3.0,0.0
+HS-CRP-VS-S-066,CRP,True,True,False,2,940065,False,no solution with margin from the start state,9.0,4.5,target,0.0,
+HS-CRP-CV-L-067,CRP,False,False,True,0,940066,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRP-VS-S-068,CRP,True,True,True,2,940067,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-CV-S-069,CRP,False,True,False,0,940068,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRP-VS-S-070,CRP,True,True,False,2,940069,True,action required and possible,6.0,3.0,target,1.0,0.0
+HS-CRP-CV-L-071,CRP,False,False,True,0,940070,False,no solution with margin from the start state,12.0,6.0,target,0.0,
+HS-CRP-VS-S-072,CRP,True,True,True,2,940071,False,ended before the start state,,,,,
+HS-CRP-CV-S-073,CRP,False,True,False,0,940072,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRP-VS-L-074,CRP,True,False,False,2,940073,True,action required and possible,4.0,2.0,goal,3.0,0.0
+HS-CRP-CV-S-075,CRP,False,True,True,0,940074,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRP-VS-S-076,CRP,True,True,True,2,940075,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRP-CV-L-077,CRP,False,False,False,0,940076,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRP-VS-S-078,CRP,True,True,False,2,940077,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-S-079,CRP,False,True,True,0,940078,False,standing on succeeds,9.0,4.5,goal,,
+HS-CRP-VS-S-080,CRP,True,True,True,2,940079,False,standing on succeeds,10.0,5.0,goal,,
+HS-CRP-CV-L-081,CRP,False,False,False,0,940080,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-S-082,CRP,True,True,False,2,940081,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRP-CV-S-083,CRP,False,True,True,0,940082,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRP-VS-L-084,CRP,True,False,True,2,940083,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRP-CV-S-085,CRP,False,True,False,0,940084,True,action required and possible,3.0,1.5,target,1.0,2.0
+HS-CRP-VS-S-086,CRP,True,True,False,2,940085,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-L-087,CRP,False,False,True,0,940086,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-VS-S-088,CRP,True,True,True,2,940087,False,standing on succeeds,8.0,4.0,goal,,
+HS-CRP-CV-S-089,CRP,False,True,False,0,940088,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRP-VS-L-090,CRP,True,False,False,2,940089,False,standing on succeeds,11.0,5.5,goal,,
+HS-CRP-CV-S-091,CRP,False,True,True,0,940090,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-S-092,CRP,True,True,True,2,940091,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRP-CV-S-093,CRP,False,True,False,0,940092,False,no solution with margin from the start state,10.0,5.0,target,0.0,
+HS-CRP-VS-L-094,CRP,True,False,False,2,940093,True,action required and possible,7.0,3.5,goal,3.0,1.0
+HS-CRP-CV-S-095,CRP,False,True,True,0,940094,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRP-VS-S-096,CRP,True,True,True,2,940095,True,action required and possible,10.0,5.0,goal,3.0,0.0
+HS-CRP-CV-L-097,CRP,False,False,False,0,940096,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRP-VS-S-098,CRP,True,True,False,2,940097,False,ended before the start state,,,,,
+HS-CRP-CV-S-099,CRP,False,True,True,0,940098,False,standing on succeeds,10.0,5.0,goal,,
+HS-CRP-VS-S-100,CRP,True,True,True,2,940099,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-L-101,CRP,False,False,False,0,940100,False,no solution with margin from the start state,4.0,2.0,obstacle,0.0,
+HS-CRP-VS-S-102,CRP,True,True,False,2,940101,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-CV-S-103,CRP,False,True,True,0,940102,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-VS-L-104,CRP,True,False,True,2,940103,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-CV-S-105,CRP,False,True,False,0,940104,True,action required and possible,5.0,2.5,target,1.0,2.0
+HS-CRP-VS-S-106,CRP,True,True,False,2,940105,True,action required and possible,8.0,4.0,target,2.0,1.0
+HS-CRP-CV-L-107,CRP,False,False,True,0,940106,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRP-VS-S-108,CRP,True,True,True,2,940107,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-109,CRP,False,True,False,0,940108,True,action required and possible,3.0,1.5,target,2.0,1.0
+HS-CRP-VS-S-110,CRP,True,True,False,2,940109,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-L-111,CRP,False,False,True,0,940110,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-S-112,CRP,True,True,True,2,940111,False,no solution with margin from the start state,10.0,5.0,target,0.0,
+HS-CRP-CV-S-113,CRP,False,True,False,0,940112,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-L-114,CRP,True,False,False,2,940113,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-S-115,CRP,False,True,True,0,940114,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-S-116,CRP,True,True,True,2,940115,False,ended before the start state,,,,,
+HS-CRP-CV-L-117,CRP,False,False,False,0,940116,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRP-VS-S-118,CRP,True,True,False,2,940117,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-S-119,CRP,False,True,True,0,940118,True,action required and possible,9.0,4.5,goal,3.0,0.0
+HS-CRP-VS-S-120,CRP,True,True,True,2,940119,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-CV-L-121,CRP,False,False,False,0,940120,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRP-VS-S-122,CRP,True,True,False,2,940121,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-CRP-CV-S-123,CRP,False,True,True,0,940122,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-L-124,CRP,True,False,True,2,940123,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-125,CRP,False,True,False,0,940124,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRP-VS-S-126,CRP,True,True,False,2,940125,False,no solution with margin from the start state,5.0,2.5,obstacle,0.0,
+HS-CRP-CV-L-127,CRP,False,False,True,0,940126,False,no solution with margin from the start state,15.0,7.5,target,0.0,
+HS-CRP-VS-S-128,CRP,True,True,True,2,940127,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-129,CRP,False,True,False,0,940128,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRP-VS-S-130,CRP,True,True,False,2,940129,False,no solution with margin from the start state,5.0,2.5,obstacle,0.0,
+HS-CRP-CV-L-131,CRP,False,False,True,0,940130,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-VS-S-132,CRP,True,True,True,2,940131,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-CV-S-133,CRP,False,True,False,0,940132,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRP-VS-L-134,CRP,True,False,False,2,940133,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-135,CRP,False,True,True,0,940134,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-VS-S-136,CRP,True,True,True,2,940135,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRP-CV-L-137,CRP,False,False,False,0,940136,False,standing on succeeds,9.0,4.5,goal,,
+HS-CRP-VS-S-138,CRP,True,True,False,2,940137,False,standing on succeeds,12.0,6.0,goal,,
+HS-CRP-CV-S-139,CRP,False,True,True,0,940138,True,action required and possible,4.0,2.0,goal,3.0,0.0
+HS-CRP-VS-S-140,CRP,True,True,True,2,940139,False,standing on succeeds,9.0,4.5,goal,,
+HS-CRP-CV-L-141,CRP,False,False,False,0,940140,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-S-142,CRP,True,True,False,2,940141,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-143,CRP,False,True,True,0,940142,False,standing on succeeds,14.0,7.0,goal,,
+HS-CRP-VS-L-144,CRP,True,False,True,2,940143,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-145,CRP,False,True,False,0,940144,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-VS-S-146,CRP,True,True,False,2,940145,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-L-147,CRP,False,False,True,0,940146,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRP-VS-S-148,CRP,True,True,True,2,940147,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-CRP-CV-S-149,CRP,False,True,False,0,940148,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRP-VS-S-150,CRP,True,True,False,2,940149,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-L-151,CRP,False,False,True,0,940150,False,standing on succeeds,11.0,5.5,goal,,
+HS-CRP-VS-S-152,CRP,True,True,True,2,940151,False,no solution with margin from the start state,8.0,4.0,target,0.0,
+HS-CRP-CV-S-153,CRP,False,True,False,0,940152,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRP-VS-L-154,CRP,True,False,False,2,940153,True,action required and possible,13.0,6.5,goal,3.0,1.0
+HS-CRP-CV-S-155,CRP,False,True,True,0,940154,False,standing on succeeds,10.0,5.0,goal,,
+HS-CRP-VS-S-156,CRP,True,True,True,2,940155,False,no solution with margin from the start state,9.0,4.5,target,0.0,
+HS-CRP-CV-L-157,CRP,False,False,False,0,940156,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRP-VS-S-158,CRP,True,True,False,2,940157,False,standing on succeeds,15.0,7.5,goal,,
+HS-CRP-CV-S-159,CRP,False,True,True,0,940158,False,no solution with margin from the start state,15.0,7.5,target,0.0,
+HS-CRP-VS-S-160,CRP,True,True,True,2,940159,True,action required and possible,5.0,2.5,obstacle,3.0,0.0
+HS-CRP-CV-L-161,CRP,False,False,False,0,940160,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-S-162,CRP,True,True,False,2,940161,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-163,CRP,False,True,True,0,940162,True,action required and possible,2.0,1.0,target,3.0,0.0
+HS-CRP-VS-L-164,CRP,True,False,True,2,940163,True,action required and possible,10.0,5.0,goal,3.0,0.0
+HS-CRP-CV-S-165,CRP,False,True,False,0,940164,True,action required and possible,4.0,2.0,obstacle,3.0,1.0
+HS-CRP-VS-S-166,CRP,True,True,False,2,940165,True,action required and possible,7.0,3.5,target,3.0,0.0
+HS-CRP-CV-L-167,CRP,False,False,True,0,940166,False,no solution with margin from the start state,9.0,4.5,target,0.0,
+HS-CRP-VS-S-168,CRP,True,True,True,2,940167,False,no solution with margin from the start state,10.0,5.0,target,0.0,
+HS-CRP-CV-S-169,CRP,False,True,False,0,940168,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-VS-L-170,CRP,True,False,False,2,940169,True,action required and possible,5.0,2.5,obstacle,3.0,1.0
+HS-CRP-CV-S-171,CRP,False,True,True,0,940170,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-VS-S-172,CRP,True,True,True,2,940171,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-CV-S-173,CRP,False,True,False,0,940172,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRP-VS-L-174,CRP,True,False,False,2,940173,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-175,CRP,False,True,True,0,940174,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-S-176,CRP,True,True,True,2,940175,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRP-CV-L-177,CRP,False,False,False,0,940176,True,action required and possible,3.0,1.5,target,2.0,0.0
+HS-CRP-VS-S-178,CRP,True,True,False,2,940177,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-179,CRP,False,True,True,0,940178,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRP-VS-L-180,CRP,True,False,True,2,940179,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRP-CV-S-181,CRP,False,True,False,0,940180,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-S-182,CRP,True,True,False,2,940181,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-183,CRP,False,True,True,0,940182,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-L-184,CRP,True,False,True,2,940183,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-CV-S-185,CRP,False,True,False,0,940184,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRP-VS-S-186,CRP,True,True,False,2,940185,False,no solution with margin from the start state,5.0,2.5,boundary,0.0,
+HS-CRP-CV-L-187,CRP,False,False,True,0,940186,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRP-VS-S-188,CRP,True,True,True,2,940187,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-CV-S-189,CRP,False,True,False,0,940188,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-S-190,CRP,True,True,False,2,940189,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-CRP-CV-L-191,CRP,False,False,True,0,940190,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRP-VS-S-192,CRP,True,True,True,2,940191,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRP-CV-S-193,CRP,False,True,False,0,940192,True,action required and possible,7.0,3.5,target,3.0,0.0
+HS-CRP-VS-L-194,CRP,True,False,False,2,940193,True,action required and possible,7.0,3.5,target,3.0,0.0
+HS-CRP-CV-S-195,CRP,False,True,True,0,940194,False,no solution with margin from the start state,9.0,4.5,target,0.0,
+HS-CRP-VS-S-196,CRP,True,True,True,2,940195,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-L-197,CRP,False,False,False,0,940196,True,action required and possible,5.0,2.5,obstacle,3.0,0.0
+HS-CRP-VS-S-198,CRP,True,True,False,2,940197,False,no solution with margin from the start state,9.0,4.5,boundary,0.0,
+HS-CRP-CV-S-199,CRP,False,True,True,0,940198,True,action required and possible,13.0,6.5,target,3.0,0.0
+HS-CRP-VS-S-200,CRP,True,True,True,2,940199,False,no solution with margin from the start state,12.0,6.0,target,0.0,
+HS-CRP-CV-L-201,CRP,False,False,False,0,940200,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-VS-S-202,CRP,True,True,False,2,940201,True,action required and possible,7.0,3.5,obstacle,3.0,0.0
+HS-CRP-CV-S-203,CRP,False,True,True,0,940202,False,no solution with margin from the start state,20.0,10.0,target,0.0,
+HS-CRP-VS-L-204,CRP,True,False,True,2,940203,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRP-CV-S-205,CRP,False,True,False,0,940204,False,no solution with margin from the start state,9.0,4.5,target,0.0,
+HS-CRP-VS-S-206,CRP,True,True,False,2,940205,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-L-207,CRP,False,False,True,0,940206,False,standing on succeeds,10.0,5.0,goal,,
+HS-CRP-VS-S-208,CRP,True,True,True,2,940207,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRP-CV-S-209,CRP,False,True,False,0,940208,True,action required and possible,4.0,2.0,goal,3.0,0.0
+HS-CRP-VS-S-210,CRP,True,True,False,2,940209,True,action required and possible,7.0,3.5,target,3.0,0.0
+HS-CRP-CV-L-211,CRP,False,False,True,0,940210,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRP-VS-S-212,CRP,True,True,True,2,940211,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-CRP-CV-S-213,CRP,False,True,False,0,940212,False,no solution with margin from the start state,4.0,2.0,boundary,0.0,
+HS-CRP-VS-L-214,CRP,True,False,False,2,940213,False,standing on succeeds,16.0,8.0,goal,,
+HS-CRP-CV-S-215,CRP,False,True,True,0,940214,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-S-216,CRP,True,True,True,2,940215,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-CV-L-217,CRP,False,False,False,0,940216,True,action required and possible,12.0,6.0,target,3.0,0.0
+HS-CRP-VS-S-218,CRP,True,True,False,2,940217,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRP-CV-S-219,CRP,False,True,True,0,940218,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-VS-S-220,CRP,True,True,True,2,940219,False,standing on succeeds,15.0,7.5,goal,,
+HS-CRP-CV-L-221,CRP,False,False,False,0,940220,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-S-222,CRP,True,True,False,2,940221,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-S-223,CRP,False,True,True,0,940222,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-L-224,CRP,True,False,True,2,940223,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-CRP-CV-S-225,CRP,False,True,False,0,940224,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-VS-S-226,CRP,True,True,False,2,940225,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-L-227,CRP,False,False,True,0,940226,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-VS-S-228,CRP,True,True,True,2,940227,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRP-CV-S-229,CRP,False,True,False,0,940228,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-S-230,CRP,True,True,False,2,940229,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-L-231,CRP,False,False,True,0,940230,False,standing on succeeds,18.0,9.0,goal,,
+HS-CRP-VS-S-232,CRP,True,True,True,2,940231,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-233,CRP,False,True,False,0,940232,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-L-234,CRP,True,False,False,2,940233,False,ended before the start state,,,,,
+HS-CRP-CV-S-235,CRP,False,True,True,0,940234,False,standing on succeeds,17.0,8.5,goal,,
+HS-CRP-VS-S-236,CRP,True,True,True,2,940235,True,action required and possible,5.0,2.5,obstacle,3.0,1.0
+HS-CRP-CV-L-237,CRP,False,False,False,0,940236,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRP-VS-S-238,CRP,True,True,False,2,940237,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRP-CV-S-239,CRP,False,True,True,0,940238,True,action required and possible,13.0,6.5,goal,3.0,0.0
+HS-CRP-VS-S-240,CRP,True,True,True,2,940239,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRP-CV-L-241,CRP,False,False,False,0,940240,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRP-VS-S-242,CRP,True,True,False,2,940241,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-CV-S-243,CRP,False,True,True,0,940242,True,action required and possible,4.0,2.0,goal,3.0,0.0
+HS-CRP-VS-L-244,CRP,True,False,True,2,940243,True,action required and possible,7.0,3.5,goal,3.0,0.0
+HS-CRP-CV-S-245,CRP,False,True,False,0,940244,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-VS-S-246,CRP,True,True,False,2,940245,True,action required and possible,5.0,2.5,target,2.0,0.0
+HS-CRP-CV-L-247,CRP,False,False,True,0,940246,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-S-248,CRP,True,True,True,2,940247,False,ended before the start state,,,,,
+HS-CRP-CV-S-249,CRP,False,True,False,0,940248,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRP-VS-S-250,CRP,True,True,False,2,940249,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRP-CV-L-251,CRP,False,False,True,0,940250,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-S-252,CRP,True,True,True,2,940251,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-S-253,CRP,False,True,False,0,940252,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRP-VS-L-254,CRP,True,False,False,2,940253,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-255,CRP,False,True,True,0,940254,True,action required and possible,3.0,1.5,goal,3.0,0.0
+HS-CRP-VS-S-256,CRP,True,True,True,2,940255,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-L-257,CRP,False,False,False,0,940256,True,action required and possible,4.0,2.0,goal,3.0,0.0
+HS-CRP-VS-S-258,CRP,True,True,False,2,940257,False,no solution with margin from the start state,5.0,2.5,obstacle,0.0,
+HS-CRP-CV-S-259,CRP,False,True,True,0,940258,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-S-260,CRP,True,True,True,2,940259,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-CV-L-261,CRP,False,False,False,0,940260,False,no solution with margin from the start state,4.0,2.0,obstacle,0.0,
+HS-CRP-VS-S-262,CRP,True,True,False,2,940261,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-S-263,CRP,False,True,True,0,940262,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-L-264,CRP,True,False,True,2,940263,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-CV-S-265,CRP,False,True,False,0,940264,False,no solution with margin from the start state,23.0,11.5,target,0.0,
+HS-CRP-VS-S-266,CRP,True,True,False,2,940265,False,standing on succeeds,9.0,4.5,goal,,
+HS-CRP-CV-L-267,CRP,False,False,True,0,940266,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-S-268,CRP,True,True,True,2,940267,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRP-CV-S-269,CRP,False,True,False,0,940268,False,ended before the start state,,,,,
+HS-CRP-VS-S-270,CRP,True,True,False,2,940269,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-CV-L-271,CRP,False,False,True,0,940270,False,no solution with margin from the start state,11.0,5.5,target,0.0,
+HS-CRP-VS-S-272,CRP,True,True,True,2,940271,False,no solution with margin from the start state,10.0,5.0,target,0.0,
+HS-CRP-CV-S-273,CRP,False,True,False,0,940272,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-L-274,CRP,True,False,False,2,940273,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-CV-S-275,CRP,False,True,True,0,940274,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-S-276,CRP,True,True,True,2,940275,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-L-277,CRP,False,False,False,0,940276,False,no solution with margin from the start state,10.0,5.0,target,0.0,
+HS-CRP-VS-S-278,CRP,True,True,False,2,940277,False,no solution with margin from the start state,6.0,3.0,boundary,0.0,
+HS-CRP-CV-S-279,CRP,False,True,True,0,940278,False,no solution with margin from the start state,13.0,6.5,target,0.0,
+HS-CRP-VS-S-280,CRP,True,True,True,2,940279,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-L-281,CRP,False,False,False,0,940280,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-VS-S-282,CRP,True,True,False,2,940281,False,no solution with margin from the start state,10.0,5.0,target,0.0,
+HS-CRP-CV-S-283,CRP,False,True,True,0,940282,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-VS-L-284,CRP,True,False,True,2,940283,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-CV-S-285,CRP,False,True,False,0,940284,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRP-VS-S-286,CRP,True,True,False,2,940285,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-L-287,CRP,False,False,True,0,940286,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-S-288,CRP,True,True,True,2,940287,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-CV-S-289,CRP,False,True,False,0,940288,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-CRP-VS-S-290,CRP,True,True,False,2,940289,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRP-CV-L-291,CRP,False,False,True,0,940290,True,action required and possible,8.0,4.0,target,3.0,0.0
+HS-CRP-VS-S-292,CRP,True,True,True,2,940291,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRP-CV-S-293,CRP,False,True,False,0,940292,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-L-294,CRP,True,False,False,2,940293,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRP-CV-S-295,CRP,False,True,True,0,940294,True,action required and possible,10.0,5.0,goal,3.0,0.0
+HS-CRP-VS-S-296,CRP,True,True,True,2,940295,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-CV-L-297,CRP,False,False,False,0,940296,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRP-VS-S-298,CRP,True,True,False,2,940297,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-CV-S-299,CRP,False,True,True,0,940298,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-CRP-VS-S-300,CRP,True,True,True,2,940299,True,action required and possible,12.0,6.0,target,3.0,0.0
+HS-CRP-CV-L-301,CRP,False,False,False,0,940300,False,no solution with margin from the start state,12.0,6.0,target,0.0,
+HS-CRP-VS-S-302,CRP,True,True,False,2,940301,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-S-303,CRP,False,True,True,0,940302,True,action required and possible,4.0,2.0,goal,3.0,0.0
+HS-CRP-VS-L-304,CRP,True,False,True,2,940303,False,standing on succeeds,9.0,4.5,goal,,
+HS-CRP-CV-S-305,CRP,False,True,False,0,940304,True,action required and possible,3.0,1.5,goal,3.0,0.0
+HS-CRP-VS-S-306,CRP,True,True,False,2,940305,False,no solution with margin from the start state,17.0,8.5,target,0.0,
+HS-CRP-CV-L-307,CRP,False,False,True,0,940306,True,action required and possible,4.0,2.0,target,1.0,0.0
+HS-CRP-VS-S-308,CRP,True,True,True,2,940307,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRP-CV-S-309,CRP,False,True,False,0,940308,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRP-VS-S-310,CRP,True,True,False,2,940309,False,standing on succeeds,8.0,4.0,goal,,
+HS-CRP-CV-L-311,CRP,False,False,True,0,940310,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-S-312,CRP,True,True,True,2,940311,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-CV-S-313,CRP,False,True,False,0,940312,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRP-VS-L-314,CRP,True,False,False,2,940313,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRP-CV-S-315,CRP,False,True,True,0,940314,True,action required and possible,4.0,2.0,goal,3.0,1.0
+HS-CRP-VS-S-316,CRP,True,True,True,2,940315,False,standing on succeeds,11.0,5.5,goal,,
+HS-CRP-CV-L-317,CRP,False,False,False,0,940316,True,action required and possible,10.0,5.0,goal,3.0,0.0
+HS-CRP-VS-S-318,CRP,True,True,False,2,940317,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRP-CV-S-319,CRP,False,True,True,0,940318,True,action required and possible,3.0,1.5,target,2.0,1.0
+HS-CRP-VS-S-320,CRP,True,True,True,2,940319,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-CV-L-321,CRP,False,False,False,0,940320,True,action required and possible,4.0,2.0,target,1.0,0.0
+HS-CRP-VS-S-322,CRP,True,True,False,2,940321,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-S-323,CRP,False,True,True,0,940322,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-L-324,CRP,True,False,True,2,940323,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-CV-S-325,CRP,False,True,False,0,940324,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-VS-S-326,CRP,True,True,False,2,940325,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-CV-L-327,CRP,False,False,True,0,940326,True,action required and possible,3.0,1.5,goal,3.0,0.0
+HS-CRP-VS-S-328,CRP,True,True,True,2,940327,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-329,CRP,False,True,False,0,940328,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-L-330,CRP,True,False,False,2,940329,True,action required and possible,10.0,5.0,target,3.0,0.0
+HS-CRP-CV-S-331,CRP,False,True,True,0,940330,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-S-332,CRP,True,True,True,2,940331,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-333,CRP,False,True,False,0,940332,True,action required and possible,11.0,5.5,target,3.0,0.0
+HS-CRP-VS-L-334,CRP,True,False,False,2,940333,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-335,CRP,False,True,True,0,940334,False,no solution with margin from the start state,18.0,9.0,target,0.0,
+HS-CRP-VS-S-336,CRP,True,True,True,2,940335,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-L-337,CRP,False,False,False,0,940336,True,action required and possible,3.0,1.5,target,1.0,0.0
+HS-CRP-VS-S-338,CRP,True,True,False,2,940337,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-CV-S-339,CRP,False,True,True,0,940338,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRP-VS-L-340,CRP,True,False,True,2,940339,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-341,CRP,False,True,False,0,940340,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-CRP-VS-S-342,CRP,True,True,False,2,940341,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-S-343,CRP,False,True,True,0,940342,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-L-344,CRP,True,False,True,2,940343,True,action required and possible,7.0,3.5,goal,3.0,0.0
+HS-CRP-CV-S-345,CRP,False,True,False,0,940344,True,action required and possible,3.0,1.5,obstacle,3.0,1.0
+HS-CRP-VS-S-346,CRP,True,True,False,2,940345,True,action required and possible,5.0,2.5,target,3.0,1.0
+HS-CRP-CV-L-347,CRP,False,False,True,0,940346,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRP-VS-S-348,CRP,True,True,True,2,940347,False,standing on succeeds,9.0,4.5,goal,,
+HS-CRP-CV-S-349,CRP,False,True,False,0,940348,True,action required and possible,4.0,2.0,target,1.0,0.0
+HS-CRP-VS-L-350,CRP,True,False,False,2,940349,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRP-CV-S-351,CRP,False,True,True,0,940350,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRP-VS-S-352,CRP,True,True,True,2,940351,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-CRP-CV-S-353,CRP,False,True,False,0,940352,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRP-VS-L-354,CRP,True,False,False,2,940353,False,standing on succeeds,14.0,7.0,goal,,
+HS-CRP-CV-S-355,CRP,False,True,True,0,940354,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRP-VS-S-356,CRP,True,True,True,2,940355,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-CV-L-357,CRP,False,False,False,0,940356,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRP-VS-S-358,CRP,True,True,False,2,940357,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-359,CRP,False,True,True,0,940358,False,standing on succeeds,9.0,4.5,goal,,
+HS-CRP-VS-L-360,CRP,True,False,True,2,940359,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-CRP-CV-S-361,CRP,False,True,False,0,940360,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRP-VS-S-362,CRP,True,True,False,2,940361,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-CV-S-363,CRP,False,True,True,0,940362,True,action required and possible,3.0,1.5,goal,3.0,0.0
+HS-CRP-VS-L-364,CRP,True,False,True,2,940363,False,standing on succeeds,16.0,8.0,goal,,
+HS-CRP-CV-S-365,CRP,False,True,False,0,940364,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-VS-S-366,CRP,True,True,False,2,940365,False,no solution with margin from the start state,6.0,3.0,goal,0.0,
+HS-CRP-CV-L-367,CRP,False,False,True,0,940366,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRP-VS-S-368,CRP,True,True,True,2,940367,True,action required and possible,5.0,2.5,obstacle,3.0,0.0
+HS-CRP-CV-S-369,CRP,False,True,False,0,940368,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-VS-S-370,CRP,True,True,False,2,940369,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-CV-L-371,CRP,False,False,True,0,940370,True,action required and possible,9.0,4.5,goal,3.0,0.0
+HS-CRP-VS-S-372,CRP,True,True,True,2,940371,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-S-373,CRP,False,True,False,0,940372,True,action required and possible,8.0,4.0,goal,3.0,0.0
+HS-CRP-VS-L-374,CRP,True,False,False,2,940373,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRP-CV-S-375,CRP,False,True,True,0,940374,False,standing on succeeds,9.0,4.5,goal,,
+HS-CRP-VS-S-376,CRP,True,True,True,2,940375,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRP-CV-L-377,CRP,False,False,False,0,940376,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRP-VS-S-378,CRP,True,True,False,2,940377,False,no solution with margin from the start state,9.0,4.5,target,0.0,
+HS-CRP-CV-S-379,CRP,False,True,True,0,940378,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRP-VS-S-380,CRP,True,True,True,2,940379,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRP-CV-L-381,CRP,False,False,False,0,940380,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRP-VS-S-382,CRP,True,True,False,2,940381,True,action required and possible,7.0,3.5,target,3.0,0.0
+HS-CRP-CV-S-383,CRP,False,True,True,0,940382,False,standing on succeeds,10.0,5.0,goal,,
+HS-CRP-VS-L-384,CRP,True,False,True,2,940383,False,no solution with margin from the start state,5.0,2.5,obstacle,0.0,
+HS-CRP-CV-S-385,CRP,False,True,False,0,940384,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRP-VS-S-386,CRP,True,True,False,2,940385,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-L-387,CRP,False,False,True,0,940386,False,standing on succeeds,12.0,6.0,goal,,
+HS-CRP-VS-S-388,CRP,True,True,True,2,940387,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-S-389,CRP,False,True,False,0,940388,False,no solution with margin from the start state,3.0,1.5,obstacle,0.0,
+HS-CRP-VS-S-390,CRP,True,True,False,2,940389,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRP-CV-L-391,CRP,False,False,True,0,940390,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRP-VS-S-392,CRP,True,True,True,2,940391,False,no solution with margin from the start state,15.0,7.5,target,0.0,
+HS-CRP-CV-S-393,CRP,False,True,False,0,940392,True,action required and possible,4.0,2.0,target,2.0,0.0
+HS-CRP-VS-L-394,CRP,True,False,False,2,940393,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-395,CRP,False,True,True,0,940394,False,no solution with margin from the start state,19.0,9.5,target,0.0,
+HS-CRP-VS-S-396,CRP,True,True,True,2,940395,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRP-CV-L-397,CRP,False,False,False,0,940396,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRP-VS-S-398,CRP,True,True,False,2,940397,False,no solution with margin from the start state,9.0,4.5,target,0.0,
+HS-CRP-CV-S-399,CRP,False,True,True,0,940398,False,standing on succeeds,10.0,5.0,goal,,
+HS-CRP-VS-S-400,CRP,True,True,True,2,940399,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-CV-L-401,CRP,False,False,False,0,940400,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRP-VS-S-402,CRP,True,True,False,2,940401,False,no solution with margin from the start state,10.0,5.0,target,0.0,
+HS-CRP-CV-S-403,CRP,False,True,True,0,940402,False,no solution with margin from the start state,13.0,6.5,target,0.0,
+HS-CRP-VS-L-404,CRP,True,False,True,2,940403,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-S-405,CRP,False,True,False,0,940404,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRP-VS-S-406,CRP,True,True,False,2,940405,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRP-CV-L-407,CRP,False,False,True,0,940406,False,standing on succeeds,12.0,6.0,goal,,
+HS-CRP-VS-S-408,CRP,True,True,True,2,940407,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRP-CV-S-409,CRP,False,True,False,0,940408,False,standing on succeeds,19.0,9.5,goal,,
+HS-CRP-VS-S-410,CRP,True,True,False,2,940409,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-CRP-CV-L-411,CRP,False,False,True,0,940410,False,no solution with margin from the start state,11.0,5.5,target,0.0,
+HS-CRP-VS-S-412,CRP,True,True,True,2,940411,True,action required and possible,7.0,3.5,target,3.0,0.0
+HS-CRP-CV-S-413,CRP,False,True,False,0,940412,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRP-VS-L-414,CRP,True,False,False,2,940413,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-CV-S-415,CRP,False,True,True,0,940414,True,action required and possible,4.0,2.0,goal,3.0,0.0
+HS-CRP-VS-S-416,CRP,True,True,True,2,940415,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-CV-L-417,CRP,False,False,False,0,940416,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRP-VS-S-418,CRP,True,True,False,2,940417,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRP-CV-S-419,CRP,False,True,True,0,940418,True,action required and possible,7.0,3.5,goal,3.0,0.0
+HS-CRP-VS-S-420,CRP,True,True,True,2,940419,True,action required and possible,8.0,4.0,goal,3.0,0.0
+HS-CRS-CV-L-001,CRS,False,False,False,0,940420,True,action required and possible,2.0,1.0,target,3.0,0.0
+HS-CRS-VS-S-002,CRS,True,True,False,2,940421,True,action required and possible,10.0,5.0,obstacle,3.0,2.0
+HS-CRS-CV-S-003,CRS,False,True,True,0,940422,True,action required and possible,2.0,1.0,target,3.0,0.0
+HS-CRS-VS-L-004,CRS,True,False,True,2,940423,True,action required and possible,5.0,2.5,target,3.0,2.0
+HS-CRS-CV-S-005,CRS,False,True,False,0,940424,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-CRS-VS-S-006,CRS,True,True,False,2,940425,False,standing on succeeds,14.0,7.0,goal,,
+HS-CRS-CV-L-007,CRS,False,False,True,0,940426,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-008,CRS,True,True,True,2,940427,True,action required and possible,7.0,3.5,target,3.0,1.0
+HS-CRS-CV-S-009,CRS,False,True,False,0,940428,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRS-VS-S-010,CRS,True,True,False,2,940429,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-L-011,CRS,False,False,True,0,940430,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-S-012,CRS,True,True,True,2,940431,False,standing on succeeds,15.0,7.5,goal,,
+HS-CRS-CV-S-013,CRS,False,True,False,0,940432,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-VS-L-014,CRS,True,False,False,2,940433,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-015,CRS,False,True,True,0,940434,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-VS-S-016,CRS,True,True,True,2,940435,False,standing on succeeds,15.0,7.5,goal,,
+HS-CRS-CV-L-017,CRS,False,False,False,0,940436,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-018,CRS,True,True,False,2,940437,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRS-CV-S-019,CRS,False,True,True,0,940438,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-020,CRS,True,True,True,2,940439,False,ended before the start state,,,,,
+HS-CRS-CV-L-021,CRS,False,False,False,0,940440,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-022,CRS,True,True,False,2,940441,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRS-CV-S-023,CRS,False,True,True,0,940442,False,standing on succeeds,10.0,5.0,goal,,
+HS-CRS-VS-L-024,CRS,True,False,True,2,940443,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRS-CV-S-025,CRS,False,True,False,0,940444,True,action required and possible,3.0,1.5,target,3.0,1.0
+HS-CRS-VS-S-026,CRS,True,True,False,2,940445,False,no solution with margin from the start state,10.0,5.0,target,0.0,
+HS-CRS-CV-L-027,CRS,False,False,True,0,940446,True,action required and possible,3.0,1.5,obstacle,3.0,1.0
+HS-CRS-VS-S-028,CRS,True,True,True,2,940447,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-029,CRS,False,True,False,0,940448,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRS-VS-S-030,CRS,True,True,False,2,940449,True,action required and possible,10.0,5.0,target,3.0,0.0
+HS-CRS-CV-L-031,CRS,False,False,True,0,940450,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-VS-S-032,CRS,True,True,True,2,940451,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-S-033,CRS,False,True,False,0,940452,True,action required and possible,3.0,1.5,target,1.0,0.0
+HS-CRS-VS-L-034,CRS,True,False,False,2,940453,False,ended before the start state,,,,,
+HS-CRS-CV-S-035,CRS,False,True,True,0,940454,True,action required and possible,8.0,4.0,target,3.0,0.0
+HS-CRS-VS-S-036,CRS,True,True,True,2,940455,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRS-CV-L-037,CRS,False,False,False,0,940456,True,action required and possible,4.0,2.0,target,2.0,0.0
+HS-CRS-VS-S-038,CRS,True,True,False,2,940457,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-CRS-CV-S-039,CRS,False,True,True,0,940458,False,standing on succeeds,20.0,10.0,goal,,
+HS-CRS-VS-S-040,CRS,True,True,True,2,940459,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-L-041,CRS,False,False,False,0,940460,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRS-VS-S-042,CRS,True,True,False,2,940461,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-043,CRS,False,True,True,0,940462,True,action required and possible,3.0,1.5,target,2.0,0.0
+HS-CRS-VS-L-044,CRS,True,False,True,2,940463,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-CRS-CV-S-045,CRS,False,True,False,0,940464,True,action required and possible,7.0,3.5,target,3.0,1.0
+HS-CRS-VS-S-046,CRS,True,True,False,2,940465,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-L-047,CRS,False,False,True,0,940466,False,no solution with margin from the start state,11.0,5.5,target,0.0,
+HS-CRS-VS-S-048,CRS,True,True,True,2,940467,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-S-049,CRS,False,True,False,0,940468,True,action required and possible,3.0,1.5,obstacle,2.0,1.0
+HS-CRS-VS-S-050,CRS,True,True,False,2,940469,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRS-CV-L-051,CRS,False,False,True,0,940470,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-052,CRS,True,True,True,2,940471,False,no solution with margin from the start state,18.0,9.0,target,0.0,
+HS-CRS-CV-S-053,CRS,False,True,False,0,940472,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRS-VS-L-054,CRS,True,False,False,2,940473,True,action required and possible,7.0,3.5,goal,3.0,0.0
+HS-CRS-CV-S-055,CRS,False,True,True,0,940474,False,standing on succeeds,12.0,6.0,goal,,
+HS-CRS-VS-S-056,CRS,True,True,True,2,940475,True,action required and possible,18.0,9.0,obstacle,3.0,0.0
+HS-CRS-CV-L-057,CRS,False,False,False,0,940476,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-058,CRS,True,True,False,2,940477,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-S-059,CRS,False,True,True,0,940478,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-060,CRS,True,True,True,2,940479,False,standing on succeeds,8.0,4.0,goal,,
+HS-CRS-CV-L-061,CRS,False,False,False,0,940480,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-VS-S-062,CRS,True,True,False,2,940481,True,action required and possible,8.0,4.0,target,3.0,1.0
+HS-CRS-CV-S-063,CRS,False,True,True,0,940482,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-L-064,CRS,True,False,True,2,940483,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-CRS-CV-S-065,CRS,False,True,False,0,940484,False,standing on succeeds,9.0,4.5,goal,,
+HS-CRS-VS-S-066,CRS,True,True,False,2,940485,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRS-CV-L-067,CRS,False,False,True,0,940486,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-068,CRS,True,True,True,2,940487,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-069,CRS,False,True,False,0,940488,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-S-070,CRS,True,True,False,2,940489,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRS-CV-L-071,CRS,False,False,True,0,940490,True,action required and possible,3.0,1.5,goal,3.0,0.0
+HS-CRS-VS-S-072,CRS,True,True,True,2,940491,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-S-073,CRS,False,True,False,0,940492,True,action required and possible,3.0,1.5,target,3.0,1.0
+HS-CRS-VS-L-074,CRS,True,False,False,2,940493,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-S-075,CRS,False,True,True,0,940494,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRS-VS-S-076,CRS,True,True,True,2,940495,False,ended before the start state,,,,,
+HS-CRS-CV-L-077,CRS,False,False,False,0,940496,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-VS-S-078,CRS,True,True,False,2,940497,False,standing on succeeds,8.0,4.0,goal,,
+HS-CRS-CV-S-079,CRS,False,True,True,0,940498,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-VS-S-080,CRS,True,True,True,2,940499,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRS-CV-L-081,CRS,False,False,False,0,940500,False,no solution with margin from the start state,9.0,4.5,target,0.0,
+HS-CRS-VS-S-082,CRS,True,True,False,2,940501,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-083,CRS,False,True,True,0,940502,False,standing on succeeds,9.0,4.5,goal,,
+HS-CRS-VS-L-084,CRS,True,False,True,2,940503,False,standing on succeeds,10.0,5.0,goal,,
+HS-CRS-CV-S-085,CRS,False,True,False,0,940504,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-086,CRS,True,True,False,2,940505,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-L-087,CRS,False,False,True,0,940506,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-VS-S-088,CRS,True,True,True,2,940507,False,standing on succeeds,29.0,14.5,goal,,
+HS-CRS-CV-S-089,CRS,False,True,False,0,940508,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRS-VS-L-090,CRS,True,False,False,2,940509,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-S-091,CRS,False,True,True,0,940510,False,no solution with margin from the start state,3.0,1.5,obstacle,0.0,
+HS-CRS-VS-S-092,CRS,True,True,True,2,940511,False,no solution with margin from the start state,10.0,5.0,target,0.0,
+HS-CRS-CV-S-093,CRS,False,True,False,0,940512,True,action required and possible,3.0,1.5,target,2.0,2.0
+HS-CRS-VS-L-094,CRS,True,False,False,2,940513,False,no solution with margin from the start state,9.0,4.5,target,0.0,
+HS-CRS-CV-S-095,CRS,False,True,True,0,940514,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-096,CRS,True,True,True,2,940515,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-L-097,CRS,False,False,False,0,940516,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRS-VS-S-098,CRS,True,True,False,2,940517,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRS-CV-S-099,CRS,False,True,True,0,940518,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRS-VS-S-100,CRS,True,True,True,2,940519,True,action required and possible,7.0,3.5,target,3.0,0.0
+HS-CRS-CV-L-101,CRS,False,False,False,0,940520,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRS-VS-S-102,CRS,True,True,False,2,940521,False,no solution with margin from the start state,5.0,2.5,goal,0.0,
+HS-CRS-CV-S-103,CRS,False,True,True,0,940522,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-L-104,CRS,True,False,True,2,940523,True,action required and possible,7.0,3.5,target,3.0,0.0
+HS-CRS-CV-S-105,CRS,False,True,False,0,940524,False,no solution with margin from the start state,3.0,1.5,obstacle,0.0,
+HS-CRS-VS-S-106,CRS,True,True,False,2,940525,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRS-CV-L-107,CRS,False,False,True,0,940526,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-108,CRS,True,True,True,2,940527,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-S-109,CRS,False,True,False,0,940528,True,action required and possible,5.0,2.5,obstacle,1.0,2.0
+HS-CRS-VS-S-110,CRS,True,True,False,2,940529,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRS-CV-L-111,CRS,False,False,True,0,940530,False,ended before the start state,,,,,
+HS-CRS-VS-S-112,CRS,True,True,True,2,940531,True,action required and possible,7.0,3.5,goal,3.0,0.0
+HS-CRS-CV-S-113,CRS,False,True,False,0,940532,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRS-VS-L-114,CRS,True,False,False,2,940533,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRS-CV-S-115,CRS,False,True,True,0,940534,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-116,CRS,True,True,True,2,940535,False,no solution with margin from the start state,8.0,4.0,target,0.0,
+HS-CRS-CV-L-117,CRS,False,False,False,0,940536,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-VS-S-118,CRS,True,True,False,2,940537,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRS-CV-S-119,CRS,False,True,True,0,940538,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-120,CRS,True,True,True,2,940539,True,action required and possible,16.0,8.0,goal,3.0,0.0
+HS-CRS-CV-L-121,CRS,False,False,False,0,940540,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRS-VS-S-122,CRS,True,True,False,2,940541,True,action required and possible,7.0,3.5,target,3.0,0.0
+HS-CRS-CV-S-123,CRS,False,True,True,0,940542,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-VS-L-124,CRS,True,False,True,2,940543,False,no solution with margin from the start state,18.0,9.0,target,0.0,
+HS-CRS-CV-S-125,CRS,False,True,False,0,940544,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-VS-S-126,CRS,True,True,False,2,940545,False,no solution with margin from the start state,5.0,2.5,obstacle,0.0,
+HS-CRS-CV-L-127,CRS,False,False,True,0,940546,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-128,CRS,True,True,True,2,940547,False,no solution with margin from the start state,14.0,7.0,target,0.0,
+HS-CRS-CV-S-129,CRS,False,True,False,0,940548,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRS-VS-S-130,CRS,True,True,False,2,940549,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRS-CV-L-131,CRS,False,False,True,0,940550,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRS-VS-S-132,CRS,True,True,True,2,940551,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-133,CRS,False,True,False,0,940552,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-VS-L-134,CRS,True,False,False,2,940553,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-135,CRS,False,True,True,0,940554,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRS-VS-S-136,CRS,True,True,True,2,940555,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-L-137,CRS,False,False,False,0,940556,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-VS-S-138,CRS,True,True,False,2,940557,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-S-139,CRS,False,True,True,0,940558,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-VS-S-140,CRS,True,True,True,2,940559,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRS-CV-L-141,CRS,False,False,False,0,940560,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-142,CRS,True,True,False,2,940561,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-S-143,CRS,False,True,True,0,940562,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRS-VS-L-144,CRS,True,False,True,2,940563,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-S-145,CRS,False,True,False,0,940564,False,no solution with margin from the start state,9.0,4.5,target,0.0,
+HS-CRS-VS-S-146,CRS,True,True,False,2,940565,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-L-147,CRS,False,False,True,0,940566,True,action required and possible,5.0,2.5,target,1.0,0.0
+HS-CRS-VS-S-148,CRS,True,True,True,2,940567,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-CRS-CV-S-149,CRS,False,True,False,0,940568,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-150,CRS,True,True,False,2,940569,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-CRS-CV-L-151,CRS,False,False,True,0,940570,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-S-152,CRS,True,True,True,2,940571,True,action required and possible,5.0,2.5,target,1.0,0.0
+HS-CRS-CV-S-153,CRS,False,True,False,0,940572,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRS-VS-L-154,CRS,True,False,False,2,940573,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRS-CV-S-155,CRS,False,True,True,0,940574,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRS-VS-S-156,CRS,True,True,True,2,940575,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-L-157,CRS,False,False,False,0,940576,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-158,CRS,True,True,False,2,940577,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-S-159,CRS,False,True,True,0,940578,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-160,CRS,True,True,True,2,940579,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-L-161,CRS,False,False,False,0,940580,True,action required and possible,3.0,1.5,goal,3.0,0.0
+HS-CRS-VS-S-162,CRS,True,True,False,2,940581,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-S-163,CRS,False,True,True,0,940582,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-L-164,CRS,True,False,True,2,940583,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-S-165,CRS,False,True,False,0,940584,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-166,CRS,True,True,False,2,940585,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-L-167,CRS,False,False,True,0,940586,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRS-VS-S-168,CRS,True,True,True,2,940587,True,action required and possible,15.0,7.5,obstacle,3.0,1.0
+HS-CRS-CV-S-169,CRS,False,True,False,0,940588,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-L-170,CRS,True,False,False,2,940589,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-171,CRS,False,True,True,0,940590,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-S-172,CRS,True,True,True,2,940591,True,action required and possible,18.0,9.0,goal,3.0,2.0
+HS-CRS-CV-S-173,CRS,False,True,False,0,940592,True,action required and possible,4.0,2.0,obstacle,2.0,2.0
+HS-CRS-VS-L-174,CRS,True,False,False,2,940593,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-175,CRS,False,True,True,0,940594,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-176,CRS,True,True,True,2,940595,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-L-177,CRS,False,False,False,0,940596,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-VS-S-178,CRS,True,True,False,2,940597,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-S-179,CRS,False,True,True,0,940598,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-L-180,CRS,True,False,True,2,940599,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-S-181,CRS,False,True,False,0,940600,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRS-VS-S-182,CRS,True,True,False,2,940601,False,standing on succeeds,12.0,6.0,goal,,
+HS-CRS-CV-S-183,CRS,False,True,True,0,940602,True,action required and possible,3.0,1.5,goal,3.0,0.0
+HS-CRS-VS-L-184,CRS,True,False,True,2,940603,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRS-CV-S-185,CRS,False,True,False,0,940604,True,action required and possible,14.0,7.0,obstacle,3.0,0.0
+HS-CRS-VS-S-186,CRS,True,True,False,2,940605,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-L-187,CRS,False,False,True,0,940606,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRS-VS-S-188,CRS,True,True,True,2,940607,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRS-CV-S-189,CRS,False,True,False,0,940608,False,no solution with margin from the start state,5.0,2.5,obstacle,0.0,
+HS-CRS-VS-S-190,CRS,True,True,False,2,940609,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-L-191,CRS,False,False,True,0,940610,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-S-192,CRS,True,True,True,2,940611,False,no solution with margin from the start state,10.0,5.0,target,0.0,
+HS-CRS-CV-S-193,CRS,False,True,False,0,940612,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRS-VS-L-194,CRS,True,False,False,2,940613,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-S-195,CRS,False,True,True,0,940614,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRS-VS-S-196,CRS,True,True,True,2,940615,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-CRS-CV-L-197,CRS,False,False,False,0,940616,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-198,CRS,True,True,False,2,940617,False,no solution with margin from the start state,15.0,7.5,target,0.0,
+HS-CRS-CV-S-199,CRS,False,True,True,0,940618,True,action required and possible,3.0,1.5,target,1.0,1.0
+HS-CRS-VS-S-200,CRS,True,True,True,2,940619,False,ended before the start state,,,,,
+HS-CRS-CV-L-201,CRS,False,False,False,0,940620,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-202,CRS,True,True,False,2,940621,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-S-203,CRS,False,True,True,0,940622,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-L-204,CRS,True,False,True,2,940623,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRS-CV-S-205,CRS,False,True,False,0,940624,False,no solution with margin from the start state,9.0,4.5,target,0.0,
+HS-CRS-VS-S-206,CRS,True,True,False,2,940625,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-L-207,CRS,False,False,True,0,940626,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRS-VS-S-208,CRS,True,True,True,2,940627,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-209,CRS,False,True,False,0,940628,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-210,CRS,True,True,False,2,940629,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRS-CV-L-211,CRS,False,False,True,0,940630,True,action required and possible,3.0,1.5,goal,3.0,1.0
+HS-CRS-VS-S-212,CRS,True,True,True,2,940631,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-S-213,CRS,False,True,False,0,940632,True,action required and possible,4.0,2.0,target,2.0,0.0
+HS-CRS-VS-L-214,CRS,True,False,False,2,940633,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-215,CRS,False,True,True,0,940634,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-216,CRS,True,True,True,2,940635,False,standing on succeeds,13.0,6.5,goal,,
+HS-CRS-CV-L-217,CRS,False,False,False,0,940636,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-218,CRS,True,True,False,2,940637,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-S-219,CRS,False,True,True,0,940638,True,action required and possible,3.0,1.5,target,1.0,0.0
+HS-CRS-VS-S-220,CRS,True,True,True,2,940639,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-L-221,CRS,False,False,False,0,940640,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-222,CRS,True,True,False,2,940641,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-223,CRS,False,True,True,0,940642,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-L-224,CRS,True,False,True,2,940643,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-S-225,CRS,False,True,False,0,940644,False,standing on succeeds,8.0,4.0,goal,,
+HS-CRS-VS-S-226,CRS,True,True,False,2,940645,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-L-227,CRS,False,False,True,0,940646,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-228,CRS,True,True,True,2,940647,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-229,CRS,False,True,False,0,940648,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRS-VS-S-230,CRS,True,True,False,2,940649,True,action required and possible,7.0,3.5,target,3.0,0.0
+HS-CRS-CV-L-231,CRS,False,False,True,0,940650,False,no solution with margin from the start state,15.0,7.5,target,0.0,
+HS-CRS-VS-S-232,CRS,True,True,True,2,940651,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRS-CV-S-233,CRS,False,True,False,0,940652,True,action required and possible,3.0,1.5,obstacle,1.0,2.0
+HS-CRS-VS-L-234,CRS,True,False,False,2,940653,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRS-CV-S-235,CRS,False,True,True,0,940654,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-236,CRS,True,True,True,2,940655,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRS-CV-L-237,CRS,False,False,False,0,940656,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRS-VS-S-238,CRS,True,True,False,2,940657,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-S-239,CRS,False,True,True,0,940658,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-240,CRS,True,True,True,2,940659,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRS-CV-L-241,CRS,False,False,False,0,940660,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRS-VS-S-242,CRS,True,True,False,2,940661,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-S-243,CRS,False,True,True,0,940662,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-L-244,CRS,True,False,True,2,940663,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-S-245,CRS,False,True,False,0,940664,True,action required and possible,3.0,1.5,goal,3.0,0.0
+HS-CRS-VS-S-246,CRS,True,True,False,2,940665,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-L-247,CRS,False,False,True,0,940666,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-248,CRS,True,True,True,2,940667,False,no solution with margin from the start state,13.0,6.5,target,0.0,
+HS-CRS-CV-S-249,CRS,False,True,False,0,940668,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRS-VS-S-250,CRS,True,True,False,2,940669,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-L-251,CRS,False,False,True,0,940670,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-CRS-VS-S-252,CRS,True,True,True,2,940671,True,action required and possible,4.0,2.0,goal,3.0,0.0
+HS-CRS-CV-S-253,CRS,False,True,False,0,940672,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRS-VS-L-254,CRS,True,False,False,2,940673,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-CRS-CV-S-255,CRS,False,True,True,0,940674,True,action required and possible,3.0,1.5,goal,3.0,0.0
+HS-CRS-VS-S-256,CRS,True,True,True,2,940675,True,action required and possible,8.0,4.0,goal,3.0,0.0
+HS-CRS-CV-L-257,CRS,False,False,False,0,940676,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRS-VS-S-258,CRS,True,True,False,2,940677,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-259,CRS,False,True,True,0,940678,False,standing on succeeds,10.0,5.0,goal,,
+HS-CRS-VS-S-260,CRS,True,True,True,2,940679,False,no solution with margin from the start state,9.0,4.5,target,0.0,
+HS-CRS-CV-L-261,CRS,False,False,False,0,940680,True,action required and possible,5.0,2.5,obstacle,2.0,2.0
+HS-CRS-VS-S-262,CRS,True,True,False,2,940681,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-S-263,CRS,False,True,True,0,940682,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-L-264,CRS,True,False,True,2,940683,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRS-CV-S-265,CRS,False,True,False,0,940684,True,action required and possible,2.0,1.0,target,3.0,0.0
+HS-CRS-VS-S-266,CRS,True,True,False,2,940685,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-L-267,CRS,False,False,True,0,940686,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-VS-S-268,CRS,True,True,True,2,940687,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRS-CV-S-269,CRS,False,True,False,0,940688,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRS-VS-S-270,CRS,True,True,False,2,940689,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRS-CV-L-271,CRS,False,False,True,0,940690,False,no solution with margin from the start state,14.0,7.0,target,0.0,
+HS-CRS-VS-S-272,CRS,True,True,True,2,940691,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-S-273,CRS,False,True,False,0,940692,True,action required and possible,3.0,1.5,target,1.0,1.0
+HS-CRS-VS-L-274,CRS,True,False,False,2,940693,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRS-CV-S-275,CRS,False,True,True,0,940694,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-S-276,CRS,True,True,True,2,940695,True,action required and possible,7.0,3.5,goal,3.0,0.0
+HS-CRS-CV-L-277,CRS,False,False,False,0,940696,True,action required and possible,3.0,1.5,goal,3.0,0.0
+HS-CRS-VS-S-278,CRS,True,True,False,2,940697,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-279,CRS,False,True,True,0,940698,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRS-VS-S-280,CRS,True,True,True,2,940699,False,standing on succeeds,14.0,7.0,goal,,
+HS-CRS-CV-L-281,CRS,False,False,False,0,940700,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-S-282,CRS,True,True,False,2,940701,True,action required and possible,4.0,2.0,target,1.0,0.0
+HS-CRS-CV-S-283,CRS,False,True,True,0,940702,False,ended before the start state,,,,,
+HS-CRS-VS-L-284,CRS,True,False,True,2,940703,False,standing on succeeds,18.0,9.0,goal,,
+HS-CRS-CV-S-285,CRS,False,True,False,0,940704,False,no solution with margin from the start state,3.0,1.5,obstacle,0.0,
+HS-CRS-VS-S-286,CRS,True,True,False,2,940705,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-L-287,CRS,False,False,True,0,940706,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRS-VS-S-288,CRS,True,True,True,2,940707,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-289,CRS,False,True,False,0,940708,False,standing on succeeds,8.0,4.0,goal,,
+HS-CRS-VS-S-290,CRS,True,True,False,2,940709,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRS-CV-L-291,CRS,False,False,True,0,940710,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-CRS-VS-S-292,CRS,True,True,True,2,940711,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-S-293,CRS,False,True,False,0,940712,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRS-VS-L-294,CRS,True,False,False,2,940713,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-CRS-CV-S-295,CRS,False,True,True,0,940714,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRS-VS-S-296,CRS,True,True,True,2,940715,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-L-297,CRS,False,False,False,0,940716,True,action required and possible,3.0,1.5,target,1.0,0.0
+HS-CRS-VS-S-298,CRS,True,True,False,2,940717,True,action required and possible,6.0,3.0,target,1.0,0.0
+HS-CRS-CV-S-299,CRS,False,True,True,0,940718,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-300,CRS,True,True,True,2,940719,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRS-CV-L-301,CRS,False,False,False,0,940720,False,no solution with margin from the start state,8.0,4.0,target,0.0,
+HS-CRS-VS-S-302,CRS,True,True,False,2,940721,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-S-303,CRS,False,True,True,0,940722,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-L-304,CRS,True,False,True,2,940723,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-S-305,CRS,False,True,False,0,940724,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-S-306,CRS,True,True,False,2,940725,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRS-CV-L-307,CRS,False,False,True,0,940726,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-VS-S-308,CRS,True,True,True,2,940727,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRS-CV-S-309,CRS,False,True,False,0,940728,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-CRS-VS-S-310,CRS,True,True,False,2,940729,False,no solution with margin from the start state,12.0,6.0,target,0.0,
+HS-CRS-CV-L-311,CRS,False,False,True,0,940730,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-312,CRS,True,True,True,2,940731,True,action required and possible,6.0,3.0,target,2.0,0.0
+HS-CRS-CV-S-313,CRS,False,True,False,0,940732,True,action required and possible,4.0,2.0,target,3.0,1.0
+HS-CRS-VS-L-314,CRS,True,False,False,2,940733,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-S-315,CRS,False,True,True,0,940734,False,no solution with margin from the start state,10.0,5.0,target,0.0,
+HS-CRS-VS-S-316,CRS,True,True,True,2,940735,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRS-CV-L-317,CRS,False,False,False,0,940736,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-CRS-VS-S-318,CRS,True,True,False,2,940737,False,no solution with margin from the start state,11.0,5.5,target,0.0,
+HS-CRS-CV-S-319,CRS,False,True,True,0,940738,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-320,CRS,True,True,True,2,940739,True,action required and possible,11.0,5.5,goal,3.0,0.0
+HS-CRS-CV-L-321,CRS,False,False,False,0,940740,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-S-322,CRS,True,True,False,2,940741,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRS-CV-S-323,CRS,False,True,True,0,940742,False,no solution with margin from the start state,2.0,1.0,goal,0.0,
+HS-CRS-VS-L-324,CRS,True,False,True,2,940743,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRS-CV-S-325,CRS,False,True,False,0,940744,True,action required and possible,3.0,1.5,target,3.0,1.0
+HS-CRS-VS-S-326,CRS,True,True,False,2,940745,False,ended before the start state,,,,,
+HS-CRS-CV-L-327,CRS,False,False,True,0,940746,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-S-328,CRS,True,True,True,2,940747,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-S-329,CRS,False,True,False,0,940748,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRS-VS-L-330,CRS,True,False,False,2,940749,False,no solution with margin from the start state,7.0,3.5,obstacle,0.0,
+HS-CRS-CV-S-331,CRS,False,True,True,0,940750,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-S-332,CRS,True,True,True,2,940751,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-333,CRS,False,True,False,0,940752,True,action required and possible,4.0,2.0,goal,3.0,0.0
+HS-CRS-VS-L-334,CRS,True,False,False,2,940753,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-S-335,CRS,False,True,True,0,940754,False,no solution with margin from the start state,3.0,1.5,obstacle,0.0,
+HS-CRS-VS-S-336,CRS,True,True,True,2,940755,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRS-CV-L-337,CRS,False,False,False,0,940756,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-338,CRS,True,True,False,2,940757,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRS-CV-S-339,CRS,False,True,True,0,940758,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-L-340,CRS,True,False,True,2,940759,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-S-341,CRS,False,True,False,0,940760,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-CRS-VS-S-342,CRS,True,True,False,2,940761,True,action required and possible,5.0,2.5,goal,3.0,1.0
+HS-CRS-CV-S-343,CRS,False,True,True,0,940762,False,standing on succeeds,22.0,11.0,goal,,
+HS-CRS-VS-L-344,CRS,True,False,True,2,940763,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-S-345,CRS,False,True,False,0,940764,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRS-VS-S-346,CRS,True,True,False,2,940765,True,action required and possible,6.0,3.0,target,3.0,2.0
+HS-CRS-CV-L-347,CRS,False,False,True,0,940766,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRS-VS-S-348,CRS,True,True,True,2,940767,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRS-CV-S-349,CRS,False,True,False,0,940768,True,action required and possible,3.0,1.5,target,2.0,1.0
+HS-CRS-VS-L-350,CRS,True,False,False,2,940769,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-S-351,CRS,False,True,True,0,940770,True,action required and possible,14.0,7.0,goal,3.0,0.0
+HS-CRS-VS-S-352,CRS,True,True,True,2,940771,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-S-353,CRS,False,True,False,0,940772,True,action required and possible,2.0,1.0,target,3.0,0.0
+HS-CRS-VS-L-354,CRS,True,False,False,2,940773,False,no solution with margin from the start state,8.0,4.0,target,0.0,
+HS-CRS-CV-S-355,CRS,False,True,True,0,940774,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-356,CRS,True,True,True,2,940775,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRS-CV-L-357,CRS,False,False,False,0,940776,False,no solution with margin from the start state,8.0,4.0,target,0.0,
+HS-CRS-VS-S-358,CRS,True,True,False,2,940777,False,no solution with margin from the start state,5.0,2.5,goal,0.0,
+HS-CRS-CV-S-359,CRS,False,True,True,0,940778,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-L-360,CRS,True,False,True,2,940779,True,action required and possible,5.0,2.5,target,3.0,1.0
+HS-CRS-CV-S-361,CRS,False,True,False,0,940780,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-S-362,CRS,True,True,False,2,940781,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-S-363,CRS,False,True,True,0,940782,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-L-364,CRS,True,False,True,2,940783,False,standing on succeeds,9.0,4.5,goal,,
+HS-CRS-CV-S-365,CRS,False,True,False,0,940784,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-CRS-VS-S-366,CRS,True,True,False,2,940785,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-L-367,CRS,False,False,True,0,940786,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRS-VS-S-368,CRS,True,True,True,2,940787,True,action required and possible,6.0,3.0,target,3.0,1.0
+HS-CRS-CV-S-369,CRS,False,True,False,0,940788,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRS-VS-S-370,CRS,True,True,False,2,940789,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-CRS-CV-L-371,CRS,False,False,True,0,940790,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-372,CRS,True,True,True,2,940791,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-S-373,CRS,False,True,False,0,940792,True,action required and possible,5.0,2.5,target,2.0,2.0
+HS-CRS-VS-L-374,CRS,True,False,False,2,940793,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-375,CRS,False,True,True,0,940794,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-376,CRS,True,True,True,2,940795,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-L-377,CRS,False,False,False,0,940796,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-378,CRS,True,True,False,2,940797,True,action required and possible,10.0,5.0,goal,3.0,0.0
+HS-CRS-CV-S-379,CRS,False,True,True,0,940798,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-380,CRS,True,True,True,2,940799,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRS-CV-L-381,CRS,False,False,False,0,940800,False,standing on succeeds,4.0,2.0,goal,,
+HS-CRS-VS-S-382,CRS,True,True,False,2,940801,False,standing on succeeds,7.0,3.5,goal,,
+HS-CRS-CV-S-383,CRS,False,True,True,0,940802,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-L-384,CRS,True,False,True,2,940803,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-S-385,CRS,False,True,False,0,940804,True,action required and possible,4.0,2.0,obstacle,3.0,1.0
+HS-CRS-VS-S-386,CRS,True,True,False,2,940805,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-CRS-CV-L-387,CRS,False,False,True,0,940806,False,no solution with margin from the start state,18.0,9.0,target,0.0,
+HS-CRS-VS-S-388,CRS,True,True,True,2,940807,False,no solution with margin from the start state,5.0,2.5,obstacle,0.0,
+HS-CRS-CV-S-389,CRS,False,True,False,0,940808,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-390,CRS,True,True,False,2,940809,False,no solution with margin from the start state,6.0,3.0,boundary,0.0,
+HS-CRS-CV-L-391,CRS,False,False,True,0,940810,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-VS-S-392,CRS,True,True,True,2,940811,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-393,CRS,False,True,False,0,940812,False,no solution with margin from the start state,12.0,6.0,target,0.0,
+HS-CRS-VS-L-394,CRS,True,False,False,2,940813,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-S-395,CRS,False,True,True,0,940814,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-VS-S-396,CRS,True,True,True,2,940815,False,no solution with margin from the start state,15.0,7.5,target,0.0,
+HS-CRS-CV-L-397,CRS,False,False,False,0,940816,True,action required and possible,3.0,1.5,target,2.0,0.0
+HS-CRS-VS-S-398,CRS,True,True,False,2,940817,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRS-CV-S-399,CRS,False,True,True,0,940818,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-400,CRS,True,True,True,2,940819,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-L-401,CRS,False,False,False,0,940820,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-CRS-VS-S-402,CRS,True,True,False,2,940821,False,standing on succeeds,6.0,3.0,goal,,
+HS-CRS-CV-S-403,CRS,False,True,True,0,940822,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-CRS-VS-L-404,CRS,True,False,True,2,940823,False,standing on succeeds,5.0,2.5,goal,,
+HS-CRS-CV-S-405,CRS,False,True,False,0,940824,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-CRS-VS-S-406,CRS,True,True,False,2,940825,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRS-CV-L-407,CRS,False,False,True,0,940826,True,action required and possible,4.0,2.0,goal,3.0,0.0
+HS-CRS-VS-S-408,CRS,True,True,True,2,940827,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-CRS-CV-S-409,CRS,False,True,False,0,940828,True,action required and possible,5.0,2.5,obstacle,3.0,0.0
+HS-CRS-VS-S-410,CRS,True,True,False,2,940829,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-CRS-CV-L-411,CRS,False,False,True,0,940830,True,action required and possible,3.0,1.5,target,1.0,0.0
+HS-CRS-VS-S-412,CRS,True,True,True,2,940831,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-CRS-CV-S-413,CRS,False,True,False,0,940832,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRS-VS-L-414,CRS,True,False,False,2,940833,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-CRS-CV-S-415,CRS,False,True,True,0,940834,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-416,CRS,True,True,True,2,940835,False,standing on succeeds,15.0,7.5,goal,,
+HS-CRS-CV-L-417,CRS,False,False,False,0,940836,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-418,CRS,True,True,False,2,940837,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-CRS-CV-S-419,CRS,False,True,True,0,940838,False,standing on succeeds,3.0,1.5,goal,,
+HS-CRS-VS-S-420,CRS,True,True,True,2,940839,False,standing on succeeds,5.0,2.5,goal,,
+HS-HO-CV-L-001,HO,False,False,False,0,940840,True,action required and possible,5.0,2.5,target,3.0,1.0
+HS-HO-VS-S-002,HO,True,True,False,2,940841,False,standing on succeeds,5.0,2.5,goal,,
+HS-HO-CV-S-003,HO,False,True,True,0,940842,False,no solution with margin from the start state,10.0,5.0,target,0.0,
+HS-HO-VS-L-004,HO,True,False,True,2,940843,True,action required and possible,5.0,2.5,target,2.0,1.0
+HS-HO-CV-S-005,HO,False,True,False,0,940844,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-HO-VS-S-006,HO,True,True,False,2,940845,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-HO-CV-L-007,HO,False,False,True,0,940846,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-HO-VS-S-008,HO,True,True,True,2,940847,False,no solution with margin from the start state,12.0,6.0,target,0.0,
+HS-HO-CV-S-009,HO,False,True,False,0,940848,True,action required and possible,4.0,2.0,goal,3.0,0.0
+HS-HO-VS-S-010,HO,True,True,False,2,940849,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-HO-CV-L-011,HO,False,False,True,0,940850,False,standing on succeeds,17.0,8.5,goal,,
+HS-HO-VS-S-012,HO,True,True,True,2,940851,False,standing on succeeds,23.0,11.5,goal,,
+HS-HO-CV-S-013,HO,False,True,False,0,940852,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-HO-VS-L-014,HO,True,False,False,2,940853,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-HO-CV-S-015,HO,False,True,True,0,940854,False,standing on succeeds,3.0,1.5,goal,,
+HS-HO-VS-S-016,HO,True,True,True,2,940855,False,standing on succeeds,7.0,3.5,goal,,
+HS-HO-CV-L-017,HO,False,False,False,0,940856,True,action required and possible,3.0,1.5,target,1.0,1.0
+HS-HO-VS-S-018,HO,True,True,False,2,940857,True,action required and possible,9.0,4.5,target,3.0,0.0
+HS-HO-CV-S-019,HO,False,True,True,0,940858,True,action required and possible,3.0,1.5,target,3.0,1.0
+HS-HO-VS-S-020,HO,True,True,True,2,940859,True,action required and possible,30.0,15.0,goal,3.0,0.0
+HS-HO-CV-L-021,HO,False,False,False,0,940860,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-HO-VS-S-022,HO,True,True,False,2,940861,False,standing on succeeds,6.0,3.0,goal,,
+HS-HO-CV-S-023,HO,False,True,True,0,940862,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-HO-VS-L-024,HO,True,False,True,2,940863,True,action required and possible,11.0,5.5,target,3.0,0.0
+HS-HO-CV-S-025,HO,False,True,False,0,940864,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-HO-VS-S-026,HO,True,True,False,2,940865,True,action required and possible,5.0,2.5,target,3.0,2.0
+HS-HO-CV-L-027,HO,False,False,True,0,940866,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-HO-VS-S-028,HO,True,True,True,2,940867,True,action required and possible,11.0,5.5,target,1.0,1.0
+HS-HO-CV-S-029,HO,False,True,False,0,940868,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-HO-VS-S-030,HO,True,True,False,2,940869,True,action required and possible,7.0,3.5,target,3.0,0.0
+HS-HO-CV-L-031,HO,False,False,True,0,940870,True,action required and possible,3.0,1.5,target,3.0,1.0
+HS-HO-VS-S-032,HO,True,True,True,2,940871,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-HO-CV-S-033,HO,False,True,False,0,940872,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-HO-VS-L-034,HO,True,False,False,2,940873,True,action required and possible,16.0,8.0,obstacle,1.0,0.0
+HS-HO-CV-S-035,HO,False,True,True,0,940874,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-HO-VS-S-036,HO,True,True,True,2,940875,True,action required and possible,5.0,2.5,target,1.0,0.0
+HS-HO-CV-L-037,HO,False,False,False,0,940876,True,action required and possible,3.0,1.5,target,3.0,2.0
+HS-HO-VS-S-038,HO,True,True,False,2,940877,True,action required and possible,6.0,3.0,boundary,2.0,0.0
+HS-HO-CV-S-039,HO,False,True,True,0,940878,True,action required and possible,3.0,1.5,goal,3.0,0.0
+HS-HO-VS-S-040,HO,True,True,True,2,940879,False,standing on succeeds,7.0,3.5,goal,,
+HS-HO-CV-L-041,HO,False,False,False,0,940880,False,standing on succeeds,3.0,1.5,goal,,
+HS-HO-VS-S-042,HO,True,True,False,2,940881,False,standing on succeeds,31.0,15.5,goal,,
+HS-HO-CV-S-043,HO,False,True,True,0,940882,True,action required and possible,9.0,4.5,target,3.0,0.0
+HS-HO-VS-L-044,HO,True,False,True,2,940883,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-HO-CV-S-045,HO,False,True,False,0,940884,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-HO-VS-S-046,HO,True,True,False,2,940885,True,action required and possible,14.0,7.0,target,3.0,0.0
+HS-HO-CV-L-047,HO,False,False,True,0,940886,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-HO-VS-S-048,HO,True,True,True,2,940887,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-HO-CV-S-049,HO,False,True,False,0,940888,False,no solution with margin from the start state,3.0,1.5,obstacle,0.0,
+HS-HO-VS-S-050,HO,True,True,False,2,940889,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-HO-CV-L-051,HO,False,False,True,0,940890,False,standing on succeeds,3.0,1.5,goal,,
+HS-HO-VS-S-052,HO,True,True,True,2,940891,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-HO-CV-S-053,HO,False,True,False,0,940892,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-HO-VS-L-054,HO,True,False,False,2,940893,False,standing on succeeds,24.0,12.0,goal,,
+HS-HO-CV-S-055,HO,False,True,True,0,940894,False,standing on succeeds,3.0,1.5,goal,,
+HS-HO-VS-S-056,HO,True,True,True,2,940895,True,action required and possible,5.0,2.5,target,3.0,2.0
+HS-HO-CV-L-057,HO,False,False,False,0,940896,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-HO-VS-S-058,HO,True,True,False,2,940897,True,action required and possible,14.0,7.0,target,2.0,0.0
+HS-HO-CV-S-059,HO,False,True,True,0,940898,True,action required and possible,11.0,5.5,target,2.0,0.0
+HS-HO-VS-S-060,HO,True,True,True,2,940899,True,action required and possible,7.0,3.5,target,3.0,0.0
+HS-HO-CV-L-061,HO,False,False,False,0,940900,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-HO-VS-S-062,HO,True,True,False,2,940901,True,action required and possible,8.0,4.0,target,3.0,0.0
+HS-HO-CV-S-063,HO,False,True,True,0,940902,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-HO-VS-L-064,HO,True,False,True,2,940903,True,action required and possible,6.0,3.0,target,1.0,2.0
+HS-HO-CV-S-065,HO,False,True,False,0,940904,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-HO-VS-S-066,HO,True,True,False,2,940905,False,standing on succeeds,6.0,3.0,goal,,
+HS-HO-CV-L-067,HO,False,False,True,0,940906,True,action required and possible,3.0,1.5,target,3.0,1.0
+HS-HO-VS-S-068,HO,True,True,True,2,940907,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-HO-CV-S-069,HO,False,True,False,0,940908,True,action required and possible,4.0,2.0,target,2.0,2.0
+HS-HO-VS-S-070,HO,True,True,False,2,940909,False,no solution with margin from the start state,14.0,7.0,target,0.0,
+HS-HO-CV-L-071,HO,False,False,True,0,940910,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-HO-VS-S-072,HO,True,True,True,2,940911,False,standing on succeeds,14.0,7.0,goal,,
+HS-HO-CV-S-073,HO,False,True,False,0,940912,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-HO-VS-L-074,HO,True,False,False,2,940913,False,no solution with margin from the start state,8.0,4.0,obstacle,0.0,
+HS-HO-CV-S-075,HO,False,True,True,0,940914,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-HO-VS-S-076,HO,True,True,True,2,940915,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-HO-CV-L-077,HO,False,False,False,0,940916,False,standing on succeeds,3.0,1.5,goal,,
+HS-HO-VS-S-078,HO,True,True,False,2,940917,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-HO-CV-S-079,HO,False,True,True,0,940918,True,action required and possible,11.0,5.5,target,3.0,0.0
+HS-HO-VS-S-080,HO,True,True,True,2,940919,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-HO-CV-L-081,HO,False,False,False,0,940920,False,no solution with margin from the start state,17.0,8.5,goal,0.0,
+HS-HO-VS-S-082,HO,True,True,False,2,940921,True,action required and possible,13.0,6.5,target,3.0,0.0
+HS-HO-CV-S-083,HO,False,True,True,0,940922,False,no solution with margin from the start state,14.0,7.0,target,0.0,
+HS-HO-VS-L-084,HO,True,False,True,2,940923,True,action required and possible,5.0,2.5,target,3.0,1.0
+HS-HO-CV-S-085,HO,False,True,False,0,940924,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-HO-VS-S-086,HO,True,True,False,2,940925,True,action required and possible,10.0,5.0,target,3.0,0.0
+HS-HO-CV-L-087,HO,False,False,True,0,940926,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-HO-VS-S-088,HO,True,True,True,2,940927,False,standing on succeeds,20.0,10.0,goal,,
+HS-HO-CV-S-089,HO,False,True,False,0,940928,False,no solution with margin from the start state,14.0,7.0,target,0.0,
+HS-HO-VS-L-090,HO,True,False,False,2,940929,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-HO-CV-S-091,HO,False,True,True,0,940930,False,standing on succeeds,26.0,13.0,goal,,
+HS-HO-VS-S-092,HO,True,True,True,2,940931,True,action required and possible,5.0,2.5,target,3.0,1.0
+HS-HO-CV-S-093,HO,False,True,False,0,940932,False,no solution with margin from the start state,17.0,8.5,target,0.0,
+HS-HO-VS-L-094,HO,True,False,False,2,940933,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-HO-CV-S-095,HO,False,True,True,0,940934,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-HO-VS-S-096,HO,True,True,True,2,940935,True,action required and possible,8.0,4.0,target,3.0,1.0
+HS-HO-CV-L-097,HO,False,False,False,0,940936,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-HO-VS-S-098,HO,True,True,False,2,940937,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-HO-CV-S-099,HO,False,True,True,0,940938,False,no solution with margin from the start state,12.0,6.0,target,0.0,
+HS-HO-VS-S-100,HO,True,True,True,2,940939,True,action required and possible,5.0,2.5,target,3.0,2.0
+HS-HO-CV-L-101,HO,False,False,False,0,940940,False,standing on succeeds,29.0,14.5,goal,,
+HS-HO-VS-S-102,HO,True,True,False,2,940941,True,action required and possible,6.0,3.0,target,3.0,1.0
+HS-HO-CV-S-103,HO,False,True,True,0,940942,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-HO-VS-L-104,HO,True,False,True,2,940943,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-HO-CV-S-105,HO,False,True,False,0,940944,False,standing on succeeds,5.0,2.5,goal,,
+HS-HO-VS-S-106,HO,True,True,False,2,940945,False,no solution with margin from the start state,40.0,20.0,goal,0.0,
+HS-HO-CV-L-107,HO,False,False,True,0,940946,True,action required and possible,12.0,6.0,target,2.0,0.0
+HS-HO-VS-S-108,HO,True,True,True,2,940947,True,action required and possible,8.0,4.0,target,3.0,0.0
+HS-HO-CV-S-109,HO,False,True,False,0,940948,True,action required and possible,3.0,1.5,target,1.0,0.0
+HS-HO-VS-S-110,HO,True,True,False,2,940949,False,standing on succeeds,26.0,13.0,goal,,
+HS-HO-CV-L-111,HO,False,False,True,0,940950,False,standing on succeeds,10.0,5.0,goal,,
+HS-HO-VS-S-112,HO,True,True,True,2,940951,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-HO-CV-S-113,HO,False,True,False,0,940952,True,action required and possible,6.0,3.0,target,3.0,2.0
+HS-HO-VS-L-114,HO,True,False,False,2,940953,True,action required and possible,5.0,2.5,obstacle,3.0,0.0
+HS-HO-CV-S-115,HO,False,True,True,0,940954,True,action required and possible,3.0,1.5,target,3.0,1.0
+HS-HO-VS-S-116,HO,True,True,True,2,940955,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-HO-CV-L-117,HO,False,False,False,0,940956,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-HO-VS-S-118,HO,True,True,False,2,940957,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-HO-CV-S-119,HO,False,True,True,0,940958,False,no solution with margin from the start state,10.0,5.0,target,0.0,
+HS-HO-VS-S-120,HO,True,True,True,2,940959,True,action required and possible,7.0,3.5,target,3.0,0.0
+HS-HO-CV-L-121,HO,False,False,False,0,940960,True,action required and possible,8.0,4.0,target,3.0,2.0
+HS-HO-VS-S-122,HO,True,True,False,2,940961,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-HO-CV-S-123,HO,False,True,True,0,940962,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-HO-VS-L-124,HO,True,False,True,2,940963,False,standing on succeeds,6.0,3.0,goal,,
+HS-HO-CV-S-125,HO,False,True,False,0,940964,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-HO-VS-S-126,HO,True,True,False,2,940965,False,standing on succeeds,6.0,3.0,goal,,
+HS-HO-CV-L-127,HO,False,False,True,0,940966,False,standing on succeeds,6.0,3.0,goal,,
+HS-HO-VS-S-128,HO,True,True,True,2,940967,True,action required and possible,8.0,4.0,target,3.0,0.0
+HS-HO-CV-S-129,HO,False,True,False,0,940968,True,action required and possible,5.0,2.5,target,2.0,0.0
+HS-HO-VS-S-130,HO,True,True,False,2,940969,False,standing on succeeds,6.0,3.0,goal,,
+HS-HO-CV-L-131,HO,False,False,True,0,940970,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-HO-VS-S-132,HO,True,True,True,2,940971,True,action required and possible,9.0,4.5,target,3.0,2.0
+HS-HO-CV-S-133,HO,False,True,False,0,940972,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-HO-VS-L-134,HO,True,False,False,2,940973,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-HO-CV-S-135,HO,False,True,True,0,940974,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-HO-VS-S-136,HO,True,True,True,2,940975,False,standing on succeeds,12.0,6.0,goal,,
+HS-HO-CV-L-137,HO,False,False,False,0,940976,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-HO-VS-S-138,HO,True,True,False,2,940977,True,action required and possible,8.0,4.0,target,3.0,0.0
+HS-HO-CV-S-139,HO,False,True,True,0,940978,True,action required and possible,9.0,4.5,target,3.0,1.0
+HS-HO-VS-S-140,HO,True,True,True,2,940979,True,action required and possible,5.0,2.5,target,3.0,1.0
+HS-HO-CV-L-141,HO,False,False,False,0,940980,True,action required and possible,4.0,2.0,goal,3.0,0.0
+HS-HO-VS-S-142,HO,True,True,False,2,940981,True,action required and possible,7.0,3.5,target,1.0,0.0
+HS-HO-CV-S-143,HO,False,True,True,0,940982,True,action required and possible,10.0,5.0,target,3.0,0.0
+HS-HO-VS-L-144,HO,True,False,True,2,940983,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-HO-CV-S-145,HO,False,True,False,0,940984,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-HO-VS-S-146,HO,True,True,False,2,940985,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-HO-CV-L-147,HO,False,False,True,0,940986,True,action required and possible,3.0,1.5,target,1.0,0.0
+HS-HO-VS-S-148,HO,True,True,True,2,940987,True,action required and possible,9.0,4.5,target,3.0,0.0
+HS-HO-CV-S-149,HO,False,True,False,0,940988,False,standing on succeeds,3.0,1.5,goal,,
+HS-HO-VS-S-150,HO,True,True,False,2,940989,True,action required and possible,10.0,5.0,target,3.0,0.0
+HS-HO-CV-L-151,HO,False,False,True,0,940990,True,action required and possible,7.0,3.5,target,3.0,0.0
+HS-HO-VS-S-152,HO,True,True,True,2,940991,True,action required and possible,7.0,3.5,target,3.0,0.0
+HS-HO-CV-S-153,HO,False,True,False,0,940992,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-HO-VS-L-154,HO,True,False,False,2,940993,True,action required and possible,10.0,5.0,target,1.0,0.0
+HS-HO-CV-S-155,HO,False,True,True,0,940994,False,standing on succeeds,12.0,6.0,goal,,
+HS-HO-VS-S-156,HO,True,True,True,2,940995,True,action required and possible,9.0,4.5,target,3.0,0.0
+HS-HO-CV-L-157,HO,False,False,False,0,940996,False,no solution with margin from the start state,37.0,18.5,goal,0.0,
+HS-HO-VS-S-158,HO,True,True,False,2,940997,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-HO-CV-S-159,HO,False,True,True,0,940998,False,standing on succeeds,6.0,3.0,goal,,
+HS-HO-VS-S-160,HO,True,True,True,2,940999,True,action required and possible,5.0,2.5,target,3.0,1.0
+HS-HO-CV-L-161,HO,False,False,False,0,941000,True,action required and possible,3.0,1.5,goal,3.0,0.0
+HS-HO-VS-S-162,HO,True,True,False,2,941001,False,no solution with margin from the start state,5.0,2.5,obstacle,0.0,
+HS-HO-CV-S-163,HO,False,True,True,0,941002,False,standing on succeeds,5.0,2.5,goal,,
+HS-HO-VS-L-164,HO,True,False,True,2,941003,False,standing on succeeds,28.0,14.0,goal,,
+HS-HO-CV-S-165,HO,False,True,False,0,941004,False,no solution with margin from the start state,3.0,1.5,obstacle,0.0,
+HS-HO-VS-S-166,HO,True,True,False,2,941005,True,action required and possible,5.0,2.5,target,1.0,0.0
+HS-HO-CV-L-167,HO,False,False,True,0,941006,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-HO-VS-S-168,HO,True,True,True,2,941007,False,standing on succeeds,20.0,10.0,goal,,
+HS-HO-CV-S-169,HO,False,True,False,0,941008,True,action required and possible,6.0,3.0,target,3.0,1.0
+HS-HO-VS-L-170,HO,True,False,False,2,941009,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-HO-CV-S-171,HO,False,True,True,0,941010,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-HO-VS-S-172,HO,True,True,True,2,941011,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-HO-CV-S-173,HO,False,True,False,0,941012,True,action required and possible,3.0,1.5,target,1.0,0.0
+HS-HO-VS-L-174,HO,True,False,False,2,941013,True,action required and possible,17.0,8.5,target,2.0,1.0
+HS-HO-CV-S-175,HO,False,True,True,0,941014,False,no solution with margin from the start state,8.0,4.0,target,0.0,
+HS-HO-VS-S-176,HO,True,True,True,2,941015,True,action required and possible,5.0,2.5,target,1.0,1.0
+HS-HO-CV-L-177,HO,False,False,False,0,941016,False,no solution with margin from the start state,7.0,3.5,target,0.0,
+HS-HO-VS-S-178,HO,True,True,False,2,941017,False,standing on succeeds,8.0,4.0,goal,,
+HS-HO-CV-S-179,HO,False,True,True,0,941018,False,standing on succeeds,27.0,13.5,goal,,
+HS-HO-VS-L-180,HO,True,False,True,2,941019,True,action required and possible,9.0,4.5,target,3.0,1.0
+HS-OT-CV-L-001,OT,False,False,False,0,941020,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-OT-VS-S-002,OT,True,True,False,2,941021,False,no solution with margin from the start state,6.0,3.0,obstacle,0.0,
+HS-OT-CV-S-003,OT,False,True,True,0,941022,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-OT-VS-L-004,OT,True,False,True,2,941023,True,action required and possible,8.0,4.0,target,3.0,0.0
+HS-OT-CV-S-005,OT,False,True,False,0,941024,True,action required and possible,5.0,2.5,target,3.0,1.0
+HS-OT-VS-S-006,OT,True,True,False,2,941025,True,action required and possible,6.0,3.0,target,2.0,1.0
+HS-OT-CV-L-007,OT,False,False,True,0,941026,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-OT-VS-S-008,OT,True,True,True,2,941027,False,standing on succeeds,6.0,3.0,goal,,
+HS-OT-CV-S-009,OT,False,True,False,0,941028,False,standing on succeeds,35.0,17.5,goal,,
+HS-OT-VS-S-010,OT,True,True,False,2,941029,True,action required and possible,6.0,3.0,target,2.0,2.0
+HS-OT-CV-L-011,OT,False,False,True,0,941030,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-OT-VS-S-012,OT,True,True,True,2,941031,True,action required and possible,15.0,7.5,target,3.0,0.0
+HS-OT-CV-S-013,OT,False,True,False,0,941032,False,no solution with margin from the start state,4.0,2.0,obstacle,0.0,
+HS-OT-VS-L-014,OT,True,False,False,2,941033,False,standing on succeeds,6.0,3.0,goal,,
+HS-OT-CV-S-015,OT,False,True,True,0,941034,False,standing on succeeds,3.0,1.5,goal,,
+HS-OT-VS-S-016,OT,True,True,True,2,941035,True,action required and possible,7.0,3.5,target,3.0,0.0
+HS-OT-CV-L-017,OT,False,False,False,0,941036,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-OT-VS-S-018,OT,True,True,False,2,941037,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-OT-CV-S-019,OT,False,True,True,0,941038,False,standing on succeeds,4.0,2.0,goal,,
+HS-OT-VS-S-020,OT,True,True,True,2,941039,True,action required and possible,6.0,3.0,target,3.0,2.0
+HS-OT-CV-L-021,OT,False,False,False,0,941040,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-OT-VS-S-022,OT,True,True,False,2,941041,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-OT-CV-S-023,OT,False,True,True,0,941042,True,action required and possible,4.0,2.0,goal,3.0,0.0
+HS-OT-VS-L-024,OT,True,False,True,2,941043,True,action required and possible,15.0,7.5,target,3.0,1.0
+HS-OT-CV-S-025,OT,False,True,False,0,941044,True,action required and possible,3.0,1.5,goal,3.0,0.0
+HS-OT-VS-S-026,OT,True,True,False,2,941045,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-OT-CV-L-027,OT,False,False,True,0,941046,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-OT-VS-S-028,OT,True,True,True,2,941047,True,action required and possible,5.0,2.5,goal,3.0,0.0
+HS-OT-CV-S-029,OT,False,True,False,0,941048,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-OT-VS-S-030,OT,True,True,False,2,941049,False,no solution with margin from the start state,5.0,2.5,target,0.0,
+HS-OT-CV-L-031,OT,False,False,True,0,941050,False,standing on succeeds,4.0,2.0,goal,,
+HS-OT-VS-S-032,OT,True,True,True,2,941051,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-OT-CV-S-033,OT,False,True,False,0,941052,False,no solution with margin from the start state,4.0,2.0,obstacle,0.0,
+HS-OT-VS-L-034,OT,True,False,False,2,941053,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-OT-CV-S-035,OT,False,True,True,0,941054,False,standing on succeeds,3.0,1.5,goal,,
+HS-OT-VS-S-036,OT,True,True,True,2,941055,False,standing on succeeds,6.0,3.0,goal,,
+HS-OT-CV-L-037,OT,False,False,False,0,941056,False,standing on succeeds,5.0,2.5,goal,,
+HS-OT-VS-S-038,OT,True,True,False,2,941057,True,action required and possible,6.0,3.0,target,1.0,0.0
+HS-OT-CV-S-039,OT,False,True,True,0,941058,True,action required and possible,17.0,8.5,target,3.0,1.0
+HS-OT-VS-S-040,OT,True,True,True,2,941059,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-OT-CV-L-041,OT,False,False,False,0,941060,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-OT-VS-S-042,OT,True,True,False,2,941061,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-OT-CV-S-043,OT,False,True,True,0,941062,False,standing on succeeds,4.0,2.0,goal,,
+HS-OT-VS-L-044,OT,True,False,True,2,941063,True,action required and possible,28.0,14.0,target,3.0,0.0
+HS-OT-CV-S-045,OT,False,True,False,0,941064,False,standing on succeeds,4.0,2.0,goal,,
+HS-OT-VS-S-046,OT,True,True,False,2,941065,True,action required and possible,6.0,3.0,target,3.0,1.0
+HS-OT-CV-L-047,OT,False,False,True,0,941066,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-OT-VS-S-048,OT,True,True,True,2,941067,False,no solution with margin from the start state,6.0,3.0,target,0.0,
+HS-OT-CV-S-049,OT,False,True,False,0,941068,True,action required and possible,4.0,2.0,target,3.0,2.0
+HS-OT-VS-S-050,OT,True,True,False,2,941069,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-OT-CV-L-051,OT,False,False,True,0,941070,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-OT-VS-S-052,OT,True,True,True,2,941071,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-OT-CV-S-053,OT,False,True,False,0,941072,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-OT-VS-L-054,OT,True,False,False,2,941073,True,action required and possible,6.0,3.0,target,3.0,1.0
+HS-OT-CV-S-055,OT,False,True,True,0,941074,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-OT-VS-S-056,OT,True,True,True,2,941075,True,action required and possible,6.0,3.0,target,3.0,1.0
+HS-OT-CV-L-057,OT,False,False,False,0,941076,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-OT-VS-S-058,OT,True,True,False,2,941077,True,action required and possible,5.0,2.5,obstacle,3.0,0.0
+HS-OT-CV-S-059,OT,False,True,True,0,941078,False,standing on succeeds,4.0,2.0,goal,,
+HS-OT-VS-S-060,OT,True,True,True,2,941079,True,action required and possible,19.0,9.5,goal,3.0,0.0
+HS-OT-CV-L-061,OT,False,False,False,0,941080,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-OT-VS-S-062,OT,True,True,False,2,941081,False,no solution with margin from the start state,6.0,3.0,boundary,0.0,
+HS-OT-CV-S-063,OT,False,True,True,0,941082,False,no solution with margin from the start state,3.0,1.5,target,0.0,
+HS-OT-VS-L-064,OT,True,False,True,2,941083,False,standing on succeeds,6.0,3.0,goal,,
+HS-OT-CV-S-065,OT,False,True,False,0,941084,True,action required and possible,4.0,2.0,target,3.0,2.0
+HS-OT-VS-S-066,OT,True,True,False,2,941085,True,action required and possible,5.0,2.5,target,3.0,0.0
+HS-OT-CV-L-067,OT,False,False,True,0,941086,False,standing on succeeds,21.0,10.5,goal,,
+HS-OT-VS-S-068,OT,True,True,True,2,941087,False,no solution with margin from the start state,6.0,3.0,obstacle,0.0,
+HS-OT-CV-S-069,OT,False,True,False,0,941088,False,standing on succeeds,3.0,1.5,goal,,
+HS-OT-VS-S-070,OT,True,True,False,2,941089,False,standing on succeeds,5.0,2.5,goal,,
+HS-OT-CV-L-071,OT,False,False,True,0,941090,True,action required and possible,3.0,1.5,target,3.0,0.0
+HS-OT-VS-S-072,OT,True,True,True,2,941091,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-OT-CV-S-073,OT,False,True,False,0,941092,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-OT-VS-L-074,OT,True,False,False,2,941093,False,standing on succeeds,6.0,3.0,goal,,
+HS-OT-CV-S-075,OT,False,True,True,0,941094,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-OT-VS-S-076,OT,True,True,True,2,941095,True,action required and possible,18.0,9.0,target,3.0,0.0
+HS-OT-CV-L-077,OT,False,False,False,0,941096,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-OT-VS-S-078,OT,True,True,False,2,941097,True,action required and possible,11.0,5.5,target,3.0,0.0
+HS-OT-CV-S-079,OT,False,True,True,0,941098,False,standing on succeeds,4.0,2.0,goal,,
+HS-OT-VS-S-080,OT,True,True,True,2,941099,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-OT-CV-L-081,OT,False,False,False,0,941100,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-OT-VS-S-082,OT,True,True,False,2,941101,True,action required and possible,25.0,12.5,target,3.0,0.0
+HS-OT-CV-S-083,OT,False,True,True,0,941102,True,action required and possible,4.0,2.0,obstacle,3.0,0.0
+HS-OT-VS-L-084,OT,True,False,True,2,941103,True,action required and possible,6.0,3.0,target,3.0,0.0
+HS-OT-CV-S-085,OT,False,True,False,0,941104,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-OT-VS-S-086,OT,True,True,False,2,941105,True,action required and possible,5.0,2.5,target,3.0,1.0
+HS-OT-CV-L-087,OT,False,False,True,0,941106,True,action required and possible,13.0,6.5,target,3.0,1.0
+HS-OT-VS-S-088,OT,True,True,True,2,941107,True,action required and possible,13.0,6.5,target,3.0,0.0
+HS-OT-CV-S-089,OT,False,True,False,0,941108,False,no solution with margin from the start state,4.0,2.0,target,0.0,
+HS-OT-VS-L-090,OT,True,False,False,2,941109,True,action required and possible,6.0,3.0,obstacle,1.0,2.0
+HS-OT-CV-S-091,OT,False,True,True,0,941110,True,action required and possible,3.0,1.5,goal,3.0,0.0
+HS-OT-VS-S-092,OT,True,True,True,2,941111,True,action required and possible,16.0,8.0,target,3.0,0.0
+HS-OT-CV-S-093,OT,False,True,False,0,941112,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-OT-VS-L-094,OT,True,False,False,2,941113,False,standing on succeeds,7.0,3.5,goal,,
+HS-OT-CV-S-095,OT,False,True,True,0,941114,True,action required and possible,4.0,2.0,goal,3.0,0.0
+HS-OT-VS-S-096,OT,True,True,True,2,941115,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-BO-CV-L-001,BO,False,False,False,0,941116,False,standing on succeeds,2.0,1.0,goal,,
+HS-BO-VS-S-002,BO,True,True,False,2,941117,False,ended before the start state,,,,,
+HS-BO-CV-S-003,BO,False,True,True,0,941118,True,action required and possible,2.0,1.0,target,3.0,0.0
+HS-BO-VS-L-004,BO,True,False,True,2,941119,True,action required and possible,4.0,2.0,obstacle,3.0,0.0
+HS-BO-CV-S-005,BO,False,True,False,0,941120,False,no solution with margin from the start state,2.0,1.0,target,0.0,
+HS-BO-VS-S-006,BO,True,True,False,2,941121,False,standing on succeeds,13.0,6.5,goal,,
+HS-BO-CV-L-007,BO,False,False,True,0,941122,False,standing on succeeds,2.0,1.0,goal,,
+HS-BO-VS-S-008,BO,True,True,True,2,941123,True,action required and possible,4.0,2.0,goal,3.0,0.0
+HS-BO-CV-S-009,BO,False,True,False,0,941124,False,no solution with margin from the start state,2.0,1.0,obstacle,0.0,
+HS-BO-VS-S-010,BO,True,True,False,2,941125,False,no solution with margin from the start state,4.0,2.0,obstacle,0.0,
+HS-BO-CV-L-011,BO,False,False,True,0,941126,False,standing on succeeds,2.0,1.0,goal,,
+HS-BO-VS-S-012,BO,True,True,True,2,941127,False,standing on succeeds,4.0,2.0,goal,,
+HS-BO-CV-S-013,BO,False,True,False,0,941128,False,no solution with margin from the start state,2.0,1.0,obstacle,0.0,
+HS-BO-VS-L-014,BO,True,False,False,2,941129,False,ended before the start state,,,,,
+HS-BO-CV-S-015,BO,False,True,True,0,941130,False,standing on succeeds,2.0,1.0,goal,,
+HS-BO-VS-S-016,BO,True,True,True,2,941131,True,action required and possible,6.0,3.0,goal,3.0,0.0
+HS-BO-CV-L-017,BO,False,False,False,0,941132,False,no solution with margin from the start state,2.0,1.0,goal,0.0,
+HS-BO-VS-S-018,BO,True,True,False,2,941133,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-BO-CV-S-019,BO,False,True,True,0,941134,False,standing on succeeds,2.0,1.0,goal,,
+HS-BO-VS-S-020,BO,True,True,True,2,941135,False,standing on succeeds,4.0,2.0,goal,,
+HS-BO-CV-L-021,BO,False,False,False,0,941136,True,action required and possible,2.0,1.0,target,3.0,0.0
+HS-BO-VS-S-022,BO,True,True,False,2,941137,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-BO-CV-S-023,BO,False,True,True,0,941138,True,action required and possible,2.0,1.0,target,3.0,0.0
+HS-BO-VS-L-024,BO,True,False,True,2,941139,False,standing on succeeds,4.0,2.0,goal,,
+HS-BO-CV-S-025,BO,False,True,False,0,941140,False,no solution with margin from the start state,2.0,1.0,obstacle,0.0,
+HS-BO-VS-S-026,BO,True,True,False,2,941141,False,standing on succeeds,4.0,2.0,goal,,
+HS-BO-CV-L-027,BO,False,False,True,0,941142,False,standing on succeeds,5.0,2.5,goal,,
+HS-BO-VS-S-028,BO,True,True,True,2,941143,False,ended before the start state,,,,,
+HS-BO-CV-S-029,BO,False,True,False,0,941144,False,ended before the start state,,,,,
+HS-BO-VS-S-030,BO,True,True,False,2,941145,False,standing on succeeds,4.0,2.0,goal,,
+HS-BO-CV-L-031,BO,False,False,True,0,941146,False,standing on succeeds,5.0,2.5,goal,,
+HS-BO-VS-S-032,BO,True,True,True,2,941147,False,standing on succeeds,4.0,2.0,goal,,
+HS-BO-CV-S-033,BO,False,True,False,0,941148,False,standing on succeeds,2.0,1.0,goal,,
+HS-BO-VS-L-034,BO,True,False,False,2,941149,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-BO-CV-S-035,BO,False,True,True,0,941150,True,action required and possible,2.0,1.0,target,3.0,0.0
+HS-BO-VS-S-036,BO,True,True,True,2,941151,False,ended before the start state,,,,,
+HS-BO-CV-L-037,BO,False,False,False,0,941152,False,no solution with margin from the start state,2.0,1.0,target,0.0,
+HS-BO-VS-S-038,BO,True,True,False,2,941153,False,standing on succeeds,4.0,2.0,goal,,
+HS-BO-CV-S-039,BO,False,True,True,0,941154,False,standing on succeeds,2.0,1.0,goal,,
+HS-BO-VS-S-040,BO,True,True,True,2,941155,False,standing on succeeds,12.0,6.0,goal,,
+HS-BO-CV-L-041,BO,False,False,False,0,941156,False,standing on succeeds,2.0,1.0,goal,,
+HS-BO-VS-S-042,BO,True,True,False,2,941157,True,action required and possible,4.0,2.0,goal,3.0,0.0
+HS-BO-CV-S-043,BO,False,True,True,0,941158,True,action required and possible,2.0,1.0,target,3.0,0.0
+HS-BO-VS-L-044,BO,True,False,True,2,941159,False,standing on succeeds,4.0,2.0,goal,,
+HS-BO-CV-S-045,BO,False,True,False,0,941160,False,no solution with margin from the start state,9.0,4.5,obstacle,0.0,
+HS-BO-VS-S-046,BO,True,True,False,2,941161,False,standing on succeeds,4.0,2.0,goal,,
+HS-BO-CV-L-047,BO,False,False,True,0,941162,False,standing on succeeds,2.0,1.0,goal,,
+HS-BO-VS-S-048,BO,True,True,True,2,941163,False,standing on succeeds,4.0,2.0,goal,,
+HS-BO-CV-S-049,BO,False,True,False,0,941164,False,standing on succeeds,2.0,1.0,goal,,
+HS-BO-VS-S-050,BO,True,True,False,2,941165,False,standing on succeeds,4.0,2.0,goal,,
+HS-BO-CV-L-051,BO,False,False,True,0,941166,True,action required and possible,2.0,1.0,target,3.0,0.0
+HS-BO-VS-S-052,BO,True,True,True,2,941167,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-BO-CV-S-053,BO,False,True,False,0,941168,False,no solution with margin from the start state,2.0,1.0,obstacle,0.0,
+HS-BO-VS-L-054,BO,True,False,False,2,941169,False,ended before the start state,,,,,
+HS-BO-CV-S-055,BO,False,True,True,0,941170,False,standing on succeeds,2.0,1.0,goal,,
+HS-BO-VS-S-056,BO,True,True,True,2,941171,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-BO-CV-L-057,BO,False,False,False,0,941172,False,standing on succeeds,2.0,1.0,goal,,
+HS-BO-VS-S-058,BO,True,True,False,2,941173,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-BO-CV-S-059,BO,False,True,True,0,941174,False,standing on succeeds,2.0,1.0,goal,,
+HS-BO-VS-S-060,BO,True,True,True,2,941175,False,standing on succeeds,4.0,2.0,goal,,
+HS-BO-CV-L-061,BO,False,False,False,0,941176,True,action required and possible,2.0,1.0,obstacle,3.0,1.0
+HS-BO-VS-S-062,BO,True,True,False,2,941177,False,ended before the start state,,,,,
+HS-BO-CV-S-063,BO,False,True,True,0,941178,False,standing on succeeds,2.0,1.0,goal,,
+HS-BO-VS-L-064,BO,True,False,True,2,941179,False,standing on succeeds,4.0,2.0,goal,,
+HS-BO-CV-S-065,BO,False,True,False,0,941180,True,action required and possible,2.0,1.0,target,3.0,1.0
+HS-BO-VS-S-066,BO,True,True,False,2,941181,True,action required and possible,4.0,2.0,target,3.0,0.0
+HS-BO-CV-L-067,BO,False,False,True,0,941182,True,action required and possible,2.0,1.0,goal,3.0,0.0
+HS-BO-VS-S-068,BO,True,True,True,2,941183,False,standing on succeeds,4.0,2.0,goal,,
+HS-BO-CV-S-069,BO,False,True,False,0,941184,True,action required and possible,2.0,1.0,obstacle,3.0,0.0
+HS-BO-VS-S-070,BO,True,True,False,2,941185,False,standing on succeeds,4.0,2.0,goal,,
+HS-BO-CV-L-071,BO,False,False,True,0,941186,False,standing on succeeds,2.0,1.0,goal,,
+HS-BO-VS-S-072,BO,True,True,True,2,941187,False,standing on succeeds,4.0,2.0,goal,,
+HS-BO-CV-S-073,BO,False,True,False,0,941188,True,action required and possible,2.0,1.0,goal,3.0,1.0
+HS-BO-VS-L-074,BO,True,False,False,2,941189,False,no solution with margin from the start state,4.0,2.0,obstacle,0.0,
+HS-BO-CV-S-075,BO,False,True,True,0,941190,True,action required and possible,2.0,1.0,target,3.0,0.0
+HS-BO-VS-S-076,BO,True,True,True,2,941191,True,action required and possible,4.0,2.0,goal,3.0,1.0
+HS-BO-CV-L-077,BO,False,False,False,0,941192,False,standing on succeeds,2.0,1.0,goal,,
+HS-BO-VS-S-078,BO,True,True,False,2,941193,True,action required and possible,4.0,2.0,obstacle,3.0,0.0
+HS-BO-CV-S-079,BO,False,True,True,0,941194,False,standing on succeeds,2.0,1.0,goal,,
+HS-BO-VS-S-080,BO,True,True,True,2,941195,False,standing on succeeds,4.0,2.0,goal,,
+HS-BO-CV-L-081,BO,False,False,False,0,941196,True,action required and possible,2.0,1.0,target,3.0,0.0
+HS-BO-VS-S-082,BO,True,True,False,2,941197,True,action required and possible,4.0,2.0,goal,3.0,0.0
+HS-BO-CV-S-083,BO,False,True,True,0,941198,False,ended before the start state,,,,,
+HS-BO-VS-L-084,BO,True,False,True,2,941199,False,standing on succeeds,4.0,2.0,goal,,

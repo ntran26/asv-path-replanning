@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# The SAC recovery back-up plan (planning/SAC_RECOVERY_PLAN.md section 0), decided
+# The SAC recovery back-up plan (planning/archive/SAC_RECOVERY_PLAN.md section 0), decided
 # 2026-09-30: stage 8 from the 2.5 M checkpoint to 3.0 M, then the frozen
 # suite and the Paper 2 set on its best model, for comparison with the kept 3 M
 # policy (runs/sac_formulation_seed0_bl3/kept_best_3M, sacs0_bl3).
