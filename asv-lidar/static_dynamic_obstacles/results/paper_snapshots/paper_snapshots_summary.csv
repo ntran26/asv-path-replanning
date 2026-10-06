@@ -1,0 +1,7 @@
+panel,case,encounter,layout,leg,panels,varying_speed,duration_s,cpa_m,t_cpa_s,min_speed_mps
+a,FS-NT-010,No target,field-style,slanted,3,False,26.0,,,0.564
+b,P2-L3-HO-FIX-15,Head-on,layout L3,slanted,3,False,24.5,4.27,13.0,0.544
+c,CH-CR-CV-035,Port crossing,channel,straight,1,False,28.0,2.53,8.5,0.294
+d,P2-L2-CRS-VAR-10,Starboard crossing,layout L2,slanted,3,True,31.0,3.02,7.0,0.49
+e,BAS-OT-CV-073,Overtaking,basin,straight,1,False,24.5,3.04,18.0,0.516
+f,BAS-BO-RE-016,Being overtaken,basin,slanted,0,False,20.0,2.22,10.0,0.396
