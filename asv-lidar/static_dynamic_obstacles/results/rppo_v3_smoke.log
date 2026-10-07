@@ -1,0 +1,24 @@
+[CONFIG] baseline-v3 (formulation 03a9c0c22f53ee0b): recurrent_ppo seed 0
+Using cpu device
+[FIELD] building the field evaluation scenarios ...
+Logging to C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\runs\tensorboard\recurrent_ppo_formulation_seed0_smoke_1
+[CURRICULUM] t=0 -> scenario stage 1
+[CURRICULUM] t=270 -> scenario stage 2
+[CURRICULUM] t=590 -> scenario stage 3
+[CURRICULUM] t=1,050 -> scenario stage 4
+[CURRICULUM] t=1,640 -> scenario stage 5
+[CURRICULUM] t=2,460 -> scenario stage 6
+[CURRICULUM] t=3,280 -> scenario stage 7
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 37.7     |
+|    ep_rew_mean     | -328     |
+| time/              |          |
+|    fps             | 28       |
+|    iterations      | 1        |
+|    time_elapsed    | 178      |
+|    total_timesteps | 5120     |
+---------------------------------
+[EVAL] t=5,120 safety off goal 0.05 collision 0.95 | dev goal 0.00 | field goal 0.05 (NT 0.10 HO 0.00 CRP 0.04 CRS 0.04 OT 0.00 BO 0.15) (93.1 s)
+[EVAL] t=5,120 safety on goal 0.05 collision 0.95 | dev goal 0.00 | field goal 0.05 (NT 0.10 HO 0.00 CRP 0.04 CRS 0.04 OT 0.00 BO 0.15) (93.9 s)
+done in 0.12 h -> C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\runs\recurrent_ppo_formulation_seed0_smoke

@@ -11,6 +11,14 @@ and the tables that decide them, in one file.
 >   deployment-layout set, trimmed of near-duplicates. Version 4, the current one, replaces the
 >   episodes no controller can solve after the target is first tracked
 >   (`planning/BASELINE_V4_PLAN.md`, section 5e).
+> - **Scenario terminology (2026-10-07).** *Decoupled* scenarios keep static obstacles clear of
+>   the region around the predicted closest point of approach (+/-0.4 T0 of own-ship travel), so
+>   obstacle avoidance and collision avoidance happen in sequence: the frozen suite and the basin
+>   and channel cells. *Coupled* scenarios place three obstacles in a structured arrangement (a
+>   gate with an on-path obstacle, a slalom, or a lateral obstacle with an on-path obstacle) and
+>   generate the encounter with them in place, so the vessel resolves both at once: the generated
+>   coupled family (episode prefix FS-) and the reference layouts L1-L3. The terms replace
+>   "field-style" and "frozen-like"; episode IDs and code names keep their recorded forms.
 > - **Results so far, all safety off, none of them run under the pre-registered protocol of
 >   multiple seeds:**
 >

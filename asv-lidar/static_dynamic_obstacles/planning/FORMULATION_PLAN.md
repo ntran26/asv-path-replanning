@@ -341,9 +341,9 @@ that is actually evaluated; if safety layer v2 is adopted, it goes here instead.
 
 > **If baseline-v3 is adopted**, replace the table's end with: 2.5 M steps;
 > stages 1–4 unchanged at the same step counts; stage 5 (1.0 M) weights three
-> panels; **stage 6** (1.5 M) halves the CPA guard and draws 25 % Paper 2-style
-> field layouts; **stage 7** (2.0 M) removes the guard, draws 45 % field layouts
-> (30 % of their targets change speed once), 30 % of field layouts near a
+> panels; **stage 6** (1.5 M) halves the CPA guard and draws 25 % coupled
+> layouts; **stage 7** (2.0 M) removes the guard, draws 45 % coupled layouts
+> (30 % of their targets change speed once), 30 % of coupled layouts near a
 > deployment layout (1–1.5 m from it, never the tested layout); every stage 6–7
 > target episode passes a space-time solvability check
 > (`src/formulation_v3.py`, F107).

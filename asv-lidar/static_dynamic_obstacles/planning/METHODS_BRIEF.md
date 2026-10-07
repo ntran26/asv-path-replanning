@@ -1,6 +1,6 @@
 # Methods brief — Paper 3, formulation baseline-v1
 
-> **Status note (2026-10-04).** Written for the baseline-v1/v2 formulation. Reward, observation, vessel model and learners are unchanged through baseline-v3, which adds a curriculum overlay (field layouts in stages 6-7). The headline evaluation is now the 1,000-episode test set (version 4; `tools/tiers/test_set.py`). The baseline-v4 draft (4.3) changes the curriculum, the development set and the training starts, and switches fix 1 on (`planning/BASELINE_V4_PLAN.md`); this brief is restated once the final formulation is fixed.
+> **Status note (2026-10-04).** Written for the baseline-v1/v2 formulation. Reward, observation, vessel model and learners are unchanged through baseline-v3, which adds a curriculum overlay (coupled layouts in stages 6-7). The headline evaluation is now the 1,000-episode test set (version 4; `tools/tiers/test_set.py`). The baseline-v4 draft (4.3) changes the curriculum, the development set and the training starts, and switches fix 1 on (`planning/BASELINE_V4_PLAN.md`); this brief is restated once the final formulation is fixed.
 
 **Purpose.** One current, paper-ready statement of the method, for drafting the
 Methods, Experimental Setup and Limitations sections. It states the formulation

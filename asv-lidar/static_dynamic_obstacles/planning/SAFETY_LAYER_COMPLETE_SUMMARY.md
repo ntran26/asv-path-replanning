@@ -49,7 +49,7 @@ The safety layer uses the onboard information behind this observation: estimated
 
 Simulator collision/termination uses true geometric state. It is deliberately separate from what the controller senses. Full-snapshot diagnostics may record truth for error scoring or run an explicitly labeled oracle comparison; those quantities are not supplied to the deployed candidate. Never mistake an oracle forecast, a future recorded SAC command sequence, or a cloned simulator branch for an online certificate.
 
-Targets are not uniformly constant velocity. The evaluation sets include constant-velocity (CV), varying-speed (VS/VAR), compliant reactive (RE), and non-compliant (NC) behavior. Older formulation prose saying that all targets are CV describes an earlier training scope; baseline-v3 adds varying-speed field curriculum cases. Most safety predictions still assume CV unless an explicitly experimental target hypothesis option is enabled.
+Targets are not uniformly constant velocity. The evaluation sets include constant-velocity (CV), varying-speed (VS/VAR), compliant reactive (RE), and non-compliant (NC) behavior. Older formulation prose saying that all targets are CV describes an earlier training scope; baseline-v3 adds varying-speed coupled curriculum cases. Most safety predictions still assume CV unless an explicitly experimental target hypothesis option is enabled.
 
 ### 2.3 Frozen policy and source identity
 
@@ -83,14 +83,14 @@ The checkpoint config has no `constant_overrides`. SAC was trained with the supe
 
 | Name used in this document | Meaning and status |
 | --- | --- |
-| DV3 / development-150 | The 150-case field-layout development set used for the early 111/150 SAC reference and later V7/V8 comparisons. DV3 is a development-set version, not safety V3. |
+| DV3 / development-150 | The 150-case coupled development set used for the early 111/150 SAC reference and later V7/V8 comparisons. DV3 is a development-set version, not safety V3. |
 | Old frozen / field sweep | Original broad comparison inventory: 2,890 scenarios x OFF/V4/V5 = 8,670 planned records. Stopped early. Details below. |
 | TS2 | Test set v2, 1,000 saved cases. Designated for development on its failures; it is now development-exposed. |
 | 32-case cohort | 27 TS2 + 5 DV3 cases, deliberately enriched for failures, rescues, lost SAC successes and six successful controls. Same identities used in V9-V16 comparisons. |
 | 40-case challenge | 30 TS2 + 10 DV3, disjoint from the 32, frozen before expanded-candidate results but still an enriched development selection. |
 | 12-case probe | Selected from the preceding development history, intentionally retaining all six V16 regressions. |
-| TS3 | Current primary benchmark: 1,000 cases, 664 frozen-derived and 336 field-layout. 755 exact geometry/seed pairs overlap TS2; 245 are new or changed. It is not wholly unseen. |
-| Primary quick-18 | 9 frozen-derived + 9 field-layout TS3 cases selected by metadata and a fixed identity hash before results; no overlap with the earlier 72 development scene/seed pairs. Ten overlap TS2 generally. |
+| TS3 | Current primary benchmark: 1,000 cases, 664 decoupled and 336 coupled. 755 exact geometry/seed pairs overlap TS2; 245 are new or changed. It is not wholly unseen. |
+| Primary quick-18 | 9 decoupled + 9 coupled TS3 cases selected by metadata and a fixed identity hash before results; no overlap with the earlier 72 development scene/seed pairs. Ten overlap TS2 generally. |
 
 Scene identity is the namespace, test ID, episode seed and scenario digest. A shared textual ID is insufficient. In particular, `TS2:` and `TS3:` must remain distinct. Do not compare percentages across different selections as if they were one learning curve.
 
@@ -207,7 +207,7 @@ Verification at this stage included 69 passing focused tests. An existing V3 dea
 
 ### The stopped 8,670-record sweep: final accounting
 
-Evaluation beyond 150 development episodes was started and later stopped. The original inventory contained DV3 150 + legacy development 120 + Tier-1 head-on 100 + frozen B 800 + frozen R 900 + frozen A 35 + field deployment layouts 630 + field validation layouts 155 = **2,890 scenarios**. OFF, V4 and proposed V5 made **8,670 planned controller/scenario records**. “Field” means simulated field layouts here, not new physical trials.
+Evaluation beyond 150 development episodes was started and later stopped. The original inventory contained DV3 150 + legacy development 120 + Tier-1 head-on 100 + frozen B 800 + frozen R 900 + frozen A 35 + field deployment layouts 630 + coupled validation layouts 155 = **2,890 scenarios**. OFF, V4 and proposed V5 made **8,670 planned controller/scenario records**. “Field” means simulated coupled layouts here, not new physical trials.
 
 The authoritative final snapshot is `results/safety_dev/v4_stopped_full_sweep_report.md`: **3,347 committed records, 5,323 absent**. Only B and R ran; **zero V5 records** were completed in this old sweep. B has OFF 799 and V4 792 records, giving 791 pairs; R has OFF 900 and V4 856, giving 856 pairs. OFF `B-06-040` is absent from the durable journal and was excluded rather than reconstructed.
 
@@ -236,7 +236,7 @@ V5 explored several separately switchable changes rather than one universally en
 
 Initial DV3 ablations on 150 cases were: one-decision-only 111 goals (18 obstacle/9 boundary/12 target); soft-only 121 (12/7/9 plus one timeout), with 3 gains/5 losses against V4; broad feedback 121 (13/6/10); infeasibility-only feedback **123** (10/6/11). The latter has **zero gained or lost goals** relative to V4: one boundary failure becomes an obstacle failure. It was the first experimental V5 preset, but no V5 episodes reached the stopped large sweep.
 
-The revised quick preset enables policy priority and policy feedback, retains V4's observer/memory, and disables one-decision, soft, broad-feedback and sideslip options. Four development probes (two failed cases under two options) produced no rescue. Then 24 preselected frozen/field scenarios were evaluated with OFF/V4/V5: **72 new runs**, plus the four probes = **76 of the then-authorized 100-run budget**. The 24 cases were a stratified quick check representing the original inventory's important categories, not a statistical substitute for 8,670 records.
+The revised quick preset enables policy priority and policy feedback, retains V4's observer/memory, and disables one-decision, soft, broad-feedback and sideslip options. Four development probes (two failed cases under two options) produced no rescue. Then 24 preselected decoupled/coupled scenarios were evaluated with OFF/V4/V5: **72 new runs**, plus the four probes = **76 of the then-authorized 100-run budget**. The 24 cases were a stratified quick check representing the original inventory's important categories, not a statistical substitute for 8,670 records.
 
 | Quick-24 controller | Goals | Obstacle | Boundary | Target | Timeout |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -793,7 +793,7 @@ Maintenance audits are under `results/safety_dev/maintenance/ntfs_compact_202610
 - The filename `quick_v18_case_list.json` refers to the frozen primary selection; actual tested candidate is V19. V18 has no primary-18 result.
 - The 1,150-row V8 reconstruction, 1,378 counterfactual branches, 8,670 planned sweep records, 585 compressed traces and 1,000 primary cases are different quantities. There is no justified grand total of independent trials obtained by adding them.
 - A diagnostic oracle/current true state, actual future recorded SAC controls and post-intervention target truth have different meanings. None can silently enter runtime action selection.
-- “No invariant set exists,” “no sampled escape,” “100% on a subset,” “last certificate,” and “field set” must not be inflated into mathematical impossibility, guaranteed safety or physical field validation.
+- “No invariant set exists,” “no sampled escape,” “100% on a subset,” “last certificate,” and “coupled set” must not be inflated into mathematical impossibility, guaranteed safety or physical field validation.
 
 ## 14. Method bibliography and exact scope of attribution
 

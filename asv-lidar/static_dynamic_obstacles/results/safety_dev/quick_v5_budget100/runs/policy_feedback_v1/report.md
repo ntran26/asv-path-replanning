@@ -6,7 +6,7 @@ Completed **72 fresh episodes: 24 identical scenario/seed triples × policy alon
 
 Shared budget: **76/100 attempts consumed**; 24 remain. This tag used 72 attempts for 72 completed results; 4 other attempts (including the earlier development probes) are excluded.
 
-Cases were fixed from scenario-only strata and hash order before quick outcomes were observed. This mixed-suite diagnostic subset does **not** estimate performance over all 2,890 cases / 8,670 mode runs. No significance or confidence interval is claimed; robustness variants can share base scenarios. Field-layout and field-validation cases are simulations, not real-world trials.
+Cases were fixed from scenario-only strata and hash order before quick outcomes were observed. This mixed-suite diagnostic subset does **not** estimate performance over all 2,890 cases / 8,670 mode runs. No significance or confidence interval is claimed; robustness variants can share base scenarios. Coupled and field-validation cases are simulations, not real-world trials.
 
 ## Outcomes
 

@@ -3,7 +3,7 @@
 The main evaluation target is now the complete frozen 1,000-case test set v3. [Protocol and commands](../../../planning/SAFETY_EVALUATION_PROTOCOL.md).
 
 - [Frozen selection](selection.json): all 1,000 cases with explicit seeds and geometry digests.
-- [Inventory](inventory.json): 664 frozen-derived cases, 336 field-layout cases; 755 exact v2 geometry/seed pairs and 245 new or changed cases.
+- [Inventory](inventory.json): 664 decoupled cases, 336 coupled cases; 755 exact v2 geometry/seed pairs and 245 new or changed cases.
 - Historical SAC baseline: **853/1,000 goals**, with 71 obstacle, 66 target and 10 boundary contacts. Its provenance is insufficient to call it a fresh current-runtime baseline.
 - Next primary comparison: fresh SAC OFF versus frozen safety filter V16, matched episode by episode.
 

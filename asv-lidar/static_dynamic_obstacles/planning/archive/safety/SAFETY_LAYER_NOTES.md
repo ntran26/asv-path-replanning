@@ -26,7 +26,7 @@ Two further causal physical-model-bank audits (one-step and continuous training 
 
 ## Primary evaluation target: test set v3 (decision, 2026-10-03)
 
-**Test set v3 is now the main evaluation set.** Start with `planning/SAFETY_EVALUATION_PROTOCOL.md` and `results/safety_dev/testset_v3_main/README.md`. The canonical frozen set has 1,000 cases (664 frozen-derived, 336 field-layout); 755 geometry/seed pairs are shared with v2 and 245 are new or changed. It is not wholly unseen because v2 was used for development. Earlier v2/DV3 results below remain historical development evidence, not v3 results.
+**Test set v3 is now the main evaluation set.** Start with `planning/SAFETY_EVALUATION_PROTOCOL.md` and `results/safety_dev/testset_v3_main/README.md`. The canonical frozen set has 1,000 cases (664 decoupled, 336 coupled); 755 geometry/seed pairs are shared with v2 and 245 are new or changed. It is not wholly unseen because v2 was used for development. Earlier v2/DV3 results below remain historical development evidence, not v3 results.
 
 The generic safety runner now defaults to the complete v3 selection and writes TS3 results under `results/safety_dev/testset_v3_main/runs/<tag>/`. Explicit historical selections keep their old output root. IDs are namespaced `TS3:` and checked against the original cached geometry and episode seeds; no scene regeneration occurs. A `--cases` quick subset is explicitly labelled as a subset, not the full benchmark.
 
@@ -375,7 +375,7 @@ physics/filter dependencies. Current comparisons therefore used fresh V4.
 The full 8,670-run evaluation was cancelled in favour of a v4 report, and
 subsequent work was capped at **100 new episode runs total**, with the
 emphasis on a quick test. **Do not resume the old full queues.** The current
-completed work is 24 fixed canonical simulated frozen/field scenarios x off,
+completed work is 24 fixed canonical simulated decoupled/coupled scenarios x off,
 v4 and revised v5 = 72 comparison episodes, plus four original-development
 probes = **76 actual new runs total**, below the shared 100-attempt cap.
 Selection used scenario families/features, not observed outcomes. The quick

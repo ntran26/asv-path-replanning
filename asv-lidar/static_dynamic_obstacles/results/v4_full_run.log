@@ -1,3 +1,12 @@
 2026-10-05 13:02:33 == SAC baseline-v4.3 full run: seed 0, 3 M steps from scratch (configs/baseline_v4.json)
 2026-10-05 13:02:39 == sac seed 0: training
 2026-10-05 13:07:36    pinned learner 26252
+2026-10-07 15:14:40 == sac seed 0 exit 0
+2026-10-07 15:18:08    tier 1 sacs0_bl4 supervisor off exit 0
+2026-10-07 15:21:05    tier 1 sacs0_bl4 supervisor on exit 0
+2026-10-07 15:52:07    frozen suite sacs0_bl4 exit 0
+2026-10-07 16:13:43    Paper 2 set sacs0_bl4 exit 0
+2026-10-07 16:13:44 == sac seed 0 done
+2026-10-07 16:13:44    train_seed.sh exit 0
+2026-10-07 16:21:13    test set v4, SAC v4.3 exit 0 (results/test_set/v4/sacs0_bl4/summary.txt)
+2026-10-07 16:21:14 == SAC baseline-v4.3 full run done

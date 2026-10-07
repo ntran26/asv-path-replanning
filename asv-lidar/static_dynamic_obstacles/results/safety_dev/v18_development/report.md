@@ -4,7 +4,7 @@
 
 ## Primary evaluation: quick test-set-v3 subset
 
-The candidate was frozen before evaluation. Eighteen cases were selected using source/encounter groups, distinct target variants and a fixed identity hash, without consulting outcomes: nine frozen-derived and nine field-layout cases. They share no geometry/seed pair with the earlier72-case development cohort; ten share geometry/seed with test set v2, so the subset is not wholly unseen. It is18/1000 cases, not a full-set estimate. No changes were tuned from these primary outcomes.
+The candidate was frozen before evaluation. Eighteen cases were selected using source/encounter groups, distinct target variants and a fixed identity hash, without consulting outcomes: nine decoupled and nine coupled cases. They share no geometry/seed pair with the earlier72-case development cohort; ten share geometry/seed with test set v2, so the subset is not wholly unseen. It is18/1000 cases, not a full-set estimate. No changes were tuned from these primary outcomes.
 
 | Controller | Goals | Target contact | Obstacle contact | Boundary contact | Timeout |
 |---|---:|---:|---:|---:|---:|

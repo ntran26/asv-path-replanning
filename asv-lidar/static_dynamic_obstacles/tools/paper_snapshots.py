@@ -40,7 +40,7 @@ DEFAULT_CASES = ("FS-NT-010", "P2-L3-HO-FIX-15", "CH-CR-CV-035",
                  "P2-L2-CRS-VAR-10", "BAS-OT-CV-073", "BAS-BO-RE-016")
 TITLES = {"NT": "No target", "HO": "Head-on", "CRP": "Port crossing",
           "CRS": "Starboard crossing", "OT": "Overtaking", "BO": "Being overtaken"}
-LAYOUT = {"BAS": "basin", "CH": "channel", "FS": "field-style", "L1": "layout L1",
+LAYOUT = {"BAS": "basin", "CH": "channel", "FS": "coupled layout", "L1": "layout L1",
           "L2": "layout L2", "L3": "layout L3"}
 OWN, TGT = "#0969da", "#cf222e"
 

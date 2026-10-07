@@ -23,8 +23,8 @@ on v2 needs roughly **+30 successes**.
 | Other frozen (head-on, BO, null, …) | about 30 | Scattered |
 
 **Why the policy has not learned the conflicts:**
-- **Too little exposure.** A near-L2 head-on is about 0.9 % of stage-7 episodes: 45 % field ×
-  20 % HO × 30 % near-deployment × about 1/3 L2. Field layouts only start at 1.5 M.
+- **Too little exposure.** A near-L2 head-on is about 0.9 % of stage-7 episodes: 45 % coupled ×
+  20 % HO × 30 % near-deployment × about 1/3 L2. Coupled layouts only start at 1.5 M.
 - **The reward favours compliance-shaped motion in a conflict.** COLREGs penalties arrive every
   step, up to about 5 per step, while the collision comes later and is discounted (about −180).
   Without fix 1, nothing tells the policy the compliant turn is blocked, so its encounter context
@@ -44,8 +44,8 @@ and `configs/baseline_v4.json`. `constants.py` is untouched, and v2 and v3 stay 
 
 | | Change | Targets | Why |
 |---|---|---|---|
-| A | **Fix 1 from step 0** (`ADMISSIBILITY_STATIC` on throughout) | L2 HO, field crossings | Blocked turns are flagged consistently, and slowing is paid when the turn is blocked |
-| B | **Conflict curriculum earlier and denser** | L2 HO, L1 OT, field crossings | Stage 5 (1.0 M): 20 % field (CPA guard 0.2). Stage 6 (1.5 M): 40 % (guard 0). Stage 7 (2.0 M): 55 %. Field weights HO .25, CRS .20, CRP .20, OT .10, BO .10, NT .15. Near-deployment share 0.5 |
+| A | **Fix 1 from step 0** (`ADMISSIBILITY_STATIC` on throughout) | L2 HO, coupled crossings | Blocked turns are flagged consistently, and slowing is paid when the turn is blocked |
+| B | **Conflict curriculum earlier and denser** | L2 HO, L1 OT, coupled crossings | Stage 5 (1.0 M): 20 % coupled (CPA guard 0.2). Stage 6 (1.5 M): 40 % (guard 0). Stage 7 (2.0 M): 55 %. Coupled-layout weights HO .25, CRS .20, CRP .20, OT .10, BO .10, NT .15. Near-deployment share 0.5 |
 | C | **Crossing emphasis** in the generator stages | Frozen crossings | Crossing weight raised in stages 5–7 (as A31 does for stage 3) |
 | D | **Start-clear rule for basin BO** | Data validity | Training draws whose own hull starts within 0.3 m of a panel are rejected. Near-L1 BO gets a start past the panel, as in test set v2 |
 | E | *(only if G1 fails)* Reward: no wrong-way penalty while the compliant turn is flagged blocked | L2 HO | Only if the scripted-behaviour check shows the reward still ranks "turn into the panel" above "slow and pass" |
@@ -60,11 +60,11 @@ training seeds. Test set v2, the frozen suite and the Paper 2 set are never used
 
 | Gate | What | Cost | Pass if |
 |---|---|---|---|
-| **G0** Headroom | Test set v2 for SAC 3 M (running), LOS-DWA and COLREGs-VO (running). Space-time solvability of every failing test-set cell. | Running; no extra cost | Some controller, or the space-time check, solves L2 HO and the field crossings. If nothing does, they are near-impossible: drop them from the 90 % arithmetic and report them separately |
-| **G1** Reward ordering | On about 40 conflict scenarios (near-L2 HO, near-L1 OT, field crossings), roll out scripted behaviours: (a) compliant turn at cruise; (b) port turn; (c) slow down / hold, then pass (Rule 8 / 2(b)); (d) COLREGs-VO. Compute episode return under v3, and under v4 (fix 1 on). | About 1 h CPU | Under v4, the safe behaviour (c or d) has the **highest** return in at least 90 % of scenarios. Under v3 it does not (confirms the diagnosis). Otherwise add E and recheck |
-| **G2** Observation | With fix 1: (i) share of conflict states flagged blocked on near-deployment dev scenarios (target over 80 %); (ii) false flags on frozen-like dev scenarios the policy now passes. | About 30 min | (i) at least 80 %; (ii) at most 10 %. High false flags explain the fine-tune's frozen loss and need a tighter room test first |
+| **G0** Headroom | Test set v2 for SAC 3 M (running), LOS-DWA and COLREGs-VO (running). Space-time solvability of every failing test-set cell. | Running; no extra cost | Some controller, or the space-time check, solves L2 HO and the coupled crossings. If nothing does, they are near-impossible: drop them from the 90 % arithmetic and report them separately |
+| **G1** Reward ordering | On about 40 conflict scenarios (near-L2 HO, near-L1 OT, coupled crossings), roll out scripted behaviours: (a) compliant turn at cruise; (b) port turn; (c) slow down / hold, then pass (Rule 8 / 2(b)); (d) COLREGs-VO. Compute episode return under v3, and under v4 (fix 1 on). | About 1 h CPU | Under v4, the safe behaviour (c or d) has the **highest** return in at least 90 % of scenarios. Under v3 it does not (confirms the diagnosis). Otherwise add E and recheck |
+| **G2** Observation | With fix 1: (i) share of conflict states flagged blocked on near-deployment dev scenarios (target over 80 %); (ii) false flags on decoupled dev scenarios the policy now passes. | About 30 min | (i) at least 80 %; (ii) at most 10 %. High false flags explain the fine-tune's frozen loss and need a tighter room test first |
 | **G3** Curriculum | Sample 2,000 episodes per stage from the v4 generator: conflict share, crossing share, start-clear rejects, space-time redraw rate, reset time. | About 1 h | The shares match the design, there are no own-start contacts, and resets stay under 1 s (PPO collection is environment-bound) |
-| **G4** Pilot | **PPO from its own 1.5 M checkpoint** (start of stage 6, where obstacles first meet the encounter, so fix 1 changes little before it) with v4 stages 6–7 for 0.5 M. The **control** is the running PPO v3 run's own 1.5 → 2.0 M segment: same seed and start, already paid for. Compare both at 2.0 M on the dev conflict subset and the frozen-like dev subset. | About 3–5 h, after PPO v3 ends | Conflict subset (near-L2 HO, field HO and crossings) **≥ +15 points** over the control; frozen-like dev **≥ −2 points** |
+| **G4** Pilot | **PPO from its own 1.5 M checkpoint** (start of stage 6, where obstacles first meet the encounter, so fix 1 changes little before it) with v4 stages 6–7 for 0.5 M. The **control** is the running PPO v3 run's own 1.5 → 2.0 M segment: same seed and start, already paid for. Compare both at 2.0 M on the dev conflict subset and the decoupled dev subset. | About 3–5 h, after PPO v3 ends | Conflict subset (near-L2 HO, field HO and crossings) **≥ +15 points** over the control; decoupled dev **≥ −2 points** |
 
 **Crossing diagnosis (part of G1):** trace 20 failing frozen crossings to see when the first
 avoidance action comes against TCPA, by side. If the give-way turn starts too late, add a
@@ -76,7 +76,7 @@ weighting.
 - **Learner (decided 2026-10-02): develop and test with PPO**, because it is quicker.
   - The G4 pilot and the full v4 confirmation run are both PPO. The comparison is against PPO v3
     (running now), on test set v2.
-  - **If PPO v4 solves the conflict cases** (L2 head-on, field crossings) with the fix, train **SAC
+  - **If PPO v4 solves the conflict cases** (L2 head-on, coupled crossings) with the fix, train **SAC
     v4**, the stronger learner on v3 (frozen 0.935; a 3 M run is about 35 h).
 - **Budget:** 3 M steps, from scratch, seed 0.
 - **Evaluation:** test set v2, safety off (and the frozen suite and Paper 2 set for continuity).
@@ -90,8 +90,8 @@ weighting.
   deliver.
 - **Fix 1's frozen-suite loss** may be intrinsic: false "blocked" flags making the policy slow
   down where it should turn. G2 measures this before any run.
-- **Denser field curriculum** may cost frozen-suite performance (overfitting to Paper 2-style
-  layouts). The G4 frozen-like gate guards against it, and near-deployment layouts never equal the
+- **Denser coupled curriculum** may cost frozen-suite performance (overfitting to coupled
+  layouts). The G4 decoupled gate guards against it, and near-deployment layouts never equal the
   tested ones.
 - **One seed.** A single 3 M run cannot show seed robustness; three seeds are needed for the paper
   claim.
@@ -118,12 +118,12 @@ Results are in `results/v4_gates/`.
 |---|---|---|
 | **G2** fix-1 flags | **PASS.** Recall 86 % on blocked conflict episodes (18 % without fix 1). Added flags on development episodes the compliant run passes: 10 %, on n = 10, so a weak estimate | Fix 1 marks blocked COLREGs turns. The false-flag estimate needs more data before a final run |
 | **G1** reward ordering | **FAIL at γ 0.951**: best-return behaviour safe in 88 % of 26 script-solvable conflicts with fix 1, 92 % without. **96 % at γ 0.97, 100 % at 0.98 and 0.99** | The reward already prefers obstacle avoidance over the compliant turn; the compliant turn never reaches the goal in head-on or overtaking conflicts. Fix 1 does not change the returns. The failures are late collisions, 61–91 steps after engagement, which γ 0.951 discounts to almost nothing. **The discount, not the reward terms, is the problem.** 14 of 40 conflicts are solved by no scripted or classical behaviour |
-| **G3** curriculum | **CHECK.** Field shares 0.18 / 0.38 / 0.58 (design 0.20 / 0.40 / 0.55); crossing share up (0.33–0.44 against 0.22–0.26); 1 own-start contact in 200 stage-7 draws (v3 has 1 too); mean reset 2.6–4.5 s back-to-back (v3 stages 6–7: 1.5–2.3 s) | Shares are as designed. Start contacts are rare but real, so **item D (start-clear redraw) is added**: `env._start_is_clear`, stage key `start_clear`, v4 stages only. Back-to-back resets overstate training cost, because the field prefetch thread refills between episodes, but v4 generates more field layouts, so PPO collection may be slower than v3's |
+| **G3** curriculum | **CHECK.** Coupled-layout shares 0.18 / 0.38 / 0.58 (design 0.20 / 0.40 / 0.55); crossing share up (0.33–0.44 against 0.22–0.26); 1 own-start contact in 200 stage-7 draws (v3 has 1 too); mean reset 2.6–4.5 s back-to-back (v3 stages 6–7: 1.5–2.3 s) | Shares are as designed. Start contacts are rare but real, so **item D (start-clear redraw) is added**: `env._start_is_clear`, stage key `start_clear`, v4 stages only. Back-to-back resets overstate training cost, because the field prefetch thread refills between episodes, but v4 generates more coupled layouts, so PPO collection may be slower than v3's |
 
 **G4 (queued, `results/v4_pilot_run.sh`).** The run starts after PPO v3 finishes training and its
 evaluations. Arm **A** is v4 at γ 0.951; arm **B** is v4 at γ 0.98. Each runs 0.5 M steps from PPO
 v3's 1.5 M checkpoint. Both are evaluated against that run's 2.0 M checkpoint on the conflict set
-(field-dev HO/CRP/CRS plus the G1 conflicts), the field development set, and the frozen-like
+(coupled dev HO/CRP/CRS plus the G1 conflicts), the coupled development set, and the decoupled
 development set (`tools/diagnostics/v4_gates/pilot.py`). Arm B's value function was fitted for
 γ 0.951, so it starts at a disadvantage.
 
@@ -145,10 +145,10 @@ so nothing changes before they finish.
 | Change | Draft 4.0 | Draft 4.1 |
 |---|---|---|
 | Straight legs: dense generator draws (≥ 3 panels) | not set | 70 % (`dense_straight_share`) |
-| Straight legs: field layouts | not set | 70 % (`field_straight_share`) |
-| Varying-speed field targets, stages 5 / 6 / 7 | 0 / 15 / 30 % | 20 / 50 / 50 % |
-| Field weights NT / HO / CRP / CRS / OT / BO | .15 / .25 / .20 / .20 / .10 / .10 | .15 / .20 / .175 / .175 / .15 / .15 |
-| Development set | DV3 (150) + frozen-like (120) | the same, **plus** `dev_set_v4.extension()` (60) |
+| Straight legs: coupled layouts | not set | 70 % (`field_straight_share`) |
+| Varying-speed coupled-layout targets, stages 5 / 6 / 7 | 0 / 15 / 30 % | 20 / 50 / 50 % |
+| Coupled-layout weights NT / HO / CRP / CRS / OT / BO | .15 / .25 / .20 / .20 / .10 / .10 | .15 / .20 / .175 / .175 / .15 / .15 |
+| Development set | DV3 (150) + decoupled (120) | the same, **plus** `dev_set_v4.extension()` (60) |
 
 - The development-set extension (`src/dev_set_v4.py`) has 10 episodes each of NT, HO, CRP, CRS, OT
   and BO, with 70 % straight legs and half the targets at varying speed. It uses generator seeds
@@ -161,24 +161,24 @@ so nothing changes before they finish.
   `formulation_v3.field_development_set`.
 
 **Applied (2026-10-03, 21:33).** `formulation_v4.py` is now `4.1-draft`. G3 on it passed its
-checks: no own-start contacts; field shares 0.18 / 0.38 / 0.57; straight legs in 55–76 % of
-3-panel draws; varying-speed targets in 29–51 % of field targets; mean reset 1.6 s.
+checks: no own-start contacts; coupled-layout shares 0.18 / 0.38 / 0.57; straight legs in 55–76 % of
+3-panel draws; varying-speed targets in 29–51 % of coupled-layout targets; mean reset 1.6 s.
 
 ## 5d. G4 result: both arms fail (2026-10-03, 21:29)
 
 Results are in `results/v4_gates/g4_summary.txt`. Pairs are compared on the same episodes and
 seeds.
 
-| | Conflict set (118) | Field dev (150) | G1 conflicts (40) | Frozen-like dev (120) |
+| | Conflict set (118) | Coupled dev (150) | G1 conflicts (40) | Decoupled dev (120) |
 |---|---|---|---|---|
 | Control (PPO v3, 2.0 M) | 0.356 | 0.473 | 0.300 | 0.883 |
 | A: draft 4.0, γ 0.951 | 0.356 (**+0.0**; 12 gained, 12 lost) | 0.473 | 0.275 | 0.842 (**−4.2**) |
 | B: draft 4.0, γ 0.98 | 0.364 (**+0.8**; 13 gained, 12 lost) | 0.507 | 0.350 | 0.842 (**−4.2**) |
 
 How to read it:
-- Neither the overlay (fix 1, a denser field curriculum, more crossings) nor the longer horizon
+- Neither the overlay (fix 1, a denser coupled curriculum, more crossings) nor the longer horizon
   moved the conflict set within 0.5 M steps.
-- Both arms lose the same 4.2 points on the frozen-like set. That loss belongs to the overlay
+- Both arms lose the same 4.2 points on the decoupled set. That loss belongs to the overlay
   rather than the discount; the fix-1 fine-tune lost 5.7 points the same way.
 - G1 found that 14 of its 40 conflicts are solved by no scripted or classical behaviour. If
   conflicts like these are a large share of the conflict set, the +15-point gate cannot be met
@@ -273,8 +273,8 @@ of the 370 episodes falls into one tier:
 | Unsolvable once tracked: decided before the target can be seen | 13 | 3.5 % | 0.54 | 0.23 | 0.00 |
 | Unsolvable with perfect foresight (oracle lower bound) | 7 | 1.9 % | 0.14 | 0.14 | 0.00 |
 
-The hard tiers concentrate in the dense field-style sets, mostly in the crossings. Among the
-field-dev, dv4x and G1 crossings, 20–40 % are tight or decided before tracking. The frozen-like
+The hard tiers concentrate in the dense coupled sets, mostly in the crossings. Among the
+coupled dev, dv4x and G1 crossings, 20–40 % are tight or decided before tracking. The decoupled
 dev_v2 set has almost none.
 
 SAC "solves" 54 % of the episodes decided before tracking, against at most 23 % for the classical
@@ -337,7 +337,7 @@ so the totals and the cell balance stay.**
   oracle test (`results/test_set/v4/replacement_candidates.csv`). The default `--version` stays 3
   until v4 is adopted.
 - **Development set v4.2** (`formulation_v4.development_set`, `field_development_set`). The
-  frozen-like 120, field dev set v3 (150) and the 4.1 extension (60) are graded with the
+  decoupled 120, coupled dev set v3 (150) and the 4.1 extension (60) are graded with the
   training evaluation's own seeds (`oracle_sets.py deveval`), because the tracking time depends on
   the seed. Each failing episode is replaced in place, so it keeps its position and seed, by
   the next draw of its own generator that passes. The accepted recipes are in
@@ -366,8 +366,8 @@ reuse the v3 rows (same id, digest and seed).
 |---|---|---|
 | Overall | 0.853 (95 % CI 0.831–0.875) | **0.865** (0.844–0.886) |
 | Frozen suite | 0.922 | 0.931 |
-| Paper 2 (L1–L3 and field-style) | 0.717 | 0.735 |
-| Field-style crossing from port (FS-CRP) | 0.448 | 0.345 |
+| Coupled (L1–L3 and FS cells) | 0.717 | 0.735 |
+| Coupled crossing from port (FS-CRP) | 0.448 | 0.345 |
 | L1-CRP / L2-HO / L2-CRS | 0.27 / 0.00 / 0.33 | 0.18 / 0.00 / 0.33 |
 | Varying-speed Paper 2 targets | 0.613 | 0.620 |
 
@@ -463,7 +463,7 @@ Of the rest, 332 needed no action (standing on succeeds), 342 had no solution wi
 the start state, and 21 ended before reaching it.
 
 **The v4.3 SAC pair (decision, 2026-10-04: a short SAC test before a full run).**
-- **Why SAC, and why short.** PPO is a weak proxy for these cases: on the field development set
+- **Why SAC, and why short.** PPO is a weak proxy for these cases: on the coupled development set
   it scores 0.47 at 2 M, against SAC's 0.71. The 2.5 M SAC checkpoint no longer exists, so both
   arms continue SAC baseline-v3 seed 0 from its final 3.0 M model and replay buffer, by +0.5 M.
 - **What the two arms share.** Reset seeds (offset 77777), safety off, and selection on
@@ -475,8 +475,8 @@ the start state, and 21 ended before reaching it.
   `start_pool`, `dev_set` and `eval_supervisor`. Both arms passed a 4,096-step smoke test, and the
   resolved stage 7 matches v4.1.
 - **The gate, fixed before the runs** (`tools/diagnostics/v4_gates/pair_compare.py`). At the
-  selected checkpoints, v4.3 minus v3 must reach field set +5 points or more, with the
-  frozen-like set no worse than −2 points. Test set v4 is reported for both, but not used for the
+  selected checkpoints, v4.3 minus v3 must reach coupled set +5 points or more, with the
+  decoupled set no worse than −2 points. Test set v4 is reported for both, but not used for the
   decision.
 - **Requirement for SAC v4 (decision, 2026-10-04, revised the same day): no regression on
   no-target episodes against the v3 SAC 3 M baseline**, on the same episodes and seeds. An earlier
@@ -484,21 +484,21 @@ the start state, and 21 ended before reaching it.
 
   | No-target set | v3 SAC 3 M, to match or beat | When checked |
   |---|---|---|
-  | Development set 4.2, evaluation seeds (50) | **44 of 50**: frozen-like 20/20, field dev set v3 14/20, 4.1 extension 10/10 | during development |
-  | Test set v4 (30) | **28 of 30**: field-style 25/27, L1–L3 3/3 | once, at the end |
+  | Development set 4.2, evaluation seeds (50) | **44 of 50**: decoupled 20/20, coupled dev set v3 14/20, 4.1 extension 10/10 | during development |
+  | Test set v4 (30) | **28 of 30**: coupled 25/27, L1–L3 3/3 | once, at the end |
   | Paper 2 set, safety off (L1–L3 × 10 noise seeds) | **30 of 30** | once, at the end |
 
   - **Null episodes** (a target present but never in conflict) are tracked alongside, against v3's
     71 of 75 on test set v4.
   - **The misses v3 already has.** On the test set they are FS-NT-014 and FS-NT-023, both obstacle
-    contacts. On the development set they are 6 field dev set v3 layouts with gates, on-path panels
+    contacts. On the development set they are 6 coupled dev set v3 layouts with gates, on-path panels
     or slaloms, mostly on slanted legs. The route follower clears 8 of the 9 failing development
     layouts with 0.34–1.2 m margin, and LOS-DWA and COLREGs-VO each solve 8.
   - **The pair is not gated on this.** `pair_compare.py` reports the no-target counts for both arms
     and the start model. The pair's gate stays as fixed before the runs.
   - **Two baselines.** The pair's start model is the final 3.0 M model, which passes 43 of 50 on the
     development set. The reference above is the kept best 3 M model behind the v3 results: 44 of
-    50. The two differ by one frozen-like no-target episode.
+    50. The two differ by one decoupled no-target episode.
   - Diagnosis: `tools/diagnostics/static/nt_trace.py` (`results/static_trace/summary.txt`). SAC 3 M
     was traced on all 80 no-target episodes (development and test set v4) and the 75 null
     episodes of test set v4, and each run was compared with the oracle's A* route.
@@ -510,15 +510,15 @@ which confirms the pairing.
 | | v4.3 arm | v3 arm (control) |
 |---|---|---|
 | Selected checkpoint | 3.4 M | 3.0 M (the start; never improved on) |
-| Field set (210) | 0.776 | 0.738 |
-| Frozen-like set (120) | 0.908 | 0.892 |
-| Field crossings | 0.653 | 0.611 |
+| Coupled set (210) | 0.776 | 0.738 |
+| Decoupled set (120) | 0.908 | 0.892 |
+| Coupled crossings | 0.653 | 0.611 |
 | No-target (50) | 45 | 43 |
 
-- **Gate: FAIL.** The field set gains +3.8 points against the +5 required. The frozen-like set
+- **Gate: FAIL.** The coupled set gains +3.8 points against the +5 required. The decoupled set
   gains +1.7, which passes its −2 limit. Over the 330 episodes, 35 were gained and 25 lost.
-- **The final checkpoints are level.** At 3.5 M against 3.5 M, the field set is −0.2 points and
-  frozen-like +6.2. The v4.3 advantage depends on its peak at 3.4 M.
+- **The final checkpoints are level.** At 3.5 M against 3.5 M, the coupled set is −0.2 points and
+  decoupled +6.2. The v4.3 advantage depends on its peak at 3.4 M.
 - **Test set v4, reported only and not used for the decision:**
 
   | Selected models | Overall | Paper 2 part | FS-CRP | Varying speed | No-target |
@@ -545,8 +545,8 @@ which confirms the pairing.
   (`tools/diagnostics/v4_gates/pair_reseed.py`).
 - **The decision uses the new seeds only.** The 3.4 M checkpoint was chosen as the best of six
   evaluations on the original seeds, so those seeds flatter it.
-- **The rule is unchanged.** v4.3 minus v3 at the selected checkpoints: field set +5 points or
-  more and frozen-like set −2 or better, reported with a 95 % interval from a bootstrap over
+- **The rule is unchanged.** v4.3 minus v3 at the selected checkpoints: coupled set +5 points or
+  more and decoupled set −2 or better, reported with a 95 % interval from a bootstrap over
   development scenarios.
 - **Outcomes.** If it passes, the full SAC v4.3 3 M run is the next step. If not, v3 stays.
 
@@ -554,15 +554,15 @@ which confirms the pairing.
 
 | New seeds, 990 episodes per checkpoint | v4.3 selected (3.4 M) | v3 selected (3.0 M) | Difference (95 % CI) |
 |---|---|---|---|
-| Field set | 0.759 | 0.708 | **+5.1** (+0.2 to +10.5) |
-| Frozen-like set | 0.931 | 0.936 | −0.6 (−3.3 to +2.2) |
-| Field crossings | 0.648 | 0.606 | +4.2 |
+| Coupled set | 0.759 | 0.708 | **+5.1** (+0.2 to +10.5) |
+| Decoupled set | 0.931 | 0.936 | −0.6 (−3.3 to +2.2) |
+| Coupled crossings | 0.648 | 0.606 | +4.2 |
 | No-target | 137 of 150 | 129 of 150 | +8 |
 
-- **The margin sits at the threshold.** The field gain is +5.1 against the +5 required, and its
+- **The margin sits at the threshold.** The coupled-set gain is +5.1 against the +5 required, and its
   interval reaches down to +0.2. v4.3 is better by this protocol, but the size of the gain is
   uncertain. Over the 990 episodes, 111 were gained and 81 lost.
-- **The final 3.5 M checkpoints are level.** The field difference is +0.0 (−4.3 to +4.3). The
+- **The final 3.5 M checkpoints are level.** The coupled-set difference is +0.0 (−4.3 to +4.3). The
   advantage depends on the selected checkpoint, chosen by the rule that applies to both arms.
 - **No regression on no-target.**
 - **Consequence.** v4.3 is adopted as the formulation for the next full run. A SAC v4.3 run of
@@ -574,24 +574,57 @@ steps) through `results/v4_full_run.sh`: training, then Tier 1, the frozen suite
 set on the best checkpoint, then test set v4 (report only). Run directory
 `runs/sac_formulation_seed0_bl4`.
 - **Wiring checks.** A 4,096-step smoke run passed all 7 stages with the pool on and finished its
-  final evaluation. The trainer's development set (120 frozen-like + 210 field) matches the pair's
+  final evaluation. The trainer's development set (120 decoupled + 210 coupled) matches the pair's
   re-scoring set at all 330 positions, with the 37 replacements in place.
 - **Fix in `dev_set_v4.development_sets`.** Replacement positions are recorded on the
-  20-per-class set. A smaller frozen-like set (the smoke run's 1 per class) now keeps the field
-  replacements and skips the frozen-like ones, instead of indexing past the end.
+  20-per-class set. A smaller decoupled set (the smoke run's 1 per class) now keeps the coupled
+  replacements and skips the decoupled ones, instead of indexing past the end.
 - **Acceptance after the run.** No-target non-regression against the kept SAC v3 3 M: development
   at least 44 of 50, test set v4 at least 28 of 30, Paper 2 set 30 of 30. The explainer-artifact
   briefs switch to v4.3 only if it becomes the best formulation.
 
+**Full-run result (2026-10-07, 16:21). v4.3 wins on the development set and loses on the held-out
+sets; it does not replace v3.** Training took 50.1 h. The selected checkpoint is the final 3.0 M
+evaluation (combined 0.82, score +0.46).
+
+| SAC seed 0, safety off | v4.3 (3.0 M selected) | v3 (kept 3 M) | Difference |
+|---|---|---|---|
+| Development set, 330 (selection) | 0.82 | 0.79 | +3 |
+| Test set v4, 1,000 (report only) | 0.833 | 0.865 | **−3.2 (−5.7 to −0.7)** |
+| of which decoupled, 664 | 0.864 | 0.931 | **−6.6 (−9.3 to −3.9)** |
+| of which coupled, 336 | 0.771 | 0.735 | +3.6 (−1.5 to +8.6) |
+| Frozen suite headline, 800 | 0.890 | 0.935 | −4.5 |
+| Paper 2 deployment-layout set, 630 | 0.649 | 0.643 | +0.6 |
+
+Test set differences are paired over the same episodes (bootstrap 95 % intervals): 66 episodes
+gained, 98 lost.
+
+- **Where it loses.** Decoupled being overtaken (test basin cell 0.79 against 0.97; frozen suite
+  0.80 against 0.94) and the null target that needs no action (0.84 against 0.95; suite 0.87
+  against 0.97), with more obstacle contacts (suite 5.8 % against 2.5 %). This matches the earlier
+  null-failure pattern: answering a target that needs no answer and running out of room.
+- **Where it gains.** Coupled crossings from starboard (FS-CRS 0.85 against 0.74) and the
+  coupled set overall; on the Paper 2 layout set it is level.
+- **No-target acceptance: fails by one episode.** Development 48 of 50 (pass), test set v4 27 of 30
+  (needs 28; v3 had 28), Paper 2 set 30 of 30 (pass).
+- **Reading.** The development gain did not transfer. Selection weights the coupled set 210 of 330,
+  so it favours coupled-set gains, and the decoupled part of the development set (0.89 for both) did not
+  reveal the being-overtaken and null regression the larger held-out sets show.
+- **Consequence.** v3 stays the best formulation; the explainer-artifact briefs stay on v3. v4.3 is
+  a documented negative result for the paper's development record.
+- **Next (decision, 2026-10-07).** The baseline set continues on v3: PPO seed 0 is done, and
+  RecurrentPPO seed 0 started 16:59 (`results/rppo_bl3_run.sh`: 2.5 M, extended to 3.0 M, then
+  Tier 1, frozen suite, Paper 2 set and test set v4).
+
 **Why the no-target failures happen (2026-10-04).**
 
-Where they fail. The failures are dense field-style layouts, mostly on slanted legs:
+Where they fail. The failures are dense coupled layouts, mostly on slanted legs:
 
 | No-target set | Success |
 |---|---|
-| Development: field dev set v3 (20; 16 slanted) | 14 of 20 |
-| Test set v4: field-style FS-NT (27; mostly straight) | 25 of 27 |
-| Development: frozen-like (20) | all |
+| Development: coupled dev set v3 (20; 16 slanted) | 14 of 20 |
+| Test set v4: coupled FS-NT (27; mostly straight) | 25 of 27 |
+| Development: decoupled (20) | all |
 | Development: 4.1 extension (10; mostly straight) | all |
 | Test set v4: Paper 2 layouts L1–L3 (3) | all |
 
@@ -631,7 +664,7 @@ on a straight three-panel basin leg.
 
 Likely causes, in order of evidence:
 1. **Exposure.** In stages 6–7, slanted dense no-target layouts are about 4–9 % of episodes. v4.1
-   lowers the no-target field weight (0.20 → 0.15) and straightens 70 % of legs, so it moves away
+   lowers the no-target coupled-layout weight (0.20 → 0.15) and straightens 70 % of legs, so it moves away
    from this failure.
 2. **Reactive control without a route, which is an interpretation.** The policy steers from
    pooled LiDAR and path errors. In tight motifs, the path term pulling back and the obstacle term

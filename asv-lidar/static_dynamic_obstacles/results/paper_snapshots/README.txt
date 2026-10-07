@@ -28,13 +28,14 @@ a success looks like, not how often one occurs.
    P2-L1-OT-FIX-01 (overtook to starboard), BAS-CR-CV-007 (port turn for a
    starboard crossing), BAS-BO-RE-094 and P2v2-L1-BO-FIX-05 (episode ended before
    the target had overtaken).
-3. From the rest, one per type, spreading layout (field-style, Paper 2 layouts L2
-   and L3, channel, basin), panel count (0, 1, 3) and leg shape (2 straight,
+3. From the rest, one per type, spreading scenario family and geometry (coupled:
+   a generated coupled layout and the reference layouts L2 and L3; decoupled:
+   channel and basin), panel count (0, 1, 3) and leg shape (2 straight,
    4 slanted), with one varying-speed target.
 
 Panels (paper_snapshots_summary.csv has the numbers)
 ------
-(a) No target, FS-NT-010: field-style layout, slanted leg, 3 panels crowding the
+(a) No target, FS-NT-010: coupled layout, slanted leg, 3 panels crowding the
     path.  Passes west of all three, rejoins the path near the goal, 26.0 s.
 (b) Head-on, P2-L3-HO-FIX-15: Paper 2 layout L3, slanted leg.  Alters about 48 deg
     to starboard, passes port to port, CPA 4.3 m at 13.0 s, then returns to the path.
@@ -53,9 +54,11 @@ Draft caption
 -------------
 Trajectories of the SAC policy in six test episodes, one per encounter type:
 (a) no target, (b) head-on, (c) port crossing, (d) starboard crossing,
-(e) overtaking and (f) being overtaken.  Layouts vary in geometry (basin, channel,
-field-style and the deployment layouts L2 and L3), number of static panels and leg
-shape.  Own-ship (blue) and target (red) hulls are drawn every 5 s; equal numbers
+(e) overtaking and (f) being overtaken.  Panels (b) and (d) are coupled scenarios,
+where the encounter can occur beside the obstacles (reference layouts L3 and L2),
+and (a) uses a generated coupled layout without a target; (c), (e) and (f) are
+decoupled, with obstacles kept clear of the encounter (channel and basin).  Layouts
+also vary in number of static panels and leg shape.  Own-ship (blue) and target (red) hulls are drawn every 5 s; equal numbers
 mark the same instant, and later hulls are darker.  The dotted segment marks the
 closest point of approach.  Targets keep their course and do not give way; the own
 ship passes astern of crossing targets, alters to starboard head-on and overtakes

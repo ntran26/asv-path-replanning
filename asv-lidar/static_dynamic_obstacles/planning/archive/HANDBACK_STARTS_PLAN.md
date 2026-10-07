@@ -38,15 +38,15 @@ with a target close by.
    - the executed actions and the brake flags.
    A hand-back state can be escaped by construction: the filter passed the policy's
    action there, so a safe recovery existed.
-2. **Sources (decision: "the dev set and the field set"):**
-   - `dev`: the v3 field development set, 150 scenarios × 2 episode seeds.
+2. **Sources (decision: "the dev set and the coupled set"):**
+   - `dev`: the v3 coupled development set, 150 scenarios × 2 episode seeds.
    - `field`: 220 fresh layouts near the deployment layouts L1–L3
      (`field_training.sample(near=True)`, training generator, seeds from 380,000).
      These cover every encounter at constant and varying speed, plus no-target.
 3. **Leakage, as handled:**
    - The **Paper 2 set's own 630 episodes are not used.** They are the held-out
      deployment test, so training on their states would leak it. The near-deployment
-     layouts give "field-set" states without that. To use the exact Paper 2 episodes
+     layouts give "coupled set" states without that. To use the exact Paper 2 episodes
      anyway, add them as a third source; the Paper 2 result for this run then stops
      being a held-out test.
    - The **dev set is used, as decided.** It is also what selects the best
@@ -54,7 +54,7 @@ with a target close by.
      states from those scenarios, not whole episodes, but the dev-goal selection is
      mildly optimistic for this run. The frozen suite is untouched either way.
 4. **Start from them in training.** From stage 6 on (when three-panel layouts and the
-   field family are in the mix), 25 % of episodes start from a random pool record:
+   coupled family are in the mix), 25 % of episodes start from a random pool record:
    - The prefix is replayed with the own ship placed on its recorded state each step,
      so the targets, the tracker and the encounter contexts are where they were.
    - The last state is jittered: heading ±10°, speed ±20 %, kept only if the hull is

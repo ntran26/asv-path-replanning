@@ -3141,7 +3141,7 @@ The set tests a static-plus-dynamic squeeze the policies were never trained on.
 6 % gained). The learner ranking inverts relative to the frozen headline: PPO
 best, TQC worst.
 
-**F106 -- the field fine-tune: 2 M -> 3 M with Paper 2-style layouts mixed in (decision,
+**F106 -- the coupled-layout fine-tune: 2 M -> 3 M with coupled layouts mixed in (decision,
 2026-09-27; SAC seed 0 first).**
 
 *Goal.* The deployed policy should pass the Paper 2 deployment-layout set -- at
@@ -3152,7 +3152,7 @@ which training never produces (the CPA guard).
 *Method* (`src/finetune_field.py`, spec `configs/finetune_field_v1.json`). Load
 the run's 2 M `final_model.zip`, `final_vecnormalize.pkl` and (SAC/TQC) 2 M replay
 buffer -- so the old distribution keeps being rehearsed -- and train 1 M more steps
-on stage-5 scenarios, **half of them field layouts** (`src/field_training.py`,
+on stage-5 scenarios, **half of them coupled layouts** (`src/field_training.py`,
 revision 1.0): a Paper 2 leg (x in [2, 8], at most 14.1 deg) with three 1 m panels
 arranged as the published scenarios are (gate+onpath / slalom / side+onpath,
 jittered, A*-feasible), no target 20 %, otherwise HO/CRP/CRS/OT/BO **with the
@@ -3166,7 +3166,7 @@ baseline run).
 seeds (training namespace; validation 350,000+); any layout within 0.75 m of a
 deployment layout (both leg ends and all three panels) is redrawn, so the test
 set stays unseen. Selection: best goal - 2 x collision over the development set
-(120) plus a field validation set (155: 30 no-target, 25 each of HO, CRP, CRS, OT,
+(120) plus a coupled validation set (155: 30 no-target, 25 each of HO, CRP, CRS, OT,
 BO at constant velocity), safety layer off; the 2 M model is evaluated first and
 kept if nothing beats it -- so a regression on the development set costs the
 fine-tune its selection. Evaluations every 100 k.
@@ -3176,7 +3176,7 @@ Paper 2 set and the frozen suite (suite 3.4) on the new best model. Tests:
 `tests/test_field_training.py` (4). SAC seed 0 launched 2026-09-27 17:56;
 ~21 h expected at SAC's rate.
 
-**F107 -- the field fine-tune switched to v2; baseline-v3 prepared; every Paper 2
+**F107 -- the coupled-layout fine-tune switched to v2; baseline-v3 prepared; every Paper 2
 test case is solvable (2026-09-28).**
 
 *v1 plateaued, v2 took over (the agreed rule).* v1's field validation score went 0.48
@@ -3184,9 +3184,9 @@ test case is solvable (2026-09-28).**
 entropy coefficient had decayed to 0.0025. At 2.4 M (field 0.52, not above 0.54)
 the watcher stopped v1 (04:12) and started **finetune-field-v2**
 (`configs/finetune_field_v2.json`) from v1's best checkpoint (2.1 M) and its
-replay buffer, to 3 M: field share 0.8, encounters weighted by failure rate (HO,
+replay buffer, to 3 M: coupled-layout share 0.8, encounters weighted by failure rate (HO,
 BO, CRS most; no-target kept ~15 %), an entropy boost for 200 k steps
-(coefficient 0.01, target -1 instead of -2), and field scenarios generated in a
+(coefficient 0.01, target -1 instead of -2), and coupled scenarios generated in a
 background thread per worker, removing the ~2 s reset stall that cost v1 a
 quarter of its speed.
 
@@ -3202,26 +3202,26 @@ baseline-v2 -- reward, observation, vessel model, learners and stages 1-4
 unchanged, `constants.py` untouched, so baseline-v2's digest and check hold
 (both configs check in their own processes). Budget 2.5 M, so stages 1-5 keep
 v2's step counts: stage 5 (1.0 M) weights clutter toward 3 panels; **stage 6**
-(1.5 M) halves the CPA guard and draws 25 % field layouts with constant-velocity
-targets; **stage 7** (2.0 M) turns the guard off, 45 % field layouts, 30 % of
+(1.5 M) halves the CPA guard and draws 25 % coupled layouts with constant-velocity
+targets; **stage 7** (2.0 M) turns the guard off, 45 % coupled layouts, 30 % of
 their targets varying speed. From stage 6 **every target episode must pass the
-space-time check** (drawn episodes and field layouts alike are redrawn until
+space-time check** (drawn episodes and coupled layouts alike are redrawn until
 they do), on top of F74's A* route, so no training episode is impossible.
-Selection uses v2's development set plus a v3 field development set (150: 20
+Selection uses v2's development set plus a v3 coupled development set (150: 20
 no-target, and per encounter 20 constant-velocity + 6 varying-speed, all
 solvable; seeds 360,000+). Train with `python src/train_formulation.py --config
 configs/baseline_v3.json --algo sac --seed 0 --tag bl3`. The frozen suite would
 need restating for v3 (its field squeezes are then trained); not done.
 
 *Revision 3.1 -- near-deployment layouts* (decision: three-panel cases should
-include settings unlike the field and some similar to it).  The field family
+include settings unlike the field and some similar to it).  The coupled family
 rarely lands near a deployment layout (0.4 % of 3,000 draws within 1.5 m; median
 4.1 m), and the generator's clutter supplies the unlike settings.  So 30 % of
-v3's field layouts in stages 6-7 are now *near-deployment* layouts
+v3's coupled layouts in stages 6-7 are now *near-deployment* layouts
 (`field_training.sample_near_layout`): one of the three deployment layouts with
 every panel moved 0.4-1.5 m and each leg end up to 0.75 m, 1-1.5 m from it
 overall and never a near-duplicate, so the tested layouts stay unseen.  The v3
-field development set takes 3 in 10 of each block as near layouts (45 of 150)
+coupled development set takes 3 in 10 of each block as near layouts (45 of 150)
 from its own seeds, so they differ from training's.  Off by default: v1/v2's
 draws and random streams are unchanged.  Formulation 03a9c0c22f53ee0b
 (`configs/baseline_v3.json` rewritten; both configs check).
