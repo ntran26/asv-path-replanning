@@ -113,3 +113,22 @@ code matches baseline-v3
 code matches baseline-v4
 2026-10-05 13:02:39 == sac seed 0: training
 2026-10-05 13:07:36    pinned learner 26252
+2026-10-07 15:14:40 == sac seed 0 exit 0
+2026-10-07 15:18:08    tier 1 sacs0_bl4 supervisor off exit 0
+2026-10-07 15:21:05    tier 1 sacs0_bl4 supervisor on exit 0
+2026-10-07 15:52:07    frozen suite sacs0_bl4 exit 0
+2026-10-07 16:13:43    Paper 2 set sacs0_bl4 exit 0
+2026-10-07 16:13:44 == sac seed 0 done
+2026-10-07 16:13:44    train_seed.sh exit 0
+2026-10-07 16:21:13    test set v4, SAC v4.3 exit 0 (results/test_set/v4/sacs0_bl4/summary.txt)
+2026-10-07 16:21:14 == SAC baseline-v4.3 full run done
+code matches baseline-v3
+2026-10-07 16:59:50 == recurrent_ppos0_bl3: training 0 -> 2.5 M (baseline-v3)
+2026-10-07 17:01:53    pinned learner 30776
+2026-10-07 17:52:25    recurrent_ppos0_bl3: stopped at 25.6 k steps (13 steps/s, thread oversubscription), set aside as _incomplete_20261007_1752; restarting with --torch-threads 4
+code matches baseline-v3
+2026-10-07 17:52:40 == recurrent_ppos0_bl3: training 0 -> 2.5 M (baseline-v3)
+2026-10-07 17:54:43    pinned learner 15340
+2026-10-07 18:41:26    recurrent_ppos0_bl3: stopped at 51200 steps (21 steps/s pinned to 4 CPUs), set aside as _incomplete_20261007_1841; restarting unpinned on all 12 CPUs (decision: pinning only for SAC and TQC)
+code matches baseline-v3
+2026-10-07 18:42:43 == recurrent_ppos0_bl3: training 0 -> 2.5 M (baseline-v3, unpinned)

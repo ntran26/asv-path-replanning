@@ -103,6 +103,14 @@ Start-Process -FilePath "$env:LOCALAPPDATA\Programs\Git\bin\bash.exe" -ArgumentL
 
 There is no window: check it with section 4.
 
+**CPU use by learner (decision, 2026-10-07).** SAC and TQC run with the learner
+pinned to the two P-cores (affinity 0x00F, AboveNormal priority) and the workers on
+the E-cores (0xFF0); their launch scripts pin a few minutes after start
+(`results/v4_full_run.sh`). PPO and RecurrentPPO run unpinned on all 12 logical
+CPUs with PyTorch's default threads: their update is one large batched computation
+while the workers are idle, and pinned to the P-cores RecurrentPPO fell from
+70-100 to 13-25 steps/s.
+
 **Several runs in a row**, if ever needed, are just one call after
 another:
 
@@ -248,8 +256,8 @@ One frozen-suite or Paper 2 set test, with a trajectory figure (test IDs are in
 python tools/tiers/run_test.py --model runs/sac_formulation_seed1_bl2/best_model.zip CH-CR-CV-007 P2-L2-CRP-VAR-07
 ```
 
-The field fine-tune (F106): continue a finished run from 2 M to 3 M with Paper
-2-style field layouts mixed in, then test it on the Paper 2 set and the frozen
+The coupled-layout fine-tune (F106): continue a finished run from 2 M to 3 M with
+coupled layouts mixed in, then test it on the Paper 2 set and the frozen
 suite. It writes a new `runs/<run>_ftfield1/` folder; the source run is untouched:
 
 ```bash
@@ -257,7 +265,7 @@ bash results/finetune_field.sh sac 0
 ```
 
 baseline-v3 (F107; prepared, not the paper's formulation): baseline-v2 plus
-field-layout stages 6-7, 2.5 M steps, run folders tagged `bl3`. Check, then train:
+coupled-layout stages 6-7, 2.5 M steps, run folders tagged `bl3`. Check, then train:
 
 ```bash
 python src/baseline_config.py --check --config configs/baseline_v3.json

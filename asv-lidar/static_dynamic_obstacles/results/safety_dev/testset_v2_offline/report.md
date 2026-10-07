@@ -18,7 +18,7 @@ layouts contribute 76 failures among 239 cases; the frozen-source subset
 contributes 52 among 761.
 
 The 735 historical pairs all belong to the frozen-source portion. The saved
-field-layout cases have no archived paired V4 results. The 23 lost policy goals
+coupled cases have no archived paired V4 results. The 23 lost policy goals
 end in 16 target, four obstacle and three boundary contacts. Another 262
 preserved-goal episodes contain V4 interventions; those interventions cannot
 all be labelled false alarms because the filter changes subsequent states.

@@ -4,7 +4,7 @@ Decision (2026-10-03): **test set v3 is the main evaluation set** for the safety
 
 ## Frozen benchmark and controllers
 
-- Exactly 1,000 scenarios: 664 frozen-suite-derived and 336 field-layout scenarios.
+- Exactly 1,000 scenarios: 664 decoupled (frozen-suite-derived) and 336 coupled scenarios.
 - Canonical files: `results/test_set/v3/definition.csv`, `definition.json` and `set_v3.0.pkl`.
 - Definition digest: `b8212ecf2a4f2529b6dec3a17dfaf178dabe0cf6590c606dd0d3427afdabb4bb`.
 - Primary selection: `results/safety_dev/testset_v3_main/selection.json`; all cases are retained in definition order, without outcome-based selection.

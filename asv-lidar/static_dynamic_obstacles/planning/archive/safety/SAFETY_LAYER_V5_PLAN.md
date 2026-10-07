@@ -2,7 +2,7 @@
 
 Continuation of `SAFETY_LAYER_V4_PLAN.md`, 2026-10-02. Goals: further
 safety improvements, a citation for every implemented method, and evaluation
-over all development, frozen and field sets. Frozen/field evaluation is now
+over all development, decoupled (frozen-suite) and coupled sets. Decoupled/coupled evaluation is now
 explicitly authorized. Candidate selection still uses development results;
 the selected implementation will be frozen before inspecting held-out results.
 
@@ -408,7 +408,7 @@ unit regressions.
 The fixed quick comparison **COMPLETED** under tag `policy_feedback_v1`
 (root exec session 97844 exited 0 and is closed), using sample manifest v3 and
 one serial, single-thread worker. It ran 24 selected canonical simulated
-frozen/field scenarios x off/v4/v5 = 72 episodes; together with the four
+decoupled/coupled scenarios x off/v4/v5 = 72 episodes; together with the four
 development probes, **76 actual new runs** consumed the shared 100-attempt
 budget. Final results are below. Do not tune this candidate from the fixed
 subset's outcomes. Count 24 paired scenarios per comparison, not 72 independent

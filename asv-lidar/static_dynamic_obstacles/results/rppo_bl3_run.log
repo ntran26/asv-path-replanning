@@ -1,0 +1,5 @@
+2026-10-07 16:59:50 == recurrent_ppos0_bl3: training 0 -> 2.5 M (baseline-v3)
+2026-10-07 17:01:53    pinned learner 30776
+2026-10-07 17:52:40 == recurrent_ppos0_bl3: training 0 -> 2.5 M (baseline-v3)
+2026-10-07 17:54:43    pinned learner 15340
+2026-10-07 18:42:43 == recurrent_ppos0_bl3: training 0 -> 2.5 M (baseline-v3, unpinned)

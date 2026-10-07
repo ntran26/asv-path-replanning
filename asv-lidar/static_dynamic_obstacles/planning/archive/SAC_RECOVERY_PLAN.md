@@ -70,10 +70,10 @@ practice) is right and is kept above, but going back in time does not help:
 > **no-target 25/30 vs 30/30** (L1 5/10 — fails the hard requirement);
 > fixed-speed targets 0.64 vs 0.63 (head-on and overtaking up, crossings and
 > being overtaken down). The heavier three-panel share traded general skill for
-> no net field gain. Kept policy: `runs/sac_formulation_seed0_bl3/kept_best_3M/`.
+> no net coupled-set gain. Kept policy: `runs/sac_formulation_seed0_bl3/kept_best_3M/`.
 
 > **Fix 1 (2026-10-01): static obstacles in the admissibility test.** Diagnosis
-> (180 field crossing/head-on replays of the 3 M policy): the compliant-turn
+> (180 coupled crossing/head-on replays of the 3 M policy): the compliant-turn
 > admissibility test (`colregs/geometry.py: channel_room`) ray-casts only the map
 > boundary, so it flagged a blocked turn in 9 of 180 episodes although a static
 > obstacle sat on the compliant side ahead in about half; the context therefore
@@ -159,7 +159,7 @@ steps for less; 2.5 M is the right start. Budget: 0.5 M steps ≈ 9 h, plus
 
 | # | Option | What changes | Cost | Expected effect |
 |---|---|---|---|---|
-| 0 | **Re-select the checkpoint** | pick the checkpoint by the three-panel development score (or the Paper 2-style no-target score) instead of the combined score | evaluation only (≈ 1 h per checkpoint) | helps if a checkpoint between 2.0 and 3.0 M is better on three-panel layouts |
+| 0 | **Re-select the checkpoint** | pick the checkpoint by the three-panel development score (or the coupled no-target score) instead of the combined score | evaluation only (≈ 1 h per checkpoint) | helps if a checkpoint between 2.0 and 3.0 M is better on three-panel layouts |
 | 1 | **Focused stage 8** (recommended) | continue stage 7 with three-panel layouts at 0.70 of episodes (was 0.45); weight toward no-target spread layouts and the weakest encounters (crossing from starboard, head-on, crossing from port); **failure replay** — each worker keeps the scenarios it collided in and re-issues one with probability 0.3 (prioritized level replay, Jiang et al., 2021 [VERIFY]) | code: a stage-8 overlay + a small env replay pool (~½ day incl. tests) | more practice exactly where it fails; no change to reward or observation |
 | 2 | **Exploration reset** | for the first 100 k steps raise SAC's target entropy (−2 → −1) or floor the entropy coefficient at 0.01 | config only | re-opens exploration so new avoidance lines can be found; combine with 1 |
 | 3 | **Earlier clearance signal** | reward-only change: obstacle term reaches 2.5 m with decay 0.8 m (was 2.0 / 0.6) | constant in the overlay; formulation change to report | rewards starting the avoidance earlier; changes the formulation, so only if 1 + 2 are not enough |
