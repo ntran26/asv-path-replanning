@@ -186,6 +186,8 @@ def verify_run(run_dir: Path, saved: Dict) -> List[str]:
     if _plain(run.get("hyperparameters")) != learner:
         problems.append(f"hyperparameters differ: {diff(learner, _plain(run['hyperparameters']))}")
     for key, value in saved["run_args"].items():
+        if key == "eval_supervisor" and run.get("eval_supervisor_override"):
+            continue                     # reporting only (decision, 2026-10-07); selection is safety off
         if key in run and _plain(run[key]) != value:
             problems.append(f"run arg {key}: run {run[key]!r}, baseline {value!r}")
     if _plain(run.get("scenario_schedule")) != saved["formulation"]["curriculum_schedule"]:

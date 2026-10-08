@@ -83,7 +83,7 @@ The checkpoint config has no `constant_overrides`. SAC was trained with the supe
 
 | Name used in this document | Meaning and status |
 | --- | --- |
-| DV3 / development-150 | The 150-case coupled development set used for the early 111/150 SAC reference and later V7/V8 comparisons. DV3 is a development-set version, not safety V3. |
+| DV3 / development-150 | The 150-case coupled validation set used for the early 111/150 SAC reference and later V7/V8 comparisons. DV3 is a validation-set version, not safety V3. |
 | Old frozen / field sweep | Original broad comparison inventory: 2,890 scenarios x OFF/V4/V5 = 8,670 planned records. Stopped early. Details below. |
 | TS2 | Test set v2, 1,000 saved cases. Designated for development on its failures; it is now development-exposed. |
 | 32-case cohort | 27 TS2 + 5 DV3 cases, deliberately enriched for failures, rescues, lost SAC successes and six successful controls. Same identities used in V9-V16 comparisons. |
@@ -207,7 +207,7 @@ Verification at this stage included 69 passing focused tests. An existing V3 dea
 
 ### The stopped 8,670-record sweep: final accounting
 
-Evaluation beyond 150 development episodes was started and later stopped. The original inventory contained DV3 150 + legacy development 120 + Tier-1 head-on 100 + frozen B 800 + frozen R 900 + frozen A 35 + field deployment layouts 630 + coupled validation layouts 155 = **2,890 scenarios**. OFF, V4 and proposed V5 made **8,670 planned controller/scenario records**. “Field” means simulated coupled layouts here, not new physical trials.
+Evaluation beyond 150 validation episodes was started and later stopped. The original inventory contained DV3 150 + legacy development 120 + Tier-1 head-on 100 + frozen B 800 + frozen R 900 + frozen A 35 + field deployment layouts 630 + coupled validation layouts 155 = **2,890 scenarios**. OFF, V4 and proposed V5 made **8,670 planned controller/scenario records**. “Field” means simulated coupled layouts here, not new physical trials.
 
 The authoritative final snapshot is `results/safety_dev/v4_stopped_full_sweep_report.md`: **3,347 committed records, 5,323 absent**. Only B and R ran; **zero V5 records** were completed in this old sweep. B has OFF 799 and V4 792 records, giving 791 pairs; R has OFF 900 and V4 856, giving 856 pairs. OFF `B-06-040` is absent from the durable journal and was excluded rather than reconstructed.
 
@@ -366,7 +366,7 @@ Sources of inspiration are dynamic occupancy/persistence (Nuss et al., R19), fre
 
 V11 reaches **18/32**: 12 rescues and ten lost SAC successes. Versus V10 it gains two goals and loses two. The three historical V8/V9 never-intervened target cases were P2-L1-CRP-FIX-05, P2-L1-CRS-VAR-08 and P2-L1-CRP-VAR-14. V11 rescues the latter two while FIX-05 remains a target collision. It addresses missing target views, but false/conflicting geometry offsets those gains elsewhere. Later V16 still succeeds on CRP-VAR-14 but loses CRS-VAR-08 to an obstacle; these are not three unchanged never-intervened failures in every version.
 
-A separate reusable **current-policy-prefix search** was also developed: fix only the current 0.5 s SAC command, search the remaining full eight-second backup with up to 192 plans, three CEM rounds and eight elites, and apply the existing hard checker. Inspiration: R4 and R11. Failure leaves the parent action; finite-search failure is not an infeasibility proof. This option is not simply synonymous with default V11. Isolated on V10 it reaches **17/32**, two gains and three losses versus V10. Its two slices have an explicitly audited archive-inventory difference (an unused development-set module), so they were not presented as a strict source-identical cohort.
+A separate reusable **current-policy-prefix search** was also developed: fix only the current 0.5 s SAC command, search the remaining full eight-second backup with up to 192 plans, three CEM rounds and eight elites, and apply the existing hard checker. Inspiration: R4 and R11. Failure leaves the parent action; finite-search failure is not an infeasibility proof. This option is not simply synonymous with default V11. Isolated on V10 it reaches **17/32**, two gains and three losses versus V10. Its two slices have an explicitly audited archive-inventory difference (an unused validation-set module), so they were not presented as a strict source-identical cohort.
 
 ### V12: prefer the existing base view for the same source
 

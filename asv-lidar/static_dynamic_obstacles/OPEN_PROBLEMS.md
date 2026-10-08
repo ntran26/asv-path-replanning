@@ -5,12 +5,12 @@ count. This file records only what is *not settled*, ordered so the
 highest-leverage item is first.
 
 **Last updated:** 2026-09-28, revision 49 — the Introduction is draft 4: literature review moved into section 1.2, the paper renumbered to six sections, contributions C1-C4, RQ6 added (skeleton revision 4); A37 opened (physical transfer in this paper or the field paper).
-Revision 48: 2026-09-28 — v1 of the coupled-layout fine-tune plateaued (coupled set 0.52-0.54), so v2 (coupled-layout share 0.8, failure weighting, entropy boost) took over from its 2.1 M best; baseline-v3 prepared as a fallback (field stages 6-7, space-time solvability on every episode, v3 dev set); all 630 Paper 2 cases found solvable (F107).
+Revision 48: 2026-09-28 — v1 of the coupled-layout fine-tune plateaued (coupled set 0.52-0.54), so v2 (coupled-layout share 0.8, failure weighting, entropy boost) took over from its 2.1 M best; baseline-v3 prepared as a fallback (field stages 6-7, space-time solvability on every episode, v3 validation set); all 630 Paper 2 cases found solvable (F107).
 Revision 47: 2026-09-27 — the coupled-layout fine-tune (decision): SAC seed 0 continued 2 M -> 3 M with coupled layouts in half the episodes, selected on the development plus a coupled validation set, tested on the Paper 2 set and the frozen suite (F106).
 Revision 46: 2026-09-27 — the Paper 2 deployment-layout set made field feasible (revision 2.0): targets start inside the basin, hold one heading, stop short of the wall after the encounter, at 0.20-1.10 m/s; a coupled set-up sheet per run (F104).
 Revision 45: 2026-09-27 — the Paper 2 deployment-layout set: the three published field layouts with and without a target ship, five COLREGs encounters, fixed and varying target speed; a separate evaluation set, not yet run (F104).
 Revision 44: 2026-09-27 — the campaign mechanism is removed; each learner x seed is trained on demand with `results/train_seed.sh` (F103).
-Revision 43: 2026-09-27 — suite 3.4 (decisions): the frozen headline is the development set's kind of scenario (800 constant-velocity episodes, trained class x geometry only, channels 7.5–10 m), reactive and non-compliant targets in a separate robustness set; A36 closed (F102).
+Revision 43: 2026-09-27 — suite 3.4 (decisions): the frozen headline is the validation set's kind of scenario (800 constant-velocity episodes, trained class x geometry only, channels 7.5–10 m), reactive and non-compliant targets in a separate robustness set; A36 closed (F102).
 Revision 42: 2026-09-27 — suite 3.3: every Tier B channel 10 m (decision), seed-0 frozen suite rerun; the channel being-overtaken failure is unchanged, so A36 opened (train being-overtaken and null in channels, or report them as untrained geometry) (F101).
 Revision 41: 2026-09-26 — decisions: A34 option (a), built (suite 3.2, `T-RE` on the COLREGs-VO rule, F100); A26 stays at 2 M; the recommended action on the rest (A32 option 4, A33 carried as a known limit, A10, A3/A4/A6 confirmed, freeze signed off). A35 opened: the COLREGs-VO comparator judges its side rule per candidate.
 Revision 40: 2026-09-26 — the frozen suite's reactive and non-compliant targets never react (F99); A34 opened; campaign held after TQC seed 0 for the fix; test IDs and a gallery for every frozen test.
@@ -83,7 +83,7 @@ generator, the scale audit, noise and randomisation.
 | Option | Change | Why | Cost |
 |---|---|---|---|
 | **1. Charge the wrong-way heading (recommended)** | `v_port` also reads the heading displaced the wrong way since engagement, `ρ · clip(max(0, −s_c · Δψ) / Δψ_min, 0, 1)` taken as the max with the yaw-rate form, so a held wrong-way heading keeps costing while the encounter is engaged | closes the measured gap; it is the mirror of the displacement credit `v_r8` already gives | a reward change: reward-scale audit, `test_reward` additions, one PPO run |
-| **2. Train port crossings earlier and more (recommended, with 1)** | stage 3 gains crossings from both sides; stages 4-5 weight crossings 60/40 port/starboard | stage 3 teaches only head-on (starboard), so "give way = starboard" is learned first and never unlearned | no formulation change; the development set is unchanged |
+| **2. Train port crossings earlier and more (recommended, with 1)** | stage 3 gains crossings from both sides; stages 4-5 weight crossings 60/40 port/starboard | stage 3 teaches only head-on (starboard), so "give way = starboard" is learned first and never unlearned | no formulation change; the validation set is unchanged |
 | 3. Pay turn plus slowdown | R-2 / `v_r8` credit the combined response more than either alone | the scripted optimum is the A17 turn *with* slowing (0.65-0.67 against 0.37-0.44 turning alone) | touches A24's settled slowing test; hold unless 1 + 2 leave crossings slow |
 | 4. Revisit A17 (Rule 15/17 stand-on for a target from port) | hold course and speed, act only by starboard turn or slowing | textbook open-water roles | **not recommended**: against a constant-velocity target that never gives way, holding course solves 0.32 and the Rule 17(c) direction does worse than A17's; the paper should state the narrow-channel convention instead (the prototype working copy flagged the same) |
 
@@ -127,12 +127,12 @@ Recommendation: 1 after run 9 reports, as run 10, so run 9 stays a single-change
 
 Cost: none to training (D1 keeps training on `T-CV`); the frozen suite has not run on baseline-v2, so nothing is lost. After the fix: redraw the gallery, then `results/frozen_seed0.sh`, then the campaign's seeds 1–2.
 
-**A36 — being overtaken (and null) in a channel is untrained geometry (F101) — closed 2026-09-27 by suite 3.4 (decision): the frozen headline now holds only the class × geometry combinations training draws, so channel being-overtaken and null are no longer evaluated (F102).** The original statement follows. Training draws channels only for head-on, crossing and overtaking (`CHANNEL_CLASSES`, F74); being-overtaken and null are always basin, in training and in the development set. Tier B puts them in channels, and every learner but PPO drops there: goal rate in channel being-overtaken + null is PPO 0.89, TQC 0.74, RecurrentPPO 0.71, SAC 0.60, against 0.81–0.92 in the trained channel classes. Suite 3.3 (all channels 10 m) left it unchanged, so it is the training distribution, not width. The failures are mostly wall and obstacle contacts, not target hits.
+**A36 — being overtaken (and null) in a channel is untrained geometry (F101) — closed 2026-09-27 by suite 3.4 (decision): the frozen headline now holds only the class × geometry combinations training draws, so channel being-overtaken and null are no longer evaluated (F102).** The original statement follows. Training draws channels only for head-on, crossing and overtaking (`CHANNEL_CLASSES`, F74); being-overtaken and null are always basin, in training and in the validation set. Tier B puts them in channels, and every learner but PPO drops there: goal rate in channel being-overtaken + null is PPO 0.89, TQC 0.74, RecurrentPPO 0.71, SAC 0.60, against 0.81–0.92 in the trained channel classes. Suite 3.3 (all channels 10 m) left it unchanged, so it is the training distribution, not width. The failures are mostly wall and obstacle contacts, not target hits.
 
 | Option | Change | Cost |
 |---|---|---|
 | **1. Report as untrained geometry (recommended for this paper)** | R1 split three ways: basin / channel, trained classes / channel being-overtaken + null, flagged as a generalisation result | none; it becomes a finding (off-policy learners generalise worse to an untrained layout) |
-| 2. Train it | add being-overtaken and null to `CHANNEL_CLASSES` in training and the development set | a formulation change: baseline-v3, all four learners retrained (~2 weeks here for seed 0, ~6 for three seeds) |
+| 2. Train it | add being-overtaken and null to `CHANNEL_CLASSES` in training and the validation set | a formulation change: baseline-v3, all four learners retrained (~2 weeks here for seed 0, ~6 for three seeds) |
 
 **A38 — the runtime safety layer lowers success; safety layer v2 proposed (2026-09-28, parked).** With it on, seed-0 success drops ~1 point and target collisions do not fall: it fires almost only in narrow-channel overtaking on a domain-based (not contact-based) test, most stops are false alarms (SAC: 25 of 46 stopped episodes lost, 22 of them to boundary contact after the stop), and 90-97 % of target collisions happen without a stop (crossing, head-on). Plan in `planning/archive/safety/SAFETY_LAYER_V2_PLAN.md`: a safety-only trigger, safety-layer-owned rudder and a recovery hand-back, then a DWA-style safety filter that can turn; no retraining, versioned apart from baseline-v2. Waits for a gap in training.
 
@@ -142,7 +142,7 @@ Cost: none to training (D1 keeps training on `T-CV`); the frozen suite has not r
 
 | Option | Change | Cost |
 |---|---|---|
-| **1. Judge on the encounter, as published (recommended)** | the comparator passes `side_live` from its present velocity (latched until it stops closing, as `T-RE` does); re-validate on the 120 development episodes and re-tune `W_CHANGE` only if the score falls | ~1 h of evaluation, run in a gap between trainings; `comparators_v1.json` → v2 |
+| **1. Judge on the encounter, as published (recommended)** | the comparator passes `side_live` from its present velocity (latched until it stops closing, as `T-RE` does); re-validate on the 120 validation episodes and re-tune `W_CHANGE` only if the score falls | ~1 h of evaluation, run in a gap between trainings; `comparators_v1.json` → v2 |
 | 2. Keep it as tuned | report the deviation from the paper in the methods | a reviewer can call the COLREGs-VO row a weakened Kuwata |
 
 No comparator result has been reported, so either is free now.
@@ -225,7 +225,7 @@ Recommendation: 1, with 4's stratum split reported whatever is chosen. Option 1 
 
 **Test:** Tier 1 of run 4 off/on, then run 5 from scratch with all of it, against run 4. Adopt if run 5's policy-only (safety layer off) outcomes match or beat run 4's and its intervention rate is low.
 
-**Run 4 baseline (F69):** goal 0.87 / collision 0.13 in training. Tier 1 under current code — safety layer off: crossing goal 0.45, all other classes 0.85–1.00; safety layer on: crossing 0.60, others identical. Intervention rate 0.05 on the development set (crossing 0.20, head-on 0.10), 0.02 on the head-on width set; 8 stops, 0 then hit; 3 outcomes changed, all crossing collisions turned to goals.
+**Run 4 baseline (F69):** goal 0.87 / collision 0.13 in training. Tier 1 under current code — safety layer off: crossing goal 0.45, all other classes 0.85–1.00; safety layer on: crossing 0.60, others identical. Intervention rate 0.05 on the validation set (crossing 0.20, head-on 0.10), 0.02 on the head-on width set; 8 stops, 0 then hit; 3 outcomes changed, all crossing collisions turned to goals.
 
 **Run 5 (F70):** goal 0.76 / collision 0.24, the same with the safety layer off and on; intervention rate 0.03. Worse than run 4 in every class, most in null (0.65 against 0.85) and crossing (0.40); faster everywhere. **Not adopted as built.**
 Low-speed starts are ruled out: run 4 scores 0.85 from cruise and 0.84 from rest (head-on 1.00 → 0.80), and starting from rest makes solved encounters easier, not infeasible.
@@ -235,7 +235,7 @@ Lead: R-2's coast test admitted the 8(e) carve-out on 6 % of candidate crossing 
 
 | Item | Resolution |
 |---|---|
-| A25 what to take from the prototype working copy | **port the fixes and the observable latch**: cross-track error scaled by the local half-width; a 14-value `context` branch (latch state, turn sense, change since engagement, admissibility, gates, age) plus the previous action, 56 -> 70; clearing restores the obligation when risk returns; one perceived state per decision; goal-overshoot and collision-kind fixes. The project's trainer, development set, curriculum, 1.60 m goal and the A15/A22 labelled cases stay. The prototype's coast-gated Rule 8 credit, 0.60 m goal, excluded hard cases, mastery gate and trainer are not taken. Run 6 trains on it; the prototype's reference controller is the comparator |
+| A25 what to take from the prototype working copy | **port the fixes and the observable latch**: cross-track error scaled by the local half-width; a 14-value `context` branch (latch state, turn sense, change since engagement, admissibility, gates, age) plus the previous action, 56 -> 70; clearing restores the obligation when risk returns; one perceived state per decision; goal-overshoot and collision-kind fixes. The project's trainer, validation set, curriculum, 1.60 m goal and the A15/A22 labelled cases stay. The prototype's coast-gated Rule 8 credit, 0.60 m goal, excluded hard cases, mastery gate and trainer are not taken. Run 6 trains on it; the prototype's reference controller is the comparator |
 | A24 R-2's slowing test | **the braking-path stop** (`R2_SLOWDOWN_TEST = "stop"`), as before F68 |
 
 ### A24 (decided in revision 19 — option 1) — which slowing test R-2 reads
@@ -252,7 +252,7 @@ Lead: R-2's coast test admitted the 8(e) carve-out on 6 % of candidate crossing 
 
 | Option | Contents | Cost |
 |---|---|---|
-| **1. Port the fixes and the observable latch, one run (recommended)** | cross-track scaled by local half-width; context branch + previous action (56 → 70); clearing-latch fix; synchronised perception; goal-overshoot and metrics fixes. Keep the project's trainer, development set, curriculum, goal tolerance 1.60 m, A15/A22 labelled cases, and R-2 on the stop test (A24 option 1). Run 7 from scratch; the prototype's reference controller becomes the comparator | ~1 day build and tests, one 8–11 h run; old checkpoints retire |
+| **1. Port the fixes and the observable latch, one run (recommended)** | cross-track scaled by local half-width; context branch + previous action (56 → 70); clearing-latch fix; synchronised perception; goal-overshoot and metrics fixes. Keep the project's trainer, validation set, curriculum, goal tolerance 1.60 m, A15/A22 labelled cases, and R-2 on the stop test (A24 option 1). Run 7 from scratch; the prototype's reference controller becomes the comparator | ~1 day build and tests, one 8–11 h run; old checkpoints retire |
 | 2. Option 1 plus the prototype's scene strata and recovery starts (not its mastery gate) | more static-only and recovery practice, aimed at run 5's obstacle collisions | two changes in one run; harder to attribute |
 | 3. Adopt the prototype wholesale | its trainer, gate, 0.60 m goal, excluded hard cases | loses comparability with runs 1–5; the gate would stall at level 4 given every measured crossing rate |
 | 4. Fix only the cross-track scaling | smallest change, same observation shape | leaves the reward non-Markov in the observation |
@@ -674,7 +674,7 @@ passes drawn at 1.0–1.9 m, above A15's floor. Two causes, both measured:
    *point*. The hull breaches the channel on the first step.
    `clamp_to_corridor` then moves the target to the nearest *centreline*
    station and turns it parallel: a median 2.4 m jump, onto the own ship's
-   track. Over the development set (path follower, 20 per class), the clamp
+   track. Over the validation set (path follower, 20 per class), the clamp
    fires **before CPA** in:
 
    | class | clamped before CPA | median jump |
@@ -850,12 +850,12 @@ settled.
 | **B5** | manoeuvring at 0.55 m/s is extrapolated | measurement | sim-to-real at the operating point | plan edit |
 | C2 | throughput | build | campaign size | mine |
 | C3–C6 | comparators, occlusion placement, metrics | build | evaluation | mine |
-| ~~C3a~~ | comparator tuning and COLREGs-VO | **done** (F97): tuned on the dev set, validated on all 120, pinned in `configs/comparators_v1.json` | — | COLREGs-VO built |
+| ~~C3a~~ | comparator tuning and COLREGs-VO | **done** (F97): tuned on the validation set, validated on all 120, pinned in `configs/comparators_v1.json` | — | COLREGs-VO built |
 | ~~B6a~~ | claim ledger: C-2/C-3 evidence moves from Tier B to R4 | **signed off** | — | 2026-09-26 |
 | **A34** | frozen suite target behaviours | **decided** (option a), built: suite 3.2 | — | F99, F100 |
 | **A35** | COLREGs-VO comparator judges its side rule per candidate | **decision** | the COLREGs-VO row | recommend option 1 |
 | ~~A36~~ | being overtaken / null in a channel is untrained geometry | **closed**: suite 3.4 evaluates only trained combinations | — | F102 |
-| ~~C3a-old~~ | **comparator tuning**: parameters ported to `src/constant_temp.py` (single source, digest-safe); **tune on the development set after the campaign**, same score as the RL checkpoints (goal − 2 × collision), search reported, tuned values pinned with each result | build | a fair classical baseline (N2) | mine, ~2 h compute |
+| ~~C3a-old~~ | **comparator tuning**: parameters ported to `src/constant_temp.py` (single source, digest-safe); **tune on the validation set after the campaign**, same score as the RL checkpoints (goal − 2 × collision), search reported, tuned values pinned with each result | build | a fair classical baseline (N2) | mine, ~2 h compute |
 | ~~A20~~ | freeze class and sense per engagement | **decided** (option 1) | — | built, F58 |
 | ~~A19~~ | classify against the path tangent | **decided** (option 1) | — | built, F56 (residual → A20) |
 | ~~A18~~ | stop only when stopping clears | **decided** (option 1) | — | built, F56 |

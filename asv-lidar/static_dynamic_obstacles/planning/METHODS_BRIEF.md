@@ -1,29 +1,32 @@
-# Methods brief — Paper 3, formulation baseline-v1
+# Methods brief — Paper 3, formulation baseline-v3
 
-> **Status note (2026-10-04).** Written for the baseline-v1/v2 formulation. Reward, observation, vessel model and learners are unchanged through baseline-v3, which adds a curriculum overlay (coupled layouts in stages 6-7). The headline evaluation is now the 1,000-episode test set (version 4; `tools/tiers/test_set.py`). The baseline-v4 draft (4.3) changes the curriculum, the development set and the training starts, and switches fix 1 on (`planning/BASELINE_V4_PLAN.md`); this brief is restated once the final formulation is fixed.
+> **Status note (2026-10-08).** Current for **baseline-v3** (`configs/baseline_v3.json`, formulation digest `03a9c0c22f53ee0b`): baseline-v2's reward, observation, vessel model and learners, unchanged, plus the curriculum overlay `src/formulation_v3.py` (coupled layouts in stages 6–7, a 2.5 M budget extended to 3.0 M). The headline evaluation is the 1,000-episode test set, version 4 (`tools/tiers/test_set.py`). The baseline-v4.3 candidate was trained and **not adopted**: it gained on the validation set and lost on the held-out sets (`planning/BASELINE_V4_PLAN.md`, section 5e).
 
 **Purpose.** One current, paper-ready statement of the method, for drafting the
 Methods, Experimental Setup and Limitations sections. It states the formulation
-**as frozen** in `configs/baseline_v2.json` (formulation digest
-`3d697858e95e5adf`), with each design choice tied to the finding that justifies
-it (`F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`).
+**as frozen** in `configs/baseline_v3.json` (formulation digest
+`03a9c0c22f53ee0b`), with each design choice tied to the finding that justifies
+it (`F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`). baseline-v3 is
+baseline-v2 (`configs/baseline_v2.json`, digest `3d697858e95e5adf`) plus a
+curriculum overlay; every section except the curriculum (section 3) and the
+training budget (section 7) reads the same for both.
 
 Written 2026-09-22, revised 2026-09-23 with three decisions: the Rule 17(b)
 below-floor draws leave training **and** the suite (S5), field work is **delayed
 within this paper** (not deferred), and the paper is **a formulation plus a
-five-learner comparison**. baseline-v1 (`configs/baseline_v1.json`, git tag
+learner comparison** (five learners then, four since TD3 was dropped on
+2026-09-24). baseline-v1 (`configs/baseline_v1.json`, git tag
 `baseline-v1`) differs in exactly one constant and is kept for the record.
 Values were read from the frozen config and the source, not from the planning
 specs.
 
 > **Precedence.** Where this brief disagrees with an earlier document, this
-> brief and `configs/baseline_v1.json` are right. `OBSERVATION_SPEC.md` and
+> brief and `configs/baseline_v3.json` are right. `OBSERVATION_SPEC.md` and
 > `CONSTANTS_AND_SCALES.md` were brought up to date on 2026-09-22. Known stale
 > documents: `01_PERCEPTION_AND_OBSERVATION.md` (describes the 56-value
-> observation, not the current 70); `02a_REWARD_SPECIFICATION.md`
-> (predates the A24 stop test, A27 held-heading charge, A29 growing `v_hold`
-> and F88 latched risk); `03a`/`04a` (predate basin mode, F74); the draft
-> skeleton (7 Sep); `PAPER3_CLAIMS_AND_TABLES.md` (still names a single "Proposed (SAC)"
+> observation, not the current 70); `03a`/`04a` (predate basin mode, F74); the draft
+> skeleton (7 Sep). `02a_REWARD_SPECIFICATION.md` was brought to baseline-v3 on
+> 2026-10-08; `PAPER3_CLAIMS_AND_TABLES.md` (still names a single "Proposed (SAC)"
 > method, see section 9). Each stale planning spec now opens with a dated status note
 > listing what is superseded.
 
@@ -37,8 +40,13 @@ moving vessel in a manner consistent with COLREGs, using only onboard range
 sensing (LiDAR) plus its own navigation state. One end-to-end policy produces
 rudder and throttle commands at 2 Hz.
 
-**In scope:** Rules 8, 9, 13, 14, 15/16 (as a narrow-channel convention, section 5.3)
-and 17 for **one** target at a time; static obstacles; basin and channel
+**In scope:** Rules 8 (8(b) readily apparent action, 8(d) passing at a safe distance,
+8(e) slowing; 8(a) as timing pressure only), 9 (as an operating convention), 13, 14
+(port-to-port passing; an alteration only when the target is not already clear),
+15/16 (as a narrow-channel convention, section 5.3: give way to every crossing target,
+passing astern) and 17(a)(i) (course and speed held while being overtaken, the hold
+penalty released in extremis) for **one** target at a time, each stated as exactly what
+the reward encodes and described as COLREGs-aware, not compliant (decision 2026-10-08); static obstacles; basin and channel
 geometry. **Out of scope (stated in the paper):** multi-target encounters,
 Rule 19 restricted visibility, sound signals, Rule 18 responsibilities, open-water
 Rule 15/17 role tables, and any claim of legal compliance: violation terms are
@@ -103,15 +111,28 @@ no encounter) 0.11, no target 0.17.
 **Static obstacles.** 1.0 m obstacles placed along 25–70 % of the path with
 lateral offsets; 0–3 per episode by curriculum stage.
 
-**Curriculum** (fraction of the training budget → stage):
+**Curriculum** (baseline-v3; fraction of the 2.5 M budget → stage, the same for
+every learner; the extension to 3.0 M stays in stage 7):
 
-| Stage | From | Classes | Obstacles | Basin share |
-|---|---|---|---|---|
-| 1 | 0 % | no target | 0–1 | 1.00 |
-| 2 | 8 % | no target | 0–3 | 1.00 |
-| 3 | 18 % | head-on, crossing (both sides, A27), null, no target | 0–1 | 0.85 |
-| 4 | 32 % | all six | 0–2 | 0.75 |
-| 5 | 50 % | all six | 0–3 | 0.75 |
+| Stage | From | Classes | Obstacles | Coupled layouts | Basin share (other draws) |
+|---|---|---|---|---|---|
+| 1 | 0 % (0) | no target | 0–1 | — | 1.00 |
+| 2 | 6.4 % (160 k) | no target | 0–3 | — | 1.00 |
+| 3 | 14.4 % (360 k) | head-on, crossing (both sides, A27), null, no target | 0–1 | — | 0.85 |
+| 4 | 25.6 % (640 k) | all six | 0–2 | — | 0.75 |
+| 5 | 40 % (1.0 M) | all six | 0–3, weighted to 3 (0.1 / 0.2 / 0.3 / 0.4) | — | 0.75 |
+| 6 | 60 % (1.5 M) | all six | 1–3 (0.2 / 0.3 / 0.5) | 25 % | 0.75 |
+| 7 | 80 % (2.0 M) | all six | 1–3 (0.2 / 0.3 / 0.5) | 45 %, 30 % of their targets varying speed | 0.75 |
+
+**Coupled layouts** (stages 6–7): three panels in a structured arrangement (a
+gate with an on-path panel, a slalom, or a side panel with an on-path panel),
+with the encounter generated beside them; classes weighted no target 0.20,
+head-on 0.20, port and starboard crossing, overtaking and being overtaken
+0.15 each. 30 % of them sit near one of the three reference layouts (panels
+moved 0.4–1.5 m, leg ends up to 0.75 m, 1–2 m from the original), never on it.
+In **decoupled** draws the CPA guard keeps ±0.4 T₀ of own-ship travel around the
+CPA clear of panels; stage 6 halves it and stage 7 removes it. Every target
+episode in stages 6–7 is checked solvable in space and time and redrawn if not.
 
 15 % of episodes start at low speed (from rest or up to half cruise).
 
@@ -281,12 +302,14 @@ sb3-contrib 2.3.0):
 
 **Common:** discount 0.951 per 0.5 s step (0.99 per 0.1 s physics step, a
 ~10 s horizon); reward normalisation only (VecNormalize, clip 10); 10 parallel
-environments; **2 × 10⁶ environment steps**; off-policy learners at **1.0
-gradient step per transition**; **3 seeds** per learner (decision, 2026-09-24;
-was 5); development-set
-evaluation every 2 × 10⁵ steps; each seed represented by its **best
-development-set checkpoint** (score = goal rate − 2 × collision rate,
-safety layer off). The frozen evaluation suite is never used for selection (A26).
+environments; **2.5 × 10⁶ environment steps, extended to 3.0 × 10⁶** (stage 7
+continues; every baseline-v3 run follows the same protocol); off-policy learners
+at **1.0 gradient step per transition**; **3 seeds** per learner (decision,
+2026-09-24; was 5); validation-set evaluation every 2 × 10⁵ steps on the 270
+validation episodes (120 decoupled + 150 coupled, section 8), with the safety
+layer off; each seed represented by its **best validation-set checkpoint**
+(score = goal rate − 2 × collision rate on all 270). The test set and the frozen
+suite are never used for selection (A26).
 
 **Development and fairness.** The observation and reward were **specified from
 the rule analysis** (02, 02a, 03a, 04a) and are learner-independent: nothing in
@@ -314,10 +337,10 @@ row differs in the avoidance logic and nothing else. Parameters live in
 `src/constant_temp.py` and are pinned with a digest in
 `configs/comparators_v1.json`.
 
-**Tuning (the fairness argument).** Each was fitted on the **development set** by
+**Tuning (the fairness argument).** Each was fitted on the **validation set** by
 coordinate descent over a declared grid, scored by the rule RL checkpoints are
 selected by (goal − 2 × collision), then the winner was re-scored on all 120
-development episodes. COLREGs-VO improved (+0.525 → +0.575, a stronger
+validation episodes. COLREGs-VO improved (+0.525 → +0.575, a stronger
 course-change penalty); DWA's 60-episode gain (+0.700 → +0.850) **did not
 replicate** on 120 (+0.650 either way), so its defaults were kept. Report that:
 it is why a search is validated rather than trusted.
@@ -326,8 +349,10 @@ it is why a search is validated rather than trusted.
 
 | Set | Size | Use |
 |---|---|---|
-| Development set | 120 episodes (20 per class × 6), development namespace | checkpoint selection, diagnostics |
-| **Tier B — the frozen suite (default)** | **800 episodes** per seed, suite 3.4: 8 cells × 100 = 800 constant-velocity episodes, drawn like the development set (only positions differ) — every class in the basin, head-on / crossing / overtaking in 7.5–10 m channels — plus a robustness set of the same scenarios with reactive (700) and, in head-ons, non-compliant (200) targets | headline results, touched once per policy |
+| Validation set | **270 episodes**: 120 decoupled (20 per class × 6) + 150 coupled (the v3 coupled validation set: 20 no-target, 20 constant-speed and 6 varying-speed per encounter, 3 in 10 near a reference layout), development namespace | checkpoint selection, diagnostics |
+| **Test set v4 (headline)** | **1,000 episodes**: 664 decoupled (from the frozen suite) + 336 coupled (generated coupled layouts and the reference layouts L1–L3); episodes no controller can solve after the target is first tracked are replaced by oracle-checked draws of the same cell | headline results, safety layer off, touched once per policy (`planning/BASELINE_V4_PLAN.md`, section 5e) |
+| Reference-layout set | 630 episodes on L1–L3 with and without a target, five encounters, fixed and varying target speed | secondary, safety layer off |
+| **Tier B — the frozen suite** | **800 episodes** per seed, suite 3.4: 8 cells × 100 = 800 constant-velocity episodes, drawn like the validation set (only positions differ) — every class in the basin, head-on / crossing / overtaking in 7.5–10 m channels — plus a robustness set of the same scenarios with reactive (700) and, in head-ons, non-compliant (200) targets | decoupled results and the robustness set; most of its episodes are also in the test set |
 | Tier A — **out of this paper** (decision, 2026-09-24) | 38 defined (35 realised), incl. basin cases and pre-committed expected failures | kept in the suite, runnable with `--tiers a`; no claim depends on it |
 | **Around the Clock** (O1) | 24 open-water + 24 channel cases × 10 seeds (`suite.around_the_clock`), reported as R8 | the one **externally defined** scenario set in the paper, after Imazu was dropped |
 
@@ -337,12 +362,14 @@ reports the seed spread. `PAPER3_CLAIMS_AND_TABLES.md` still says "mean over 5 s
 a 95 % CI" and needs restating for **3 seeds** (B6), with the wider interval
 that implies. Pre-registered metrics: success;
 collisions by type (static, boundary, target); RMS cross-track error; path
-ratio; intervention rate with the safety layer on (R1); violation rate per class,
-with crossings split by side (R2); results by target behaviour (R3; `cv` constant velocity (`T-CV`), `re` compliant reactive (`T-RE`, the COLREGs-VO rule from the target's side), `nc` non-compliant (`T-NC2`, alters to port, in head-on; `T-NC1`, stands on when give-way, elsewhere)), channel
+ratio; intervention rate with the safety layer on (R1; run separately on the test
+set, by request, while the safety layer is developed — training-run evaluations are
+safety-off only, decision 2026-10-07); COLREGs behaviour by trajectory snapshots of
+each encounter type, not per-rule rates (R2, decision 2026-10-08); results by target behaviour (R3; `cv` constant velocity (`T-CV`), `re` compliant reactive (`T-RE`, the COLREGs-VO rule from the target's side), `nc` non-compliant (`T-NC2`, alters to port, in head-on; `T-NC1`, stands on when give-way, elsewhere)), channel
 width (R4), perception degradation (R5), ablation (R6), Tier A (R8) and field
 (R9). First-alteration compliance by side is a diagnostic added since (F92).
 
-**Measured seed spread** (PPO, two seeds): 0.05 on the development-set goal
+**Measured seed spread** (PPO, two seeds): 0.05 on the validation-set goal
 rate, 0.20 on crossings (F90). With **3 seeds** a headline difference of about
 0.05 is at the edge of what can be separated, and crossing-level differences
 (spread 0.20) cannot be. The paper should compare learners on the headline and
@@ -354,8 +381,8 @@ difference between learners there.
 **Fixed (can be written now):** sections 1–7, the evaluation design in section 8, and the
 limitations in section 10.
 
-**Decided 2026-09-23:** the paper is **a formulation plus a five-learner
-comparison** (not a proposed learner plus baselines), which is what was
+**Decided 2026-09-23:** the paper is **a formulation plus a learner
+comparison** (five learners then, four since 2026-09-24) (not a proposed learner plus baselines), which is what was
 pre-registered and what the campaign produces, and which makes the classical
 comparators essential rather than optional for N2. **Field work is delayed
 within this paper, not deferred:** the basin sessions of `PART2_BASIN_PLAN.md`
@@ -364,17 +391,18 @@ the two-vessel scope all stand — at the cost of a timeline that depends on poo
 access and on deployment (C13).
 
 **Pending:**
-- **Results.** The campaign restarts on baseline-v2 (F96); the three runs made on
-  baseline-v1 (run 11's two PPO seeds and RecurrentPPO seed 0) do not carry over.
-  About 6 days for seed 0 of every learner, ~4 weeks for all 25 (A26, F95).
-- **Evaluation machinery.** The Tier B runner and the classical comparators
-  (encounter-specific VO, COLREGs-VO, LOS-PID + DWA; C3–C6) are not built. The
-  suite freeze, claim ledger and result tables are unsigned drafts.
+- **Results (2026-10-08).** On baseline-v3: SAC, PPO and RecurrentPPO seed 0 are
+  done (test set v4: SAC 0.865, RecurrentPPO 0.757, PPO 0.751; `results/baseline_v3/seed0_summary.md`); nine runs remain (PPO and RecurrentPPO seeds 1–2,
+  SAC seeds 1–2, TQC seeds 0–2), about 15 days run one at a time. The runs on
+  baseline-v1 and v2 were removed (2026-10-04).
+- **Evaluation machinery.** Built: the frozen suite, test set v4, the
+  reference-layout set and the classical comparators (section 7.1). The claim
+  ledger and result tables (`PAPER3_CLAIMS_AND_TABLES.md`) are unsigned drafts.
 - **A framing decision.** `PAPER3_CLAIMS_AND_TABLES.md` still names a single "Proposed
   (SAC, full)" method and pre-registers runs outside the campaign — "SAC, no
   COLREGs terms", the 2 × 2 feature/reward ablation (C-4), randomisation-off
   (C-6) — plus Paper 2's SAC and the three classical comparators. The paper is
-  now either **a formulation plus a five-learner comparison**, or a proposed
+  now either **a formulation plus a learner comparison**, or a proposed
   learner plus baselines. The ledger and tables must say which, and which
   ablations the compute budget covers, before sign-off.
 - **C-4's ablation needs restating.** It was written as 2 × 2 (encounter-class
@@ -390,8 +418,8 @@ access and on deployment (C13).
   and are reported as a characterised failure mode (S5 put active release out of
   scope; A15 later put those draws in).
 
-**Development-set context, not paper results.** The best PPO formulation run
-(run 11, which baseline-v1 reproduces exactly) reached a development goal rate
+**Validation-set context, not paper results (historical, baseline-v1).** The best
+PPO formulation run (run 11, which baseline-v1 reproduces exactly) reached a development goal rate
 of 0.92 and 0.88 on two seeds, head-on 1.00 on both, crossing 0.75 and 0.55.
 
 ## 10. Limitations (to state in the paper)
@@ -425,10 +453,12 @@ of 0.92 and 0.88 on two seeds, head-on 1.00 on both, crossing 0.75 and 0.55.
 
 | Topic | File |
 |---|---|
-| Every frozen number | `configs/baseline_v1.json` |
+| Every frozen number | `configs/baseline_v3.json` (baseline-v2 without the overlay: `configs/baseline_v2.json`) |
 | Each constant and why | `CONSTANTS_AND_SCALES.md` |
 | Findings F1–F95 (full rationale, chronological) | `PROJECT_STATE.md` |
 | Open decisions and known limits | `OPEN_PROBLEMS.md` |
 | Basin geometry | `planning/06_BASIN_MODE_SPECIFICATION.md` |
-| Claims and pre-committed tables | `planning/PAPER3_CLAIMS_AND_TABLES.md`, `planning/PAPER3_CLAIMS_AND_TABLES.md` |
+| Claims and pre-committed tables | `planning/PAPER3_CLAIMS_AND_TABLES.md` |
+| Equations, as frozen | `planning/FORMULATION_EQUATIONS.md` |
+| Curriculum, sets and test-set construction | `planning/CURRICULUM_AND_DATA_BRIEF.md`, `planning/BASELINE_V4_PLAN.md` (section 5e) |
 | Running the campaign | `TRAINING_GUIDE.md` |

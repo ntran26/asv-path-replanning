@@ -1,0 +1,301 @@
+scope,metric,method,kind,point,ci_lo,ci_hi
+All episodes,Success rate,SAC,rate,0.865,0.846,0.8830249999999996
+All episodes,Success rate,PPO,rate,0.751,0.727,0.776
+All episodes,Success rate,RecurrentPPO,rate,0.757,0.732,0.781
+All episodes,Success rate,LOS-DWA,rate,0.77,0.748,0.793
+All episodes,Success rate,COLREGs-VO,rate,0.687,0.661,0.711
+All episodes,Target collision rate,SAC,rate,0.053,0.041,0.066
+All episodes,Target collision rate,PPO,rate,0.142,0.122,0.163
+All episodes,Target collision rate,RecurrentPPO,rate,0.155,0.135,0.17502499999999963
+All episodes,Target collision rate,LOS-DWA,rate,0.08,0.065,0.096
+All episodes,Target collision rate,COLREGs-VO,rate,0.135,0.115,0.154
+All episodes,Obstacle collision rate,SAC,rate,0.07,0.056,0.085
+All episodes,Obstacle collision rate,PPO,rate,0.091,0.075,0.107
+All episodes,Obstacle collision rate,RecurrentPPO,rate,0.078,0.063,0.094
+All episodes,Obstacle collision rate,LOS-DWA,rate,0.109,0.092,0.12602499999999964
+All episodes,Obstacle collision rate,COLREGs-VO,rate,0.133,0.114,0.152
+All episodes,Boundary collision rate,SAC,rate,0.012,0.006,0.019
+All episodes,Boundary collision rate,PPO,rate,0.016,0.009,0.024
+All episodes,Boundary collision rate,RecurrentPPO,rate,0.01,0.004,0.016
+All episodes,Boundary collision rate,LOS-DWA,rate,0.038,0.027,0.05
+All episodes,Boundary collision rate,COLREGs-VO,rate,0.045,0.033,0.058
+All episodes,Timeout rate,SAC,rate,0.0,0.0,0.0
+All episodes,Timeout rate,PPO,rate,0.0,0.0,0.0
+All episodes,Timeout rate,RecurrentPPO,rate,0.0,0.0,0.0
+All episodes,Timeout rate,LOS-DWA,rate,0.003,0.0,0.007
+All episodes,Timeout rate,COLREGs-VO,rate,0.0,0.0,0.0
+All episodes,RMS cross-track error (m),SAC,iqm,1.4218297858972964,1.3753884451406906,1.469016569239054
+All episodes,RMS cross-track error (m),PPO,iqm,0.8531602053670244,0.8132372391611511,0.8952271158930695
+All episodes,RMS cross-track error (m),RecurrentPPO,iqm,0.9146643001652389,0.8691950261666747,0.9606435739384375
+All episodes,RMS cross-track error (m),LOS-DWA,iqm,0.5147467966957312,0.48289226963070536,0.5469422531184185
+All episodes,RMS cross-track error (m),COLREGs-VO,iqm,0.41329930372402307,0.3828148472308626,0.4446509720757808
+All episodes,"Completion time, successful episodes (s)",SAC,iqm,26.22285067873303,26.0152749490835,26.486604762119605
+All episodes,"Completion time, successful episodes (s)",PPO,iqm,33.234177215189874,33.063785639497425,33.64398850503635
+All episodes,"Completion time, successful episodes (s)",RecurrentPPO,iqm,31.223502304147466,31.04426495635512,31.621673387096774
+All episodes,"Completion time, successful episodes (s)",LOS-DWA,iqm,36.52758620689655,36.25,36.914368695711104
+All episodes,"Completion time, successful episodes (s)",COLREGs-VO,iqm,35.26470588235294,35.0385612725041,35.33447508266415
+All episodes,"Path length / reference, successful episodes",SAC,iqm,0.9913361114281976,0.989393776876577,0.9932322951142418
+All episodes,"Path length / reference, successful episodes",PPO,iqm,0.9663901781745877,0.9648137260184518,0.9681842772022271
+All episodes,"Path length / reference, successful episodes",RecurrentPPO,iqm,0.9652923489204593,0.9638028792674741,0.9669233000207871
+All episodes,"Path length / reference, successful episodes",LOS-DWA,iqm,0.9533721584126478,0.9523927214700608,0.9544020792230826
+All episodes,"Path length / reference, successful episodes",COLREGs-VO,iqm,0.9489763283360464,0.9481160902491734,0.9499130671682541
+All episodes,Mean speed (m/s),SAC,iqm,0.7425989745125721,0.7374321293080925,0.7475648070904164
+All episodes,Mean speed (m/s),PPO,iqm,0.544596896508868,0.53831755610262,0.5502573355951527
+All episodes,Mean speed (m/s),RecurrentPPO,iqm,0.575362587515751,0.5691980379570212,0.581445761519541
+All episodes,Mean speed (m/s),LOS-DWA,iqm,0.495372056209505,0.4914162923287978,0.49916285579146746
+All episodes,Mean speed (m/s),COLREGs-VO,iqm,0.5324432297379221,0.5312786670517281,0.5335829286223237
+All episodes,Minimum speed (m/s),SAC,iqm,0.5128938507364582,0.5073143145470967,0.5178467195692247
+All episodes,Minimum speed (m/s),PPO,iqm,0.3058533313332696,0.29909325937675285,0.31270748778707536
+All episodes,Minimum speed (m/s),RecurrentPPO,iqm,0.38508316898788075,0.3764779195184739,0.39400757839680284
+All episodes,Minimum speed (m/s),LOS-DWA,iqm,0.3224723145157335,0.3123594607526441,0.33281772007103544
+All episodes,Minimum speed (m/s),COLREGs-VO,iqm,0.39597021541145444,0.39048637833785693,0.4012868836663991
+All episodes,Min obstacle clearance (m),SAC,iqm,0.6550775486128033,0.6187772375348136,0.6921320262911717
+All episodes,Min obstacle clearance (m),PPO,iqm,0.616859419610335,0.5739660812760059,0.6624327750755541
+All episodes,Min obstacle clearance (m),RecurrentPPO,iqm,0.7481257665540734,0.6998090654532519,0.7976063473593796
+All episodes,Min obstacle clearance (m),LOS-DWA,iqm,0.6341519708787497,0.5923943696028766,0.6768864209682177
+All episodes,Min obstacle clearance (m),COLREGs-VO,iqm,0.33409209437642984,0.3076411512037956,0.36266931570178407
+All episodes,Min boundary clearance (m),SAC,iqm,0.819012254345771,0.8143907779359397,0.8234177707583626
+All episodes,Min boundary clearance (m),PPO,iqm,0.8231869580232942,0.8192751829762159,0.8267290669027695
+All episodes,Min boundary clearance (m),RecurrentPPO,iqm,0.8186503219812,0.8144098323216983,0.8226604935563784
+All episodes,Min boundary clearance (m),LOS-DWA,iqm,0.8244171752221887,0.8202035373065972,0.8284774824198426
+All episodes,Min boundary clearance (m),COLREGs-VO,iqm,0.8268507707572905,0.8229535551504701,0.8306345334318264
+All episodes,Ship-domain intrusion rate,SAC,rate,0.0865979381443299,0.07010309278350516,0.10412371134020619
+All episodes,Ship-domain intrusion rate,PPO,rate,0.2536082474226804,0.22783505154639175,0.2793814432989691
+All episodes,Ship-domain intrusion rate,RecurrentPPO,rate,0.24845360824742269,0.22577319587628866,0.27319587628865977
+All episodes,Ship-domain intrusion rate,LOS-DWA,rate,0.1422680412371134,0.12268041237113401,0.16288659793814433
+All episodes,Ship-domain intrusion rate,COLREGs-VO,rate,0.20309278350515464,0.18144329896907216,0.22474226804123712
+All episodes,"Deepest intrusion, episodes with one (fraction of radius)",SAC,iqm,0.20668945684036663,0.17231818874156066,0.2438567405486747
+All episodes,"Deepest intrusion, episodes with one (fraction of radius)",PPO,iqm,0.2154392958951001,0.19614871630036737,0.23618932500628761
+All episodes,"Deepest intrusion, episodes with one (fraction of radius)",RecurrentPPO,iqm,0.26480791731546177,0.23915359774303532,0.2884176554040019
+All episodes,"Deepest intrusion, episodes with one (fraction of radius)",LOS-DWA,iqm,0.21472634628060755,0.18361184409267126,0.2512193213975624
+All episodes,"Deepest intrusion, episodes with one (fraction of radius)",COLREGs-VO,iqm,0.2574016874141596,0.2244388160333752,0.28815761078128854
+All episodes,"Time inside the domain, episodes with an intrusion (s)",SAC,iqm,1.4081632653061225,1.3113207547169812,1.6583333333333334
+All episodes,"Time inside the domain, episodes with an intrusion (s)",PPO,iqm,1.8583815028901733,1.663634960718294,2.2185243055555555
+All episodes,"Time inside the domain, episodes with an intrusion (s)",RecurrentPPO,iqm,2.329710144927536,1.965314717933709,2.5357338373305525
+All episodes,"Time inside the domain, episodes with an intrusion (s)",LOS-DWA,iqm,2.117283950617284,1.9022988505747127,2.3235377673796793
+All episodes,"Time inside the domain, episodes with an intrusion (s)",COLREGs-VO,iqm,1.928030303030303,1.8192307692307692,2.267326732673267
+All episodes,"Closest approach, centre to centre (m)",SAC,iqm,2.897503151304931,2.8259344305285707,2.9708334638502305
+All episodes,"Closest approach, centre to centre (m)",PPO,iqm,2.4676681050275526,2.397648449439635,2.5396973323656584
+All episodes,"Closest approach, centre to centre (m)",RecurrentPPO,iqm,2.384900090877471,2.317509809956967,2.4575213446910937
+All episodes,"Closest approach, centre to centre (m)",LOS-DWA,iqm,2.4730142170877416,2.4078569985734926,2.542189325391166
+All episodes,"Closest approach, centre to centre (m)",COLREGs-VO,iqm,2.148741971711359,2.0939665041047997,2.2028189350810874
+All episodes,"Min target clearance, hull to hull (m)",SAC,iqm,1.6872535075310968,1.6242761547121431,1.7499102862379716
+All episodes,"Min target clearance, hull to hull (m)",PPO,iqm,1.2761832933038713,1.2010634859697942,1.3528655750211083
+All episodes,"Min target clearance, hull to hull (m)",RecurrentPPO,iqm,1.2653174935691798,1.1941223263371101,1.3369249163855175
+All episodes,"Min target clearance, hull to hull (m)",LOS-DWA,iqm,1.3298934103921356,1.2807874775767638,1.3819553576520505
+All episodes,"Min target clearance, hull to hull (m)",COLREGs-VO,iqm,0.9916056915155943,0.9500326943668246,1.0355623186423442
+All episodes,Rudder saturation fraction,SAC,rate,0.05345659926627648,0.049545447878243686,0.05754887670945486
+All episodes,Rudder saturation fraction,PPO,rate,0.23366599345091396,0.22671499782403823,0.2407461704302647
+All episodes,Rudder saturation fraction,RecurrentPPO,rate,0.37040999777237277,0.3615313457985664,0.37917409483996384
+All episodes,Rudder saturation fraction,LOS-DWA,rate,0.2794557731350963,0.27135201265761677,0.2873880511033967
+All episodes,Rudder saturation fraction,COLREGs-VO,rate,0.1563205631513689,0.15088163205119337,0.16156770974032642
+All episodes,Mean abs. rudder rate (deg/s),SAC,iqm,22.27372215017783,21.938365114602156,22.611530980601156
+All episodes,Mean abs. rudder rate (deg/s),PPO,iqm,22.675679937295968,22.3960529359702,22.95424557928315
+All episodes,Mean abs. rudder rate (deg/s),RecurrentPPO,iqm,41.48605361888233,40.623207821529704,42.347511726580876
+All episodes,Mean abs. rudder rate (deg/s),LOS-DWA,iqm,26.152836023794954,25.6745841310693,26.627595772031857
+All episodes,Mean abs. rudder rate (deg/s),COLREGs-VO,iqm,29.89662896911316,29.533193937712447,30.253915900237896
+All episodes,Control effort (int. sq. rudder cmd),SAC,iqm,9.749528141082292,9.54505218837409,9.958643324767593
+All episodes,Control effort (int. sq. rudder cmd),PPO,iqm,12.452412082235767,12.097552795285493,12.805801016085699
+All episodes,Control effort (int. sq. rudder cmd),RecurrentPPO,iqm,14.26565081403052,13.762116559240969,14.771803025105953
+All episodes,Control effort (int. sq. rudder cmd),LOS-DWA,iqm,14.076232612732653,13.640168508904749,14.532065854554428
+All episodes,Control effort (int. sq. rudder cmd),COLREGs-VO,iqm,10.972610462690314,10.63548367455622,11.313777149405345
+Decoupled,Success rate,SAC,rate,0.9307228915662651,0.911144578313253,0.9487951807228916
+Decoupled,Success rate,PPO,rate,0.8268072289156626,0.7981927710843374,0.8539156626506024
+Decoupled,Success rate,RecurrentPPO,rate,0.8343373493975904,0.8072289156626506,0.8599397590361446
+Decoupled,Success rate,LOS-DWA,rate,0.8704819277108434,0.8463855421686747,0.8930722891566265
+Decoupled,Success rate,COLREGs-VO,rate,0.7831325301204819,0.7545180722891566,0.8117469879518072
+Decoupled,Target collision rate,SAC,rate,0.04066265060240964,0.02710843373493976,0.05572289156626506
+Decoupled,Target collision rate,PPO,rate,0.13403614457831325,0.10993975903614457,0.15963855421686746
+Decoupled,Target collision rate,RecurrentPPO,rate,0.12951807228915663,0.10692771084337349,0.1536144578313253
+Decoupled,Target collision rate,LOS-DWA,rate,0.060240963855421686,0.043674698795180725,0.0783132530120482
+Decoupled,Target collision rate,COLREGs-VO,rate,0.11144578313253012,0.08885542168674698,0.13403614457831325
+Decoupled,Obstacle collision rate,SAC,rate,0.02108433734939759,0.010542168674698794,0.03313253012048193
+Decoupled,Obstacle collision rate,PPO,rate,0.02710843373493976,0.015060240963855422,0.0391566265060241
+Decoupled,Obstacle collision rate,RecurrentPPO,rate,0.03162650602409638,0.01957831325301205,0.045180722891566265
+Decoupled,Obstacle collision rate,LOS-DWA,rate,0.03765060240963856,0.024096385542168676,0.05271084337349398
+Decoupled,Obstacle collision rate,COLREGs-VO,rate,0.07078313253012049,0.05271084337349398,0.09036144578313253
+Decoupled,Boundary collision rate,SAC,rate,0.007530120481927711,0.0015060240963855422,0.015060240963855422
+Decoupled,Boundary collision rate,PPO,rate,0.012048192771084338,0.004518072289156626,0.02108433734939759
+Decoupled,Boundary collision rate,RecurrentPPO,rate,0.004518072289156626,0.0,0.010542168674698794
+Decoupled,Boundary collision rate,LOS-DWA,rate,0.03162650602409638,0.018072289156626505,0.045180722891566265
+Decoupled,Boundary collision rate,COLREGs-VO,rate,0.03463855421686747,0.02108433734939759,0.04823042168674644
+Decoupled,Timeout rate,SAC,rate,0.0,0.0,0.0
+Decoupled,Timeout rate,PPO,rate,0.0,0.0,0.0
+Decoupled,Timeout rate,RecurrentPPO,rate,0.0,0.0,0.0
+Decoupled,Timeout rate,LOS-DWA,rate,0.0,0.0,0.0
+Decoupled,Timeout rate,COLREGs-VO,rate,0.0,0.0,0.0
+Decoupled,RMS cross-track error (m),SAC,iqm,1.312963815763292,1.2661326253582599,1.3593246977837794
+Decoupled,RMS cross-track error (m),PPO,iqm,0.8144562056638709,0.7633661338282579,0.8631231483483809
+Decoupled,RMS cross-track error (m),RecurrentPPO,iqm,0.8237732294764774,0.7650595817493379,0.879876058102761
+Decoupled,RMS cross-track error (m),LOS-DWA,iqm,0.43644284238354675,0.3984379025306175,0.47675498721420334
+Decoupled,RMS cross-track error (m),COLREGs-VO,iqm,0.31976564667102664,0.28685360822649414,0.35727004526336853
+Decoupled,"Completion time, successful episodes (s)",SAC,iqm,26.432515337423315,26.149838203268274,26.663331596769993
+Decoupled,"Completion time, successful episodes (s)",PPO,iqm,33.23597359735974,32.82212674661679,33.50181688051877
+Decoupled,"Completion time, successful episodes (s)",RecurrentPPO,iqm,30.688741721854306,30.491438356164384,30.853424254416673
+Decoupled,"Completion time, successful episodes (s)",LOS-DWA,iqm,35.715654952076676,35.53968057520038,36.02245192307692
+Decoupled,"Completion time, successful episodes (s)",COLREGs-VO,iqm,34.9655737704918,34.890363365583895,35.0422386552562
+Decoupled,"Path length / reference, successful episodes",SAC,iqm,0.9866208713349686,0.9845527627035665,0.9887342389160156
+Decoupled,"Path length / reference, successful episodes",PPO,iqm,0.96330843229977,0.9616334465230303,0.965094696165361
+Decoupled,"Path length / reference, successful episodes",RecurrentPPO,iqm,0.9607307380932789,0.9591046316183732,0.962473159375866
+Decoupled,"Path length / reference, successful episodes",LOS-DWA,iqm,0.9510215706697989,0.9500134032548889,0.9521822027805639
+Decoupled,"Path length / reference, successful episodes",COLREGs-VO,iqm,0.947552669710076,0.9466329328099939,0.9485633563412172
+Decoupled,Mean speed (m/s),SAC,iqm,0.7360400521213063,0.7298990244241472,0.7418931240946053
+Decoupled,Mean speed (m/s),PPO,iqm,0.5563733995553163,0.5501169774156,0.562490321960986
+Decoupled,Mean speed (m/s),RecurrentPPO,iqm,0.605348226765613,0.6001151981258043,0.6101887090335881
+Decoupled,Mean speed (m/s),LOS-DWA,iqm,0.5160981847700822,0.5121864432677322,0.5195903394675223
+Decoupled,Mean speed (m/s),COLREGs-VO,iqm,0.5369835591621315,0.5356987063123437,0.5381453202351806
+Decoupled,Minimum speed (m/s),SAC,iqm,0.5158896767217279,0.5093318008338743,0.5218538742669685
+Decoupled,Minimum speed (m/s),PPO,iqm,0.3282738099800339,0.3196591661416971,0.3374170711375955
+Decoupled,Minimum speed (m/s),RecurrentPPO,iqm,0.4514190432417529,0.4411888323344424,0.46097620714522985
+Decoupled,Minimum speed (m/s),LOS-DWA,iqm,0.37673939592433503,0.36434339829175694,0.3887481114707789
+Decoupled,Minimum speed (m/s),COLREGs-VO,iqm,0.4136622881706818,0.40789157907002976,0.4193939568457708
+Decoupled,Min obstacle clearance (m),SAC,iqm,0.9322843177463175,0.8634178361873792,1.0064698069788285
+Decoupled,Min obstacle clearance (m),PPO,iqm,0.9706905856370703,0.8878630801982818,1.0614618613969584
+Decoupled,Min obstacle clearance (m),RecurrentPPO,iqm,1.0331565519319656,0.9402164527944086,1.1296891524238515
+Decoupled,Min obstacle clearance (m),LOS-DWA,iqm,0.8743862719642634,0.8057167165300586,0.9507768743930658
+Decoupled,Min obstacle clearance (m),COLREGs-VO,iqm,0.4139079654346152,0.3637729281816623,0.4772915769833704
+Decoupled,Min boundary clearance (m),SAC,iqm,0.8012098621100068,0.7967638258582448,0.8053185339771185
+Decoupled,Min boundary clearance (m),PPO,iqm,0.8035285046690568,0.7992969320093851,0.8075808262701585
+Decoupled,Min boundary clearance (m),RecurrentPPO,iqm,0.8035914571995025,0.7995374153951872,0.8074656636415253
+Decoupled,Min boundary clearance (m),LOS-DWA,iqm,0.7996740375884431,0.7958236545924307,0.8031496114494999
+Decoupled,Min boundary clearance (m),COLREGs-VO,iqm,0.8000465126466193,0.7962514224405955,0.8034863382854535
+Decoupled,Ship-domain intrusion rate,SAC,rate,0.07078313253012049,0.05271084337349398,0.09036144578313253
+Decoupled,Ship-domain intrusion rate,PPO,rate,0.21686746987951808,0.18674698795180722,0.24849397590361447
+Decoupled,Ship-domain intrusion rate,RecurrentPPO,rate,0.21234939759036145,0.1852409638554217,0.24096385542168675
+Decoupled,Ship-domain intrusion rate,LOS-DWA,rate,0.10090361445783133,0.07981927710843373,0.12349397590361445
+Decoupled,Ship-domain intrusion rate,COLREGs-VO,rate,0.15060240963855423,0.125,0.17620481927710843
+Decoupled,"Deepest intrusion, episodes with one (fraction of radius)",SAC,iqm,0.20029156430872003,0.1579514801986313,0.2514624626460421
+Decoupled,"Deepest intrusion, episodes with one (fraction of radius)",PPO,iqm,0.23387825502139814,0.206894967079161,0.2621590209098972
+Decoupled,"Deepest intrusion, episodes with one (fraction of radius)",RecurrentPPO,iqm,0.25083710266045595,0.2117711897922329,0.2923091837252206
+Decoupled,"Deepest intrusion, episodes with one (fraction of radius)",LOS-DWA,iqm,0.20487486313097572,0.1524263800964734,0.2694880589202762
+Decoupled,"Deepest intrusion, episodes with one (fraction of radius)",COLREGs-VO,iqm,0.24792688074334815,0.19748101851517055,0.30028311756609105
+Decoupled,"Time inside the domain, episodes with an intrusion (s)",SAC,iqm,1.3709677419354838,1.2166666666666666,1.6515151515151516
+Decoupled,"Time inside the domain, episodes with an intrusion (s)",PPO,iqm,1.8157894736842106,1.688155241935484,2.376577304048234
+Decoupled,"Time inside the domain, episodes with an intrusion (s)",RecurrentPPO,iqm,2.3448275862068964,1.736232142857143,2.4825581395348837
+Decoupled,"Time inside the domain, episodes with an intrusion (s)",LOS-DWA,iqm,2.081081081081081,1.6785714285714286,2.4204545454545454
+Decoupled,"Time inside the domain, episodes with an intrusion (s)",COLREGs-VO,iqm,1.90625,1.6610169491525424,2.2363755980861244
+Decoupled,"Closest approach, centre to centre (m)",SAC,iqm,2.8424973318399545,2.7633853755949316,2.9269678291950467
+Decoupled,"Closest approach, centre to centre (m)",PPO,iqm,2.4289796065125304,2.347205408276852,2.5110648176258232
+Decoupled,"Closest approach, centre to centre (m)",RecurrentPPO,iqm,2.396491677376584,2.314728023449443,2.4844146889428513
+Decoupled,"Closest approach, centre to centre (m)",LOS-DWA,iqm,2.546199107661497,2.4607912531504,2.6354740289261835
+Decoupled,"Closest approach, centre to centre (m)",COLREGs-VO,iqm,2.150250078103233,2.0851500438338406,2.2173332661939327
+Decoupled,"Min target clearance, hull to hull (m)",SAC,iqm,1.6713503132692167,1.6007024370791685,1.7455294597814517
+Decoupled,"Min target clearance, hull to hull (m)",PPO,iqm,1.2926307437766178,1.2081275982118855,1.3765062935245855
+Decoupled,"Min target clearance, hull to hull (m)",RecurrentPPO,iqm,1.3361441796607865,1.258033605600407,1.4149203555258925
+Decoupled,"Min target clearance, hull to hull (m)",LOS-DWA,iqm,1.4659390597133248,1.4041180842259222,1.5322615510366193
+Decoupled,"Min target clearance, hull to hull (m)",COLREGs-VO,iqm,1.0563424974248454,1.008921177015302,1.1067539760026746
+Decoupled,Rudder saturation fraction,SAC,rate,0.043346672598340776,0.039102880160260596,0.047858162456540364
+Decoupled,Rudder saturation fraction,PPO,rate,0.22496089268233885,0.21637158061195622,0.23401924019641296
+Decoupled,Rudder saturation fraction,RecurrentPPO,rate,0.2968604931209323,0.2846829831575212,0.30873206891337424
+Decoupled,Rudder saturation fraction,LOS-DWA,rate,0.2288176305240671,0.2185009480366409,0.23853450986837502
+Decoupled,Rudder saturation fraction,COLREGs-VO,rate,0.14692730779000943,0.1406569043566179,0.15340692368897968
+Decoupled,Mean abs. rudder rate (deg/s),SAC,iqm,21.556450208133942,21.183560081767336,21.942120342686213
+Decoupled,Mean abs. rudder rate (deg/s),PPO,iqm,22.51352345848177,22.197072337052376,22.83467725262333
+Decoupled,Mean abs. rudder rate (deg/s),RecurrentPPO,iqm,37.46378665900343,36.419537260173215,38.50690647110514
+Decoupled,Mean abs. rudder rate (deg/s),LOS-DWA,iqm,24.50429327365296,23.985828630604956,25.035582487541525
+Decoupled,Mean abs. rudder rate (deg/s),COLREGs-VO,iqm,29.87854643314508,29.456315532796154,30.2917229622167
+Decoupled,Control effort (int. sq. rudder cmd),SAC,iqm,9.55974537802406,9.309810208622011,9.820241710904083
+Decoupled,Control effort (int. sq. rudder cmd),PPO,iqm,12.229543898918456,11.794977153294068,12.670230167634768
+Decoupled,Control effort (int. sq. rudder cmd),RecurrentPPO,iqm,12.002348350488965,11.435077715230094,12.57138610589581
+Decoupled,Control effort (int. sq. rudder cmd),LOS-DWA,iqm,12.710312786642204,12.2473165195969,13.193898305889189
+Decoupled,Control effort (int. sq. rudder cmd),COLREGs-VO,iqm,11.079306425778965,10.69621344693511,11.468513133755918
+Coupled,Success rate,SAC,rate,0.7351190476190477,0.6964285714285714,0.7738839285714275
+Coupled,Success rate,PPO,rate,0.6011904761904762,0.5535714285714286,0.6488095238095238
+Coupled,Success rate,RecurrentPPO,rate,0.6041666666666666,0.5565476190476191,0.6517857142857143
+Coupled,Success rate,LOS-DWA,rate,0.5714285714285714,0.5238095238095238,0.6190476190476191
+Coupled,Success rate,COLREGs-VO,rate,0.49702380952380953,0.4494047619047619,0.5446428571428571
+Coupled,Target collision rate,SAC,rate,0.07738095238095238,0.05357142857142857,0.10416666666666667
+Coupled,Target collision rate,PPO,rate,0.15773809523809523,0.12202380952380952,0.19642857142857142
+Coupled,Target collision rate,RecurrentPPO,rate,0.20535714285714285,0.16666666666666666,0.24404761904761904
+Coupled,Target collision rate,LOS-DWA,rate,0.11904761904761904,0.08928571428571429,0.1488095238095238
+Coupled,Target collision rate,COLREGs-VO,rate,0.18154761904761904,0.14583333333333334,0.21726190476190477
+Coupled,Obstacle collision rate,SAC,rate,0.16666666666666666,0.12797619047619047,0.20535714285714285
+Coupled,Obstacle collision rate,PPO,rate,0.21726190476190477,0.17857142857142858,0.25892857142857145
+Coupled,Obstacle collision rate,RecurrentPPO,rate,0.16964285714285715,0.13392857142857142,0.20833333333333334
+Coupled,Obstacle collision rate,LOS-DWA,rate,0.25,0.20833333333333334,0.29464285714285715
+Coupled,Obstacle collision rate,COLREGs-VO,rate,0.25595238095238093,0.2113095238095238,0.2976190476190476
+Coupled,Boundary collision rate,SAC,rate,0.020833333333333332,0.008928571428571428,0.03571428571428571
+Coupled,Boundary collision rate,PPO,rate,0.023809523809523808,0.008928571428571428,0.041666666666666664
+Coupled,Boundary collision rate,RecurrentPPO,rate,0.020833333333333332,0.005952380952380952,0.03571428571428571
+Coupled,Boundary collision rate,LOS-DWA,rate,0.050595238095238096,0.02976190476190476,0.0744047619047619
+Coupled,Boundary collision rate,COLREGs-VO,rate,0.06547619047619048,0.041666666666666664,0.09226190476190477
+Coupled,Timeout rate,SAC,rate,0.0,0.0,0.0
+Coupled,Timeout rate,PPO,rate,0.0,0.0,0.0
+Coupled,Timeout rate,RecurrentPPO,rate,0.0,0.0,0.0
+Coupled,Timeout rate,LOS-DWA,rate,0.008928571428571428,0.0,0.020833333333333332
+Coupled,Timeout rate,COLREGs-VO,rate,0.0,0.0,0.0
+Coupled,RMS cross-track error (m),SAC,iqm,1.7762125707180805,1.6725584624999776,1.874048510804695
+Coupled,RMS cross-track error (m),PPO,iqm,0.9626785821269376,0.8799044944907426,1.052083200605035
+Coupled,RMS cross-track error (m),RecurrentPPO,iqm,1.1236401658673498,1.0377171968051493,1.2137288277858835
+Coupled,RMS cross-track error (m),LOS-DWA,iqm,0.6708031486330458,0.6159998482887153,0.7280846284473451
+Coupled,RMS cross-track error (m),COLREGs-VO,iqm,0.613272514444773,0.5615342792218027,0.6666960160427913
+Coupled,"Completion time, successful episodes (s)",SAC,iqm,26.044776119402986,25.670540433403804,26.187034828244276
+Coupled,"Completion time, successful episodes (s)",PPO,iqm,34.13592233009709,33.375,34.74286048064085
+Coupled,"Completion time, successful episodes (s)",RecurrentPPO,iqm,34.06422018348624,33.568159965034965,35.094384978229314
+Coupled,"Completion time, successful episodes (s)",LOS-DWA,iqm,39.883495145631066,39.2122641509434,41.11224489795919
+Coupled,"Completion time, successful episodes (s)",COLREGs-VO,iqm,36.07142857142857,35.90555555555556,36.43751610824742
+Coupled,"Path length / reference, successful episodes",SAC,iqm,1.0063072316580213,1.0023248485172003,1.009868332437598
+Coupled,"Path length / reference, successful episodes",PPO,iqm,0.9793513812150687,0.9744633227177022,0.9846956328275359
+Coupled,"Path length / reference, successful episodes",RecurrentPPO,iqm,0.9814352690428194,0.977480789450624,0.9854395137266196
+Coupled,"Path length / reference, successful episodes",LOS-DWA,iqm,0.9608058545929126,0.9587754827885,0.963186770810572
+Coupled,"Path length / reference, successful episodes",COLREGs-VO,iqm,0.9541334995337502,0.9523440148071102,0.9563264607143138
+Coupled,Mean speed (m/s),SAC,iqm,0.7586159321768743,0.748632302785399,0.7676739653561062
+Coupled,Mean speed (m/s),PPO,iqm,0.505857246903733,0.48898448601823225,0.5215571846525339
+Coupled,Mean speed (m/s),RecurrentPPO,iqm,0.4860920411619646,0.47208228459207136,0.4994406045839335
+Coupled,Mean speed (m/s),LOS-DWA,iqm,0.4515793199339402,0.4434865694463083,0.459382904264138
+Coupled,Mean speed (m/s),COLREGs-VO,iqm,0.5206141658171265,0.5173797778565207,0.5234649745213334
+Coupled,Minimum speed (m/s),SAC,iqm,0.5063179733057781,0.49544863495450653,0.5154362389900122
+Coupled,Minimum speed (m/s),PPO,iqm,0.2598804863305135,0.2490689738354867,0.27001903112301756
+Coupled,Minimum speed (m/s),RecurrentPPO,iqm,0.27625186673030766,0.265003423566619,0.2874324451540052
+Coupled,Minimum speed (m/s),LOS-DWA,iqm,0.24347571254360603,0.2300904012715836,0.2566031115332708
+Coupled,Minimum speed (m/s),COLREGs-VO,iqm,0.35080906880284196,0.3351565708498006,0.36426535762178386
+Coupled,Min obstacle clearance (m),SAC,iqm,0.4391273414556876,0.3946110753909171,0.48265200306930334
+Coupled,Min obstacle clearance (m),PPO,iqm,0.3605875558104773,0.21469182737768877,0.40741669175675094
+Coupled,Min obstacle clearance (m),RecurrentPPO,iqm,0.5316902167654339,0.47323762958304894,0.5886829207917134
+Coupled,Min obstacle clearance (m),LOS-DWA,iqm,0.4221782303355446,0.24530796833229643,0.47742302073354925
+Coupled,Min obstacle clearance (m),COLREGs-VO,iqm,0.18025640693110356,0.15749203824960292,0.3056104435203742
+Coupled,Min boundary clearance (m),SAC,iqm,0.8461071526889773,0.8401073905270928,0.8516412140517825
+Coupled,Min boundary clearance (m),PPO,iqm,0.8475738708506022,0.8424479200121499,0.8519511762253861
+Coupled,Min boundary clearance (m),RecurrentPPO,iqm,0.8399985548512238,0.8345212456158005,0.8453348411668216
+Coupled,Min boundary clearance (m),LOS-DWA,iqm,0.8560800392425738,0.8508655464665783,0.8601278832289512
+Coupled,Min boundary clearance (m),COLREGs-VO,iqm,0.8590888007362724,0.8549315071150667,0.8620431563437032
+Coupled,Ship-domain intrusion rate,SAC,rate,0.12091503267973856,0.091421568627451,0.15359477124183007
+Coupled,Ship-domain intrusion rate,PPO,rate,0.3333333333333333,0.2875816993464052,0.38235294117647056
+Coupled,Ship-domain intrusion rate,RecurrentPPO,rate,0.32679738562091504,0.28431372549019607,0.37254901960784315
+Coupled,Ship-domain intrusion rate,LOS-DWA,rate,0.23202614379084968,0.19281045751633988,0.27450980392156865
+Coupled,Ship-domain intrusion rate,COLREGs-VO,rate,0.31699346405228757,0.27450980392156865,0.3627450980392157
+Coupled,"Deepest intrusion, episodes with one (fraction of radius)",SAC,iqm,0.21695081961397236,0.1635033890927129,0.2703534216887772
+Coupled,"Deepest intrusion, episodes with one (fraction of radius)",PPO,iqm,0.18942733418561933,0.1641826737914378,0.22000298963053164
+Coupled,"Deepest intrusion, episodes with one (fraction of radius)",RecurrentPPO,iqm,0.2761388098601291,0.24946345893360958,0.303150867886975
+Coupled,"Deepest intrusion, episodes with one (fraction of radius)",LOS-DWA,iqm,0.22420765725972047,0.1859749639564315,0.26695305766375726
+Coupled,"Deepest intrusion, episodes with one (fraction of radius)",COLREGs-VO,iqm,0.26406685446341005,0.2250345365319596,0.30128507873516236
+Coupled,"Time inside the domain, episodes with an intrusion (s)",SAC,iqm,1.619047619047619,1.0,2.020020833333333
+Coupled,"Time inside the domain, episodes with an intrusion (s)",PPO,iqm,1.8933333333333333,1.5201603389103389,2.3707361392832986
+Coupled,"Time inside the domain, episodes with an intrusion (s)",RecurrentPPO,iqm,2.482456140350877,2.0214285714285714,2.9
+Coupled,"Time inside the domain, episodes with an intrusion (s)",LOS-DWA,iqm,2.147727272727273,1.9148871302542814,2.3469387755102042
+Coupled,"Time inside the domain, episodes with an intrusion (s)",COLREGs-VO,iqm,2.2169811320754715,1.8088235294117647,2.4492934782608695
+Coupled,"Closest approach, centre to centre (m)",SAC,iqm,3.017055229617892,2.868927466859786,3.158479354716593
+Coupled,"Closest approach, centre to centre (m)",PPO,iqm,2.5545451267566066,2.4086022034100916,2.7016784357557007
+Coupled,"Closest approach, centre to centre (m)",RecurrentPPO,iqm,2.3539102014388473,2.2302103514840352,2.485014825336673
+Coupled,"Closest approach, centre to centre (m)",LOS-DWA,iqm,2.372331862538747,2.263317478658434,2.4886808772358595
+Coupled,"Closest approach, centre to centre (m)",COLREGs-VO,iqm,2.1468688049493503,2.061571837929195,2.240489752060945
+Coupled,"Min target clearance, hull to hull (m)",SAC,iqm,1.7128342643473153,1.5756145598139093,1.844436097270801
+Coupled,"Min target clearance, hull to hull (m)",PPO,iqm,1.2255258274744036,1.063676704242367,1.3843040570038057
+Coupled,"Min target clearance, hull to hull (m)",RecurrentPPO,iqm,1.0642842530474255,0.6281034183398265,1.2093138712101872
+Coupled,"Min target clearance, hull to hull (m)",LOS-DWA,iqm,1.059614094379129,0.9781008008375179,1.1455839324821635
+Coupled,"Min target clearance, hull to hull (m)",COLREGs-VO,iqm,0.8194292667016874,0.7361744903446436,0.9034962621270647
+Coupled,Rudder saturation fraction,SAC,rate,0.07343574006243513,0.06560726635048217,0.08154973760296796
+Coupled,Rudder saturation fraction,PPO,rate,0.25086893068405036,0.23816861851401258,0.26280459230611286
+Coupled,Rudder saturation fraction,RecurrentPPO,rate,0.5157578283930765,0.5040911746714015,0.5277148676141986
+Coupled,Rudder saturation fraction,LOS-DWA,rate,0.37952638829498736,0.36519133056362557,0.39346128238282196
+Coupled,Rudder saturation fraction,COLREGs-VO,rate,0.1748834249369126,0.16530507470478586,0.18505963927275046
+Coupled,Mean abs. rudder rate (deg/s),SAC,iqm,23.986154838954057,23.344904326511266,24.654241361508696
+Coupled,Mean abs. rudder rate (deg/s),PPO,iqm,23.022529360360256,22.47815783339233,23.566553256274915
+Coupled,Mean abs. rudder rate (deg/s),RecurrentPPO,iqm,48.782852913752535,47.54164010914958,50.04069740774405
+Coupled,Mean abs. rudder rate (deg/s),LOS-DWA,iqm,30.30387732817239,29.27120022656891,31.354577354152745
+Coupled,Mean abs. rudder rate (deg/s),COLREGs-VO,iqm,29.946804320346263,29.263467440877687,30.647016423042036
+Coupled,Control effort (int. sq. rudder cmd),SAC,iqm,10.117681335788255,9.791857258180173,10.46885743712912
+Coupled,Control effort (int. sq. rudder cmd),PPO,iqm,12.883343950339917,12.269069119020296,13.462577165477537
+Coupled,Control effort (int. sq. rudder cmd),RecurrentPPO,iqm,19.64449818870393,18.706694872077843,20.530671622224336
+Coupled,Control effort (int. sq. rudder cmd),LOS-DWA,iqm,17.4774977159838,16.477514671261723,18.536365387370026
+Coupled,Control effort (int. sq. rudder cmd),COLREGs-VO,iqm,10.725142378645154,10.074389301983185,11.389079362212621

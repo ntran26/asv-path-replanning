@@ -132,3 +132,29 @@ code matches baseline-v3
 2026-10-07 18:41:26    recurrent_ppos0_bl3: stopped at 51200 steps (21 steps/s pinned to 4 CPUs), set aside as _incomplete_20261007_1841; restarting unpinned on all 12 CPUs (decision: pinning only for SAC and TQC)
 code matches baseline-v3
 2026-10-07 18:42:43 == recurrent_ppos0_bl3: training 0 -> 2.5 M (baseline-v3, unpinned)
+2026-10-08 06:26:43    recurrent_ppos0_bl3 2.5 M exit 0
+2026-10-08 06:26:44 == recurrent_ppos0_bl3: 2.5 M -> 3.0 M
+2026-10-08 09:45:33    recurrent_ppos0_bl3 3.0 M exit 0
+code matches baseline-v3
+2026-10-08 09:46:25 == recurrent_ppo seed 0: already trained
+2026-10-08 09:49:31    tier 1 recurrent_ppos0_bl3 supervisor off exit 0
+2026-10-08 10:05:33    frozen suite recurrent_ppos0_bl3 exit 0
+2026-10-08 10:24:46    Paper 2 set recurrent_ppos0_bl3 exit 0
+2026-10-08 10:24:47 == recurrent_ppo seed 0 done
+2026-10-08 10:34:01    test set v4, recurrent_ppos0_bl3 exit 0 (results/test_set/v4/recurrent_ppos0_bl3/summary.txt)
+2026-10-08 10:34:01 == recurrent_ppos0_bl3 run done
+2026-10-08 11:25:50    test set v4, ppos0_bl3 exit (results/test_set/v4/ppos0_bl3/summary.txt)
+2026-10-08 13:57:55 == tqcs0_bl3 CPU benchmark armed: waiting for the running evaluations and training to finish
+2026-10-08 14:08:53 == tqcs0_bl3 CPU benchmark: pinned / pinned with 4 threads / unpinned (4,096-step smoke runs)
+2026-10-08 14:33:12    tqcs0_bl3 CPU benchmark stopped: it started in a gap between two comparator evaluations and shared the CPU; re-armed to start after the whole evaluation batch
+2026-10-08 14:39:07    test set v4: encounter VO stopped (not in the paper, decision 2026-10-08); LOS-DWA and COLREGs-VO done
+2026-10-08 14:57:11 == test set v4 with tracks: SAC, PPO, RecurrentPPO, LOS-DWA, COLREGs-VO (10 processes)
+2026-10-08 15:05:58    test set v4 with tracks, sacs0_bl3_metrics exit 0
+2026-10-08 15:16:26    test set v4 with tracks, ppos0_bl3_metrics exit 0
+2026-10-08 15:27:37    test set v4 with tracks, recurrent_ppos0_bl3_metrics exit 0
+2026-10-08 16:08:00    test set v4 with tracks: held (decision 2026-10-08) after the three learners; LOS-DWA stopped mid-run (its earlier rows unchanged), COLREGs-VO not started; COLREGs table on hold
+2026-10-08 16:08:12 == tqcs0_bl3 CPU benchmark: pinned / pinned with 4 threads / unpinned (4,096-step smoke runs)
+2026-10-08 17:01:39    tqcs0_bl3 CPU benchmark: fastest PIN=1 THREADS=4 (10.51 steps/s; results/bench_cpu_tqc.txt)
+code matches baseline-v3
+2026-10-08 17:02:38 == tqcs0_bl3: training 0 -> 2.5 M (baseline-v3; PIN=1, THREADS=4)
+2026-10-08 17:04:40    pinned learner 17732

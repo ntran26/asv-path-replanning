@@ -1,6 +1,6 @@
 # 03a — Environment and Dynamic Target: Specification
 
-> **Status note (2026-09-22, updated 2026-10-04).** A design record: the code cites its sections. Parts are superseded by the implementation. The formulation was frozen as **baseline-v1** (`configs/baseline_v1.json`), then **baseline-v2** (`configs/baseline_v2.json`; reward and observation unchanged since), **baseline-v3** (a curriculum overlay, `src/formulation_v3.py`; the kept SAC 3 M policy) and the **baseline-v4** draft (`src/formulation_v4.py`, `planning/BASELINE_V4_PLAN.md`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here (as of baseline-v1):
+> **Status note (2026-09-22, updated 2026-10-08).** A design record: the code cites its sections. Parts are superseded by the implementation. The formulation was frozen as **baseline-v1** (`configs/baseline_v1.json`), then **baseline-v2** (`configs/baseline_v2.json`; reward and observation unchanged since). **The current formulation is baseline-v3** (`configs/baseline_v3.json`): baseline-v2 plus the curriculum overlay `src/formulation_v3.py`. The baseline-v4.3 candidate (`src/formulation_v4.py`) was trained and not adopted (`planning/BASELINE_V4_PLAN.md`, section 5e). The current statement of the method is `planning/FORMULATION_EQUATIONS.md` with `planning/METHODS_BRIEF.md`; formulation values quoted here were checked against baseline-v3 on 2026-10-08. Superseded here (as of baseline-v1):
 >
 > - Section 4.1: 0.1 s is the physics step; decisions are at **2 Hz** (F38).
 >
@@ -170,7 +170,7 @@ affine in `e_y` and the 7-dimensional boundary branch is decorative.
 |---|---|---|
 | Ahead | 2.0 · Lpp | 3.14 |
 | Astern | 1.0 · Lpp | 1.57 |
-| Abeam, each side | `max(0.75·Lpp, a_floor)` | 1.18 or 1.25 — `TODO(03-1)` |
+| Abeam, each side | `max(0.75·Lpp, a_floor)` | **1.25** — the floor binds (resolved; frozen in baseline-v2, unchanged in baseline-v3) |
 
 `TODO(03-1)`: 04a's width thresholds were derived with `a_abeam` = 1.25 m, taken from the sensor-floor
 constraint flagged in 02b. Confirm that value and its origin against 02b before it propagates further.

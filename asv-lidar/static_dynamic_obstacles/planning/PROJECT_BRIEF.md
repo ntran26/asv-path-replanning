@@ -1,6 +1,6 @@
 # PROJECT BRIEF — read at the start of each work session
 
-> **Status note (2026-09-22, updated 2026-10-04).** Parts of this brief are superseded. The formulation was frozen as **baseline-v1** (`configs/baseline_v1.json`), then **baseline-v2** (`configs/baseline_v2.json`; reward and observation unchanged since), **baseline-v3** (a curriculum overlay, `src/formulation_v3.py`; the kept SAC 3 M policy) and the **baseline-v4** draft (`src/formulation_v4.py`, `planning/BASELINE_V4_PLAN.md`). Current state: `planning/BASELINE_V4_PLAN.md` (formulation, test set v4, the v4.3 SAC pair) and `PROJECT_STATE.md` (findings). Superseded here (as of baseline-v1):
+> **Status note (2026-09-22, updated 2026-10-08).** Parts of this brief are superseded. The formulation was frozen as **baseline-v1** (`configs/baseline_v1.json`), then **baseline-v2** (`configs/baseline_v2.json`; reward and observation unchanged since), **baseline-v3** (a curriculum overlay, `src/formulation_v3.py`), **the current formulation**; the baseline-v4.3 candidate was trained and not adopted. Current state: `planning/FORMULATION_EQUATIONS.md` and `planning/METHODS_BRIEF.md` (the method), `planning/BASELINE_V4_PLAN.md` (test set v4, the v4.3 result) and `PROJECT_STATE.md` (findings). Superseded here (as of baseline-v1):
 >
 > - "SAC primary; PPO, RecurrentPPO, TQC as …": the baseline set is PPO, RecurrentPPO, TD3, SAC and TQC on one frozen formulation (F76, F77, F93); the framing is open (`METHODS_BRIEF.md` section 9).
 >
@@ -15,10 +15,10 @@
 >
 > **Added 2026-09-24.** The baseline is **four learners (PPO, RecurrentPPO, SAC,
 > TQC) x 3 seeds = 12 runs** -- TD3 dropped, 5 seeds -> 3. **Tier B is the default
-> frozen suite** (suite 3.4: 800 constant-velocity episodes drawn like the dev set, 8 cells x 100,
+> frozen suite** (suite 3.4: 800 constant-velocity episodes drawn like the validation set, 8 cells x 100,
 > channels 7.5-10 m for the trained channel classes only, plus a robustness set) and **Tier A the extended set**, run only on request. C-2/C-3 rest on the
 > R4 width sweep, since Tier B no longer spans the rule thresholds. COLREGs-VO
-> (Kuwata) is built; both VO comparators are tuned on the development set and
+> (Kuwata) is built; both VO comparators are tuned on the validation set and
 > pinned in `configs/comparators_v1.json` (F97, F98).
 
 **Last updated:** 2026-09-04
@@ -79,7 +79,7 @@ committing to scan-to-map localisation.
 
 ## 3. Paper 3 scope
 
-Path following with **static obstacles and one dynamic target vessel**, COLREGs-compliant,
+Path following with **static obstacles and one dynamic target vessel**, COLREGs-aware,
 in a **narrow / restricted waterway**.
 
 **Repositioned from the earlier multi-vessel plan.** Two-vessel encounters are the unit of
@@ -92,7 +92,7 @@ is a config parameter so it costs a retrain, not a redesign.
 
 | | Claim |
 |---|---|
-| **N1** *(headline)* | COLREGs compliance driven by target state estimated entirely from onboard 2D LiDAR, not AIS or a simulation oracle. Perception noise characterised from field logs and injected in training |
+| **N1** *(headline)* | COLREGs-aware encounter behaviour (not a legal-compliance claim; decision 2026-10-08) driven by target state estimated entirely from onboard 2D LiDAR, not AIS or a simulation oracle. Perception noise characterised from field logs and injected in training |
 | **N2** | Rule 9 precedence over Rules 13–16 where channel width makes the open-water manoeuvre inadmissible |
 | **N3** | Full sim-to-real pipeline — system ID, domain randomisation over identified uncertainty, field validation |
 
@@ -111,7 +111,7 @@ is a config parameter so it costs a retrain, not a redesign.
 | | Decision |
 |---|---|
 | S1 | Two-vessel encounters. One dynamic target + up to 3 static obstacles. `N_max` kept configurable |
-| S2 | COLREGs scope: Rules 13–16, Rule 9 governs precedence, Rule 8 governs action quality |
+| S2 | COLREGs scope: Rules 13–16 and 17(a)(i), Rule 9 governs precedence, Rule 8 governs action quality (8(b), 8(d), 8(e); 8(a) as timing pressure only). Each rule is stated as exactly what the reward encodes, and the behaviour is called COLREGs-aware, not compliant (decision 2026-10-08) |
 | S3 | Own ship gives way in **all** crossing encounters, justified by **Rule 9(b)** — not Rule 18 |
 | S4 | Five encounter classes: none, head-on, crossing, overtaking, being overtaken |
 | S5 | Rule 17(a)(i) passive course-keeping retained for being-overtaken. Active release under 17(a)(ii) is out of scope → future work |
@@ -155,8 +155,8 @@ via Rule 9(b). O3 — sim-to-real retained as RQ4. O4 — simulation matches the
 O5 — software gating, not a physical barrier; the facility walls are the only localisation
 reference and must not be occluded. O6 — no external instrumentation; scan-to-map registration
 against surveyed facility geometry, validated by static tests and closed-loop drift.
-Ship domain — compressed asymmetric, provisionally 2.0/1.0/0.75 · Lpp (ahead/astern/abeam),
-final values derived from the identified turning circle. **IMU confirmed** — will be added;
+Ship domain — compressed asymmetric, 3.14 / 1.57 / 1.25 m ahead / astern / abeam (2.0 / 1.0 / 0.796 · Lpp;
+the abeam value is set by the sensor floor), frozen in baseline-v2 and unchanged since. **IMU confirmed** — will be added;
 log raw gyro and accelerometer at 100 Hz+, time-synced to the LiDAR. **Precedence structure
 resolved** — Rule 9 constrains the space, Rule 8(e) supplies the action when space is
 unavailable; boundary conflict resolves to slacken speed or stop; overtaking permitted whenever

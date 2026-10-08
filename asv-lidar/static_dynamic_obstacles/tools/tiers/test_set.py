@@ -814,13 +814,20 @@ def evaluate(kept, report, *, tag, args, t0, model=None, policy="model"):
         reuse = _reusable(tag, mode, kept)
         done = set(reuse.test_id) if reuse is not None else set()
         jobs = [(it["built"], it["episode_seed"], policy, None,
-                 {k: it[k] for k in ("test_id", "origin_id", "source", "cell", "stratum", "variant")})
+                 {**{k: it[k] for k in ("test_id", "origin_id", "source", "cell", "stratum", "variant")},
+                  "_keep_traj": True})
                 for it in kept if it["test_id"] not in done]
         if done:
             print(f"[{tag}] reusing {len(done)} rows of the previous version; evaluating {len(jobs)} episodes", flush=True)
         rows = run_pool(jobs, model_path=model, processes=args.processes,
                         overrides={"EMERGENCY_STOP_ENABLED": mode == "on",
                                    "SAFETY_VERSION": int(args.safety_version)}) if jobs else []
+        # The true trajectories go to their own file, for the offline COLREGs checks
+        # (tools/diagnostics/colregs_compliance.py), not into the CSV.
+        trajs = {r["test_id"]: r.pop("_traj") for r in rows if "_traj" in r}
+        if trajs:
+            np.savez_compressed(out / f"trajectories_{mode}.npz",
+                                **{f"{tid}|{k}": v for tid, tr in trajs.items() for k, v in tr.items()})
         f = pd.DataFrame(rows)
         f["safety"] = mode
         if reuse is not None and len(reuse):

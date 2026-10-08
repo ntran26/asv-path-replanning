@@ -1,0 +1,48 @@
+Paper 2 deployment-layout set (recurrent_ppos0_bl3) -- runs\recurrent_ppo_formulation_seed0_bl3\best_model.zip
+630 episodes, set revision 2.0, manifest 67311d204bcc01d7, 391 s
+
+-- by safety layer
+              n  success  coll_target  coll_other  rms_cte  min_range  estops
+supervisor                                                                   
+off         630     0.54        0.341       0.119    0.862      1.867     0.0
+
+-- no target, by layout (safety layer off)
+         n  success  coll_target  coll_other  rms_cte  min_range  estops
+layout                                                                  
+L1      10      0.9          0.0         0.1    1.341        inf     0.0
+L2      10      1.0          0.0         0.0    1.598        inf     0.0
+L3      10      1.0          0.0         0.0    0.978        inf     0.0
+
+-- with a target, by encounter and speed
+                  n  success  coll_target  coll_other  rms_cte  min_range  estops
+encounter speed                                                                  
+BO        FIX    60    0.500        0.167       0.333    0.505      2.508     0.0
+          VAR    60    0.467        0.183       0.350    0.516      2.540     0.0
+CRP       FIX    60    0.450        0.550       0.000    0.685      1.801     0.0
+          VAR    60    0.483        0.517       0.000    0.724      1.825     0.0
+CRS       FIX    60    0.533        0.400       0.067    0.739      1.954     0.0
+          VAR    60    0.500        0.417       0.083    0.764      1.797     0.0
+HO        FIX    60    0.350        0.650       0.000    0.786      1.796     0.0
+          VAR    60    0.333        0.667       0.000    0.763      1.805     0.0
+OT        FIX    60    0.767        0.033       0.200    1.454      2.530     0.0
+          VAR    60    0.800        0.000       0.200    1.460      2.450     0.0
+
+-- with a target, by layout and speed
+                n  success  coll_target  coll_other  rms_cte  min_range  estops
+layout speed                                                                   
+L1     FIX    100     0.39         0.28        0.33    0.964      2.120     0.0
+       VAR    100     0.37         0.29        0.34    0.969      2.058     0.0
+L2     FIX    100     0.65         0.35        0.00    0.963      1.884     0.0
+       VAR    100     0.62         0.38        0.00    0.960      1.862     0.0
+L3     FIX    100     0.52         0.45        0.03    0.575      1.794     0.0
+       VAR    100     0.56         0.40        0.04    0.606      1.788     0.0
+
+-- VAR against its FIX twin (same scenario and seed; only the speed differs)
+      n  success_fix  success_var   lost  gained
+enc                                             
+BO   60        0.500        0.467  0.033   0.000
+CRP  60        0.450        0.483  0.000   0.033
+CRS  60        0.533        0.500  0.083   0.050
+HO   60        0.350        0.333  0.050   0.033
+OT   60        0.767        0.800  0.050   0.083
+

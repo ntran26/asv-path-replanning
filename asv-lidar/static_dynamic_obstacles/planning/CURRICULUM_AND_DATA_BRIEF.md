@@ -39,7 +39,7 @@ Five disjoint integer ranges (`constants.SEED_NAMESPACES`):
 | Namespace | Range | Used for |
 |---|---|---|
 | `training` | 0 – 99,999 | every training episode |
-| `development` | 200,000 – 209,999 | the 120-episode development set ("validation") |
+| `development` | 200,000 – 209,999 | the 120-episode validation set ("validation") |
 | `frozen_eval` | 300,000 – 309,999 | the frozen benchmark: the test set's encounter cells ("test") |
 | `study1` | 400,000 – 409,999 | the channel-width sweep (R4) |
 | `study2` | 500,000 – 509,999 | perception degradation (R5) |
@@ -195,7 +195,7 @@ added target and obstacle costs raycasting and collision work.
 | Used for | gradient updates | **checkpoint selection** and all diagnostics | the paper's tables |
 | Seen how often | continuously | every 200 k steps | **once per policy** |
 
-### 5.1 Development sets — the selection instrument
+### 5.1 Validation sets — the selection instrument
 
 120 fixed episodes drawn at stage 5, plus 150 three-obstacle layouts: 20 with no target, and 20
 constant-speed plus 6 varying-speed episodes for each of head-on, crossing from port, crossing
@@ -310,6 +310,6 @@ no longer fits, leaving only speed reduction at the end.
 - Observation **70 values in 6 branches**; action = (rudder, throttle) ∈ [−1, 1]².
 - Training: **10 parallel environments**, **3 M steps**, seven curriculum stages, **3 seeds** per learner.
 - Learners compared: **PPO, RecurrentPPO, SAC, TQC** on the identical formulation.
-- Development sets **120 + 150**; test set **1,000**; disjoint seed ranges.
+- Validation sets **120 + 150**; test set **1,000**; disjoint seed ranges.
 - Measured example (SAC seed 0): development score −1.22 at 200 k steps → **0.41 at 3.0 M**
-  (goal rate 0.80 over both development sets: 0.88 on the 120, 0.74 on the three-obstacle 150).
+  (goal rate 0.80 over both validation sets: 0.88 on the 120, 0.74 on the three-obstacle 150).

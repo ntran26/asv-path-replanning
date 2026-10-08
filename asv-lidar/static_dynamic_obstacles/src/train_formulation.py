@@ -641,6 +641,10 @@ def main() -> None:
                     help="F68: run the stop latch in the training environments")
     ap.add_argument("--eval-safety", "--eval-supervisor", dest="eval_supervisor", choices=("on", "off", "both"), default="on",
                     help="F68: evaluate with the stop latch off, on, or both")
+    ap.add_argument("--eval-safety-override", choices=("on", "off", "both"), default=None,
+                    help="reporting only: replaces the frozen config's eval_supervisor (decision, "
+                         "2026-10-07: development evaluations run safety off; selection always uses "
+                         "the safety-off pass, so training is unchanged)")
     ap.add_argument("--low-speed-start-frac", type=float, default=0.0,
                     help="F68: share of training episodes starting slow or at rest")
     ap.add_argument("--r2-slowdown-test", choices=("coast", "stop"), default=None,
@@ -767,6 +771,11 @@ def main() -> None:
         run_dir = args.runs_dir / (f"{args.algo}_formulation_seed{args.seed}"
                                    + (f"_{args.tag}" if args.tag else "")
                                    + ("_smoke" if args.smoke else ""))
+    if args.eval_safety_override:
+        # Reporting only, after the frozen config and any resume have set it: the
+        # best checkpoint is chosen on the safety-off pass whatever this says.
+        args.eval_supervisor = args.eval_safety_override
+        print(f"[EVAL] development evaluations with the safety layer: {args.eval_supervisor}", flush=True)
     if args.algo in ("ppo", "recurrent_ppo"):
         hyperparameters = dict(PPO_HYPERPARAMS)
     elif args.algo == "td3":
@@ -788,6 +797,7 @@ def main() -> None:
         "algo": args.algo, "num_envs": args.num_envs, "hyperparameters": hyperparameters,
         "torch_threads": args.torch_threads, "fixed_stage": args.fixed_stage,
         "train_supervisor": args.train_supervisor, "eval_supervisor": args.eval_supervisor,
+        "eval_supervisor_override": args.eval_safety_override,
         "low_speed_start_frac": args.low_speed_start_frac,
         "eval_freq": args.eval_freq, "eval_per_class": args.eval_per_class,
         "r2_slowdown_test": cfg.R2_SLOWDOWN_TEST,

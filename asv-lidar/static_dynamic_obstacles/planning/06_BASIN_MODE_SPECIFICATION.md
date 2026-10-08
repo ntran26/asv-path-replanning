@@ -1,6 +1,6 @@
 # 06 — Basin Mode: Navigable Geometry, Straight Legs, and Suite Restructure
 
-> **Status note (2026-09-22, updated 2026-10-04).** A design record: the code cites its sections. Parts are superseded by the implementation. The formulation was frozen as **baseline-v1** (`configs/baseline_v1.json`), then **baseline-v2** (`configs/baseline_v2.json`; reward and observation unchanged since), **baseline-v3** (a curriculum overlay, `src/formulation_v3.py`; the kept SAC 3 M policy) and the **baseline-v4** draft (`src/formulation_v4.py`, `planning/BASELINE_V4_PLAN.md`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here (as of baseline-v1):
+> **Status note (2026-09-22, updated 2026-10-08).** A design record: the code cites its sections. Parts are superseded by the implementation. The formulation was frozen as **baseline-v1** (`configs/baseline_v1.json`), then **baseline-v2** (`configs/baseline_v2.json`; reward and observation unchanged since). **The current formulation is baseline-v3** (`configs/baseline_v3.json`): baseline-v2 plus the curriculum overlay `src/formulation_v3.py`. The baseline-v4.3 candidate (`src/formulation_v4.py`) was trained and not adopted (`planning/BASELINE_V4_PLAN.md`, section 5e). The current statement of the method is `planning/FORMULATION_EQUATIONS.md` with `planning/METHODS_BRIEF.md`; formulation values quoted here were checked against baseline-v3 on 2026-10-08. Superseded here (as of baseline-v1):
 >
 > - Section 3.5, as amended by decisions (F74): inside the basin **only head-on traffic keeps the path band**; other confined targets use the whole basin (a 2–3 m band left null and overtaking traffic nowhere to go).
 >
@@ -12,10 +12,10 @@
 >
 > **Added 2026-09-24.** The baseline is **four learners (PPO, RecurrentPPO, SAC,
 > TQC) x 3 seeds = 12 runs** -- TD3 dropped, 5 seeds -> 3. **Tier B is the default
-> frozen suite** (suite 3.4: 800 constant-velocity episodes drawn like the dev set, 8 cells x 100,
+> frozen suite** (suite 3.4: 800 constant-velocity episodes drawn like the validation set, 8 cells x 100,
 > channels 7.5-10 m for the trained channel classes only, plus a robustness set) and **Tier A the extended set**, run only on request. C-2/C-3 rest on the
 > R4 width sweep, since Tier B no longer spans the rule thresholds. COLREGs-VO
-> (Kuwata) is built; both VO comparators are tuned on the development set and
+> (Kuwata) is built; both VO comparators are tuned on the validation set and
 > pinned in `configs/comparators_v1.json` (F97, F98).
 
 **Revision 1.0** — introduces a second navigable-geometry mode and makes it the primary training

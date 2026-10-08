@@ -1,0 +1,25 @@
+Comparison,Episodes,Scope,n,Success A,Success B,McNemar only A / only B,McNemar p,RMS CTE median A / B,RMS CTE median diff,RMS CTE Wilcoxon p,Target clearance median A / B,Target clearance median diff,Target clearance Wilcoxon p
+SAC vs PPO,All episodes,all paired,1000,0.865,0.751,195 / 81,5.17e-12,1.414 / 0.859,+0.383,5.52e-77,1.670 / 1.236,+0.328,1.45e-16
+SAC vs PPO,All episodes,both succeeded,670,0.865,0.751,195 / 81,5.17e-12,1.418 / 0.942,+0.302,3.7e-53,1.766 / 1.413,+0.259,3.48e-10
+SAC vs PPO,Decoupled,all paired,664,0.931,0.827,103 / 34,2.9e-09,1.307 / 0.818,+0.399,1.21e-55,1.650 / 1.255,+0.305,9.42e-13
+SAC vs PPO,Decoupled,both succeeded,515,0.931,0.827,103 / 34,2.9e-09,1.308 / 0.916,+0.323,4.91e-42,1.761 / 1.407,+0.240,9.05e-08
+SAC vs PPO,Coupled,all paired,336,0.735,0.601,92 / 47,0.000169,1.862 / 0.922,+0.359,5.6e-24,1.716 / 1.151,+0.511,3.88e-06
+SAC vs PPO,Coupled,both succeeded,155,0.735,0.601,92 / 47,0.000169,2.133 / 1.115,+0.258,9.42e-13,1.895 / 1.485,+0.487,0.000412
+SAC vs RecurrentPPO,All episodes,all paired,1000,0.865,0.757,174 / 66,2.1e-12,1.414 / 0.911,+0.291,2.08e-60,1.670 / 1.211,+0.351,9.81e-20
+SAC vs RecurrentPPO,All episodes,both succeeded,691,0.865,0.757,174 / 66,2.1e-12,1.419 / 1.019,+0.222,1.48e-42,1.822 / 1.384,+0.301,3.89e-14
+SAC vs RecurrentPPO,Decoupled,all paired,664,0.931,0.834,92 / 28,3.77e-09,1.307 / 0.811,+0.302,1.85e-48,1.650 / 1.281,+0.303,5.77e-13
+SAC vs RecurrentPPO,Decoupled,both succeeded,526,0.931,0.834,92 / 28,3.77e-09,1.307 / 0.898,+0.254,8e-35,1.781 / 1.395,+0.225,1.22e-08
+SAC vs RecurrentPPO,Coupled,all paired,336,0.735,0.604,82 / 38,7.29e-05,1.862 / 1.145,+0.221,3.12e-15,1.716 / 1.033,+0.582,9.36e-09
+SAC vs RecurrentPPO,Coupled,both succeeded,165,0.735,0.604,82 / 38,7.29e-05,2.079 / 1.372,+0.142,7.61e-09,2.053 / 1.317,+0.576,2.48e-08
+SAC vs LOS-DWA,All episodes,all paired,1000,0.865,0.770,176 / 81,3.02e-09,1.414 / 0.484,+0.733,1.21e-111,1.670 / 1.250,+0.253,1.05e-05
+SAC vs LOS-DWA,All episodes,both succeeded,689,0.865,0.770,176 / 81,3.02e-09,1.363 / 0.487,+0.714,3.9e-88,1.761 / 1.352,+0.210,0.00383
+SAC vs LOS-DWA,Decoupled,all paired,664,0.931,0.870,75 / 35,0.000172,1.307 / 0.391,+0.687,2.18e-80,1.650 / 1.342,+0.180,0.392
+SAC vs LOS-DWA,Decoupled,both succeeded,543,0.931,0.870,75 / 35,0.000172,1.288 / 0.400,+0.695,5.01e-72,1.742 / 1.464,+0.152,0.824
+SAC vs LOS-DWA,Coupled,all paired,336,0.735,0.571,101 / 46,6.67e-06,1.862 / 0.645,+0.917,5.83e-34,1.716 / 0.992,+0.668,7.32e-11
+SAC vs LOS-DWA,Coupled,both succeeded,146,0.735,0.571,101 / 46,6.67e-06,2.046 / 0.730,+0.954,6.03e-18,1.947 / 0.987,+0.877,1.13e-09
+SAC vs COLREGs-VO,All episodes,all paired,1000,0.865,0.687,240 / 62,7.17e-26,1.414 / 0.375,+0.815,7.14e-132,1.670 / 0.963,+0.630,9.78e-38
+SAC vs COLREGs-VO,All episodes,both succeeded,625,0.865,0.687,240 / 62,7.17e-26,1.335 / 0.372,+0.775,2.14e-93,1.822 / 1.069,+0.583,9.2e-21
+SAC vs COLREGs-VO,Decoupled,all paired,664,0.931,0.783,128 / 30,1.29e-15,1.307 / 0.273,+0.809,4.21e-94,1.650 / 1.020,+0.554,4.22e-19
+SAC vs COLREGs-VO,Decoupled,both succeeded,490,0.931,0.783,128 / 30,1.29e-15,1.266 / 0.269,+0.762,8.92e-77,1.792 / 1.086,+0.522,2.12e-13
+SAC vs COLREGs-VO,Coupled,all paired,336,0.735,0.497,112 / 32,1.33e-11,1.862 / 0.579,+0.858,1.42e-39,1.716 / 0.781,+0.830,8.18e-23
+SAC vs COLREGs-VO,Coupled,both succeeded,135,0.735,0.497,112 / 32,1.33e-11,2.047 / 0.671,+0.828,4.21e-18,2.005 / 0.949,+1.020,9.61e-11
