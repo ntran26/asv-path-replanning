@@ -12,7 +12,7 @@ this plan is right; section 6 lists the known disagreements.
 **Which formulation.** Write Section 2 for **baseline-v2**, the formulation all
 four learners are trained on. baseline-v3 (field stages 6–7; SAC seed 0
 training since 28 Sep, done about 30 Sep) changes only the curriculum after
-stage 4 and the development set. If v3 is adopted, only section 2.3.5 (curriculum) and
+stage 4 and the validation set. If v3 is adopted, only section 2.3.5 (curriculum) and
 one sentence in section 2.1.4 change; the box in section 2.3.5 holds the v3 text.
 
 **Spelling and voice.** Draft 4 uses American spelling ("maneuver",
@@ -400,8 +400,8 @@ coefficient list.
 
 | Item | Where it disagrees | Action |
 |---|---|---|
-| Abeam domain | skeleton: 0.75 L = 1.18 m; config: 1.25 m (`DOMAIN_LATERAL`), d_req 2.5 m | use the config (1.25 m, d_req 2.5 m); fix the skeleton |
-| Head-on width threshold | skeleton: 3.66 m; config: 3.8 m (compliant target), 6.3 m (centerline target) | use the config values; fix the skeleton |
+| Abeam domain | skeleton: 0.75 L = 1.18 m; config: 1.25 m (`DOMAIN_LATERAL`), d_req 2.5 m | **done 2026-10-08**: skeleton, `00`, `01`, `02a`, `03a` and `PROJECT_BRIEF` now quote 1.25 m and d_req 2.5 m |
+| Head-on width threshold | skeleton: 3.66 m; config: 3.8 m (compliant target), 6.3 m (centerline target) | **done**: the skeleton quotes `PREDICTED_THRESHOLDS_M`; `02a` and `03` note both values |
 | Overtaking / crossing thresholds | ledger C-3: 4.26 m / 7.60 m; config: overtaking 4.945 m | check `04a` section 6 and the sweep design; pick one set and restate C-3 |
 | Observation table | skeleton section 2.3.2: ~56 values | use Table 6 (70 values) |
 | LiDAR rate | skeleton: 10 Hz; decisions at 2 Hz | state what the simulator does per decision step |

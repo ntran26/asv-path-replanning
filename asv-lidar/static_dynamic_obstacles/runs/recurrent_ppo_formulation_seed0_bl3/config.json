@@ -1,7 +1,7 @@
 {
  "algorithm": "RecurrentPPO",
  "seed": 0,
- "timesteps": 2500000,
+ "timesteps": 3000000,
  "algo": "recurrent_ppo",
  "num_envs": 10,
  "hyperparameters": {
@@ -125,5 +125,14 @@
   "MOTION_CLASSIFIER": "free_space",
   "PF_OVERSPEED_TOL": 0.2,
   "PF_OVERSPEED_SPAN": 0.5
- }
+ },
+ "wall_clock_s": 11579.015681028366,
+ "resumes": [
+  {
+   "from_steps": 2500000,
+   "at": "2026-10-08 06:27:42",
+   "replay_buffer": "n/a",
+   "extended_from": 2500000
+  }
+ ]
 }

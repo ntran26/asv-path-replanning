@@ -92,7 +92,14 @@ equations" box (what bold vectors, hats and subscripts mean).
 
 ### 2. The collision regulations in brief (added)
 - What COLREGs are; Rules 8, 9, 13, 14, 15/16, 17(a)(i) in plain words, each
-  with a small diagram.
+  with a small diagram, stated as exactly what the reward encodes: Rule 8 as a
+  readily apparent action (20° or a 30 % slowdown), passing at a safe distance
+  (2.5 m) and slowing where no turn fits, with time pressure below 15 s to the
+  CPA; Rule 14 as port-to-port passing, with no alteration needed when keeping to
+  the starboard side of the channel already clears the target; crossings given way
+  by passing astern (a port alteration for a target from port); Rule 17(a)(i) as
+  holding course and speed while being overtaken, released in extremis. The
+  behaviour is COLREGs-aware, not a legal-compliance claim.
 - The five encounter classes with their bearing/crossing-angle bands (facts:
   `FORMULATION_EQUATIONS.md` section 4.4) and the required turn sense (+1 starboard,
   −1 port, 0 hold).
@@ -179,7 +186,7 @@ Build up from zero:
 11. Comparison table of the four (on/off-policy, memory, exploration,
     over-estimation control, sample efficiency, cost per step).
 12. How this study trains them: facts section 3 (identical network, defaults,
-    3 M steps, 3 seeds, development-set checkpoint selection, why the test
+    3 M steps, 3 seeds, validation-set checkpoint selection, why the test
     suite is touched once). ▶ **Network diagram** of the two-encoder
     architecture with the six observation branches.
 - Sources: Sutton & Barto (2018); Schulman et al. (2016, 2017); Haarnoja et

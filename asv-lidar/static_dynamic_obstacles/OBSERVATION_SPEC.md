@@ -6,7 +6,8 @@ in `constants.py`). Supersedes `obs-v2` (56 dims, five branches) and `obs-v1`
 feature in its original order and appends a sixth branch, `context` (F72).
 
 **Status:** frozen in baseline-v1 (`configs/baseline_v1.json`, git tag
-`baseline-v1`). Every checkpoint and every evaluation case depends on this
+`baseline-v1`) and unchanged through baseline-v3 (`configs/baseline_v3.json`, the
+current formulation). Every checkpoint and every evaluation case depends on this
 ordering. Changing any index is a version bump, not an edit; a checkpoint from
 an earlier schema cannot be loaded or resumed against this one.
 

@@ -1,6 +1,6 @@
 # 03 — Environment and Dynamic Target
 
-> **Status note (2026-09-22, updated 2026-10-04).** A design record: the code cites its sections. Parts are superseded by the implementation. The formulation was frozen as **baseline-v1** (`configs/baseline_v1.json`), then **baseline-v2** (`configs/baseline_v2.json`; reward and observation unchanged since), **baseline-v3** (a curriculum overlay, `src/formulation_v3.py`; the kept SAC 3 M policy) and the **baseline-v4** draft (`src/formulation_v4.py`, `planning/BASELINE_V4_PLAN.md`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here (as of baseline-v1):
+> **Status note (2026-09-22, updated 2026-10-08).** A design record: the code cites its sections. Parts are superseded by the implementation. The formulation was frozen as **baseline-v1** (`configs/baseline_v1.json`), then **baseline-v2** (`configs/baseline_v2.json`; reward and observation unchanged since). **The current formulation is baseline-v3** (`configs/baseline_v3.json`): baseline-v2 plus the curriculum overlay `src/formulation_v3.py`. The baseline-v4.3 candidate (`src/formulation_v4.py`) was trained and not adopted (`planning/BASELINE_V4_PLAN.md`, section 5e). The current statement of the method is `planning/FORMULATION_EQUATIONS.md` with `planning/METHODS_BRIEF.md`; formulation values quoted here were checked against baseline-v3 on 2026-10-08. Superseded here (as of baseline-v1):
 >
 > - Basin mode is the default geometry; channels only for head-on, crossing and overtaking at 15–25 % of their draws (F74, spec 06).
 >
@@ -151,7 +151,8 @@ With the compressed ship domain from 01 section 5.2, the sweep brackets the tran
 | 4 m | 8 B | Tight |
 | 3.5 m | 7 B | **No** — below threshold |
 
-Minimum width for a compliant port-to-port head-on is ≈3.66 m (7.3 B): 2.36 m centre-to-centre
+Minimum width for a compliant port-to-port head-on is ≈3.8 m (`PREDICTED_THRESHOLDS_M`; ≈3.66 m, 7.3 B, at the
+provisional 1.18 m abeam domain): 2.50 m centre-to-centre
 lateral separation for non-overlapping domains, plus ≈0.65 m wall clearance each side.
 Six levels with the transition bracketed between 4 m and 3.5 m. **Verify this arithmetic once
 the ship domain is finalised from the turning-circle data in 05** — the threshold moves with

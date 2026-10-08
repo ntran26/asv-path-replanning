@@ -1,0 +1,5 @@
+2026-10-08 14:57:11 == test set v4 with tracks: SAC, PPO, RecurrentPPO, LOS-DWA, COLREGs-VO (10 processes)
+2026-10-08 15:05:58    test set v4 with tracks, sacs0_bl3_metrics exit 0
+2026-10-08 15:16:26    test set v4 with tracks, ppos0_bl3_metrics exit 0
+2026-10-08 15:27:37    test set v4 with tracks, recurrent_ppos0_bl3_metrics exit 0
+2026-10-08 16:08:00    test set v4 with tracks: held (decision 2026-10-08) after the three learners; LOS-DWA stopped mid-run (its earlier rows unchanged), COLREGs-VO not started; COLREGs table on hold

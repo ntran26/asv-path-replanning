@@ -14,5 +14,21 @@
  {
   "timesteps": 640000,
   "stage": 4
+ },
+ {
+  "timesteps": 1000000,
+  "stage": 5
+ },
+ {
+  "timesteps": 1500000,
+  "stage": 6
+ },
+ {
+  "timesteps": 2000000,
+  "stage": 7
+ },
+ {
+  "timesteps": 2500000,
+  "stage": 7
  }
 ]

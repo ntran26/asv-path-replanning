@@ -51,11 +51,11 @@ and `configs/baseline_v4.json`. `constants.py` is untouched, and v2 and v3 stay 
 | E | *(only if G1 fails)* Reward: no wrong-way penalty while the compliant turn is flagged blocked | L2 HO | Only if the scripted-behaviour check shows the reward still ranks "turn into the panel" above "slow and pass" |
 
 Unchanged: the reward (unless E is triggered), the observation layout, the learners, the 3 M budget
-and the development set.
+and the validation set.
 
 ## 3. Validation gates (cheap) before any long run
 
-All gates use the **development side** only: the dev sets and near-deployment layouts from
+All gates use the **development side** only: the validation sets and near-deployment layouts from
 training seeds. Test set v2, the frozen suite and the Paper 2 set are never used.
 
 | Gate | What | Cost | Pass if |
@@ -116,18 +116,18 @@ Results are in `results/v4_gates/`.
 
 | Gate | Result | Reading |
 |---|---|---|
-| **G2** fix-1 flags | **PASS.** Recall 86 % on blocked conflict episodes (18 % without fix 1). Added flags on development episodes the compliant run passes: 10 %, on n = 10, so a weak estimate | Fix 1 marks blocked COLREGs turns. The false-flag estimate needs more data before a final run |
+| **G2** fix-1 flags | **PASS.** Recall 86 % on blocked conflict episodes (18 % without fix 1). Added flags on validation episodes the compliant run passes: 10 %, on n = 10, so a weak estimate | Fix 1 marks blocked COLREGs turns. The false-flag estimate needs more data before a final run |
 | **G1** reward ordering | **FAIL at γ 0.951**: best-return behaviour safe in 88 % of 26 script-solvable conflicts with fix 1, 92 % without. **96 % at γ 0.97, 100 % at 0.98 and 0.99** | The reward already prefers obstacle avoidance over the compliant turn; the compliant turn never reaches the goal in head-on or overtaking conflicts. Fix 1 does not change the returns. The failures are late collisions, 61–91 steps after engagement, which γ 0.951 discounts to almost nothing. **The discount, not the reward terms, is the problem.** 14 of 40 conflicts are solved by no scripted or classical behaviour |
 | **G3** curriculum | **CHECK.** Coupled-layout shares 0.18 / 0.38 / 0.58 (design 0.20 / 0.40 / 0.55); crossing share up (0.33–0.44 against 0.22–0.26); 1 own-start contact in 200 stage-7 draws (v3 has 1 too); mean reset 2.6–4.5 s back-to-back (v3 stages 6–7: 1.5–2.3 s) | Shares are as designed. Start contacts are rare but real, so **item D (start-clear redraw) is added**: `env._start_is_clear`, stage key `start_clear`, v4 stages only. Back-to-back resets overstate training cost, because the field prefetch thread refills between episodes, but v4 generates more coupled layouts, so PPO collection may be slower than v3's |
 
 **G4 (queued, `results/v4_pilot_run.sh`).** The run starts after PPO v3 finishes training and its
 evaluations. Arm **A** is v4 at γ 0.951; arm **B** is v4 at γ 0.98. Each runs 0.5 M steps from PPO
 v3's 1.5 M checkpoint. Both are evaluated against that run's 2.0 M checkpoint on the conflict set
-(coupled dev HO/CRP/CRS plus the G1 conflicts), the coupled development set, and the decoupled
-development set (`tools/diagnostics/v4_gates/pilot.py`). Arm B's value function was fitted for
+(coupled dev HO/CRP/CRS plus the G1 conflicts), the coupled validation set, and the decoupled
+validation set (`tools/diagnostics/v4_gates/pilot.py`). Arm B's value function was fitted for
 γ 0.951, so it starts at a disadvantage.
 
-## 5c. Queued for after G4: draft 4.1 and the development-set extension (2026-10-03)
+## 5c. Queued for after G4: draft 4.1 and the validation-set extension (2026-10-03)
 
 The trigger is test set v3 (`tools/tiers/test_set.py --version 3`). It has more straight survey
 lanes and new dense arrangements. SAC 3 M scores 0.853 overall, and is weakest on:
@@ -148,16 +148,16 @@ so nothing changes before they finish.
 | Straight legs: coupled layouts | not set | 70 % (`field_straight_share`) |
 | Varying-speed coupled-layout targets, stages 5 / 6 / 7 | 0 / 15 / 30 % | 20 / 50 / 50 % |
 | Coupled-layout weights NT / HO / CRP / CRS / OT / BO | .15 / .25 / .20 / .20 / .10 / .10 | .15 / .20 / .175 / .175 / .15 / .15 |
-| Development set | DV3 (150) + decoupled (120) | the same, **plus** `dev_set_v4.extension()` (60) |
+| Validation set | DV3 (150) + decoupled (120) | the same, **plus** `dev_set_v4.extension()` (60) |
 
-- The development-set extension (`src/dev_set_v4.py`) has 10 episodes each of NT, HO, CRP, CRS, OT
+- The validation-set extension (`src/dev_set_v4.py`) has 10 episodes each of NT, HO, CRP, CRS, OT
   and BO, with 70 % straight legs and half the targets at varying speed. It uses generator seeds
   520,000+, which no other set uses.
 - Code support is in place: opt-in stage keys in `scenario.py`, `field_training.py` and `env.py`,
   and tests in `tests/test_dense_straight.py`. Baseline v2 and v3 are unchanged (`baseline_config`
   check passes).
 - **Still to do before a full v4 run:** wire `train_formulation.py` to a `configs/baseline_v4.json`
-  that installs `formulation_v4`. Its development evaluation currently hard-codes
+  that installs `formulation_v4`. Its validation evaluation currently hard-codes
   `formulation_v3.field_development_set`.
 
 **Applied (2026-10-03, 21:33).** `formulation_v4.py` is now `4.1-draft`. G3 on it passed its
@@ -187,7 +187,7 @@ How to read it:
 ## 5e. Near-impossible episodes and the crossing trace (2026-10-03)
 
 **Decision (2026-10-03):** near-impossible episodes should be left out of the test set and the
-development set, or kept to a very small share. That way they neither confuse the policy nor
+validation set, or kept to a very small share. That way they neither confuse the policy nor
 mislead readers of the statistics.
 
 **Oracle feasibility (`src/oracle_feasibility.py`).** `feasibility_st` treats the own ship as a
@@ -215,11 +215,11 @@ a lower bound on solvability, and its outputs are graded rather than a single ve
 - `latest_start_s`, the latest start time from which a manoeuvre still works.
 
 **The rule is set on the development side before it is applied to the test set:**
-- Run the oracle on the development sets (`tools/diagnostics/feasibility/oracle_sets.py dev`).
+- Run the oracle on the validation sets (`tools/diagnostics/feasibility/oracle_sets.py dev`).
 - Check it against outcomes already recorded: any episode the oracle calls unsolvable but a
   controller solved is a miss.
 - Fix the threshold, for example "no manoeuvre keeps 0.2 m clearance".
-- Rebuild test set v4 and the development set without these episodes, or with a capped share
+- Rebuild test set v4 and the validation set without these episodes, or with a capped share
   that is reported separately.
 
 **Crossing trace (`tools/diagnostics/crossing/crossing_trace.py`).** This traces SAC 3 M step by
@@ -259,7 +259,7 @@ not by reacting.
 **Candidate rule (to fix on the development side):** an episode is near-impossible if no
 manoeuvre that starts at or after the first track avoids collision with 0.2 m clearance, even
 with perfect foresight. Such episodes would be excluded, or capped and reported separately.
-Controller outcomes on the same 370 development episodes (SAC, LOS-DWA and COLREGs-VO, in
+Controller outcomes on the same 370 validation episodes (SAC, LOS-DWA and COLREGs-VO, in
 `results/feasibility/dev_outcomes.csv`) show how often a controller "solves" these episodes by
 its behaviour before detection.
 
@@ -328,7 +328,7 @@ runner now checks for completeness itself.
 - **L2 head-on is not one of them.** All 5 of its episodes are in tier A, so SAC's failures there
   are policy failures, not infeasibility.
 
-**Decision (2026-10-04): tiers B, C and D leave the test set and the development set, replaced
+**Decision (2026-10-04): tiers B, C and D leave the test set and the validation set, replaced
 so the totals and the cell balance stay.**
 
 - **Test set v4** (`tools/tiers/test_set.py --version 4`). It is v3 with the 67 failing episodes
@@ -336,8 +336,8 @@ so the totals and the cell balance stay.**
   and leg type, from new seed blocks (`V4_*`). A draw is accepted only if it passes the same
   oracle test (`results/test_set/v4/replacement_candidates.csv`). The default `--version` stays 3
   until v4 is adopted.
-- **Development set v4.2** (`formulation_v4.development_set`, `field_development_set`). The
-  decoupled 120, coupled dev set v3 (150) and the 4.1 extension (60) are graded with the
+- **Validation set v4.2** (`formulation_v4.development_set`, `field_development_set`). The
+  decoupled 120, coupled validation set v3 (150) and the 4.1 extension (60) are graded with the
   training evaluation's own seeds (`oracle_sets.py deveval`), because the tracking time depends on
   the seed. Each failing episode is replaced in place, so it keeps its position and seed, by
   the next draw of its own generator that passes. The accepted recipes are in
@@ -348,7 +348,7 @@ so the totals and the cell balance stay.**
   reset of 1.6 s. A validated layout pool built offline is the option if training needs the same
   rule.
 - **Queue (detached):** the v4 build, then SAC 3 M on v4 (`results/test_v4_sac.sh`; the 933 shared
-  episodes reuse the v3 rows), the development-set oracle (`results/feasibility_deveval.sh`) and
+  episodes reuse the v3 rows), the validation-set oracle (`results/feasibility_deveval.sh`) and
   the replacements (`results/dev_v4_replace.sh`).
 - **Still to do before a v4 training run:** `train_formulation.py` must install `formulation_v4`
   and evaluate on `formulation_v4.development_set` and `field_development_set`.
@@ -356,7 +356,7 @@ so the totals and the cell balance stay.**
 **Built and evaluated (2026-10-04).**
 - **Test set v4.** Digest `a8c40beb234ea7f9`, built in 28 min. 146 candidates were graded over
   2 rounds and 109 passed.
-- **Development set.** Graded with the evaluation seeds, 37 of the 330 episodes fail. All 37 are
+- **Validation set.** Graded with the evaluation seeds, 37 of the 330 episodes fail. All 37 are
   replaced (`configs/dev_set_v4_replacements.json`).
 
 SAC 3 M on test set v4, safety off (`results/test_set/v4/sacs0_bl3/`). The 933 shared episodes
@@ -446,7 +446,7 @@ Candidate levers, in order of expected effect:
   - **The approach.** The oracle's route follower at cruise, so no learner chooses the states.
   - **The replay.** The hand-back mechanism replays each record, with ±10° and ±20 % jitter on the
     last state. The pool gives practice in these states and never supplies an action.
-- **The recommended baseline is v4.3:** v4.1 (exposure, E) plus 4.2 (feasible development set,
+- **The recommended baseline is v4.3:** v4.1 (exposure, E) plus 4.2 (feasible validation set,
   F) plus 4.3 (hard starts, G). None of 4.1–4.3 has trained yet; G4 tested 4.0 only.
 
 **The hard-state pool (2026-10-04, 13:35).** 505 of 1,200 candidates were kept:
@@ -463,11 +463,11 @@ Of the rest, 332 needed no action (standing on succeeds), 342 had no solution wi
 the start state, and 21 ended before reaching it.
 
 **The v4.3 SAC pair (decision, 2026-10-04: a short SAC test before a full run).**
-- **Why SAC, and why short.** PPO is a weak proxy for these cases: on the coupled development set
+- **Why SAC, and why short.** PPO is a weak proxy for these cases: on the coupled validation set
   it scores 0.47 at 2 M, against SAC's 0.71. The 2.5 M SAC checkpoint no longer exists, so both
   arms continue SAC baseline-v3 seed 0 from its final 3.0 M model and replay buffer, by +0.5 M.
 - **What the two arms share.** Reset seeds (offset 77777), safety off, and selection on
-  formulation v4.2's development sets (`dev_set: "v4"`).
+  formulation v4.2's validation sets (`dev_set: "v4"`).
 - **The v4.3 arm** (`configs/finetune_v4_pair_v43.json`). v4's stage 7, built as the overlay
   builds it, plus 15 % hard-state starts. Fix 1 stays off.
 - **The v3 arm** (`configs/finetune_v4_pair_v3.json`). v3's stage 7: the control.
@@ -484,27 +484,27 @@ the start state, and 21 ended before reaching it.
 
   | No-target set | v3 SAC 3 M, to match or beat | When checked |
   |---|---|---|
-  | Development set 4.2, evaluation seeds (50) | **44 of 50**: decoupled 20/20, coupled dev set v3 14/20, 4.1 extension 10/10 | during development |
+  | Validation set 4.2, evaluation seeds (50) | **44 of 50**: decoupled 20/20, coupled validation set v3 14/20, 4.1 extension 10/10 | during development |
   | Test set v4 (30) | **28 of 30**: coupled 25/27, L1–L3 3/3 | once, at the end |
   | Paper 2 set, safety off (L1–L3 × 10 noise seeds) | **30 of 30** | once, at the end |
 
   - **Null episodes** (a target present but never in conflict) are tracked alongside, against v3's
     71 of 75 on test set v4.
   - **The misses v3 already has.** On the test set they are FS-NT-014 and FS-NT-023, both obstacle
-    contacts. On the development set they are 6 coupled dev set v3 layouts with gates, on-path panels
+    contacts. On the validation set they are 6 coupled validation set v3 layouts with gates, on-path panels
     or slaloms, mostly on slanted legs. The route follower clears 8 of the 9 failing development
     layouts with 0.34–1.2 m margin, and LOS-DWA and COLREGs-VO each solve 8.
   - **The pair is not gated on this.** `pair_compare.py` reports the no-target counts for both arms
     and the start model. The pair's gate stays as fixed before the runs.
   - **Two baselines.** The pair's start model is the final 3.0 M model, which passes 43 of 50 on the
-    development set. The reference above is the kept best 3 M model behind the v3 results: 44 of
+    validation set. The reference above is the kept best 3 M model behind the v3 results: 44 of
     50. The two differ by one decoupled no-target episode.
   - Diagnosis: `tools/diagnostics/static/nt_trace.py` (`results/static_trace/summary.txt`). SAC 3 M
-    was traced on all 80 no-target episodes (development and test set v4) and the 75 null
+    was traced on all 80 no-target episodes (validation and test set v4) and the 75 null
     episodes of test set v4, and each run was compared with the oracle's A* route.
 
 **The v4.3 SAC pair: result (2026-10-05, 10:11; `results/v4_gates/pair_summary.txt`).** Both arms
-are scored on development set 4.2 with the same seeds. The 3.0 M start evaluations are identical,
+are scored on validation set 4.2 with the same seeds. The 3.0 M start evaluations are identical,
 which confirms the pairing.
 
 | | v4.3 arm | v3 arm (control) |
@@ -540,7 +540,7 @@ which confirms the pairing.
 - **Checkpoints.** The same ones the gate compared: the v4.3 arm's selected 3.4 M model and the
   v3 arm's selected model, which is its 3.0 M start. Both arms' final 3.5 M models are scored as
   secondary.
-- **Episodes.** The same 330 development episodes (formulation v4.2) under three new episode-seed
+- **Episodes.** The same 330 validation episodes (formulation v4.2) under three new episode-seed
   sets (1,100,000 / 1,200,000 / 1,300,000 + position), 990 episodes per checkpoint, safety off
   (`tools/diagnostics/v4_gates/pair_reseed.py`).
 - **The decision uses the new seeds only.** The 3.4 M checkpoint was chosen as the best of six
@@ -574,7 +574,7 @@ steps) through `results/v4_full_run.sh`: training, then Tier 1, the frozen suite
 set on the best checkpoint, then test set v4 (report only). Run directory
 `runs/sac_formulation_seed0_bl4`.
 - **Wiring checks.** A 4,096-step smoke run passed all 7 stages with the pool on and finished its
-  final evaluation. The trainer's development set (120 decoupled + 210 coupled) matches the pair's
+  final evaluation. The trainer's validation set (120 decoupled + 210 coupled) matches the pair's
   re-scoring set at all 330 positions, with the 37 replacements in place.
 - **Fix in `dev_set_v4.development_sets`.** Replacement positions are recorded on the
   20-per-class set. A smaller decoupled set (the smoke run's 1 per class) now keeps the coupled
@@ -583,13 +583,13 @@ set on the best checkpoint, then test set v4 (report only). Run directory
   at least 44 of 50, test set v4 at least 28 of 30, Paper 2 set 30 of 30. The explainer-artifact
   briefs switch to v4.3 only if it becomes the best formulation.
 
-**Full-run result (2026-10-07, 16:21). v4.3 wins on the development set and loses on the held-out
+**Full-run result (2026-10-07, 16:21). v4.3 wins on the validation set and loses on the held-out
 sets; it does not replace v3.** Training took 50.1 h. The selected checkpoint is the final 3.0 M
 evaluation (combined 0.82, score +0.46).
 
 | SAC seed 0, safety off | v4.3 (3.0 M selected) | v3 (kept 3 M) | Difference |
 |---|---|---|---|
-| Development set, 330 (selection) | 0.82 | 0.79 | +3 |
+| Validation set, 330 (selection) | 0.82 | 0.79 | +3 |
 | Test set v4, 1,000 (report only) | 0.833 | 0.865 | **−3.2 (−5.7 to −0.7)** |
 | of which decoupled, 664 | 0.864 | 0.931 | **−6.6 (−9.3 to −3.9)** |
 | of which coupled, 336 | 0.771 | 0.735 | +3.6 (−1.5 to +8.6) |
@@ -608,7 +608,7 @@ gained, 98 lost.
 - **No-target acceptance: fails by one episode.** Development 48 of 50 (pass), test set v4 27 of 30
   (needs 28; v3 had 28), Paper 2 set 30 of 30 (pass).
 - **Reading.** The development gain did not transfer. Selection weights the coupled set 210 of 330,
-  so it favours coupled-set gains, and the decoupled part of the development set (0.89 for both) did not
+  so it favours coupled-set gains, and the decoupled part of the validation set (0.89 for both) did not
   reveal the being-overtaken and null regression the larger held-out sets show.
 - **Consequence.** v3 stays the best formulation; the explainer-artifact briefs stay on v3. v4.3 is
   a documented negative result for the paper's development record.
@@ -622,7 +622,7 @@ Where they fail. The failures are dense coupled layouts, mostly on slanted legs:
 
 | No-target set | Success |
 |---|---|
-| Development: coupled dev set v3 (20; 16 slanted) | 14 of 20 |
+| Development: coupled validation set v3 (20; 16 slanted) | 14 of 20 |
 | Test set v4: coupled FS-NT (27; mostly straight) | 25 of 27 |
 | Development: decoupled (20) | all |
 | Development: 4.1 extension (10; mostly straight) | all |
@@ -678,7 +678,7 @@ Remedies after the pair, cheapest and fairest first:
 - **Only if those fall short:** a stronger rudder-reversal (smoothness) cost near panels, or a
   free-side cue in the observation. Both are formulation changes.
 - **Launch.** Started 13:47 (`results/v4_pair_run.sh`), arms one at a time, each about 11–13 h.
-  0.5 M steps at roughly 12–15 steps/s plus development evaluations is slower than the earlier
+  0.5 M steps at roughly 12–15 steps/s plus validation evaluations is slower than the earlier
   9 h estimate.
 
 ## 6. Order

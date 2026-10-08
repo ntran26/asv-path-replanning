@@ -1,5 +1,9 @@
 # CONSTANTS AND SCALES — Paper 3
 
+> **Current formulation (2026-10-08): baseline-v3** (`configs/baseline_v3.json`). No constant here
+> changed after baseline-v2; baseline-v3 adds only the curriculum overlay `src/formulation_v3.py`
+> (stage schedule, stage 5–7 clutter, coupled layouts), recorded in the config's `overlay` block.
+
 **Revision 2.9 (2026-09-22) — baseline-v1 frozen.** Every value training uses
 is recorded in `configs/baseline_v1.json` (git tag `baseline-v1`), which a run
 checks against before it starts; **where this document and the config differ,
@@ -781,7 +785,8 @@ tracker.
 | F91 / A33 | `V_PORT_HEADING_NEEDS_ADMISSIBLE` **False** in baseline-v1 | on for run 12 only; one seed abandoned the Rule 14 alteration (F92) |
 | A31 | `A31_STAGE3_WEIGHTS` **False** in baseline-v1 (`STAGE3_CROSSING_WEIGHTS` 0.35/0.35/0.15/0.15) | on for run 12 only; falsified (F92) |
 | **baseline-v1** | `configs/baseline_v1.json`, the run 11 formulation; superseded | F93 |
-| **baseline-v2** | **`configs/baseline_v2.json`**, the current frozen formulation: baseline-v1 with `BEING_OVERTAKEN_BELOW_FLOOR_FRAC` **0.20 -> 0.0** (S5, decision); checked by `src/baseline_config.py`, applied by `train_formulation.py --config` | F96 |
+| **baseline-v3** | **`configs/baseline_v3.json`**, the current formulation: baseline-v2 plus the curriculum overlay `src/formulation_v3.py` (seven stages, coupled layouts in stages 6–7, 2.5 M steps extended to 3.0 M); no constant changed | F107 |
+| **baseline-v2** | `configs/baseline_v2.json`, superseded by baseline-v3 (curriculum only): baseline-v1 with `BEING_OVERTAKEN_BELOW_FLOOR_FRAC` **0.20 -> 0.0** (S5, decision); checked by `src/baseline_config.py`, applied by `train_formulation.py --config` | F96 |
 | `BEING_OVERTAKEN_BELOW_FLOOR_FRAC` | **0.0** (was 0.20) | F96, S5: the Rule 17(b) last-moment case is out of scope, so no draw sits below the contact-free floor in training or in the suite |
 | geometry | **basin default** (`DEFAULT_GEOMETRY_MODE`); `BASIN_START_Y` 2.0, `BASIN_GOAL_Y` 22.0, `BASIN_X_RANGE` (2.5, 7.5) m, `BASIN_NAV_INSET_M` 0.40, `BASIN_H_SIDE_CLIP` (0.60, 5.00); `p_basin` 1 / 1 / 0.85 / 0.75 / 0.75 by stage, channel only for `CHANNEL_CLASSES` | F74 (06, decisions) |
 | feasibility | A* grid 0.25 m, walls 0.40 m, panels 0.45 m, route ≤ 2.25 × leg, 20 redraws then thin | F74 (Paper 2's filter) |

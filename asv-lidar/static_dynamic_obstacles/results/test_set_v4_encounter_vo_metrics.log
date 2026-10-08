@@ -1,0 +1,34 @@
+test set 4.0: 1000 episodes from 1103 distinct scenarios (103 near-duplicates removed), digest a8c40beb234ea7f9, built in 0 s
+source  cell                 
+frozen  basin-being_overtaken     95
+        basin-crossing           100
+        basin-head_on            100
+        basin-null                75
+        basin-overtaking          54
+        channel-crossing         100
+        channel-head_on           98
+        channel-overtaking        42
+paper2  FS-BO                     25
+        FS-CRP                    29
+        FS-CRS                    27
+        FS-HO                     25
+        FS-NT                     27
+        FS-OT                     95
+        L1-BO                     10
+        L1-CRP                    11
+        L1-CRS                    12
+        L1-HO                     10
+        L1-NT                      1
+        L1-OT                     10
+        L2-BO                      5
+        L2-CRP                     5
+        L2-CRS                     6
+        L2-HO                      5
+        L2-NT                      1
+        L2-OT                      5
+        L3-BO                      5
+        L3-CRP                     6
+        L3-CRS                     5
+        L3-HO                      5
+        L3-NT                      1
+        L3-OT                      5

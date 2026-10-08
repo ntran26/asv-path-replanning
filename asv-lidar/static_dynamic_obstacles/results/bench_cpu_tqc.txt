@@ -1,0 +1,5 @@
+CPU benchmark for tqc seed 0, 2026-10-08 16:08, steps/s after 1,500 steps
+PIN=1 THREADS=default: 8.71 steps/s
+PIN=1 THREADS=4: 10.51 steps/s
+PIN=0 THREADS=default: 6.66 steps/s
+fastest: PIN=1 THREADS=4 (10.51 steps/s)

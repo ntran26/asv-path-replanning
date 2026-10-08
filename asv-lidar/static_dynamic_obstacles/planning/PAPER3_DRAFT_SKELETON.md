@@ -56,10 +56,10 @@
 > set and the field fine-tune (F104-F107), status open (S12). **Open:** A35 (the
 > COLREGs-VO comparator's side rule), S12, S13.
 
-**Working title:** Sensor-Realistic COLREGs-Compliant Path Following and Collision Avoidance for Autonomous Surface Vessels in Confined Water: A Deep Reinforcement Learning Formulation and Learner Comparison
+**Working title:** Sensor-Realistic COLREGs-Aware Path Following and Collision Avoidance for Autonomous Surface Vessels in Confined Water: A Deep Reinforcement Learning Formulation and Learner Comparison
 
 **Alternative titles:**
-- COLREGs-Compliant Collision Avoidance in Confined Water from Onboard LiDAR: One Formulation, Four Learners
+- COLREGs-Aware Collision Avoidance in Confined Water from Onboard LiDAR: One Formulation, Four Learners
 - When the Channel Decides: Rule 9 Precedence in Learned COLREGs Collision Avoidance from Onboard Range Sensing \[check against draft 4's softer Rule 9 stance before use\]
 
 **Authors:** H. N. Tran, H. Nguyen, P. King, M. Tran (order TBC)
@@ -80,7 +80,7 @@ Scope decisions carried into this revision
 | **\#** | **Decision**                                                                                                                 |
 |--------|------------------------------------------------------------------------------------------------------------------------------|
 | S1     | Two-vessel encounters only: one own ship, **one** moving target, and zero to three static obstacles per episode.             |
-| S2     | COLREGs scope: selected requirements of Rules 8, 9, 13, 14, 15/16 and 17(a)(i) (draft 4 section 1.3). **Rule 9** shapes the admissible response in narrow water through an adopted operating convention, and **Rule 8** governs action quality (timing, readiness, 8(e) slowing). |
+| S2     | COLREGs scope: selected requirements of Rules 8, 9, 13, 14, 15/16 and 17(a)(i) (draft 4 section 1.3), each stated as exactly what the reward encodes (section 2.2.1; decision 2026-10-08). **Rule 9** shapes the admissible response in narrow water through an adopted operating convention, and **Rule 8** governs action quality (8(b) readily apparent action, 8(d) passing at a safe distance, 8(e) slowing; 8(a) as timing pressure only). The behaviour is described as COLREGs-aware, not COLREGs-compliant. |
 | S3     | The own ship gives way in every crossing: an explicit **narrow-channel operating convention** motivated by the conditional non-impeding requirement of **Rule 9(b)** (A17), not the open-water Rule 15/17 role table and not a consequence of vessel length. |
 | S4     | Six episode types: no target, null (a target that never meets the own ship), head-on, crossing, overtaking, being overtaken. |
 | S5     | Rule 17(a)(i) course-keeping for the being-overtaken class. Rule 17(b) (last-moment action) is out of scope **by construction**: every being-overtaken draw passes at or above a contact-free floor (baseline-v2, F96). |
@@ -89,7 +89,7 @@ Scope decisions carried into this revision
 | S8     | **Training targets hold constant velocity and never give way** (D1). Reactive (compliant) and non-compliant targets appear only in evaluation (the robustness set, R3). |
 | S9     | **Geometry:** the 10 x 25 m basin of Paper 2's field site (straight and slanted legs, the default) and parallel-walled channels. Headline channels 7.5-10 m; the width sweep (R4) goes to 3.5 m. Every layout admits a static route (A* filter, F74) -- not a proof that every dynamic encounter is avoidable (draft 4 section 1.3). |
 | S10    | **8(e) in two layers:** the learned policy slackens speed; an engineered runtime safety layer, off during training, takes all way off when a collision is imminent. Compliance is reported with it **off** (C-7); its interventions are not attributed to the policy. |
-| S11    | **Formulation plus comparison:** one frozen formulation (observation, reward, curriculum, dynamics), four learners (on-policy, recurrent, off-policy, distributional), 3 seeds, 2 M steps, checkpoint selected on the development set, the frozen suite touched once per policy. |
+| S11    | **Formulation plus comparison:** one frozen formulation (observation, reward, curriculum, dynamics), four learners (on-policy, recurrent, off-policy, distributional), 3 seeds, 2 M steps, checkpoint selected on the validation set, the frozen suite touched once per policy. |
 | S12    | \[TBC\] The Paper 2 deployment-layout set and the field fine-tune (F104-F107): report as a field-readiness study, as the bridge to the field trials, or leave to the field paper. |
 | S13    | \[TBC, new 2026-09-28\] **Physical transfer.** Draft 4 calls it "planned" and its roadmap has no field section. Either (a) keep basin trials in this paper -- add a field section to the roadmap and keep RQ4, C-6 and old C7; or (b) move them to the field paper -- drop RQ4 and C-6 here and state the transfer as future work. Old section 7 is parked, unnumbered, after section 4 until then. |
 
@@ -97,7 +97,7 @@ Abstract
 
 *Draft skeleton — write last, but fix the shape now. Sentences marked \[RESULT\] wait for the three-seed campaign. \[Align with draft 4 before use: Rule 9 as an adopted convention, width as a geometric variable, the four contributions, and S13.\]*
 
-Autonomous surface vessels in restricted waterways must follow a planned route, keep clear of static hazards and resolve encounters with other vessels in keeping with the collision regulations, under geometric limits that open-water methods do not face: in narrow water, Rule 9 decides which manoeuvre is admissible before Rules 13 to 17 decide which is required. Learning-based COLREGs methods almost universally take the other vessel's state from AIS or a simulation oracle and are developed around a single learning algorithm. This paper presents a deep reinforcement learning formulation for path following, static obstacle avoidance and COLREGs-compliant manoeuvring against a moving target in confined water, driven entirely by onboard sensing: the target is detected and tracked from a two-dimensional LiDAR, and the observation combines pooled range sensing, a map-derived boundary, a tracked-target branch and an encounter-context branch that makes the reward's judgement of the encounter observable. A COLREGs reward group reads the encounter as the vessel perceives it, with Rule 9 governing precedence where the open-water manoeuvre does not fit, and an engineered runtime layer separates learned speed reduction from an emergency stop. The formulation is frozen and four learners — PPO, recurrent PPO, SAC and TQC — are trained on it under an identical protocol and evaluated once on a held-out suite of \[800\] episodes per seed and a robustness set with reactive and non-compliant targets. \[RESULT\] The learners reach \[X-Y\]% success, against \[Z\]% for COLREGs-aware velocity-obstacle and dynamic-window comparators; crossing encounters remain the dominant failure for every learner. A channel-width sweep locates where each classical comparator becomes inadmissible, a perception-degradation study characterises how compliance fails as tracking degrades, and \[the transfer to a 1.73 m model vessel is evaluated in basin trials — TBC, S13\].
+Autonomous surface vessels in restricted waterways must follow a planned route, keep clear of static hazards and resolve encounters with other vessels in keeping with the collision regulations, under geometric limits that open-water methods do not face: in narrow water, Rule 9 decides which manoeuvre is admissible before Rules 13 to 17 decide which is required. Learning-based COLREGs methods almost universally take the other vessel's state from AIS or a simulation oracle and are developed around a single learning algorithm. This paper presents a deep reinforcement learning formulation for path following, static obstacle avoidance and COLREGs-aware manoeuvring against a moving target in confined water, driven entirely by onboard sensing: the target is detected and tracked from a two-dimensional LiDAR, and the observation combines pooled range sensing, a map-derived boundary, a tracked-target branch and an encounter-context branch that makes the reward's judgement of the encounter observable. A COLREGs reward group reads the encounter as the vessel perceives it, with Rule 9 governing precedence where the open-water manoeuvre does not fit, and an engineered runtime layer separates learned speed reduction from an emergency stop. The formulation is frozen and four learners — PPO, recurrent PPO, SAC and TQC — are trained on it under an identical protocol and evaluated once on a held-out suite of \[800\] episodes per seed and a robustness set with reactive and non-compliant targets. \[RESULT\] The learners reach \[X-Y\]% success, against \[Z\]% for COLREGs-aware velocity-obstacle and dynamic-window comparators; crossing encounters remain the dominant failure for every learner. A channel-width sweep locates where each classical comparator becomes inadmissible, a perception-degradation study characterises how encounter safety degrades as tracking degrades, and \[the transfer to a 1.73 m model vessel is evaluated in basin trials — TBC, S13\].
 
 **Keywords:** autonomous surface vessel; COLREGs; Rule 9; narrow channel; deep reinforcement learning; learner comparison; LiDAR perception; collision avoidance
 
@@ -165,7 +165,7 @@ Contributions (draft 4's four; the table maps revision 3's seven onto them)
 |--------|------------------|----------------|
 | C1     | **A sensor- and encounter-aware learning formulation.** One observation and reward design combining tracked LiDAR target information, map-derived boundaries, own-ship and path states, and explicit encounter context: the classifier supplies the encounter regime, the policy learns the rudder-and-propulsion response. Encounter-dependent reward terms support route completion, clearance and selected COLREGs behaviours, without treating reward shaping as a formal safety guarantee. Frozen, digest-checked and released. | C1 |
 | C2     | **A geometric framework for constrained encounter responses.** Relates available maneuvering space to an encounter-consistent course alteration, holding astern, or speed reduction where predicted clearance supports it; the channel-width sweep tests configuration-dependent admissibility thresholds and changes in manoeuvre choice, not legal precedence from width alone. | C2 + C4 |
-| C3     | **A controlled four-learner comparison with classical references.** PPO, recurrent PPO, SAC and TQC on the frozen formulation, 2 M steps, 3 seeds, checkpoint selection confined to a separate development set; COLREGs-VO, its narrow-channel encounter-specific adaptation, and LOS-PID with a DWA layer as nonlearned comparators on the same perception pipeline; differences reported with seed variability, no preferred learner assumed. | C3 (+ C6's protocol) |
+| C3     | **A controlled four-learner comparison with classical references.** PPO, recurrent PPO, SAC and TQC on the frozen formulation, 2 M steps, 3 seeds, checkpoint selection confined to a separate validation set; COLREGs-VO, its narrow-channel encounter-specific adaptation, and LOS-PID with a DWA layer as nonlearned comparators on the same perception pipeline; differences reported with seed variability, no preferred learner assumed. | C3 (+ C6's protocol) |
 | C4     | **An evaluation design separating safety, rule-related behaviour and robustness.** Held-out scenarios, paired target-behaviour tests, the width sweep and the perception-degradation study (pose error, dropout, occlusion, velocity-estimation error) distinguish task completion from collision type, encounter violations and intervention dependence, and give the basis for the planned physical-transfer assessment. \[TBC S12: plus the field-stageable Paper 2 deployment-layout set.\] | C5 + C6 |
 | —      | Sim-to-field transfer (system identification, randomisation over identified uncertainty, basin trials) | C7 -> S13 |
 
@@ -219,13 +219,13 @@ State, action a = \[rudder, throttle\] ∈ \[−1,1\]², transition, reward, dis
 
 | **Rule**   | **Content**                                            | **Treatment**                                                                                                                                                                    |
 |------------|--------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 8          | Action to avoid collision                              | Implemented — 8(a) ample time, 8(b) readily apparent, 8(e) slacken speed. Drives the timing and magnitude metrics.                                                               |
+| 8          | Action to avoid collision                              | Implemented — 8(b) readily apparent (a 20° alteration or a 30 % slowdown counts as one full action), 8(d) passing at a safe distance (the required separation d_req = 2.5 m and the ship-domain term), 8(e) slacken speed where no alteration fits. 8(a) only as timing pressure: the Rule 8 penalty grows as TCPA falls below 15 s, and many confined-water encounters begin inside that horizon, so ample time is not claimed. |
 | 9          | Narrow channels                                        | Implemented as an adopted operating convention — 9(a) keep starboard, 9(b) do not impede, 9(e) overtaking. Shapes the admissible response under Rules 13–16 (section 2.2.3).          |
 | 13         | Overtaking                                             | Implemented — two classes: own ship overtaking, own ship overtaken.                                                                                                              |
-| 14         | Head-on                                                | Implemented — alter to starboard, subject to available channel width.                                                                                                            |
-| 15         | Crossing                                               | Implemented — own ship gives way in all crossing encounters under the narrow-channel convention (S3).                                                                          |
+| 14         | Head-on                                                | Implemented — port-to-port passing. Keeping to the starboard side of the channel (9(a)) satisfies the rule without an alteration; a starboard alteration is required only when the target is not already clear, subject to available channel width. |
+| 15         | Crossing                                               | Implemented — own ship gives way in all crossing encounters under the narrow-channel convention (S3), passing astern of the target: a starboard alteration for a target from starboard, a **port** alteration for a target from port (A17). Stated explicitly, since a port alteration in a crossing reads as a violation under the open-water role table. |
 | 16         | Give-way action                                        | Implemented — early and substantial, per Rule 8.                                                                                                                                 |
-| 17         | Stand-on action                                        | Partially — 17(a)(i) passive course-keeping is retained for the being-overtaken class. Active release under 17(a)(ii) is out of scope and identified as future work.             |
+| 17         | Stand-on action                                        | Partially — 17(a)(i) passive course-keeping (course and speed held) for the being-overtaken class. The hold penalty is released in extremis (DCPA < d_req, TCPA < 5 s), so the reward never pays for holding course into a collision; action is then left to the collision and ship-domain terms. Rule 17(b) action itself is not claimed: no evaluation draw requires it (S5, baseline-v2). Active release under 17(a)(ii) is out of scope and identified as future work. |
 | 2, 5, 6, 7 | Responsibility, lookout, safe speed, risk of collision | Acknowledged; operationalised implicitly — the collision risk index for Rule 7, the perception pipeline for Rule 5.                                                              |
 | 18         | Responsibilities between vessels                       | Out of scope — own ship and target are similarly sized, so the asymmetry the rule requires does not exist. The always-give-way simplification is instead motivated by Rule 9(b). |
 | 19–31      | Restricted visibility, lights, shapes, sound signals   | Out of scope — no corresponding sensing or actuation on the platform.                                                                                                            |
@@ -237,10 +237,10 @@ State, action a = \[rudder, throttle\] ∈ \[−1,1\]², transition, reward, dis
 | **Class**       | **Governing rule** | **Own-ship obligation**                                      |
 |-----------------|--------------------|--------------------------------------------------------------|
 | None            | —                  | Follow path                                                  |
-| Head-on         | 14                 | Alter to starboard, subject to channel width                 |
-| Crossing        | 15, 16, 9(b)       | Give way regardless of which side the target approaches from |
-| Overtaking      | 13, 16, 9(e)       | Keep clear of the vessel being overtaken                     |
-| Being overtaken | 13, 17(a)(i)       | Hold course and speed                                        |
+| Head-on         | 14, 9(a)           | Pass port to port; alter to starboard only when the target is not already clear, subject to channel width |
+| Crossing        | 15, 16, 9(b)       | Give way regardless of which side the target approaches from, passing astern: starboard alteration from starboard, port alteration from port (A17) |
+| Overtaking      | 13, 16, 9(a), 9(e) | Keep clear of the vessel being overtaken, passing to port of it (geometric reading of 9(e) only); hold astern at reduced speed where the pass does not fit |
+| Being overtaken | 13, 17(a)(i)       | Hold course and speed; the hold penalty is released in extremis |
 
 2.2.3 Geometric framework for constrained encounter responses (revision 3: "Rule precedence")
 
@@ -353,7 +353,7 @@ One multi-input policy over the **six** observation branches (70 values), identi
 
 3.2 Training protocol
 
-2 M environment steps per run, **three** seeds per learner (2026-09-24; was five), checkpoint selected on the development set (goal − 2 × collision), frozen suite touched once per policy. Runs trained on demand, one learner × seed at a time. Hyperparameters in Appendix B.
+2 M environment steps per run, **three** seeds per learner (2026-09-24; was five), checkpoint selected on the validation set (goal − 2 × collision), frozen suite touched once per policy. Runs trained on demand, one learner × seed at a time. Hyperparameters in Appendix B.
 
 3.3 Classical comparators
 
@@ -367,7 +367,7 @@ One multi-input policy over the **six** observation branches (70 values), identi
 | Learned    | PPO, RecurrentPPO, SAC, TQC on the identical formulation (the comparison itself)                   |
 | Learned    | COLREGs-ablated policy (avoidance only)                                                            |
 
-All comparators receive the same perception pipeline (draft 4). Classical baselines are run against reactive targets as well, or the comparison is not like-for-like. Tuned on the development set and pinned in `configs/comparators_v1.json`.
+All comparators receive the same perception pipeline (draft 4). Classical baselines are run against reactive targets as well, or the comparison is not like-for-like. Tuned on the validation set and pinned in `configs/comparators_v1.json`.
 
 3.4 Evaluation design
 
@@ -383,7 +383,7 @@ One frozen tier, versioned and hashed before the first training run.
 
 \[Tier A, the 38 named deterministic cases, is **out of this paper** (2026-09-24). It exists in the suite and can be reported later; the argument here rests on Tier B and the width sweep.\]
 
-- **Tier B (the default frozen suite, suite 3.4) —** a held-out draw of the development set's kind of scenario: only the positions differ. 8 balanced cells × 100 = 800 episodes per seed, constant-velocity targets as in training; every encounter class in the basin, and head-on, crossing and overtaking in channels of 7.5–10 m — the class × geometry combinations training draws (being overtaken and null are trained in the basin only). **Robustness set (R3):** the same scenarios and episode seeds with a compliant reactive target (700) and, in head-ons, a non-compliant one that alters to port (200); a non-compliant stand-on target moves exactly like the constant-velocity one, which already is the give-way vessel that does not give way. Narrower water is the R4 width sweep. Static clutter is 0–3 obstacles per episode, dropped where they would decide the encounter.
+- **Tier B (the default frozen suite, suite 3.4) —** a held-out draw of the validation set's kind of scenario: only the positions differ. 8 balanced cells × 100 = 800 episodes per seed, constant-velocity targets as in training; every encounter class in the basin, and head-on, crossing and overtaking in channels of 7.5–10 m — the class × geometry combinations training draws (being overtaken and null are trained in the basin only). **Robustness set (R3):** the same scenarios and episode seeds with a compliant reactive target (700) and, in head-ons, a non-compliant one that alters to port (200); a non-compliant stand-on target moves exactly like the constant-velocity one, which already is the give-way vessel that does not give way. Narrower water is the R4 width sweep. Static clutter is 0–3 obstacles per episode, dropped where they would decide the encounter.
 
 - **External benchmark —** the "Around the Clock" set of 24 single-ship encounters at equally spaced target headings. \[Out of this paper (2026-09-24) unless built; see section 4.8.\]
 
@@ -397,7 +397,7 @@ Geometric only: channel width in ship breadths, spawn TCPA, static clutter count
 
 **Task.** Success rate; collision rate reported separately for static obstacle, boundary and target vessel; RMS and maximum cross-track error; path length ratio; action smoothness.
 
-**COLREGs.** Violation rate per encounter class; minimum CPA distribution reported as a CDF rather than a mean, since the tail is the safety claim; ship-domain intrusion rate and depth; time to first evasive action; magnitude of first evasive action; course-keeping stability while being overtaken; side-of-passing correctness; speed-reduction (manoeuvre-mode) share.
+**COLREGs.** Shown by trajectory snapshots of each encounter type (section 4.2), not by per-rule rates (decision 2026-10-08). Target-ship safety is quantified: target collision rate, ship-domain intrusion rate and depth, closest approach (centre to centre) and minimum hull-to-hull clearance.
 
 **Perception.** Track acquisition range; classification latency and stability; velocity estimate error; occlusion duration.
 
@@ -434,14 +434,11 @@ Table R1 — Tier B holdout (suite 3.4: 800 constant-velocity episodes per seed,
 | COLREGs-VO            |             |                  |                    |                  |                 |                |
 | LOS-PID + DWA         |             |                  |                    |                  |                 |                |
 
-4.2 Compliance by encounter class
+4.2 COLREGs behaviour by encounter class
 
-Table R2 — violation rate per class. \[RESULT\]
+Figure R2 — trajectory snapshots, one successful episode per encounter type (head-on, crossing from starboard, crossing from port, overtaking, being overtaken) plus a no-target layout, spread across decoupled and coupled layouts, obstacle counts and leg shapes (`results/paper_snapshots`, `tools/paper_snapshots.py`). \[RESULT\]
 
-| **Method** | **Head-on** | **Crossing** | **Overtaking** | **Being overtaken** |
-|------------|-------------|--------------|----------------|---------------------|
-|            |             |              |                |                     |
-|            |             |              |                |                     |
+**Decision (2026-10-08): no per-rule compliance table.** The paper already carries many metrics, and a compliance rate is not a fair measure where the compliant manoeuvre would meet a static obstacle (coupled layouts) or the target does not keep to the rules itself; the formulation answers those cases with Rule 8(e) slowing and the Rule 2(b) and 17(b) releases, which a per-rule pass/fail check cannot weigh. COLREGs behaviour is shown qualitatively by the snapshots; target-ship safety is quantified in R1 (target collision, ship-domain intrusion rate and depth, closest approach, hull-to-hull clearance). Each snapshot case is verified against track-based rule checks (`tools/diagnostics/colregs_compliance.py`: alteration side from the lateral departure beyond the path, passing side at the CPA, crossing ahead, course and speed held while being overtaken), so the figure shows compliant behaviour, not merely successful episodes. The figure is a selection, not a sample; R1 gives the rates.
 
 4.3 Performance by target behaviour
 
@@ -500,7 +497,7 @@ Physical transfer (parked — S13; revision 3 section 7, not in draft 4's roadma
 
 P.1 Platform and setup
 
-Bluefin model vessel, RPLidar C1, UDP offboard control at 10 Hz. The basin is an indoor pool within a hall, with the facility walls standing one to two metres beyond the pool edge. Returns from beyond the pool boundary are removed by geometric gating against the known pool polygon rather than by a physical barrier: the facility walls carry the fixed features on which localisation depends, and occluding them would remove the only available registration reference. Gating is in any case necessary rather than merely preferable, since operators standing on the deck lie at scan height and would otherwise be tracked as dynamic targets. Localisation is run on the complete scan and the obstacle gate applied only afterwards, so that the walls serve as a registration asset while being excluded from the tracker.
+Bluefin model vessel, RPLidar C1, UDP offboard control; the policy decides at 2 Hz, the rate the deployed bridge delivers (median command period 0.5 s over 1,085 logged frames), which is also the simulator's decision rate. The basin is an indoor pool within a hall, with the facility walls standing one to two metres beyond the pool edge. Returns from beyond the pool boundary are removed by geometric gating against the known pool polygon rather than by a physical barrier: the facility walls carry the fixed features on which localisation depends, and occluding them would remove the only available registration reference. Gating is in any case necessary rather than merely preferable, since operators standing on the deck lie at scan height and would otherwise be tracked as dynamic targets. Localisation is run on the complete scan and the obstacle gate applied only afterwards, so that the walls serve as a registration asset while being excluded from the tracker.
 
 Static obstacles are suspended panels, confirmed stable in the water. Apparent motion of static objects in the scan therefore arises almost entirely from ego-pose error, which affects all objects identically; the static-versus-dynamic threshold is consequently a property of localisation quality rather than of the obstacles, and is set from measured pose noise.
 
@@ -559,6 +556,8 @@ P.6 Results
 - Single dynamic target; sequential rather than concurrent multi-vessel encounters
 
 - Active stand-on release under Rule 17(a)(ii) is out of scope
+
+- Stand-on course-keeping competes with the ship-domain term: the domain term (weight 12.5 per decision) outweighs the whole COLREGs group (capped at 9), so letting an overtaking target into the domain astern costs more than departing from Rule 17(a)(i). The learned policies change speed while being overtaken (seed 0: SAC speeds up, PPO slows), shown by the track-based diagnostics, not reported as a rate
 
 - Calm water with no generated waves or current
 
@@ -633,5 +632,5 @@ Resolved
 | Corridor dimensions | Simulation matches the basin; maximum width 10 m, sweeping to 3.5 m                                                                       |
 | Boundary handling   | Geometric gating against the pool polygon, not a physical barrier; facility walls retained as the localisation reference                  |
 | Ground truth        | No external instrumentation; scan-to-map registration against surveyed facility geometry                                                  |
-| Ship domain         | Compressed asymmetric, provisionally 2.0 / 1.0 / 0.75 Lpp ahead, astern and abeam                                                         |
+| Ship domain         | Compressed asymmetric, 3.14 / 1.57 / 1.25 m ahead, astern and abeam (2.0 / 1.0 / 0.796 Lpp), d_req = 2.5 m (frozen in baseline-v2)         |
 | Recurrence          | RecurrentPPO is one of the four learners                                                                                                  |

@@ -1,6 +1,6 @@
 # 02a — Paper 3 Reward Function Specification
 
-> **Status note (2026-09-22, updated 2026-10-04).** A design record: the code cites its sections. Parts are superseded by the implementation. The formulation was frozen as **baseline-v1** (`configs/baseline_v1.json`), then **baseline-v2** (`configs/baseline_v2.json`; reward and observation unchanged since), **baseline-v3** (a curriculum overlay, `src/formulation_v3.py`; the kept SAC 3 M policy) and the **baseline-v4** draft (`src/formulation_v4.py`, `planning/BASELINE_V4_PLAN.md`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here (as of baseline-v1):
+> **Status note (2026-09-22, updated 2026-10-08).** A design record: the code cites its sections. **The current formulation is baseline-v3** (`configs/baseline_v3.json`, formulation digest 03a9c0c22f53ee0b): the reward and observation frozen in baseline-v1 and unchanged through baseline-v2, plus the curriculum overlay `src/formulation_v3.py`. The baseline-v4.3 candidate (`src/formulation_v4.py`) was trained and not adopted (`planning/BASELINE_V4_PLAN.md`, section 5e). The paper-facing statement of the method is `planning/FORMULATION_EQUATIONS.md`, with `planning/METHODS_BRIEF.md`. **Values in this document were brought to baseline-v3 on 2026-10-08.** Where a derivation needs the original design point (0.1 s step, `U_ref = 0.8 m/s`, the provisional ship domain), it says so. Superseded here (as of baseline-v1):
 >
 > - **R-2** (8(e) slow-down) applies only when stopping would clear the target (A18), tested along the braking path (A23) with the stop test (A24).
 >
@@ -12,11 +12,11 @@
 >
 > - Dense weights are per 2 Hz step (`REWARD_DT_SCALE` = 5, `CONSTANTS_AND_SCALES.md` rev 2.6). F91's admissibility gate on the held-heading charge exists but is **off** in baseline-v1 (F92).
 >
-> - Current values: `configs/baseline_v1.json`, `CONSTANTS_AND_SCALES.md` section 12 and section 14.1, `METHODS_BRIEF.md` section 5.
+> - Current values: `configs/baseline_v3.json` (and `src/reward/config.py`), `CONSTANTS_AND_SCALES.md` section 12 and section 14.1, `FORMULATION_EQUATIONS.md` section 5.
 >
 > The rationale below still stands where it is not listed. `F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`.
 
-**Status:** design output of `02_REWARD_AND_COLREGS.md`. Next step: implementation.
+**Status:** design output of `02_REWARD_AND_COLREGS.md`; implemented in `src/reward/`, frozen in baseline-v1 and unchanged through baseline-v3.
 **Supersedes:** the six-term `REWARD_REDESIGN.md` spec (re-derived, not patched — D10).
 **Revision 2.2** — reconciled against the full doc set including a live read of `04`, 2026-09-07.
 
@@ -85,17 +85,21 @@ Fossen body frame, consistent with the existing simulator.
 | `y_rel_CPA` | lateral offset of TS from OS at projected CPA, OS body frame | **positive = TS to starboard** |
 | `W` | local channel width | metres; reported in breadths `B = 0.50 m` |
 
-Constants: `Lpp = 1.57 m`, `B = 0.50 m`, `U_ref = 0.8 m/s`, `Δt = 0.1 s`.
+Constants (baseline-v3): `LOA = 1.725 m` (`Lpp = 1.57 m` scales the ship domain), `B = 0.50 m`,
+`U_ref = 0.558 m/s` (the 6 rpm-unit cruise), decision step `Δt = 0.5 s` (2 Hz). The design point
+behind sections 7 and 8 was `U_ref = 0.8 m/s` and `Δt = 0.1 s`; the dense weights are scaled by
+`REWARD_DT_SCALE = 5` for the 2 Hz step, which keeps every per-second rate (section 7).
 
-**Ship domain** (provisional, `01 section 5.2`; final values an output of 05):
+**Ship domain** (frozen in baseline-v2, unchanged in baseline-v3; `CONSTANTS_AND_SCALES.md` section 8):
 
 ```
 d_ahead  = 2.00 · Lpp = 3.14 m
 d_astern = 1.00 · Lpp = 1.57 m
-d_abeam  = 0.75 · Lpp = 1.18 m
+d_abeam  = 1.25 m                      # 0.796 · Lpp, set by the sensor floor; the provisional
+                                       # 0.75 · Lpp = 1.18 m (01 section 5.2) was below it
 
 d_dom(β) = 1 / sqrt( (cos β / a(β))² + (sin β / d_abeam)² ),   a(β) = d_ahead if cos β ≥ 0 else d_astern
-d_req    = 2 · d_abeam = 2.36 m          # required separation, two identical vessels abeam
+d_req    = 2 · d_abeam = 2.50 m          # required separation, two identical vessels abeam
 ```
 
 ---
@@ -131,7 +135,7 @@ the reward would punish the behaviour the paper is trying to elicit.
 | Encounter | Compliant action | Compliant turn sense | Fallback when inadmissible |
 |---|---|---|---|
 | Head-on | Alter to starboard **only if `Δy_req > 0`**; otherwise hold the starboard side | `+1` | Slacken speed (8(e)) |
-| Crossing | Alter to starboard and/or slacken; never cross ahead | `+1` | Slacken speed or stop (8(e)) |
+| Crossing | Pass astern: alter to starboard for a target from starboard, to port for one from port (A17), and/or slacken; never cross ahead | `+1` from starboard, `−1` from port | Slacken speed or stop (8(e)) |
 | Overtaking | Pass **to port of the target**; regain starboard side after | `−1` | Hold astern at reduced speed (8(e)) |
 | Being overtaken | Hold course and speed, keep starboard | `0` | — |
 
@@ -144,6 +148,10 @@ anywhere in the code.
 
 Subordinate to the table above — these are **predictions to be tested by the sweep**, not
 inputs to the reward.
+
+The derivations below use the provisional `d_req = 2.36 m`. At the frozen `d_req = 2.50 m` the
+thresholds are `PREDICTED_THRESHOLDS_M` in the config: crossing 6.8 m, head-on 3.8 m (6.3 m with
+the target on the centreline), overtaking 4.9 m. The ordering is unchanged.
 
 | Encounter | Predicted threshold | Derivation |
 |---|---|---|
@@ -172,7 +180,7 @@ The head-on obligation has two regimes depending on the target's **lateral place
 | Target placement | OS must produce | Alteration required? |
 |---|---|---|
 | TS on its own starboard side (positionally 9(a)-compliant) | nothing — `Δy_req = 0` | **No.** Channel-keeping satisfies Rule 14 |
-| TS on the channel centreline | the whole 2.36 m separation alone | Yes, and the threshold moves to 6.02 m |
+| TS on the channel centreline | the whole 2.50 m separation alone | Yes, and the threshold moves to 6.3 m (6.02 m at the provisional domain) |
 
 Training targets are constant-velocity (D1) and never alter, so only initial placement
 varies. `03 section 5` currently brackets the head-on transition between 4 m and 3.5 m, which is the
@@ -263,8 +271,9 @@ path-following reward. Without this the agent structurally cannot learn 8(e).
 r_bnd = −[ max(0, 1 − d_b / d_safe) ]²        ∈ [-1, 0]
 ```
 
-`d_b` = hull polygon to boundary polygon, from the map, ground truth. `d_safe = 0.50 m`
-(changed from Paper 2's 0.7 m — required by the section 2 invariant).
+`d_b` = hull polygon to boundary polygon, from the map, ground truth. `d_safe = 0.35 m`.
+Paper 2 used 0.7 m and this specification first set 0.50 m; both breach the section 2
+invariant `d_safe < c_wall − B/2 = 0.40 m` (F23, `CONSTANTS_AND_SCALES.md` section 12.3).
 
 The boundary stays a **hard constraint** per `02 section 4.4`: `w_bnd` is the largest dense weight,
 above the COLREGs group, so slackening speed always dominates violating the boundary.
@@ -275,7 +284,11 @@ above the COLREGs group, so slackening speed always dominates violating the boun
 r_dom = −[ max(0, 1 − d_TS / d_dom(β_TS)) ]²    ∈ [-1, 0]
 ```
 
-Hull-to-hull, ground truth, asymmetric domain applied at the correct bearing.
+`d_TS` is the **centre-to-centre** distance to the target, from ground truth (never the tracks,
+F29). `d_dom(β_TS)` is own ship's domain radius at the target's relative bearing from own
+ship's heading, so the domain reaches further ahead than astern. With several targets the
+deepest intrusion counts (`src/reward/terms.py`, `domain_intrusion`). The term is zero outside
+the domain, −0.25 with a target halfway in and −1 at the centre.
 
 **Addition beyond the doc's eleven terms, and not optional.** `00 section 4.2` reports ship-domain
 intrusion rate and depth, but nothing in the six carried terms or the five COLREGs terms
@@ -301,8 +314,8 @@ the `c_t` swath, so the agent is never charged for proximity it cannot observe a
 obstacle astern generates no signal against an action space with no reverse.
 
 The unshifted form was rejected: at `d_oa = 0.8 m` it reads −0.08 at 2 m, integrating to
-≈ −53 over 300 steps at `w_obs = 2.2` — larger than the path term, constant, and carrying no
-gradient. Paper 2's failure mode in the opposite direction.
+≈ −53 over a 300-step episode at the design point (`w_obs = 2.2` per 0.1 s step) — larger
+than the path term, constant, and carrying no gradient. Paper 2's failure mode in the opposite direction.
 
 ### 5.5 `r_prog` — progress, and the carve-out question
 
@@ -311,6 +324,8 @@ r_prog = clip( (s_t − s_{t−1}) / (U_ref · Δt), −1, 1 )      ∈ [-1, +1]
 ```
 
 `s` = **along-path arclength**, not distance-to-goal (which penalises the outside of a bend).
+At baseline-v3 the normaliser `U_ref·Δt` is 0.279 m per decision, so a 20 m reference path
+telescopes to `N_ref = 71.7` (`FORMULATION_EQUATIONS.md`, Eq. 16).
 
 **`R-9` — this closes the open item `00` assigns to 02.** `02 section 4.4` flags that the progress
 term and existence cost fight Rule 8(e), and asks for a class-conditional carve-out gated on
@@ -363,16 +378,17 @@ such — it costs one sentence and is awkward if a reviewer raises it first.
 r_smooth = −σ_t · clip( (Δa_δ/κ_δ)² + w_n·(Δa_n/κ_n)², 0, 1 )     ∈ [-1, 0]
 ```
 
-`κ_δ` = the actuator's per-step rate limit in normalised units, so the term saturates at
-exactly the physical limit and self-calibrates when 05 delivers the actuator model.
-`κ_n = 0.30`, `w_n = 0.5`.
+`κ_δ = 0.25` per decision: the 20°/s smoothness scale (`KAPPA_DELTA`) of a 40° rudder over
+0.5 s. It was meant to follow the actuator's rate limit, but the identified servo is
+effectively unlimited and the bridge's command limiter is off, so the scale stays fixed until
+the basin measures the real servo rate. `κ_n = 0.30`, `w_n = 0.5`.
 
 **`σ_t` resolves the Rule 8 tension (`02 section 4.3`).** Rule 8(b) wants one large alteration and
 forbids a succession of small ones; a plain smoothness penalty suppresses both.
 
 ```
 σ_t = σ_enc  if  0 ≤ (t − t_engage) < N_free  else 1.0
-σ_enc = 0.25,  N_free = 20 steps (2.0 s)
+σ_enc = 0.25,  N_free = 4 decisions (2.0 s at 2 Hz; 20 steps at the 0.1 s design point)
 ```
 
 The first two seconds after engagement are cheap, so the committed alteration is affordable;
@@ -403,12 +419,14 @@ ENGAGED  → CLEARING  when TCPA < 0 ∧ range opening,  or  DCPA > κ_rel · d_
 CLEARING → IDLE      after N_clear steps
 ```
 
-`T_engage = 25 s`, `κ_eng = 1.5`, `κ_rel = 2.5`, `N_clear = 30`, `N_switch = 10`.
+`T_engage = 25 s`, `κ_eng = 1.5`, `κ_rel = 2.5`, `N_clear = 6` decisions (3 s), `N_switch = 2`
+decisions (1 s); 30 and 10 steps at the 0.1 s design point.
 
-**`κ_eng` is now scaled on `d_req`, not `d_dom`.** In Revision 1 it evaluated to 2.36 m —
-exactly the compliant separation — putting the engagement threshold on a knife-edge at the
-geometry the agent is supposed to achieve. At `1.5 · d_req = 3.54 m` engagement fires before
-the obligation does, which is right: watch first, then act.
+**`κ_eng` is now scaled on `d_req`, not `d_dom`.** In Revision 1 it evaluated to the compliant
+separation itself (2.36 m at the provisional domain), putting the engagement threshold on a
+knife-edge at the geometry the agent is supposed to achieve. At `1.5 · d_req = 3.75 m` (3.54 m at
+the provisional domain) engagement fires before the obligation does, which is right: watch
+first, then act.
 
 ```
 ρ_t = clip( 1 − DCPA / (κ_eng · d_req), 0, 1 )      ∈ [0, 1]     # proximity gate
@@ -521,14 +539,18 @@ agent for correctly holding course — the single most consequential change in t
 A_req   = clip( Δy_req / d_req, 0, 1 )                       # 0 when no action is required
 Δψ_c    = max(0, s_c · (ψ_t − ψ_engage))  unwrapped          # compliant-sense heading change
 Δu_red  = max(0, u_engage − u_t)
-A_t     = (Δψ_c/Δψ_min if turn_admissible else 0) + Δu_red/Δu_min
+A_t     = Δu_red/Δu_min + (Δψ_c/Δψ_min if turn_admissible ∨ ¬slowing_clears else 0)
 
 urgency = clip( 1 − TCPA/T_act, 0, 1 )
 v_r8    = urgency · clip( A_req − A_t, 0, 1 ) · 1[ class ∈ give-way ] · 1[ ENGAGED ]
 ```
 
-`Δψ_min = 20° = 0.35 rad`, `Δu_min = 0.24 m/s` (30% of `U_ref`), `T_act = 15 s`.
-`turn_admissible` = `A_stbd` for head-on/crossing, `A_port` for overtaking.
+`Δψ_min = 20° = 0.35 rad`, `Δu_min = 0.167 m/s` (30% of `U_ref`; 0.24 m/s at the design point),
+`T_act = 15 s`. `turn_admissible` = the room on the compliant side: `A_stbd` for head-on and
+starboard crossings, `A_port` for port crossings (A17) and overtaking. The heading change also
+counts when the turn is inadmissible but slowing alone cannot clear the target (A18): turning
+is then the only help. Heading and speed changes are measured on the perceived state latched
+at engagement (A25).
 
 Reads directly:
 
@@ -546,11 +568,12 @@ Time-to-first-action and first-action-magnitude fall out of `A_t` and are logged
 `T_act = 15 s` is derived: 2.36 m of lateral offset at 0.8 m/s with a 30° alteration needs
 ≈5.9 s of running plus ≈3.5 s of turn-in and turn-out, ≈10 s, plus margin. **Constraint for
 04:** spawn TCPA must extend well above 15 s or the term saturates at spawn and carries no
-gradient.
+gradient. At baseline-v3 (`d_req = 2.50 m`, `U_ref = 0.558 m/s`) the same 30° manoeuvre needs
+≈9 s of running plus turn-in and turn-out, ≈12–13 s in all: still inside 15 s, with less margin.
 
 **State `T_act` non-dimensionally as well.** `03 section 5` flags that a reviewer will ask what a
 15 s TCPA on a 1.57 m model means at full scale. In ship lengths of advance,
-`T_act · U_ref / Lpp = 15 × 0.8 / 1.57 ≈ 7.6 Lpp`. Report the Rule 8 timing threshold in
+`T_act · U_ref / Lpp = 15 × 0.558 / 1.57 ≈ 5.3 Lpp` (7.6 Lpp at the design point's 0.8 m/s). Report the Rule 8 timing threshold in
 ship lengths, not seconds, and the Froude question answers itself.
 
 ### 6.7 Group aggregation
@@ -571,18 +594,18 @@ Maxima before clipping: head-on `1.45`; crossing `1.60`; overtaking `1.50`; bein
 
 ## 7. Coefficients and hierarchy
 
-| Term | Range | Weight | Max per-step |
+| Term | Range | Weight per 0.1 s design step | **Weight per 0.5 s decision (baseline-v3)** |
 |---|---|---|---|
-| Terminal collision | one-shot | — | **300** |
-| Terminal goal | one-shot | — | 100 |
-| `r_bnd` boundary | `[-1,0]` | `3.0` | 3.0 |
-| `r_dom` target domain | `[-1,0]` | `2.5` | 2.5 |
-| `r_obs` static obstacle | `[-1,0]` | `2.2` | 2.2 |
-| `r_col` COLREGs group | `[-1,0]` | `1.8` | 1.8 |
-| `r_pf` path following | `[-1,0]` | `0.6` | 0.6 |
-| `r_prog` progress | `[-1,1]` | `0.3` | 0.3 |
-| `r_smooth` smoothness | `[-1,0]` | `0.10` | 0.10 |
-| `r_exist` existence | `−1` | `0.05` | 0.05 |
+| Terminal collision | one-shot | — | **−300** |
+| Terminal goal | one-shot | — | +100 |
+| `r_bnd` boundary | `[-1,0]` | `3.0` | **15.0** |
+| `r_dom` target domain | `[-1,0]` | `2.5` | **12.5** |
+| `r_obs` static obstacle | `[-1,0]` | `2.2` | **11.0** |
+| `r_col` COLREGs group | `[-1,0]` | `1.8` | **9.0** |
+| `r_pf` path following | `[-1,0]` | `0.6` | **3.0** |
+| `r_prog` progress | `[-1,1]` | `0.3` | **1.5** |
+| `r_smooth` smoothness | `[-1,0]` | `0.10` | **0.5** |
+| `r_exist` existence | `−1` | `0.05` | **0.25** |
 
 ```
 300  ≫  3.0 > 2.5 > 2.2  >  1.8  >  0.6 > 0.3 > 0.10 > 0.05
@@ -591,6 +614,22 @@ collision ≫ ——— safety ———  >  COLREGs  >  ——— task ——�
 
 Satisfies `02 section 5` exactly. Because every term is unit-normalised the ordering is a property
 of the table, not something to discover empirically.
+
+**Scaling to 2 Hz.** Multiplying every dense weight by 5 (`REWARD_DT_SCALE`) keeps each term's
+per-second rate and leaves the ordering untouched. The terminals are not scaled, and the
+collision payoff still exceeds a whole non-compliant encounter (300 > 9.0 × 20 decisions).
+
+**Why the safety terms are ordered boundary > domain > obstacle.** The boundary is a hard
+constraint (`02 section 4.4`): slackening speed must always beat touching it. Domain intrusion
+sits above obstacle proximity for two reasons. Close quarters with a target is never needed for
+the task, while passing close to static panels often is: coupled layouts put gates 1.3–2.7 m
+either side of the path and panels 0.4 m from the walls, so `r_obs` is active over long stretches
+of normal, safe driving, and a heavier obstacle weight would make the gates themselves costly
+(the constant-background failure of the unshifted form, section 5.4). And a target moves, with
+its future track only estimated, while a panel is fixed and fully seen, so the same separation
+carries more risk. The ordering fixes only the per-step maxima; the term shapes decide the
+penalty at a given distance. At 0.5 m clearance `r_obs` gives about −0.41 × 11.0 = −4.6 per
+decision, while a target halfway into the forward domain gives −0.25 × 12.5 = −3.1.
 
 **Two checks, and the distinction matters.** `02 section 5` and `02 section 6` ask for different things and
 can conflict, because terms have very different natural durations — a boundary excursion
@@ -612,7 +651,11 @@ Mandatory per `02 section 6`. Predictions to assert against, so a mismatch is di
 
 ### 8.1 Predicted episode-integrated contributions
 
-Design point: 300 steps, 20 m path, `U_ref = 0.8 m/s`.
+Design point: 300 steps, 20 m path, `U_ref = 0.8 m/s` (the pre-registered prediction, kept as
+written). At baseline-v3 a 20 m path takes about 72 decisions (36 s) and the dense weights are
+×5 per decision, so the dense integrals scale roughly with episode duration (36 s against the
+design point's 30 s). The realised audits are `results/scale_audit*.json`; the reward has not
+changed since baseline-v2.
 
 | Term | Nominal success | Collision at step 150 | Max non-compliant, no collision |
 |---|---|---|---|
@@ -665,53 +708,57 @@ than a scale problem.
 ```python
 @dataclass(frozen=True)
 class RewardConfig:
+    # values as frozen in baseline-v3 (src/reward/config.py); dense weights per 0.5 s decision,
+    # the 0.1 s design values times REWARD_DT_SCALE = 5
     # weights
-    w_pf: float = 0.60
-    w_prog: float = 0.30
-    w_exist: float = 0.05
-    w_smooth: float = 0.10
-    w_obs: float = 2.20
-    w_bnd: float = 3.00
-    w_dom: float = 2.50
-    w_col: float = 1.80
+    w_pf: float = 3.0
+    w_prog: float = 1.5
+    w_exist: float = 0.25
+    w_smooth: float = 0.5
+    w_obs: float = 11.0
+    w_bnd: float = 15.0
+    w_dom: float = 12.5
+    w_col: float = 9.0
 
     # terminal
     r_goal: float = 100.0
     r_collision: float = -300.0
+    r_timeout: float = 0.0
+    r_estop: float = -20.0              # once per stop, safety layer runs only
     timeout_bootstrap: bool = True
 
     # path following
     gamma_e: float = 4.0
     w_e: float = 0.70
     omega_la: float = 0.25
-    u_ref: float = 0.80
+    u_ref: float = 0.558                # 6 rpm-units (0.80 at the design point)
     u_ref_slow_factor: float = 0.40      # R-2
 
     # safety geometry
-    d_safe: float = 0.50
+    d_safe: float = 0.35                # F23: below c_wall - B/2 = 0.40
     c_wall: float = 0.65
     d_oa: float = 0.60
     d_cut: float = 2.00
     obs_swath_deg: float = 135.0
 
-    # ship domain (provisional; final from 05)
-    dom_ahead_lpp: float = 2.00
-    dom_astern_lpp: float = 1.00
-    dom_abeam_lpp: float = 0.75
+    # ship domain (frozen in baseline-v2)
+    dom_fore: float = 3.14              # 2.00 Lpp
+    dom_aft: float = 1.57               # 1.00 Lpp
+    dom_abeam: float = 1.25             # 0.796 Lpp, sensor floor
 
     # smoothness
-    kappa_delta: float = None            # from actuator rate limit at build time
+    kappa_delta: float = 0.25           # 20 deg/s of a 40 deg rudder over 0.5 s
     kappa_n: float = 0.30
     w_n: float = 0.50
     sigma_enc: float = 0.25
-    n_free: int = 20
+    n_free: int = 4                     # decisions (2 s)
 
     # encounter state machine
     t_engage: float = 25.0
     kappa_eng: float = 1.5               # scaled on d_req, not d_dom
     kappa_rel: float = 2.5
-    n_clear: int = 30
-    n_switch: int = 10
+    n_clear: int = 6                    # decisions (3 s)
+    n_switch: int = 2                   # decisions (1 s)
 
     # COLREGs sub-weights
     w_port: float = 0.55
@@ -728,7 +775,7 @@ class RewardConfig:
     du_hold: float = 0.10
     t_extremis: float = 5.0
     dpsi_min_deg: float = 20.0
-    du_min: float = 0.24
+    du_min: float = 0.167               # 30 % of U_ref
     t_act: float = 15.0
 
     # propulsion (03 section 6 — reverse unverified)
@@ -949,7 +996,7 @@ stratum, or a documented decision not to.
 
 #### 11.2 Spawn TCPA range — needs a floor
 
-Must extend well above `T_act = 15 s` (≈7.6 Lpp of advance), or `v_r8` saturates at spawn and
+Must extend well above `T_act = 15 s` (≈5.3 Lpp of advance at baseline-v3), or `v_r8` saturates at spawn and
 carries no gradient. `04 section 3.2`'s curriculum already treats spawn TCPA as an axis — stage 3
 "generous", stage 4 "reduced" — so this is a bound on the sampled range, not a new parameter.
 

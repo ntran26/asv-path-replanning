@@ -4,17 +4,18 @@
 
 
 How to train, check, pause, resume and evaluate the baseline runs (PPO,
-RecurrentPPO, SAC, TQC × 3 seeds) on the frozen formulation **baseline-v2**
-(`configs/baseline_v2.json`). **Each run is trained on demand, one learner and
-seed at a time** (decision, 2026-09-27): the campaign script that chained all
-twelve is gone. Runs on the previous formulation -- run 11 and the `_bl1`
-folders -- are not part of the baseline (F96).
+RecurrentPPO, SAC, TQC × 3 seeds) on the frozen formulation **baseline-v3**
+(`configs/baseline_v3.json`: baseline-v2 plus a curriculum overlay, F107; run
+folders tagged `bl3`). **Each run is trained on demand, one learner and seed at
+a time** (decision, 2026-09-27): the campaign script that chained all twelve is
+gone. Runs on the earlier formulations (`_bl1`, `_bl2`) were removed on
+2026-10-04 and are not part of the baseline.
 
 Commands are run from this folder (`asv-lidar/static_dynamic_obstacles`). Bash
 commands work in Git Bash; PowerShell commands in a PowerShell terminal.
 
 Background: `PROJECT_STATE.md` F93 (the first freeze), F95 (the run safeguards),
-F96 (baseline-v2), F102 (the frozen suite, suite 3.4); `OPEN_PROBLEMS.md` A26
+F96 (baseline-v2), F102 (the frozen suite, suite 3.4), F107 (baseline-v3); `OPEN_PROBLEMS.md` A26
 (the budget decisions).
 
 ---
@@ -23,14 +24,16 @@ F96 (baseline-v2), F102 (the frozen suite, suite 3.4); `OPEN_PROBLEMS.md` A26
 
 | Thing | Location |
 |---|---|
-| The frozen formulation, and the planned learners × seeds | `configs/baseline_v2.json` (`campaign` block: 4 learners × seeds 0–2; `configs/baseline_v1.json` is kept for the record) |
+| The frozen formulation, and the planned learners × seeds | `configs/baseline_v3.json` (`campaign` block: 4 learners × seeds 0–2; `configs/baseline_v1.json` and `_v2.json` are kept for the record) |
 | Train and evaluate one run | `results/train_seed.sh` |
 | Status of every planned run | `python tools/run_status.py` |
-| One folder per run | `runs/<learner>_formulation_seed<N>_bl2/` |
-| Training output of a run | `runs/<learner>_formulation_seed<N>_bl2.log` |
+| One folder per run | `runs/<learner>_formulation_seed<N>_bl3/` |
+| Training output of a run | `runs/<learner>_formulation_seed<N>_bl3.log` |
 | Event log (started / resumed / finished / evaluated) | `results/train_seed.log` (`results/baseline_campaign.log` holds the seed-0 campaign's events) |
-| Tier 1 of a finished run (development set, a diagnostic) | `results/tiers/tier1_<learner>s<N>_bl2_supervisor_{off,on}/summary.txt` |
-| **Frozen suite of a finished run (what the paper reports)** | `results/frozen_suite/<learner>s<N>_bl2/summary.txt` — **Tier B**, suite 3.4: the 800-episode headline and the 900-episode robustness set, safety layer off and on. Tier A is the **extended** set and runs only on request (`--tiers a,b`) |
+| Tier 1 of a finished run (validation set, a diagnostic) | `results/tiers/tier1_<learner>s<N>_bl3_supervisor_off/summary.txt` |
+| **Test set v4 of a finished run (the headline)** | `results/test_set/v4/<learner>s<N>_bl3/summary.txt` — 1,000 episodes, 664 decoupled + 336 coupled, safety layer off |
+| Frozen suite of a finished run | `results/frozen_suite/<learner>s<N>_bl3/summary.txt` — **Tier B**, suite 3.4: the 800-episode decoupled set and the 900-episode robustness set, safety layer off. Tier A is the **extended** set and runs only on request (`--tiers a,b`) |
+| Reference-layout (Paper 2) set of a finished run | `results/paper2_set/<learner>s<N>_bl3/summary.txt` — 630 episodes on L1–L3, safety layer off |
 | TensorBoard curves | `runs/tensorboard/` |
 | Off-policy replay buffers (SAC/TQC only) | `PhD/asv_replay_buffers/<run>/` — **outside the repository**; the latest checkpoint's while training, and the final one kept when the run ends so it can be continued |
 
@@ -38,17 +41,19 @@ Inside a run folder:
 
 | File | What it is |
 |---|---|
-| `best_model.zip` | **the model the paper uses** — best development-set score (goal − 2 × collision, safety layer off) |
-| `final_model.zip` | the model at 2 M steps; its presence means the run is **finished** |
+| `best_model.zip` | **the model the paper uses** — best validation-set score (goal − 2 × collision, safety layer off) |
+| `final_model.zip` | the model at 3.0 M steps (after the 2.5 → 3.0 M extension); its presence means the run is **finished** |
+| `final_model_2500000.zip` | the model at 2.5 M, kept when the extension starts |
 | `<learner>_<steps>_steps.zip` | checkpoints every 250 k steps (what a resume starts from) |
 | `*vecnormalize*.pkl` | reward normalisation statistics (a few KB) |
 | `config.json` | everything the run used: settings, baseline id and digest, software versions, git commit, any resumes |
-| `eval_summary.json`, `eval_episodes.csv` | development-set evaluations every 200 k steps |
+| `eval_summary.json`, `eval_episodes.csv` | validation-set evaluations every 200 k steps (keys `dev/` = decoupled part, `field/` = coupled part; the validation set was called the development set before 2026-10-08, and `src/dev_set_v4.py` keeps that name) |
 | `monitor.csv`, `curriculum.json` | per-episode training log, curriculum stage changes |
 
-Approximate hours per run on this machine: PPO 6, RecurrentPPO 7–9, SAC 33–35,
-TQC 31–44 (TQC seed 0 took 44 h including a slow spell on the efficiency cores),
-plus about 40 min for the evaluations afterwards.
+Approximate hours per 3.0 M baseline-v3 run on this machine: PPO 7–8 and
+RecurrentPPO 10–12 (both unpinned), SAC 50–54 (pinned), TQC about 63–67 (pinned;
+estimated from baseline-v2's TQC/SAC ratio), plus about 1 h for the evaluations
+afterwards.
 
 ---
 
@@ -62,33 +67,43 @@ plus about 40 min for the evaluations afterwards.
 3. **Disk space.** C: needs a few GB free. Each off-policy replay buffer is
    ~0.58 GB; a buffer is not saved below 3 GB free.
 4. **Only one run at a time.** Check nothing is training (section 4, last item).
-5. **Check the code matches baseline-v2** (the script also does this and
+5. **Check the code matches baseline-v3** (the script also does this and
    refuses to start otherwise):
 
 ```bash
-python src/baseline_config.py --check
+python src/baseline_config.py --check --config configs/baseline_v3.json
 ```
 
-Expected: `code matches baseline-v2`.
+Expected: `code matches baseline-v3`.
 
 ---
 
 ## 3. Train one run
 
 ```bash
-bash results/train_seed.sh sac 1
+bash results/train_seed.sh sac 1 configs/baseline_v3.json
 ```
 
 The learner is one of `ppo`, `recurrent_ppo`, `sac`, `tqc`; the seed is 0, 1 or 2
-for the planned runs. The script:
+for the planned runs. The config defaults to `configs/baseline_v3.json` (it was
+baseline-v2 until 2026-10-08), but naming it keeps the log unambiguous. The
+script:
 
-1. checks the code against baseline-v2;
+1. checks the code against the config;
 2. trains the run -- or **resumes** it if the folder has a checkpoint, or skips
    training if it is already finished; a run that died before its first
    checkpoint is moved to `<run>_incomplete_<date>` and restarted;
-3. runs **Tier 1** (development set, safety layer off and on) and the **frozen
-   suite** (headline + robustness set, safety layer off and on) on the run's
-   `best_model.zip`, skipping either if it is already done.
+3. runs **Tier 1** (validation set) and the **frozen suite** (decoupled set +
+   robustness set) on the run's `best_model.zip`, and for baseline-v3 the
+   reference-layout set, all with the safety layer off, skipping any already done.
+
+**The 2.5 → 3.0 M extension.** baseline-v3's budget is 2.5 M steps
+(`timesteps` in the config), and every paper run is then extended to 3.0 M with
+stage 7 continuing. `train_seed.sh` trains to 2.5 M only, so a paper run goes
+through a wrapper that trains, extends, calls `train_seed.sh` for the
+evaluations and then runs test set v4: **`bash results/run_bl3.sh <algo> <seed>`** does
+all four steps (resuming either phase from its last checkpoint) and applies the CPU
+setting below; `--after-evaluations` makes it wait until no evaluation is running.
 
 It is safe to start again at any time with the same learner and seed: it picks up
 where it stopped. (`bash results/train_seed.sh tqc 0` would, for instance, run
@@ -103,13 +118,23 @@ Start-Process -FilePath "$env:LOCALAPPDATA\Programs\Git\bin\bash.exe" -ArgumentL
 
 There is no window: check it with section 4.
 
-**CPU use by learner (decision, 2026-10-07).** SAC and TQC run with the learner
-pinned to the two P-cores (affinity 0x00F, AboveNormal priority) and the workers on
-the E-cores (0xFF0); their launch scripts pin a few minutes after start
-(`results/v4_full_run.sh`). PPO and RecurrentPPO run unpinned on all 12 logical
-CPUs with PyTorch's default threads: their update is one large batched computation
-while the workers are idle, and pinned to the P-cores RecurrentPPO fell from
-70-100 to 13-25 steps/s.
+**CPU use by learner (decisions, 2026-10-07 and 2026-10-08: use the faster option).**
+PPO and RecurrentPPO run unpinned on all 12 logical CPUs with PyTorch's default
+threads: their update is one large batched computation while the workers are idle,
+and pinned to the P-cores RecurrentPPO fell from 70-100 to 13-25 steps/s. For SAC and
+TQC, `bash results/bench_cpu.sh <algo> <seed>` measures three 4,096-step smoke runs
+(learner pinned to the P-cores 0x00F with workers on the E-cores 0xFF0, the same with
+4 PyTorch threads, and unpinned), writes `results/bench_cpu_<algo>.txt` and starts the
+run with the fastest. Later seeds of the same learner reuse the winner
+(`PIN=0|1 THREADS=n bash results/run_bl3.sh <algo> <seed>`).
+
+**Safety layer in evaluations (decision, 2026-10-07).** Runs evaluate with the
+safety layer off only: `train_seed.sh` passes `--eval-safety-override off` to the
+trainer (the frozen configs still record `eval_supervisor: both`; the override is
+reporting only, since the best checkpoint is chosen on the safety-off pass anyway)
+and runs Tier 1, the frozen suite and the Paper 2 set with the safety layer off.
+Safety-on evaluations are run separately, on the test set, only when requested,
+while the safety layer is still being developed.
 
 **Several runs in a row**, if ever needed, are just one call after
 another:
@@ -129,18 +154,18 @@ python tools/run_status.py
 ```
 
 Shows, for all 12 planned runs, done / started (with the last step count) / not
-started, the best development-set goal rate so far, whether the frozen suite has
+started, the best validation-set goal rate so far, whether the frozen suite has
 run, and the last event-log lines.
 
 **Live training output** of a run (Ctrl+C closes the view, not the training) —
 replace the run name:
 
 ```powershell
-Get-Content runs\sac_formulation_seed1_bl2.log -Wait -Tail 20
+Get-Content runs\sac_formulation_seed1_bl3.log -Wait -Tail 20
 ```
 
 Useful lines: `total_timesteps` (progress), `[EVAL] t=... goal ... collision
-...` (development-set result every 200 k steps; an evaluation takes a few
+...` (validation-set result every 200 k steps; an evaluation takes a few
 minutes, during which the log is quiet), `[CURRICULUM]` (stage changes).
 
 **Learning curves:**
@@ -155,10 +180,10 @@ then open <http://localhost:6006>.
 learner and 10 environment workers). Or:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File tools\pause_run.ps1 -Tag bl2 -Action status
+powershell -ExecutionPolicy Bypass -File tools\pause_run.ps1 -Tag bl3 -Action status
 ```
 
-`no running learner for tag bl2` means nothing is training (the script may still
+`no running learner for tag bl3` means nothing is training (the script may still
 be running an evaluation -- check `results/train_seed.log`).
 
 ---
@@ -173,11 +198,11 @@ Freezes the training processes where they are; resuming continues exactly
 where it stopped, losing nothing:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File tools\pause_run.ps1 -Tag bl2 -Action pause
+powershell -ExecutionPolicy Bypass -File tools\pause_run.ps1 -Tag bl3 -Action pause
 ```
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File tools\pause_run.ps1 -Tag bl2 -Action resume
+powershell -ExecutionPolicy Bypass -File tools\pause_run.ps1 -Tag bl3 -Action resume
 ```
 
 The pause does **not** survive a reboot or sign-out, and a pause across sleep
@@ -220,40 +245,48 @@ checks.
 Train, or resume, a run:
 
 ```bash
-python src/train_formulation.py --config configs/baseline_v2.json --algo sac --seed 1 --tag bl2
-python src/train_formulation.py --config configs/baseline_v2.json --algo sac --seed 1 --tag bl2 --resume runs/sac_formulation_seed1_bl2
+python src/train_formulation.py --config configs/baseline_v3.json --algo sac --seed 1 --tag bl3 --eval-safety-override off
+python src/train_formulation.py --config configs/baseline_v3.json --algo sac --seed 1 --tag bl3 --eval-safety-override off --resume runs/sac_formulation_seed1_bl3
+python src/train_formulation.py --config configs/baseline_v3.json --algo sac --seed 1 --tag bl3 --eval-safety-override off --resume runs/sac_formulation_seed1_bl3 --extend-to 3000000
 ```
 
-With `--config`, only `--algo`, `--seed`, `--tag` (and `--resume`) come from the
-command line; everything else comes from the file. `td3` still works but is not
+With `--config`, only `--algo`, `--seed`, `--tag`, `--resume`, `--extend-to`, the
+reporting-only `--eval-safety-override` and speed settings (`--torch-threads`)
+come from the command line; everything else comes from the file. `td3` still works but is not
 part of the baseline.
 
-The frozen suite of a finished run -- what the paper reports -- (add
-`--tiers a,b,r` only when the extended named cases are wanted too):
+Test set v4 of a finished run -- the headline:
 
 ```bash
-python tools/tiers/frozen_suite.py --model runs/sac_formulation_seed1_bl2/best_model.zip --tag sacs1_bl2 --supervisor both
+python tools/tiers/test_set.py --version 4 --model runs/sac_formulation_seed1_bl3/best_model.zip --tag sacs1_bl3 --safety off --processes 4
 ```
 
-Tier 1, the development-set diagnostic, safety layer `off` and `on`:
+The frozen suite of a finished run (add `--tiers a,b,r` only when the extended
+named cases are wanted too):
 
 ```bash
-python tools/tiers/tier1_replay.py --model runs/sac_formulation_seed1_bl2/best_model.zip --tag sacs1_bl2_supervisor_off --supervisor off
+python tools/tiers/frozen_suite.py --model runs/sac_formulation_seed1_bl3/best_model.zip --tag sacs1_bl3 --supervisor off
+```
+
+Tier 1, the validation-set diagnostic (safety layer `off`; `on` only when requested):
+
+```bash
+python tools/tiers/tier1_replay.py --model runs/sac_formulation_seed1_bl3/best_model.zip --tag sacs1_bl3_supervisor_off --supervisor off
 ```
 
 The Paper 2 deployment-layout set -- a separate set, not part of the frozen
 suite (F104): the three published field layouts with and without a target ship,
-630 episodes per safety layer mode, into `results/paper2_set/<tag>/`:
+630 episodes per safety layer mode, into `results/paper2_set/<tag>/` (safety layer off):
 
 ```bash
-python tools/tiers/paper2_suite.py --model runs/sac_formulation_seed1_bl2/best_model.zip --tag sacs1_bl2
+python tools/tiers/paper2_suite.py --model runs/sac_formulation_seed1_bl3/best_model.zip --tag sacs1_bl3 --safety off
 ```
 
 One frozen-suite or Paper 2 set test, with a trajectory figure (test IDs are in
 `results/frozen_gallery/index.csv` and `results/paper2_gallery/index.csv`):
 
 ```bash
-python tools/tiers/run_test.py --model runs/sac_formulation_seed1_bl2/best_model.zip CH-CR-CV-007 P2-L2-CRP-VAR-07
+python tools/tiers/run_test.py --model runs/sac_formulation_seed1_bl3/best_model.zip CH-CR-CV-007 P2-L2-CRP-VAR-07
 ```
 
 The coupled-layout fine-tune (F106): continue a finished run from 2 M to 3 M with
@@ -264,29 +297,30 @@ suite. It writes a new `runs/<run>_ftfield1/` folder; the source run is untouche
 bash results/finetune_field.sh sac 0
 ```
 
-baseline-v3 (F107; prepared, not the paper's formulation): baseline-v2 plus
-coupled-layout stages 6-7, 2.5 M steps, run folders tagged `bl3`. Check, then train:
+baseline-v3 (F107) -- **the paper's formulation**: baseline-v2 plus coupled-layout
+stages 6-7, 2.5 M steps extended to 3.0 M, run folders tagged `bl3`. Check, then
+train:
 
 ```bash
 python src/baseline_config.py --check --config configs/baseline_v3.json
-python src/train_formulation.py --config configs/baseline_v3.json --algo sac --seed 0 --tag bl3
+python src/train_formulation.py --config configs/baseline_v3.json --algo sac --seed 0 --tag bl3 --eval-safety-override off
 ```
 
 A quick launch check that trains 4,096 steps into a `_smoke` folder (delete it
 afterwards):
 
 ```bash
-python src/train_formulation.py --config configs/baseline_v2.json --algo sac --seed 0 --tag check --smoke
+python src/train_formulation.py --config configs/baseline_v3.json --algo sac --seed 0 --tag check --smoke
 ```
 
 ---
 
 ## 8. Do not change the formulation between runs
 
-Every run checks the code against `configs/baseline_v2.json` and refuses to
-start if any constant, switch, curriculum or learner setting differs
-(`BASELINE CHECK FAILED` in `results/train_seed.log`, or `code does not match
-baseline-v2` in a run log). This keeps every learner and seed on the same
+Every run checks the code against its config (`configs/baseline_v3.json` for the
+paper's runs) and refuses to start if any constant, switch, curriculum or learner
+setting differs (`BASELINE CHECK FAILED` in `results/train_seed.log`, or `code does
+not match baseline-v3` in a run log). This keeps every learner and seed on the same
 formulation, however far apart in time they are trained.
 
 - Editing documents, diagnostics, the evaluation tools or the frozen suite is
@@ -298,7 +332,7 @@ formulation, however far apart in time they are trained.
 - To check a finished run against the baseline:
 
 ```bash
-python src/baseline_config.py --verify-run runs/sac_formulation_seed1_bl2
+python src/baseline_config.py --verify-run runs/sac_formulation_seed1_bl3 --config configs/baseline_v3.json
 ```
 
 ---
@@ -339,13 +373,13 @@ a run trains is safe (training only writes its own run folder).
 
 | Message or symptom | Meaning | What to do |
 |---|---|---|
-| `BASELINE CHECK FAILED` (`results/train_seed.log`) | the code differs from baseline-v2 | run `python src/baseline_config.py --check` to see what changed; undo it (section 8) |
+| `BASELINE CHECK FAILED` (`results/train_seed.log`) | the code differs from the config (baseline-v3) | run `python src/baseline_config.py --check --config configs/baseline_v3.json` to see what changed; undo it (section 8) |
 | `<learner> SEED <N> FAILED (see ...log)` | a run crashed | read the end of that run's log; start the same command again — it resumes from the last checkpoint |
 | `note: ... is outside the planned learners x seeds` | a learner or seed not in the config's plan | fine for an extra run; it is simply not one of the twelve |
 | `[BUFFER] ... GB free -- replay buffer NOT saved` | C: is nearly full | free disk space; training continues, but a resume from that checkpoint refills the buffer |
 | `[BUFFER] a replay-buffer file stayed locked` | OneDrive held a file | harmless; an older buffer may be left in `PhD/asv_replay_buffers/` — delete it once that run is finished |
 | `<run>_incomplete_<date>` folder | a run died before its first checkpoint and was restarted | delete it |
-| log quiet for a few minutes | a development-set evaluation (every 200 k steps) | wait; `[EVAL]` lines follow |
+| log quiet for a few minutes | a validation-set evaluation (every 200 k steps) | wait; `[EVAL]` lines follow |
 | nothing in the log for much longer, no CPU use | the processes are stuck or paused | `pause_run.ps1 ... -Action status`; if paused, resume (section 5a); otherwise stop and restart (section 5b) |
 | steps/s falls to a third (e.g. TQC 14 → 4) with the learner on CPUs 4–11 and CPUs 0–3 idle | Windows moved the hidden process to the efficiency cores (EcoQoS), not heat; `CurrentClockSpeed` 1600 MHz is only the base clock and always reads that | runs opt out at start (`_no_efficiency_mode`, 2026-09-26); anything else heavy running beside a training (evaluations, figure generation, OneDrive uploading many files) also slows it |
 | steps/s falls to about two thirds | the laptop is on battery | plug it in |

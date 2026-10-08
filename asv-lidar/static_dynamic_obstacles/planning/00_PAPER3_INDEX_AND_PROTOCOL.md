@@ -1,6 +1,6 @@
 # Paper 3 — Index and Experiment Protocol
 
-> **Status note (2026-09-22, updated 2026-10-04).** A design record: the code cites its sections. Parts are superseded by the implementation. The formulation was frozen as **baseline-v1** (`configs/baseline_v1.json`), then **baseline-v2** (`configs/baseline_v2.json`; reward and observation unchanged since), **baseline-v3** (a curriculum overlay, `src/formulation_v3.py`; the kept SAC 3 M policy) and the **baseline-v4** draft (`src/formulation_v4.py`, `planning/BASELINE_V4_PLAN.md`). The current statement of the method is `planning/METHODS_BRIEF.md`. Superseded here (as of baseline-v1):
+> **Status note (2026-09-22, updated 2026-10-08).** A design record: the code cites its sections. Parts are superseded by the implementation. The formulation was frozen as **baseline-v1** (`configs/baseline_v1.json`), then **baseline-v2** (`configs/baseline_v2.json`; reward and observation unchanged since). **The current formulation is baseline-v3** (`configs/baseline_v3.json`): baseline-v2 plus the curriculum overlay `src/formulation_v3.py`. The baseline-v4.3 candidate (`src/formulation_v4.py`) was trained and not adopted (`planning/BASELINE_V4_PLAN.md`, section 5e). The current statement of the method is `planning/FORMULATION_EQUATIONS.md` with `planning/METHODS_BRIEF.md`; formulation values quoted here were checked against baseline-v3 on 2026-10-08. Superseded here (as of baseline-v1):
 >
 > - S6: the observation is **70** values in six branches (`a25-v3-context`, F72), not ≈56 — see `OBSERVATION_SPEC.md`.
 >
@@ -14,17 +14,17 @@
 >
 > **Added 2026-09-24.** The baseline is **four learners (PPO, RecurrentPPO, SAC,
 > TQC) x 3 seeds = 12 runs** -- TD3 dropped, 5 seeds -> 3. **Tier B is the default
-> frozen suite** (suite 3.4: 800 constant-velocity episodes drawn like the dev set, 8 cells x 100,
+> frozen suite** (suite 3.4: 800 constant-velocity episodes drawn like the validation set, 8 cells x 100,
 > channels 7.5-10 m for the trained channel classes only, plus a robustness set) and **Tier A the extended set**, run only on request. C-2/C-3 rest on the
 > R4 width sweep, since Tier B no longer spans the rule thresholds. COLREGs-VO
-> (Kuwata) is built; both VO comparators are tuned on the development set and
+> (Kuwata) is built; both VO comparators are tuned on the validation set and
 > pinned in `configs/comparators_v1.json` (F97, F98).
 
 **Revision 2** — repositioned to two-vessel encounters with static obstacles.
 Supersedes the multi-vessel version of this document set.
 
 **Scope:** Path following with static obstacles and one dynamic target vessel,
-COLREGs-compliant, in a narrow waterway.
+COLREGs-aware, in a narrow waterway.
 **Predecessors:** ICMCR 2026 conference paper (SAC vs PPO, static); MDPI *Drones*
 journal paper (Paper 2 — LiDAR sector pooling, staged curriculum, sim-to-field).
 
@@ -63,7 +63,7 @@ width-sweep design. Then `05` in parallel (basin booking lead time), then `01 �
 | # | Decision |
 |---|---|
 | S1 | Two-vessel encounters. One dynamic target plus up to 3 static obstacles. `N_max` kept as a config parameter so multi-vessel extension costs a retrain, not a redesign |
-| S2 | COLREGs scope: Rules 13–16, with Rule 9 governing precedence and Rule 8 governing action quality |
+| S2 | COLREGs scope: Rules 13–16 and 17(a)(i), with Rule 9 governing precedence and Rule 8 governing action quality (8(b), 8(d), 8(e); 8(a) as timing pressure only). Each rule is stated as exactly what the reward encodes, and the behaviour is called COLREGs-aware, not compliant (decision 2026-10-08) |
 | S3 | Own ship gives way in **all** crossing encounters, justified by **Rule 9(b)** — not Rule 18. The Rule 18 route fails because own ship and target are similarly sized model vessels |
 | S4 | Five encounter classes: none, head-on, crossing, overtaking, being overtaken |
 | S5 | Rule 17(a)(i) passive course-keeping retained for being-overtaken. Active release under 17(a)(ii) is out of scope and moved to future work |
@@ -100,7 +100,7 @@ width-sweep design. Then `05` in parallel (basin booking lead time), then `01 �
 | O4 | Corridor dimensions | **Resolved** — simulation matches basin, max width 10 m (20 B). The open-water "Around the Clock" variant supplies the unconfined reference case, so the sweep covers degrees of confinement only |
 | O5 | Barrier vs software gating | **Resolved — software gating**, geometric against the pool polygon. A physical barrier would occlude the facility-wall features that are the only localisation reference. Gating is also mandatory rather than optional because operators standing on the deck sit at scan height and would otherwise be tracked as targets |
 | O6 | Ground-truth instrumentation | **Reframed** — no external instrumentation. Scan-to-map registration against surveyed facility geometry, validated by static tests and closed-loop drift. A software deliverable, not a purchase; removes the longest lead time in the project |
-| — | Ship domain geometry | **Resolved (provisional)** — compressed asymmetric: 2.0·Lpp ahead, 1.0·Lpp astern, 0.75·Lpp abeam. Final values derived from the identified turning circle in 05 |
+| — | Ship domain geometry | **Resolved** — compressed asymmetric: 3.14 m (2.0·Lpp) ahead, 1.57 m (1.0·Lpp) astern, 1.25 m abeam (0.796·Lpp, set by the sensor floor; the provisional 0.75·Lpp = 1.18 m was below it), so `d_req` = 2.50 m. Frozen in baseline-v2, unchanged in baseline-v3 |
 
 | IMU | **Confirmed — will be added.** Removes the yaw-rate observability constraint and, via the accelerometer, rescues surge measurement. Specification in 05 section 4.7 | 05 |
 | Precedence | **Structure resolved** (02 section 3.2). Rule 9 constrains the space; Rule 8(e) supplies the action when space is unavailable. Width thresholds remain an output of Study 1 | 02 |
@@ -132,7 +132,7 @@ Dropping both Rule 17 active release and multi-vessel left the paper close to
 
 | | Claim |
 |---|---|
-| **N1** *(headline)* | COLREGs compliance driven by target state estimated entirely from onboard 2D LiDAR rather than AIS or a simulation oracle, with perception noise characterised from field logs and injected in training |
+| **N1** *(headline)* | COLREGs-aware encounter behaviour (not a legal-compliance claim; decision 2026-10-08) driven by target state estimated entirely from onboard 2D LiDAR rather than AIS or a simulation oracle, with perception noise characterised from field logs and injected in training |
 | **N2** | Rule 9 precedence over Rules 13–16 where channel width makes the open-water manoeuvre inadmissible |
 | **N3** | Full sim-to-real pipeline — system identification, domain randomisation over identified uncertainty, field validation |
 
@@ -167,10 +167,12 @@ regulations and the geometry of the domain, not a constraint conceded after the 
 *Task:* success rate; collision rate separately for static obstacle / boundary / target
 vessel; RMS and maximum cross-track error; path length ratio; action smoothness.
 
-*COLREGs:* violation rate per encounter class; minimum CPA distribution as a CDF, not a
-mean; ship-domain intrusion rate and depth; time to first evasive action (Rule 8(a));
-magnitude of first evasive action (Rule 8(b)); course-keeping stability while being
-overtaken (Rule 17(a)(i)); side-of-passing correctness.
+*COLREGs:* shown by trajectory snapshots of each encounter type, each case checked on its
+true track (`tools/diagnostics/colregs_compliance.py`), not by per-rule rates (decision
+2026-10-08: a compliance rate is not a fair measure where the compliant manoeuvre would meet
+a static obstacle or the target does not keep to the rules). Target-ship safety is
+quantified: target collision rate, ship-domain intrusion rate and depth, closest approach
+and hull-to-hull clearance.
 
 *Perception (new in Rev 2):* track acquisition range; classification latency and
 stability; velocity estimate error; occlusion duration. These carry N1 and Study 2.

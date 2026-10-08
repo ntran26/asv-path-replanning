@@ -1,0 +1,8 @@
+2026-10-08 16:08:12 == tqcs0_bl3 CPU benchmark: pinned / pinned with 4 threads / unpinned (4,096-step smoke runs)
+PIN=1 THREADS=default: 8.71 steps/s
+PIN=1 THREADS=4: 10.51 steps/s
+PIN=0 THREADS=default: 6.66 steps/s
+fastest: PIN=1 THREADS=4 (10.51 steps/s)
+2026-10-08 17:01:39    tqcs0_bl3 CPU benchmark: fastest PIN=1 THREADS=4 (10.51 steps/s; results/bench_cpu_tqc.txt)
+2026-10-08 17:02:38 == tqcs0_bl3: training 0 -> 2.5 M (baseline-v3; PIN=1, THREADS=4)
+2026-10-08 17:04:40    pinned learner 17732

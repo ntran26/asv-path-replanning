@@ -1,0 +1,95 @@
+test set 4.0: 1000 episodes from 1103 distinct scenarios (103 near-duplicates removed), digest a8c40beb234ea7f9, built in 0 s
+source  cell                 
+frozen  basin-being_overtaken     95
+        basin-crossing           100
+        basin-head_on            100
+        basin-null                75
+        basin-overtaking          54
+        channel-crossing         100
+        channel-head_on           98
+        channel-overtaking        42
+paper2  FS-BO                     25
+        FS-CRP                    29
+        FS-CRS                    27
+        FS-HO                     25
+        FS-NT                     27
+        FS-OT                     95
+        L1-BO                     10
+        L1-CRP                    11
+        L1-CRS                    12
+        L1-HO                     10
+        L1-NT                      1
+        L1-OT                     10
+        L2-BO                      5
+        L2-CRP                     5
+        L2-CRS                     6
+        L2-HO                      5
+        L2-NT                      1
+        L2-OT                      5
+        L3-BO                      5
+        L3-CRP                     6
+        L3-CRS                     5
+        L3-HO                      5
+        L3-NT                      1
+        L3-OT                      5
+Test set 4.0 (los_dwa) -- classical: los_dwa
+1000 episodes, digest a8c40beb234ea7f9, 2698 s
+
+-- overall
+           n  success  coll_target  coll_other  timeout
+safety                                                 
+off     1000     0.77         0.08       0.147    0.003
+
+-- by source (safety off)
+          n  success  coll_target  coll_other  timeout
+source                                                
+frozen  664    0.870        0.060       0.069    0.000
+paper2  336    0.571        0.119       0.301    0.009
+
+-- by cell (safety off)
+                                n  success  coll_target  coll_other  timeout
+source cell                                                                 
+frozen basin-being_overtaken   95    0.916        0.021       0.063    0.000
+       basin-crossing         100    0.720        0.140       0.140    0.000
+       basin-head_on          100    0.890        0.050       0.060    0.000
+       basin-null              75    0.973        0.000       0.027    0.000
+       basin-overtaking        54    0.963        0.000       0.037    0.000
+       channel-crossing       100    0.710        0.160       0.130    0.000
+       channel-head_on         98    0.939        0.031       0.031    0.000
+       channel-overtaking      42    1.000        0.000       0.000    0.000
+paper2 FS-BO                   25    0.360        0.120       0.520    0.000
+       FS-CRP                  29    0.552        0.241       0.207    0.000
+       FS-CRS                  27    0.667        0.148       0.185    0.000
+       FS-HO                   25    0.400        0.080       0.520    0.000
+       FS-NT                   27    0.704        0.000       0.296    0.000
+       FS-OT                   95    0.463        0.021       0.484    0.032
+       L1-BO                   10    1.000        0.000       0.000    0.000
+       L1-CRP                  11    0.273        0.727       0.000    0.000
+       L1-CRS                  12    0.417        0.333       0.250    0.000
+       L1-HO                   10    0.900        0.000       0.100    0.000
+       L1-NT                    1    0.000        0.000       1.000    0.000
+       L1-OT                   10    1.000        0.000       0.000    0.000
+       L2-BO                    5    1.000        0.000       0.000    0.000
+       L2-CRP                   5    0.600        0.400       0.000    0.000
+       L2-CRS                   6    0.667        0.333       0.000    0.000
+       L2-HO                    5    0.400        0.200       0.400    0.000
+       L2-NT                    1    1.000        0.000       0.000    0.000
+       L2-OT                    5    0.600        0.400       0.000    0.000
+       L3-BO                    5    1.000        0.000       0.000    0.000
+       L3-CRP                   6    1.000        0.000       0.000    0.000
+       L3-CRS                   5    0.600        0.400       0.000    0.000
+       L3-HO                    5    0.400        0.200       0.400    0.000
+       L3-NT                    1    1.000        0.000       0.000    0.000
+       L3-OT                    5    0.800        0.000       0.200    0.000
+
+-- by variant (safety off)
+                  n  success  coll_target  coll_other  timeout
+source variant                                                
+frozen CV       340    0.835        0.100       0.065    0.000
+       NC        66    0.985        0.000       0.015    0.000
+       RE       258    0.888        0.023       0.089    0.000
+paper2           30    0.700        0.000       0.300    0.000
+       FIX      156    0.564        0.115       0.308    0.013
+       VAR      150    0.553        0.147       0.293    0.007
+
+

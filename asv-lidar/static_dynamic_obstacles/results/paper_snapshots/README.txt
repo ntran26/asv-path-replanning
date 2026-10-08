@@ -50,6 +50,21 @@ Panels (paper_snapshots_summary.csv has the numbers)
     within about 20 deg while the target passes on its port side (CPA 2.2 m at
     10.0 s); speed eases from 0.5 to 0.4 m/s.
 
+Track-based check (2026-10-08)
+------------------------------
+The paper shows COLREGs behaviour through this figure, not a compliance table, so each
+encounter panel was rechecked on its true track with tools/diagnostics/colregs_compliance.py
+(results/test_set/v4/sacs0_bl3_metrics/compliance.csv; same policy and episodes, replays
+identical).  All five pass:
+(b) Rule 14: first lateral departure to starboard (3.2 m), target to port at the CPA.
+(c) crossing from port: does not cross ahead, departs to port, CPA 2.5 m.
+(d) Rules 15-16: does not cross ahead, departs to starboard, CPA 3.0 m.
+(e) Rule 13: keeps clear (CPA 3.0 m), passes with the target to starboard (port-side pass).
+(f) Rule 17: within 0.15 m of its track and within 0.15 m/s of its speed until the target
+    is within 2.5 m.  Borderline on speed: 0.48 -> 0.62 m/s (+0.14) while the target
+    closes, inside the check's 0.15 m/s but above the reward's own 0.10 m/s tolerance.
+    A steadier being-overtaken case could replace it.
+
 Draft caption
 -------------
 Trajectories of the SAC policy in six test episodes, one per encounter type:

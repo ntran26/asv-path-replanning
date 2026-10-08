@@ -19,7 +19,7 @@ The primary metrics are completed goals, rescued SAC failures, and lost SAC succ
 
 The saved `results/test_set/v3/sacs0_bl3/episodes.csv` reports 853 goals, 71 obstacle contacts, 66 target contacts and 10 boundary contacts. It contains all 1,000 IDs, but combines 755 reused v2 results with 245 new runs. It has no frozen checkpoint/config/source archive. Treat it as historical context, not a fresh matched baseline for the current filter.
 
-V3 shares 755 exact geometry/seed pairs with v2 and introduces 245 new or changed cases. Because v2 was explicitly used for safety development, v3 is not wholly unseen. Report that overlap; keep candidate code frozen during evaluation. Making v3 the main evaluation set does not authorize tuning thresholds on its outcomes. Use the separately designated development sets for changes.
+V3 shares 755 exact geometry/seed pairs with v2 and introduces 245 new or changed cases. Because v2 was explicitly used for safety development, v3 is not wholly unseen. Report that overlap; keep candidate code frozen during evaluation. Making v3 the main evaluation set does not authorize tuning thresholds on its outcomes. Use the separately designated validation sets for changes.
 
 ## Entry point and artifacts
 

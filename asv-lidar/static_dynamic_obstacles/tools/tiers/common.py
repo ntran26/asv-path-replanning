@@ -120,7 +120,8 @@ def make_controller(policy: str):
 # ---------------------------------------------------------------------------
 # One episode, with everything any tier reads
 # ---------------------------------------------------------------------------
-def run_episode(env, built, seed: int, policy: str, model=None, obstacles: Optional[int] = None) -> Dict:
+def run_episode(env, built, seed: int, policy: str, model=None, obstacles: Optional[int] = None,
+                keep_traj: bool = False) -> Dict:
     if obstacles is not None:
         env.forced_num_obs = int(obstacles)
     obs, _ = env.reset(seed=seed, options={"generated": built})
@@ -131,6 +132,25 @@ def run_episode(env, built, seed: int, policy: str, model=None, obstacles: Optio
     stops, stop_steps, r_path_max = [], [], 0.0
     min_range = float("inf")
     last_events = 0
+    # Paper 2's per-episode metrics (src/metrics.py, the same definitions) plus the
+    # target-ship ones, added 2026-10-08 for the paper's results table.
+    import metrics as pm
+    rudder_cmd: List[float] = []
+    min_obs_clear = min_bnd_clear = min_tgt_clear = float("inf")
+    dom_max, dom_steps, viol_steps = 0.0, 0, 0
+    # true trajectories for the per-rule COLREGs checks (first target only; one per episode)
+    own_xy, own_h, own_u, tgt_xy, tgt_h, engaged_now = [], [], [], [], [], []
+
+    def record_state(engaged_flag: bool) -> None:
+        own_xy.append((env.asv_x, env.asv_y))
+        own_h.append(float(env.asv_h))
+        own_u.append(float(env.speed_mps))
+        if env.targets:
+            tgt_xy.append((env.targets[0].x, env.targets[0].y))
+            tgt_h.append(float(env.targets[0].heading))
+        engaged_now.append(engaged_flag)
+
+    record_state(False)
     actor = tf.EpisodeActor(model) if policy == "model" else None
     controller = make_controller(policy)
     while True:
@@ -153,15 +173,31 @@ def run_episode(env, built, seed: int, policy: str, model=None, obstacles: Optio
         speeds.append(float(info["speed_mps"]))
         ctes.append(float(env.cross_track_error))
         r_path_max = max(r_path_max, abs(float(info["r_path_radps"])))
+        violating = False
         for part in COLREGS_PARTS:
             value = float(info.get(f"colregs/v_{part}", 0.0))
             frames[part] += int(value > 0.0)
             integrals[part] += value
+            violating = violating or value > 0.0
+        viol_steps += int(violating)
+        rudder_cmd.append(float(np.clip(action[0], -1.0, 1.0)))
+        hull = env.hull_polygon()
+        if env.obstacles:
+            min_obs_clear = min(min_obs_clear, pm.min_obstacle_clearance(hull, env.obstacles))
+        min_bnd_clear = min(min_bnd_clear, float(env._hull_boundary_distance(hull)))
+        for t in env.targets:
+            min_tgt_clear = min(min_tgt_clear, pm.polygon_distance(hull, t.hull()))
+        intrusion = float(getattr(env.last_reward_state, "dom_intrusion", 0.0) or 0.0)
+        dom_max = max(dom_max, intrusion)
+        dom_steps += int(intrusion > 0.0)
+        any_engaged = False
         for ctx in env.encounter_contexts.values():
+            any_engaged = any_engaged or bool(ctx.engaged)
             if ctx.engaged and ctx.tcpa > 0.0:
                 engaged_frames += 1
                 first_engaged_cls = first_engaged_cls or str(ctx.cls)
                 port_sense_frames += int(ctx.compliant_turn_sense < 0 and str(ctx.cls) != "overtaking")
+        record_state(any_engaged)
         if int(info["estop/events"]) > last_events:
             last_events = int(info["estop/events"])
             stops.append(env.estop.events[-1].reason)
@@ -173,7 +209,17 @@ def run_episode(env, built, seed: int, policy: str, model=None, obstacles: Optio
     ct = float(getattr(built, "ct_deg", 0.0))
     outcome = (f"collision:{info['collision_kind']}" if info["collided"] else
                "goal" if info["reached_goal"] else "timeout")
-    return {
+    # The true trajectories, for the per-rule COLREGs checks computed offline
+    # (tools/diagnostics/colregs_compliance.py); kept only when a caller asks (`_job`).
+    traj = {"own_x": np.array([p[0] for p in own_xy], np.float32),
+            "own_y": np.array([p[1] for p in own_xy], np.float32),
+            "own_h": np.array(own_h, np.float32), "own_u": np.array(own_u, np.float32),
+            "engaged": np.array(engaged_now, bool),
+            "path": np.asarray(env.path.points, np.float32)}
+    if tgt_xy and len(tgt_xy) == len(own_xy):
+        traj.update(tgt_x=np.array([p[0] for p in tgt_xy], np.float32),
+                    tgt_y=np.array([p[1] for p in tgt_xy], np.float32), tgt_h=np.array(tgt_h, np.float32))
+    row = {
         "policy": policy, "class": built.encounter_class, "width": float(built.nominal_width),
         "dcpa_m": float(getattr(built, "dcpa_m", 0.0)), "ct_deg": ct,
         "crossing_side": ("port" if ct < 180.0 else "starboard") if built.encounter_class == "crossing" else "",
@@ -196,7 +242,29 @@ def run_episode(env, built, seed: int, policy: str, model=None, obstacles: Optio
         "p_port_sense": port_sense_frames / max(engaged_frames, 1),
         "ever_port_sense_non_overtaking": port_sense_frames > 0,
         "r_path_max": r_path_max,
+        # --- the paper's results table (Paper 2 definitions, src/metrics.py) ----------
+        "completion_time_s": steps * float(cfg.UPDATE_RATE),
+        "min_speed": float(np.min(speeds)),
+        "path_length_m": pm._polyline_length(env.asv_path),
+        "path_efficiency": (pm._polyline_length(env.asv_path) / float(env.path.length)
+                            if float(env.path.length) > 1e-6 else float("nan")),
+        "min_obstacle_clearance": min_obs_clear if math.isfinite(min_obs_clear) else float("nan"),
+        "min_boundary_clearance": min_bnd_clear if math.isfinite(min_bnd_clear) else float("nan"),
+        "mean_abs_rudder_rate": (float(np.mean(np.abs(np.diff(np.asarray(rudder_cmd) * pm.MAX_RUD_ANGLE))))
+                                 / float(cfg.UPDATE_RATE) if len(rudder_cmd) > 1 else 0.0),
+        "rudder_saturation_fraction": float(np.mean(np.abs(np.asarray(rudder_cmd)) >= pm.SATURATION_THRESHOLD)),
+        "control_effort": float(np.sum(np.square(rudder_cmd)) * float(cfg.UPDATE_RATE)),
+        # target ship (true positions): hull-to-hull clearance, ship-domain intrusion
+        # (deepest, as a fraction of the domain radius, and time inside), time with a
+        # COLREGs penalty term active
+        "min_target_clearance": min_tgt_clear if math.isfinite(min_tgt_clear) else float("nan"),
+        "domain_intrusion_max": dom_max,
+        "domain_time_s": dom_steps * float(cfg.UPDATE_RATE),
+        "colregs_violation_time_s": viol_steps * float(cfg.UPDATE_RATE),
     }
+    if keep_traj:
+        row["_traj"] = traj
+    return row
 
 
 # ---------------------------------------------------------------------------
@@ -244,7 +312,9 @@ def load_model(model_path):
 
 def _job(args) -> Dict:
     built, seed, policy, obstacles, extra = args
-    row = run_episode(_WORKER["env"], built, seed, policy, _WORKER["model"], obstacles)
+    extra = dict(extra)
+    keep = bool(extra.pop("_keep_traj", False))
+    row = run_episode(_WORKER["env"], built, seed, policy, _WORKER["model"], obstacles, keep_traj=keep)
     row.update(extra)
     return row
 
