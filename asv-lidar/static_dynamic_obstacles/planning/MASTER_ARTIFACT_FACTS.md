@@ -1,6 +1,6 @@
 # Paper 3 master artifact — verified technical facts
 
-> **Kept current (decision, 2026-10-04).** This file describes only the best formulation: **baseline-v3**, the kept SAC 3 M policy (`configs/baseline_v3.json`, `src/formulation_v3.py`). Earlier versions are not described. If baseline-v4.3 passes its SAC pair (`planning/BASELINE_V4_PLAN.md`), this file is updated to v4.3.
+> **Kept current (decision, 2026-10-04).** This file describes only the best formulation: **baseline-v3**, the kept SAC 3 M policy (`configs/baseline_v3.json`, `src/formulation_v3.py`). Earlier versions are not described. Baseline-v4.3 was trained in full and not adopted (`planning/BASELINE_V4_PLAN.md`, section 5e), so baseline-v3 is the campaign's formulation. Terminology (2026-10-08): *decoupled* / *coupled* scenarios and the *validation set*.
 
 **Written 2026-09-29 from the project's code**, as the source for the
 master explainer artifact (`MASTER_ARTIFACT_BRIEF.md`). Every number here is
@@ -19,7 +19,7 @@ Two presentation rules from the author:
 
 ---
 
-## 1. Vessel and dynamics (Section 2 of the artifact)
+## 1. Vessel and dynamics (Section 3 of the artifact)
 
 **Platform.** Bluefin model-scale ASV: length overall L = 1.725 m, beam
 B = 0.50 m, draft 0.193 m, mass m = 64.55 kg. Single propeller and a stern
@@ -121,7 +121,7 @@ Coriolis and Munk terms, LOS guidance). Fossen (2011), 1st ed. Yasukawa &
 Yoshimura (2015), MMG standard method, *J. Mar. Sci. Technol.* 20:37–52
 [VERIFY]. Paper 2 (Tran et al., 2026) for the platform.
 
-## 2. Classical comparators (Section 3)
+## 2. Classical comparators (Section 4)
 
 All comparators use the same perception (LiDAR scan, tracker, map boundary) as
 the learned policies and the same actuator limits; they differ only in the
@@ -208,7 +208,7 @@ sum of the forces (Khatib, 1986 [VERIFY]). Fast and simple, but it gets stuck
 in local minima between close obstacles and knows no rules. Explain it as
 context; it is not a Paper 3 comparator.
 
-## 3. Learners and training protocol (Section 4)
+## 3. Learners and training protocol (Section 5)
 
 - Library: Stable-Baselines3 2.3.2 / sb3-contrib 2.3.0 (Raffin et al., 2021).
 - **Common:** discount γ = 0.951 per 0.5 s step; reward normalization only
@@ -232,7 +232,7 @@ context; it is not a Paper 3 comparator.
 - Development used PPO to iterate the formulation; the formulation itself
   references no algorithm.
 
-## 4. LiDAR perception and tracking (Section 5)
+## 4. LiDAR perception and tracking (Section 6)
 
 **Sensor model:** 720 beams at 0.5° (full 360°), range 1.0–16 m (returns
 closer than 1 m are lost in a dead zone). Pose noise 0.03 m / 0.2°, surge
@@ -323,7 +323,7 @@ quarters). For each sector with beam ranges ρ₁…ρ_M in angular order:
   farthest return".
 - Closeness c = 1 − ρ̄/16 ∈ [0, 1].
 
-## 5. Runtime safety layer
+## 5. Runtime safety layer (Section 9)
 
 Off during training. When enabled: fires if an engaged give-way encounter is
 in extremis (DCPA < d_req, 0 ≤ TCPA < 5 s), the compliant alteration is
@@ -332,7 +332,7 @@ Then full astern (S2 = −100) until stopped (≤ 0.05 m/s; at most 8 s), hold a
 zero thrust at least 2 s and at most 10 s, then return control. Interventions
 are never counted as learned behavior.
 
-## 6. Scenario generation, curriculum and data sets (Section 7)
+## 6. Scenario generation, curriculum and data sets (Section 8)
 
 **6.1 Workspace.** Basin 10 × 25 m, start y = 2 m, goal y = 22 m, each
 x ~ U[2.5, 7.5] m (slant ≤ about 14°); navigable polygon = basin inset
@@ -367,13 +367,17 @@ only for head-on, crossing and overtaking.
    water; reject and resample.
 5. **Static obstacles:** 1.0 m panels along 25–70 % of the path with lateral
    offsets; in stages 1–5 panels are kept clear of ±0.4 T₀ of own-ship travel
-   around the CPA so they do not decide the encounter.
+   around the CPA so they do not decide the encounter (the **decoupled**
+   scenarios: obstacle avoidance and collision avoidance happen one after the
+   other).
 6. **Static feasibility (A\*; Hart, Nilsson & Raphael, 1968):** grid 0.25 m,
    walls inflated 0.40 m and panels 0.45 m for the hull; a route must exist and
    be ≤ 2.25 × the leg length; otherwise redraw (up to 20 times, then thin
    the obstacles).
 
-**6.3 Curriculum (baseline-v3, 3.0 × 10⁶ steps; stage 7 continues to 3.0 M).**
+**6.3 Curriculum (baseline-v3, 3.0 × 10⁶ steps).** Stage boundaries are fixed
+timesteps at 6.4, 14.4, 25.6, 40, 60 and 80 % of a 2.5 M base budget; training
+then continues in stage 7 to 3.0 M.
 
 | Stage | From | Episodes | Obstacles | Channel widths |
 |---|---|---|---|---|
@@ -385,7 +389,7 @@ only for head-on, crossing and overtaking.
 | 6 | 1.50 M | all six types; 25 % three-obstacle spread layouts | 1–3, weighted to 3 (0.2/0.3/0.5) | 3.5–10 m |
 | 7 | 2.00 M | all six types; 45 % three-obstacle spread layouts; 30 % of their targets change speed once | 1–3, weighted to 3 | 3.5–10 m |
 
-- **Spread three-obstacle layouts (stages 6–7):** a leg with start and goal x
+- **Spread three-obstacle layouts (stages 6–7) — the coupled scenarios:** a leg with start and goal x
   in [2, 8] m (slant ≤ 14.1°) and three 1 m panels in one of three motifs —
   **gate + on-path** (two panels either side of the leg, 1.3–2.7 m from it,
   plus one near the path further on; 40 %), **slalom** (three panels
@@ -410,21 +414,23 @@ only for head-on, crossing and overtaking.
   targets always hold their course and never give way.
 
 **6.4 Data sets** — disjoint random-seed ranges ("namespaces") so training,
-selection and testing never share an episode:
+selection and testing never share an episode (the coupled validation episodes
+come from their own block at seeds 350,000+, in a gap no namespace uses, and the
+coupled test episodes from dedicated test blocks):
 
 | Set | Size | Use |
 |---|---|---|
-| Training | generated on the fly | seeds 0–99,999 |
-| Development | 120 episodes: 20 per episode type × 6 (stage-5 generator) | checkpoint selection |
-| Three-obstacle validation set | 150 episodes: 20 no-target + per encounter (head-on, crossing from port, crossing from starboard, overtaking, being overtaken) 20 constant-speed + 6 varying-speed, all space-time solvable | checkpoint selection, with the validation set |
-| Test set (headline) | 1,000 held-out episodes: basin and channel encounters of every type (constant-velocity, reactive and non-compliant targets) and three-obstacle layouts with constant- and varying-speed targets; near-duplicates trimmed; every episode passes the fairness check (6.5) | touched once per policy |
-| Frozen benchmark | the 800 basin and channel encounter episodes the test set draws its encounter cells from (8 cells × 100) | continuity with earlier tables |
+| Training set | generated on the fly from the training seeds | seeds 0–99,999 |
+| Validation set, decoupled part | 120 episodes: 20 per episode type × 6 (stage-5 generator) | checkpoint selection |
+| Validation set, coupled part | 150 episodes: 20 no-target + per encounter (head-on, crossing from port, crossing from starboard, overtaking, being overtaken) 20 constant-speed + 6 varying-speed, all space-time solvable | checkpoint selection, together with the decoupled part (270 episodes in all) |
+| Test set (test set v4; headline) | 1,000 held-out episodes: **664 decoupled** (basin and channel encounters of every type, with constant-velocity, reactive and non-compliant targets) and **336 coupled** (three-obstacle layouts with constant- and varying-speed targets); near-duplicates trimmed; every episode passes the fairness check (6.5) | touched once per policy |
+| Frozen benchmark | the 800 basin and channel encounter episodes the test set's decoupled part is drawn from (8 cells × 100) | continuity with earlier tables |
 | Robustness set | the same scenarios with a reactive target (700; it follows the COLREGs-VO rule from its own side) and, in head-ons, a non-compliant target that turns to port (200) | robustness to target behavior |
-| Width sweep | channels 10, 8, 7, 6, 5, 4.5, 4, 3.5 m | how the response changes with room |
-| Perception degradation | pose drift, detection dropout, occlusion, velocity-estimate noise, separately and jointly | robustness to sensing |
+| Width sweep (planned) | channels 10, 8, 7, 6, 5, 4.5, 4, 3.5 m | how the response changes with room |
+| Perception degradation (planned) | pose drift, detection dropout, occlusion, velocity-estimate noise, separately and jointly | robustness to sensing |
 
-Selection score: goal rate − 2 × collision rate on the validation sets,
-safety layer off.
+Selection score: goal rate − 2 × collision rate on the whole validation set
+(both parts, 270 episodes), safety layer off, every 200,000 steps.
 
 **6.5 Fairness check on the test set (oracle feasibility).** For each test episode, a library of
 up to 574 manoeuvres is rolled out with perfect knowledge of the target's future motion, the
@@ -436,7 +442,7 @@ only if some manoeuvre that starts at or after that moment reaches the goal with
 clearance throughout; otherwise it is replaced by a fresh episode of the same kind that passes.
 Of the 1,000 episodes, 67 were replaced (`src/oracle_feasibility.py`).
 
-## 7. Field trials and the UDP bridge (Section 8)
+## 7. Field trials and the UDP bridge (Section 10)
 
 (Paper 2's basin trials; Paper 3's physical encounter trials are planned. Take
 the trial description — site, panels, procedure, results — from Paper 2.)

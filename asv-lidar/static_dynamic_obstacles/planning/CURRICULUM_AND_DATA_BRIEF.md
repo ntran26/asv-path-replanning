@@ -1,9 +1,9 @@
 # Curriculum, scenario generation, and the three data sets — a visualisation brief
 
-> **Kept current (decision, 2026-10-04).** This file describes only the best formulation: **baseline-v3**, the kept SAC 3 M policy (`configs/baseline_v3.json`, `src/formulation_v3.py`). Earlier versions are not described. If baseline-v4.3 passes its SAC pair (`planning/BASELINE_V4_PLAN.md`), this file is updated to v4.3.
+> **Kept current (decision, 2026-10-04).** This file describes only the best formulation: **baseline-v3**, the kept SAC 3 M policy (`configs/baseline_v3.json`, `src/formulation_v3.py`). Earlier versions are not described. Baseline-v4.3 was trained in full and not adopted (`planning/BASELINE_V4_PLAN.md`, section 5e), so baseline-v3 is the campaign's formulation. Terminology (2026-10-08): *decoupled* / *coupled* scenarios and the *validation set*.
 
 **Purpose.** A self-contained description of how scenarios are made, how the
-curriculum orders them, and how the training / development / frozen sets are kept
+curriculum orders them, and how the training / validation / test sets are kept
 disjoint — written so it can be turned into an explanatory artifact with
 equations and animations. Every number is read from the code (`src/scenario.py`,
 `src/field_training.py`, `src/formulation_v3.py`, `src/constants.py`,
@@ -34,13 +34,16 @@ different scene falls out. Repeat the same seed, the identical scene falls out.
 
 ## 2. Seed namespaces: how the sets are kept apart
 
-Five disjoint integer ranges (`constants.SEED_NAMESPACES`):
+Five disjoint integer namespaces (`constants.SEED_NAMESPACES`), plus dedicated
+blocks in the gaps for the coupled validation and test episodes:
 
 | Namespace | Range | Used for |
 |---|---|---|
 | `training` | 0 – 99,999 | every training episode |
-| `development` | 200,000 – 209,999 | the 120-episode validation set ("validation") |
-| `frozen_eval` | 300,000 – 309,999 | the frozen benchmark: the test set's encounter cells ("test") |
+| `development` | 200,000 – 209,999 | the decoupled part of the validation set (120 episodes) |
+| — (own block) | 350,000 + | the coupled part of the validation set (150 episodes), in a gap no namespace uses |
+| `frozen_eval` | 300,000 – 309,999 | the frozen benchmark: source of the test set's decoupled part |
+| — (dedicated test blocks) | — | the test set's coupled episodes |
 | `study1` | 400,000 – 409,999 | the channel-width sweep (R4) |
 | `study2` | 500,000 – 509,999 | perception degradation (R5) |
 
@@ -51,8 +54,8 @@ of "the test set was not used in training".
 
 **Animation 2 — the number line.** Show 0 … 500,000 as a line with five coloured
 bands. Sample dots fall into the training band during a training montage; when
-evaluation starts, dots fall only in the development band; when the paper's
-tables are produced, only in the frozen band. No dot ever crosses a boundary.
+evaluation starts, dots fall only in the validation bands; when the paper's
+tables are produced, only in the test bands. No dot ever crosses a boundary.
 
 ---
 
@@ -148,8 +151,10 @@ A counter ticks up the rejections. It makes the point that difficulty is
 
 ## 4. The curriculum
 
-Seven stages, switched on **fraction of the training budget**, not on performance (3.0 M steps;
-stage 7 runs from 2.0 M to the end):
+Seven stages, switched on **fixed timesteps** (6.4, 14.4, 25.6, 40, 60 and 80 % of a 2.5 M base
+budget), not on performance; training then continues in stage 7 to 3.0 M. Stages 1–5 are
+**decoupled** (obstacles kept clear of the encounter); stages 6–7 add the **coupled** three-obstacle
+layouts:
 
 | Stage | From | Classes | Obstacles | Channel width (m) | Three-obstacle spread layouts |
 |---|---|---|---|---|---|
@@ -187,17 +192,17 @@ added target and obstacle costs raycasting and collision work.
 
 ## 5. The data sets
 
-| | Training | Development | Test set |
+| | Training set | Validation set | Test set (test set v4) |
 |---|---|---|---|
-| Seeds | `training` | `development` | `frozen_eval` and dedicated test blocks |
-| Size | unbounded — a fresh draw every episode | **120** (20 per class × 6) + **150** three-obstacle layouts | **1,000** |
+| Seeds | `training` | `development` (decoupled) and its own block at 350,000+ (coupled) | `frozen_eval` and dedicated test blocks |
+| Size | unbounded — a fresh draw every episode | **270**: 120 decoupled (20 per class × 6) + 150 coupled | **1,000**: 664 decoupled + 336 coupled |
 | Sampling | curriculum stage of the moment | fixed lists | stratified cells, near-duplicates trimmed |
 | Used for | gradient updates | **checkpoint selection** and all diagnostics | the paper's tables |
 | Seen how often | continuously | every 200 k steps | **once per policy** |
 
-### 5.1 Validation sets — the selection instrument
+### 5.1 Validation set — the selection instrument
 
-120 fixed episodes drawn at stage 5, plus 150 three-obstacle layouts: 20 with no target, and 20
+120 fixed decoupled episodes drawn at stage 5, plus 150 coupled three-obstacle layouts: 20 with no target, and 20
 constant-speed plus 6 varying-speed episodes for each of head-on, crossing from port, crossing
 from starboard, overtaking and being overtaken. Every 200 k steps the current policy is replayed
 over all of them with the safety layer **off**, and the checkpoint is kept if it improves
@@ -207,16 +212,17 @@ $$\text{score} = P(\text{goal}) - 2\,P(\text{collision})$$
 That factor of 2 is the whole selection rule: a policy that reaches the goal by taking risks
 scores worse than a cautious one.
 
-**Animation 7 — best-on-dev selection.** Plot the evaluation points of a real run as a noisy
-curve; drop a marker each time a new best appears; show the final "best" marker being copied to
+**Animation 7 — best-on-validation selection.** Plot an illustrative noisy curve of evaluation
+points (not a real run: results are not stated); drop a marker each time a new best appears; show the final "best" marker being copied to
 `best_model.zip` while later, worse points are ignored.
 
-### 5.2 Test set — the evidence
+### 5.2 Test set (test set v4) — the evidence
 
 1,000 held-out episodes. The cells are:
-- **Basin and channel encounters** of every class: the frozen benchmark, 8 cells × 100, with
-  constant-velocity, reactive (`T-RE`) and non-compliant (`T-NC`) targets.
-- **Three-obstacle layouts** with constant-speed and varying-speed targets.
+- **Decoupled (664):** basin and channel encounters of every class, drawn from the frozen
+  benchmark (8 cells × 100), with constant-velocity, reactive (`T-RE`) and non-compliant (`T-NC`)
+  targets.
+- **Coupled (336):** three-obstacle layouts with constant-speed and varying-speed targets.
 
 Two steps prepare the set:
 - **Trimming.** Twins (the same scenario with only the target behaviour changed) are collapsed.
@@ -310,6 +316,8 @@ no longer fits, leaving only speed reduction at the end.
 - Observation **70 values in 6 branches**; action = (rudder, throttle) ∈ [−1, 1]².
 - Training: **10 parallel environments**, **3 M steps**, seven curriculum stages, **3 seeds** per learner.
 - Learners compared: **PPO, RecurrentPPO, SAC, TQC** on the identical formulation.
-- Validation sets **120 + 150**; test set **1,000**; disjoint seed ranges.
-- Measured example (SAC seed 0): development score −1.22 at 200 k steps → **0.41 at 3.0 M**
-  (goal rate 0.80 over both validation sets: 0.88 on the 120, 0.74 on the three-obstacle 150).
+- Training set: generated on the fly from the training seeds (0–99,999). Validation set **270**
+  (120 decoupled + 150 coupled). Test set (test set v4) **1,000** (664 decoupled + 336 coupled).
+  Disjoint seed ranges.
+- Selection score = goal rate − 2 × collision rate on the validation set, safety layer off, every
+  200,000 steps. (No measured scores here: the artifact does not state results.)

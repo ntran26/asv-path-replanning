@@ -1,6 +1,6 @@
 # Paper 3 master artifact — build brief
 
-> **Kept current (decision, 2026-10-04).** This file describes only the best formulation: **baseline-v3**, the kept SAC 3 M policy (`configs/baseline_v3.json`, `src/formulation_v3.py`). Earlier versions are not described. If baseline-v4.3 passes its SAC pair (`planning/BASELINE_V4_PLAN.md`), this file is updated to v4.3.
+> **Kept current (decision, 2026-10-04).** This file describes only the best formulation: **baseline-v3**, the kept SAC 3 M policy (`configs/baseline_v3.json`, `src/formulation_v3.py`). Earlier versions are not described. Baseline-v4.3 was trained in full and not adopted (`planning/BASELINE_V4_PLAN.md`, section 5e), so baseline-v3 is the campaign's formulation. Terminology (2026-10-08): *decoupled* / *coupled* scenarios and the *validation set*.
 
 **Written 2026-09-29.** This file specifies what to build. The facts it
 must use are in `MASTER_ARTIFACT_FACTS.md` (vessel model, classical methods,
@@ -46,11 +46,14 @@ one fixed problem formulation, against classical controllers.
 5. **Citations:** cite the method's source where it is used (author, year),
    with a reference list at the end. Prefer Fossen for vessel dynamics and
    guidance. Keep any reference the facts files mark [VERIFY] visibly marked.
-6. **Stance on the regulations (from Introduction draft 4):** the COLREGs
-   subset is implemented as an *adopted operating convention*; compliance is
-   judged by *declared behavioral metrics*, not legal certification; channel
-   width is a *geometric experimental variable*, not a legal definition of a
-   narrow channel. Use "encounter-consistent" for the desired behavior.
+6. **Stance on the regulations (from Introduction draft 4, revised 2026-10-08):**
+   the COLREGs subset is implemented as an *adopted operating convention*, and
+   each rule is described as exactly what the reward encodes; the behavior is
+   **COLREGs-aware**, never "COLREGs-compliant", and no legal certification is
+   claimed. The paper shows this behavior with trajectory snapshots of each
+   encounter type, not with per-rule compliance rates. Channel width is a
+   *geometric experimental variable*, not a legal definition of a narrow
+   channel. Use "encounter-consistent" for the desired behavior.
 7. **Do not state results.** Where a result will go, say so ("reported in the
    paper").
 8. **Two exclusions from the author:** (a) in the vessel-model section, do not
@@ -60,7 +63,16 @@ one fixed problem formulation, against classical controllers.
    three-obstacle layouts.
 9. **The curriculum described is baseline-v3** (seven stages, 3 M steps).
 10. **Spelling:** American ("maneuver", "behavior"), matching the paper.
-11. **Nomenclature** at the end: every symbol (with unit and the section where
+11. **Terms (2026-10-08).** *Decoupled* scenarios keep the static obstacles clear
+    of the region around the predicted closest point of approach, so obstacle
+    avoidance and collision avoidance happen one after the other. *Coupled*
+    scenarios place three obstacles in a structured layout and generate the
+    encounter with them in place, so the vessel may have to resolve both at once.
+    The three data sets are named the *training set* (episodes generated on
+    the fly from the training seeds), the *validation set* (used only to select
+    checkpoints; never "development set") and the *test set* (test set v4, the
+    held-out evidence).
+12. **Nomenclature** at the end: every symbol (with unit and the section where
     it first appears) and every abbreviation. Group by topic.
 
 ## 3. Structure
@@ -278,24 +290,40 @@ Use facts section 6.
 - Static obstacles and the A* feasibility check (▶ grid view with inflation).
 - ▶ **Space-time reachability animation:** the reachable set growing each
   0.5 s while cells near the moving target are removed; solvable or not.
+- ▶ **Decoupled vs coupled, side by side:** the same encounter with the
+  obstacles held clear of the CPA region (decoupled) and with a three-obstacle
+  layout in place (coupled), so the two scenario families used throughout the
+  results are clear before the data sets are introduced.
 - Curriculum: ▶ **timeline chart** of the seven stages (what is added when).
-  Stages 6–7: more, and more evenly spread, three-obstacle layouts in three
-  motifs (gallery), CPA guard relaxed then removed, varying-speed targets.
-- Data sets: training / development / three-obstacle development / the
-  1,000-episode held-out test set / robustness set / width sweep / perception
-  degradation, with a seed-namespace diagram showing they never overlap;
-  checkpoint selection score.
+  Stage boundaries are fixed timesteps (6.4, 14.4, 25.6, 40, 60 and 80 % of a
+  2.5 M base budget); training then continues in stage 7 to 3.0 M. Stages 1–5
+  are decoupled. Stages 6–7: more, and more evenly spread, three-obstacle
+  layouts in three motifs (gallery) — the coupled scenarios — with the CPA
+  guard relaxed then removed, and varying-speed targets.
+- Data sets: the **training set** (generated on the fly from the training
+  seeds) / the **validation set** (270
+  episodes: 120 decoupled + 150 coupled, used only to select checkpoints) /
+  the **test set** (test set v4: 1,000 held-out episodes, 664 decoupled + 336 coupled,
+  touched once per policy) / robustness set / width sweep and perception
+  degradation (planned studies), with a seed-namespace diagram showing they
+  never overlap; checkpoint selection score.
 
 ### 9. Safety layer and evaluation design (added)
 - The runtime stop safety layer (facts section 5): trigger, maneuver, hand-back; off in
-  training; learned compliance always reported with it off.
+  training and in every validation-set evaluation; learned behavior always reported
+  with it off.
 - ▶ **Fairness check widget:** for one test episode, the manoeuvres tried by
   the perfect-foresight checker (facts section 6.5), coloured by outcome, and
   the moment the target is first seen; an episode solvable only before that
   moment is replaced.
-- What is measured: success; collisions by type; cross-track error; rule
-  metrics per encounter; minimum CPA distribution; intervention rate; by
-  target behavior; by width; by perception quality. No values.
+- What is measured: success; collisions by type (static obstacle, boundary,
+  target vessel); cross-track error; completion time and speed; target-ship
+  safety (ship-domain intrusion, closest approach, hull-to-hull clearance);
+  results by encounter type and by decoupled / coupled family; validation-set
+  learning curves for the four learners; COLREGs behavior shown by trajectory
+  snapshots of each encounter type, **not** by per-rule compliance rates;
+  safety-layer intervention rate reported separately; by target behavior; by
+  width and by perception quality (planned studies). No values.
 
 ### 10. Field trials and the vessel–computer link
 - Paper 2's basin trials (platform, basin, panels, procedure) from the Paper 2
