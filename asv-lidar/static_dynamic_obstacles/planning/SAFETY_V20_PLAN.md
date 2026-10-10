@@ -639,3 +639,11 @@ Revision 2 is the only configuration with fewer development contacts than fresh 
 - **Runs:** tags `ts4_r2_c01`-`c40` of 25 scenarios each, same order and compact gzip traces, started after the OFF/V16 chunks, at most two processes.
 - **Pairing:** with the fresh OFF and V16 records by test ID, episode seed and scenario digest. The report gives goals, rescued SAC failures, lost SAC successes, each contact type and timeouts.
 - **No tuning:** no change follows any outcome.
+
+### 17.2 Interruption note, 2026-10-10
+
+The OFF/V16 run completed all ten chunks. The revision-2 run completed `ts4_r2_c01`-`c19`. The evaluation container was then paused and restarted, and the two running chunks stopped mid-episode:
+- `ts4_r2_c20` after 14 of 25 episodes;
+- `ts4_r2_c21` after 24 of 25 episodes.
+
+Both directories are kept unchanged with an `INTERRUPTED.md` note and are excluded from the report, because they have no completion record. Their scenarios run again from scratch as `ts4_r2_c20b` and `ts4_r2_c21b`, with identical code, options and selection, before `c22`-`c40` continue. No outcome was read before this decision, and partial episodes are not reused.
