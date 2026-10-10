@@ -1,0 +1,252 @@
+{
+ "replay": "g2g3_v3",
+ "episodes": 68,
+ "margins": [
+  {
+   "margin_m": 0.0,
+   "checked_available": [
+    2746,
+    3216
+   ],
+   "survival_traffic": {
+    "survived": 1400,
+    "rechecks": 1521,
+    "rate": 0.9204470742932281,
+    "wilson95": [
+     0.9057643482783863,
+     0.9330112989757285
+    ]
+   },
+   "survival_no_traffic": {
+    "survived": 1137,
+    "rechecks": 1210,
+    "rate": 0.9396694214876034,
+    "wilson95": [
+     0.9248112122153129,
+     0.9517446744835776
+    ]
+   }
+  },
+  {
+   "margin_m": 0.05,
+   "checked_available": [
+    2590,
+    3216
+   ],
+   "survival_traffic": {
+    "survived": 1335,
+    "rechecks": 1409,
+    "rate": 0.9474804826117814,
+    "wilson95": [
+     0.9345682823137708,
+     0.9579592310323822
+    ]
+   },
+   "survival_no_traffic": {
+    "survived": 1105,
+    "rechecks": 1159,
+    "rate": 0.9534081104400345,
+    "wilson95": [
+     0.939703883746356,
+     0.9641165506103095
+    ]
+   }
+  },
+  {
+   "margin_m": 0.1,
+   "checked_available": [
+    2455,
+    3216
+   ],
+   "survival_traffic": {
+    "survived": 1259,
+    "rechecks": 1314,
+    "rate": 0.9581430745814308,
+    "wilson95": [
+     0.945912958169021,
+     0.9677021530856246
+    ]
+   },
+   "survival_no_traffic": {
+    "survived": 1073,
+    "rechecks": 1112,
+    "rate": 0.9649280575539568,
+    "wilson95": [
+     0.9524153823930182,
+     0.9742394402986614
+    ]
+   }
+  },
+  {
+   "margin_m": 0.127,
+   "checked_available": [
+    2387,
+    3216
+   ],
+   "survival_traffic": {
+    "survived": 1220,
+    "rechecks": 1264,
+    "rate": 0.9651898734177216,
+    "wilson95": [
+     0.9535925486905587,
+     0.9739681181940113
+    ]
+   },
+   "survival_no_traffic": {
+    "survived": 1060,
+    "rechecks": 1094,
+    "rate": 0.9689213893967094,
+    "wilson95": [
+     0.9568851519068419,
+     0.9776758995235285
+    ]
+   }
+  },
+  {
+   "margin_m": 0.15,
+   "checked_available": [
+    2322,
+    3216
+   ],
+   "survival_traffic": {
+    "survived": 1180,
+    "rechecks": 1218,
+    "rate": 0.9688013136288999,
+    "wilson95": [
+     0.9574681328694389,
+     0.9771865719630043
+    ]
+   },
+   "survival_no_traffic": {
+    "survived": 1040,
+    "rechecks": 1073,
+    "rate": 0.9692451071761417,
+    "wilson95": [
+     0.9571238337184325,
+     0.9780183450384061
+    ]
+   }
+  },
+  {
+   "margin_m": 0.2,
+   "checked_available": [
+    2191,
+    3216
+   ],
+   "survival_traffic": {
+    "survived": 1107,
+    "rechecks": 1133,
+    "rate": 0.9770520741394528,
+    "wilson95": [
+     0.9665876524288823,
+     0.984292399814104
+    ]
+   },
+   "survival_no_traffic": {
+    "survived": 1000,
+    "rechecks": 1029,
+    "rate": 0.9718172983479106,
+    "wilson95": [
+     0.9598179112669737,
+     0.9803068861850267
+    ]
+   }
+  },
+  {
+   "margin_m": 0.3,
+   "checked_available": [
+    1954,
+    3216
+   ],
+   "survival_traffic": {
+    "survived": 961,
+    "rechecks": 980,
+    "rate": 0.9806122448979592,
+    "wilson95": [
+     0.9699175903185944,
+     0.987553612362813
+    ]
+   },
+   "survival_no_traffic": {
+    "survived": 926,
+    "rechecks": 948,
+    "rate": 0.9767932489451476,
+    "wilson95": [
+     0.9651123361816469,
+     0.9846255193607036
+    ]
+   }
+  }
+ ],
+ "input_sha256": {
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/DV3_DV3-BO-CV-04.json": "e03303228ed20d4dc704ca1d53ca7aee64e523b9819c94c85f3618edf8c75b14",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/DV3_DV3-BO-CV-10.json": "80bbfcd292ad6a4369a7ad64914da6ea6cb3c71c903beb77b9d886b7d0ba5511",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/DV3_DV3-CRP-CV-12.json": "1973530f090f472b0bfb268959a257756a08e9e82885a474d728d02e897e6054",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/DV3_DV3-CRP-CV-16.json": "6ae1ae9be471e0875f5ad450da44255e5ad96c564dc3244178b70ed7752e4e12",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/DV3_DV3-CRP-CV-20.json": "926db98d32f6f476dbb597d7b5d76aa7be310b277ac5f875cc0ba870315ad0c9",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/DV3_DV3-CRS-CV-01.json": "2d87047a63e17b4d548dbb1b897304f6817a29e3cb7df3f7ef98a935ca65fd01",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/DV3_DV3-CRS-CV-04.json": "11b5df4498de106c6b887f93eaf048dbe7aae56c7ded7440651f5d373b2949bc",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/DV3_DV3-CRS-CV-10.json": "ec074e93061b652bc869935731f1d157b660c1c6a3b4654afcb220d254ad6395",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/DV3_DV3-CRS-CV-12.json": "4ef2532c55815f18db966666a353e6ceae3cdb282bd1433637e9ebb3fac2381a",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/DV3_DV3-HO-VS-01.json": "cffc5111a229af9de3964c68e9b4778df228b2f5b1b2b8d41e1412579a0dd0e2",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/DV3_DV3-NT-CV-15.json": "39d322f29966afe2bef34baf504f22e734638e61f6c73313c5be70088c4a95b8",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/DV3_DV3-OT-CV-08.json": "8f5008668f7d00551653652c6a42b36dcd1a33dd942b9d65b08d94c5e7c57e9c",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-BO-CV-055.json": "bd221f03c2d47ddd906b88a87185fe173b450be3b4eab941138690317810c8a2",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-BO-CV-063.json": "1b8ea83c2ba7938e37b09413f444541b53aab2a5f45505fcba0d45aa42be8f76",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-BO-CV-075.json": "9df5ef95708368cf33c8c93f992fa119c2333d5959571eafd651c911c3b957ed",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-BO-RE-024.json": "a98267f00d005ad2d984c8accdd1746c8acebbd03581407a2f8c3cfa3858086b",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-CR-CV-027.json": "b2d6dff9ed4fb8d78842ad7b1cb3df7fd03f20df0895248e8e7c68d4d915cd87",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-CR-CV-045.json": "6c30b71a7b026bc6dfaed73b20061c6bbf1de1385e9f73b5f5ee5c13f7c5151a",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-CR-RE-018.json": "6238dec88945d7f409c99afcc64c59c9935bab4a7750a949c45931be4fa63619",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-CR-RE-022.json": "e98906a435a2d8313ef7ab8992599199076e69bec4cebb9c740b1bec400ad5d2",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-CR-RE-070.json": "ed6ced37414e96bae327d4e5a81461f9b8b8231fc1f89a57ff8f4af2cda7629d",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-CR-RE-072.json": "b184d5ac14e421e7c8bb00f3e11cf6b6d987e990f88361467644e28ac01bf500",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-CR-RE-090.json": "b771b4e059077540d746fafd52cdbc5acfbe5cfa1c0bf4b9bf8af7260a79a619",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-HO-NC-002.json": "bf61fb8e1d78507795cd8b51bc3831474cd0dfd37fb581621fad27369b51fc31",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-HO-NC-059.json": "9ded149d5cbef270e302c1081f0519f1f0ed77334ce2e542b58f4bc0d61a226d",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-HO-NC-071.json": "b8e99a2a64af61065ccb1a6b3d410624af3aa5640bf9fcda140138cfa0a9d679",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-NU-CV-043.json": "577ce15fb6c10da3c78fd39c86172201ebc382a3c064b29a5f1a90aef40a2271",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-NU-CV-070.json": "87c370c89aaef626da7512413a9a7ff42fec6acb0467c26d5e991c62a011d03f",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-OT-CV-087.json": "edad8dbd000994f0cfd541169a0001a29025ab71f53bc19c0ec2adc35bf10e72",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-OT-CV-095.json": "f6d5fb5c3a6e92c05f27f384de289da13b996b6c7afa4b4e6f80130a58eacb60",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_BAS-OT-RE-016.json": "ebd11ce0bc7d47b2c315d5aeb392a664c39710099e2aa774529fa9e7bfe550db",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_CH-CR-CV-007.json": "40222c6f027f2832e5ddeb3d19ebbd038a216bfaa19aa28d537de530ddb4d202",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_CH-CR-CV-015.json": "c6a57a36858fc0e9f0ed698a37a8de7ef20e03047aa1939f19eef90e06877fd8",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_CH-CR-CV-031.json": "df7f41c656de5bfb26a47ef6f68f73481c1835053d8d98e8cf7c0406aee8fa4e",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_CH-CR-CV-059.json": "23dea42dc28355fbfd58a3d927573e923937bf84c9aa389133864f1c855ddb45",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_CH-CR-CV-073.json": "c365c04ff5563fd0fa9e71844f11fa44b6fbfca8334fd8af1f19247af8b5c3e2",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_CH-CR-CV-091.json": "a28c8758fa26672f22ab38f186872c63055025898feae86c0ea0e92e722ab03e",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_CH-CR-RE-038.json": "832cc87e206536d106b41e1a126b8b9d953cddd4585307937d8d2b42cdf25b60",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_CH-HO-CV-043.json": "abd2c5ef25f89890816cd2f849f9a0aa4fdeeac427bd2bd6a8098e7884430aca",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_CH-HO-CV-073.json": "c3aadcca8f81ce0def65f24fb111e7ed33e2f182c930377ef457d8c8ce216a0a",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_CH-HO-RE-057.json": "e89bef202b6d9c23bbf977b1ddf3134412959214490bf54a3afa6c195a549aac",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_CH-HO-RE-060.json": "260ad36a491d7c146af6f812046719ee8f272365eb9805448edb583909fd1033",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_CH-OT-CV-051.json": "1dad0a350fd142ebb458b06dc160ee69514c37fe43ce74c2ad5b2b6f74af6bb7",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_CH-OT-RE-064.json": "186b025a430b573b9e54b4cf0873585b07af864be9ea1ab44d708312f6494562",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L1-CRP-FIX-03.json": "8e94ef532c46203687afaf6cfcbf317fb90f3e224b393c602eb6dafb51342844",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L1-CRP-FIX-05.json": "d95df696cbc696a0112bc514586e2c7fbdcfce582628da09417febc99d4d8e81",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L1-CRP-FIX-09.json": "3d91ca33862a350db9cee39c9650208bfc1a92210bdae479c567493d84a71b2c",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L1-CRP-FIX-15.json": "47ecfa2518547b643bf389cd297d458ad0a8b2c050f9dd7477102259399066cb",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L1-CRP-VAR-12.json": "32614c6e85eda1d634239cdc6070322e72838d1ccab9326b662df15995d0209c",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L1-CRP-VAR-14.json": "c2fca6f7263471ebb337a1c225e67845ad1d02b682a3d9b4ebd05bd83ae0cc56",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L1-CRS-FIX-09.json": "2de38c39777e1327f845a59062e7010f05b0ecc81441adbfffa8a75b239ffb6b",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L1-CRS-VAR-08.json": "cb01a27361343a97453b5fb4c3a277db1415d8aedf5432d44555a668bd73a708",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L1-OT-VAR-20.json": "eb78ba3ce278fcdd0ca1ce699a1c218d4c8b97eb76fe5c4eed75b66e1d6c11fe",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L2-BO-FIX-19.json": "ca9f7b039966c1c57999c5c9506973083d8efec6c364dd48c31029477f3c7ce1",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L2-CRP-VAR-02.json": "237035ce320e1a074face332459097296d76ab8c9b8acf970ca7afa0db6d451b",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L2-CRP-VAR-16.json": "ecb889476de646edd3ab22da8717f693ce75d5c146f695f2c73bea5154c10ffe",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L2-CRS-FIX-19.json": "04f81a084e67848c9d6f47f1bf848f2cfab9535f7af538d8e137161bc6c7349f",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L2-CRS-VAR-14.json": "4def808e9f273144aa4ef729e87f017b0ae1525cbabd9e1a9862fc1609ad276f",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L2-HO-FIX-05.json": "431535affeea30fbfe0ae53c0e1bbcd72efdf9574a2d90627eb79bc3413d84cb",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L2-HO-FIX-11.json": "f559827878f6ce08723bc269dbf838a100c92041f13ee7bf2c95b58a59d3e8ad",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L2-HO-FIX-19.json": "864beef0983f941d4f092f0838ca11e26c4a43381e88f9018946177e2db838c7",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L2-HO-VAR-14.json": "1a3f10dfb507cc2bc649bebc2b9bf4a2a5628b1f96d79260e89e1eddae54266b",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L2-HO-VAR-16.json": "c7125a20ed75098e6acf8429f96da213554c256aecfcebd122e8742250fb51a4",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L3-BO-FIX-09.json": "d7efb59b9eaecfa0f1ebca79b3ce5371b9573e1d511bf625f412aab4e6eb6396",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L3-CRP-FIX-03.json": "19f8eb206fc0bbae0e1cb300cfc70a38af2eb393cff97370cec267d0e71756a5",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L3-CRP-FIX-17.json": "8e5d02430d9e05b7df50b7d52514ff18dca3aad7912fb37238ea842acd14febb",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L3-CRP-FIX-19.json": "01ebebe2a063c800c000e1750ceca5717a7a586c64439cb680213e2c132aa1a8",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/episodes/TS2_P2-L3-OT-FIX-09.json": "166044a7709bd67f373c14924f6dc64bbb348dc534cb6f040b2c3f2ff0505300"
+ },
+ "script_sha256": "4191291c63731c6a84ded57ef1efba7ed0db745ab4dea5ae2c90ad1890457bc9"
+}
