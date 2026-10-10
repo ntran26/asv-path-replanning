@@ -1,0 +1,108 @@
+{
+ "schema": 1,
+ "title": "E1b: V20 revision 2 on the 12-case probe",
+ "runs": [
+  "results/safety_dev/v20_development/runs/e0_probe12_off_v16",
+  "results/safety_dev/v20_development/runs/e1b_probe12_v20_r2"
+ ],
+ "run_manifest_sha256": {
+  "results/safety_dev/v20_development/runs/e0_probe12_off_v16": "19b4905dad09c8c89328558048fcbd7fdd8b0a1db33dbc6d96bc8d3eab2c424f",
+  "results/safety_dev/v20_development/runs/e1b_probe12_v20_r2": "f142a79125da24381ec3febfb210655bae3393cc5120641848122d6c08505e54"
+ },
+ "cases": 12,
+ "modes": [
+  "off",
+  "v16",
+  "v20_r2"
+ ],
+ "per_mode": {
+  "off": {
+   "goal": 10,
+   "episodes": 12,
+   "collision:target": 1,
+   "collision:obstacle": 1
+  },
+  "v16": {
+   "goal": 5,
+   "episodes": 12,
+   "collision:boundary": 4,
+   "collision:target": 3
+  },
+  "v20_r2": {
+   "goal": 6,
+   "episodes": 12,
+   "out_of_contract_episodes": 8,
+   "decisions": 692,
+   "certified_decisions": 377,
+   "level:v16_unchanged_certified": 365,
+   "level:v16_unchanged_finite_only": 87,
+   "level:out_of_contract_v16": 38,
+   "identical_to_v16": 6,
+   "collision:boundary": 2,
+   "level:gatekeeper_uncertified_v16": 85,
+   "level:out_of_contract_stop": 105,
+   "collision:target": 3,
+   "level:gatekeeper_replaced": 8,
+   "level:committed_continuation": 3,
+   "level:replaced_by_sac": 1,
+   "timeout": 1
+  }
+ },
+ "pairs": {
+  "v16_vs_off": {
+   "pairs": 12,
+   "reference_goals": 10,
+   "candidate_goals": 5,
+   "gained_goals": 1,
+   "lost_goals": 6,
+   "both_goal": 4,
+   "both_fail": 1
+  },
+  "v20_r2_vs_off": {
+   "pairs": 12,
+   "reference_goals": 10,
+   "candidate_goals": 6,
+   "gained_goals": 1,
+   "lost_goals": 5,
+   "both_goal": 5,
+   "both_fail": 1
+  },
+  "v20_r2_vs_v16": {
+   "pairs": 12,
+   "reference_goals": 5,
+   "candidate_goals": 6,
+   "gained_goals": 1,
+   "lost_goals": 0,
+   "both_goal": 5,
+   "both_fail": 6
+  }
+ },
+ "transitions": {
+  "v16_vs_off": {
+   "goal -> collision:boundary": 4,
+   "goal -> collision:target": 2,
+   "collision:obstacle -> goal": 1
+  },
+  "v20_r2_vs_off": {
+   "goal -> collision:boundary": 2,
+   "goal -> collision:target": 2,
+   "collision:obstacle -> goal": 1,
+   "goal -> timeout": 1
+  },
+  "v20_r2_vs_v16": {
+   "collision:boundary -> goal": 1,
+   "collision:boundary -> timeout": 1
+  }
+ },
+ "v20_decision_seconds": {
+  "p50": 0.6708733129999018,
+  "p95": 1.089818992999426,
+  "max": 18.195513212998776,
+  "decisions": 692
+ },
+ "runtime_environment": {
+  "python": "3.11.17 (main, Oct  1 2026, 15:41:07) [GCC 13.3.0]",
+  "platform": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39"
+ },
+ "script_sha256": "e7d23fe0d959dbf8b1640c121a17f2cdcc6be458287458d427480c13586e3e82"
+}

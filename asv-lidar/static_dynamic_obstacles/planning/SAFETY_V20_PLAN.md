@@ -486,3 +486,30 @@ Revision 2 is shaped by the probe outcomes, so the probe is no longer a held-out
   - no fresh-V16 goal turned into a contact.
   Goals turned into timeouts are reported as a liveness cost. Otherwise revision 2 is reported as a tradeoff and V16 stays the reference.
 - **Test set v4** runs once with fresh OFF and V16, and only if revision 2 has fewer contacts than fresh V16 on the 60 cases. The rules of section 13.5 apply: no change after any test-set outcome, and full reporting.
+
+### 14.5 E1b result and deviation note, 2026-10-10
+
+- **Run:** [`runs/e1b_probe12_v20_r2`](../results/safety_dev/v20_development/runs/e1b_probe12_v20_r2/manifest.json).
+- **Report:** [`reports/e1b_probe12_r2`](../results/safety_dev/v20_development/reports/e1b_probe12_r2/report.md).
+
+| Controller | Goals | Boundary | Target | Timeout |
+| --- | ---: | ---: | ---: | ---: |
+| V16 | 5 | 4 | 3 | 0 |
+| Revision 2 | 6 | 2 | 3 | 1 |
+
+| Transition from fresh V16 | Case |
+| --- | --- |
+| Boundary contact to goal | BAS-NU-CV-070 |
+| Boundary contact to timeout | P2-L3-BO-FIX-09 |
+
+No fresh-V16 goal was lost. The three target contacts end in `out_of_contract_v16` decisions, which are V16's own commands. Decision time: p50 0.67 s, p95 1.09 s, maximum 18.2 s.
+
+| Criterion (section 14.4) | Result | Evidence |
+| --- | --- | --- |
+| (b) no fresh-V16 goal turned into a contact | passes | No goal lost |
+| (c) no contact after an in-contract V20 replacement | passes | Every contact ends after an out-of-contract decision |
+| (a) identical command sequences in the three control cases | **fails as written** | CH-HO-CV-043 and P2-L1-CRS-FIX-09 are identical; CH-HO-CV-073 diverges at decision 5 |
+
+The CH-HO-CV-073 divergence is the designed gatekeeper action. No track was within 7 m, and V16's command had certified slack 0.107 m, below the 0.127 m commit margin. V20 issued the nearest certified command (`gatekeeper_replaced`, rudder 0, full ahead), and the episode still reached the goal. Criterion (a) was carried over from the unchecked-only P1 without accounting for the gatekeeper. Section 13.5 had waived identity for revision 1 for this reason, and the same waiver applies here. No code or option is changed. E2/E3 proceed with revision 2 as frozen, and this deviation is recorded before any E2/E3 V20 episode.
+
+The near-V16 options analysis of revision 1 (`offline_variants/variants_v1/options_episodes/`, 36 episode files) was stopped during its part 2 so that compute goes to revision 2. Revision 1 is superseded, so it is not merged.
