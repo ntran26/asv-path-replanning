@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "suite_version": "4.0",
+  "definition_digest": "a8c40beb234ea7f9600fcce4e97271e0eb2e74bb5d8e0dc05d77aa37e9e7b2b0",
+  "episodes": 1000,
+  "source_counts": {
+    "frozen": 664,
+    "paper2": 336
+  },
+  "variant_counts": {
+    "CV": 340,
+    "NC": 66,
+    "RE": 258,
+    "FIX": 156,
+    "VAR": 150,
+    "": 30
+  },
+  "shared_geometry_and_seed": {
+    "v2": 721,
+    "v3": 933
+  },
+  "replaced_from_v3": 67,
+  "historical_sac": {
+    "path": "results/test_set/v4/sacs0_bl3/episodes.csv",
+    "sha256": "98e3a30fab5d3720231f1242aa851f052f2dedc644b47fc1075c0f68623b5553",
+    "outcomes": {
+      "goal": 865,
+      "collision:target": 53,
+      "collision:obstacle": 70,
+      "collision:boundary": 12
+    },
+    "evidence": "Historical saved CSV reusing v3 rows for 933 shared episodes; no frozen source/checkpoint provenance. Fresh matched OFF is the pairing reference."
+  },
+  "episodes_run_by_preparation": 0,
+  "primary_selection": "results/safety_dev/testset_v4_main/selection.json",
+  "input_sha256": {
+    "results/test_set/v4/definition.json": "a6777a5c15a4e2c2cbb90344ffa0a2450c0000bbf66e5d0a9c85828a7b7eedf3",
+    "results/test_set/v4/definition.csv": "3cb4e3fd3b3b418ba2dd584feb448a299b268491228505daff5678977fe52f4c",
+    "results/test_set/v4/set_v4.0.pkl": "148916fa4cbad0a2fd8e9e100b29b7fa66eda48674fa2378919e499729c47c73"
+  }
+}
