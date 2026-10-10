@@ -26,4 +26,6 @@ Python 3.11.17 virtual environment with numpy 1.26.4, torch 2.2.1, gymnasium 0.2
 | [`runs/e1b_probe12_v20_r2/`](runs/e1b_probe12_v20_r2/manifest.json), [`reports/e1b_probe12_r2/`](reports/e1b_probe12_r2/report.md) | E1b | `v20_r2` 6 goals, 5 contacts, 1 timeout on the probe |
 | `runs/e2_cohort32_off_v16/`, `runs/e3_broader40_off_v16/` | E2/E3 references | Fresh OFF and V16 on the other 60 development cases |
 | `runs/e2_cohort32_r2_*`, `runs/e3_broader40_r2_*`, [`reports/e2e3_cohorts60_r2/`](reports/e2e3_cohorts60_r2/report.md) | E2/E3 | `v20_r2` 40 goals, 16 contacts, 4 timeouts (V16: 45 goals, 15 contacts); not promoted |
-| `runs/e1c_probe12_r3`, `runs/e2_cohort32_r3_*`, `runs/e3_broader40_r3_*` | Revision 3 | `v20_r3` on all 72 development cases (plan section 15) |
+| `runs/e1c_probe12_r3`, `runs/e2_cohort32_r3_*`, `runs/e3_broader40_r3_*`, [`reports/dev72_r3/`](reports/dev72_r3/report.md) | Revision 3 | `v20_r3` on all 72 development cases: 46 goals, 24 contacts, 2 timeouts (V16: 50 goals, 22 contacts); test set v4 not run |
+
+**Outcome (plan section 16).** No V20 configuration reduces contacts relative to fresh V16 on the development cases, and each turns some V16 goals into contacts. V16 remains the reference. The stop-terminal backup is not pursued further, and test set v4 was not run for V20 (`../testset_v4_main/` holds only the frozen selection and inventory).

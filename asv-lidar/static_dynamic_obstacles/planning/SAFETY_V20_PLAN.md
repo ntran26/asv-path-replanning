@@ -557,3 +557,56 @@ Revision 3 is shaped by the probe and by the revision-2 outcomes on the 60 cases
 - **Runs:** all 72 development cases (probe and both cohorts), `v20_r3`, in chunks of 12, paired with the existing fresh OFF and V16 runs.
 - **Reported:** goals, each contact type, timeouts, rescued SAC failures, lost SAC successes, every transition against fresh V16, and the last decision levels before each contact.
 - **Test set v4:** runs once with fresh OFF, V16 and `v20_r3`, all 1,000 scenarios in definition order, in chunks of 25 with compact gzip traces, if and only if revision 3 has fewer contacts than fresh V16 on the 72 development cases. No change follows any test-set outcome.
+
+## 16. Revision 3 result and decision, 2026-10-10
+
+### 16.1 Revision 3 on the 72 development cases
+
+- **Runs:** `runs/e1c_probe12_r3`, `runs/e2_cohort32_r3_{a,b}` and `runs/e3_broader40_r3_{a,b,c}`.
+- **References:** fresh OFF and V16 from `e0_probe12_off_v16`, `e2_cohort32_off_v16` and `e3_broader40_off_v16`.
+- **Report:** [`reports/dev72_r3`](../results/safety_dev/v20_development/reports/dev72_r3/report.md).
+
+| Controller | Goals | Rescued SAC failures | Lost SAC successes | Obstacle | Boundary | Target | Timeout |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| OFF | 37 | - | - | 16 | 3 | 16 | 0 |
+| V16 | 50 | 19 | 6 | 6 | 7 | 9 | 0 |
+| Revision 3 | 46 | 16 | 7 | 8 | 7 | 9 | 2 |
+
+Against fresh V16, revision 3 makes 2 contacts goals (BAS-NU-CV-070, P2-L2-HO-VAR-16) and 1 contact a timeout (BAS-NU-CV-043). It turns 5 goals into contacts (DV3-CRP-CV-16, DV3-HO-CV-03, BAS-CR-RE-070, P2-L1-CRP-FIX-09, P2-L1-CRP-VAR-14) and 1 goal into a timeout (CH-CR-CV-073), and changes 2 contact types. Contacts: 24 against 22.
+
+In every lost goal, V20 changed the trajectory only through certified actions (gatekeeper replacements and committed continuations), and V16 issued every uncertified command. DV3-HO-CV-03 diverges at a single certified gatekeeper brake at decision 11, after which V16 drove an unchanged policy into an obstacle it had avoided before.
+
+Decision time: p50 0.21 s, p95 1.07 s, maximum 12.9 s.
+
+**Test set v4 is not run.** The pre-registered condition of section 15.3 is not met: revision 3 has 24 contacts against fresh V16's 22.
+
+### 16.2 All V20 configurations, against fresh V16 on the same cases
+
+| Configuration | Cases | Goals (V16) | Contacts (V16) | Timeouts | V16 goals lost to contact |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Nominal (stop fallback, unchecked branches only) | 12 (probe) | 3 (5) | 7 (7) | 2 | 2 |
+| Revision 1 (gatekeeper, extended tails, margin) | 12 (probe) | 2 (5) | 7 (7) | 3 | 3 |
+| Revision 2 (traffic-gated gatekeeper and stop) | 12 (probe) | 6 (5) | 5 (7) | 1 | 0 |
+| Revision 2 | 60 (cohorts) | 40 (45) | 16 (15) | 4 | 5 |
+| Revision 3 (revision 2 without uncertified stops) | 72 (all) | 46 (50) | 24 (22) | 2 | 5 |
+
+### 16.3 Decision: redirect
+
+No V20 configuration reduces contacts relative to V16 on the development data, and each turns V16 goals into contacts. V16 remains the reference candidate. The stop-terminal backup is not pursued further, because the evidence identifies three limits that a further revision of it cannot remove:
+
+1. **Rest is not a usable terminal set in this problem.**
+   - Against moving targets, a stopped vessel is struck when it lies in a crossing target's path (DV3-BO-CV-04, P2-L1-CRP-VAR-12, CH-HO-CV-073).
+   - Near static hazards, braking out of a turn leaves yaw and sway that the identified model damps only quadratically at zero surge, so a stopped hull still reaches the wall (revision 2 losses).
+   - The certified share is high in open water (85 % of checked decisions without allowances) and low exactly where it is needed (11 % of V16's unchecked decisions; 2 of 21 contact precursors at their first unchecked decision).
+2. **The target certificate is limited by the target estimate, not by the filter.** Constant-velocity forecasts from V16's track views cover truth 68 % of the time at 0.5 s.
+   - The calibrated 95 % allowance (0.57 m at 0.5 s, 6.4 m at 20 s) removes availability.
+   - Without it, contacts occur after certified decisions (CRP-VAR-12).
+   - About half of the recheck failures at the moments V16 turns unchecked come from target-estimate updates alone (16 of 33).
+3. **Certified interventions perturb a closed loop that V16 and SAC often recover from, and offline certificate metrics do not predict the net effect.** Revision 3 changes trajectories only through certified actions, yet it loses five V16 goals to contacts against two gained. Gates G2/G3 measured certificate availability and one-step survival along V16's own trajectories. They could not measure how often a certified deviation leads the unchanged policy into a worse state, and that effect dominated the episodes.
+
+**Directions for a redirected design** (not implemented):
+- A target-state estimator whose short-horizon forecasts are calibrated well enough for a separation certificate: extended-object tracking with interacting motion models (section 3.2), validated by forecast coverage before any filter work.
+- A terminal set that stays safe against constant-velocity targets: certified separating or stern-passing branches that keep moving, instead of rest.
+- Evaluation of any intervening layer by paired closed-loop counterfactuals from the decision of first divergence (resimulating V16 and the candidate from saved states), so that the cost of perturbing the policy is measured before cohort runs.
+
+The V20 modules, options, tests, tools and all runs remain in place for reference. Nothing in V16, the environment, the constants, the checkpoint or the configuration was changed.
