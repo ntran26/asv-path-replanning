@@ -42,6 +42,8 @@ import ship
 CERTIFIED_FALLBACK = True
 ALLOWANCE_TABLES = "calibrated"
 OUT_OF_CONTRACT = "committed_then_stop"
+TAIL_FAMILY = "stop"
+ENFORCEMENT = "unchecked_only"
 
 # V16 branches whose issued plan hard-passed the inherited checker at that decision.
 CHECKED_BRANCHES = frozenset({
@@ -68,7 +70,8 @@ def _same_command(a, b) -> bool:
 
 class SafetyFilterV20(v16.SafetyFilterV16):
     def __init__(self, *, certified_fallback=None, allowance_tables=None,
-                 hold_horizon_s=None, out_of_contract=None, **v16_options):
+                 hold_horizon_s=None, out_of_contract=None, tail_family=None,
+                 enforcement=None, **v16_options):
         super().__init__(**v16_options)
         self.certified_fallback = (CERTIFIED_FALLBACK if certified_fallback is None
                                    else bool(certified_fallback))
@@ -85,6 +88,14 @@ class SafetyFilterV20(v16.SafetyFilterV16):
         if mode not in ("committed_then_stop", "v16"):
             raise ValueError("out_of_contract must be 'committed_then_stop' or 'v16'")
         self.out_of_contract = mode
+        family = TAIL_FAMILY if tail_family is None else str(tail_family)
+        if family not in sc.TAIL_FAMILIES:
+            raise ValueError("tail_family must be 'stop' or 'extended'")
+        self.tail_family = family
+        enforce = ENFORCEMENT if enforcement is None else str(enforcement)
+        if enforce not in ("unchecked_only", "gatekeeper"):
+            raise ValueError("enforcement must be 'unchecked_only' or 'gatekeeper'")
+        self.enforcement = enforce
         self.v20_committed = None           # (DECISIONS, 2) contingency starting at the next decision
         self._v20_previous_tracks = None
 
@@ -150,6 +161,7 @@ class SafetyFilterV20(v16.SafetyFilterV16):
         sac_command = np.asarray(policy, dtype=float)
         details = {"v20_certified_fallback": self.certified_fallback,
                    "v20_allowance_tables": self.allowance_tables,
+                   "v20_tail_family": self.tail_family, "v20_enforcement": self.enforcement,
                    "v20_v16_why": why, "v20_v16_command": np.asarray(out).tolist(),
                    "v20_v16_brake": brake}
         if bool(getattr(env, "command_rate_limit", False)) or snap is None:
@@ -161,7 +173,8 @@ class SafetyFilterV20(v16.SafetyFilterV16):
             return out, changed
 
         checker = sc.ContingencyChecker(snap, self._v20_before, self.own_table,
-                                        self.target_table, self.hold_horizon_s)
+                                        self.target_table, self.hold_horizon_s,
+                                        sc.TAIL_FAMILIES[self.tail_family])
         residuals = self._contract_residuals(snap)
         rho_half = float(sc._lookup(self.target_table, np.array([0.5]))[0])
         details.update(v20_contract_residual_max=max(residuals) if residuals else None,
@@ -182,9 +195,29 @@ class SafetyFilterV20(v16.SafetyFilterV16):
 
         checked = why == IDLE or why in CHECKED_BRANCHES
         level, source, cert, command = None, None, None, None
-        if checked or not self.certified_fallback:
+        if not self.certified_fallback or (checked and cert_v16.certified):
             level = "v16_unchanged_certified" if cert_v16.certified else "v16_unchanged_finite_only"
             cert = cert_v16 if cert_v16.certified else None
+        elif checked and self.enforcement == "unchecked_only":
+            level = "v16_unchanged_finite_only"
+        elif checked:
+            # Gatekeeper: V16's own checked command is not certified. Keep V16's
+            # intent with the nearest certified command; otherwise the
+            # committed contingency; otherwise V16's checked command.
+            reference = v16_command if np.isfinite(v16_command[1]) else np.array([v16_command[0], -1.0])
+            grid = sc.projection_candidates(reference)
+            batch = checker.certify_many(grid)
+            details["v20_candidates_evaluated"] = len(grid)
+            for candidate, certificate in zip(grid, batch):
+                if certificate.certified:
+                    source, cert, command = "gatekeeper", certificate, candidate
+                    break
+            if cert is None and cert_previous is not None and cert_previous.certified:
+                source, cert, command = "committed", cert_previous, previous[0]
+            if cert is not None:
+                level = "gatekeeper_replaced" if source == "gatekeeper" else "committed_continuation"
+            else:
+                level = "gatekeeper_uncertified_v16"
         else:
             options = [("sac", sac_command, cert_sac), ("v16", v16_command, cert_v16)]
             options += [("projection", c, None) for c in sc.projection_candidates(sac_command)]
@@ -238,7 +271,8 @@ class SafetyFilterV20(v16.SafetyFilterV16):
         if replace:
             return self._issue_replacement(env, policy, command, sequence, source, details)
         if self.certified_fallback and level in ("replaced_by_v16_certified", "replaced_by_sac",
-                                                 "replaced_by_projection", "committed_continuation"):
+                                                 "replaced_by_projection", "committed_continuation",
+                                                 "gatekeeper_replaced"):
             # Same command as V16 in an unchecked branch: keep it, but follow the
             # certified contingency instead of V16's failed stored plan.
             self.plan = _v16_plan(sequence)

@@ -80,6 +80,33 @@ def tails(decisions: int = DECISIONS) -> np.ndarray:
 TAILS = tails()
 
 
+def extended_tails(decisions: int = DECISIONS) -> np.ndarray:
+    """Stop tails plus turn-then-cruise-then-stop tails, (71, decisions - 1, 2).
+
+    With traffic, stopping where a constant-velocity target will pass is not a
+    safe terminal; continuing at cruise for 0-6 s after an optional turn lets
+    the target pass before the stop (fail-safe manoeuvres that continue before
+    braking, as in Pek et al. 2020, https://doi.org/10.1038/s42256-020-0225-y).
+    The first three rows are the immediate-stop tails of `tails()`.
+    """
+    length = decisions - 1
+    rows = list(tails(decisions)[:len(STOP_RUDDERS)])
+    for rudder in (-1.0, -0.5, 0.0, 0.5, 1.0):
+        for n in (1, 2, 4, 6):
+            if rudder == 0.0 and n > 1:
+                continue
+            for cruise in (0, 4, 8, 12):
+                tail = np.tile((0.0, np.nan), (length, 1))
+                tail[:n] = (rudder, 0.0)
+                tail[n:n + cruise] = (0.0, 0.0)
+                rows.append(tail)
+    return np.asarray(rows, dtype=float)
+
+
+EXTENDED_TAILS = extended_tails()
+TAIL_FAMILIES = {"stop": TAILS, "extended": EXTENDED_TAILS}
+
+
 def sequences_for(first_commands: np.ndarray, tail_bank: np.ndarray = TAILS) -> np.ndarray:
     """Candidate-major sequences (m * len(tail_bank), decisions, 2)."""
     first = np.asarray(first_commands, dtype=float).reshape(-1, 2)
@@ -218,9 +245,10 @@ class ContingencyChecker:
     """Certificate evaluation from one decision snapshot and actuator history."""
 
     def __init__(self, snap, actuators, own_table=None, target_table=None,
-                 hold_horizon_s: float = HOLD_HORIZON_S):
+                 hold_horizon_s: float = HOLD_HORIZON_S, tails: np.ndarray = TAILS):
         if not np.isfinite(hold_horizon_s) or hold_horizon_s < 0.0:
             raise ValueError("hold horizon must be finite and nonnegative")
+        self.tails = np.asarray(tails, dtype=float)
         self.snap, self.actuators = snap, actuators
         self.own_table, self.target_table = own_table, target_table
         self.hold_horizon_s = float(hold_horizon_s)
@@ -331,9 +359,9 @@ class ContingencyChecker:
                 or np.isinf(first[:, 1]).any()
                 or (np.abs(first[np.isfinite(first[:, 1]), 1]) > 1.0).any()):
             raise ValueError("First command must be normalized; only throttle may be NaN")
-        seqs = sequences_for(first)
+        seqs = sequences_for(first, self.tails)
         slack, rest, parts = self.evaluate(seqs)
-        k, n_stop = len(TAILS), len(STOP_RUDDERS)
+        k, n_stop = len(self.tails), len(STOP_RUDDERS)
         out = []
         for i in range(len(first)):
             block = slice(i * k, (i + 1) * k)
