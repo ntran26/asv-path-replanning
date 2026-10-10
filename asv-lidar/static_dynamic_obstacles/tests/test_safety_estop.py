@@ -162,8 +162,10 @@ def test_outcomes_after_commitment():
     assert env.estop_protocol["commit_step"] == 4
     env.u_body, env.asv_w = 0.01, 3.0                       # still spinning: not still
     assert ep.after_step(env, (None, 0.0, False, False, info), 5)[2] is False
-    env.asv_w = 0.5
-    result = ep.after_step(env, (None, 0.0, False, False, info), 6)
+    env.asv_w = 0.5                                          # own ship still, target still braking
+    assert ep.after_step(env, (None, 0.0, False, False, info), 6)[2] is False
+    target.speed = 0.0
+    result = ep.after_step(env, (None, 0.0, False, False, info), 7)
     assert result[2] is True and env.estop_protocol["outcome"] == "stopped"
     env2 = protocol_env(tgtmod.Target(x=0.0, y=0.0, heading=0.0, speed=1.0))
     ep.install(env2)

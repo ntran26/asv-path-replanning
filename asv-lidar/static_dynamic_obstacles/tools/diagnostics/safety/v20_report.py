@@ -25,7 +25,8 @@ from pathlib import Path
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[3]
-OUTCOMES = ("goal", "collision:obstacle", "collision:boundary", "collision:target", "timeout")
+OUTCOMES = ("goal", "collision:obstacle", "collision:boundary", "collision:target", "timeout",
+            "stopped", "collision:by_target")
 SHARED_KEYS = ("checkpoint_sha256", "config_sha256", "constants")
 V20_MODULES = ("src/safety_v20.py", "src/safety_v20_contingency.py", "src/safety_v20_tubes.py")
 
@@ -223,11 +224,13 @@ def main():
     lines = [f"# {args.title}", "",
              f"{len(cases)} scenes; fresh runs paired by case ID, episode seed and scenario digest. "
              "Rescue/loss are relative to the fresh OFF record of the same scene.", "",
-             "| Mode | Episodes | Goals | Obstacle | Boundary | Target | Timeout |", "| --- | ---: | ---: | ---: | ---: | ---: | ---: |"]
+             "| Mode | Episodes | Goals | Obstacle | Boundary | Target | Timeout | Stopped | Target strikes stopped ship |",
+             "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"]
     for m in modes:
         c = per_mode[m]
         lines.append(f"| {m} | {c['episodes']} | {c['goal']} | {c['collision:obstacle']} | "
-                     f"{c['collision:boundary']} | {c['collision:target']} | {c['timeout']} |")
+                     f"{c['collision:boundary']} | {c['collision:target']} | {c['timeout']} | "
+                     f"{c['stopped']} | {c['collision:by_target']} |")
     lines += ["", "| Comparison | Pairs | Reference goals | Candidate goals | Gained | Lost |",
               "| --- | ---: | ---: | ---: | ---: | ---: |"]
     for k, s in sorted(pair_stats.items()):

@@ -37,6 +37,8 @@ MAX_WINDOW_S = 6.0
 TRUE_HALF_L = 0.5 * ship.VESSEL_LENGTH
 TRUE_HALF_W = 0.5 * ship.VESSEL_WIDTH
 CHUNK_COLUMNS = 256
+# Hazards overlapping the hull at the current estimate are estimation errors.
+EXCLUDE_CURRENT_OVERLAPS = False
 
 
 def continuation_bank(decisions: int) -> np.ndarray:
@@ -89,22 +91,50 @@ def corners_outside(positions, headings, edges_a) -> np.ndarray:
     return ~sc.inside_polygon(pts, edges_a).all(axis=-1)
 
 
-def first_contact_times(snap, ro) -> np.ndarray:
-    """First sample time of predicted physical contact per column; inf if none."""
-    contact = true_point_clearance(ro.positions, ro.headings, snap.points) < 0.0
+def current_overlap_free(snap, points):
+    """Static points not inside the true hull at the current estimated pose.
+
+    A real overlap would already be a collision, so a remembered point inside
+    the hull now is an estimation error (stale memory, pose error or target
+    returns kept as static points) and cannot make a contact certain.
+    """
+    points = np.asarray(points, dtype=float).reshape(-1, 2)
+    if not len(points):
+        return points
+    pos = np.array([[[snap.x, snap.y]]])
+    hdg = np.array([[snap.heading]])
+    clear = np.array([true_point_clearance(pos, hdg, p[None])[0, 0] for p in points])
+    return points[clear >= 0.0]
+
+
+def first_contact_times(snap, ro, exclude_current_overlaps: bool = EXCLUDE_CURRENT_OVERLAPS) -> np.ndarray:
+    """First sample time of predicted physical contact per column; inf if none.
+
+    With ``exclude_current_overlaps`` a hazard that already overlaps the true
+    hull at the current estimated pose is treated as an estimation error and
+    left out: static points inside the hull, a polygon that already excludes a
+    hull corner, and target hulls that already overlap.
+    """
+    points = current_overlap_free(snap, snap.points) if exclude_current_overlaps else snap.points
+    contact = true_point_clearance(ro.positions, ro.headings, points) < 0.0
     poly = np.asarray(snap.edges_a, dtype=float)
     if poly.ndim == 2 and len(poly) >= 3:
-        contact |= corners_outside(ro.positions, ro.headings, poly)
+        outside = corners_outside(ro.positions, ro.headings, poly)
+        if not (exclude_current_overlaps and outside[0].any()):
+            contact |= outside
     for track in snap.tracks:
         future = track.position + ro.times[:, None] * track.velocity
         gap = hull_separation(ro.positions, ro.headings, future[:, None, :], track.heading, margin=0.0)
+        if exclude_current_overlaps and (gap[0] < 0.0).any():
+            continue
         contact |= gap < 0.0
     hit = contact.any(axis=0)
     first = np.argmax(contact, axis=0)
     return np.where(hit, ro.times[first], np.inf)
 
 
-def escape_time(snap, actuators, first_commands, window_s: float = MAX_WINDOW_S) -> tuple:
+def escape_time(snap, actuators, first_commands, window_s: float = MAX_WINDOW_S,
+                exclude_current_overlaps: bool = None) -> tuple:
     """T*: the longest predicted time before contact over all candidate sequences.
 
     Each sequence's time is the later of its two reverse-model contact times
@@ -123,7 +153,9 @@ def escape_time(snap, actuators, first_commands, window_s: float = MAX_WINDOW_S)
             keep = ro.times <= window_s + 1e-9
             ro = sc.StateRollout(ro.times[keep], ro.positions[keep], ro.headings[keep], ro.u[keep],
                                  ro.v[keep], ro.r[keep], ro.servo[keep])
-            best[cols] = np.maximum(best[cols], first_contact_times(snap, ro))
+            best[cols] = np.maximum(best[cols], first_contact_times(
+                snap, ro, EXCLUDE_CURRENT_OVERLAPS if exclude_current_overlaps is None
+                else bool(exclude_current_overlaps)))
     i = int(np.argmax(best))
     return float(best[i]), {"sequences": int(len(seqs)), "best_sequence_first_command": seqs[i, 0].tolist(),
                             "best_sequence_index": i}

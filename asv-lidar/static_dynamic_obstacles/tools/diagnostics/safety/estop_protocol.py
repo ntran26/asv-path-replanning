@@ -8,8 +8,9 @@ environment rules from that moment, without changing env.py or its defaults:
   rest, ignoring its behaviour model (installed per target at reset, so the
   braking starts inside the same physics step as the commitment);
 * the episode ends as ``stopped`` once the own ship is still (true planar
-  speed and yaw rate below the thresholds); truth is used only here, for
-  termination and scoring;
+  speed and yaw rate below the thresholds) and every target has finished
+  braking, so a braking target cannot reach the stopped ship after the
+  episode was scored; truth is used only here, for termination and scoring;
 * a target contact after the commitment is ``collision:by_target``.
 """
 from __future__ import annotations
@@ -55,8 +56,10 @@ def install(env) -> None:
 
 
 def still(env) -> bool:
+    """Own ship still and every target at rest."""
     return (math.hypot(float(env.u_body), float(env.v_body)) <= STILL_SPEED_MPS
-            and abs(float(env.asv_w)) <= STILL_YAW_DEGPS)
+            and abs(float(env.asv_w)) <= STILL_YAW_DEGPS
+            and all(float(t.speed) <= 0.0 or t._stopped for t in env.targets))
 
 
 def after_step(env, result, step_index: int):

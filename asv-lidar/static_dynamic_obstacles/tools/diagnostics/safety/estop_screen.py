@@ -37,6 +37,7 @@ import v20_replay_saved_decisions as replay  # noqa: E402
 DEV = ROOT / "results/safety_dev/v20_development"
 OUT = ROOT / "results/safety_dev/estop_protocol"
 WINDOWS = (1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0)
+EXCLUDE = False                    # set by --exclude-current-overlaps
 SUCCESS = ("rescue", "both_goal")
 
 
@@ -59,7 +60,7 @@ def screen_episode(trace, unchecked_steps):
         sac = np.clip(np.asarray(rec["policy_action"], float), -1, 1)
         firsts = np.vstack([sac[None], replay.issued(rec)[None], np.asarray(grid, float)])
         t0 = time.perf_counter()
-        t_star, details = se.escape_time(snap, act, firsts)
+        t_star, details = se.escape_time(snap, act, firsts, exclude_current_overlaps=EXCLUDE)
         rows.append({"step": rec["step"], "why": rec["filter"]["why"], "t_star": t_star,
                      "seconds": time.perf_counter() - t0, "best_first_command": details["best_sequence_first_command"]})
     return rows
@@ -97,7 +98,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--replay", required=True)
     parser.add_argument("--tag", required=True)
+    parser.add_argument("--exclude-current-overlaps", action="store_true",
+                        help="Ignore hazards already overlapping the hull at the current estimate")
     args = parser.parse_args()
+    global EXCLUDE
+    EXCLUDE = bool(args.exclude_current_overlaps)
     out = OUT / args.tag
     if Path(args.tag).name != args.tag:
         parser.error("Use a simple tag")
@@ -119,7 +124,8 @@ def main():
                          "trace_sha256": sha(trace)})
         print(f"{case} {len(rows)} unchecked decisions {time.perf_counter() - t0:.0f}s", flush=True)
     table, chosen = score(episodes)
-    result = {"schema": 1, "replay": args.replay, "windows": table, "chosen_window_s": chosen,
+    result = {"schema": 1, "replay": args.replay, "exclude_current_overlaps": EXCLUDE,
+              "windows": table, "chosen_window_s": chosen,
               "rule": "max caught contacts with zero false alarms; ties to the smaller window",
               "episodes": episodes, "script_sha256": sha(Path(__file__)),
               "module_sha256": {m: sha(ROOT / "src" / m) for m in ("safety_estop.py", "safety_v20_contingency.py")}}

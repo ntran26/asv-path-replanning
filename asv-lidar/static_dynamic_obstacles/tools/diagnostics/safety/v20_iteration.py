@@ -13,6 +13,12 @@ retries or result reuse, STOP marker), with three differences:
   the manifest, because fresh runs in this environment are the only valid
   pairing references.
 
+Modes v16_estop and v17_estop run V16 and V17 with the permanent emergency
+stop and the protocol's environment rules (planning/SAFETY_ESTOP_PROTOCOL.md;
+tools/diagnostics/safety/estop_protocol.py); their result rows give the
+protocol outcome (``stopped``, ``collision:by_target``) and the unchanged
+environment outcome in ``unprotocol_outcome``.
+
 Modes: off, v16, v20, the pre-registered V20 options v20_nominal
 (allowance_tables="none") and v20_oocv16 (out_of_contract="v16"), and
 v20_r1, v20_r2 and v20_r3 (revisions 1-3: safety_v20.REVISIONn_OPTIONS).
@@ -46,6 +52,7 @@ for _name in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS", "NUM
 ROOT = Path(__file__).resolve().parents[3]
 sys.path[:0] = [str(ROOT / "src"), str(ROOT / "tools/tiers"), str(Path(__file__).resolve().parent)]
 import v9_paired_pilot as pilot  # noqa: E402
+import estop_protocol  # noqa: E402
 from v9_paired_pilot import MODEL, EXPECTED_MODEL, jsonable, sha, write_json  # noqa: E402
 
 DEVELOPMENT_OUT = ROOT / "results/safety_dev/v20_development/runs"
@@ -66,7 +73,14 @@ VARIANTS = {
     "v20_r2": (20, "safety_v20", dict(importlib.import_module("safety_v20").REVISION2_OPTIONS)),
     # Revision 3 (planning/SAFETY_V20_PLAN.md, section 15).
     "v20_r3": (20, "safety_v20", dict(importlib.import_module("safety_v20").REVISION3_OPTIONS)),
+    # Emergency-stop protocol (planning/SAFETY_ESTOP_PROTOCOL.md).
+    "v16_estop": (16, "safety_estop", {}),
+    "v17_estop": (17, "safety_estop", {}),
 }
+# Filter class per mode where it is not SafetyFilterV<version> in the module.
+VARIANT_CLASSES = {"v16_estop": "SafetyFilterV16E", "v17_estop": "SafetyFilterV17E"}
+# Modes evaluated under the emergency-stop protocol's environment rules.
+PROTOCOL_MODES = frozenset({"v16_estop", "v17_estop"})
 
 
 def load_ts4_cache():
@@ -180,7 +194,8 @@ def main():
     classes, options = {}, {}
     for mode in modes:
         version, module, defaults = VARIANTS[mode]
-        classes[mode] = None if module is None else getattr(importlib.import_module(module), f"SafetyFilterV{version}")
+        classes[mode] = None if module is None else getattr(
+            importlib.import_module(module), VARIANT_CLASSES.get(mode, f"SafetyFilterV{version}"))
         options[mode] = dict(defaults) if module else {}
         if module:
             classes[mode](**options[mode])  # Validate configuration without an episode.
@@ -229,6 +244,8 @@ def main():
         def reset(self, **reset_kwargs):
             result = super().reset(**reset_kwargs)
             self._safety_v2 = classes[self.mode](**options[self.mode]) if self.estop_enabled else None
+            if self.mode in PROTOCOL_MODES:
+                estop_protocol.install(self)
             self.last_observation = result[0]
             return result
 
@@ -238,6 +255,8 @@ def main():
             observation = self.last_observation
             start = time.perf_counter()
             result = super().step(action)
+            if self.mode in PROTOCOL_MODES:
+                result = estop_protocol.after_step(self, result, self.steps_logged + 1)
             seconds = time.perf_counter() - start
             filt = self._safety_v2
             if self.estop_enabled and type(filt) is not classes[self.mode]:
@@ -255,6 +274,9 @@ def main():
                           changed=bool(getattr(self, "safety_v2_changed", False)),
                           brake=bool(getattr(self, "_v2_brake", False)),
                           filter=details, plan=getattr(filt, "plan", None))
+            if self.mode in PROTOCOL_MODES:
+                record["estop_protocol"] = dict(self.estop_protocol,
+                                                committed=bool(getattr(self, "emergency_stop_committed", False)))
             if capture:
                 record["diagnostic_before"] = diagnostic_before
                 record["diagnostic_decision"] = capture.capture_decision(self)
@@ -286,6 +308,12 @@ def main():
                 with opener as trace:
                     env.trace = trace
                     result = run_episode(env, copy.deepcopy(scenes[case["case"]]), int(case["seed"]), "model", model)
+                    if mode in PROTOCOL_MODES:
+                        state = env.estop_protocol
+                        result["unprotocol_outcome"] = result["outcome"]
+                        result["outcome"] = state["outcome"] or result["outcome"]
+                        result["estop_commit_step"] = state["commit_step"]
+                        result["estop_commit_speed_mps"] = state["commit_speed_mps"]
                     trace.flush()
                     if not args.gzip_traces:
                         os.fsync(trace.fileno())
