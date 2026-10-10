@@ -15,7 +15,8 @@ retries or result reuse, STOP marker), with three differences:
 
 Modes: off, v16, v20, the pre-registered V20 options v20_nominal
 (allowance_tables="none") and v20_oocv16 (out_of_contract="v16"), and
-v20_r1 (revision 1: safety_v20.REVISION1_OPTIONS).
+v20_r1 and v20_r2 (revisions 1 and 2: safety_v20.REVISION1_OPTIONS and
+REVISION2_OPTIONS).
 
 Example (project root):
     python -B tools/diagnostics/safety/v20_iteration.py --tag probe12_a \
@@ -62,6 +63,8 @@ VARIANTS = {
     "v20_oocv16": (20, "safety_v20", {"out_of_contract": "v16"}),
     # Revision 1 (planning/SAFETY_V20_PLAN.md, section 13).
     "v20_r1": (20, "safety_v20", dict(importlib.import_module("safety_v20").REVISION1_OPTIONS)),
+    # Revision 2 (planning/SAFETY_V20_PLAN.md, section 14).
+    "v20_r2": (20, "safety_v20", dict(importlib.import_module("safety_v20").REVISION2_OPTIONS)),
 }
 
 
