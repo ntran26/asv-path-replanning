@@ -1,0 +1,158 @@
+{
+ "schema": 1,
+ "title": "E1: V20 nominal and revision 1 on the 12-case probe",
+ "runs": [
+  "results/safety_dev/v20_development/runs/e0_probe12_off_v16",
+  "results/safety_dev/v20_development/runs/e1_probe12_v20"
+ ],
+ "run_manifest_sha256": {
+  "results/safety_dev/v20_development/runs/e0_probe12_off_v16": "19b4905dad09c8c89328558048fcbd7fdd8b0a1db33dbc6d96bc8d3eab2c424f",
+  "results/safety_dev/v20_development/runs/e1_probe12_v20": "b627f0ddcc40ba871fb9b94b1e4af143ffe6928c2508bd3526bfac1c6136af5d"
+ },
+ "cases": 12,
+ "modes": [
+  "off",
+  "v16",
+  "v20_nominal",
+  "v20_r1"
+ ],
+ "per_mode": {
+  "off": {
+   "goal": 10,
+   "episodes": 12,
+   "collision:target": 1,
+   "collision:obstacle": 1
+  },
+  "v16": {
+   "goal": 5,
+   "episodes": 12,
+   "collision:boundary": 4,
+   "collision:target": 3
+  },
+  "v20_nominal": {
+   "collision:target": 4,
+   "episodes": 12,
+   "out_of_contract_episodes": 9,
+   "decisions": 846,
+   "certified_decisions": 498,
+   "level:v16_unchanged_certified": 489,
+   "level:v16_unchanged_finite_only": 107,
+   "level:out_of_contract_stop": 134,
+   "identical_to_v16": 3,
+   "collision:boundary": 3,
+   "level:out_of_contract_committed": 107,
+   "level:replaced_by_sac": 3,
+   "goal": 3,
+   "timeout": 2,
+   "level:replaced_by_v16_certified": 2,
+   "level:replaced_by_projection": 4
+  },
+  "v20_r1": {
+   "collision:target": 5,
+   "episodes": 12,
+   "out_of_contract_episodes": 10,
+   "decisions": 976,
+   "certified_decisions": 486,
+   "level:v16_unchanged_certified": 381,
+   "level:gatekeeper_uncertified_v16": 237,
+   "level:out_of_contract_stop": 243,
+   "identical_to_v16": 2,
+   "collision:boundary": 2,
+   "level:gatekeeper_replaced": 49,
+   "level:committed_continuation": 55,
+   "level:out_of_contract_committed": 10,
+   "timeout": 3,
+   "level:replaced_by_projection": 1,
+   "goal": 2
+  }
+ },
+ "pairs": {
+  "v16_vs_off": {
+   "pairs": 12,
+   "reference_goals": 10,
+   "candidate_goals": 5,
+   "gained_goals": 1,
+   "lost_goals": 6,
+   "both_goal": 4,
+   "both_fail": 1
+  },
+  "v20_nominal_vs_off": {
+   "pairs": 12,
+   "reference_goals": 10,
+   "candidate_goals": 3,
+   "gained_goals": 0,
+   "lost_goals": 7,
+   "both_goal": 3,
+   "both_fail": 2
+  },
+  "v20_r1_vs_off": {
+   "pairs": 12,
+   "reference_goals": 10,
+   "candidate_goals": 2,
+   "gained_goals": 0,
+   "lost_goals": 8,
+   "both_goal": 2,
+   "both_fail": 2
+  },
+  "v20_nominal_vs_v16": {
+   "pairs": 12,
+   "reference_goals": 5,
+   "candidate_goals": 3,
+   "gained_goals": 0,
+   "lost_goals": 2,
+   "both_goal": 3,
+   "both_fail": 7
+  },
+  "v20_r1_vs_v16": {
+   "pairs": 12,
+   "reference_goals": 5,
+   "candidate_goals": 2,
+   "gained_goals": 0,
+   "lost_goals": 3,
+   "both_goal": 2,
+   "both_fail": 7
+  }
+ },
+ "transitions": {
+  "v20_nominal_vs_off": {
+   "goal -> collision:target": 3,
+   "goal -> collision:boundary": 3,
+   "collision:target -> timeout": 1,
+   "collision:obstacle -> collision:target": 1,
+   "goal -> timeout": 1
+  },
+  "v20_r1_vs_off": {
+   "goal -> collision:target": 4,
+   "goal -> collision:boundary": 2,
+   "goal -> timeout": 2,
+   "collision:target -> timeout": 1,
+   "collision:obstacle -> collision:target": 1
+  },
+  "v20_nominal_vs_v16": {
+   "goal -> collision:target": 2,
+   "collision:target -> timeout": 1,
+   "collision:boundary -> timeout": 1
+  },
+  "v20_r1_vs_v16": {
+   "goal -> collision:target": 3,
+   "collision:boundary -> timeout": 2,
+   "collision:target -> timeout": 1
+  },
+  "v16_vs_off": {
+   "goal -> collision:boundary": 4,
+   "goal -> collision:target": 2,
+   "collision:obstacle -> goal": 1
+  }
+ },
+ "v20_decision_seconds": {
+  "p50": 0.8356513149992679,
+  "p95": 1.6024093810010527,
+  "max": 23.58892393899987,
+  "decisions": 1822
+ },
+ "runtime_environment": {
+  "python": "3.11.17 (main, Oct  1 2026, 15:41:07) [GCC 13.3.0]",
+  "platform": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39"
+ },
+ "script_sha256": "e7d23fe0d959dbf8b1640c121a17f2cdcc6be458287458d427480c13586e3e82"
+}

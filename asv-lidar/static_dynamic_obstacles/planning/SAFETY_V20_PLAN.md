@@ -412,3 +412,77 @@ Unchecked decisions are handled as in section 4.1.
 - Exactly one V20 variant is frozen after E3: among advancing variants, the one with fewer contacts on the 72 development cases, with ties broken by more goals.
 - It runs once with fresh OFF and V16, provided it has fewer contacts than fresh V16 on the development cases; otherwise V20 is not run on the test set and the report says why.
 - No code, option or threshold changes after any test-set outcome. Results are reported whatever they show: goals, rescued SAC failures, lost SAC successes, and each contact type, paired by test ID, episode seed and scenario digest.
+
+## 14. E1 result and revision 2, 2026-10-10
+
+### 14.1 E1 on the 12-case probe
+
+- **Runs:** [`runs/e1_probe12_v20`](../results/safety_dev/v20_development/runs/e1_probe12_v20/manifest.json) (`v20_nominal`, `v20_r1`) and the fresh references in [`runs/e0_probe12_off_v16`](../results/safety_dev/v20_development/runs/e0_probe12_off_v16/manifest.json).
+- **Strict paired report:** [`reports/e1_probe12`](../results/safety_dev/v20_development/reports/e1_probe12/report.md).
+
+| Controller | Goals | Boundary | Target | Obstacle | Timeout |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| OFF | 10 | 0 | 1 | 1 | 0 |
+| V16 | 5 | 4 | 3 | 0 | 0 |
+| V20 nominal | 3 | 3 | 4 | 0 | 2 |
+| V20 revision 1 | 2 | 2 | 5 | 0 | 3 |
+
+Against fresh V16:
+
+| Variant | Contacts to timeouts | Goals to target contacts | Other differences |
+| --- | --- | --- | --- |
+| Nominal | P2-L1-CRP-FIX-05 (target), P2-L3-BO-FIX-09 (boundary) | DV3-BO-CV-04, P2-L1-CRP-VAR-12 | None; the three control cases issue command sequences identical to V16 |
+| Revision 1 | Those two plus BAS-NU-CV-070 (boundary) | The same two plus CH-HO-CV-073 | None |
+
+Decision time over 1,822 V20 decisions: p50 0.84 s, p95 1.6 s, maximum 23.6 s. The maximum is revision 1 in CH-HO-CV-073, where extended tails on the whole grid are checked against many remembered points.
+
+**Pre-registered criteria (section 13.5):**
+
+| Variant | Criterion | Result | Evidence |
+| --- | --- | --- | --- |
+| Nominal | P1 | passes | The three control cases are command-identical to fresh V16 |
+| Nominal | P2 | **fails** | In P2-L1-CRP-VAR-12 the target contact follows three certified decisions (target slack 0.29, 0.12 and 0.13 m, with no allowance). The one-decision track residuals there are 0.06-0.12 m, so the online monitor did not flag the variable-speed target as out of contract |
+| Nominal | P3 | **fails** | 7 contacts, equal to V16's 7 |
+| Revision 1 | R1-P1 | **fails** | Same case: the contact follows `committed_continuation` and `v16_unchanged_certified` decisions |
+| Revision 1 | R1-P2 | **fails** | 7 contacts |
+
+Neither variant advances to E2/E3, and no V20 variant was run on E2/E3 or the test set. The fresh OFF and V16 references for the other 60 development cases ([`runs/e2_cohort32_off_v16`](../results/safety_dev/v20_development/runs/e2_cohort32_off_v16/manifest.json), [`runs/e3_broader40_off_v16`](../results/safety_dev/v20_development/runs/e3_broader40_off_v16/manifest.json)) were run while E1 was in progress. They are controller-independent and were not used for any decision here.
+
+### 14.2 Mechanisms
+
+Every outcome difference from V16 traces to decisions where nothing is certified. The last three decision levels before the end of each changed episode are in `paired.csv`.
+
+1. **The uncertified stop helps against static hazards and some stopping targets.** BO-FIX-09 and BAS-NU-CV-070 (revision 1) do not hit the boundary. Each ends at rest clear of it after a long out-of-contract phase (`out_of_contract_stop` or `out_of_contract_committed`), although no stop was certified there. CRP-FIX-05 ends at rest instead of a target contact; its target stops at decision 32.
+2. **The same stop is harmful with a crossing target.** In DV3-BO-CV-04 at decision 13 every option is predicted to be struck by the target (SAC -1.02 m, V16 -1.02 m, stop -1.01 m, best grid command -0.98 m, from the saved V16 state). V20 stopped and was struck at decision 17, while V16's unchecked hard turn reached the goal. In CRP-VAR-12 (both variants) and CH-HO-CV-073 (revision 1) the vessel stopped near a target for many decisions and was then struck, or struck it on resuming. Section 3.4 already states the reason: rest is invariant for static hazards, but not against targets.
+3. **Without a target allowance the certificate is not reliable at small target slack** (CRP-VAR-12). With the calibrated allowance it is rarely available (section 13.2). The constant-velocity forecast of V16's track estimates covers truth only 68 % of the time at 0.5 s (G1), so neither setting gives a usable target certificate with the current estimates.
+4. **Gatekeeper enforcement near targets adds interventions without a safety gain** on the probe: 49 replacements and 55 committed continuations, against 237 decisions where V16's command was issued uncertified. It costs time and contributes to the CH-HO-CV-073 loss.
+
+### 14.3 Decision: restrict the backup to where its terminal set is valid
+
+The evidence does not support a stop-terminal backup around targets. Rest remains a sound terminal set for static hazards. The boundary contacts are 4 of fresh V16's 7 probe contacts, and 4 of the 6 lost SAC successes in the phase-1 audit. Revision 2 therefore restricts V20's active role to scenes without a target inside V2's existing engagement range (7 m, the gate V2 already uses). A different terminal set for targets, for example a moving terminal set that clears the target's swept path, would be a new design. It is not attempted here.
+
+| Option | Revision 2 (`REVISION2_OPTIONS`, runner mode `v20_r2`) | Reason |
+| --- | --- | --- |
+| `allowance_tables` | `"none"` | As revision 1 (section 13.3) |
+| `tail_family` | `"stop"` | Extended tails cost up to 23.6 s per decision; availability matters only without targets, where the stop family suffices |
+| `commit_margin` | 0.1269 m (G1 one-decision own-ship allowance) | As revision 1 (section 13.3 item 4) |
+| `enforcement` | `"gatekeeper_without_traffic"`: gatekeeper at checked decisions only with no track inside 7 m; otherwise unchecked-only | Section 14.2 items 1 and 4 |
+| `out_of_contract` | `"stop_without_traffic"`: committed-then-stop only with no track inside 7 m; otherwise V16's command | Section 14.2 items 1 and 2 |
+
+With a target in range, revision 2 is V16 plus certified replacements of V16's unchecked decisions, so its target behavior is V16's except where a certificate exists. Item 3 still applies to those certified replacements and is reported.
+
+Revision 2 is shaped by the probe outcomes, so the probe is no longer a held-out check for it. The 60 other development cases (E2 and E3) are the development evidence that counts, and test set v4 is the final evaluation.
+
+### 14.4 Pre-registered criteria for revision 2
+
+- **E1b (probe, `v20_r2`)** is a functional check before the cohorts, not evidence of benefit. It must show:
+  - (a) identical command sequences to fresh V16 in the three control cases;
+  - (b) no fresh-V16 goal turned into a contact;
+  - (c) no contact in an interval that begins with a V20 replacement certified in contract (`replaced_by_*`, `gatekeeper_replaced`, `committed_continuation`).
+  Contacts after `v16_unchanged_certified` decisions are reported as certificate failures, not criteria, because V20 did not act there.
+- **E2/E3 (60 cases)** run only if E1b passes. Promotion over V16 on the 60 cases, judged on these alone and not on the probe:
+  - fewer contacts than fresh V16;
+  - no additional lost SAC successes relative to fresh V16;
+  - no fresh-V16 goal turned into a contact.
+  Goals turned into timeouts are reported as a liveness cost. Otherwise revision 2 is reported as a tradeoff and V16 stays the reference.
+- **Test set v4** runs once with fresh OFF and V16, and only if revision 2 has fewer contacts than fresh V16 on the 60 cases. The rules of section 13.5 apply: no change after any test-set outcome, and full reporting.

@@ -5,6 +5,7 @@ branch is exercised deterministically; certificate physics is covered by
 test_safety_v20_contingency.py.
 """
 import copy
+import math
 from types import SimpleNamespace
 
 import numpy as np
@@ -38,15 +39,16 @@ def make_env():
                    gated_ranges=np.full(360, 16.0), pose_stale=False)
 
 
-def snap():
+def snap(tracks=()):
     a = np.array([[0.0, 0.0], [10.0, 0.0], [10.0, 25.0], [0.0, 25.0]])
     return cc.Snapshot(5.0, 5.0, 0.0, 0.5, 0.0, 0.0, np.array([0.0, 1.0]), np.array([1.0, 0.0]),
-                       np.array([5.0, 5.0]), 0.0, 0.0, 15.0, np.empty((0, 2)), [], a, np.roll(a, -1, 0))
+                       np.array([5.0, 5.0]), 0.0, 0.0, 15.0, np.empty((0, 2)), list(tracks), a,
+                       np.roll(a, -1, 0))
 
 
-def stub_v16(monkeypatch, why, out, brake=False, plan=None):
+def stub_v16(monkeypatch, why, out, brake=False, plan=None, tracks=()):
     def fake(self, env, action):
-        self._observer_snapshot = snap()
+        self._observer_snapshot = snap(tracks)
         self.actuators.issue(env, float(out[0]))
         env._v2_brake = brake
         self.plan = None if plan is None else np.asarray(plan, float)
@@ -256,3 +258,33 @@ def test_commit_margin_blocks_thin_new_commitments_but_keeps_a_committed_tail(mo
     stub_v16(monkeypatch, "no escape", [0.7, 0.7])
     run(filt2, env2, [0.7, 0.7])
     assert filt2.last["v20_level"] == "committed_continuation"
+
+
+def test_stop_without_traffic_keeps_v16_with_a_target_in_range(monkeypatch, fake_checker):
+    near = cc.TrackView(1, np.array([5.0, 9.0]), np.array([0.0, -0.5]), math.pi)
+    far = cc.TrackView(2, np.array([5.0, 20.0]), np.array([0.0, -0.5]), math.pi)
+    for tracks, level in (([near], "out_of_contract_v16"), ([far], "out_of_contract_stop"),
+                          ([], "out_of_contract_stop")):
+        stub_v16(monkeypatch, "no escape", [0.7, 0.7], tracks=tracks)
+        filt, env = make_filter(out_of_contract="stop_without_traffic"), make_env()
+        out, _ = run(filt, env, [0.7, 0.7])
+        assert filt.last["v20_level"] == level and filt.last["v20_traffic"] == (tracks == [near])
+        expected = [0.7, 0.7] if level == "out_of_contract_v16" else [0.0, -1.0]
+        assert np.allclose(out, expected)
+
+
+def test_gatekeeper_without_traffic_acts_only_without_a_target_in_range(monkeypatch, fake_checker):
+    near = cc.TrackView(1, np.array([5.0, 9.0]), np.array([0.0, -0.5]), math.pi)
+    fake_checker.allowed = {-1.0}
+    for tracks, level in (([], "gatekeeper_replaced"), ([near], "v16_unchanged_finite_only")):
+        stub_v16(monkeypatch, "turn", [-0.5, 0.0], tracks=tracks)
+        filt, env = make_filter(enforcement="gatekeeper_without_traffic"), make_env()
+        out, _ = run(filt, env, [0.8, 0.9])
+        assert filt.last["v20_level"] == level
+        assert out[0] == pytest.approx(-1.0 if level == "gatekeeper_replaced" else -0.5)
+
+
+def test_revision_option_sets_construct():
+    for options in (v20.REVISION1_OPTIONS, v20.REVISION2_OPTIONS):
+        filt = make_filter(**options)
+        assert filt.allowance_tables == "none" and filt.commit_margin > 0.1

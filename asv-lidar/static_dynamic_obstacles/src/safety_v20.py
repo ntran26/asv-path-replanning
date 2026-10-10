@@ -24,8 +24,8 @@ collision-avoidance guarantee. No truth, scenario identity or outcome is read.
 ``certified_fallback=False`` returns V16's decision and state unchanged while
 still logging certificates (parity mode).
 
-Options added after the offline gates (planning/SAFETY_V20_PLAN.md, section
-13): ``enforcement="gatekeeper"`` also replaces V16's checked commands that
+Options added after the offline gates (planning/SAFETY_V20_PLAN.md, sections
+13 and 14): ``enforcement="gatekeeper"`` also replaces V16's checked commands that
 are not certified, with the certified command nearest to V16's, else the
 committed contingency, as in gatekeeper; ``tail_family="extended"`` adds
 turn-cruise-stop tails; ``commit_margin`` (metres) requires that slack for a
@@ -50,14 +50,29 @@ import ship
 CERTIFIED_FALLBACK = True
 ALLOWANCE_TABLES = "calibrated"
 OUT_OF_CONTRACT = "committed_then_stop"
+# "stop_without_traffic": rest is invariant for static hazards only (plan,
+# section 3.4), so an uncertified stop is issued only when no track is inside
+# V2's engagement range; with a target in range V16's command is kept.
+OUT_OF_CONTRACT_MODES = ("committed_then_stop", "v16", "stop_without_traffic")
 TAIL_FAMILY = "stop"
 ENFORCEMENT = "unchecked_only"
+# "gatekeeper_without_traffic" enforces the certificate at checked decisions
+# only while no track is inside V2's engagement range, where rest is a valid
+# terminal set; with a target in range it behaves as "unchecked_only".
+ENFORCEMENT_MODES = ("unchecked_only", "gatekeeper", "gatekeeper_without_traffic")
 COMMIT_MARGIN_M = 0.0
 # Revision 1 (planning/SAFETY_V20_PLAN.md, section 13), fixed before any V20
 # episode: nominal certificate, gatekeeper enforcement, extended tails, and new
 # commitments tightened by gate G1's one-decision own-ship allowance.
 REVISION1_OPTIONS = {"allowance_tables": "none", "enforcement": "gatekeeper",
                      "tail_family": "extended", "commit_margin": tubes.OWN_TABLE[0][1]}
+# Revision 2 (plan, section 14), fixed before any revision-2 episode: the
+# stop-terminal backup is enforced, and an uncertified stop is issued, only
+# without a target in V2's engagement range; with one, V20 is V16 plus
+# certified replacements of its unchecked decisions.
+REVISION2_OPTIONS = {"allowance_tables": "none", "enforcement": "gatekeeper_without_traffic",
+                     "tail_family": "stop", "commit_margin": tubes.OWN_TABLE[0][1],
+                     "out_of_contract": "stop_without_traffic"}
 
 # V16 branches whose issued plan hard-passed the inherited checker at that decision.
 CHECKED_BRANCHES = frozenset({
@@ -99,16 +114,16 @@ class SafetyFilterV20(v16.SafetyFilterV16):
         if not math.isfinite(self.hold_horizon_s) or self.hold_horizon_s < 0.0:
             raise ValueError("hold_horizon_s must be finite and nonnegative")
         mode = OUT_OF_CONTRACT if out_of_contract is None else str(out_of_contract)
-        if mode not in ("committed_then_stop", "v16"):
-            raise ValueError("out_of_contract must be 'committed_then_stop' or 'v16'")
+        if mode not in OUT_OF_CONTRACT_MODES:
+            raise ValueError(f"out_of_contract must be one of {OUT_OF_CONTRACT_MODES}")
         self.out_of_contract = mode
         family = TAIL_FAMILY if tail_family is None else str(tail_family)
         if family not in sc.TAIL_FAMILIES:
             raise ValueError("tail_family must be 'stop' or 'extended'")
         self.tail_family = family
         enforce = ENFORCEMENT if enforcement is None else str(enforcement)
-        if enforce not in ("unchecked_only", "gatekeeper"):
-            raise ValueError("enforcement must be 'unchecked_only' or 'gatekeeper'")
+        if enforce not in ENFORCEMENT_MODES:
+            raise ValueError(f"enforcement must be one of {ENFORCEMENT_MODES}")
         self.enforcement = enforce
         self.commit_margin = float(COMMIT_MARGIN_M if commit_margin is None else commit_margin)
         if not math.isfinite(self.commit_margin) or self.commit_margin < 0.0:
@@ -194,6 +209,9 @@ class SafetyFilterV20(v16.SafetyFilterV16):
                                         self.target_table, self.hold_horizon_s,
                                         sc.TAIL_FAMILIES[self.tail_family])
         residuals = self._contract_residuals(snap)
+        traffic = any(float(np.hypot(*(t.position - snap.position))) < v2.ENGAGE_RANGE_M
+                      for t in snap.tracks)
+        details["v20_traffic"] = bool(traffic)
         rho_half = float(sc._lookup(self.target_table, np.array([0.5]))[0])
         details.update(v20_contract_residual_max=max(residuals) if residuals else None,
                        v20_contract_violations=int(sum(r > rho_half for r in residuals)) if self.target_table else None)
@@ -217,7 +235,8 @@ class SafetyFilterV20(v16.SafetyFilterV16):
         if not self.certified_fallback or (checked and cert_v16.certified):
             level = "v16_unchanged_certified" if cert_v16.certified else "v16_unchanged_finite_only"
             cert = cert_v16 if cert_v16.certified else None
-        elif checked and self.enforcement == "unchecked_only":
+        elif checked and (self.enforcement == "unchecked_only" or
+                          (self.enforcement == "gatekeeper_without_traffic" and traffic)):
             level = "v16_unchanged_finite_only"
         elif checked:
             # Gatekeeper: V16's own checked command is not certified. Keep V16's
@@ -258,7 +277,8 @@ class SafetyFilterV20(v16.SafetyFilterV16):
                 level = {"sac": "replaced_by_sac", "v16": "replaced_by_v16_certified",
                          "projection": "replaced_by_projection",
                          "committed": "committed_continuation"}[source]
-            elif self.out_of_contract == "v16":
+            elif self.out_of_contract == "v16" or (self.out_of_contract == "stop_without_traffic"
+                                                   and traffic):
                 level = "out_of_contract_v16"
             elif previous is not None:
                 level, source, command = "out_of_contract_committed", "committed", previous[0]
