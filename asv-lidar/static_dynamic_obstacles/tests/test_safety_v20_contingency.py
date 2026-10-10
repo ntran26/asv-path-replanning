@@ -267,3 +267,18 @@ def test_extended_tail_family_contains_stops_and_cruise_segments():
     snap = make_snap(u=0.5)
     cert = sc.ContingencyChecker(snap, actuators(), tails=ext).certify([0.0, 0.0])
     assert cert.certified and np.allclose(cert.sequence[1:], ext[cert.tail_index], equal_nan=True)
+
+
+def test_chunked_clearance_evaluation_is_identical(monkeypatch):
+    wall = [(x, 7.0) for x in np.linspace(2.0, 8.0, 60)]
+    target = cc.TrackView(1, np.array([4.0, 14.0]), np.array([0.0, -0.4]), math.pi)
+    snap = make_snap(u=0.7, points=wall, tracks=[target])
+    checker = sc.ContingencyChecker(snap, actuators())
+    seqs = sc.sequences_for(sc.projection_candidates([0.1, 0.2])[:5])
+    monkeypatch.setattr(sc, "SLACK_CHUNK_COLUMNS", 10_000)
+    whole = checker.evaluate(seqs)
+    monkeypatch.setattr(sc, "SLACK_CHUNK_COLUMNS", 7)
+    chunked = checker.evaluate(seqs)
+    assert np.array_equal(whole[0], chunked[0]) and np.array_equal(whole[1], chunked[1])
+    for key in whole[2]:
+        assert np.array_equal(whole[2][key], chunked[2][key])

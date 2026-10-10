@@ -1,0 +1,9 @@
+{
+ "note": "Part 2 was killed by the memory-cgroup OOM killer (about 6.9 GB) during TS2:CH-CR-CV-073 because batched clearance arrays grew with the number of columns. It was resumed with these files: clearances are evaluated in column chunks (identical results, asserted by tests/test_safety_v20_contingency.py::test_chunked_clearance_evaluation_is_identical); the default stop-tail certificate and branch handling used by the replay are otherwise unchanged. Completed episode files were reused.",
+ "sha256": {
+  "src/safety_v20.py": "efecf86de81ce989f90b6ecd4aac67309090a140efce42fe4da9ef44bc440ba0",
+  "src/safety_v20_contingency.py": "8da903c00105fbb467ffb448bc1360ae19f169a59f20916079c8118b9abffaa2",
+  "src/safety_v20_tubes.py": "3f7023cadccd114946ce62bbdd11831120a25c4bc15293b834a33f1ad7979998",
+  "tools/diagnostics/safety/v20_replay_saved_decisions.py": "94c856ade93cb428d26b11c7fa78dd0e1cc31711516ffdb637abc2bb098ceb3c"
+ }
+}
