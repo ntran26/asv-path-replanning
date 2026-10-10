@@ -56,6 +56,7 @@ TURN_THROTTLES = (0.0, 1.0)            # cruise and ceiling propulsion
 TURN_DECISIONS = (1, 2, 3, 4, 6)       # 0.5 to 3 s before braking
 WEAK = (v2.BRAKE_EFFICIENCY, v2.BRAKE_DELAY_S)          # 0.25, 0.75 s
 STRONG = (ship.REVERSE_THRUST_EFFICIENCY, 0.0)          # simulator assumption 0.5, no delay
+SLACK_CHUNK_COLUMNS = 96            # memory bound for clearance arrays; results unaffected
 HULL_HALF_DIAGONAL = math.hypot(0.5 * ship.VESSEL_LENGTH, 0.5 * ship.VESSEL_WIDTH)
 INFLATED_HALF_DIAGONAL = math.hypot(cc.HALF_L, cc.HALF_W)
 
@@ -336,7 +337,18 @@ class ContingencyChecker:
         efficiency = np.concatenate([np.full(n, WEAK[0]), np.full(len(strong_index), STRONG[0])])
         delay = np.concatenate([np.full(n, WEAK[1]), np.full(len(strong_index), STRONG[1])])
         ro = rollout_states(self.snap, self.actuators, stacked, efficiency, delay)
-        slack_all, rest_all, parts_all = self._slack(ro)
+        # Clearances build (samples x columns x points) arrays; evaluate them in
+        # column chunks to bound memory. Columns are independent, so the result
+        # is identical to a single evaluation.
+        chunks = []
+        for start in range(0, ro.positions.shape[1], SLACK_CHUNK_COLUMNS):
+            cols = slice(start, start + SLACK_CHUNK_COLUMNS)
+            chunks.append(self._slack(StateRollout(ro.times, ro.positions[:, cols], ro.headings[:, cols],
+                                                   ro.u[:, cols], ro.v[:, cols], ro.r[:, cols],
+                                                   ro.servo[:, cols])))
+        slack_all = np.concatenate([c[0] for c in chunks])
+        rest_all = np.concatenate([c[1] for c in chunks])
+        parts_all = {key: np.concatenate([c[2][key] for c in chunks]) for key in chunks[0][2]}
         slack, rest = slack_all[:n].copy(), rest_all[:n].copy()
         if len(strong_index):
             slack[strong_index] = np.minimum(slack[strong_index], slack_all[n:])
