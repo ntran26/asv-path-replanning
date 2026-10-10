@@ -25,7 +25,7 @@ collision-avoidance guarantee. No truth, scenario identity or outcome is read.
 still logging certificates (parity mode).
 
 Options added after the offline gates (planning/SAFETY_V20_PLAN.md, sections
-13 and 14): ``enforcement="gatekeeper"`` also replaces V16's checked commands that
+13-15): ``enforcement="gatekeeper"`` also replaces V16's checked commands that
 are not certified, with the certified command nearest to V16's, else the
 committed contingency, as in gatekeeper; ``tail_family="extended"`` adds
 turn-cruise-stop tails; ``commit_margin`` (metres) requires that slack for a
@@ -73,6 +73,9 @@ REVISION1_OPTIONS = {"allowance_tables": "none", "enforcement": "gatekeeper",
 REVISION2_OPTIONS = {"allowance_tables": "none", "enforcement": "gatekeeper_without_traffic",
                      "tail_family": "stop", "commit_margin": tubes.OWN_TABLE[0][1],
                      "out_of_contract": "stop_without_traffic"}
+# Revision 3 (plan, section 15): revision 2 without any uncertified stop; when
+# nothing is certified V16's command is issued.
+REVISION3_OPTIONS = dict(REVISION2_OPTIONS, out_of_contract="v16")
 
 # V16 branches whose issued plan hard-passed the inherited checker at that decision.
 CHECKED_BRANCHES = frozenset({
