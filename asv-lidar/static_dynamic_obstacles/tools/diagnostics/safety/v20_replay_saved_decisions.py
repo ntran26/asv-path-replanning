@@ -118,11 +118,28 @@ def issued(rec):
     return np.array([float(rec["rudder_command"]), throttle])
 
 
+def stream_records(trace):
+    """Yield one decision at a time with only the fields the replay needs.
+
+    Full-snapshot lines are about 9 MB each; parsing a whole episode at once
+    exhausted memory, so each line is reduced as soon as it is parsed.
+    """
+    with trace.open(encoding="utf-8") as stream:
+        for line in stream:
+            rec = json.loads(line)
+            dd = rec.get("diagnostic_decision") or {}
+            yield {"step": rec["step"], "filter": {"why": (rec.get("filter") or {}).get("why", "idle")},
+                   "policy_action": rec["policy_action"], "rudder_command": rec["rudder_command"],
+                   "signed_rpm_command": rec["signed_rpm_command"], "brake": rec.get("brake"),
+                   "diagnostic_decision": {"snapshot": dd.get("snapshot"),
+                                           "actuators_before_decision": dd.get("actuators_before_decision")}}
+            del rec, dd
+
+
 def replay_episode(case, label, trace, audit_row):
-    records = [json.loads(line) for line in trace.open(encoding="utf-8")]
     rows = []
     committed = {name: None for name in SETTINGS}
-    for k, rec in enumerate(records):
+    for rec in stream_records(trace):
         dd = rec.get("diagnostic_decision") or {}
         s = dd.get("snapshot")
         a = dd.get("actuators_before_decision") or {}
@@ -298,15 +315,27 @@ def main():
         parser.error("Existing part; results are never overwritten")
     inputs = {AUDIT.relative_to(ROOT).as_posix(): sha(AUDIT)}
     todo = sources(inputs)[args.part - 1::args.parts]
+    episodes_dir = out / "episodes"
+    episodes_dir.mkdir(parents=True, exist_ok=True)
     rows, episodes = [], []
     for case, label, trace, audit_row in todo:
+        name = episodes_dir / (case.replace(":", "_") + ".json")
+        if name.exists():
+            # Completed earlier by this same tag and code; never recomputed or overwritten.
+            saved = json.loads(name.read_text())
+            rows += saved["rows"]
+            episodes.append(saved["episode"])
+            print(f"{case} reused completed episode file", flush=True)
+            continue
         t0 = time.perf_counter()
         er = replay_episode(case, label, trace, audit_row)
+        episode = {"case": case, "source": label, "category": audit_row["category"],
+                   "contact": audit_row["contact"], "decisions": len(er)}
+        with name.open("x", encoding="utf-8") as stream:
+            json.dump({"episode": episode, "rows": er}, stream, default=float)
         rows += er
-        episodes.append({"case": case, "source": label, "category": audit_row["category"],
-                         "contact": audit_row["contact"], "decisions": len(er)})
+        episodes.append(episode)
         print(f"{case} {label} {len(er)} decisions {time.perf_counter() - t0:.0f}s", flush=True)
-    out.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps({"rows": rows, "episodes": episodes, "input_sha256": inputs},
                                  indent=None, default=float) + "\n", encoding="utf-8")
 
