@@ -39,6 +39,9 @@ TRUE_HALF_W = 0.5 * ship.VESSEL_WIDTH
 CHUNK_COLUMNS = 256
 # Hazards overlapping the hull at the current estimate are estimation errors.
 EXCLUDE_CURRENT_OVERLAPS = False
+# Remembered static LiDAR points in the contact check. The map boundary and
+# target tracks are always checked.
+USE_STATIC_POINTS = True
 
 
 def continuation_bank(decisions: int) -> np.ndarray:
@@ -107,7 +110,8 @@ def current_overlap_free(snap, points):
     return points[clear >= 0.0]
 
 
-def first_contact_times(snap, ro, exclude_current_overlaps: bool = EXCLUDE_CURRENT_OVERLAPS) -> np.ndarray:
+def first_contact_times(snap, ro, exclude_current_overlaps: bool = EXCLUDE_CURRENT_OVERLAPS,
+                        use_static_points: bool = USE_STATIC_POINTS) -> np.ndarray:
     """First sample time of predicted physical contact per column; inf if none.
 
     With ``exclude_current_overlaps`` a hazard that already overlaps the true
@@ -115,7 +119,8 @@ def first_contact_times(snap, ro, exclude_current_overlaps: bool = EXCLUDE_CURRE
     left out: static points inside the hull, a polygon that already excludes a
     hull corner, and target hulls that already overlap.
     """
-    points = current_overlap_free(snap, snap.points) if exclude_current_overlaps else snap.points
+    points = snap.points if use_static_points else np.empty((0, 2))
+    points = current_overlap_free(snap, points) if exclude_current_overlaps else points
     contact = true_point_clearance(ro.positions, ro.headings, points) < 0.0
     poly = np.asarray(snap.edges_a, dtype=float)
     if poly.ndim == 2 and len(poly) >= 3:
@@ -134,7 +139,7 @@ def first_contact_times(snap, ro, exclude_current_overlaps: bool = EXCLUDE_CURRE
 
 
 def escape_time(snap, actuators, first_commands, window_s: float = MAX_WINDOW_S,
-                exclude_current_overlaps: bool = None) -> tuple:
+                exclude_current_overlaps: bool = None, use_static_points: bool = None) -> tuple:
     """T*: the longest predicted time before contact over all candidate sequences.
 
     Each sequence's time is the later of its two reverse-model contact times
@@ -155,7 +160,8 @@ def escape_time(snap, actuators, first_commands, window_s: float = MAX_WINDOW_S,
                                  ro.v[keep], ro.r[keep], ro.servo[keep])
             best[cols] = np.maximum(best[cols], first_contact_times(
                 snap, ro, EXCLUDE_CURRENT_OVERLAPS if exclude_current_overlaps is None
-                else bool(exclude_current_overlaps)))
+                else bool(exclude_current_overlaps),
+                USE_STATIC_POINTS if use_static_points is None else bool(use_static_points)))
     i = int(np.argmax(best))
     return float(best[i]), {"sequences": int(len(seqs)), "best_sequence_first_command": seqs[i, 0].tolist(),
                             "best_sequence_index": i}
