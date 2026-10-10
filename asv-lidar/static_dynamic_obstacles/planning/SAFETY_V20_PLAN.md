@@ -647,3 +647,32 @@ The OFF/V16 run completed all ten chunks. The revision-2 run completed `ts4_r2_c
 - `ts4_r2_c21` after 24 of 25 episodes.
 
 Both directories are kept unchanged with an `INTERRUPTED.md` note and are excluded from the report, because they have no completion record. Their scenarios run again from scratch as `ts4_r2_c20b` and `ts4_r2_c21b`, with identical code, options and selection, before `c22`-`c40` continue. No outcome was read before this decision, and partial episodes are not reused.
+
+### 17.3 Test set v4 result
+
+- **Runs:**
+  - OFF and V16: `testset_v4_main/runs/ts4_off_v16_c01`-`c10`.
+  - Revision 2: `ts4_r2_c01`-`c19`, `c20b`, `c21b` and `c22`-`c40`.
+  - Interrupted `c20` and `c21` (section 17.2) are excluded.
+- **Report:** [`testset_v4_main/reports/off_v16_r2_1000`](../results/safety_dev/testset_v4_main/reports/off_v16_r2_1000/report.md). All 1,000 scenarios are paired by test ID, episode seed and scenario digest.
+
+| Controller | Goals | Obstacle | Boundary | Target | Contacts | Timeout | Rescued SAC failures | Lost SAC successes |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| OFF | 865 | 70 | 12 | 53 | 135 | 0 | - | - |
+| V16 | 904 | 46 | 25 | 25 | 96 | 0 | 50 | 11 |
+| V20 revision 2 | 881 | 39 | 33 | 24 | 96 | 23 | 53 | 37 |
+
+Against fresh V16, revision 2 has the same number of contacts (96) and 23 fewer goals.
+
+| Change | Count | Last decision level |
+| --- | ---: | --- |
+| Goal to boundary contact | 15 | Of the 20 goals lost to contact: 12 after uncertified stops (`out_of_contract_stop` 11, `out_of_contract_committed` 1); 4 after V16 commands issued uncertified under gatekeeper enforcement; 3 after `out_of_contract_v16`; 1 after a finite-only V16 decision |
+| Goal to obstacle contact | 5 | (included above) |
+| Goal to timeout | 12 | - |
+| Contact to goal | 9 | All end in certified, unchanged V16 decisions |
+| Contact to timeout | 11 | - |
+| Contact type changed | 5 | - |
+
+Decision time over 56,785 decisions: p50 0.21 s, p95 1.08 s, maximum 16.5 s. Revision 2's command sequence is identical to V16's in 788 of 1,000 episodes.
+
+The test set confirms the development conclusion of section 16: revision 2 does not reduce contacts relative to V16 and costs goals, mostly through uncertified stops near the boundary. V16 remains the reference. No change follows this result.

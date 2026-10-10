@@ -901,3 +901,24 @@ Contact types for revision 3 on the 72 cases are obstacle 8, boundary 7 and targ
 - closed-loop counterfactual screening of interventions before cohort runs.
 
 New code is confined to `src/safety_v20*.py`, its tests and V20 tools. V16, the environment, constants, checkpoint and configuration are unchanged.
+
+## 18. Continuation, 2026-10-10: test set v4 with OFF, V16 and V20 revision 2
+
+This section is appended; sections 1-17 are unchanged. At the user's request, test set v4 ran with fresh OFF, fresh V16 and V20 revision 2. Revision 2 is the V20 configuration with the fewest development contacts; it is not promoted. Its choice was recorded before any test-set outcome was read ([V20 plan](SAFETY_V20_PLAN.md) section 17). All 1,000 scenarios ran in definition order from the trusted cache, paired by test ID, episode seed and scenario digest. Nothing was tuned on any outcome.
+
+| Controller | Goals | Obstacle | Boundary | Target | Contacts | Timeout | Rescued SAC failures | Lost SAC successes |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| OFF | 865 | 70 | 12 | 53 | 135 | 0 | - | - |
+| V16 | 904 | 46 | 25 | 25 | 96 | 0 | 50 | 11 |
+| V20 revision 2 | 881 | 39 | 33 | 24 | 96 | 23 | 53 | 37 |
+
+**V16 against OFF.** V16 removes 39 of OFF's 135 contacts and raises goals from 865 to 904. Contacts fall from 70 to 46 for obstacles and from 53 to 25 for targets, but boundary contacts rise from 12 to 25. V16 loses 11 SAC successes: 6 to the boundary, 3 to a target, 2 to an obstacle.
+
+**V20 revision 2 against V16.** Revision 2 matches V16's contact count (96) with 23 fewer goals:
+- It turns 20 V16 goals into contacts (15 boundary, 5 obstacle), 12 of them after uncertified stops.
+- It turns 12 V16 goals into timeouts.
+- It turns 9 V16 contacts into goals and 11 into timeouts.
+
+This confirms the development decision to redirect (summary section 17). The test set adds no evidence for the stop-terminal backup.
+
+Report: [`testset_v4_main/reports/off_v16_r2_1000`](../results/safety_dev/testset_v4_main/reports/off_v16_r2_1000/report.md). The container restarted once during the run, which interrupted two revision-2 chunks; they are kept as records and their scenarios were rerun from scratch under new tags (plan section 17.2).
