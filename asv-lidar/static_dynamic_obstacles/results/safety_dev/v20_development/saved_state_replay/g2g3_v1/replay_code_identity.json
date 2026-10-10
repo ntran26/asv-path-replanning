@@ -1,0 +1,10 @@
+{
+ "note": "Code loaded by both replay workers (launched after these files' last edit; identical to commit ee86be1). The merged replay.json may list later on-disk hashes; this file is authoritative for the replay.",
+ "commit": "ee86be1",
+ "sha256": {
+  "src/safety_v20.py": "e892e8065873f849c1f9c4c9310fa4ebfd361e0d924152b38c8f4186b90be876",
+  "src/safety_v20_contingency.py": "6349289ad37221371a6cd78d13ded13e828fde5bc3f5bf7f6971d84591af21bf",
+  "src/safety_v20_tubes.py": "3f7023cadccd114946ce62bbdd11831120a25c4bc15293b834a33f1ad7979998",
+  "tools/diagnostics/safety/v20_replay_saved_decisions.py": "8988b4fb8df3d23e299e4c63792af9e30670bea6a470fe59e548093b98603be4"
+ }
+}

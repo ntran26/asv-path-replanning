@@ -188,16 +188,17 @@ class SafetyFilterV20(v16.SafetyFilterV16):
         else:
             options = [("sac", sac_command, cert_sac), ("v16", v16_command, cert_v16)]
             options += [("projection", c, None) for c in sc.projection_candidates(sac_command)]
-            evaluated = 0
-            for name, candidate, known in options:
-                certificate = known if known is not None else checker.certify(candidate)
-                evaluated += known is None
+            pending = [i for i, (_, _, known) in enumerate(options) if known is None]
+            batch = checker.certify_many(np.array([options[i][1] for i in pending])) if pending else []
+            certificates = {i: c for i, c in zip(pending, batch)}
+            details["v20_candidates_evaluated"] = len(pending)
+            for i, (name, candidate, known) in enumerate(options):
+                certificate = known if known is not None else certificates[i]
                 if name == "sac":
                     cert_sac = certificate
                 if certificate.certified:
                     source, cert, command = name, certificate, candidate
                     break
-            details["v20_candidates_evaluated"] = evaluated
             if cert is None and cert_previous is not None and cert_previous.certified:
                 source, cert, command = "committed", cert_previous, previous[0]
             if cert is not None:

@@ -216,3 +216,42 @@ def test_tables_are_nondecreasing_and_cover_the_window():
         values = [q for _, q in table]
         assert all(b >= a for a, b in zip(values, values[1:]))
     assert tubes.OWN_TABLE[-1][0] >= 12.0 and tubes.TARGET_TABLE[-1][0] >= 20.0
+
+
+def separate_models(checker, seqs):
+    weak = sc.rollout_states(checker.snap, checker.actuators, seqs, *sc.WEAK)
+    strong = sc.rollout_states(checker.snap, checker.actuators, seqs, *sc.STRONG)
+    sw, rw, _ = checker._slack(weak)
+    ss, rs, _ = checker._slack(strong)
+    braking = np.isnan(seqs[:, :, 1]).any(axis=1)
+    return np.where(braking, np.minimum(sw, ss), sw), np.where(braking, np.maximum(rw, rs), rw)
+
+
+@pytest.mark.parametrize("case", range(4))
+def test_vectorised_models_and_staged_search_match_full_evaluation(case):
+    rng = np.random.default_rng(case)
+    wall = [(x, 5.0 + rng.uniform(1.0, 4.0)) for x in np.linspace(2.0, 8.0, 20)]
+    target = cc.TrackView(1, np.array([rng.uniform(2, 8), 14.0]), np.array([0.0, -0.4]), math.pi)
+    snap = make_snap(u=float(rng.uniform(0.2, 0.9)), points=wall, tracks=[target] if case % 2 else [])
+    checker = sc.ContingencyChecker(snap, actuators())
+    first = np.array([rng.uniform(-1, 1), rng.uniform(-1, 1)])
+    seqs = sc.sequences_for(first[None])
+    slack, rest, _ = checker.evaluate(seqs)
+    ref_slack, ref_rest = separate_models(checker, seqs)
+    assert np.allclose(slack, ref_slack) and np.allclose(rest, ref_rest)
+    full_ok = bool(np.any(np.isfinite(slack) & (slack >= 0.0)))
+    cert = checker.certify(first)
+    assert cert.certified == full_ok
+    assert np.allclose(cert.sequence[1:], sc.TAILS[cert.tail_index], equal_nan=True)
+
+
+def test_batched_certification_matches_single_commands():
+    wall = [(x, 7.5) for x in np.linspace(2.0, 8.0, 20)]
+    snap = make_snap(u=0.7, points=wall)
+    checker = sc.ContingencyChecker(snap, actuators())
+    firsts = sc.projection_candidates([0.2, 0.5])[:6]
+    batch = checker.certify_many(firsts)
+    for first, cert in zip(firsts, batch):
+        single = checker.certify(first)
+        assert single.certified == cert.certified and single.tail_index == cert.tail_index
+        assert single.slack == pytest.approx(cert.slack)
