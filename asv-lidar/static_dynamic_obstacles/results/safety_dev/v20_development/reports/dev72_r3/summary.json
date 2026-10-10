@@ -1,0 +1,146 @@
+{
+ "schema": 1,
+ "title": "Revision 3 on all 72 development cases",
+ "runs": [
+  "results/safety_dev/v20_development/runs/e0_probe12_off_v16",
+  "results/safety_dev/v20_development/runs/e2_cohort32_off_v16",
+  "results/safety_dev/v20_development/runs/e3_broader40_off_v16",
+  "results/safety_dev/v20_development/runs/e1c_probe12_r3",
+  "results/safety_dev/v20_development/runs/e2_cohort32_r3_a",
+  "results/safety_dev/v20_development/runs/e2_cohort32_r3_b",
+  "results/safety_dev/v20_development/runs/e3_broader40_r3_a",
+  "results/safety_dev/v20_development/runs/e3_broader40_r3_b",
+  "results/safety_dev/v20_development/runs/e3_broader40_r3_c"
+ ],
+ "run_manifest_sha256": {
+  "results/safety_dev/v20_development/runs/e0_probe12_off_v16": "19b4905dad09c8c89328558048fcbd7fdd8b0a1db33dbc6d96bc8d3eab2c424f",
+  "results/safety_dev/v20_development/runs/e2_cohort32_off_v16": "b65eb3e1fef2886023ecb5117d22f684ac5f7ecc61a91515d2bb1febc35f1213",
+  "results/safety_dev/v20_development/runs/e3_broader40_off_v16": "05b291ba947d704fe11f278d9fc6664e10456ee196511e9728c8fb3d4fada387",
+  "results/safety_dev/v20_development/runs/e1c_probe12_r3": "e7d14d989759ad6a99ad427df38f0faaff3ff72fb8354156a3212529f76ddc83",
+  "results/safety_dev/v20_development/runs/e2_cohort32_r3_a": "1a6f86f9c1157acc2048e581269f7480e0257d67bce723c0852cc25f9a0b77bc",
+  "results/safety_dev/v20_development/runs/e2_cohort32_r3_b": "2e86b6f3d2b3fffca1d4f082204142a10e908bbd6f46afb54f0e08c72236f7bf",
+  "results/safety_dev/v20_development/runs/e3_broader40_r3_a": "f27549a2f1632ac89a346b0281ef3958ea08f9edf5738ed4b2f4db692fdda17f",
+  "results/safety_dev/v20_development/runs/e3_broader40_r3_b": "f8f77ba7f7f726686d064153e2304e810c347212a3e583cf3df0f9004f009e8c",
+  "results/safety_dev/v20_development/runs/e3_broader40_r3_c": "ca42217bcb309a31ff826de36004313cabda36867ad67531309369bf26426fec"
+ },
+ "cases": 72,
+ "modes": [
+  "off",
+  "v16",
+  "v20_r3"
+ ],
+ "per_mode": {
+  "off": {
+   "goal": 37,
+   "episodes": 72,
+   "collision:obstacle": 16,
+   "collision:target": 16,
+   "collision:boundary": 3
+  },
+  "v16": {
+   "goal": 50,
+   "episodes": 72,
+   "collision:obstacle": 6,
+   "collision:boundary": 7,
+   "collision:target": 9
+  },
+  "v20_r3": {
+   "goal": 46,
+   "episodes": 72,
+   "out_of_contract_episodes": 49,
+   "decisions": 4142,
+   "certified_decisions": 3019,
+   "level:v16_unchanged_certified": 2755,
+   "level:v16_unchanged_finite_only": 559,
+   "level:out_of_contract_v16": 349,
+   "identical_to_v16": 42,
+   "collision:obstacle": 8,
+   "level:gatekeeper_uncertified_v16": 215,
+   "level:gatekeeper_replaced": 99,
+   "level:committed_continuation": 150,
+   "level:replaced_by_sac": 10,
+   "collision:boundary": 7,
+   "collision:target": 9,
+   "level:replaced_by_projection": 2,
+   "timeout": 2,
+   "level:replaced_by_v16_certified": 3
+  }
+ },
+ "pairs": {
+  "v16_vs_off": {
+   "pairs": 72,
+   "reference_goals": 37,
+   "candidate_goals": 50,
+   "gained_goals": 19,
+   "lost_goals": 6,
+   "both_goal": 31,
+   "both_fail": 16
+  },
+  "v20_r3_vs_off": {
+   "pairs": 72,
+   "reference_goals": 37,
+   "candidate_goals": 46,
+   "gained_goals": 16,
+   "lost_goals": 7,
+   "both_goal": 30,
+   "both_fail": 19
+  },
+  "v20_r3_vs_v16": {
+   "pairs": 72,
+   "reference_goals": 50,
+   "candidate_goals": 46,
+   "gained_goals": 2,
+   "lost_goals": 6,
+   "both_goal": 44,
+   "both_fail": 20
+  }
+ },
+ "transitions": {
+  "v16_vs_off": {
+   "collision:obstacle -> goal": 8,
+   "collision:target -> goal": 10,
+   "goal -> collision:boundary": 4,
+   "collision:boundary -> collision:obstacle": 1,
+   "goal -> collision:target": 2,
+   "collision:target -> collision:obstacle": 1,
+   "collision:boundary -> goal": 1,
+   "collision:obstacle -> collision:target": 2,
+   "collision:obstacle -> collision:boundary": 2
+  },
+  "v20_r3_vs_off": {
+   "collision:obstacle -> goal": 7,
+   "collision:target -> goal": 8,
+   "goal -> collision:obstacle": 1,
+   "goal -> collision:boundary": 4,
+   "collision:boundary -> collision:obstacle": 1,
+   "collision:obstacle -> collision:boundary": 2,
+   "goal -> collision:target": 2,
+   "collision:boundary -> timeout": 1,
+   "collision:target -> timeout": 1,
+   "collision:target -> collision:boundary": 1,
+   "collision:target -> collision:obstacle": 1,
+   "collision:boundary -> goal": 1,
+   "collision:obstacle -> collision:target": 2
+  },
+  "v20_r3_vs_v16": {
+   "goal -> collision:obstacle": 2,
+   "collision:obstacle -> collision:boundary": 1,
+   "goal -> collision:boundary": 3,
+   "collision:boundary -> timeout": 1,
+   "collision:boundary -> goal": 2,
+   "goal -> timeout": 1,
+   "collision:boundary -> collision:obstacle": 1
+  }
+ },
+ "v20_decision_seconds": {
+  "p50": 0.21048987600079272,
+  "p95": 1.0708752360005747,
+  "max": 12.86985328800074,
+  "decisions": 4142
+ },
+ "runtime_environment": {
+  "python": "3.11.17 (main, Oct  1 2026, 15:41:07) [GCC 13.3.0]",
+  "platform": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39"
+ },
+ "script_sha256": "e7d23fe0d959dbf8b1640c121a17f2cdcc6be458287458d427480c13586e3e82"
+}

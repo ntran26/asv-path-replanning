@@ -860,3 +860,44 @@ Two model facts were also checked from the identified equations: rest with zero 
 The resulting design is recorded in the [V20 plan](SAFETY_V20_PLAN.md): V16 keeps every decision it can check; a committed contingency that brings the vessel to rest with the rudder centred is certified at every decision against static points, signed boundary containment and a declared constant-velocity target contract, using calibrated forecast-error allowances; certified commands replace V16's two unchecked branches only. The plan states its conditional claim, assumptions, offline gates and pre-registered probe predictions, and awaits approval before implementation.
 
 The constants file hash quoted in section 2.3 refers to the file before a comment-only edit on 2026-10-04; the current file differs only in comment, docstring and error-message text, with an identical syntax tree once string literals are blanked.
+
+## 17. Continuation, 2026-10-10: V20 phase 2 (gates, development episodes, decision)
+
+This section is appended; sections 1-16 are unchanged. Full record: [V20 plan](SAFETY_V20_PLAN.md) sections 13-16 and the [V20 development results](../results/safety_dev/v20_development/README.md). **No controller was promoted; V16 remains the reference. Test set v4 was authorized but not run for V20, because no configuration met the pre-registered development condition. No test-set outcome was read.**
+
+**Runtime.** Fresh episodes ran in a Python 3.11.17 environment (numpy 1.26.4, torch 2.2.1, gymnasium 0.29.1, stable-baselines3 2.3.2) with one thread per process. Fresh V16 reproduces the historical probe outcomes but not bit-identical commands, so all pairing uses fresh OFF and V16 runs from the same environment.
+
+**Offline gates (saved V16 states only).**
+- G1: held-out own-ship forecast coverage passes for every horizon a stop contingency uses.
+- G2/G3, 3,569 decisions in 68 development episodes:
+  - The default configuration, with calibrated allowances, fails: one-step survival with a target present is 0.805, and 3 of 21 contact precursors are certified at their last checked decision.
+  - The nominal option, without allowances, meets the rule narrowly: survival 0.920 and 0.940, and 11 of 21 precursors.
+  - Only 11 % of V16's unchecked decisions have any certified option.
+  - At 9 of the 11 certified precursors the commitment fails its recheck exactly when V16 turns unchecked.
+- Recheck failures split into small own-state errors against thin slack (104 of 194) and target-estimate updates (58).
+- A commit margin of 0.127 m raises survival to 0.965 and 0.969.
+- Constant-velocity target forecasts cover truth 68 % of the time at 0.5 s.
+
+**Episodes (fresh, paired by test ID, seed and scenario digest).**
+
+| Configuration | Cases | Goals (V16) | Contacts (V16) | Timeouts | Rescued / lost SAC vs OFF (V16) |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Nominal V20 | 12 | 3 (5) | 7 (7) | 2 | 0 / 7 (1 / 6) |
+| Revision 1: gatekeeper, extended tails, margin | 12 | 2 (5) | 7 (7) | 3 | 0 / 8 (1 / 6) |
+| Revision 2: traffic-gated gatekeeper and stop | 12 | 6 (5) | 5 (7) | 1 | 1 / 5 (1 / 6) |
+| Revision 2 | 60 | 40 (45) | 16 (15) | 4 | 16 / 3 (18 / 0) |
+| Revision 3: no uncertified stops | 72 | 46 (50) | 24 (22) | 2 | 16 / 7 (19 / 6) |
+
+Contact types for revision 3 on the 72 cases are obstacle 8, boundary 7 and target 9; V16 has 6, 7 and 9, and OFF has 16, 3 and 16 with 37 goals.
+
+**Mechanisms.**
+- Uncertified stops turn some boundary and target contacts into timeouts. They also let crossing targets strike the stopped vessel, and let a braked hull drift or spin into walls. Rest is invariant only for an exactly stationary hull, and braked turns are not.
+- Without a target allowance, contacts follow certified decisions. With the allowance, certificates are rarely available.
+- Even certified interventions alone (revision 3) perturb V16 and SAC into new contacts more often than they recover failures.
+
+**Decision: redirect.** The stop-terminal backup is not pursued further. Plan section 16.3 names the directions:
+- a target estimator with calibrated short-horizon forecasts;
+- a moving, target-safe terminal set;
+- closed-loop counterfactual screening of interventions before cohort runs.
+
+New code is confined to `src/safety_v20*.py`, its tests and V20 tools. V16, the environment, constants, checkpoint and configuration are unchanged.
