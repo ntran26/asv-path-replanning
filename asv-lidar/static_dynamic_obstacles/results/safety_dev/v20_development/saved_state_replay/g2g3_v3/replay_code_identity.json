@@ -1,0 +1,9 @@
+{
+ "note": "Code on disk when both replay workers were launched; unchanged until the merge.",
+ "sha256": {
+  "src/safety_v20.py": "6d6ffc58f24e3ac7db00d17d9c22d3a1f11dcfbc5fdd05f06bb934f0e1933a19",
+  "src/safety_v20_contingency.py": "2572a80343d97342e2d7c42fa09c6bddc3aaab82a154d2724dcb6193448b55a4",
+  "src/safety_v20_tubes.py": "3f7023cadccd114946ce62bbdd11831120a25c4bc15293b834a33f1ad7979998",
+  "tools/diagnostics/safety/v20_replay_saved_decisions.py": "94c856ade93cb428d26b11c7fa78dd0e1cc31711516ffdb637abc2bb098ceb3c"
+ }
+}
