@@ -97,7 +97,8 @@ def run(filt, env, action):
 
 
 def test_constructor_validates_options():
-    for bad in (dict(allowance_tables="x"), dict(out_of_contract="x"), dict(hold_horizon_s=-1.0)):
+    for bad in (dict(allowance_tables="x"), dict(out_of_contract="x"), dict(hold_horizon_s=-1.0),
+                dict(tail_family="x"), dict(enforcement="x")):
         with pytest.raises(ValueError):
             make_filter(**bad)
     assert make_filter(allowance_tables="none").own_table is None
@@ -207,3 +208,28 @@ def test_real_certificate_path_runs_without_truth(monkeypatch):
     out, _ = run(filt, env, [0.2, 0.3])
     assert filt.last["v20_level"] in ("replaced_by_sac", "replaced_by_v16_certified")
     assert filt.last["v20_observed_free"]["free"] >= 0.0
+
+
+def test_gatekeeper_replaces_an_uncertified_checked_command_near_v16(monkeypatch, fake_checker):
+    stub_v16(monkeypatch, "turn", [-0.5, 0.0])
+    fake_checker.allowed = {-1.0}
+    filt, env = make_filter(enforcement="gatekeeper"), make_env()
+    out, changed = run(filt, env, [0.8, 0.9])
+    assert filt.last["v20_level"] == "gatekeeper_replaced" and filt.last["why"] == "v20 gatekeeper"
+    assert out[0] == pytest.approx(-1.0) and changed and filt.v20_committed is not None
+
+
+def test_gatekeeper_keeps_v16_when_nothing_certifies(monkeypatch, fake_checker):
+    stub_v16(monkeypatch, "turn", [-0.5, 0.0])
+    filt, env = make_filter(enforcement="gatekeeper"), make_env()
+    out, _ = run(filt, env, [0.8, 0.9])
+    assert filt.last["v20_level"] == "gatekeeper_uncertified_v16" and np.allclose(out, [-0.5, 0.0])
+    assert filt.v20_committed is None
+
+
+def test_gatekeeper_leaves_certified_v16_commands_alone(monkeypatch, fake_checker):
+    stub_v16(monkeypatch, "nominal", [0.3, 0.4])
+    fake_checker.allowed = {0.3, 1.0}
+    filt, env = make_filter(enforcement="gatekeeper"), make_env()
+    out, changed = run(filt, env, [0.3, 0.4])
+    assert filt.last["v20_level"] == "v16_unchanged_certified" and np.allclose(out, [0.3, 0.4]) and not changed

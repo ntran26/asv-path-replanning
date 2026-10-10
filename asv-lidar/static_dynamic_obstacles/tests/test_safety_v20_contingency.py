@@ -255,3 +255,15 @@ def test_batched_certification_matches_single_commands():
         single = checker.certify(first)
         assert single.certified == cert.certified and single.tail_index == cert.tail_index
         assert single.slack == pytest.approx(cert.slack)
+
+
+def test_extended_tail_family_contains_stops_and_cruise_segments():
+    ext = sc.EXTENDED_TAILS
+    assert ext.shape == (71, sc.DECISIONS - 1, 2)
+    assert np.allclose(ext[:3], sc.TAILS[:3], equal_nan=True)
+    assert np.all(np.isnan(ext[:, -1, 1])) and np.all(ext[:, -1, 0] == 0.0)
+    cruising = [(np.isfinite(t[:, 1]) & (t[:, 0] == 0.0)).sum() for t in ext[3:]]
+    assert max(cruising) >= 12
+    snap = make_snap(u=0.5)
+    cert = sc.ContingencyChecker(snap, actuators(), tails=ext).certify([0.0, 0.0])
+    assert cert.certified and np.allclose(cert.sequence[1:], ext[cert.tail_index], equal_nan=True)
