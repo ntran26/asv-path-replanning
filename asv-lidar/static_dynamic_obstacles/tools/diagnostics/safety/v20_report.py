@@ -81,6 +81,7 @@ def read_lines(trace: Path):
 def trace_metrics(trace: Path):
     levels, sources, seconds, oocs, certified, decisions = Counter(), Counter(), [], [], 0, 0
     first_v20_change = None
+    tail = []                      # (step, level, contract violations) of the last decisions
     for line in read_lines(trace):
         rec = json.loads(line)
         f = rec["filter"] or {}
@@ -88,19 +89,20 @@ def trace_metrics(trace: Path):
         level = f.get("v20_level")
         if level is None:
             continue
+        tail = (tail + [(rec["step"], level, f.get("v20_contract_violations"))])[-3:]
         levels[level] += 1
         if f.get("v20_seconds") is not None:
             seconds.append(float(f["v20_seconds"]))
         if level.startswith("out_of_contract"):
             oocs.append(rec["step"])
         if level in ("v16_unchanged_certified", "replaced_by_sac", "replaced_by_v16_certified",
-                     "replaced_by_projection", "committed_continuation"):
+                     "replaced_by_projection", "committed_continuation", "gatekeeper_replaced"):
             certified += 1
         if first_v20_change is None and str(f.get("why", "")).startswith("v20 "):
             first_v20_change = rec["step"]
     return dict(levels=dict(levels), certified_decisions=certified, decisions=decisions,
                 out_of_contract_steps=oocs, first_v20_command_change=first_v20_change,
-                v20_seconds=seconds)
+                v20_seconds=seconds, last_levels=tail)
 
 
 def commands(trace: Path):
@@ -163,6 +165,7 @@ def main():
                     row[f"{mode}_out_of_contract_decisions"] = len(m["out_of_contract_steps"])
                     row[f"{mode}_first_v20_command_change"] = m["first_v20_command_change"]
                     row[f"{mode}_levels"] = json.dumps(m["levels"], sort_keys=True)
+                    row[f"{mode}_last_levels"] = json.dumps(m["last_levels"])
                     per_mode[mode]["out_of_contract_episodes"] += bool(m["out_of_contract_steps"])
                     per_mode[mode]["decisions"] += m["decisions"]
                     per_mode[mode]["certified_decisions"] += m["certified_decisions"]

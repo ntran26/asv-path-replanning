@@ -53,6 +53,11 @@ OUT_OF_CONTRACT = "committed_then_stop"
 TAIL_FAMILY = "stop"
 ENFORCEMENT = "unchecked_only"
 COMMIT_MARGIN_M = 0.0
+# Revision 1 (planning/SAFETY_V20_PLAN.md, section 13), fixed before any V20
+# episode: nominal certificate, gatekeeper enforcement, extended tails, and new
+# commitments tightened by gate G1's one-decision own-ship allowance.
+REVISION1_OPTIONS = {"allowance_tables": "none", "enforcement": "gatekeeper",
+                     "tail_family": "extended", "commit_margin": tubes.OWN_TABLE[0][1]}
 
 # V16 branches whose issued plan hard-passed the inherited checker at that decision.
 CHECKED_BRANCHES = frozenset({
