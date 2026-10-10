@@ -1,0 +1,180 @@
+{
+ "schema": 1,
+ "title": "Emergency-stop protocol: V16 and V17 with the stop on the 72 development cases",
+ "runs": [
+  "results/safety_dev/v20_development/runs/e0_probe12_off_v16",
+  "results/safety_dev/v20_development/runs/e2_cohort32_off_v16",
+  "results/safety_dev/v20_development/runs/e3_broader40_off_v16",
+  "results/safety_dev/v20_development/runs/estop_probe12",
+  "results/safety_dev/v20_development/runs/estop_cohort32",
+  "results/safety_dev/v20_development/runs/estop_broader40"
+ ],
+ "run_manifest_sha256": {
+  "results/safety_dev/v20_development/runs/e0_probe12_off_v16": "19b4905dad09c8c89328558048fcbd7fdd8b0a1db33dbc6d96bc8d3eab2c424f",
+  "results/safety_dev/v20_development/runs/e2_cohort32_off_v16": "b65eb3e1fef2886023ecb5117d22f684ac5f7ecc61a91515d2bb1febc35f1213",
+  "results/safety_dev/v20_development/runs/e3_broader40_off_v16": "05b291ba947d704fe11f278d9fc6664e10456ee196511e9728c8fb3d4fada387",
+  "results/safety_dev/v20_development/runs/estop_probe12": "1a67538a952af1879f08bab339e984a0980550e5c09c2ec7e2d1dcd3a2e0e7de",
+  "results/safety_dev/v20_development/runs/estop_cohort32": "20e96257ac954963efe02ba7d0701805e13b4157b5976f113486f4ecf9a96440",
+  "results/safety_dev/v20_development/runs/estop_broader40": "c2e80f076b6870b0c772cbb227c4007ba988ed21dfebd2895d552e8805c6acee"
+ },
+ "cases": 72,
+ "modes": [
+  "off",
+  "v16",
+  "v16_estop",
+  "v17_estop"
+ ],
+ "per_mode": {
+  "off": {
+   "goal": 37,
+   "episodes": 72,
+   "collision:obstacle": 16,
+   "collision:target": 16,
+   "collision:boundary": 3
+  },
+  "v16": {
+   "goal": 50,
+   "episodes": 72,
+   "collision:obstacle": 6,
+   "collision:boundary": 7,
+   "collision:target": 9
+  },
+  "v16_estop": {
+   "goal": 45,
+   "episodes": 72,
+   "collision:obstacle": 7,
+   "stopped": 7,
+   "collision:boundary": 4,
+   "collision:target": 2,
+   "collision:by_target": 6,
+   "timeout": 1
+  },
+  "v17_estop": {
+   "goal": 45,
+   "episodes": 72,
+   "collision:obstacle": 6,
+   "collision:by_target": 6,
+   "stopped": 7,
+   "collision:boundary": 6,
+   "collision:target": 2
+  }
+ },
+ "pairs": {
+  "v16_vs_off": {
+   "pairs": 72,
+   "reference_goals": 37,
+   "candidate_goals": 50,
+   "gained_goals": 19,
+   "lost_goals": 6,
+   "both_goal": 31,
+   "both_fail": 16
+  },
+  "v16_estop_vs_off": {
+   "pairs": 72,
+   "reference_goals": 37,
+   "candidate_goals": 45,
+   "gained_goals": 16,
+   "lost_goals": 8,
+   "both_goal": 29,
+   "both_fail": 19
+  },
+  "v17_estop_vs_off": {
+   "pairs": 72,
+   "reference_goals": 37,
+   "candidate_goals": 45,
+   "gained_goals": 18,
+   "lost_goals": 10,
+   "both_goal": 27,
+   "both_fail": 17
+  },
+  "v16_estop_vs_v16": {
+   "pairs": 72,
+   "reference_goals": 50,
+   "candidate_goals": 45,
+   "gained_goals": 0,
+   "lost_goals": 5,
+   "both_goal": 45,
+   "both_fail": 22
+  },
+  "v17_estop_vs_v16": {
+   "pairs": 72,
+   "reference_goals": 50,
+   "candidate_goals": 45,
+   "gained_goals": 4,
+   "lost_goals": 9,
+   "both_goal": 41,
+   "both_fail": 18
+  }
+ },
+ "transitions": {
+  "v16_vs_off": {
+   "collision:obstacle -> goal": 8,
+   "collision:target -> goal": 10,
+   "goal -> collision:boundary": 4,
+   "collision:boundary -> collision:obstacle": 1,
+   "goal -> collision:target": 2,
+   "collision:target -> collision:obstacle": 1,
+   "collision:boundary -> goal": 1,
+   "collision:obstacle -> collision:target": 2,
+   "collision:obstacle -> collision:boundary": 2
+  },
+  "v16_estop_vs_off": {
+   "collision:obstacle -> goal": 8,
+   "collision:target -> stopped": 3,
+   "collision:target -> goal": 7,
+   "goal -> collision:boundary": 2,
+   "collision:boundary -> collision:obstacle": 1,
+   "goal -> stopped": 3,
+   "collision:target -> collision:by_target": 3,
+   "goal -> collision:by_target": 2,
+   "collision:boundary -> stopped": 1,
+   "goal -> timeout": 1,
+   "collision:target -> collision:obstacle": 1,
+   "collision:boundary -> goal": 1,
+   "collision:obstacle -> collision:boundary": 2,
+   "collision:obstacle -> collision:by_target": 1
+  },
+  "v17_estop_vs_off": {
+   "collision:obstacle -> goal": 9,
+   "collision:target -> goal": 7,
+   "goal -> collision:by_target": 2,
+   "collision:target -> stopped": 3,
+   "goal -> collision:boundary": 4,
+   "collision:boundary -> goal": 2,
+   "goal -> collision:obstacle": 1,
+   "collision:target -> collision:by_target": 3,
+   "collision:boundary -> stopped": 1,
+   "goal -> stopped": 3,
+   "collision:target -> collision:obstacle": 1,
+   "collision:obstacle -> collision:by_target": 1,
+   "collision:obstacle -> collision:boundary": 2
+  },
+  "v16_estop_vs_v16": {
+   "goal -> stopped": 4,
+   "collision:target -> stopped": 1,
+   "collision:target -> collision:by_target": 5,
+   "collision:boundary -> stopped": 2,
+   "collision:boundary -> timeout": 1,
+   "goal -> collision:by_target": 1,
+   "collision:target -> collision:obstacle": 1
+  },
+  "v17_estop_vs_v16": {
+   "goal -> collision:by_target": 2,
+   "goal -> stopped": 4,
+   "collision:obstacle -> goal": 1,
+   "collision:target -> stopped": 1,
+   "goal -> collision:boundary": 2,
+   "goal -> collision:obstacle": 1,
+   "collision:target -> collision:by_target": 4,
+   "collision:boundary -> stopped": 2,
+   "collision:boundary -> goal": 1,
+   "collision:target -> goal": 2
+  }
+ },
+ "v20_decision_seconds": null,
+ "runtime_environment": {
+  "python": "3.11.17 (main, Oct  1 2026, 15:41:07) [GCC 13.3.0]",
+  "platform": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39"
+ },
+ "script_sha256": "bdec3dd5f5b960a11f0926e4c83176a400910ad22731f8e4214e571ff2353593"
+}
