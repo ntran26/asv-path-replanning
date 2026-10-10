@@ -23,6 +23,14 @@ collision-avoidance guarantee. No truth, scenario identity or outcome is read.
 
 ``certified_fallback=False`` returns V16's decision and state unchanged while
 still logging certificates (parity mode).
+
+Options added after the offline gates (planning/SAFETY_V20_PLAN.md, section
+13): ``enforcement="gatekeeper"`` also replaces V16's checked commands that
+are not certified, with the certified command nearest to V16's, else the
+committed contingency, as in gatekeeper; ``tail_family="extended"`` adds
+turn-cruise-stop tails; ``commit_margin`` (metres) requires that slack for a
+new commitment, while a committed tail is kept as long as its recheck slack
+is nonnegative (constraint tightening for recursive feasibility).
 """
 from __future__ import annotations
 
@@ -44,6 +52,7 @@ ALLOWANCE_TABLES = "calibrated"
 OUT_OF_CONTRACT = "committed_then_stop"
 TAIL_FAMILY = "stop"
 ENFORCEMENT = "unchecked_only"
+COMMIT_MARGIN_M = 0.0
 
 # V16 branches whose issued plan hard-passed the inherited checker at that decision.
 CHECKED_BRANCHES = frozenset({
@@ -71,7 +80,7 @@ def _same_command(a, b) -> bool:
 class SafetyFilterV20(v16.SafetyFilterV16):
     def __init__(self, *, certified_fallback=None, allowance_tables=None,
                  hold_horizon_s=None, out_of_contract=None, tail_family=None,
-                 enforcement=None, **v16_options):
+                 enforcement=None, commit_margin=None, **v16_options):
         super().__init__(**v16_options)
         self.certified_fallback = (CERTIFIED_FALLBACK if certified_fallback is None
                                    else bool(certified_fallback))
@@ -96,6 +105,9 @@ class SafetyFilterV20(v16.SafetyFilterV16):
         if enforce not in ("unchecked_only", "gatekeeper"):
             raise ValueError("enforcement must be 'unchecked_only' or 'gatekeeper'")
         self.enforcement = enforce
+        self.commit_margin = float(COMMIT_MARGIN_M if commit_margin is None else commit_margin)
+        if not math.isfinite(self.commit_margin) or self.commit_margin < 0.0:
+            raise ValueError("commit_margin must be finite and nonnegative")
         self.v20_committed = None           # (DECISIONS, 2) contingency starting at the next decision
         self._v20_previous_tracks = None
 
@@ -162,6 +174,7 @@ class SafetyFilterV20(v16.SafetyFilterV16):
         details = {"v20_certified_fallback": self.certified_fallback,
                    "v20_allowance_tables": self.allowance_tables,
                    "v20_tail_family": self.tail_family, "v20_enforcement": self.enforcement,
+                   "v20_commit_margin": self.commit_margin,
                    "v20_v16_why": why, "v20_v16_command": np.asarray(out).tolist(),
                    "v20_v16_brake": brake}
         if bool(getattr(env, "command_rate_limit", False)) or snap is None:
@@ -186,7 +199,8 @@ class SafetyFilterV20(v16.SafetyFilterV16):
             cert_previous = checker.certify_sequence(previous)
             details.update(v20_previous_recheck=bool(cert_previous.certified),
                            v20_previous_slack=cert_previous.slack)
-        cert_v16 = checker.certify(v16_command)
+        margin = self.commit_margin
+        cert_v16 = checker.certify(v16_command, margin)
         details.update(v20_v16_certified=bool(cert_v16.certified), v20_v16_slack=cert_v16.slack)
         if _same_command(sac_command, v16_command):
             cert_sac = cert_v16
@@ -206,7 +220,7 @@ class SafetyFilterV20(v16.SafetyFilterV16):
             # committed contingency; otherwise V16's checked command.
             reference = v16_command if np.isfinite(v16_command[1]) else np.array([v16_command[0], -1.0])
             grid = sc.projection_candidates(reference)
-            batch = checker.certify_many(grid)
+            batch = checker.certify_many(grid, margin)
             details["v20_candidates_evaluated"] = len(grid)
             for candidate, certificate in zip(grid, batch):
                 if certificate.certified:
@@ -222,7 +236,8 @@ class SafetyFilterV20(v16.SafetyFilterV16):
             options = [("sac", sac_command, cert_sac), ("v16", v16_command, cert_v16)]
             options += [("projection", c, None) for c in sc.projection_candidates(sac_command)]
             pending = [i for i, (_, _, known) in enumerate(options) if known is None]
-            batch = checker.certify_many(np.array([options[i][1] for i in pending])) if pending else []
+            batch = (checker.certify_many(np.array([options[i][1] for i in pending]), margin)
+                     if pending else [])
             certificates = {i: c for i, c in zip(pending, batch)}
             details["v20_candidates_evaluated"] = len(pending)
             for i, (name, candidate, known) in enumerate(options):
