@@ -1,0 +1,80 @@
+{
+ "schema": 1,
+ "title": "Test set v4: fresh OFF and V16 on 1,000 scenarios",
+ "runs": [
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c01",
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c02",
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c03",
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c04",
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c05",
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c06",
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c07",
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c08",
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c09",
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c10"
+ ],
+ "run_manifest_sha256": {
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c01": "d65e7487cceda3eb7ce3a72173c2fb8163320613ca8a1ef6588d4314963e1f6a",
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c02": "8c3284787aecfd506f1a031c02a01cb82b5d0aad1bc1ab51d516d949b9543cee",
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c03": "04c080affb0388f69c60338d18ab7465831ab7a0a0f2cb62f847f99d18db54af",
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c04": "606db550bebbb076ca228e5229c60527b466d38745fe0f3cd1516e5acb6c05b4",
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c05": "16ed2fd47b4267892f5af3ba200f24c6464092dadc34887f214accb632b5adb4",
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c06": "8f11134d025e6bb4b2d11203b22cb10c33ac5944931aaec68620ad448afb3f81",
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c07": "826ac273bf15dd7ceda5c8eee71553632b63ecde0bb31da008a94abc2b190b1d",
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c08": "2f6dedb834bc94151c2ab32d9d03a4298deab8d14157a4a21a11bf0cf3e4a862",
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c09": "05a8c45f08bcb5cb56f6acd6c56ece973bd608985d1d673926db19779d3e5d37",
+  "results/safety_dev/testset_v4_main/runs/ts4_off_v16_c10": "0fbbf3373e4cff2a7a6c7e802fe46e7a92f02f7bf4e12081e10a3dada6002db0"
+ },
+ "cases": 1000,
+ "modes": [
+  "off",
+  "v16"
+ ],
+ "per_mode": {
+  "off": {
+   "goal": 865,
+   "episodes": 1000,
+   "collision:target": 53,
+   "collision:boundary": 12,
+   "collision:obstacle": 70
+  },
+  "v16": {
+   "goal": 904,
+   "episodes": 1000,
+   "collision:boundary": 25,
+   "collision:target": 25,
+   "collision:obstacle": 46
+  }
+ },
+ "pairs": {
+  "v16_vs_off": {
+   "pairs": 1000,
+   "reference_goals": 865,
+   "candidate_goals": 904,
+   "gained_goals": 50,
+   "lost_goals": 11,
+   "both_goal": 854,
+   "both_fail": 85
+  }
+ },
+ "transitions": {
+  "v16_vs_off": {
+   "collision:target -> goal": 26,
+   "collision:obstacle -> goal": 23,
+   "collision:target -> collision:obstacle": 7,
+   "goal -> collision:target": 3,
+   "collision:boundary -> collision:target": 3,
+   "goal -> collision:boundary": 6,
+   "goal -> collision:obstacle": 2,
+   "collision:obstacle -> collision:boundary": 10,
+   "collision:boundary -> goal": 1,
+   "collision:target -> collision:boundary": 1
+  }
+ },
+ "v20_decision_seconds": null,
+ "runtime_environment": {
+  "python": "3.11.17 (main, Oct  1 2026, 15:41:07) [GCC 13.3.0]",
+  "platform": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39"
+ },
+ "script_sha256": "e7d23fe0d959dbf8b1640c121a17f2cdcc6be458287458d427480c13586e3e82"
+}
