@@ -27,6 +27,7 @@ import argparse
 from collections import Counter
 import copy
 import csv
+import gzip
 import importlib
 import importlib.metadata
 import io
@@ -48,6 +49,10 @@ from v9_paired_pilot import MODEL, EXPECTED_MODEL, jsonable, sha, write_json  # 
 
 DEVELOPMENT_OUT = ROOT / "results/safety_dev/v20_development/runs"
 TS4_OUT = ROOT / "results/safety_dev/testset_v4_main/runs"
+# Bulky per-decision diagnostics omitted by --compact-traces; decisions,
+# commands, branches, V20 levels and certificates are always kept.
+COMPACT_DROP = ("risk_monitor", "track_persistence", "motion_axis_geometry", "policy_search",
+                "escape_search", "v11_track_admission", "v11_track_persistence")
 VARIANTS = {
     "off": (1, None, {}),
     "v16": (16, "safety_v16", {}),
@@ -123,7 +128,12 @@ def main():
     parser.add_argument("--selection", type=Path, required=True)
     parser.add_argument("--cases", default="", help="Comma-separated canonical prefixed IDs")
     parser.add_argument("--snapshots", action="store_true")
+    parser.add_argument("--compact-traces", action="store_true",
+                        help="Omit bulky nested diagnostics from trace records (storage only)")
+    parser.add_argument("--gzip-traces", action="store_true", help="Write traces as .jsonl.gz (storage only)")
     args = parser.parse_args()
+    if args.snapshots and args.compact_traces:
+        parser.error("Snapshots and compact traces are exclusive")
     modes = args.modes.split(",")
     if (Path(args.tag).name != args.tag or not args.tag or len(set(modes)) != len(modes)
             or not set(modes) <= set(VARIANTS)):
@@ -192,7 +202,8 @@ def main():
         filter_classes={m: None if classes[m] is None else classes[m].__module__ + "." + classes[m].__name__
                         for m in modes},
         constructor_options=options, filter_installation="Explicit instance immediately after native reset",
-        snapshots=args.snapshots, checkpoint=str(MODEL.relative_to(ROOT)), checkpoint_sha256=EXPECTED_MODEL,
+        snapshots=args.snapshots, compact_traces=args.compact_traces, gzip_traces=args.gzip_traces,
+        compact_trace_omitted_keys=list(COMPACT_DROP) if args.compact_traces else [], checkpoint=str(MODEL.relative_to(ROOT)), checkpoint_sha256=EXPECTED_MODEL,
         config_sha256=sha(MODEL.with_name("config.json").read_bytes()), source_sha256=source_hashes,
         cache_sha256=cache_hashes, threadpools=threadpool_info(), torch_threads=torch.get_num_threads(),
         native_thread_environment={k: os.environ[k] for k in
@@ -225,6 +236,8 @@ def main():
             if self.estop_enabled and type(filt) is not classes[self.mode]:
                 raise AssertionError("Unexpected filter class")
             details = getattr(filt, "last", {})
+            if args.compact_traces:
+                details = {k: v for k, v in details.items() if k not in COMPACT_DROP}
             self.why_counts[details.get("why", "idle")] += 1
             if "v20_level" in details:
                 self.level_counts[details["v20_level"]] += 1
@@ -260,11 +273,15 @@ def main():
             env.mode, env.why_counts, env.level_counts, env.steps_logged = mode, Counter(), Counter(), 0
             episode_start = time.perf_counter()
             try:
-                with (out / "traces" / f"{count:03d}_{mode}.jsonl").open("x", encoding="utf-8", newline="\n") as trace:
+                name = f"{count:03d}_{mode}.jsonl" + (".gz" if args.gzip_traces else "")
+                opener = (gzip.open(out / "traces" / name, "xt", encoding="utf-8", newline="\n")
+                          if args.gzip_traces else (out / "traces" / name).open("x", encoding="utf-8", newline="\n"))
+                with opener as trace:
                     env.trace = trace
                     result = run_episode(env, copy.deepcopy(scenes[case["case"]]), int(case["seed"]), "model", model)
                     trace.flush()
-                    os.fsync(trace.fileno())
+                    if not args.gzip_traces:
+                        os.fsync(trace.fileno())
                 row = dict(identity, dataset=case["dataset"], stratum=case.get("selection_stratum", "explicit"),
                            scenario_sha256=case["scenario_sha256"],
                            elapsed_s=time.perf_counter() - episode_start, why_counts=dict(env.why_counts),
