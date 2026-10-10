@@ -215,6 +215,36 @@ def inside_polygon(points: np.ndarray, edges_a: np.ndarray) -> np.ndarray:
     return path.contains_points(points.reshape(-1, 2)).reshape(shape)
 
 
+def _segment_point_distance(points, a, b):
+    """Distance from each point (P, 2) to each segment (E): (P, E)."""
+    edge = b - a
+    length2 = np.maximum(np.sum(edge * edge, axis=1), 1e-12)
+    rel = points[:, None, :] - a
+    t = np.clip(np.sum(rel * edge, axis=-1) / length2, 0.0, 1.0)
+    return np.linalg.norm(rel - t[..., None] * edge, axis=-1)
+
+
+def candidate_edges(query_points, edges_a, edges_b, extra: float = 0.0) -> np.ndarray:
+    """Indices of the edges that can be nearest to some point of `query_points`.
+
+    For every point q in the axis-aligned box B of the queries, the nearest-edge
+    distance is at most U = min over edges of the largest distance from a box
+    vertex to that edge (distance to a segment is convex, so its maximum over B
+    is at a vertex). An edge whose own bounding box is farther than U + `extra`
+    from B can therefore never attain the minimum (with `extra` covering any
+    per-edge offset subtracted afterwards, such as the hull support), and
+    dropping it leaves every minimum unchanged.
+    """
+    a, b = np.asarray(edges_a, float), np.asarray(edges_b, float)
+    q = np.asarray(query_points, float).reshape(-1, 2)
+    lo, hi = q.min(axis=0), q.max(axis=0)
+    box = np.array([[lo[0], lo[1]], [hi[0], lo[1]], [hi[0], hi[1]], [lo[0], hi[1]]])
+    bound = _segment_point_distance(box, a, b).max(axis=0).min()
+    elo, ehi = np.minimum(a, b), np.maximum(a, b)
+    gap = np.maximum(0.0, np.maximum(elo - hi, lo - ehi))      # per-axis box separation
+    return np.flatnonzero(np.hypot(gap[:, 0], gap[:, 1]) <= bound + extra + 1e-9)
+
+
 def signed_corner_clearance(positions, headings, edges_a, edges_b) -> np.ndarray:
     """Minimum signed distance of the inflated hull's corners to the map polygon.
 
@@ -223,12 +253,14 @@ def signed_corner_clearance(positions, headings, edges_a, edges_b) -> np.ndarray
     """
     pts = corners(positions, headings)                           # (K, n, 4, 2)
     a, b = np.asarray(edges_a, float), np.asarray(edges_b, float)
+    inside = inside_polygon(pts, a)
+    keep = candidate_edges(pts, a, b)                            # exact pruning
+    a, b = a[keep], b[keep]
     edge = b - a
     length2 = np.maximum(np.sum(edge * edge, axis=1), 1e-12)
     rel = pts[..., None, :] - a                                  # (K, n, 4, E, 2)
     t = np.clip(np.sum(rel * edge, axis=-1) / length2, 0.0, 1.0)
     dist = np.linalg.norm(rel - t[..., None] * edge, axis=-1).min(axis=-1)   # (K, n, 4)
-    inside = inside_polygon(pts, a)
     return np.where(inside, dist, -dist).min(axis=-1)
 
 
@@ -301,7 +333,11 @@ class ContingencyChecker:
         static = static - e_own - sample_allowance
         parts = {"static": static.min(axis=0)}
         if self.has_polygon:
-            edge = cc.boundary_clearance(ro.positions, ro.headings, snap.edges_a, snap.edges_b)
+            # Exact pruning: the hull support lies in [0, HALF_L + HALF_W].
+            keep = candidate_edges(ro.positions, snap.edges_a, snap.edges_b, cc.HALF_L + cc.HALF_W)
+            edge = cc.boundary_clearance(ro.positions, ro.headings,
+                                         np.asarray(snap.edges_a, float)[keep],
+                                         np.asarray(snap.edges_b, float)[keep])
             signed = signed_corner_clearance(ro.positions, ro.headings, snap.edges_a, snap.edges_b)
             boundary = np.minimum(edge, signed) - v2.GAP_BOUNDARY_M - e_own - sample_allowance
             parts["boundary"] = boundary.min(axis=0)

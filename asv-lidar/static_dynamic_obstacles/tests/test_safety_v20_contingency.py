@@ -297,3 +297,40 @@ def test_commit_margin_tightens_new_certificates_only():
     for bad in (-0.1, np.nan, np.inf):
         with pytest.raises(ValueError):
             checker.certify([0.0, 0.0], margin=bad)
+
+
+def wavy_channel(n=60, width=4.0):
+    s = np.linspace(0.0, 40.0, n)
+    x = 3.0 * np.sin(s / 6.0)
+    left = np.stack([x - width / 2, s], axis=1)
+    right = np.stack([x + width / 2, s], axis=1)[::-1]
+    a = np.vstack([left, right])
+    return a, np.roll(a, -1, axis=0)
+
+
+@pytest.mark.parametrize("seed", range(3))
+def test_edge_pruning_leaves_boundary_clearances_unchanged(seed, monkeypatch):
+    rng = np.random.default_rng(seed)
+    a, b = wavy_channel()
+    pos = np.stack([rng.uniform(-3, 3, (30, 50)), rng.uniform(2, 38, (30, 50))], axis=-1)
+    hdg = rng.uniform(-math.pi, math.pi, (30, 50))
+    pruned = sc.signed_corner_clearance(pos, hdg, a, b)
+    keep = sc.candidate_edges(pos, a, b, cc.HALF_L + cc.HALF_W)
+    assert len(keep) < len(a) or pos.std() > 10
+    monkeypatch.setattr(sc, "candidate_edges", lambda q, ea, eb, extra=0.0: np.arange(len(ea)))
+    full = sc.signed_corner_clearance(pos, hdg, a, b)
+    assert np.array_equal(pruned, full)
+    assert np.array_equal(cc.boundary_clearance(pos, hdg, a[keep], b[keep]).min(axis=0),
+                          cc.boundary_clearance(pos, hdg, a, b).min(axis=0))
+
+
+def test_edge_pruning_leaves_certificates_unchanged(monkeypatch):
+    a, b = wavy_channel()
+    snap = make_snap(x=0.5, y=8.0, heading=0.3, u=0.8, poly=(a, b))
+    seqs = sc.sequences_for(sc.projection_candidates([0.2, 0.5])[:6])
+    pruned = sc.ContingencyChecker(snap, actuators()).evaluate(seqs)
+    monkeypatch.setattr(sc, "candidate_edges", lambda q, ea, eb, extra=0.0: np.arange(len(ea)))
+    full = sc.ContingencyChecker(snap, actuators()).evaluate(seqs)
+    assert np.array_equal(pruned[0], full[0]) and np.array_equal(pruned[1], full[1])
+    for key in full[2]:
+        assert np.array_equal(pruned[2][key], full[2][key])

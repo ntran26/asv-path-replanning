@@ -285,6 +285,7 @@ def test_gatekeeper_without_traffic_acts_only_without_a_target_in_range(monkeypa
 
 
 def test_revision_option_sets_construct():
-    for options in (v20.REVISION1_OPTIONS, v20.REVISION2_OPTIONS):
+    assert v20.REVISION3_OPTIONS["out_of_contract"] == "v16"
+    for options in (v20.REVISION1_OPTIONS, v20.REVISION2_OPTIONS, v20.REVISION3_OPTIONS):
         filt = make_filter(**options)
         assert filt.allowance_tables == "none" and filt.commit_margin > 0.1

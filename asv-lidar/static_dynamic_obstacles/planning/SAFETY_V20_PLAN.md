@@ -513,3 +513,47 @@ No fresh-V16 goal was lost. The three target contacts end in `out_of_contract_v1
 The CH-HO-CV-073 divergence is the designed gatekeeper action. No track was within 7 m, and V16's command had certified slack 0.107 m, below the 0.127 m commit margin. V20 issued the nearest certified command (`gatekeeper_replaced`, rudder 0, full ahead), and the episode still reached the goal. Criterion (a) was carried over from the unchecked-only P1 without accounting for the gatekeeper. Section 13.5 had waived identity for revision 1 for this reason, and the same waiver applies here. No code or option is changed. E2/E3 proceed with revision 2 as frozen, and this deviation is recorded before any E2/E3 V20 episode.
 
 The near-V16 options analysis of revision 1 (`offline_variants/variants_v1/options_episodes/`, 36 episode files) was stopped during its part 2 so that compute goes to revision 2. Revision 1 is superseded, so it is not merged.
+
+## 15. Revision 2 development result and revision 3, 2026-10-10
+
+### 15.1 Revision 2 on the 60 held-out development cases
+
+- **Runs:** `runs/e2_cohort32_r2_{a,b}` and `runs/e3_broader40_r2_{a,b,c}`.
+- **References:** `runs/e2_cohort32_off_v16` and `runs/e3_broader40_off_v16`.
+- **Report:** [`reports/e2e3_cohorts60_r2`](../results/safety_dev/v20_development/reports/e2e3_cohorts60_r2/report.md).
+
+| Controller | Goals | Obstacle | Boundary | Target | Timeout |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| OFF | 27 | 15 | 3 | 15 | 0 |
+| V16 | 45 | 6 | 3 | 6 | 0 |
+| Revision 2 | 40 | 6 | 4 | 6 | 4 |
+
+Against fresh V16:
+
+| Change | Cases | Last decisions |
+| --- | --- | --- |
+| Goal to contact (5) | DV3-CRP-CV-04, DV3-CRP-CV-16, BAS-CR-RE-070, P2-L1-CRP-FIX-09, P2-L1-CRP-VAR-14 | All `out_of_contract_stop` |
+| Goal to timeout (2) | BAS-CR-CV-045, CH-CR-CV-073 | - |
+| Contact to goal (2) | P2-L2-CRS-VAR-14, P2-L2-HO-VAR-16 | Certified decisions |
+| Contact to timeout (2) | BAS-NU-CV-043 (ends in `committed_continuation`), DV3-NT-CV-15 | - |
+| Contact type changed | P2-L2-HO-VAR-14 (boundary to obstacle) | - |
+
+Decision time: p50 0.22 s, p95 1.6 s, maximum 19.7 s. CH-CR-CV-073 took 32 min, almost all of it in signed boundary clearance against its 102-edge channel polygon.
+
+Revision 2 fails promotion: 16 contacts against V16's 15, and five V16 goals lost to contacts. Under section 14.4 it is not run on the test set.
+
+**Mechanism.** In every goal-to-contact loss, V20 issued uncertified stops with no target in range while V16 was in `no escape`. The stopped hull then reached the boundary or an obstacle: braked turns keep yawing and drifting at zero surge (section 13.1), and the stop was uncertified because the window already predicted contact. V16's unchecked SAC command had reached the goal in each case. The out-of-contract stop is therefore harmful against static hazards as well as targets (section 14.2). The gains, by contrast, come from certified, in-contract actions: gatekeeper replacements and committed continuations.
+
+### 15.2 Revision 3
+
+Revision 3 (`REVISION3_OPTIONS`, runner mode `v20_r3`) is revision 2 with `out_of_contract="v16"`, the option pre-registered in phase 1. When nothing is certified, V16's command is issued. V20 then changes a command only through a certified, in-contract action: a gatekeeper replacement without a target in range, a certified replacement of an unchecked V16 decision, or a committed continuation that passed its recheck. Revision 3 is the decomposition that isolates what the certified actions contribute.
+
+The certificate code adds exact edge pruning (`candidate_edges` in `src/safety_v20_contingency.py`). Only boundary edges that can be nearest to some hull corner or centre in an evaluation chunk are kept: for every point of the chunk's box the nearest edge is no farther than the best edge's farthest box vertex, by convexity of segment distance. Unit tests on random trajectories in a 120-edge channel and a certificate test show identical results. On the saved CH-CR-CV-073 state a grid certification takes 3.4 s instead of 15.5 s, with identical certificates. All 50 tests pass.
+
+Revision 3 is shaped by the probe and by the revision-2 outcomes on the 60 cases, so no development case is held out for it. The development run is reported in full, and test set v4 is the only held-out evaluation.
+
+### 15.3 Pre-registered rule for revision 3
+
+- **Runs:** all 72 development cases (probe and both cohorts), `v20_r3`, in chunks of 12, paired with the existing fresh OFF and V16 runs.
+- **Reported:** goals, each contact type, timeouts, rescued SAC failures, lost SAC successes, every transition against fresh V16, and the last decision levels before each contact.
+- **Test set v4:** runs once with fresh OFF, V16 and `v20_r3`, all 1,000 scenarios in definition order, in chunks of 25 with compact gzip traces, if and only if revision 3 has fewer contacts than fresh V16 on the 72 development cases. No change follows any test-set outcome.
