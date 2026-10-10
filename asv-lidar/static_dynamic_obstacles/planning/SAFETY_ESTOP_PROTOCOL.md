@@ -59,3 +59,19 @@ The detector is replayed on the saved V16-equivalent full-snapshot traces of the
 2. **Test set v4:** both modes on all 1,000 scenarios, paired with the existing fresh OFF and V16 records, in chunks with compact gzip traces and at most two processes.
 
 No code, option or W changes after any test-set outcome. Reports give goals, stopped, timeouts, rescued SAC failures, lost SAC successes, and each contact type including `collision:by_target`, paired by test ID, episode seed and scenario digest.
+
+## 6. Window screen results and the user's choice, 2026-10-10
+
+Three screens ran on the 68 saved V16-equivalent development traces (`results/safety_dev/estop_protocol/`). Each counts false alarms (V16-successful episodes in which the detector would fire) and caught contacts (V16 contact episodes in which it first fires at least one decision before the last).
+
+| Screen | Contact check | False alarms at W = 1.0 / 1.5 / 2.5 / 6 s | Caught at W = 1.0 / 1.5 / 2.5 / 6 s | Rule of section 4 |
+| --- | --- | --- | --- | --- |
+| `screen_v1` | Boundary, targets and remembered static points | 5 / 5 / 5 / 7 | 7 / 8 / 9 / 12 | No window qualifies |
+| `screen_v2_exclude_overlaps` | As v1, ignoring hazards already inside the hull now | 5 / 5 / 5 / 7 | 6 / 7 / 8 / 12 | No window qualifies |
+| `screen_v3_no_static` | Boundary and targets only | 0 / 0 / 0 / 2 | 7 / 8 / 9 / 11 | W = 2.5 s |
+
+**False alarms come from the obstacle memory.** All false alarms at short windows (DV3-CRP-CV-12, BAS-CR-CV-045, CH-CR-CV-073, CH-OT-RE-064, P2-L1-CRP-VAR-14) come only from remembered static LiDAR points 0.6-26 cm from, or inside, the hull at the current estimate. Removing those points removes every false alarm. Every contact caught at W = 1.5 s is driven by a target or the map boundary.
+
+**Choice.** Under the rule of section 4, the choice went back to the user. The user chose to **keep the obstacle memory in the check and accept the false alarms**, with W = 1.5 s (screen v1: 5 false alarms, 8 caught contacts). The configuration is therefore `ESTOP_WINDOW_S = 1.5`, `USE_STATIC_POINTS = True`, `EXCLUDE_CURRENT_OVERLAPS = False`. It is fixed before any episode with the stop.
+
+The 8 V16 contact episodes caught at W = 1.5 s are BAS-HO-NC-002, BAS-HO-NC-059, BAS-NU-CV-043, BAS-NU-CV-070, CH-CR-CV-059, P2-L2-HO-FIX-11, P2-L3-BO-FIX-09 and P2-L3-CRP-FIX-03. Whether each becomes a stop, a collision during braking or a target strike is measured by the episodes.

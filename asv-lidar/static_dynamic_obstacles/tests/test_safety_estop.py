@@ -78,9 +78,9 @@ def test_target_contact_uses_true_hulls():
     assert np.isinf(contact).all()          # true hulls 2.3 m apart along the axis: no contact at rest
 
 
-def test_constructor_requires_a_window():
-    with pytest.raises(ValueError):
-        se.SafetyFilterV16E()
+def test_constructor_validates_the_window():
+    assert se.SafetyFilterV16E().estop_window_s == se.ESTOP_WINDOW_S == 1.5
+    assert se.USE_STATIC_POINTS and not se.EXCLUDE_CURRENT_OVERLAPS
     with pytest.raises(ValueError):
         se.SafetyFilterV16E(estop_window_s=0.0)
     assert se.SafetyFilterV16E(estop_window_s=2.0).estop_window_s == 2.0

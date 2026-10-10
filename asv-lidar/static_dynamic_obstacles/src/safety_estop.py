@@ -31,8 +31,9 @@ import safety_v20 as v20
 import safety_v20_contingency as sc
 import ship
 
-# Fixed from development data by the rule in planning/SAFETY_ESTOP_PROTOCOL.md section 4.
-ESTOP_WINDOW_S = None
+# Chosen by the user from the development screen (planning/SAFETY_ESTOP_PROTOCOL.md
+# section 6): 1.5 s with the obstacle memory included, accepting false alarms.
+ESTOP_WINDOW_S = 1.5
 MAX_WINDOW_S = 6.0
 TRUE_HALF_L = 0.5 * ship.VESSEL_LENGTH
 TRUE_HALF_W = 0.5 * ship.VESSEL_WIDTH
