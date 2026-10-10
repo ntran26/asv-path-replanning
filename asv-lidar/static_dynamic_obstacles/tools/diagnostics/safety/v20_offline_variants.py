@@ -87,7 +87,7 @@ def margin_analysis(replay_tag):
     return out
 
 
-def option_rows(case, label, trace, wanted, why_by_step):
+def option_rows(case, label, trace, wanted, why_by_step, families):
     rows = []
     for rec in replay.stream_records(trace):
         step = rec["step"]
@@ -107,7 +107,8 @@ def option_rows(case, label, trace, wanted, why_by_step):
         firsts = np.vstack([v16[None], sac[None], grid])
         row = {"case": case, "step": step, "why": why_by_step[step],
                "unchecked": wanted[step]}
-        for family, bank in FAMILIES.items():
+        for family in families:
+            bank = FAMILIES[family]
             checker = sc.ContingencyChecker(snap, act, tails=bank)
             slack, _, _ = checker.evaluate(sc.sequences_for(firsts, bank))
             best = np.where(np.isfinite(slack), slack, -np.inf).reshape(len(firsts), -1).max(axis=1)
@@ -126,7 +127,7 @@ def option_rows(case, label, trace, wanted, why_by_step):
     return rows
 
 
-def options_part(replay_tag, tag, part, parts, max_margin):
+def options_part(replay_tag, tag, part, parts, max_margin, families):
     out = DEV / "offline_variants" / tag
     episodes_dir = out / "options_episodes"
     episodes_dir.mkdir(parents=True, exist_ok=True)
@@ -142,9 +143,10 @@ def options_part(replay_tag, tag, part, parts, max_margin):
                   if r["unchecked"] or not (r["none_v16_certified"] and r["none_v16_slack"] >= max_margin)}
         why = {r["step"]: r["why"] for r in rows}
         t0 = time.perf_counter()
-        er = option_rows(case, label, trace, wanted, why)
+        er = option_rows(case, label, trace, wanted, why, families)
         episode = {"case": case, "source": label, "category": saved[case]["episode"]["category"],
                    "contact": saved[case]["episode"]["contact"], "selected": len(er),
+                   "families": list(families), "max_margin": max_margin,
                    "trace_sha256": sha(trace)}
         with name.open("x", encoding="utf-8") as stream:
             json.dump({"episode": episode, "rows": er}, stream)
@@ -171,7 +173,7 @@ def options_merge(replay_tag, tag):
                     "_v16_success" if success else "_v16_failure")
                 c = counts[group]
                 c["decisions"] += 1
-                for family in FAMILIES:
+                for family in [f for f in FAMILIES if f"{f}_v16" in r]:
                     c[f"{family}_v16"] += r[f"{family}_v16"] >= m
                     c[f"{family}_sac"] += r[f"{family}_sac"] >= m
                     near = r[f"{family}_nearest_projection"][str(m)]
@@ -204,6 +206,8 @@ def main():
     parser.add_argument("--parts", type=int, default=1)
     parser.add_argument("--merge", action="store_true")
     parser.add_argument("--max-margin", type=float, default=max(MARGINS))
+    parser.add_argument("--families", default="stop,extended",
+                        help="Comma-separated tail families for the options analysis")
     args = parser.parse_args()
     if Path(args.tag).name != args.tag:
         parser.error("Use a simple tag")
@@ -221,7 +225,10 @@ def main():
     elif args.merge:
         options_merge(args.replay, args.tag)
     else:
-        options_part(args.replay, args.tag, args.part, args.parts, args.max_margin)
+        families = [f for f in args.families.split(",") if f]
+        if not families or not set(families) <= set(FAMILIES):
+            parser.error("Unknown tail family")
+        options_part(args.replay, args.tag, args.part, args.parts, args.max_margin, families)
 
 
 if __name__ == "__main__":

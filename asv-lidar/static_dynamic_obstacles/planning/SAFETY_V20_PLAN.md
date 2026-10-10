@@ -294,3 +294,121 @@ Existing R-numbers refer to [section 14 of the complete record](SAFETY_LAYER_COM
 - Venkatraman, A.; Hebert, M.; Bagnell, J. A. *Improving multi-step prediction of learned time series models.* AAAI 2015, 3024-3030. [DOI 10.1609/aaai.v29i1.9590](https://doi.org/10.1609/aaai.v29i1.9590).
 - Sha, L. *Using simplicity to control complexity.* IEEE Software, 2001. Simplex switching between a high-performance and a high-assurance controller; the architectural pattern of V16 as performance layer and the certified contingency as assurance layer.
 - Granstrom, Baum and Reuter (R14); Li and Jilkov (R17); Ljung (R15); stage-1 references (Kochdumper et al.; Li et al.; Krasowski and Althoff) as cited in the [stage-1 plan](SAFETY_REACHABILITY_STAGE1_PLAN.md).
+
+## 13. Revision 1, 2026-10-10: offline gate results and redesign before any V20 episode
+
+Status: the phase-1 default configuration fails the pre-registered advancement rule of section 9.1, so no episode was run with it. The pre-registered nominal option (`allowance_tables="none"`) meets the rule, narrowly. This section gives the gate results, corrections to sections 2-4 found during implementation, the diagnosis, the decision, and a revised configuration (revision 1) with pre-registered episode criteria. Sections 0-12 stand as written; where they disagree with this section, this section applies. All evidence is development data; no test-set outcome was read.
+
+### 13.1 Corrections found during implementation
+
+1. **Rest after a braked turn is slow (sections 2 item 4, 3.4, 4.3 item 4, assumption A4).** Rest with zero rudder and zero propulsion is an exact equilibrium, as stated, but the hull does not settle quickly after a turn: at zero surge the identified yaw and sway damping is almost purely quadratic. After a 2 s full-rudder turn at 0.56 m/s followed by full astern (strong reverse model), surge reaches zero at 3.1 s, yet the heading changes by a further 101 degrees by 20 s and the yaw rate is still 5.8 deg/s at 12 s. Predicate 4 (|r| at most 1 deg/s within 10 s) is therefore unattainable for turn tails. The implemented predicate simulates an explicit 20 s window (40 decisions) for both reverse models, spin-down included. A tail qualifies if surge reaches 0.02 m/s with at least the 8 s hold left inside the window and planar speed is at most 0.05 m/s at the window end. The final sample carries a 1 s residual-motion allowance. No pose is frozen at rest.
+2. **Tail choice (section 4.3).** The best qualifying immediate-stop tail is committed if one exists, otherwise the best qualifying turn tail (largest minimum slack, then earlier rest).
+3. **Computation.** All candidates of one decision are certified in a single vectorised rollout, and clearances are evaluated in column chunks to bound memory. Unit tests show both are identical to single evaluation.
+4. **Replay runs.** `g2g3_v1` (too slow) and `g2g3_v2` (memory exhausted) were stopped before any result; their `ABORTED.md` files say why. `g2g3_v3` is the reported run. Its part 2 was resumed once after a memory failure, with an identity note.
+5. **Options added after the gates.** These are constructor options, unused by any gate, and each defaults to the phase-1 behavior:
+   - `tail_family="extended"`: the 3 stop tails plus 68 turn-cruise-stop tails (rudder in {-1, -0.5, 0, 0.5, 1} for 1, 2, 4 or 6 decisions, then 0-6 s at cruise, then full astern with rudder 0);
+   - `enforcement="gatekeeper"`;
+   - `commit_margin`.
+
+### 13.2 Gate results
+
+- **Scoring tool:** `tools/diagnostics/safety/v20_gate_report.py`, output [`offline_gates/gates_v1/gates.json`](../results/safety_dev/v20_development/offline_gates/gates_v1/gates.json).
+- **Inputs:** the [G1 calibration](../results/safety_dev/v20_development/allowance_calibration/g1_v1/calibration.json) and the merged [G2/G3 replay](../results/safety_dev/v20_development/saved_state_replay/g2g3_v3/replay.json).
+- **Replay coverage:** 68 of the 72 development cases have a V16-equivalent full-snapshot trace (3,569 decisions), including all 21 contact precursors.
+
+| Gate | Threshold | Default (`calibrated`) | Option `none` |
+| --- | --- | --- | --- |
+| G0 unit and parity tests | pass | 41 passed at replay time; 43 now | same |
+| G1 held-out own-ship coverage, both split directions, bins used | at least 0.90 | Pass: at least 0.90 in every bin up to 11 s; the bins that fall short (11.5 s and 12 s: 0.896 and 0.892, calibrate-A/validate-B) lie beyond the latest default-family rest time of 7.0 s from the highest saved surge (1.09 m/s) | not used |
+| G2 checked or idle V16 commands certified | reported | 1,075/3,216 (33 %) | 2,746/3,216 (85 %) |
+| G2 unchecked V16 commands certified | reported | 8/353 | 27/353 |
+| G2 unchecked decisions with any certified option (SAC, V16, grid, committed) | reported | 27/353 | 38/353 (11 %) |
+| G2 contact precursors with a certified option at the first unchecked decision | reported | 2/21 | 2/21 |
+| G3 one-step survival, target in engagement range | at least 0.90 | 157/195 = 0.805 (Wilson 0.744-0.855) | 1,400/1,521 = 0.920 (0.906-0.933) |
+| G3 one-step survival, no target | at least 0.90 | 814/859 = 0.948 (0.931-0.961) | 1,137/1,210 = 0.940 (0.925-0.952) |
+| G3 contact precursors certified at the last checked decision | at least 11/21 | 3/21 | 11/21 |
+| **Advancement** | all of the above | **fails** | **meets the rule** (precursor count exactly at the threshold) |
+
+Target constant-velocity forecasts were scored against truth for reporting only. Coverage is 0.68 at 0.5 s, 0.85 at 2 s, 0.89 at 4 s and 0.96 at 8 s. The frozen target allowance is 0.57 m at 0.5 s, 1.02 m at 2 s, 1.77 m at 5 s, 4.2 m at 10 s and 6.4 m at 20 s.
+
+The replay covers 46 successful V16 episodes (16 rescues and 30 both-goal cases); 25 of them contain unchecked decisions, 166 in all. At those decisions the nominal option would issue:
+
+| Command | Decisions |
+| --- | ---: |
+| Centred full astern, out of contract | 126 |
+| Committed contingency, out of contract | 17 |
+| A certified SAC command (2 of them equal to V16's) | 17 |
+| A certified grid command | 5 |
+| V16's own command | 1 |
+
+### 13.3 Diagnosis
+
+1. **The calibrated allowances remove availability without buying survival.** The target allowance grows to several metres over the 20 s window and excludes most stops near traffic. Survival with a target present is *lower* with the allowances (0.805) than without (0.920). The tables are not nested from one decision to the next, and target-estimate jumps exceed them.
+2. **Unchecked-only enforcement acts too late.** Of the 11 precursors with a certified contingency at the last checked decision, 9 lose it at the very next decision: the recheck fails exactly when V16 turns unchecked. The other 2 have a certified SAC command, equal to V16's. Over all 353 unchecked decisions a certified option exists in only 11 %. What makes V16 lose its checked plan is the same thing that breaks the committed contingency.
+3. **Why rechecks fail.** The 194 nominal recheck failures were rerun with one input changed at a time ([`recheck_attribution/attribution_v1`](../results/safety_dev/v20_development/recheck_attribution/attribution_v1/attribution.json)):
+
+   | Cause | All failures | The 33 failures that coincide with V16 entering an unchecked run |
+   | --- | ---: | ---: |
+   | Own state only | 104 | 11 |
+   | World update only | 58 (55 of them target estimates) | 16, all target |
+   | Both | 12 | 5 |
+   | Interaction | 20 | 1 |
+
+   The own-ship hull-point displacement behind own-state failures is small (median 0.077 m, maximum 0.18 m). The committed slack at those failures is also small (median 0.087 m).
+4. **Tightening the commit margin helps survival at a known availability cost** ([`offline_variants/variants_v1/margin.json`](../results/safety_dev/v20_development/offline_variants/variants_v1/margin.json)). A new commitment requires slack of at least m; the recheck stays at zero.
+
+   | m | Checked decisions available | Survival, target present | Survival, no target |
+   | --- | ---: | ---: | ---: |
+   | 0 | 85 % | 0.920 | 0.940 |
+   | 0.05 m | 81 % | 0.947 | 0.953 |
+   | 0.127 m | 74 % | 0.965 (0.954-0.974) | 0.969 (0.957-0.978) |
+   | 0.2 m | 68 % | 0.977 | 0.972 |
+   | 0.3 m | 61 % | 0.981 | 0.977 |
+
+5. **Gatekeeper availability.** A scratch screen covered 51 replay episodes, before the replay finished. It took the 371 checked or idle decisions whose V16 command has no nominal stop-family certificate, at margin 0:
+   - with the extended family, V16's own command is certified in 124;
+   - a grid command is certified in 61;
+   - nothing is certified in 186.
+
+   In the 6 lost SAC successes, nothing is certified at 30 of 36 such decisions. The committed tool `v20_offline_variants.py options` repeats this on all 68 episodes with the margin of revision 1, as a reported diagnostic.
+
+### 13.4 Decision: improve within the method family
+
+The method family stays backup-based safety filtering. Phase 1 restricted the backup filter to V16's unchecked branches, to keep V16's intervention timing. The gates show that by then the backup is usually gone. The standard form of the family enforces the backup condition at every decision, so that the system never leaves the set from which a backup is certified. This is gatekeeper (Agrawal, Chen and Panagou 2024) and model-predictive shielding (Bastani). It takes the backup earlier, before the cascade, at the price of more interventions in successful episodes. The literature remedy for small one-step model errors that break recursive feasibility is constraint tightening: new commitments carry a margin, and a committed backup is kept while it remains feasible ([Chisci, Rossiter and Zappa, Automatica 2001](https://doi.org/10.1016/S0005-1098(00)00203-1)). Target-estimate jumps remain out of contract. The calibrated target allowance is not a remedy for them (diagnosis item 1).
+
+Alternatives considered and not taken now:
+- Larger, rule-based target occupancy (Koschi and Althoff 2021) would lower availability further.
+- Passive safety would count a target striking a vessel at rest as a contact, and the scripted targets do not react.
+- Learning-based recoverability would need recorded future SAC commands or simulator cloning at runtime, which is not allowed.
+
+Two configurations go to episodes. Both are frozen before any V20 episode:
+
+| Name (runner mode) | Options | Basis |
+| --- | --- | --- |
+| Nominal V20 (`v20_nominal`) | `allowance_tables="none"`; otherwise phase-1 defaults (stop family, unchecked-only enforcement, margin 0) | Pre-registered option; meets the section 9.1 rule |
+| Revision 1 (`v20_r1`) | `safety_v20.REVISION1_OPTIONS`: `allowance_tables="none"`, `enforcement="gatekeeper"`, `tail_family="extended"`, `commit_margin` = 0.1269 m, which is G1's one-decision own-ship allowance (the 0.5 s row of `OWN_TABLE`) | This section; the margin comes from G1 calibration, not from an outcome |
+
+Under gatekeeper enforcement, a checked V16 command without a certificate at the margin is replaced, in order, by:
+1. the certified grid command nearest to V16's command;
+2. the committed contingency, if its recheck passes;
+3. V16's own command, labelled `gatekeeper_uncertified_v16`, as a last resort.
+
+Unchecked decisions are handled as in section 4.1.
+
+**Disclosure.** Before this section was written, a timing-only check ran revision 1 for the first decisions of TS2:BAS-HO-NC-059: decision time p50 0.22 s, p95 1.4 s. The episode ended at decision 28. The outcome was not read, but early termination of this lost-SAC-success case was seen. No option was changed afterwards.
+
+### 13.5 Pre-registered episode criteria
+
+**E1 (12-case probe; fresh OFF and V16 from `e0_probe12_off_v16` as references):**
+- `v20_nominal` is judged by sections 9.2 and 9.3 unchanged: P1 identical command sequences in the three cases without unchecked V16 decisions; P2 no contact while the issued command was certified and in contract; P3 strictly fewer contacts than fresh V16 (7).
+- `v20_r1` is judged by:
+  - R1-P1: no contact in a decision interval that begins with a certified, in-contract decision (level `v16_unchanged_certified`, `replaced_by_*`, `gatekeeper_replaced` or `committed_continuation`, with no target-contract violation logged at that decision). Gatekeeper enforcement changes checked decisions by design, so identity with V16 is not required.
+  - R1-P2: strictly fewer contacts than fresh V16 (7).
+- For both, the following are reported and do not block: goals (fresh V16 5, OFF 10), lost fresh-V16 goals, timeouts, and the levels of the last three decisions before every contact.
+
+**E2 and E3 (the other 60 development cases; fresh OFF, fresh V16 and every variant that advanced):** chunked as in section 10.3. Promotion over V16 is unchanged from section 9.3. It is judged on the 72 cases combined: fewer contacts than fresh V16, no additional lost SAC successes, and no lost fresh-V16 goals. A variant that misses any condition is reported as a tradeoff.
+
+**Test set v4** (authorized 2026-10-10; selection [`testset_v4_main/selection.json`](../results/safety_dev/testset_v4_main/selection.json), all 1,000 scenarios in definition order):
+- Exactly one V20 variant is frozen after E3: among advancing variants, the one with fewer contacts on the 72 development cases, with ties broken by more goals.
+- It runs once with fresh OFF and V16, provided it has fewer contacts than fresh V16 on the development cases; otherwise V20 is not run on the test set and the report says why.
+- No code, option or threshold changes after any test-set outcome. Results are reported whatever they show: goals, rescued SAC failures, lost SAC successes, and each contact type, paired by test ID, episode seed and scenario digest.

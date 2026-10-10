@@ -1,0 +1,580 @@
+{
+ "schema": 1,
+ "g0": {
+  "pytest": "43 passed (tests/test_safety_v20_contingency.py, tests/test_safety_v20_filter.py; 41 at replay time)",
+  "pass": true
+ },
+ "g1": {
+  "threshold": 0.9,
+  "max_rest_time_s_default_family": 7.0,
+  "splits": {
+   "calibrate_A_validate_B": {
+    "min_coverage": 0.8919597989949749,
+    "failing_bins": [
+     [
+      11.5,
+      0.896
+     ],
+     [
+      12.0,
+      0.892
+     ]
+    ],
+    "failing_bins_within_default_rest_time": []
+   },
+   "calibrate_B_validate_A": {
+    "min_coverage": 0.9148766905330151,
+    "failing_bins": [],
+    "failing_bins_within_default_rest_time": []
+   }
+  },
+  "pass": true,
+  "target_truth_coverage_constant_velocity_reported": [
+   [
+    0.5,
+    0.6802
+   ],
+   [
+    1.0,
+    0.7507
+   ],
+   [
+    2.0,
+    0.8488
+   ],
+   [
+    4.0,
+    0.8887
+   ],
+   [
+    8.0,
+    0.9567
+   ],
+   [
+    12.0,
+    0.9652
+   ]
+  ]
+ },
+ "g2_g3": {
+  "audit_contacts": 22,
+  "audit_contact_precursors": 21,
+  "precursors_without_saved_trace": [],
+  "settings": {
+   "none": {
+    "g2_checked_or_idle_v16_certified": [
+     2746,
+     3216
+    ],
+    "g2_unchecked_v16_certified": [
+     27,
+     353
+    ],
+    "g2_unchecked_with_certified_option": [
+     38,
+     353
+    ],
+    "g2_unchecked_choice_all": {
+     "out_of_contract_stop": 282,
+     "out_of_contract_committed": 33,
+     "projection": 11,
+     "sac": 17,
+     "sac_same_as_v16": 8,
+     "v16_same_as_v16": 2
+    },
+    "g2_unchecked_choice_in_successful_v16_episodes": {
+     "out_of_contract_stop": 126,
+     "out_of_contract_committed": 17,
+     "projection": 5,
+     "sac": 15,
+     "sac_same_as_v16": 2,
+     "v16_same_as_v16": 1
+    },
+    "g2_precursors_with_certified_option_at_first_unchecked": [
+     2,
+     21
+    ],
+    "g3_survival": {
+     "traffic": {
+      "rechecks": 1521,
+      "survived": 1400,
+      "rate": 0.9204470742932281,
+      "wilson95": [
+       0.9057643482783863,
+       0.9330112989757285
+      ]
+     },
+     "no_traffic": {
+      "rechecks": 1210,
+      "survived": 1137,
+      "rate": 0.9396694214876034,
+      "wilson95": [
+       0.9248112122153129,
+       0.9517446744835776
+      ]
+     }
+    },
+    "g3_survival_pass": true,
+    "g3_precursors_certified_at_last_checked": [
+     11,
+     21
+    ],
+    "g3_precursor_pass": true,
+    "precursor_detail": [
+     {
+      "case": "DV3:DV3-CRS-CV-04",
+      "unchecked_tail": 15,
+      "last_checked_step": 52,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 53,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "DV3:DV3-HO-VS-01",
+      "unchecked_tail": 2,
+      "last_checked_step": 39,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 40,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "DV3:DV3-NT-CV-15",
+      "unchecked_tail": 2,
+      "last_checked_step": 32,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 33,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:BAS-CR-CV-027",
+      "unchecked_tail": 13,
+      "last_checked_step": 14,
+      "last_checked_v16_certified": true,
+      "first_unchecked_step": 15,
+      "first_unchecked_choice": "out_of_contract_committed",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:BAS-CR-RE-022",
+      "unchecked_tail": 1,
+      "last_checked_step": 48,
+      "last_checked_v16_certified": true,
+      "first_unchecked_step": 49,
+      "first_unchecked_choice": "out_of_contract_committed",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:BAS-HO-NC-002",
+      "unchecked_tail": 7,
+      "last_checked_step": 26,
+      "last_checked_v16_certified": true,
+      "first_unchecked_step": 27,
+      "first_unchecked_choice": "out_of_contract_committed",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:BAS-HO-NC-059",
+      "unchecked_tail": 6,
+      "last_checked_step": 22,
+      "last_checked_v16_certified": true,
+      "first_unchecked_step": 23,
+      "first_unchecked_choice": "out_of_contract_committed",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:BAS-NU-CV-043",
+      "unchecked_tail": 7,
+      "last_checked_step": 60,
+      "last_checked_v16_certified": true,
+      "first_unchecked_step": 61,
+      "first_unchecked_choice": "out_of_contract_committed",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:BAS-NU-CV-070",
+      "unchecked_tail": 14,
+      "last_checked_step": 64,
+      "last_checked_v16_certified": true,
+      "first_unchecked_step": 65,
+      "first_unchecked_choice": "sac_same_as_v16",
+      "unchecked_with_certified_option": 5
+     },
+     {
+      "case": "TS2:CH-CR-CV-059",
+      "unchecked_tail": 8,
+      "last_checked_step": 6,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 7,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:CH-HO-RE-057",
+      "unchecked_tail": 4,
+      "last_checked_step": 40,
+      "last_checked_v16_certified": true,
+      "first_unchecked_step": 41,
+      "first_unchecked_choice": "out_of_contract_committed",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:P2-L1-CRP-FIX-05",
+      "unchecked_tail": 6,
+      "last_checked_step": 28,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 29,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:P2-L1-CRS-VAR-08",
+      "unchecked_tail": 7,
+      "last_checked_step": 43,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 44,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:P2-L2-CRS-FIX-19",
+      "unchecked_tail": 9,
+      "last_checked_step": 27,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 28,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:P2-L2-CRS-VAR-14",
+      "unchecked_tail": 3,
+      "last_checked_step": 22,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 23,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:P2-L2-HO-FIX-11",
+      "unchecked_tail": 15,
+      "last_checked_step": 13,
+      "last_checked_v16_certified": true,
+      "first_unchecked_step": 14,
+      "first_unchecked_choice": "out_of_contract_committed",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:P2-L2-HO-VAR-14",
+      "unchecked_tail": 8,
+      "last_checked_step": 42,
+      "last_checked_v16_certified": true,
+      "first_unchecked_step": 43,
+      "first_unchecked_choice": "sac_same_as_v16",
+      "unchecked_with_certified_option": 5
+     },
+     {
+      "case": "TS2:P2-L2-HO-VAR-16",
+      "unchecked_tail": 8,
+      "last_checked_step": 33,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 34,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:P2-L3-BO-FIX-09",
+      "unchecked_tail": 11,
+      "last_checked_step": 59,
+      "last_checked_v16_certified": true,
+      "first_unchecked_step": 60,
+      "first_unchecked_choice": "out_of_contract_committed",
+      "unchecked_with_certified_option": 1
+     },
+     {
+      "case": "TS2:P2-L3-CRP-FIX-03",
+      "unchecked_tail": 14,
+      "last_checked_step": 5,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 6,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:P2-L3-CRP-FIX-17",
+      "unchecked_tail": 7,
+      "last_checked_step": 10,
+      "last_checked_v16_certified": true,
+      "first_unchecked_step": 11,
+      "first_unchecked_choice": "out_of_contract_committed",
+      "unchecked_with_certified_option": 0
+     }
+    ],
+    "checked_rows": 3216
+   },
+   "calibrated": {
+    "g2_checked_or_idle_v16_certified": [
+     1075,
+     3216
+    ],
+    "g2_unchecked_v16_certified": [
+     8,
+     353
+    ],
+    "g2_unchecked_with_certified_option": [
+     27,
+     353
+    ],
+    "g2_unchecked_choice_all": {
+     "out_of_contract_stop": 322,
+     "out_of_contract_committed": 4,
+     "sac": 6,
+     "projection": 19,
+     "sac_same_as_v16": 1,
+     "v16_same_as_v16": 1
+    },
+    "g2_unchecked_choice_in_successful_v16_episodes": {
+     "out_of_contract_stop": 146,
+     "out_of_contract_committed": 1,
+     "sac": 6,
+     "projection": 13
+    },
+    "g2_precursors_with_certified_option_at_first_unchecked": [
+     2,
+     21
+    ],
+    "g3_survival": {
+     "traffic": {
+      "rechecks": 195,
+      "survived": 157,
+      "rate": 0.8051282051282052,
+      "wilson95": [
+       0.7438618501720522,
+       0.8546044667354762
+      ]
+     },
+     "no_traffic": {
+      "rechecks": 859,
+      "survived": 814,
+      "rate": 0.9476135040745053,
+      "wilson95": [
+       0.9306208875257413,
+       0.9606203321836468
+      ]
+     }
+    },
+    "g3_survival_pass": false,
+    "g3_precursors_certified_at_last_checked": [
+     3,
+     21
+    ],
+    "g3_precursor_pass": false,
+    "precursor_detail": [
+     {
+      "case": "DV3:DV3-CRS-CV-04",
+      "unchecked_tail": 15,
+      "last_checked_step": 52,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 53,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "DV3:DV3-HO-VS-01",
+      "unchecked_tail": 2,
+      "last_checked_step": 39,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 40,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "DV3:DV3-NT-CV-15",
+      "unchecked_tail": 2,
+      "last_checked_step": 32,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 33,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:BAS-CR-CV-027",
+      "unchecked_tail": 13,
+      "last_checked_step": 14,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 15,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:BAS-CR-RE-022",
+      "unchecked_tail": 1,
+      "last_checked_step": 48,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 49,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:BAS-HO-NC-002",
+      "unchecked_tail": 7,
+      "last_checked_step": 26,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 27,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:BAS-HO-NC-059",
+      "unchecked_tail": 6,
+      "last_checked_step": 22,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 23,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:BAS-NU-CV-043",
+      "unchecked_tail": 7,
+      "last_checked_step": 60,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 61,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:BAS-NU-CV-070",
+      "unchecked_tail": 14,
+      "last_checked_step": 64,
+      "last_checked_v16_certified": true,
+      "first_unchecked_step": 65,
+      "first_unchecked_choice": "sac_same_as_v16",
+      "unchecked_with_certified_option": 3
+     },
+     {
+      "case": "TS2:CH-CR-CV-059",
+      "unchecked_tail": 8,
+      "last_checked_step": 6,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 7,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:CH-HO-RE-057",
+      "unchecked_tail": 4,
+      "last_checked_step": 40,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 41,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:P2-L1-CRP-FIX-05",
+      "unchecked_tail": 6,
+      "last_checked_step": 28,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 29,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:P2-L1-CRS-VAR-08",
+      "unchecked_tail": 7,
+      "last_checked_step": 43,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 44,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:P2-L2-CRS-FIX-19",
+      "unchecked_tail": 9,
+      "last_checked_step": 27,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 28,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:P2-L2-CRS-VAR-14",
+      "unchecked_tail": 3,
+      "last_checked_step": 22,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 23,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:P2-L2-HO-FIX-11",
+      "unchecked_tail": 15,
+      "last_checked_step": 13,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 14,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:P2-L2-HO-VAR-14",
+      "unchecked_tail": 8,
+      "last_checked_step": 42,
+      "last_checked_v16_certified": true,
+      "first_unchecked_step": 43,
+      "first_unchecked_choice": "projection",
+      "unchecked_with_certified_option": 3
+     },
+     {
+      "case": "TS2:P2-L2-HO-VAR-16",
+      "unchecked_tail": 8,
+      "last_checked_step": 33,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 34,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:P2-L3-BO-FIX-09",
+      "unchecked_tail": 11,
+      "last_checked_step": 59,
+      "last_checked_v16_certified": true,
+      "first_unchecked_step": 60,
+      "first_unchecked_choice": "out_of_contract_committed",
+      "unchecked_with_certified_option": 1
+     },
+     {
+      "case": "TS2:P2-L3-CRP-FIX-03",
+      "unchecked_tail": 14,
+      "last_checked_step": 5,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 6,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     },
+     {
+      "case": "TS2:P2-L3-CRP-FIX-17",
+      "unchecked_tail": 7,
+      "last_checked_step": 10,
+      "last_checked_v16_certified": false,
+      "first_unchecked_step": 11,
+      "first_unchecked_choice": "out_of_contract_stop",
+      "unchecked_with_certified_option": 0
+     }
+    ],
+    "checked_rows": 3216
+   }
+  }
+ },
+ "max_saved_surge_mps": 1.0866976748478918,
+ "advancement_by_allowance_setting": {
+  "none": true,
+  "calibrated": false
+ },
+ "input_sha256": {
+  "results/safety_dev/v20_development/allowance_calibration/g1_v1/calibration.json": "bfd5ccae96867b94685eaaf329403cea0372aabab0f9cfddcff004adb7bfa640",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/replay.json": "fe141e014d65a78e0c8d932526f651f9b1f734f395239b0c2d9d793cf789bd15",
+  "results/safety_dev/v20_development/saved_state_replay/g2g3_v3/decisions.csv": "bc51138b2ab2fe96e9c4c4901f3183e4fd7cae76b68d0123814eff734ad733ad",
+  "results/safety_dev/v20_development/phase1_saved_cascade_audit/audit.json": "d978c4d4e7d3a6a1c8efc6bdf33ac569754d6dfbc1cf21be853687fe9f45942e"
+ },
+ "script_sha256": "1e4515dc8b84a69780239e7f8c22804a29131d06227227fa3cd35934fd274a41"
+}
