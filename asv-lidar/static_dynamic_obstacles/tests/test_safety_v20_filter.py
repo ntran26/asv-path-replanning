@@ -66,14 +66,14 @@ class FakeChecker:
     def __init__(self, *args, **kwargs):
         pass
 
-    def certify(self, first):
+    def certify(self, first, margin=0.0):
         first = np.asarray(first, float)
-        ok = round(float(first[0]), 6) in self.allowed
+        slack = 0.1 if round(float(first[0]), 6) in self.allowed else -0.1
         seq = np.vstack([first[None], np.tile((0.0, np.nan), (sc.DECISIONS - 1, 1))])
-        return sc.Certificate(ok, 0.1 if ok else -0.1, 0, seq, 3.0, {"static": 0.1})
+        return sc.Certificate(slack >= margin, slack, 0, seq, 3.0, {"static": 0.1})
 
-    def certify_many(self, firsts):
-        return [self.certify(f) for f in np.asarray(firsts, float).reshape(-1, 2)]
+    def certify_many(self, firsts, margin=0.0):
+        return [self.certify(f, margin) for f in np.asarray(firsts, float).reshape(-1, 2)]
 
     def certify_sequence(self, seq):
         return sc.Certificate(self.sequence_ok, 0.05 if self.sequence_ok else -0.05, -1,
@@ -98,7 +98,8 @@ def run(filt, env, action):
 
 def test_constructor_validates_options():
     for bad in (dict(allowance_tables="x"), dict(out_of_contract="x"), dict(hold_horizon_s=-1.0),
-                dict(tail_family="x"), dict(enforcement="x")):
+                dict(tail_family="x"), dict(enforcement="x"), dict(commit_margin=-0.1),
+                dict(commit_margin=float("nan"))):
         with pytest.raises(ValueError):
             make_filter(**bad)
     assert make_filter(allowance_tables="none").own_table is None
@@ -233,3 +234,25 @@ def test_gatekeeper_leaves_certified_v16_commands_alone(monkeypatch, fake_checke
     filt, env = make_filter(enforcement="gatekeeper"), make_env()
     out, changed = run(filt, env, [0.3, 0.4])
     assert filt.last["v20_level"] == "v16_unchanged_certified" and np.allclose(out, [0.3, 0.4]) and not changed
+
+
+def test_commit_margin_blocks_thin_new_commitments_but_keeps_a_committed_tail(monkeypatch, fake_checker):
+    filt, env = make_filter(commit_margin=0.2), make_env()
+    # FakeChecker slack is 0.1 < 0.2: a checked V16 command is not committed.
+    stub_v16(monkeypatch, "nominal", [0.0, 0.0])
+    fake_checker.allowed = {0.0}
+    run(filt, env, [0.0, 0.0])
+    assert filt.last["v20_level"] == "v16_unchanged_finite_only" and filt.v20_committed is None
+    assert filt.last["v20_commit_margin"] == pytest.approx(0.2)
+    # Unchecked with no option above the margin and no commitment: centred full astern.
+    stub_v16(monkeypatch, "no escape", [0.0, 0.0])
+    out, _ = run(filt, env, [0.0, 0.0])
+    assert filt.last["v20_level"] == "out_of_contract_stop" and np.allclose(out, [0.0, -1.0])
+    # A commitment made at zero margin survives rechecks at zero slack under a margin.
+    filt2, env2 = make_filter(commit_margin=0.0), make_env()
+    stub_v16(monkeypatch, "nominal", [0.0, 0.0])
+    run(filt2, env2, [0.0, 0.0])
+    filt2.commit_margin = 0.2
+    stub_v16(monkeypatch, "no escape", [0.7, 0.7])
+    run(filt2, env2, [0.7, 0.7])
+    assert filt2.last["v20_level"] == "committed_continuation"

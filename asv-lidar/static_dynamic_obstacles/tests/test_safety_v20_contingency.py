@@ -282,3 +282,18 @@ def test_chunked_clearance_evaluation_is_identical(monkeypatch):
     assert np.array_equal(whole[0], chunked[0]) and np.array_equal(whole[1], chunked[1])
     for key in whole[2]:
         assert np.array_equal(whole[2][key], chunked[2][key])
+
+
+def test_commit_margin_tightens_new_certificates_only():
+    wall = [(x, 9.5) for x in np.linspace(3.0, 7.0, 25)]
+    checker = sc.ContingencyChecker(make_snap(u=0.6, points=wall), actuators())
+    base = checker.certify([0.0, 0.0])
+    assert base.certified and base.slack > 0.02
+    assert checker.certify([0.0, 0.0], margin=base.slack - 0.01).certified
+    tight = checker.certify([0.0, 0.0], margin=base.slack + 0.01)
+    assert not tight.certified and tight.slack == pytest.approx(base.slack)
+    # A recheck of the committed tail is unaffected by any margin.
+    assert checker.certify_sequence(base.sequence).certified
+    for bad in (-0.1, np.nan, np.inf):
+        with pytest.raises(ValueError):
+            checker.certify([0.0, 0.0], margin=bad)

@@ -355,17 +355,23 @@ class ContingencyChecker:
             rest[strong_index] = np.maximum(rest[strong_index], rest_all[n:])
         return slack, rest, {k: v[:n] for k, v in parts_all.items()}
 
-    def certify(self, first_command) -> Certificate:
+    def certify(self, first_command, margin: float = 0.0) -> Certificate:
         """Certify one first command (see `certify_many`)."""
-        return self.certify_many(np.asarray(first_command, dtype=float).reshape(1, 2))[0]
+        return self.certify_many(np.asarray(first_command, dtype=float).reshape(1, 2), margin)[0]
 
-    def certify_many(self, first_commands) -> List[Certificate]:
+    def certify_many(self, first_commands, margin: float = 0.0) -> List[Certificate]:
         """Certify several first commands in one vectorised rollout.
 
-        A command is certified if any of its 43 tails qualifies. The committed
-        tail is the qualifying immediate-stop tail with the largest slack if
-        one exists, otherwise the qualifying turn tail with the largest slack.
+        A command is certified if any of its tails qualifies with slack of at
+        least `margin` (0 by default; a positive margin tightens new
+        commitments only, rechecks of a committed tail use `certify_sequence`
+        at zero). The committed tail is the qualifying immediate-stop tail with
+        the largest slack if one exists, otherwise the qualifying turn tail
+        with the largest slack.
         """
+        margin = float(margin)
+        if not np.isfinite(margin) or margin < 0.0:
+            raise ValueError("margin must be finite and nonnegative")
         first = np.asarray(first_commands, dtype=float).reshape(-1, 2)
         if (not np.isfinite(first[:, 0]).all() or (np.abs(first[:, 0]) > 1.0).any()
                 or np.isinf(first[:, 1]).any()
@@ -380,12 +386,12 @@ class ContingencyChecker:
             s, r = slack[block], rest[block]
             p = {key: value[block] for key, value in parts.items()}
             stop = self._best(seqs[block][:n_stop], s[:n_stop], r[:n_stop],
-                              {key: value[:n_stop] for key, value in p.items()})
+                              {key: value[:n_stop] for key, value in p.items()}, margin=margin)
             if stop.certified:
                 out.append(stop)
                 continue
             turn = self._best(seqs[block][n_stop:], s[n_stop:], r[n_stop:],
-                              {key: value[n_stop:] for key, value in p.items()})
+                              {key: value[n_stop:] for key, value in p.items()}, margin=margin)
             turn.tail_index += n_stop
             out.append(turn if (turn.certified or turn.slack > stop.slack) else stop)
         return out
@@ -396,8 +402,8 @@ class ContingencyChecker:
         return self._best(seq, slack, rest, parts, single=True)
 
     @staticmethod
-    def _best(seqs, slack, rest, parts, single=False) -> Certificate:
-        ok = np.isfinite(slack) & (slack >= 0.0)
+    def _best(seqs, slack, rest, parts, single=False, margin=0.0) -> Certificate:
+        ok = np.isfinite(slack) & (slack >= margin)
         finite = np.where(np.isfinite(slack), slack, -np.inf)
         if ok.any():
             # Largest slack first, then the earlier rest.
