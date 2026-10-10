@@ -107,12 +107,13 @@ class StateRollout:
     servo: np.ndarray
 
 
-def rollout_states(snap, actuators, sequences, efficiency: float, delay_s: float) -> StateRollout:
+def rollout_states(snap, actuators, sequences, efficiency, delay_s) -> StateRollout:
     """`safety_prediction.rollout_seq` returning the full state, with the current state as sample 0.
 
     Same identified parameters, actuator history, 0.125 s step and operator-split
     braking as the inherited predictors, so a contingency is checked with the
-    model V16 uses for its own plans.
+    model V16 uses for its own plans. `efficiency` and `delay_s` may be scalars
+    or per-column arrays, so both reverse models can share one vectorised call.
     """
     sequences = np.asarray(sequences, dtype=float)
     n, decisions = sequences.shape[:2]
@@ -127,7 +128,9 @@ def rollout_states(snap, actuators, sequences, efficiency: float, delay_s: float
     pos = np.empty((samples, n, 2))
     hdg, uu, vv, rr, sv = (np.empty((samples, n)) for _ in range(5))
     pos[0], hdg[0], uu[0], vv[0], rr[0], sv[0] = state[5:7].T, state[3], state[0], state[1], state[2], state[4]
-    deceleration = ship.braking_thrust(v2.ASTERN_RPM, efficiency=efficiency) / ship.M11
+    unit = ship.braking_thrust(v2.ASTERN_RPM, efficiency=1.0) / ship.M11
+    deceleration = np.broadcast_to(np.asarray(efficiency, dtype=float) * unit, (n,))
+    delay_s = np.broadcast_to(np.asarray(delay_s, dtype=float), (n,))
     brake_since = np.full(n, np.inf)
     sample = 0
     for decision in range(decisions):
@@ -292,29 +295,60 @@ class ContingencyChecker:
 
     # -- public API ---------------------------------------------------------
     def evaluate(self, sequences: np.ndarray) -> Tuple[np.ndarray, np.ndarray, Dict]:
-        """Slack (min over both reverse models) and rest time for each sequence."""
+        """Slack (min over both reverse models) and stop time for each sequence.
+
+        Both models run in one vectorised rollout; sequences without astern
+        commands use only the weak model, which they do not depend on.
+        """
         sequences = np.asarray(sequences, dtype=float)
-        weak = rollout_states(self.snap, self.actuators, sequences, *WEAK)
-        slack_w, rest_w, parts_w = self._slack(weak)
+        n = len(sequences)
         braking = np.isnan(sequences[:, :, 1]).any(axis=1)
-        slack_s = np.full(len(sequences), np.inf)
-        rest_s = np.zeros(len(sequences))
-        if braking.any():
-            strong = rollout_states(self.snap, self.actuators, sequences[braking], *STRONG)
-            s, rt, _ = self._slack(strong)
-            slack_s[braking], rest_s[braking] = s, rt
-        slack = np.minimum(slack_w, slack_s)
-        rest = np.maximum(rest_w, rest_s)
-        return slack, rest, {k: v for k, v in parts_w.items()}
+        strong_index = np.flatnonzero(braking)
+        stacked = np.concatenate([sequences, sequences[strong_index]], axis=0)
+        efficiency = np.concatenate([np.full(n, WEAK[0]), np.full(len(strong_index), STRONG[0])])
+        delay = np.concatenate([np.full(n, WEAK[1]), np.full(len(strong_index), STRONG[1])])
+        ro = rollout_states(self.snap, self.actuators, stacked, efficiency, delay)
+        slack_all, rest_all, parts_all = self._slack(ro)
+        slack, rest = slack_all[:n].copy(), rest_all[:n].copy()
+        if len(strong_index):
+            slack[strong_index] = np.minimum(slack[strong_index], slack_all[n:])
+            rest[strong_index] = np.maximum(rest[strong_index], rest_all[n:])
+        return slack, rest, {k: v[:n] for k, v in parts_all.items()}
 
     def certify(self, first_command) -> Certificate:
-        first = np.asarray(first_command, dtype=float).reshape(2)
-        if not np.isfinite(first[0]) or abs(first[0]) > 1.0 or np.isinf(first[1]) or (
-                np.isfinite(first[1]) and abs(first[1]) > 1.0):
+        """Certify one first command (see `certify_many`)."""
+        return self.certify_many(np.asarray(first_command, dtype=float).reshape(1, 2))[0]
+
+    def certify_many(self, first_commands) -> List[Certificate]:
+        """Certify several first commands in one vectorised rollout.
+
+        A command is certified if any of its 43 tails qualifies. The committed
+        tail is the qualifying immediate-stop tail with the largest slack if
+        one exists, otherwise the qualifying turn tail with the largest slack.
+        """
+        first = np.asarray(first_commands, dtype=float).reshape(-1, 2)
+        if (not np.isfinite(first[:, 0]).all() or (np.abs(first[:, 0]) > 1.0).any()
+                or np.isinf(first[:, 1]).any()
+                or (np.abs(first[np.isfinite(first[:, 1]), 1]) > 1.0).any()):
             raise ValueError("First command must be normalized; only throttle may be NaN")
-        seqs = sequences_for(first[None])
+        seqs = sequences_for(first)
         slack, rest, parts = self.evaluate(seqs)
-        return self._best(seqs, slack, rest, parts)
+        k, n_stop = len(TAILS), len(STOP_RUDDERS)
+        out = []
+        for i in range(len(first)):
+            block = slice(i * k, (i + 1) * k)
+            s, r = slack[block], rest[block]
+            p = {key: value[block] for key, value in parts.items()}
+            stop = self._best(seqs[block][:n_stop], s[:n_stop], r[:n_stop],
+                              {key: value[:n_stop] for key, value in p.items()})
+            if stop.certified:
+                out.append(stop)
+                continue
+            turn = self._best(seqs[block][n_stop:], s[n_stop:], r[n_stop:],
+                              {key: value[n_stop:] for key, value in p.items()})
+            turn.tail_index += n_stop
+            out.append(turn if (turn.certified or turn.slack > stop.slack) else stop)
+        return out
 
     def certify_sequence(self, sequence) -> Certificate:
         seq = np.asarray(sequence, dtype=float)[None]

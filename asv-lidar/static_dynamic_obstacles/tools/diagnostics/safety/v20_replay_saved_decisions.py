@@ -159,9 +159,12 @@ def replay_episode(case, label, trace, audit_row):
             if row["unchecked"]:
                 options = [("sac", sac, cs), ("v16", v16, cv)]
                 options += [("projection", c, None) for c in sc.projection_candidates(sac)]
+                pending = [i for i, o in enumerate(options) if o[2] is None]
+                batch = checker.certify_many(np.array([options[i][1] for i in pending])) if pending else []
+                computed = dict(zip(pending, batch))
                 found = None
-                for opt, cand, known in options:
-                    cert = known if known is not None else checker.certify(cand)
+                for i, (opt, cand, known) in enumerate(options):
+                    cert = known if known is not None else computed[i]
                     if opt == "sac":
                         cs = cert
                     if cert.certified:
@@ -274,10 +277,13 @@ def main():
         if (out / "replay.json").exists():
             parser.error("Merged output exists; results are never overwritten")
         summary = summarise(rows, episodes)
+        identity = out / "replay_code_identity.json"
         result = {"schema": 1, "episodes": episodes, "summary": summary, "input_sha256": inputs,
-                  "script_sha256": sha(Path(__file__)),
-                  "module_sha256": {m: sha(ROOT / "src" / m) for m in
-                                    ("safety_v20.py", "safety_v20_contingency.py", "safety_v20_tubes.py")}}
+                  "replay_code_identity": json.loads(identity.read_text()) if identity.exists() else None,
+                  "merge_script_sha256": sha(Path(__file__)),
+                  "module_sha256_on_disk_at_merge": {m: sha(ROOT / "src" / m) for m in
+                                                     ("safety_v20.py", "safety_v20_contingency.py",
+                                                      "safety_v20_tubes.py")}}
         (out / "replay.json").write_text(json.dumps(result, indent=1) + "\n", encoding="utf-8")
         with (out / "decisions.csv").open("x", encoding="utf-8", newline="") as stream:
             fields = sorted({k for r in rows for k in r}, key=lambda k: (k not in ("case", "step"), k))

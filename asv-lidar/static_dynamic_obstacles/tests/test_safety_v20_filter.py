@@ -72,6 +72,9 @@ class FakeChecker:
         seq = np.vstack([first[None], np.tile((0.0, np.nan), (sc.DECISIONS - 1, 1))])
         return sc.Certificate(ok, 0.1 if ok else -0.1, 0, seq, 3.0, {"static": 0.1})
 
+    def certify_many(self, firsts):
+        return [self.certify(f) for f in np.asarray(firsts, float).reshape(-1, 2)]
+
     def certify_sequence(self, seq):
         return sc.Certificate(self.sequence_ok, 0.05 if self.sequence_ok else -0.05, -1,
                               np.asarray(seq, float), 3.0, {})

@@ -1,0 +1,3 @@
+# Aborted replay attempt g2g3_v1
+
+Started 2026-10-10 with the code recorded in `replay_code_identity.json` (commit ee86be1). Stopped by the operator after about 33 of 68 episodes because each candidate certification ran as a separate rollout (about 3 s per saved decision). No part file was written, so no result from this attempt exists or is reported. The replay was rerun as `g2g3_v2` with batched certification (all tails of all candidate commands in one rollout). Batching does not change whether a command is certified; it changes which qualifying tail is committed (an immediate-stop tail is preferred when one qualifies).
