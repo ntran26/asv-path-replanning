@@ -1,0 +1,73 @@
+cohort,case,seed,category,off_outcome,v16_outcome,decisions,changed_decisions,first_change_step,first_change_why,first_change_sac_same_tail_first_violation_s,first_change_sac_same_tail_hard_pass,brake_decisions,first_rest_step_after_first_change_truth_scored,last_certificate_decisions,no_escape_decisions,final_why,contact,consecutive_unchecked_decisions_before_end,last_checked_step,last_checked_why
+32,DV3:DV3-BO-CV-04,900247,both_goal,goal,goal,29,7,13,last certificate,1.75,False,0,,5,0,policy prefix searched,False,0,29,policy prefix searched
+32,DV3:DV3-CRP-CV-04,900169,rescue,collision:obstacle,goal,50,5,4,last certificate,4.25,False,0,,3,2,last certificate,False,2,48,policy prefix searched
+32,DV3:DV3-CRP-CV-17,900182,rescue,collision:target,goal,50,5,4,last certificate,5.0,False,0,,4,0,idle,False,0,50,idle
+32,DV3:DV3-HO-CV-03,900142,rescue,collision:obstacle,goal,87,21,27,turn,inf,True,4,39,12,3,searched policy,False,0,87,searched policy
+32,DV3:DV3-HO-VS-01,900160,both_fail,collision:boundary,collision:obstacle,41,3,28,continue,4.5,False,2,31,0,2,no escape,True,2,39,nominal
+32,TS2:BAS-BO-CV-063,400362,both_goal,goal,goal,28,0,,,,,0,,0,0,nominal,False,0,28,nominal
+32,TS2:BAS-CR-RE-072,400171,both_goal,goal,goal,49,1,26,turn,inf,True,0,,0,0,idle,False,0,49,idle
+32,TS2:BAS-HO-NC-059,400058,lost_sac_success,goal,collision:target,28,7,20,continue,inf,True,5,25,4,2,no escape,True,6,22,continue
+32,TS2:BAS-HO-NC-071,400070,both_goal,goal,goal,50,0,,,,,0,,0,3,idle,False,0,50,idle
+32,TS2:BAS-NU-CV-070,400469,lost_sac_success,goal,collision:boundary,78,1,11,searched escape,1.875,False,0,,0,14,no escape,True,14,64,idle
+32,TS2:CH-CR-CV-007,400606,both_goal,goal,goal,54,4,13,continue,inf,True,0,,1,0,idle,False,0,54,idle
+32,TS2:CH-CR-CV-015,400614,both_goal,goal,goal,53,0,,,,,0,,0,0,idle,False,0,53,idle
+32,TS2:CH-CR-CV-031,400630,both_goal,goal,goal,52,0,,,,,0,,0,0,idle,False,0,52,idle
+32,TS2:CH-CR-CV-059,400658,both_fail,collision:target,collision:target,14,4,7,last certificate,3.75,False,0,,4,4,no escape,True,8,6,searched policy
+32,TS2:CH-CR-CV-073,400672,rescue,collision:target,goal,107,22,11,continue,2.875,False,8,18,11,10,idle,False,0,107,idle
+32,TS2:CH-CR-RE-038,400637,both_goal,goal,goal,51,0,,,,,0,,0,0,idle,False,0,51,idle
+32,TS2:CH-HO-CV-043,400542,both_goal,goal,goal,60,0,,,,,0,,0,0,idle,False,0,60,idle
+32,TS2:CH-HO-CV-073,400572,both_goal,goal,goal,54,1,30,turn,inf,True,0,,0,0,idle,False,0,54,idle
+32,TS2:CH-HO-RE-060,400559,rescue,collision:target,goal,60,3,24,turn,inf,True,1,,0,0,idle,False,0,60,idle
+32,TS2:P2-L1-CRP-FIX-03,470022,both_goal,goal,goal,46,0,,,,,0,,0,1,searched policy,False,0,46,searched policy
+32,TS2:P2-L1-CRP-FIX-05,470024,both_fail,collision:target,collision:target,34,6,13,continue,3.625,False,5,17,1,6,no escape,True,6,28,nominal
+32,TS2:P2-L1-CRP-VAR-12,470031,rescue,collision:obstacle,goal,51,3,3,searched escape,inf,True,0,,2,2,searched policy,False,0,51,searched policy
+32,TS2:P2-L1-CRP-VAR-14,470033,rescue,collision:target,goal,65,8,10,turn,inf,True,3,19,0,6,searched policy,False,0,65,searched policy
+32,TS2:P2-L1-CRS-FIX-09,470048,both_goal,goal,goal,55,0,,,,,0,,0,0,idle,False,0,55,idle
+32,TS2:P2-L1-CRS-VAR-08,470047,both_fail,collision:target,collision:obstacle,50,19,14,continue,4.0,False,9,21,9,3,no escape,True,7,43,turn
+32,TS2:P2-L1-OT-VAR-20,470079,rescue,collision:obstacle,goal,49,2,29,turn,inf,True,0,,0,0,nominal,False,0,49,nominal
+32,TS2:P2-L2-CRP-VAR-02,470121,rescue,collision:target,goal,85,15,9,continue,3.75,False,5,11,4,3,no escape,False,1,84,idle
+32,TS2:P2-L2-CRP-VAR-16,470135,both_goal,goal,goal,50,7,10,last certificate,3.125,False,0,,4,0,last certificate,False,2,48,continue
+32,TS2:P2-L2-HO-FIX-05,470104,rescue,collision:boundary,goal,64,5,22,last certificate,4.0,False,4,29,4,0,idle,False,0,64,idle
+32,TS2:P2-L2-HO-FIX-11,470110,both_fail,collision:obstacle,collision:target,28,4,14,last certificate,5.875,False,0,,4,12,no escape,True,15,13,searched policy
+32,TS2:P2-L2-HO-FIX-19,470118,rescue,collision:obstacle,goal,65,7,15,searched escape,7.875,False,5,32,4,1,idle,False,0,65,idle
+32,TS2:P2-L3-CRS-FIX-05,470244,both_goal,goal,goal,45,8,4,last certificate,4.375,False,0,,7,0,last certificate,False,3,42,policy prefix searched
+40,DV3:DV3-BO-CV-10,900253,both_fail,collision:obstacle,collision:obstacle,1,0,,,,,0,,0,0,nominal,True,0,1,nominal
+40,DV3:DV3-CRP-CV-12,900177,rescue,collision:target,goal,115,23,12,turn,7.25,False,9,20,7,7,continue,False,0,115,continue
+40,DV3:DV3-CRP-CV-16,900181,both_goal,goal,goal,85,9,3,turn,6.75,False,3,16,4,0,idle,False,0,85,idle
+40,DV3:DV3-CRP-CV-20,900185,both_goal,goal,goal,55,0,,,,,0,,0,0,idle,False,0,55,idle
+40,DV3:DV3-CRS-CV-01,900192,rescue,collision:target,goal,101,23,13,brake,inf,True,8,20,8,6,last certificate,False,1,100,policy prefix searched
+40,DV3:DV3-CRS-CV-04,900195,lost_sac_success,goal,collision:boundary,67,16,13,searched escape,7.625,False,5,39,4,11,no escape,True,15,52,policy prefix searched
+40,DV3:DV3-CRS-CV-10,900201,rescue,collision:target,goal,67,7,12,brake,inf,True,1,,2,0,idle,False,0,67,idle
+40,DV3:DV3-CRS-CV-12,900203,both_goal,goal,goal,60,5,9,brake,4.75,False,2,11,2,1,idle,False,0,60,idle
+40,DV3:DV3-NT-CV-15,900134,both_fail,collision:obstacle,collision:obstacle,34,3,32,turn,1.625,False,0,,2,0,last certificate,True,2,32,turn
+40,DV3:DV3-OT-CV-08,900225,both_goal,goal,goal,55,3,16,turn,inf,True,0,,1,0,nominal,False,0,55,nominal
+40,TS2:BAS-BO-CV-055,400354,rescue,collision:target,goal,68,5,20,turn,1.875,False,3,24,4,3,idle,False,0,68,idle
+40,TS2:BAS-BO-CV-075,400374,both_goal,goal,goal,32,1,32,turn,4.25,False,0,,0,0,turn,False,0,32,turn
+40,TS2:BAS-BO-RE-024,400323,both_goal,goal,goal,35,0,,,,,0,,0,0,nominal,False,0,35,nominal
+40,TS2:BAS-CR-CV-027,400126,both_fail,collision:target,collision:target,27,9,5,brake,5.75,False,8,10,7,10,no escape,True,13,14,policy prefix searched
+40,TS2:BAS-CR-CV-045,400144,both_goal,goal,goal,96,21,11,turn,inf,True,9,20,8,16,idle,False,0,96,idle
+40,TS2:BAS-CR-RE-018,400117,both_goal,goal,goal,59,2,4,brake,6.125,False,2,,1,0,idle,False,0,59,idle
+40,TS2:BAS-CR-RE-022,400121,both_fail,collision:target,collision:target,49,9,26,continue,2.5,False,5,,1,0,last certificate,True,1,48,policy prefix searched
+40,TS2:BAS-CR-RE-070,400169,both_goal,goal,goal,62,6,28,turn,7.625,False,0,,4,4,idle,False,0,62,idle
+40,TS2:BAS-CR-RE-090,400189,both_goal,goal,goal,53,8,20,turn,6.875,False,0,,4,4,idle,False,0,53,idle
+40,TS2:BAS-HO-NC-002,400001,both_fail,collision:target,collision:target,33,0,,,,,0,,0,7,no escape,True,7,26,nominal
+40,TS2:BAS-NU-CV-043,400442,both_fail,collision:boundary,collision:boundary,67,0,,,,,0,,0,7,no escape,True,7,60,idle
+40,TS2:BAS-OT-CV-087,400286,rescue,collision:obstacle,goal,66,5,21,continue,3.75,False,3,25,1,0,nominal,False,0,66,nominal
+40,TS2:BAS-OT-CV-095,400294,both_goal,goal,goal,55,3,17,turn,inf,True,0,,0,0,nominal,False,0,55,nominal
+40,TS2:BAS-OT-RE-016,400215,both_goal,goal,goal,48,0,,,,,0,,0,0,nominal,False,0,48,nominal
+40,TS2:CH-CR-CV-091,400690,both_goal,goal,goal,60,1,59,turn,inf,True,0,,0,0,policy prefix searched,False,0,60,policy prefix searched
+40,TS2:CH-HO-RE-057,400556,both_fail,collision:obstacle,collision:obstacle,44,4,32,continue,3.0,False,2,36,0,4,no escape,True,4,40,nominal
+40,TS2:CH-OT-CV-051,400750,both_goal,goal,goal,51,1,38,searched escape,inf,True,0,,0,0,nominal,False,0,51,nominal
+40,TS2:CH-OT-RE-064,400763,both_goal,goal,goal,77,5,18,brake,4.0,False,2,23,1,13,nominal,False,0,77,nominal
+40,TS2:P2-L1-CRP-FIX-09,470028,rescue,collision:obstacle,goal,45,1,27,continue,inf,True,0,,0,0,searched policy,False,0,45,searched policy
+40,TS2:P2-L1-CRP-FIX-15,470034,rescue,collision:obstacle,goal,45,3,27,turn,1.375,False,0,,0,0,searched escape,False,0,45,searched escape
+40,TS2:P2-L2-BO-FIX-19,470198,both_goal,goal,goal,30,0,,,,,0,,0,0,nominal,False,0,30,nominal
+40,TS2:P2-L2-CRS-FIX-19,470158,lost_sac_success,goal,collision:boundary,36,8,17,turn,inf,True,5,32,4,5,no escape,True,9,27,policy prefix searched
+40,TS2:P2-L2-CRS-VAR-14,470153,both_fail,collision:obstacle,collision:obstacle,25,3,23,last certificate,1.0,False,0,,3,1,last certificate,True,3,22,policy prefix searched
+40,TS2:P2-L2-HO-VAR-14,470113,both_fail,collision:obstacle,collision:boundary,50,12,15,turn,inf,True,4,27,2,8,no escape,True,8,42,nominal
+40,TS2:P2-L2-HO-VAR-16,470115,both_fail,collision:obstacle,collision:boundary,41,9,16,continue,7.75,False,1,,3,8,no escape,True,8,33,nominal
+40,TS2:P2-L3-BO-FIX-09,470288,lost_sac_success,goal,collision:boundary,70,25,32,continue,2.25,False,11,42,7,7,no escape,True,11,59,turn
+40,TS2:P2-L3-CRP-FIX-03,470222,lost_sac_success,goal,collision:target,19,5,4,turn,6.5,False,4,8,4,10,no escape,True,14,5,policy prefix searched
+40,TS2:P2-L3-CRP-FIX-17,470236,both_fail,collision:obstacle,collision:target,17,2,6,turn,3.875,False,1,,0,7,no escape,True,7,10,nominal
+40,TS2:P2-L3-CRP-FIX-19,470238,rescue,collision:target,goal,69,5,6,last certificate,2.75,False,2,8,4,0,last certificate,False,3,66,policy prefix searched
+40,TS2:P2-L3-OT-FIX-09,470268,both_goal,goal,goal,50,0,,,,,0,,0,0,nominal,False,0,50,nominal
