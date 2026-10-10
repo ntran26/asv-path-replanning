@@ -619,3 +619,23 @@ At the user's explicit request after section 16, test set v4 runs with fresh OFF
 - **Runs:** ten tags `ts4_off_v16_c01`-`c10` of 100 scenarios each under `results/safety_dev/testset_v4_main/runs/`, with compact gzip traces, same runtime environment as the development runs, at most two processes.
 - **Reported:** goals, rescued SAC failures, lost SAC successes, each contact type and timeouts, paired by test ID, episode seed and scenario digest.
 - **No tuning:** no code, option or threshold changes in response to any outcome. The selection notes that test set v4 overlaps earlier v2/v3 development exposure and is not wholly unseen.
+
+### 17.1 Addition: one V20 configuration on test set v4, 2026-10-10
+
+At the user's further request, one V20 configuration runs on the same 1,000 scenarios alongside the fresh OFF and V16 runs, for comparison. This overrides the section 15.3 condition at the user's request. It does not promote anything.
+
+The configuration is **revision 2** (`v20_r2`, `REVISION2_OPTIONS`), chosen before any test-set outcome was read and only from development results:
+
+| Configuration on the 72 development cases | Goals | Contacts | Timeouts |
+| --- | ---: | ---: | ---: |
+| Fresh V16 | 50 | 22 | 0 |
+| Revision 2 (probe from E1b, cohorts from E2/E3) | 46 | 21 | 5 |
+| Revision 3 | 46 | 24 | 2 |
+| Nominal V20 and revision 1 (probe only) | - | 7 of 12, equal to V16 | - |
+
+Revision 2 is the only configuration with fewer development contacts than fresh V16, and contacts are the primary outcome. It is not a promoted candidate: on its 60 held-out development cases it had 16 contacts against V16's 15, and it lost five V16 goals to contacts. The test-set run measures it and does not qualify it.
+
+- **Code:** the source now includes the exact edge pruning of section 15.2, which yields identical certificates and only changes run time. Revision 2's options are unchanged.
+- **Runs:** tags `ts4_r2_c01`-`c40` of 25 scenarios each, same order and compact gzip traces, started after the OFF/V16 chunks, at most two processes.
+- **Pairing:** with the fresh OFF and V16 records by test ID, episode seed and scenario digest. The report gives goals, rescued SAC failures, lost SAC successes, each contact type and timeouts.
+- **No tuning:** no change follows any outcome.
