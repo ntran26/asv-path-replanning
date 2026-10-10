@@ -13,8 +13,9 @@ retries or result reuse, STOP marker), with three differences:
   the manifest, because fresh runs in this environment are the only valid
   pairing references.
 
-Modes: off, v16, v20 and the pre-registered V20 options v20_nominal
-(allowance_tables="none") and v20_oocv16 (out_of_contract="v16").
+Modes: off, v16, v20, the pre-registered V20 options v20_nominal
+(allowance_tables="none") and v20_oocv16 (out_of_contract="v16"), and
+v20_r1 (revision 1: safety_v20.REVISION1_OPTIONS).
 
 Example (project root):
     python -B tools/diagnostics/safety/v20_iteration.py --tag probe12_a \
@@ -59,6 +60,8 @@ VARIANTS = {
     "v20": (20, "safety_v20", {}),
     "v20_nominal": (20, "safety_v20", {"allowance_tables": "none"}),
     "v20_oocv16": (20, "safety_v20", {"out_of_contract": "v16"}),
+    # Revision 1 (planning/SAFETY_V20_PLAN.md, section 13).
+    "v20_r1": (20, "safety_v20", dict(importlib.import_module("safety_v20").REVISION1_OPTIONS)),
 }
 
 
