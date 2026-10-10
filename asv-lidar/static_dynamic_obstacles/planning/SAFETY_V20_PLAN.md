@@ -610,3 +610,12 @@ No V20 configuration reduces contacts relative to V16 on the development data, a
 - Evaluation of any intervening layer by paired closed-loop counterfactuals from the decision of first divergence (resimulating V16 and the candidate from saved states), so that the cost of perturbing the policy is measured before cohort runs.
 
 The V20 modules, options, tests, tools and all runs remain in place for reference. Nothing in V16, the environment, the constants, the checkpoint or the configuration was changed.
+
+## 17. Test set v4 with OFF and V16 only, 2026-10-10
+
+At the user's explicit request after section 16, test set v4 runs with fresh OFF and fresh V16 only. No V20 configuration is included, so the section 15.3 condition, which governs V20, is unaffected.
+
+- **Selection:** [`testset_v4_main/selection.json`](../results/safety_dev/testset_v4_main/selection.json), all 1,000 scenarios in definition order, read from the trusted saved cache and verified against its definition and manifest digest.
+- **Runs:** ten tags `ts4_off_v16_c01`-`c10` of 100 scenarios each under `results/safety_dev/testset_v4_main/runs/`, with compact gzip traces, same runtime environment as the development runs, at most two processes.
+- **Reported:** goals, rescued SAC failures, lost SAC successes, each contact type and timeouts, paired by test ID, episode seed and scenario digest.
+- **No tuning:** no code, option or threshold changes in response to any outcome. The selection notes that test set v4 overlaps earlier v2/v3 development exposure and is not wholly unseen.
