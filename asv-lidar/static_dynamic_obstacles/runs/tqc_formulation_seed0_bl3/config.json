@@ -1,7 +1,7 @@
 {
  "algorithm": "TQC",
  "seed": 0,
- "timesteps": 2500000,
+ "timesteps": 3000000,
  "algo": "tqc",
  "num_envs": 10,
  "hyperparameters": {
@@ -125,5 +125,14 @@
   "MOTION_CLASSIFIER": "free_space",
   "PF_OVERSPEED_TOL": 0.2,
   "PF_OVERSPEED_SPAN": 0.5
- }
+ },
+ "wall_clock_s": 38960.76280641556,
+ "resumes": [
+  {
+   "from_steps": 2500000,
+   "at": "2026-10-10 15:53:41",
+   "replay_buffer": "restored (C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv_replay_buffers\\tqc_formulation_seed0_bl3\\tqc_replay_buffer_2500000_steps.pkl)",
+   "extended_from": 2500000
+  }
+ ]
 }

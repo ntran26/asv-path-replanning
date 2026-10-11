@@ -6,3 +6,14 @@ fastest: PIN=1 THREADS=4 (10.51 steps/s)
 2026-10-08 17:01:39    tqcs0_bl3 CPU benchmark: fastest PIN=1 THREADS=4 (10.51 steps/s; results/bench_cpu_tqc.txt)
 2026-10-08 17:02:38 == tqcs0_bl3: training 0 -> 2.5 M (baseline-v3; PIN=1, THREADS=4)
 2026-10-08 17:04:40    pinned learner 17732
+2026-10-10 15:53:09    tqcs0_bl3 2.5 M exit 0
+2026-10-10 15:53:10 == tqcs0_bl3: 2.5 M -> 3.0 M
+2026-10-10 15:55:14    pinned learner 20716
+2026-10-11 02:48:31    tqcs0_bl3 3.0 M exit 0
+2026-10-11 02:49:07 == tqc seed 0: already trained
+2026-10-11 02:52:28    tier 1 tqcs0_bl3 supervisor off exit 0
+2026-10-11 03:08:18    frozen suite tqcs0_bl3 exit 0
+2026-10-11 03:26:20    Paper 2 set tqcs0_bl3 exit 0
+2026-10-11 03:26:21 == tqc seed 0 done
+2026-10-11 03:34:52    test set v4, tqcs0_bl3 exit 0 (results/test_set/v4/tqcs0_bl3/summary.txt)
+2026-10-11 03:34:53 == tqcs0_bl3 run done

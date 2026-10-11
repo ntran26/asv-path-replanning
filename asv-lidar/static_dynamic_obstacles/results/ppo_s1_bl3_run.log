@@ -1,0 +1,9 @@
+2026-10-11 03:58:31 == ppos1_bl3: training 0 -> 3.0 M in one run (baseline-v3, stages on the 2.5 M schedule; PIN=0, THREADS=default)
+2026-10-11 16:29:04    ppos1_bl3 3.0 M exit 0
+2026-10-11 16:29:43 == ppo seed 1: already trained
+2026-10-11 16:33:19    tier 1 ppos1_bl3 supervisor off exit 0
+2026-10-11 16:51:40    frozen suite ppos1_bl3 exit 0
+2026-10-11 17:24:03    Paper 2 set ppos1_bl3 exit 0
+2026-10-11 17:24:05 == ppo seed 1 done
+2026-10-11 17:37:19    test set v4, ppos1_bl3 exit 0 (results/test_set/v4/ppos1_bl3/summary.txt)
+2026-10-11 17:37:20 == ppos1_bl3 run done

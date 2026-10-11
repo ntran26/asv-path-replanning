@@ -31,7 +31,7 @@ import safety_v20 as v20
 import safety_v20_contingency as sc
 import ship
 
-# Chosen by the user from the development screen (planning/SAFETY_ESTOP_PROTOCOL.md
+# Decision (2026-10-10) from the development screen (planning/SAFETY_ESTOP_PROTOCOL.md
 # section 6): 1.5 s with the obstacle memory included, accepting false alarms.
 ESTOP_WINDOW_S = 1.5
 # Boundary-and-targets trigger (protocol section 8): the window selected by the

@@ -37,7 +37,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 from metrics import iqm, stratified_bootstrap_ci  # noqa: E402
 
-DEFAULT = ("SAC=sacs0_bl3_metrics;PPO=ppos0_bl3_metrics;RecurrentPPO=recurrent_ppos0_bl3_metrics;"
+DEFAULT = ("SAC=sacs0_bl3_metrics;PPO=ppos0_bl3_metrics;RecurrentPPO=recurrent_ppos0_bl3_metrics;TQC=tqcs0_bl3;"
            "LOS-DWA=los_dwa;COLREGs-VO=colregs_vo")
 SCOPES = (("All episodes", None), ("Decoupled", "frozen"), ("Coupled", "paper2"))
 

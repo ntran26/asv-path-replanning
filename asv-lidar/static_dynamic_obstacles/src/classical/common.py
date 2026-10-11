@@ -49,9 +49,14 @@ PID_KI = ct.CLASSICAL_PID_KI   # per deg.s
 PID_I_GATE_DEG = ct.CLASSICAL_PID_I_GATE_DEG
 PID_I_LIMIT = ct.CLASSICAL_PID_I_LIMIT   # rudder units
 
-# Identified steady turn: ~10.4 deg/s per unit rudder at cruise (probed on the
-# simulator, linear in rudder to full deflection).  Used as the feed-forward of
-# the yaw-rate loop.
+# Feed-forward scale of the yaw-rate loop, deg/s per unit rudder.  It is not the
+# hull's turn rate at cruise: the identified hull turns at about 5 deg/s at full
+# rudder at the 6 rpm-unit cruise and about 10 deg/s at 12 rpm-units (check of
+# 2026-10-10, results/classical/dwa_yaw_gain_check.md).  The DWA rollouts run the
+# same law on the same dynamics, so predictions match execution; with this value
+# the nine set-points give a monotonic spread of 9-36 deg of heading change over
+# 6 s at cruise, while the plant-matched value (5.06) would make the two largest
+# saturate at full rudder and coincide.
 YAW_RATE_GAIN_DPS = ct.CLASSICAL_YAW_RATE_GAIN_DPS
 YAW_RATE_KP = ct.CLASSICAL_YAW_RATE_KP   # rudder units per deg/s of yaw-rate error
 

@@ -9,7 +9,8 @@
 # unpinned with default threads -- and measures training speed after the first 1,500
 # steps (learning has started and pinning is in place). Speed only: the formulation, seed
 # and hyperparameters are the same in every variant. Writes results/bench_cpu_<algo>.txt
-# and starts results/run_bl3.sh with the fastest setting.
+# and starts the run with the fastest setting: results/run_bl3.sh for seed 0,
+# results/run_bl3_3m.sh (straight to 3.0 M, decision 2026-10-10) for seeds 1 and 2.
 cd "$(dirname "$0")/.."
 A=$1; S=$2
 LOG=results/train_seed.log
@@ -73,4 +74,5 @@ rm -rf runs/${A}_formulation_seed${S}_smoke
 P=${best%%:*}; T=${best#*:}
 echo "fastest: PIN=$P THREADS=${T:-default} ($best_rate steps/s)" | tee -a "$OUT"
 note "   ${A}s${S}_bl3 CPU benchmark: fastest PIN=$P THREADS=${T:-default} ($best_rate steps/s; $OUT)"
-PIN=$P THREADS=$T exec bash results/run_bl3.sh $A $S
+if [ "$S" -ge 1 ]; then RUNNER=results/run_bl3_3m.sh; else RUNNER=results/run_bl3.sh; fi
+PIN=$P THREADS=$T exec bash $RUNNER $A $S

@@ -471,6 +471,7 @@ class FormulationEvalCallback(BaseCallback):
         self.best = -np.inf
         self.next_eval = self.eval_freq
         self.history: List[Dict] = []
+        self.extra_evals: List[int] = []      # one-off points besides every eval_freq (sorted)
         self.resume_from = resume_from
         if resume_from is not None:
             self._restore(int(resume_from))
@@ -565,6 +566,11 @@ class FormulationEvalCallback(BaseCallback):
     def _on_step(self) -> bool:
         if self.num_timesteps >= self.next_eval:
             self.next_eval += self.eval_freq
+            while self.extra_evals and self.extra_evals[0] <= self.num_timesteps:
+                self.extra_evals.pop(0)        # this evaluation covers it
+            self._evaluate()
+        elif self.extra_evals and self.num_timesteps >= self.extra_evals[0]:
+            self.extra_evals.pop(0)
             self._evaluate()
         return True
 
@@ -657,6 +663,14 @@ def main() -> None:
     ap.add_argument("--extend-to", type=int, default=None,
                     help="with --resume: raise the run's step budget to this total (recorded in "
                          "config.json); the curriculum keeps its final stage past the old budget")
+    ap.add_argument("--train-to", type=int, default=None,
+                    help="with --config, a new run: train straight to this many steps.  The stage "
+                         "boundaries stay fractions of the frozen budget and the final stage holds "
+                         "past it -- the curriculum timing of a run extended with --extend-to, "
+                         "without the stop (decision, 2026-10-10: seeds 1-2)")
+    ap.add_argument("--extra-evals", type=str, default=None,
+                    help="comma-separated evaluation timesteps besides every --eval-freq, e.g. "
+                         "2500000 where an extended run's first phase ended")
     ap.add_argument("--algo", choices=tuple(ALGORITHMS), default="ppo",
                     help="learner: PPO, RecurrentPPO, TD3, SAC, TQC (the five baselines)")
     ap.add_argument("--gradient-steps", type=int, default=0,
@@ -729,7 +743,8 @@ def main() -> None:
         with open(run_dir / "config.json") as fh:
             previous = json.load(fh)
         for key in ("algo", "seed", "timesteps", "num_envs", "train_supervisor",
-                    "eval_supervisor", "low_speed_start_frac", "eval_freq", "eval_per_class"):
+                    "eval_supervisor", "low_speed_start_frac", "eval_freq", "eval_per_class",
+                    "curriculum_budget", "extra_evals"):
             if key in previous:
                 setattr(args, key, previous[key])
         hb = previous.get("handback_starts")
@@ -771,6 +786,22 @@ def main() -> None:
         run_dir = args.runs_dir / (f"{args.algo}_formulation_seed{args.seed}"
                                    + (f"_{args.tag}" if args.tag else "")
                                    + ("_smoke" if args.smoke else ""))
+    if not hasattr(args, "curriculum_budget"):
+        args.curriculum_budget = None
+    if args.train_to and not args.resume:
+        # After the frozen config has set its budget: train past it in one go, with the
+        # stage boundaries kept on that budget (the final stage holds beyond it).
+        if int(args.train_to) <= int(args.timesteps):
+            raise SystemExit(f"--train-to {args.train_to:,} must exceed the budget {args.timesteps:,}")
+        args.curriculum_budget = int(args.timesteps)
+        args.timesteps = int(args.train_to)
+        print(f"[TRAIN-TO] {args.timesteps:,} steps in one run; stages on the "
+              f"{args.curriculum_budget:,}-step schedule, the final stage holding past it", flush=True)
+    elif args.train_to:
+        print("[TRAIN-TO] ignored on a resume: the run's config.json decides its budget", flush=True)
+    extra = args.extra_evals
+    args.extra_evals = sorted({int(x) for x in (extra.split(",") if isinstance(extra, str) else (extra or []))
+                               if str(x).strip()})
     if args.eval_safety_override:
         # Reporting only, after the frozen config and any resume have set it: the
         # best checkpoint is chosen on the safety-off pass whatever this says.
@@ -800,6 +831,7 @@ def main() -> None:
         "eval_supervisor_override": args.eval_safety_override,
         "low_speed_start_frac": args.low_speed_start_frac,
         "eval_freq": args.eval_freq, "eval_per_class": args.eval_per_class,
+        "curriculum_budget": args.curriculum_budget, "extra_evals": args.extra_evals,
         "r2_slowdown_test": cfg.R2_SLOWDOWN_TEST,
         # F86: the formulation switches, so a resume can refuse changed code.
         "switches": _formulation_switches(),
@@ -934,8 +966,10 @@ def main() -> None:
                                        activation_fn=nn.ReLU),
                     **PPO_HYPERPARAMS)
 
+    eval_cb = _eval_callback(args, run_dir, resume_steps, baseline)
+    eval_cb.extra_evals = [t for t in args.extra_evals if resume_steps is None or t > resume_steps]
     callbacks = CallbackList([
-        ScenarioStageCallback(args.timesteps, str(run_dir / "curriculum.json"),
+        ScenarioStageCallback(args.curriculum_budget or args.timesteps, str(run_dir / "curriculum.json"),
                               resume=resume_steps is not None),
         CheckpointCallback(save_freq=max(args.checkpoint_every // args.num_envs, 1), save_path=str(run_dir),
                            name_prefix=args.algo, save_vecnormalize=True),
@@ -943,7 +977,7 @@ def main() -> None:
         # repository, so a resume continues on the same data.
         *([ReplayBufferCheckpoint(run_dir, args.algo, max(args.checkpoint_every // args.num_envs, 1))]
           if args.algo in OFF_POLICY else []),
-        _eval_callback(args, run_dir, resume_steps, baseline),
+        eval_cb,
     ])
 
     started = time.time()

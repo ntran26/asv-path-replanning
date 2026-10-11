@@ -54,7 +54,8 @@ def seeds_of(algo):
     for s in range(5):
         run = ROOT / "runs" / f"{algo}_formulation_seed{s}_bl3"
         if run.exists():
-            out.append((s, run, TEST / f"{algo}s{s}_bl3_metrics"))
+            test = TEST / f"{algo}s{s}_bl3_metrics"      # re-run with the paper-table metrics, else the run's own
+            out.append((s, run, test if test.exists() else TEST / f"{algo}s{s}_bl3"))
     return out
 
 

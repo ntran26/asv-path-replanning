@@ -613,7 +613,7 @@ The V20 modules, options, tests, tools and all runs remain in place for referenc
 
 ## 17. Test set v4 with OFF and V16 only, 2026-10-10
 
-At the user's explicit request after section 16, test set v4 runs with fresh OFF and fresh V16 only. No V20 configuration is included, so the section 15.3 condition, which governs V20, is unaffected.
+Decision (2026-10-10), after section 16: test set v4 runs with fresh OFF and fresh V16 only. No V20 configuration is included, so the section 15.3 condition, which governs V20, is unaffected.
 
 - **Selection:** [`testset_v4_main/selection.json`](../results/safety_dev/testset_v4_main/selection.json), all 1,000 scenarios in definition order, read from the trusted saved cache and verified against its definition and manifest digest.
 - **Runs:** ten tags `ts4_off_v16_c01`-`c10` of 100 scenarios each under `results/safety_dev/testset_v4_main/runs/`, with compact gzip traces, same runtime environment as the development runs, at most two processes.
@@ -622,7 +622,7 @@ At the user's explicit request after section 16, test set v4 runs with fresh OFF
 
 ### 17.1 Addition: one V20 configuration on test set v4, 2026-10-10
 
-At the user's further request, one V20 configuration runs on the same 1,000 scenarios alongside the fresh OFF and V16 runs, for comparison. This overrides the section 15.3 condition at the user's request. It does not promote anything.
+Further decision (2026-10-10): one V20 configuration runs on the same 1,000 scenarios alongside the fresh OFF and V16 runs, for comparison. This decision overrides the section 15.3 condition. It does not promote anything.
 
 The configuration is **revision 2** (`v20_r2`, `REVISION2_OPTIONS`), chosen before any test-set outcome was read and only from development results:
 

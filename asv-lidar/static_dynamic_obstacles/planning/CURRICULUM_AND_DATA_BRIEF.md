@@ -41,9 +41,9 @@ blocks in the gaps for the coupled validation and test episodes:
 |---|---|---|
 | `training` | 0 – 99,999 | every training episode |
 | `development` | 200,000 – 209,999 | the decoupled part of the validation set (120 episodes) |
-| — (own block) | 350,000 + | the coupled part of the validation set (150 episodes), in a gap no namespace uses |
+| — (own block) | 360,000 + | the coupled part of the validation set (150 episodes), in a gap no namespace uses |
 | `frozen_eval` | 300,000 – 309,999 | the frozen benchmark: source of the test set's decoupled part |
-| — (dedicated test blocks) | — | the test set's coupled episodes |
+| — (dedicated test blocks) | 310,000 – 349,999; 450,000 +; 600,000 + | the test set's coupled episodes |
 | `study1` | 400,000 – 409,999 | the channel-width sweep (R4) |
 | `study2` | 500,000 – 509,999 | perception degradation (R5) |
 
@@ -71,8 +71,12 @@ Basin: start and goal have fixed along-basin positions and sampled lateral ones,
 $$y_{\text{start}} = 2\,\text{m},\quad y_{\text{goal}} = 22\,\text{m},\quad x_{\text{start}}, x_{\text{goal}} \sim \mathcal{U}(2.5, 7.5)\,\text{m}$$
 
 so the reference path is a straight but **slanted** leg, and the navigable
-polygon is the basin inset by 0.40 m. Channel: parallel walls at a width drawn
-from the stage's range, with the path along the centreline.
+polygon is the basin inset by 0.40 m. Channel: 25 m long, width measured wall
+to wall (no inset), drawn from the stage's range and varying along the channel
+by up to 1.8 times; the straight reference path is offset
+toward the starboard wall by a fraction of the half-width drawn from a normal
+distribution (mean +0.12, standard deviation 0.15, clipped to ±0.30) — the
+Rule 9(a) station.
 
 **Animation 3 — slanted legs.** Draw the basin rectangle; sample start and goal
 dots on the two horizontal lines; connect them. Repeat quickly to show the fan
@@ -194,10 +198,10 @@ added target and obstacle costs raycasting and collision work.
 
 | | Training set | Validation set | Test set (test set v4) |
 |---|---|---|---|
-| Seeds | `training` | `development` (decoupled) and its own block at 350,000+ (coupled) | `frozen_eval` and dedicated test blocks |
+| Seeds | `training` | `development` (decoupled) and its own block at 360,000+ (coupled) | `frozen_eval` and dedicated test blocks |
 | Size | unbounded — a fresh draw every episode | **270**: 120 decoupled (20 per class × 6) + 150 coupled | **1,000**: 664 decoupled + 336 coupled |
 | Sampling | curriculum stage of the moment | fixed lists | stratified cells, near-duplicates trimmed |
-| Used for | gradient updates | **checkpoint selection** and all diagnostics | the paper's tables |
+| Used for | gradient updates | **checkpoint selection**, comparator tuning and the learning curves | the paper's tables |
 | Seen how often | continuously | every 200 k steps | **once per policy** |
 
 ### 5.1 Validation set — the selection instrument
@@ -278,7 +282,7 @@ An encounter **engages** when
 
 $$\text{class} \ne \text{none} \quad\wedge\quad 0 < TCPA \le 25\,\text{s} \quad\wedge\quad DCPA < 1.5\,d_{\text{req}},\qquad d_{\text{req}} = 2.5\,\text{m}$$
 
-and then the class, the compliant turn direction, and the heading and speed at
+and then the class, the required turn direction, and the heading and speed at
 that instant are **frozen** until the target is past and opening. Without the
 latch, a policy could turn until the classifier changed its mind and then be
 judged against the new class.
@@ -301,7 +305,11 @@ violation at close quarters costs full price.
 The widths at which each manoeuvre stops fitting are **derived** from hull beam,
 required separation and wall clearance, not chosen:
 
-$$W_{\text{head-on}} = 3.80\,\text{m}, \qquad W_{\text{overtaking}} = 4.26\,\text{m}, \qquad W_{\text{crossing}} = 7.60\,\text{m}$$
+$$W_{\text{crossing}} \ge 4\,(a_{\text{abeam}} + w_{\text{wall}}) = 7.60\,\text{m}, \qquad W_{\text{head-on}} \ge 2a_{\text{abeam}} + 2w_{\text{wall}} = 3.80\,\text{m}, \qquad W_{\text{overtaking}} \approx W_{\text{head-on}} + 2\rho_{\text{pose}} t_{\text{exp}} = 4.26\,\text{m}$$
+
+with $a_{\text{abeam}} = 1.25$ m, wall clearance $w_{\text{wall}} = 0.65$ m, pose drift
+$\rho_{\text{pose}} = 0.0101$ m/s and abreast exposure $t_{\text{exp}} \approx 22.8$ s (MASTER_ARTIFACT_FACTS
+section 6.3 has the reasoning).
 
 **Animation 12 — the shrinking channel.** Slide a width slider from 10 m down to
 3.5 m with two vessels meeting; at each threshold, grey out the manoeuvre that

@@ -2,9 +2,9 @@
 
 Date: 2026-10-10. Status: protocol fixed before any episode; the detector window is chosen on saved development data by the rule in section 4 before any episode runs.
 
-## 1. Purpose and user decisions
+## 1. Purpose and decisions
 
-The earlier objective counted every non-goal outcome against a filter. The user relaxed it: a collision that cannot be avoided may instead end in a permanent stop. A stopped vessel counts as better than a collision, like a timeout. The user's rules and decisions (2026-10-10):
+The earlier objective counted every non-goal outcome against a filter. Decision (2026-10-10): the objective is relaxed so that a collision that cannot be avoided may instead end in a permanent stop. A stopped vessel counts as better than a collision, like a timeout. The rules and decisions (2026-10-10):
 
 1. **Trigger:** if a collision is guaranteed, stop the vessel. "Guaranteed" is decided onboard: every candidate command that the filter checks, each followed by every continuation in a fixed bank (holding the command, braking at once, turning then braking, turning, cruising then braking), is predicted to make physical contact within a short window *W*, under both reverse-thrust models. *W* is fixed from development data (section 4). No simulator truth enters the decision.
 2. **Stop manoeuvre:** full astern with the rudder centred; the environment's existing brake-to-zero conversion applies. The stop is permanent and the vessel never resumes.
@@ -51,7 +51,7 @@ The detector is replayed on the saved V16-equivalent full-snapshot traces of the
 - **False alarms:** V16-successful episodes in which the detector would fire.
 - **Caught contacts:** V16 contact episodes in which it would first fire at least one decision before the episode's last decision.
 
-**Rule:** the chosen W maximises caught contacts subject to zero false alarms, with ties going to the smaller W. If no W catches a contact without a false alarm, the result is reported and the choice is returned to the user. Along V16's own trajectory nothing changes before the first firing, so the replay gives exactly where V16 with the stop rule would first commit, up to environment reproduction.
+**Rule:** the chosen W maximises caught contacts subject to zero false alarms, with ties going to the smaller W. If no W catches a contact without a false alarm, the result is reported and W is set by a recorded decision instead. Along V16's own trajectory nothing changes before the first firing, so the replay gives exactly where V16 with the stop rule would first commit, up to environment reproduction.
 
 ## 5. Evaluation
 
@@ -60,7 +60,7 @@ The detector is replayed on the saved V16-equivalent full-snapshot traces of the
 
 No code, option or W changes after any test-set outcome. Reports give goals, stopped, timeouts, rescued SAC failures, lost SAC successes, and each contact type including `collision:by_target`, paired by test ID, episode seed and scenario digest.
 
-## 6. Window screen results and the user's choice, 2026-10-10
+## 6. Window screen results and the choice of W, 2026-10-10
 
 Three screens ran on the 68 saved V16-equivalent development traces (`results/safety_dev/estop_protocol/`). Each counts false alarms (V16-successful episodes in which the detector would fire) and caught contacts (V16 contact episodes in which it first fires at least one decision before the last).
 
@@ -72,7 +72,7 @@ Three screens ran on the 68 saved V16-equivalent development traces (`results/sa
 
 **False alarms come from the obstacle memory.** All false alarms at short windows (DV3-CRP-CV-12, BAS-CR-CV-045, CH-CR-CV-073, CH-OT-RE-064, P2-L1-CRP-VAR-14) come only from remembered static LiDAR points 0.6-26 cm from, or inside, the hull at the current estimate. Removing those points removes every false alarm. Every contact caught at W = 1.5 s is driven by a target or the map boundary.
 
-**Choice.** Under the rule of section 4, the choice went back to the user. The user chose to **keep the obstacle memory in the check and accept the false alarms**, with W = 1.5 s (screen v1: 5 false alarms, 8 caught contacts). The configuration is therefore `ESTOP_WINDOW_S = 1.5`, `USE_STATIC_POINTS = True`, `EXCLUDE_CURRENT_OVERLAPS = False`. It is fixed before any episode with the stop.
+**Choice.** No window qualifies under the rule of section 4, so W was set by decision (2026-10-10): **keep the obstacle memory in the check and accept the false alarms**, with W = 1.5 s (screen v1: 5 false alarms, 8 caught contacts). The configuration is therefore `ESTOP_WINDOW_S = 1.5`, `USE_STATIC_POINTS = True`, `EXCLUDE_CURRENT_OVERLAPS = False`. It is fixed before any episode with the stop.
 
 The 8 V16 contact episodes caught at W = 1.5 s are BAS-HO-NC-002, BAS-HO-NC-059, BAS-NU-CV-043, BAS-NU-CV-070, CH-CR-CV-059, P2-L2-HO-FIX-11, P2-L3-BO-FIX-09 and P2-L3-CRP-FIX-03. Whether each becomes a stop, a collision during braking or a target strike is measured by the episodes.
 
@@ -128,10 +128,10 @@ Report: [`testset_v4_main/reports/off_v16_estop_1000`](../results/safety_dev/tes
 
 ## 8. Boundary-and-targets trigger, 2026-10-11
 
-At the user's request, a second trigger configuration runs. It is fixed before any of its episodes:
+Decision (2026-10-11): a second trigger configuration runs. It is fixed before any of its episodes:
 
 - **Check:** the map boundary and target ships only. The remembered static LiDAR points are left out of the contact check (`use_static_points=False`).
-- **Window:** W = 2.5 s, the window the section 4 rule selects on `screen_v3_no_static`: zero false alarms and 9 caught V16 contact episodes on the development traces. The section 4 rule was pre-registered, and the user's earlier choice was not used here.
+- **Window:** W = 2.5 s, the window the section 4 rule selects on `screen_v3_no_static`: zero false alarms and 9 caught V16 contact episodes on the development traces. The section 4 rule was pre-registered, and the earlier decision on W (section 6) was not used here.
 - **Everything else as before:** detector, stop manoeuvre, target braking, stillness termination and scoring are unchanged.
 - **Implementation:** the constructor options `estop_window_s=2.5, use_static_points=False` (`safety_estop.BOUNDARY_TARGET_OPTIONS`). The runner modes are `v16_estop_bt` and `v17_estop_bt`. The earlier modes and module defaults are unchanged.
 
@@ -182,4 +182,4 @@ All runs are paired by test ID, episode seed and scenario digest with the fresh 
 - Compared with the all-hazards trigger, false-alarm stops fall from 27 to 7 and target strikes on the stopped ship from 15 to 8, while own-ship contacts stay the same (77 against 78). Leaving the remembered static points out of the trigger removes most of the cost without giving up contact reduction, as the development screen predicted.
 - Against V16, own-ship contacts fall by about a fifth (96 to 77) and all contacts by 11 (96 to 85), for 11 fewer goals (904 to 893, about 1.2 %).
 - On development data V16 + stop loses no V16 goal. On the test set it loses 11.
-- Under the user's relaxed scoring, where a stop is better than a collision and worse than a goal, this is the first configuration that reduces contacts relative to V16 at a small cost in goals. It is still a tradeoff, not a strict improvement.
+- Under the relaxed scoring of section 1, where a stop is better than a collision and worse than a goal, this is the first configuration that reduces contacts relative to V16 at a small cost in goals. It is still a tradeoff, not a strict improvement.

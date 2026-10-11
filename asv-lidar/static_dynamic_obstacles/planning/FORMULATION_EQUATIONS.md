@@ -95,10 +95,10 @@ executed action:
 | # | Feature | Definition |
 |---|---|---|
 | 0, 1 | engaged, clearing | state indicators |
-| 2 | compliant turn sense σ | +1, 0, −1 (Table 4 of the draft) |
+| 2 | required turn sense σ | +1, 0, −1 (Table 4 of the draft; `compliant_turn_sense` in code) |
 | 3 | heading change since engagement | wrap(ψ̂ − ψ_e)/180° (0 when idle) |
 | 4 | speed change since engagement | clip((û − u_e)/U_s, −1, 1) |
-| 5 | turn admissible | A (Eq. 11) for the compliant side |
+| 5 | turn admissible | A (Eq. 11) for the required side |
 | 6 | slowdown clears | S_coast (Eq. 12, coasting profile) — see note |
 | 7 | admissibility known | 1 when Eq. 11 was evaluated on a boundary |
 | 8 | action required | a_req = clip(Δy_req / d_req, 0, 1) |
@@ -244,7 +244,7 @@ static obstacle within ±135°; r_obs = 0 beyond 2.0 m.
   v_col = clip(0.55 v_port + 0.55 v_bow + 0.40 v_side + 0.45 v_hold + 0.50 v_r8, 0, 1),
   r_col = −v_col   (Eq. 19)
 
-With σ the compliant sense, r_p the yaw rate needed to track the path, and
+With σ the required turn sense, r_p the yaw rate needed to track the path, and
 headings on the perceived frame:
 
 - **Wrong-way turn or heading** (give-way classes, σ ≠ 0):
@@ -284,7 +284,7 @@ headings on the perceived frame:
   admissible, or when slowing cannot clear and turning is the only help.)
 
 **5.7 Verified property (F94)** — a statement about Eqs. 13–24, not a result:
-from one engagement state, a scripted 30° compliant crossing turn returns +61
+from one engagement state, a scripted 30° crossing turn in the required direction returns +61
 (discounted) over the same turn made the wrong way, from either side.
 
 ## 6. Where Paper 2's equations still apply

@@ -71,7 +71,7 @@ def main():
         scenarios=1000,
         scope=("Evaluation on the entire frozen test set v4; no safety tuning on these outcomes. "
                "Overlap with v2/v3 development exposure is reported separately; not a wholly unseen set."),
-        authorization="User, 2026-10-10: testing authorized on development data and test set v4.",
+        authorization="Decision (2026-10-10): testing authorized on development data and test set v4.",
         ranking="All 1,000 definition rows in their original order; no outcome-based selection.",
         definition_digest=digest, input_sha256=source, cases=cases)
     overlap = {}

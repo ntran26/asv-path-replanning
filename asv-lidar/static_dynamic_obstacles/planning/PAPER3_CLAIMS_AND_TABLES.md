@@ -31,6 +31,7 @@ and the tables that decide them, in one file.
 >   | SAC 3 M, baseline-v3 seed 0 (best checkpoint 3.0 M) | v4 | 0.865 (0.84–0.88) |
 >   | RecurrentPPO 3 M, baseline-v3 seed 0 (best checkpoint 2.4 M) | v4 | 0.757 (0.73–0.78) |
 >   | PPO 3 M, baseline-v3 seed 0 (best checkpoint 2.8 M) | v4 | 0.751 (0.72–0.78) |
+>   | TQC 3 M, baseline-v3 seed 0 (best checkpoint 3.0 M) | v4 | 0.837 (0.81–0.86) |
 >   | SAC 3 M, baseline-v4.3 seed 0 (not adopted) | v4 | 0.833 |
 >   | SAC 3 M, baseline-v3 seed 0 | v1 | 0.857 |
 >   | LOS-DWA | v1 | 0.804 |
@@ -67,8 +68,21 @@ and the tables that decide them, in one file.
 >   success every 200,000 steps for the RL learners, seed mean, seeds and seed-range band, with the
 >   curriculum stages marked. No selected-policy marker and no trade-off figure: completion time and
 >   safety stay in the results table and the text.
-> - **Runs.** Of the four-learner, three-seed campaign, baseline-v3 SAC, PPO and RecurrentPPO
->   seed 0 exist (2026-10-08). The baseline-v1 and baseline-v2 runs were removed on 2026-10-04, but their result
+> - **Framing and deployment choice (decision, 2026-10-10)**, superseding the 2026-09-23 framing
+>   note below. The paper develops a formulation and deploys one policy; it is not a
+>   learner-comparison study. Proposed method: the frozen formulation and the deployed policy, the
+>   better of SAC and TQC on test set v4 (three-seed mean; the deployed seed by validation score),
+>   the test set being larger and more balanced than the validation set. Baselines: the other
+>   learners on the identical formulation and the classical references (LOS-PID + DWA, COLREGs-VO),
+>   all on the same test set. Within each run the checkpoint is still selected on the validation set.
+>   The test set therefore also chooses the learner family: the paper states this, and the field
+>   trials (S13) are the independent evaluation of the deployed policy. Sensing: the formulation is
+>   stated for onboard perception (pooled range returns, target tracks, a map boundary) and
+>   implemented with a 2D LiDAR; LiDAR stays out of the title and the contribution names
+>   (supervisors' guidance, as for Paper 2), and other range sensors such as radar are a design
+>   scope, not a tested result.
+> - **Runs.** Of the four-learner, three-seed campaign, baseline-v3 SAC, PPO, RecurrentPPO
+>   seed 0 exist (2026-10-08), and TQC seed 0 (2026-10-11). The baseline-v1 and baseline-v2 runs were removed on 2026-10-04, but their result
 >   summaries are kept. The campaign's formulation is baseline-v3: the v4.3
 >   candidate was trained in full and not adopted (`BASELINE_V4_PLAN.md`, section 5e).
 > - **The tables below still describe suite 3.0.** R1, the Tier B holdout, becomes the test-set
@@ -92,7 +106,7 @@ tests it. **Status** is `pending` until that evidence exists.
 
 | # | Claim | RQ / contribution | Evidence | Prediction (pre-registered) | Status |
 |---|---|---|---|---|---|
-| C-1 | One end-to-end policy does path following, static avoidance and COLREGs-aware manoeuvring in a laterally bounded basin and channel from onboard range sensing alone | RQ1 | R1 (Tier B, suite 3.4: 800 constant-velocity episodes × 3 seeds). **R8 dropped**: Tier A is out of the paper and Around the Clock is not built (2026-09-24) | Proposed method's success rate beats every classical comparator on Tier B overall; per-cell intervals reported | pending |
+| C-1 | One end-to-end policy does path following, static avoidance and COLREGs-aware manoeuvring in a laterally bounded basin and channel from onboard range sensing alone | RQ1 | R1 (test set v4: 1,000 episodes, 664 decoupled + 336 coupled; learners at 3 seeds). **R8 dropped**: Tier A is out of the paper and Around the Clock is not built (2026-09-24) | The deployed policy (the better of SAC and TQC on test set v4) exceeds every classical comparator's success overall; per-cell intervals reported; differences to the other learners reported with seed variability | pending |
 | C-2 | Rule 9 governs Rules 13–15 below a width threshold, and the policy's manoeuvre mode switches from alteration to 8(e) speed reduction there | RQ6, C2, Study 1 | **R4 + manoeuvre-mode curve only** — suite 3.4 draws Tier B channels at 7.5–10 m, above the head-on (3.80 m) and overtaking (4.26 m) thresholds, so Tier B cannot show the switch (2026-09-24, 2026-09-27) | **Crossing** mode share crosses 50 % between **8 m and 7 m**; **overtaking** between **4.5 m and 4.0 m**; **head-on** is resolved by channel-keeping at every width and never crosses (04a section 6) | pending |
 | C-3 | The width at which each classical comparator becomes inadmissible is predicted by the precedence-table thresholds (head-on, overtaking 4.26 m, crossing 7.60 m) | RQ6, C2, Study 1 | R4 (the sweep keeps widths to 3.5 m; comparators are COLREGs-VO (Kuwata) and the encounter-specific VO, tuned on the validation set and pinned in `configs/comparators_v1.json`) | Each comparator's admissibility loss falls within ±0.5 m of its predicted threshold | pending |
 | C-4 | Supplying the encounter class as an observation feature improves compliance over reward shaping alone | RQ2 | R6 (2 × 2 ablation) | Violation rate lower with the feature in both reward conditions; effect size reported with seed CIs | pending |
@@ -134,7 +148,8 @@ frozen-namespace runs. Every cell reports the mean over **3 seeds** with a 95 % 
 campaign at 4 learners x 3 seeds = 12 runs). At 3 seeds a headline difference of
 about 0.05 is at the edge of separability and the measured 0.20 crossing spread is
 not separable, so learner comparisons are made on the headline and crossing
-behaviour is reported descriptively, per seed.
+behaviour is reported descriptively, per seed. The deployed learner is chosen on the
+headline (decision, 2026-10-10).
 
 > **Status note (2026-09-28).** The Introduction is now draft 4 (`planning/Paper3_Introduction_draft4.docx`), with the literature review moved into section 1.2 and the paper renumbered to six sections (`PAPER3_DRAFT_SKELETON.md` revision 4). Contributions are now **C1-C4** (C1 formulation; C2 geometric framework for constrained encounter responses, absorbing the old width-sweep C4; C3 four-learner comparison with classical references; C4 evaluation design, absorbing the old perception C5 and protocol C6); the old field C7 and **RQ4 / C-6 are open (S13)** because draft 4 calls physical transfer "planned". Draft 4 adds **RQ6** (how the response changes as maneuvering room decreases), which C-2 and C-3 now serve. Paper sections cited below use the revision-4 numbers.
 >

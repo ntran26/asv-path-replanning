@@ -24,7 +24,8 @@ Two presentation rules from the author:
 **Platform.** Bluefin model-scale ASV: length overall L = 1.725 m, beam
 B = 0.50 m, draft 0.193 m, mass m = 64.55 kg. Single propeller and a stern
 rudder (±40°). A 360° 2D LiDAR sits at the bow (0.8625 m ahead of the
-reference point).
+reference point). The target vessel is the same class of vessel and uses the
+same hull outline (1.725 × 0.50 m).
 
 **State** (7 values): surge u, sway v (body-frame velocities, m/s), yaw rate r
 (rad/s), heading ψ (compass: 0 = north, clockwise positive), actual rudder angle
@@ -36,7 +37,7 @@ reference point).
 
 **Kinetics** — three coupled equations (Newton's second law in a rotating body
 frame, in the form of Fossen, 2011/2021, with MMG-style hydrodynamic terms,
-Yasukawa & Yoshimura, 2015 [VERIFY]):
+Yasukawa & Yoshimura, 2015):
 
   m₁₁ u̇ = T(n, u) + X_damp + X_rud + m₂₂ v r
   m₂₂ v̇ = Y_damp + Y_rud − m₁₁ u r
@@ -53,7 +54,9 @@ Masses include "added mass" (the water the hull must accelerate with it):
 Forces and moments (identified parameter values in the table below):
 
 - Propeller thrust: T = T₁₂ (n/12)² (1 + t_b e^{−u/u_b}), n in "rpm-units"
-  (command scale 0–24, 12 = nominal field setting). With t_b = 0: T ∝ n².
+  (command scale 0–24, 12 = nominal field setting). The identified low-speed
+  boost is t_b = 0 (its speed scale u_b = 0.5 m/s is then inert), so
+  T = T₁₂ (n/12)².
 - Surge damping: X_damp = −X_uu u|u| − X_vv v² − X_rr (L r)²
   (hull drag, plus speed lost to sideways and turning cross-flow).
 - Rudder drag: X_rud = −X_δ |F_N| |sin δ|.
@@ -74,12 +77,17 @@ Forces and moments (identified parameter values in the table below):
   interaction a_H = 0.444 and lever arm ℓ = 1.207 m.
 
 - **Rudder servo (actuator dynamics):** the commanded angle
-  δ_c = 40° × a_δ passes through a transport delay t_d = 0.73 s,
+  δ_c = −40° × a_δ passes through a transport delay t_d = 0.73 s,
   then a first-order lag with time constant τ = 0.90 s and a rate limit:
 
     δ_{k+1} = δ_k + clip((δ_c(t − t_d) − δ_k)(1 − e^{−Δt/τ}), ±δ̇_max Δt)
 
-  (the fitted rate limit is effectively non-binding; the delay and lag dominate).
+  (identified servo rate limit δ̇_max ≈ 2,985°/s, effectively non-binding; the
+  field bridge's 20°/s command limiter is off in simulation; the delay and lag
+  dominate). **Sign convention:** in these equations δ is positive to port (the
+  identified model's and the transmitted command's convention), hence the minus
+  sign: a positive policy command a_δ gives a negative δ and turns the vessel to
+  starboard, the convention every steering law in Section 4 uses.
 
 - **Integration:** fourth-order Runge–Kutta, sub-steps ≤ 0.05 s inside each
   0.1 s physics step; five physics steps per 0.5 s decision. Surge is clipped at
@@ -106,20 +114,25 @@ Forces and moments (identified parameter values in the table below):
 | t_d | 0.730 | s | rudder transport delay |
 
 **Resulting behavior:** steady speed 0.558 m/s at 6 rpm-units (the cruise used
-in all training), 1.116 m/s at 12; yaw rate about 10.4°/s at full rudder;
-several seconds to build a turn (delay + lag + inertia).
+in all training), 1.116 m/s at 12; steady yaw rate at full rudder about
+10°/s at 12 rpm-units and about 5°/s at the 6 rpm-unit cruise (speed falls to
+about 0.46 m/s in the turn); several seconds to build a turn (delay + lag +
+inertia).
 
-**Domain randomization:** each training episode draws a new parameter set as
-a convex blend of two bootstrap solutions of the identification plus 5 %
-jitter (scale 1.0). Blending whole parameter vectors keeps the correlations
-between yaw parameters (k_R, N_r, N_uv), so every draw is a physically
-consistent vessel (Tobin et al., 2017 for domain randomization [VERIFY]).
+**Domain randomization:** each training episode draws a new parameter set.
+Two of the 28 bootstrap solutions of the identification, θ_A and θ_B, are
+picked uniformly at random (with replacement) and blended,
+θ = λ θ_A + (1 − λ) θ_B with λ ~ U(0, 1); each parameter then gets Gaussian
+jitter with standard deviation 5 % of its bootstrap standard deviation (scale
+1.0), and keeps its sign. Blending whole parameter vectors keeps the
+correlations between yaw parameters (k_R, N_r, N_uv), so every draw is a
+physically consistent vessel (Tobin et al., 2017 for domain randomization).
 
 **Sources:** Fossen, T. I. (2021). *Handbook of Marine Craft Hydrodynamics and
 Motion Control*, 2nd ed., Wiley (3-DOF maneuvering models, added mass,
 Coriolis and Munk terms, LOS guidance). Fossen (2011), 1st ed. Yasukawa &
-Yoshimura (2015), MMG standard method, *J. Mar. Sci. Technol.* 20:37–52
-[VERIFY]. Paper 2 (Tran et al., 2026) for the platform.
+Yoshimura (2015), MMG standard method, *J. Mar. Sci. Technol.* 20(1):37–52.
+Paper 2 (Tran et al., 2026) for the platform.
 
 ## 2. Classical comparators (Section 4)
 
@@ -139,7 +152,13 @@ Heading PID on the error e = χ_d − ψ (degrees):
   a_δ = clip(K_p e − K_d r[°/s] + I, −1, 1),  K_p = 1/35, K_d = 1/18,
   K_i = 1/600 (integral active only inside |e| < 10°, capped at 0.15).
 
-Yaw-rate tracking (used by DWA): a_δ = r_d/10.4 + 0.08 (r_d − r) (deg/s).
+Yaw-rate tracking (used by DWA): a_δ = r_d/10.4 + 0.08 (r_d − r) (deg/s); the
+feed-forward 10.4 °/s per unit rudder is a scale on the candidate set, not a model
+of the plant (the hull turns at about 5 °/s at full rudder at cruise). DWA's
+rollouts run the same law on the same dynamics, so the trajectories it scores
+are the ones the vessel sails; with this value the nine set-points spread over
+about 9–36° of heading change in 6 s at cruise (check of 2026-10-10,
+`results/classical/dwa_yaw_gain_check.md`).
 Speed: rpm = u_d / (speed per rpm) + 6 (u_d − u).
 
 **2.2 LOS-PID + Dynamic Window Approach (DWA)** (Fox, Burgard & Thrun, 1997).
@@ -147,8 +166,8 @@ LOS-PID drives the vessel until anything comes within 9 m (a track, a scan
 point ahead, or within a hull length of the boundary). Then, each decision:
 
 1. **Candidates:** yaw-rate set-points r_d ∈ {−9, −6.75, …, +9} °/s × speeds
-   {1.0, 0.5, 0} × U_nom × hold times {3, 6} s, plus plain LOS-PID at two
-   speeds.
+   {1.0, 0.5, 0} × U_nom × hold times {3, 6} s, plus plain LOS-PID at full
+   and half U_nom.
 2. **Dynamic window through the real dynamics:** each candidate is simulated
    closed-loop on the vessel model (delay, lag, inertia) for up to 16 s — not
    as an ideal arc, because this hull needs about 5 s to build a turn. After the
@@ -161,15 +180,20 @@ point ahead, or within a hull length of the boundary). Then, each decision:
    G = 1.0·heading + 1.0·clearance + 0.5·velocity + 0.6·path − 0.25·smoothness
 
    heading = 1 − |LOS heading at the end point − predicted heading|/π;
-   clearance = min(clearance, 1.5 m)/1.5 m; velocity = mean speed/U_nom;
-   path = 1 − mean|cross-track|/2 m; smoothness = change from last choice.
+   clearance = min(clearance, 1.5 m)/1.5 m, with clearance measured over the
+   same windows as admissibility (fixed obstacles and the boundary over the
+   first 5.5 m of travel, the tracked target over the first 10 s);
+   velocity = mean speed/U_nom; path = 1 − mean|cross-track|/2 m;
+   smoothness = |r_d − r_d,prev|/(18 °/s) when both the candidate and the last
+   choice are yaw-rate set-points, 1 when one of them is plain LOS-PID, plus
+   |speed fraction − last speed fraction|.
 5. **Fallback** if none is admissible: the candidate whose first violation
    comes latest, then most clearance.
 
 **DWA knows obstacles, not rules** — it is the "no COLREGs" reference.
 
 **2.3 COLREGs-VO** (Kuwata et al., 2014; velocity obstacles after Fiorini &
-Shiller, 1998 [VERIFY]):
+Shiller, 1998):
 
 1. **Candidates:** course offsets −90° … +90° in 5° steps about the present
    heading, plus the LOS course; speeds {1, 0.75, 0.5, 0.25, 0} × U_nom.
@@ -192,19 +216,18 @@ Shiller, 1998 [VERIFY]):
 6. **Stand-on (Rule 17):** hold course and speed while the preferred candidate
    stays clear for more than 12 s.
 7. **Cost** over the allowed candidates:
-   J = 1.0·|χ − χ_LOS|/π + 0.5·max(0, U_pref − U)/U_pref + 1.0·static-proximity
-   + 0.3·|χ − χ_prev|/π.
+   J = 1.0·|χ − χ_LOS|/π + 0.5·max(0, U_pref − U)/U_pref + 1.0·J_prox
+   + 0.3·|χ − χ_prev|/π, with U_pref = U_nom = 0.558 m/s and
+   J_prox = max(0, 0.60 m − c_min)/(0.60 m − 0.15 m), c_min being the candidate's
+   smallest clearance to scan points and the boundary over 10 s (a soft margin
+   above the 0.15 m hard limit).
 8. **Fallback:** if nothing satisfies both the velocity obstacle and the
    COLREGs constraint, drop the constraint rather than accept a collision
    (Kuwata's own rule); if nothing is safe, take the latest first contact.
 
-A second VO variant uses the paper's narrow-channel convention (give way to a
-crossing target from either side); the contrast between the two isolates the
-convention's effect.
-
 **Artificial potential field (APF) — background only.** Paper 2's comparator
 (LOS + APF): the goal attracts, obstacles repel, and the vessel follows the
-sum of the forces (Khatib, 1986 [VERIFY]). Fast and simple, but it gets stuck
+sum of the forces (Khatib, 1986). Fast and simple, but it gets stuck
 in local minima between close obstacles and knows no rules. Explain it as
 context; it is not a Paper 3 comparator.
 
@@ -221,12 +244,13 @@ context; it is not a Paper 3 comparator.
 | Learner | Type | Key settings |
 |---|---|---|
 | PPO (Schulman et al., 2017) | on-policy, policy gradient with clipped surrogate | lr 3e-4; 512 steps × 10 envs per update; minibatch 512; 10 epochs; GAE λ = 0.95 (Schulman et al., 2016); clip ε = 0.2; target KL 0.03 |
-| RecurrentPPO | on-policy, PPO + LSTM memory (Hochreiter & Schmidhuber, 1997) | PPO settings + 256-unit LSTM, separate for actor and critic |
-| SAC (Haarnoja et al., 2018) | off-policy, maximum-entropy actor–critic | lr 3e-4; replay buffer 10⁶; batch 256; τ = 0.005; 10⁴ random warm-up steps; automatic entropy temperature; 1 gradient step per environment step |
+| RecurrentPPO | on-policy, PPO + LSTM memory (Hochreiter & Schmidhuber, 1997) | PPO settings + one 256-unit LSTM layer for the actor and a separate one for the critic, placed after the features extractor and before the 256 × 256 heads |
+| SAC (Haarnoja et al., 2018) | off-policy, maximum-entropy actor–critic | lr 3e-4; replay buffer 10⁶; batch 256; τ = 0.005; 10⁴ random warm-up steps; automatic entropy temperature with target entropy −2 (= −dim of the action; the library default, not overridden); 1 gradient step per environment step |
 | TQC (Kuznetsov et al., 2020) | off-policy, distributional (quantile) SAC | SAC settings; 2 critics × 25 quantiles; drop the top 2 quantiles per critic |
 
-- **Network (identical for all):** a scene encoder (lidar, boundary, ego, path,
-  previous action → 128) and a target-slot encoder (target + context, 28 → 64
+- **Network (identical for all):** a scene encoder (lidar 27 + boundary 7 +
+  ego 3 + path 3 + previous action 2 = 42 inputs → 128 → 128, two ReLU layers)
+  and a target-slot encoder (target + context, 28 → 64
   → 64 → 32) whose input is gated by the presence bit; concatenated features
   (160) feed actor and critic heads of 256 × 256 ReLU.
 - Development used PPO to iterate the formulation; the formulation itself
@@ -236,14 +260,18 @@ context; it is not a Paper 3 comparator.
 
 **Sensor model:** 720 beams at 0.5° (full 360°), range 1.0–16 m (returns
 closer than 1 m are lost in a dead zone). Pose noise 0.03 m / 0.2°, surge
-noise 0.05 m/s, yaw-rate noise 1°/s. One scan per 0.5 s decision.
+noise 0.05 m/s, yaw-rate noise 1°/s. One scan per 0.5 s decision. Ranges are
+exact ray casts: no per-beam range noise and no isolated beam dropout in
+training (both left at zero until characterized from field data). The planned
+perception-degradation study sweeps detection dropout from zero to the point of
+track loss rather than using one fixed rate.
 
 **Pipeline, in order:**
 
 1. **Gate:** discard returns outside the known navigable polygon (walls,
    people on the deck, anything beyond the water).
-2. **Segment** (adaptive breakpoint detection, after Borges & Aldon, 2004
-   [VERIFY]): walk the scan in bearing order; consecutive returns j−1, j join
+2. **Segment** (adaptive breakpoint detection, after Borges & Aldon, 2004):
+   walk the scan in bearing order; consecutive returns j−1, j join
    the same cluster if the beams are adjacent and
 
      ‖**q**_j − **q**_{j−1}‖ ≤ ε + ρ_j Δθ,  ε = 0.35 m, Δθ = 0.5°
@@ -254,8 +282,8 @@ noise 0.05 m/s, yaw-rate noise 1°/s. One scan per 0.5 s decision.
 3. **Ego-motion compensation:** lift each return into world coordinates using
    the **estimated** pose and the sensor's position at the bow:
    **q** = (x_s + ρ sin(ψ + θ), y_s + ρ cos(ψ + θ)).
-4. **Associate** (greedy global nearest neighbour; Bar-Shalom et al., 2001
-   [VERIFY]): sort all track–cluster distances; accept the smallest unused
+4. **Associate** (greedy global nearest neighbour; Bar-Shalom et al., 2001):
+   sort all track–cluster distances; accept the smallest unused
    pairs while the distance ≤ gate g = max(2.5 U_nom Δt, 0.30) = 0.70 m.
    Unmatched clusters start tentative tracks; confirmed after 2 hits; dropped
    after 3 consecutive misses (1.5 s).
@@ -295,8 +323,7 @@ noise 0.05 m/s, yaw-rate noise 1°/s. One scan per 0.5 s decision.
    demote after 4 quiet updates (2 s). Biased toward under-detection: calling a
    panel a vessel has COLREGs consequences. τ_p is sized from pose noise:
    τ_p = max(0.25, 5√2 σ_pose). (Related idea: free-space/ray-casting evidence
-   in occupancy mapping and vehicle tracking, e.g. Petrovskaya & Thrun, 2009
-   [VERIFY].)
+   in occupancy mapping and vehicle tracking, e.g. Petrovskaya & Thrun, 2009.)
 
    Static clusters feed the lidar branch; the moving track feeds the target
    branch and the encounter module.
@@ -326,7 +353,7 @@ quarters). For each sector with beam ranges ρ₁…ρ_M in angular order:
 ## 5. Runtime safety layer (Section 9)
 
 Off during training. When enabled: fires if an engaged give-way encounter is
-in extremis (DCPA < d_req, 0 ≤ TCPA < 5 s), the compliant alteration is
+in extremis (DCPA < d_req, 0 ≤ TCPA < 5 s), the required alteration is
 inadmissible, and a full stop would let the target pass clear (≥ 1.76 m).
 Then full astern (S2 = −100) until stopped (≤ 0.05 m/s; at most 8 s), hold at
 zero thrust at least 2 s and at most 10 s, then return control. Interventions
@@ -336,22 +363,42 @@ are never counted as learned behavior.
 
 **6.1 Workspace.** Basin 10 × 25 m, start y = 2 m, goal y = 22 m, each
 x ~ U[2.5, 7.5] m (slant ≤ about 14°); navigable polygon = basin inset
-0.40 m. Channels: parallel walls, width by stage (below), reference path offset
-U[−0.30, 0.30] × half-width, mean +0.12 (starboard station). Channels are used
-only for head-on, crossing and overtaking.
+0.40 m. Channels: 25 m long (the basin's length), width measured wall to wall
+(the channel polygon is itself the navigable boundary, with no inset); nominal
+width by stage (below); in every stage that uses channels the width varies
+along the channel by up to 1.8 times (W_max/W_min ~ U[1.0, 1.8], piecewise linear through 2–4 control
+points), with a straight reference path. The path offset is drawn once per
+channel from a normal distribution with mean +0.12 and standard deviation 0.15,
+clipped to [−0.30, 0.30], as a fraction of the half-width of the narrowest
+section (positive = starboard, the Rule 9(a) station), and stays constant along
+the path. Channels are used only for head-on, crossing and overtaking, with
+probability 0.15 in stage 3 and 0.25 from stage 4 on (stages 6–7 included,
+for the episodes that are not three-obstacle layouts).
 
 **6.2 Encounter generation (class first, then solve backward).** Per episode:
 
 1. Draw the class (training shares: head-on 0.20, crossing 0.22, overtaking
    0.16, being overtaken 0.14, null 0.11, no target 0.17; stage limits apply).
 2. Draw the heading-crossing angle c from the class band (head-on 170–190°;
-   crossing 67.5–175° or 185–292.5°, 60 % from port in training; overtaking
-   and being overtaken −67.5–67.5°; null −20–20°), the speed ratio
+   crossing 67.5–175° or 185–292.5°, 60 % from port in training; overtaking,
+   being overtaken and null −10–10°, near-parallel traffic, although the
+   classifier accepts up to ±67.5° and ±20° — a crossing drawn in the 5° gaps
+   either side of the head-on band fails the re-check in step 4 and is
+   redrawn), the speed ratio
    k = U_TS/U_OS (head-on 0.70–1.30; crossing 0.60–1.40; overtaking
    0.40–0.55; being overtaken 1.50–2.20; null 0.85–1.15), the time to CPA T₀
    (head-on 12.3–17.0 s; crossing 7.9–14.8 s; overtaking 19.7–31.5 s; being
    overtaken 9.9–15.8 s) and the miss distance d₀ (U[0, 2.0] m; crossing
-   U[0, 2.5] m; null ≥ 4 m; being overtaken above a contact-free floor + 0.35 m).
+   U[0, 2.5] m; being overtaken U[f, max(2.0, f + 0.5)] m, where the floor
+   f = the contact-free miss distance + 0.35 m). The contact-free miss distance
+   is the smallest centre-to-centre miss distance at which the target's hull,
+   moving along the straight relative track, never touches the own hull
+   inflated by 0.15 m each side (found by bisection, cached per 0.5° of crossing
+   angle and 0.05 of speed ratio); no being-overtaken draw lies below the floor.
+   **The null class is placed, not solved:** range U[8, 15] m at a bearing of
+   20–160° to either side, course within ±10° of the own ship's, speed ratio
+   0.85–1.15, accepted only if its CPA is at least 4 m or does not occur within
+   the 90 s episode; it has no T₀.
 3. **Solve backward** for the spawn that produces exactly (d₀, T₀):
 
      ψ_TS = ψ_OS + c;  **v**_rel = U_OS **h**_OS − U_TS **h**_TS;
@@ -363,8 +410,20 @@ only for head-on, crossing and overtaking.
    target is always dead on the track, and the policy never sees an encounter
    that needs no alteration.
 4. **Validate:** re-classify the realized geometry (reject if the class came out
-   different), check the spawn range and that the target track stays inside the
-   water; reject and resample.
+   different), check the spawn range R₀ (head-on 13.8–19 m, beyond the 12 m
+   effective LiDAR range; crossing 5–10 m; overtaking 6 m to min(12, 16(1 − k)) m;
+   being overtaken 4–6 m astern, with the own ship starting 6.9 m along the
+   basin leg; null 8–15 m) and that the target track stays inside the water;
+   reject and resample. The target is present from the first step and is
+   acquired by the tracker as it comes into range.
+   **Unescapable crossings:** each crossing draw first decides whether it is to
+   be unescapable (probability 0.20), then its kinematics are redrawn until a
+   scripted check agrees. In the check the own ship holds course at cruise for
+   1.5 s, then either coasts to a stop or commits a 60° alteration in the
+   required direction (starboard for a target from starboard, port for one
+   from port); the crossing is escapable if either response keeps the hulls
+   (0.15 m margin) apart and the own hull inside the water until 6 s past the
+   drawn TCPA. The label is kept with the episode.
 5. **Static obstacles:** 1.0 m panels along 25–70 % of the path with lateral
    offsets; in stages 1–5 panels are kept clear of ±0.4 T₀ of own-ship travel
    around the CPA so they do not decide the encounter (the **decoupled**
@@ -411,20 +470,31 @@ then continues in stage 7 to 3.0 M.
   about separation; it removes episodes no controller could solve. Unsolvable
   draws are redrawn.
 - 15 % of episodes start slow (from rest or up to half cruise). Training
-  targets always hold their course and never give way.
+  targets always hold their course and never give way; in stage 7, 30 % of the
+  three-obstacle layouts' targets change speed once.
+- **Width thresholds** (the strata edges, derived rather than chosen): with the
+  own ship at the Rule 9(a) station a quarter of the width from the starboard
+  wall, a give-way alteration needs one abeam domain semi-axis of starboard
+  room, so W_crossing ≥ 4 (a_abeam + w_wall) = 4 (1.25 + 0.65) = 7.60 m;
+  head-on needs two vessels abreast, W_head-on ≥ 2 a_abeam + 2 w_wall = 3.80 m;
+  overtaking adds a pose-drift margin over the time the vessels stay abreast,
+  W_overtaking ≈ 3.80 + 2 ρ_pose t_exp = 3.80 + 2 × 0.0101 m/s × 22.8 s = 4.26 m,
+  with t_exp = (a_ahead + a_astern + L_pp)/(U_OS − U_TS) at a speed ratio of 0.5
+  (w_wall = 0.65 m wall clearance).
 
 **6.4 Data sets** — disjoint random-seed ranges ("namespaces") so training,
 selection and testing never share an episode (the coupled validation episodes
-come from their own block at seeds 350,000+, in a gap no namespace uses, and the
-coupled test episodes from dedicated test blocks):
+come from their own block at seeds 360,000+, in a gap no namespace uses, and the
+coupled test episodes from dedicated blocks at 310,000–349,999, 450,000+ and
+600,000+ that no training or validation draw uses):
 
 | Set | Size | Use |
 |---|---|---|
 | Training set | generated on the fly from the training seeds | seeds 0–99,999 |
-| Validation set, decoupled part | 120 episodes: 20 per episode type × 6 (stage-5 generator) | checkpoint selection |
-| Validation set, coupled part | 150 episodes: 20 no-target + per encounter (head-on, crossing from port, crossing from starboard, overtaking, being overtaken) 20 constant-speed + 6 varying-speed, all space-time solvable | checkpoint selection, together with the decoupled part (270 episodes in all) |
+| Validation set, decoupled part | 120 episodes: 20 per episode type × 6 (stage-5 generator) | checkpoint selection for the learners, tuning of the classical comparators, and the learning curves |
+| Validation set, coupled part | 150 episodes: 20 no-target + per encounter (head-on, crossing from port, crossing from starboard, overtaking, being overtaken) 20 constant-speed + 6 varying-speed, all space-time solvable | the same uses, together with the decoupled part (270 episodes in all) |
 | Test set (test set v4; headline) | 1,000 held-out episodes: **664 decoupled** (basin and channel encounters of every type, with constant-velocity, reactive and non-compliant targets) and **336 coupled** (three-obstacle layouts with constant- and varying-speed targets); near-duplicates trimmed; every episode passes the fairness check (6.5) | touched once per policy |
-| Frozen benchmark | the 800 basin and channel encounter episodes the test set's decoupled part is drawn from (8 cells × 100) | continuity with earlier tables |
+| Frozen benchmark | the 800 basin and channel encounter episodes the test set's decoupled part is drawn from: 8 cells × 100 (basin head-on, crossing, overtaking, being overtaken and null; channel head-on, crossing and overtaking) | continuity with earlier tables |
 | Robustness set | the same scenarios with a reactive target (700; it follows the COLREGs-VO rule from its own side) and, in head-ons, a non-compliant target that turns to port (200) | robustness to target behavior |
 | Width sweep (planned) | channels 10, 8, 7, 6, 5, 4.5, 4, 3.5 m | how the response changes with room |
 | Perception degradation (planned) | pose drift, detection dropout, occlusion, velocity-estimate noise, separately and jointly | robustness to sensing |
@@ -495,3 +565,26 @@ Paper 2's observation (225 beams over 270° pooled into 25 sectors, u, v, yaw ra
 errors, front clearance, side-clearance difference, local target cross-track)
 is replaced; the three LiDAR-derived cues were dropped so the passing side is
 learned rather than supplied.
+
+## 8. References formerly marked [VERIFY] (checked 2026-10-10)
+
+- Yasukawa, H. & Yoshimura, Y. (2015). Introduction of MMG standard method for ship maneuvering
+  predictions. *Journal of Marine Science and Technology* 20(1):37–52.
+- Tobin, J., Fong, R., Ray, A., Schneider, J., Zaremba, W. & Abbeel, P. (2017). Domain randomization
+  for transferring deep neural networks from simulation to the real world. *IEEE/RSJ International
+  Conference on Intelligent Robots and Systems (IROS)*, 23–30.
+- Khatib, O. (1986). Real-time obstacle avoidance for manipulators and mobile robots.
+  *International Journal of Robotics Research* 5(1):90–98.
+- Fiorini, P. & Shiller, Z. (1998). Motion planning in dynamic environments using velocity
+  obstacles. *International Journal of Robotics Research* 17(7):760–772.
+- Borges, G. A. & Aldon, M.-J. (2004). Line extraction in 2D range images for mobile robotics.
+  *Journal of Intelligent and Robotic Systems* 40(3):267–297.
+- Bar-Shalom, Y., Li, X. R. & Kirubarajan, T. (2001). *Estimation with Applications to Tracking and
+  Navigation*. Wiley.
+- Petrovskaya, A. & Thrun, S. (2009). Model based vehicle detection and tracking for autonomous
+  urban driving. *Autonomous Robots* 26(2–3):123–139.
+- Bengio, Y., Louradour, J., Collobert, R. & Weston, J. (2009). Curriculum learning. *Proceedings of
+  the 26th International Conference on Machine Learning (ICML)*, 41–48.
+- Haarnoja, T., Zhou, A., Hartikainen, K., Tucker, G., Ha, S., Tan, J., Kumar, V., Zhu, H., Gupta, A.,
+  Abbeel, P. & Levine, S. (2018b). Soft actor-critic algorithms and applications. arXiv:1812.05905
+  (automatic entropy tuning with target entropy −dim(A)).

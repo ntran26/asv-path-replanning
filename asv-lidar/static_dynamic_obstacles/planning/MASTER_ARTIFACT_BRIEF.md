@@ -69,9 +69,14 @@ one fixed problem formulation, against classical controllers.
     scenarios place three obstacles in a structured layout and generate the
     encounter with them in place, so the vessel may have to resolve both at once.
     The three data sets are named the *training set* (episodes generated on
-    the fly from the training seeds), the *validation set* (used only to select
-    checkpoints; never "development set") and the *test set* (test set v4, the
-    held-out evidence).
+    the fly from the training seeds), the *validation set* (used to select the
+    learners' checkpoints, to tune the classical comparators and for the
+    learning curves, never for reported results; never "development set") and
+    the *test set* (test set v4, the held-out evidence). Turn direction is the
+    *required turn sense* σ, the *required side* and the *required turn*
+    (never "compliant"), and a maneuver that follows the rules is
+    *rule-consistent* (never "lawful"). Each section's opening box is labeled
+    "In this section" and holds a two-line summary.
 12. **Nomenclature** at the end: every symbol (with unit and the section where
     it first appears) and every abbreviation. Group by topic.
 
@@ -87,7 +92,7 @@ equations" box (what bold vectors, hats and subscripts mean).
 
 ### 1. Scope and objective
 - The problem: route following + static obstacles + one moving vessel in
-  confined water; why these interact (a lawful turn may be blocked by a wall or
+  confined water; why these interact (a rule-consistent turn may be blocked by a wall or
   a panel, so speed becomes the answer — Rule 8(e)).
 - Why onboard LiDAR only (no AIS), and why the navigable boundary comes from a
   map (a channel edge is often a depth contour, not a wall).
@@ -253,7 +258,7 @@ Use `FORMULATION_EQUATIONS.md` exactly.
   term against its driving variable with sliders for its parameters, plus a
   panel "what happens if this is larger/smaller, and why this value" using the
   design rationale below. Include a combined view: pick a scripted maneuver
-  (compliant turn, wrong-way turn, slow-down, no action) in a head-on or
+  (required turn, wrong-way turn, slow-down, no action) in a head-on or
   crossing; show the per-step contributions stacked over time and the
   discounted total; changing weights updates the totals. Label it clearly as a
   reward-landscape illustration, not trained-policy results.
@@ -264,10 +269,10 @@ Use `FORMULATION_EQUATIONS.md` exactly.
   |---|---|---|
   | Bounded terms, weight = max per-step contribution | Paper 2's obstacle term was ~49× weaker than path following at contact because of a hidden scale | unbounded terms let one term silently dominate |
   | w_bnd = 15, the largest dense weight | slowing must always cost less than touching the boundary | smaller: the policy may graze the wall to keep speed |
-  | Collision −300 ≫ goal +100 | a compliant collision must be worse than a non-compliant near miss | smaller: risk-taking pays |
+  | Collision −300 ≫ goal +100 | a collision after a rule-consistent maneuver must cost more than a near miss after a rule violation | smaller: risk-taking pays |
   | Path term width-normalized, exp(−4 ẽ²) | Paper 2's exp(−0.05·e_y) varied < 10 % over a 10 m channel — no gradient | un-normalized: the term becomes a constant offset |
   | Speed gate in r_pf, overspeed gate above 1.2 U_ref | stopping must not score a perfect path; speeding must not pay | no gate: a stationary vessel on the line scores well |
-  | Progress telescopes (Σ r_prog constant) | a lawful slowdown costs no progress reward | distance-to-goal form penalizes bends |
+  | Progress telescopes (Σ r_prog constant) | a rule-consistent slowdown costs no progress reward | distance-to-goal form penalizes bends |
   | r_obs shifted exponential, d_oa = 0.6 m, zero beyond 2 m | the unshifted form adds a constant background penalty far from any obstacle (about −53 over an episode in the original design) that carries no gradient | larger decay: obstacles repel from far, the vessel wanders |
   | d_safe = 0.35 m boundary band | penalty only where contact is imminent | larger: narrow channels become uniformly penalized |
   | COLREGs group clipped to [0, 1], w = 9 | two simultaneous violations cannot out-rank safety terms | unclipped: rule terms can exceed w_dom |
@@ -277,9 +282,9 @@ Use `FORMULATION_EQUATIONS.md` exactly.
   | v_r8 deficit-based (a_req = Δy_req/d_req) | when the target is already clear (9(a) channel-keeping), no alteration is owed | fixed "always alter": the policy learns to always swerve |
   | v_hold speed part keeps rising (up to 3×) | saturating at 0.10 m/s made fleeing an overtaker free | saturating: the policy outruns overtakers |
   | Smoothness free window (σ = 0.25 for 4 steps after engagement) | Rule 8(b) wants one large alteration, not many small ones | no window: the committed turn is too costly |
-  | Carve-outs R-2 (U_eff = 0.4 U_ref) and R-5 (hold astern) | without them the lawful Rule 8(e) slowdown is structurally unlearnable; gated so "always slow" is not rewarded | ungated: the degenerate always-slow policy |
+  | Carve-outs R-2 (U_eff = 0.4 U_ref) and R-5 (hold astern) | without them the rule-consistent Rule 8(e) slowdown is structurally unlearnable; gated so "always slow" is not rewarded | ungated: the degenerate always-slow policy |
   | Slowdown credited only if stopping clears (≥ 1.76 m) | stopping in a reciprocal target's path preserves the conflict | unconditional: the policy stops in front of head-on targets |
-  | Verified property | from one engagement state the compliant 30° crossing turn earns +61 (discounted) over the wrong way, from either side | — |
+  | Verified property | from one engagement state a 30° crossing turn in the required direction earns +61 (discounted) over the same turn the wrong way, from either side | — |
 
 ### 8. Scenarios, curriculum and data sets
 Use facts section 6.
@@ -302,7 +307,8 @@ Use facts section 6.
   guard relaxed then removed, and varying-speed targets.
 - Data sets: the **training set** (generated on the fly from the training
   seeds) / the **validation set** (270
-  episodes: 120 decoupled + 150 coupled, used only to select checkpoints) /
+  episodes: 120 decoupled + 150 coupled; checkpoint selection, comparator
+  tuning and learning curves) /
   the **test set** (test set v4: 1,000 held-out episodes, 664 decoupled + 336 coupled,
   touched once per policy) / robustness set / width sweep and perception
   degradation (planned studies), with a seed-namespace diagram showing they

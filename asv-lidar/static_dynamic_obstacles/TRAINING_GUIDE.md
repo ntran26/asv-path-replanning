@@ -42,8 +42,8 @@ Inside a run folder:
 | File | What it is |
 |---|---|
 | `best_model.zip` | **the model the paper uses** — best validation-set score (goal − 2 × collision, safety layer off) |
-| `final_model.zip` | the model at 3.0 M steps (after the 2.5 → 3.0 M extension); its presence means the run is **finished** |
-| `final_model_2500000.zip` | the model at 2.5 M, kept when the extension starts |
+| `final_model.zip` | the model at 3.0 M steps; its presence means the run is **finished** |
+| `final_model_2500000.zip` | the model at 2.5 M (seed 0: kept when the extension starts; seeds 1-2: copied from the 2.5 M checkpoint) |
 | `<learner>_<steps>_steps.zip` | checkpoints every 250 k steps (what a resume starts from) |
 | `*vecnormalize*.pkl` | reward normalisation statistics (a few KB) |
 | `config.json` | everything the run used: settings, baseline id and digest, software versions, git commit, any resumes |
@@ -97,13 +97,27 @@ script:
    robustness set) on the run's `best_model.zip`, and for baseline-v3 the
    reference-layout set, all with the safety layer off, skipping any already done.
 
-**The 2.5 → 3.0 M extension.** baseline-v3's budget is 2.5 M steps
-(`timesteps` in the config), and every paper run is then extended to 3.0 M with
-stage 7 continuing. `train_seed.sh` trains to 2.5 M only, so a paper run goes
-through a wrapper that trains, extends, calls `train_seed.sh` for the
-evaluations and then runs test set v4: **`bash results/run_bl3.sh <algo> <seed>`** does
-all four steps (resuming either phase from its last checkpoint) and applies the CPU
-setting below; `--after-evaluations` makes it wait until no evaluation is running.
+**Training to 3.0 M.** baseline-v3's frozen budget is 2.5 M steps (`timesteps` in
+the config), and the stage boundaries are fractions of it (0.16, 0.36, 0.64, 1.0, 1.5
+and 2.0 M); every paper run trains to 3.0 M with stage 7 continuing past 2.5 M.
+`train_seed.sh` trains to 2.5 M only, so a paper run goes through a wrapper that
+trains, calls `train_seed.sh` for the evaluations and then runs test set v4:
+
+- **Seed 0** (all four learners, done): **`bash results/run_bl3.sh <algo> 0`** trained
+  to 2.5 M, stopped, and extended to 3.0 M with `--resume ... --extend-to 3000000`.
+- **Seeds 1 and 2 (decision, 2026-10-10): `bash results/run_bl3_3m.sh <algo> <seed>`**
+  trains straight to 3.0 M in one run with `--train-to 3000000`, which keeps the stage
+  boundaries on the 2.5 M schedule and holds stage 7 to the end, so the curriculum
+  timing matches seed 0 without the stop (a plain 3.0 M budget would stretch every
+  stage by 20 % and shorten stage 7 from 1.0 M to 0.6 M steps). The evaluation points
+  match seed 0 too: every 200,000 steps, plus 2.5 M for SAC and TQC (`--extra-evals
+  2500000`; seed 0's PPO and RecurrentPPO kept no evaluation there). The pause itself
+  changes nothing else: weights, optimizer state, entropy temperature, reward
+  normalisation, the replay buffer and the best-score history all carry across a
+  resume.
+
+Both wrappers resume from the last checkpoint, apply the CPU setting below, and take
+`--after-evaluations` to wait until no evaluation is running.
 
 It is safe to start again at any time with the same learner and seed: it picks up
 where it stopped. (`bash results/train_seed.sh tqc 0` would, for instance, run
@@ -125,8 +139,11 @@ and pinned to the P-cores RecurrentPPO fell from 70-100 to 13-25 steps/s. For SA
 TQC, `bash results/bench_cpu.sh <algo> <seed>` measures three 4,096-step smoke runs
 (learner pinned to the P-cores 0x00F with workers on the E-cores 0xFF0, the same with
 4 PyTorch threads, and unpinned), writes `results/bench_cpu_<algo>.txt` and starts the
-run with the fastest. Later seeds of the same learner reuse the winner
-(`PIN=0|1 THREADS=n bash results/run_bl3.sh <algo> <seed>`).
+run with the fastest (for seeds 1-2 it starts `results/run_bl3_3m.sh`). Later seeds of
+the same learner reuse the winner (`PIN=0|1 THREADS=n bash results/run_bl3_3m.sh <algo>
+<seed>`). Measured winner for TQC: pinned with 4 threads (10.5 steps/s in the
+benchmark, about 14-16 in training; `run_bl3_3m.sh`'s TQC default). SAC has not been
+benchmarked yet: its seed 1 goes through `bench_cpu.sh` first.
 
 **Safety layer in evaluations (decision, 2026-10-07).** Runs evaluate with the
 safety layer off only: `train_seed.sh` passes `--eval-safety-override off` to the
@@ -247,10 +264,12 @@ Train, or resume, a run:
 ```bash
 python src/train_formulation.py --config configs/baseline_v3.json --algo sac --seed 1 --tag bl3 --eval-safety-override off
 python src/train_formulation.py --config configs/baseline_v3.json --algo sac --seed 1 --tag bl3 --eval-safety-override off --resume runs/sac_formulation_seed1_bl3
-python src/train_formulation.py --config configs/baseline_v3.json --algo sac --seed 1 --tag bl3 --eval-safety-override off --resume runs/sac_formulation_seed1_bl3 --extend-to 3000000
+python src/train_formulation.py --config configs/baseline_v3.json --algo sac --seed 1 --tag bl3 --eval-safety-override off --train-to 3000000 --extra-evals 2500000
 ```
 
-With `--config`, only `--algo`, `--seed`, `--tag`, `--resume`, `--extend-to`, the
+(`--resume runs/<run> --extend-to 3000000` is the seed-0 extension; `--train-to` is
+the seeds 1-2 straight run.) With `--config`, only `--algo`, `--seed`, `--tag`,
+`--resume`, `--extend-to`, `--train-to`, `--extra-evals`, the
 reporting-only `--eval-safety-override` and speed settings (`--torch-threads`)
 come from the command line; everything else comes from the file. `td3` still works but is not
 part of the baseline.

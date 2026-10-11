@@ -904,7 +904,7 @@ New code is confined to `src/safety_v20*.py`, its tests and V20 tools. V16, the 
 
 ## 18. Continuation, 2026-10-10: test set v4 with OFF, V16 and V20 revision 2
 
-This section is appended; sections 1-17 are unchanged. At the user's request, test set v4 ran with fresh OFF, fresh V16 and V20 revision 2. Revision 2 is the V20 configuration with the fewest development contacts; it is not promoted. Its choice was recorded before any test-set outcome was read ([V20 plan](SAFETY_V20_PLAN.md) section 17). All 1,000 scenarios ran in definition order from the trusted cache, paired by test ID, episode seed and scenario digest. Nothing was tuned on any outcome.
+This section is appended; sections 1-17 are unchanged. By decision (2026-10-10), test set v4 ran with fresh OFF, fresh V16 and V20 revision 2. Revision 2 is the V20 configuration with the fewest development contacts; it is not promoted. Its choice was recorded before any test-set outcome was read ([V20 plan](SAFETY_V20_PLAN.md) section 17). All 1,000 scenarios ran in definition order from the trusted cache, paired by test ID, episode seed and scenario digest. Nothing was tuned on any outcome.
 
 | Controller | Goals | Obstacle | Boundary | Target | Contacts | Timeout | Rescued SAC failures | Lost SAC successes |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -927,13 +927,13 @@ Report: [`testset_v4_main/reports/off_v16_r2_1000`](../results/safety_dev/testse
 
 This section is appended; sections 1-18 are unchanged.
 
-**The protocol.** The user relaxed the objective so that a certain collision may end in a permanent stop, and fixed the protocol's loose ends ([emergency-stop protocol](SAFETY_ESTOP_PROTOCOL.md)):
+**The protocol.** The objective was relaxed (decision, 2026-10-10) so that a certain collision may end in a permanent stop, and the protocol's open details were fixed ([emergency-stop protocol](SAFETY_ESTOP_PROTOCOL.md)):
 - An onboard detector stops the boat (full astern, rudder centred, permanent) when every candidate command and continuation is predicted to make physical contact within W = 1.5 s.
 - Target ships then brake to rest at 0.471 m/s².
 - The episode ends as "stopped" once the boat and all targets are still.
 - A target hitting the stopped boat is "collision by target ship".
 
-**Choice of W.** A screen on saved development traces showed that the obstacle memory (remembered static LiDAR points near the hull) causes every short-window false alarm. The user chose to keep it in the trigger and accept the false alarms.
+**Choice of W.** A screen on saved development traces showed that the obstacle memory (remembered static LiDAR points near the hull) causes every short-window false alarm. By decision, it was kept in the trigger and the false alarms were accepted.
 
 **Test set v4, 1,000 scenarios, paired with fresh OFF and V16:**
 
@@ -952,7 +952,7 @@ The rule reduces own-ship contacts by about a fifth, but total contacts barely c
 
 ## 20. Continuation, 2026-10-11: emergency stop triggered by the map boundary and target ships only
 
-This section is appended; sections 1-19 are unchanged. At the user's request, the emergency-stop trigger was rerun with the remembered static LiDAR points left out of the contact check, at W = 2.5 s. That is the window the pre-registered rule selects on the development screen without static points ([protocol](SAFETY_ESTOP_PROTOCOL.md) section 8).
+This section is appended; sections 1-19 are unchanged. By decision (2026-10-11), the emergency-stop trigger was rerun with the remembered static LiDAR points left out of the contact check, at W = 2.5 s. That is the window the pre-registered rule selects on the development screen without static points ([protocol](SAFETY_ESTOP_PROTOCOL.md) section 8).
 
 **Test set v4, 1,000 scenarios, paired with fresh OFF and V16:**
 
@@ -973,4 +973,4 @@ This section is appended; sections 1-19 are unchanged. At the user's request, th
 | Goal to stopped (false alarm) | 7 |
 | Goal to contact | 4 |
 
-Own-ship contacts fall by about a fifth (96 to 77) and all contacts from 96 to 85, for 11 fewer goals (about 1.2 %). Under the user's relaxed scoring this is the first configuration that reduces contacts relative to V16 at a small cost in goals. It remains a tradeoff, not a strict improvement, and it is not promoted.
+Own-ship contacts fall by about a fifth (96 to 77) and all contacts from 96 to 85, for 11 fewer goals (about 1.2 %). Under the relaxed scoring of section 19 this is the first configuration that reduces contacts relative to V16 at a small cost in goals. It remains a tradeoff, not a strict improvement, and it is not promoted.

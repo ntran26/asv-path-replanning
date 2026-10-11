@@ -25,7 +25,8 @@
 >
 > - **Four contributions**, not seven (section 1.3): the formulation; a geometric
 >   framework for constrained encounter responses (absorbs the width sweep); the
->   controlled four-learner comparison with classical references; an evaluation
+>   controlled four-learner comparison with classical references (restated on 2026-10-10 as a
+>   deployed policy chosen and benchmarked fairly, below); an evaluation
 >   design separating safety, rule-related behaviour and robustness (absorbs the
 >   perception study and the protocol). Old C1-C7 are mapped in section 1.3.
 > - **Rule 9 is stated as an adopted operating convention**, not a legal finding:
@@ -36,8 +37,8 @@
 >   responses"; was "Rule precedence"); its tables are unchanged.
 > - **Comparators:** COLREGs-VO (Kuwata et al., 2014), "a narrow-channel
 >   encounter-specific adaptation" of it (the encounter-specific VO,
->   `src/classical/encounter_vo.py`), and LOS-PID with a DWA layer, all on the same
->   perception pipeline. The prior-paper SAC and the NMPC option are not named in
+>   `src/classical/encounter_vo.py`; dropped from the paper on 2026-10-08), and LOS-PID
+>   with a DWA layer, all on the same perception pipeline. The prior-paper SAC and the NMPC option are not named in
 >   draft 4 (section 3.3).
 > - **Physical transfer is "planned"**: the design "provides a basis for the
 >   planned physical-transfer assessment", and the roadmap has no field section.
@@ -48,7 +49,7 @@
 >   learner differences across seeds (RQ5). RQ2 (the ablation) and RQ4 (field)
 >   are not stated in draft 4.
 >
-> Carried from revision 3: framing **formulation plus a four-learner comparison**
+> Carried from revision 3 (its framing superseded on 2026-10-10, below): **formulation plus a four-learner comparison**
 > (PPO, RecurrentPPO, SAC, TQC) under baseline-v2 (digest `3d697858e95e5adf`);
 > **2 M steps, 3 seeds**, best-on-development checkpoint (seed 0 of all four
 > trained); **suite 3.4** (800 constant-velocity headline episodes per seed plus a
@@ -56,11 +57,28 @@
 > set and the field fine-tune (F104-F107), status open (S12). **Open:** A35 (the
 > COLREGs-VO comparator's side rule), S12, S13.
 
-**Working title:** Sensor-Realistic COLREGs-Aware Path Following and Collision Avoidance for Autonomous Surface Vessels in Confined Water: A Deep Reinforcement Learning Formulation and Learner Comparison
+> **Framing (decision, 2026-10-10).** The paper develops a formulation and deploys one policy trained
+> on it; it is not a learner-comparison study. The other learners make the evaluation fair (Paper 2's
+> first draft compared SAC with no other learner). **Proposed method:** the frozen formulation and the
+> deployed policy. **Baselines:** the other learners on the identical formulation (PPO, RecurrentPPO,
+> and whichever of SAC and TQC is not deployed; three seeds each, checkpoints selected on the
+> validation set) and the classical references LOS-PID + DWA and COLREGs-VO. **Deployment choice:**
+> the better of SAC and TQC on test set v4 (the larger and more balanced set), on its three-seed
+> mean, with the classical references compared on the same set; the deployed seed is the one with
+> the best validation score. The test set therefore also chooses the learner family; the paper states
+> this, and the field trials (S13) are the independent evaluation of the deployed policy.
+> **Sensing:** the formulation is stated for onboard perception in general (pooled range returns,
+> target tracks and a map boundary) and is not tied to LiDAR, following the supervisors' guidance
+> for Paper 2: this study implements it with a 2D LiDAR, and another range sensor such as radar
+> could supply the same observation through its own detection and tracking. That portability is a
+> design property, not a tested result. LiDAR stays out of the title and the contribution names.
+
+**Working title:** A Deep Reinforcement Learning Formulation for COLREGs-Aware Path Following and Collision Avoidance of Autonomous Surface Vessels in Confined Water
 
 **Alternative titles:**
-- COLREGs-Aware Collision Avoidance in Confined Water from Onboard LiDAR: One Formulation, Four Learners
-- When the Channel Decides: Rule 9 Precedence in Learned COLREGs Collision Avoidance from Onboard Range Sensing \[check against draft 4's softer Rule 9 stance before use\]
+- \[S13(a), with the field trials\] A Deep Reinforcement Learning Formulation for COLREGs-Aware Path Following and Collision Avoidance of Autonomous Surface Vessels in Confined Water: From Simulation to Field Trials
+- COLREGs-Aware Path Following and Collision Avoidance in Confined Water from Onboard Perception: Formulation and Deployment of a Deep Reinforcement Learning Policy
+- When the Channel Decides: Rule 9 Precedence in Learned COLREGs Collision Avoidance from Onboard Range Sensing \[only if the width sweep is run; check against draft 4's softer Rule 9 stance before use\]
 
 **Authors:** H. N. Tran, H. Nguyen, P. King, M. Tran (order TBC)
 
@@ -85,11 +103,11 @@ Scope decisions carried into this revision
 | S4     | Six episode types: no target, null (a target that never meets the own ship), head-on, crossing, overtaking, being overtaken. |
 | S5     | Rule 17(a)(i) course-keeping for the being-overtaken class. Rule 17(b) (last-moment action) is out of scope **by construction**: every being-overtaken draw passes at or above a contact-free floor (baseline-v2, F96). |
 | S6     | The target branch is a shared-weight slot encoder, so a multi-vessel extension costs a retrain, not a redesign.                |
-| S7     | **Onboard sensing only.** Target state is estimated from a 360° 2D LiDAR (motion classifier, tracker); no AIS, no ground-truth target in the policy input. The navigable limit is a map boundary ray-cast at the noisy estimated pose. Simulator ground truth is used for collision and clearance rewards in training (draft 4 section 1.3). |
+| S7     | **Onboard sensing only.** The observation is built from pooled range returns, target tracks and a map boundary, a sensor-agnostic interface: this study supplies it with a 360° 2D LiDAR (motion classifier, tracker), and another range sensor such as radar could supply it through its own detection and tracking (not tested here). No AIS, no ground-truth target in the policy input. The navigable limit is a map boundary ray-cast at the noisy estimated pose. Simulator ground truth is used for collision and clearance rewards in training (draft 4 section 1.3). |
 | S8     | **Training targets hold constant velocity and never give way** (D1). Reactive (compliant) and non-compliant targets appear only in evaluation (the robustness set, R3). |
 | S9     | **Geometry:** the 10 x 25 m basin of Paper 2's field site (straight and slanted legs, the default) and parallel-walled channels. Headline channels 7.5-10 m; the width sweep (R4) goes to 3.5 m. Every layout admits a static route (A* filter, F74) -- not a proof that every dynamic encounter is avoidable (draft 4 section 1.3). |
 | S10    | **8(e) in two layers:** the learned policy slackens speed; an engineered runtime safety layer, off during training, takes all way off when a collision is imminent. Compliance is reported with it **off** (C-7); its interventions are not attributed to the policy. |
-| S11    | **Formulation plus comparison:** one frozen formulation (observation, reward, curriculum, dynamics), four learners (on-policy, recurrent, off-policy, distributional), 3 seeds, 2 M steps, checkpoint selected on the validation set, the frozen suite touched once per policy. |
+| S11    | **Formulation, deployed policy and baselines (2026-10-10):** one frozen formulation (observation, reward, curriculum, dynamics); four learners trained on it (on-policy, recurrent, off-policy, distributional), 3 seeds each, 3.0 M steps, checkpoints selected on the validation set; the deployed policy is the better of SAC and TQC on test set v4 (three-seed mean; deployed seed by validation score), with the other learners and the classical references compared on the same set. |
 | S12    | \[TBC\] The Paper 2 deployment-layout set and the field fine-tune (F104-F107): report as a field-readiness study, as the bridge to the field trials, or leave to the field paper. |
 | S13    | \[TBC, new 2026-09-28\] **Physical transfer.** Draft 4 calls it "planned" and its roadmap has no field section. Either (a) keep basin trials in this paper -- add a field section to the roadmap and keep RQ4, C-6 and old C7; or (b) move them to the field paper -- drop RQ4 and C-6 here and state the transfer as future work. Old section 7 is parked, unnumbered, after section 4 until then. |
 
@@ -97,9 +115,9 @@ Abstract
 
 *Draft skeleton — write last, but fix the shape now. Sentences marked \[RESULT\] wait for the three-seed campaign. \[Align with draft 4 before use: Rule 9 as an adopted convention, width as a geometric variable, the four contributions, and S13.\]*
 
-Autonomous surface vessels in restricted waterways must follow a planned route, keep clear of static hazards and resolve encounters with other vessels in keeping with the collision regulations, under geometric limits that open-water methods do not face: in narrow water, Rule 9 decides which manoeuvre is admissible before Rules 13 to 17 decide which is required. Learning-based COLREGs methods almost universally take the other vessel's state from AIS or a simulation oracle and are developed around a single learning algorithm. This paper presents a deep reinforcement learning formulation for path following, static obstacle avoidance and COLREGs-aware manoeuvring against a moving target in confined water, driven entirely by onboard sensing: the target is detected and tracked from a two-dimensional LiDAR, and the observation combines pooled range sensing, a map-derived boundary, a tracked-target branch and an encounter-context branch that makes the reward's judgement of the encounter observable. A COLREGs reward group reads the encounter as the vessel perceives it, with Rule 9 governing precedence where the open-water manoeuvre does not fit, and an engineered runtime layer separates learned speed reduction from an emergency stop. The formulation is frozen and four learners — PPO, recurrent PPO, SAC and TQC — are trained on it under an identical protocol and evaluated once on a held-out suite of \[800\] episodes per seed and a robustness set with reactive and non-compliant targets. \[RESULT\] The learners reach \[X-Y\]% success, against \[Z\]% for COLREGs-aware velocity-obstacle and dynamic-window comparators; crossing encounters remain the dominant failure for every learner. A channel-width sweep locates where each classical comparator becomes inadmissible, a perception-degradation study characterises how encounter safety degrades as tracking degrades, and \[the transfer to a 1.73 m model vessel is evaluated in basin trials — TBC, S13\].
+Autonomous surface vessels in restricted waterways must follow a planned route, keep clear of static hazards and resolve encounters with other vessels in keeping with the collision regulations, under geometric limits that open-water methods do not face: in narrow water, Rule 9 decides which manoeuvre is admissible before Rules 13 to 17 decide which is required. Learning-based COLREGs methods almost universally take the other vessel's state from AIS or a simulation oracle, and are seldom evaluated against other learning algorithms on the same problem. This paper presents a deep reinforcement learning formulation for path following, static obstacle avoidance and COLREGs-aware manoeuvring against a moving target in confined water, driven entirely by onboard perception: the observation combines pooled range sensing, a map-derived boundary, a tracked-target branch and an encounter-context branch that makes the reward's judgement of the encounter observable, an interface that any range sensor with detection and tracking can supply (a two-dimensional LiDAR here). A COLREGs reward group reads the encounter as the vessel perceives it, with Rule 9 governing precedence where the open-water manoeuvre does not fit, and an engineered runtime layer separates learned speed reduction from an emergency stop. The formulation is frozen; four learners (PPO, recurrent PPO, SAC and TQC) are trained on it under an identical protocol, and the policy for deployment is the best of them on a 1,000-episode held-out test set of decoupled and coupled scenarios with constant-velocity, reactive and noncompliant targets, compared on the same set with COLREGs-aware velocity-obstacle and dynamic-window methods. \[RESULT\] The deployed policy reaches \[X\]% success, against \[Y-Z\]% for the other learners and \[W\]% for the classical methods; crossing encounters remain the dominant failure \[check\]. A channel-width sweep locates where each classical comparator becomes inadmissible, a perception-degradation study characterises how encounter safety degrades as tracking degrades, and \[the transfer to a 1.73 m model vessel is evaluated in basin trials — TBC, S13\].
 
-**Keywords:** autonomous surface vessel; COLREGs; Rule 9; narrow channel; deep reinforcement learning; learner comparison; LiDAR perception; collision avoidance
+**Keywords:** autonomous surface vessel; COLREGs; Rule 9; narrow channel; deep reinforcement learning; problem formulation; onboard perception; collision avoidance
 
 1\. Introduction
 
@@ -141,9 +159,9 @@ Automatic COLREG evaluation encodes the evaluator's interpretation (Hagen et al.
 
 1.3 Scope, objective and contributions
 
-**Objective** (draft 4): develop and evaluate a sensor-realistic DRL formulation for path following, static-obstacle avoidance and COLREGs-aware two-vessel encounters in confined water, and compare PPO, recurrent PPO, SAC and TQC under that shared formulation.
+**Objective** (revised 2026-10-10): develop a DRL formulation, driven by onboard perception, for path following, static-obstacle avoidance and COLREGs-aware two-vessel encounters in confined water, and deploy the best policy trained on it, chosen on the test set against the other learners under the same formulation (PPO, recurrent PPO, SAC, TQC) and against classical references.
 
-**Scope** (draft 4; see S1-S13): one model-scale ASV, one moving target, up to three static obstacles, 10 x 25 m basin and parallel-walled channels; continuous rudder and propulsion at 2 Hz; target from onboard 2D LiDAR (no AIS, no ground-truth target in the policy input); map-derived boundaries at the estimated pose; detection, tracking and encounter classification as explicit stages. Selected requirements of Rules 8, 9, 13, 14, 15/16 and 17(a)(i); the narrow-channel crossing convention (S3); excluded: Rule 17(a)(ii) and 17(b), Rule 18, Rule 19, signalling, simultaneous multiple targets. Constant-velocity, non-cooperating training targets; reactive and non-compliant targets for robustness only. Headline: 800 held-out constant-velocity scenarios per seed (basin, and channels 7.5-10 m); a separate 3.5-10 m width sweep; the stopping safety layer evaluated separately and off for learned-compliance results.
+**Scope** (draft 4; see S1-S13): one model-scale ASV, one moving target, up to three static obstacles, 10 x 25 m basin and parallel-walled channels; continuous rudder and propulsion at 2 Hz; target tracks from onboard perception, a 2D LiDAR in this study (no AIS, no ground-truth target in the policy input); map-derived boundaries at the estimated pose; detection, tracking and encounter classification as explicit stages. Selected requirements of Rules 8, 9, 13, 14, 15/16 and 17(a)(i); the narrow-channel crossing convention (S3); excluded: Rule 17(a)(ii) and 17(b), Rule 18, Rule 19, signalling, simultaneous multiple targets. Non-cooperating training targets that hold their course (30 % of stage-7 coupled targets change speed once); reactive and noncompliant targets in the test set and the robustness set. Headline: test set v4, 1,000 held-out episodes (664 decoupled, 336 coupled); a separate 3.5-10 m width sweep (planned); the runtime safety layer evaluated separately and off for learned-behaviour results.
 
 Research questions -- draft 4 states four central questions (RQ1, RQ6, RQ3, RQ5):
 
@@ -153,7 +171,7 @@ Research questions -- draft 4 states four central questions (RQ1, RQ6, RQ3, RQ5)
 
 - **RQ3 —** How does perception degradation affect safety and compliance, and at what point does the policy fail unsafely rather than conservatively?
 
-- **RQ5 —** Under one frozen formulation, which differences between on-policy, recurrent, off-policy and distributional learners -- in success, compliance by encounter and side, and robustness to target behaviour -- remain meaningful across training seeds?
+- **RQ5 —** Under one frozen formulation, which learner's policy should be deployed, and which differences between on-policy, recurrent, off-policy and distributional learners -- in success, behaviour by encounter type and robustness to target behaviour -- remain meaningful across training seeds?
 
 - **RQ2 —** Does making the encounter explicit in the observation improve compliance over reward shaping alone? \[Not stated in draft 4; the ablation (C-4, three rungs) still supports its section 1.2.2 argument on supplied context versus learned response. TBC — ablation budget.\]
 
@@ -163,17 +181,17 @@ Contributions (draft 4's four; the table maps revision 3's seven onto them)
 
 | **\#** | **Contribution** | **Revision 3** |
 |--------|------------------|----------------|
-| C1     | **A sensor- and encounter-aware learning formulation.** One observation and reward design combining tracked LiDAR target information, map-derived boundaries, own-ship and path states, and explicit encounter context: the classifier supplies the encounter regime, the policy learns the rudder-and-propulsion response. Encounter-dependent reward terms support route completion, clearance and selected COLREGs behaviours, without treating reward shaping as a formal safety guarantee. Frozen, digest-checked and released. | C1 |
+| C1     | **A sensor- and encounter-aware learning formulation.** One observation and reward design combining tracked target information from onboard range sensing (implemented with a 2D LiDAR; the interface admits other range sensors such as radar), map-derived boundaries, own-ship and path states, and explicit encounter context: the classifier supplies the encounter regime, the policy learns the rudder-and-propulsion response. Encounter-dependent reward terms support route completion, clearance and selected COLREGs behaviours, without treating reward shaping as a formal safety guarantee. Frozen, digest-checked and released. | C1 |
 | C2     | **A geometric framework for constrained encounter responses.** Relates available maneuvering space to an encounter-consistent course alteration, holding astern, or speed reduction where predicted clearance supports it; the channel-width sweep tests configuration-dependent admissibility thresholds and changes in manoeuvre choice, not legal precedence from width alone. | C2 + C4 |
-| C3     | **A controlled four-learner comparison with classical references.** PPO, recurrent PPO, SAC and TQC on the frozen formulation, 2 M steps, 3 seeds, checkpoint selection confined to a separate validation set; COLREGs-VO, its narrow-channel encounter-specific adaptation, and LOS-PID with a DWA layer as nonlearned comparators on the same perception pipeline; differences reported with seed variability, no preferred learner assumed. | C3 (+ C6's protocol) |
-| C4     | **An evaluation design separating safety, rule-related behaviour and robustness.** Held-out scenarios, paired target-behaviour tests, the width sweep and the perception-degradation study (pose error, dropout, occlusion, velocity-estimation error) distinguish task completion from collision type, encounter violations and intervention dependence, and give the basis for the planned physical-transfer assessment. \[TBC S12: plus the field-stageable Paper 2 deployment-layout set.\] | C5 + C6 |
+| C3     | **A deployed policy, chosen and benchmarked fairly.** Four learners (PPO, recurrent PPO, SAC and TQC) trained on the frozen formulation (3.0 M steps, 3 seeds, checkpoints selected on a separate validation set); the policy for field deployment is the better of SAC and TQC on the held-out test set, benchmarked there against the other learners and against COLREGs-VO and LOS-PID with a DWA layer on the same perception pipeline, with seed variability reported. The learned baselines close the gap in Paper 2's first draft, which evaluated SAC alone. | C3 (+ C6's protocol) |
+| C4     | **An evaluation design separating safety, rule-related behaviour and robustness.** Held-out scenarios, paired target-behaviour tests, the width sweep and the perception-degradation study (pose error, dropout, occlusion, velocity-estimation error) distinguish task completion from collision type, target-ship safety and intervention dependence, and give the basis for the planned physical-transfer assessment. \[TBC S12: plus the field-stageable Paper 2 deployment-layout set.\] | C5 + C6 |
 | —      | Sim-to-field transfer (system identification, randomisation over identified uncertainty, basin trials) | C7 -> S13 |
 
 Novelty in one paragraph
 
 *For the cover letter. Draft 4 claims the intersection (section 1.2.5); keep this consistent with it.*
 
-To the authors' knowledge this is the first learned COLREGs collision-avoidance study that (i) perceives the other vessel only through onboard 2D LiDAR, in training as well as evaluation, while (ii) evaluating how the admissible encounter response changes with channel width under a declared narrow-channel convention, (iii) in water shared with static obstacles, and (iv) separates the contribution of the formulation from that of the learner by training four learner families on one frozen formulation and evaluating them once on a pre-registered held-out suite. \[VERIFY each clause against section 1.2 before submission; claim the intersection, not any single thread.\]
+To the authors' knowledge this is the first learned COLREGs collision-avoidance study that (i) perceives the other vessel only through onboard perception (a 2D LiDAR here, behind a sensor-agnostic observation), in training as well as evaluation, while (ii) evaluating how the admissible encounter response changes with channel width under a declared narrow-channel convention, (iii) in water shared with static obstacles, and (iv) deploys a policy chosen against other learner families trained on the identical frozen formulation and against classical references, on a held-out test set. \[VERIFY each clause against section 1.2 before submission; claim the intersection, not any single thread.\]
 
 What the paper does not claim
 
@@ -353,18 +371,17 @@ One multi-input policy over the **six** observation branches (70 values), identi
 
 3.2 Training protocol
 
-2 M environment steps per run, **three** seeds per learner (2026-09-24; was five), checkpoint selected on the validation set (goal − 2 × collision), frozen suite touched once per policy. Runs trained on demand, one learner × seed at a time. Hyperparameters in Appendix B.
+3.0 M environment steps per run (stage boundaries at 0.16-2.0 M on the 2.5 M schedule, stage 7 to the end), **three** seeds per learner (2026-09-24; was five), checkpoint selected on the validation set (goal − 2 × collision); test set v4 touched once per policy, and the deployed learner chosen on it (S11). Runs trained on demand, one learner × seed at a time. Hyperparameters in Appendix B.
 
-3.3 Classical comparators
+3.3 Baselines
 
 | **Family** | **Method**                                                                                         |
 |------------|----------------------------------------------------------------------------------------------------|
 | Classical  | LOS-PID with dynamic window approach (Fox et al. 1997)                                            |
 | Classical  | COLREGs-aware velocity obstacles (Kuwata et al. 2014) — its rule from the target's side is also the reactive target model; side rule open (A35) |
-| Classical  | Encounter-specific VO — the same machinery under the narrow-channel convention (draft 4: "a narrow-channel encounter-specific adaptation"; revision 3 credited Thyri & Breivik 2022) |
 | Classical  | \[Optional, not in draft 4\] NMPC with COLREGs constraints                                         |
 | Learned    | Prior-paper SAC, unmodified, zero-shot (frozen) \[not in draft 4\]                                 |
-| Learned    | PPO, RecurrentPPO, SAC, TQC on the identical formulation (the comparison itself)                   |
+| Learned    | PPO, RecurrentPPO, SAC, TQC on the identical formulation: the deployed policy (the better of SAC and TQC on the test set) and the learned baselines |
 | Learned    | COLREGs-ablated policy (avoidance only)                                                            |
 
 All comparators receive the same perception pipeline (draft 4). Classical baselines are run against reactive targets as well, or the comparison is not like-for-like. Tuned on the validation set and pinned in `configs/comparators_v1.json`.
@@ -420,17 +437,16 @@ This answers the question a sceptical reviewer will actually ask: is compliance 
 
 4.1 Overall performance (held-out results)
 
-Table R1 — Tier B holdout (suite 3.4: 800 constant-velocity episodes per seed, 3 seeds). \[RESULT\]
+Table R1 — test set v4 (1,000 held-out episodes; learners as three-seed means with the seed range). \[RESULT\]
 
 | **Method**            | **Success** | **Static coll.** | **Boundary coll.** | **Target coll.** | **RMS CTE (m)** | **Path ratio** |
 |-----------------------|-------------|------------------|--------------------|------------------|-----------------|----------------|
+| **Deployed policy (SAC or TQC)** |  |                  |                    |                  |                 |                |
 | PPO                   |             |                  |                    |                  |                 |                |
 | RecurrentPPO          |             |                  |                    |                  |                 |                |
-| SAC                   |             |                  |                    |                  |                 |                |
-| TQC                   |             |                  |                    |                  |                 |                |
+| SAC or TQC (not deployed) |         |                  |                    |                  |                 |                |
 | No COLREGs terms (ablation, budget TBC) |             |                  |                    |                  |                 |                |
 | Prior SAC (frozen)    |             |                  |                    |                  |                 |                |
-| Encounter-specific VO |             |                  |                    |                  |                 |                |
 | COLREGs-VO            |             |                  |                    |                  |                 |                |
 | LOS-PID + DWA         |             |                  |                    |                  |                 |                |
 
@@ -556,6 +572,10 @@ P.6 Results
 - Single dynamic target; sequential rather than concurrent multi-vessel encounters
 
 - Active stand-on release under Rule 17(a)(ii) is out of scope
+
+- The deployed learner is chosen on the test set, so its test-set figures include that choice (between two learners, on 1,000 episodes × 3 seeds, with checkpoints selected on the validation set); the field trials are its independent evaluation \[S13\]
+
+- Only LiDAR supplies the onboard perception here; the observation interface is sensor-agnostic, but another range sensor such as radar is not tested
 
 - Stand-on course-keeping competes with the ship-domain term: the domain term (weight 12.5 per decision) outweighs the whole COLREGs group (capped at 9), so letting an overtaking target into the domain astern costs more than departing from Rule 17(a)(i). The learned policies change speed while being overtaken (seed 0: SAC speeds up, PPO slows), shown by the track-based diagnostics, not reported as a rate
 

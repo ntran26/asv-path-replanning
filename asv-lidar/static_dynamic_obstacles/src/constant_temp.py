@@ -64,7 +64,7 @@ CLASSICAL_PID_I_GATE_DEG = 10.0          # integral acts only inside this error
 CLASSICAL_PID_I_LIMIT = 0.15             # rudder units
 
 # Yaw-rate and speed loops.
-CLASSICAL_YAW_RATE_GAIN_DPS = 10.4       # deg/s at full rudder, identified plant
+CLASSICAL_YAW_RATE_GAIN_DPS = 10.4       # feed-forward scale, deg/s per unit rudder (see classical/common.py)
 CLASSICAL_YAW_RATE_KP = 0.08             # rudder units per deg/s of error
 CLASSICAL_SPEED_KP_RPM = 6.0             # rpm-units per m/s of speed error
 
@@ -79,7 +79,7 @@ CLASSICAL_TRACK_EXCLUSION_M = 1.8        # returns this close to a track are the
 CLASSICAL_DWA_TRAVEL_M = 5.5             # static obstacles judged over this track (10 s at cruise)
 CLASSICAL_DWA_TARGET_HORIZON_S = 10.0    # tracked targets judged over this time
 CLASSICAL_DWA_MAX_HORIZON_S = 16.0       # rollout length for the slowest candidate
-CLASSICAL_DWA_YAW_RATES_DPS = tuple(np.linspace(-9.0, 9.0, 9))   # inside the 10.4 deg/s turn
+CLASSICAL_DWA_YAW_RATES_DPS = tuple(np.linspace(-9.0, 9.0, 9))   # set-points, not achieved rates (common.py)
 CLASSICAL_DWA_SPEED_FRACTIONS = (1.0, 0.5, 0.0)                  # of U_NOM; 0 = propulsion floor
 CLASSICAL_DWA_COMMIT_S = (3.0, 6.0)      # how long a candidate is held
 CLASSICAL_DWA_LOS_SPEED_FRACTIONS = (1.0, 0.5)
