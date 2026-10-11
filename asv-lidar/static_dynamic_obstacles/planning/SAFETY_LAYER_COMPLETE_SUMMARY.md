@@ -949,3 +949,28 @@ This section is appended; sections 1-18 are unchanged.
 - Goals: it turns 27 V16 goals into false-alarm stops and 12 into contacts.
 
 The rule reduces own-ship contacts by about a fifth, but total contacts barely change and goals fall by about 4 %. V16 remains the reference.
+
+## 20. Continuation, 2026-10-11: emergency stop triggered by the map boundary and target ships only
+
+This section is appended; sections 1-19 are unchanged. At the user's request, the emergency-stop trigger was rerun with the remembered static LiDAR points left out of the contact check, at W = 2.5 s. That is the window the pre-registered rule selects on the development screen without static points ([protocol](SAFETY_ESTOP_PROTOCOL.md) section 8).
+
+**Test set v4, 1,000 scenarios, paired with fresh OFF and V16:**
+
+| Controller | Goals | Own-ship contacts | Target strikes on the stopped ship | Stopped | Timeout |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| OFF | 865 | 135 | - | - | 0 |
+| V16 | 904 | 96 | - | - | 0 |
+| V16 + stop, all hazards | 865 | 78 | 15 | 41 | 1 |
+| V16 + stop, boundary and targets | 893 | 77 | 8 | 21 | 1 |
+| V17 + stop, boundary and targets | 894 | 77 | 6 | 23 | 0 |
+
+**V16 with the boundary-and-targets trigger against V16, scenario by scenario.**
+
+| Change | Count |
+| --- | ---: |
+| Contact to stopped or timeout | 15 |
+| Contact to target strike on the stopped ship | 7 |
+| Goal to stopped (false alarm) | 7 |
+| Goal to contact | 4 |
+
+Own-ship contacts fall by about a fifth (96 to 77) and all contacts from 96 to 85, for 11 fewer goals (about 1.2 %). Under the user's relaxed scoring this is the first configuration that reduces contacts relative to V16 at a small cost in goals. It remains a tradeoff, not a strict improvement, and it is not promoted.

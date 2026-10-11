@@ -29,4 +29,8 @@ Revision 2 has the same contact count as V16 (96) with 23 fewer goals. V16 remai
 | V16 | 904 | 96 | - | - | 0 |
 | V16 + stop | 865 | 78 | 15 | 41 | 1 |
 | V17 + stop | 866 | 77 | 11 | 46 | 0 |
+| V16 + stop, boundary and targets only | 893 | 77 | 8 | 21 | 1 |
+| V17 + stop, boundary and targets only | 894 | 77 | 6 | 23 | 0 |
+
+The boundary-and-targets trigger (`runs/ts4_estop_bt_c01`-`c20`, protocol section 8) leaves remembered static points out of the stop check. Report: [`reports/off_v16_estop_bt_1000/`](reports/off_v16_estop_bt_1000/report.md).
 

@@ -138,3 +138,48 @@ At the user's request, a second trigger configuration runs. It is fixed before a
 Obstacle contacts are left to V16/V17's ordinary behaviour, because a remembered point can no longer trigger the stop. A stop committed for a boundary or target reason can still end in an obstacle contact while braking; that is scored as an ordinary own-ship collision.
 
 The runs repeat sections 5 and 7: all 72 development cases, then all 1,000 test-set-v4 scenarios. Both are paired with the existing fresh OFF and V16 records, and nothing is changed after any test-set outcome.
+
+### 8.1 Results, 2026-10-11
+
+Runs: development `estop_bt_probe12`, `estop_bt_cohort32` and `estop_bt_broader40`; test set v4 `ts4_estop_bt_c01`-`c20`.
+
+Reports:
+- [`v20_development/reports/dev72_estop_bt`](../results/safety_dev/v20_development/reports/dev72_estop_bt/report.md)
+- [`testset_v4_main/reports/off_v16_estop_bt_1000`](../results/safety_dev/testset_v4_main/reports/off_v16_estop_bt_1000/report.md)
+
+All runs are paired by test ID, episode seed and scenario digest with the fresh OFF and V16 records. No setting changed after any outcome.
+
+**Development, 72 cases.**
+
+| Controller | Goals | Own-ship contacts (obstacle / boundary / target) | Target strikes on the stopped ship | Stopped | Timeout |
+| --- | ---: | --- | ---: | ---: | ---: |
+| V16 | 50 | 22 (6 / 7 / 9) | - | - | 0 |
+| V16 + stop, boundary and targets | 50 | 13 (7 / 4 / 2) | 4 | 4 | 1 |
+| V17 + stop, boundary and targets | 49 | 13 (5 / 6 / 2) | 3 | 7 | 0 |
+
+**Test set v4, 1,000 scenarios.**
+
+| Controller | Goals | Own-ship contacts (obstacle / boundary / target) | Target strikes on the stopped ship | All contacts | Stopped | Timeout | Rescued SAC failures | Lost SAC successes |
+| --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| OFF | 865 | 135 (70 / 12 / 53) | - | 135 | - | 0 | - | - |
+| V16 | 904 | 96 (46 / 25 / 25) | - | 96 | - | 0 | 50 | 11 |
+| V16 + stop, all hazards (section 7) | 865 | 78 (46 / 21 / 11) | 15 | 93 | 41 | 1 | 38 | 38 |
+| V16 + stop, boundary and targets | 893 | 77 (46 / 20 / 11) | 8 | 85 | 21 | 1 | 47 | 19 |
+| V17 + stop, boundary and targets | 894 | 77 (42 / 23 / 12) | 6 | 83 | 23 | 0 | 52 | 23 |
+
+**V16 + stop (boundary and targets) against V16, scenario by scenario.** It changes no V16 contact into a goal.
+
+| Change | Count |
+| --- | ---: |
+| Contact to stopped or timeout | 15 (target 7, boundary 7, obstacle 1) |
+| Contact to target strike on the stopped ship | 7 (target 5, boundary 2) |
+| Contact type changed | 2 |
+| Goal to stopped (false alarm) | 7 |
+| Goal to boundary contact during the stop | 3 |
+| Goal to target strike | 1 |
+
+**Reading.**
+- Compared with the all-hazards trigger, false-alarm stops fall from 27 to 7 and target strikes on the stopped ship from 15 to 8, while own-ship contacts stay the same (77 against 78). Leaving the remembered static points out of the trigger removes most of the cost without giving up contact reduction, as the development screen predicted.
+- Against V16, own-ship contacts fall by about a fifth (96 to 77) and all contacts by 11 (96 to 85), for 11 fewer goals (904 to 893, about 1.2 %).
+- On development data V16 + stop loses no V16 goal. On the test set it loses 11.
+- Under the user's relaxed scoring, where a stop is better than a collision and worse than a goal, this is the first configuration that reduces contacts relative to V16 at a small cost in goals. It is still a tradeoff, not a strict improvement.
