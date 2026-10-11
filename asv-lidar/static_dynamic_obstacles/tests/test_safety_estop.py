@@ -173,3 +173,14 @@ def test_outcomes_after_commitment():
     ep.after_step(env2, (None, 0.0, True, False, {"collided": True, "collision_kind": "target",
                                                    "reached_goal": False}), 2)
     assert env2.estop_protocol["outcome"] == "collision:by_target"
+
+
+def test_boundary_target_trigger_ignores_static_points():
+    pts = [(x, 6.4) for x in np.linspace(3.5, 6.5, 40)]
+    pts += [(4.45, y) for y in np.linspace(3.0, 6.4, 30)] + [(5.55, y) for y in np.linspace(3.0, 6.4, 30)]
+    snap = make_snap(u=0.9, points=pts)
+    assert se.escape_time(snap, actuators(), GRID, window_s=3.0)[0] <= 3.0
+    assert math.isinf(se.escape_time(snap, actuators(), GRID, window_s=3.0, use_static_points=False)[0])
+    filt = se.SafetyFilterV17E(**se.BOUNDARY_TARGET_OPTIONS)
+    assert filt.estop_window_s == 2.5 and filt.estop_use_static_points is False
+    assert se.SafetyFilterV16E().estop_use_static_points is True

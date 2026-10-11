@@ -125,3 +125,16 @@ Report: [`testset_v4_main/reports/off_v16_estop_1000`](../results/safety_dev/tes
 - **Why target strikes remain.** At the commitment the target is usually already too close to stop. At 0.471 m/s² a target at 1 m/s needs about 1.1 m and 2.1 s.
 - **Goals.** The cost is 39 V16 goals (V16 + stop) and 38 net (V17 + stop). Most are false-alarm stops, the effect accepted when the obstacle memory was kept in the trigger (section 6). On development data every short-window false alarm came from remembered static points.
 - **No promotion.** Neither configuration is promoted. The stop rule trades goals for fewer own-ship contacts.
+
+## 8. Boundary-and-targets trigger, 2026-10-11
+
+At the user's request, a second trigger configuration runs. It is fixed before any of its episodes:
+
+- **Check:** the map boundary and target ships only. The remembered static LiDAR points are left out of the contact check (`use_static_points=False`).
+- **Window:** W = 2.5 s, the window the section 4 rule selects on `screen_v3_no_static`: zero false alarms and 9 caught V16 contact episodes on the development traces. The section 4 rule was pre-registered, and the user's earlier choice was not used here.
+- **Everything else as before:** detector, stop manoeuvre, target braking, stillness termination and scoring are unchanged.
+- **Implementation:** the constructor options `estop_window_s=2.5, use_static_points=False` (`safety_estop.BOUNDARY_TARGET_OPTIONS`). The runner modes are `v16_estop_bt` and `v17_estop_bt`. The earlier modes and module defaults are unchanged.
+
+Obstacle contacts are left to V16/V17's ordinary behaviour, because a remembered point can no longer trigger the stop. A stop committed for a boundary or target reason can still end in an obstacle contact while braking; that is scored as an ordinary own-ship collision.
+
+The runs repeat sections 5 and 7: all 72 development cases, then all 1,000 test-set-v4 scenarios. Both are paired with the existing fresh OFF and V16 records, and nothing is changed after any test-set outcome.

@@ -34,6 +34,9 @@ import ship
 # Chosen by the user from the development screen (planning/SAFETY_ESTOP_PROTOCOL.md
 # section 6): 1.5 s with the obstacle memory included, accepting false alarms.
 ESTOP_WINDOW_S = 1.5
+# Boundary-and-targets trigger (protocol section 8): the window selected by the
+# section 4 rule on the development screen without static points.
+BOUNDARY_TARGET_OPTIONS = {"estop_window_s": 2.5, "use_static_points": False}
 MAX_WINDOW_S = 6.0
 TRUE_HALF_L = 0.5 * ship.VESSEL_LENGTH
 TRUE_HALF_W = 0.5 * ship.VESSEL_WIDTH
@@ -171,8 +174,10 @@ def escape_time(snap, actuators, first_commands, window_s: float = MAX_WINDOW_S,
 class EmergencyStopMixin:
     """Commit to a permanent centred full-astern stop when contact is predicted certain."""
 
-    def __init__(self, *, estop_window_s=None, **options):
+    def __init__(self, *, estop_window_s=None, use_static_points=None, **options):
         super().__init__(**options)
+        self.estop_use_static_points = (USE_STATIC_POINTS if use_static_points is None
+                                        else bool(use_static_points))
         window = ESTOP_WINDOW_S if estop_window_s is None else estop_window_s
         if window is None or not math.isfinite(float(window)) or not 0.0 < float(window) <= MAX_WINDOW_S:
             raise ValueError("estop_window_s must be in (0, MAX_WINDOW_S]")
@@ -210,8 +215,10 @@ class EmergencyStopMixin:
         issued = np.array([float(out[0]), np.nan if brake else float(out[1])])
         grid = [(r, t) for r in v2.RUDDERS for t in v2.THROTTLES] + [(r, np.nan) for r in v2.BRAKE_RUDDERS]
         firsts = np.vstack([sac[None], issued[None], np.asarray(grid, dtype=float)])
-        t_star, details = escape_time(snap, before, firsts)
+        t_star, details = escape_time(snap, before, firsts,
+                                      use_static_points=self.estop_use_static_points)
         self.last.update(estop_t_star=t_star, estop_window_s=self.estop_window_s,
+                         estop_use_static_points=self.estop_use_static_points,
                          estop_seconds=time.perf_counter() - started, estop_details=details)
         if t_star <= self.estop_window_s:
             self.estop_committed_decision = self._estop_decisions

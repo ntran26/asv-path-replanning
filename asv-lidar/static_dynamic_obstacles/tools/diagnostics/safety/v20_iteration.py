@@ -76,11 +76,15 @@ VARIANTS = {
     # Emergency-stop protocol (planning/SAFETY_ESTOP_PROTOCOL.md).
     "v16_estop": (16, "safety_estop", {}),
     "v17_estop": (17, "safety_estop", {}),
+    # Boundary-and-targets trigger (planning/SAFETY_ESTOP_PROTOCOL.md section 8).
+    "v16_estop_bt": (16, "safety_estop", dict(importlib.import_module("safety_estop").BOUNDARY_TARGET_OPTIONS)),
+    "v17_estop_bt": (17, "safety_estop", dict(importlib.import_module("safety_estop").BOUNDARY_TARGET_OPTIONS)),
 }
 # Filter class per mode where it is not SafetyFilterV<version> in the module.
-VARIANT_CLASSES = {"v16_estop": "SafetyFilterV16E", "v17_estop": "SafetyFilterV17E"}
+VARIANT_CLASSES = {"v16_estop": "SafetyFilterV16E", "v17_estop": "SafetyFilterV17E",
+                   "v16_estop_bt": "SafetyFilterV16E", "v17_estop_bt": "SafetyFilterV17E"}
 # Modes evaluated under the emergency-stop protocol's environment rules.
-PROTOCOL_MODES = frozenset({"v16_estop", "v17_estop"})
+PROTOCOL_MODES = frozenset({"v16_estop", "v17_estop", "v16_estop_bt", "v17_estop_bt"})
 
 
 def load_ts4_cache():
