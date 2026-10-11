@@ -19,3 +19,14 @@ Protocol and decisions: [planning/SAFETY_V20_PLAN.md](../../../planning/SAFETY_V
 | V20 revision 2 | 881 | 39 | 33 | 24 | 23 | 53 | 37 |
 
 Revision 2 has the same contact count as V16 (96) with 23 fewer goals. V16 remains the reference.
+
+## Emergency-stop protocol (2026-10-11)
+
+`runs/ts4_estop_c01`-`c20` run V16 and V17 with the permanent emergency stop ([protocol](../../../planning/SAFETY_ESTOP_PROTOCOL.md)). Report: [`reports/off_v16_estop_1000/`](reports/off_v16_estop_1000/report.md).
+
+| Controller | Goals | Own-ship contacts | Target strikes on the stopped ship | Stopped | Timeout |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| V16 | 904 | 96 | - | - | 0 |
+| V16 + stop | 865 | 78 | 15 | 41 | 1 |
+| V17 + stop | 866 | 77 | 11 | 46 | 0 |
+

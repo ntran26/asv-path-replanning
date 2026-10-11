@@ -75,3 +75,53 @@ Three screens ran on the 68 saved V16-equivalent development traces (`results/sa
 **Choice.** Under the rule of section 4, the choice went back to the user. The user chose to **keep the obstacle memory in the check and accept the false alarms**, with W = 1.5 s (screen v1: 5 false alarms, 8 caught contacts). The configuration is therefore `ESTOP_WINDOW_S = 1.5`, `USE_STATIC_POINTS = True`, `EXCLUDE_CURRENT_OVERLAPS = False`. It is fixed before any episode with the stop.
 
 The 8 V16 contact episodes caught at W = 1.5 s are BAS-HO-NC-002, BAS-HO-NC-059, BAS-NU-CV-043, BAS-NU-CV-070, CH-CR-CV-059, P2-L2-HO-FIX-11, P2-L3-BO-FIX-09 and P2-L3-CRP-FIX-03. Whether each becomes a stop, a collision during braking or a target strike is measured by the episodes.
+
+## 7. Results, 2026-10-11
+
+All runs are fresh and use the same runtime environment, paired by test ID, episode seed and scenario digest with the existing fresh OFF and V16 records.
+
+### 7.1 Development, 72 cases
+
+Report: [`v20_development/reports/dev72_estop`](../results/safety_dev/v20_development/reports/dev72_estop/report.md); runs `estop_probe12`, `estop_cohort32` and `estop_broader40`.
+
+| Controller | Goals | Own-ship contacts (obstacle / boundary / target) | Target strikes on the stopped ship | Stopped | Timeout |
+| --- | ---: | --- | ---: | ---: | ---: |
+| OFF | 37 | 35 (16 / 3 / 16) | - | - | 0 |
+| V16 | 50 | 22 (6 / 7 / 9) | - | - | 0 |
+| V16 + stop | 45 | 13 (7 / 4 / 2) | 6 | 7 | 1 |
+| V17 + stop | 45 | 14 (6 / 6 / 2) | 6 | 7 | 0 |
+
+### 7.2 Test set v4, 1,000 scenarios
+
+Report: [`testset_v4_main/reports/off_v16_estop_1000`](../results/safety_dev/testset_v4_main/reports/off_v16_estop_1000/report.md); runs `ts4_estop_c01`-`c20`. No setting was changed after any test-set outcome.
+
+| Controller | Goals | Own-ship contacts (obstacle / boundary / target) | Target strikes on the stopped ship | All contacts | Stopped | Timeout | Rescued SAC failures | Lost SAC successes |
+| --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| OFF | 865 | 135 (70 / 12 / 53) | - | 135 | - | 0 | - | - |
+| V16 | 904 | 96 (46 / 25 / 25) | - | 96 | - | 0 | 50 | 11 |
+| V16 + stop | 865 | 78 (46 / 21 / 11) | 15 | 93 | 41 | 1 | 38 | 38 |
+| V17 + stop | 866 | 77 (42 / 23 / 12) | 11 | 88 | 46 | 0 | 42 | 41 |
+
+**V16 + stop against V16, scenario by scenario.** It changes no V16 contact into a goal.
+
+| Change | Count |
+| --- | ---: |
+| Contact to stopped or timeout | 15 (boundary 7, obstacle 4, target 4) |
+| Contact to target strike on the stopped ship | 9 (target 8, boundary 1) |
+| Contact type changed | 2 |
+| Goal to stopped (false alarm) | 27 |
+| Goal to target strike | 6 |
+| Goal to own-ship contact during the stop | 6 (boundary 3, obstacle 3) |
+
+**V17 + stop against V16.**
+- It gains 11 goals: 6 from obstacle contacts, 3 from boundary contacts, 2 from target contacts. These come from V17's own behaviour, not the stop.
+- It turns 14 contacts into a stop or a target strike.
+- It loses 49 goals: 32 to false-alarm stops, 13 to own-ship contacts, 4 to target strikes.
+
+### 7.3 Reading
+
+- **Own-ship contacts.** The stop removes about a fifth of V16's own-ship contacts on the test set (96 to 78), mostly target contacts (25 to 11).
+- **All contacts, counting target strikes.** The reduction is small (96 to 93 for V16, 88 for V17).
+- **Why target strikes remain.** At the commitment the target is usually already too close to stop. At 0.471 m/s² a target at 1 m/s needs about 1.1 m and 2.1 s.
+- **Goals.** The cost is 39 V16 goals (V16 + stop) and 38 net (V17 + stop). Most are false-alarm stops, the effect accepted when the obstacle memory was kept in the trigger (section 6). On development data every short-window false alarm came from remembered static points.
+- **No promotion.** Neither configuration is promoted. The stop rule trades goals for fewer own-ship contacts.

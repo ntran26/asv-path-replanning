@@ -922,3 +922,30 @@ This section is appended; sections 1-17 are unchanged. At the user's request, te
 This confirms the development decision to redirect (summary section 17). The test set adds no evidence for the stop-terminal backup.
 
 Report: [`testset_v4_main/reports/off_v16_r2_1000`](../results/safety_dev/testset_v4_main/reports/off_v16_r2_1000/report.md). The container restarted once during the run, which interrupted two revision-2 chunks; they are kept as records and their scenarios were rerun from scratch under new tags (plan section 17.2).
+
+## 19. Continuation, 2026-10-11: emergency-stop protocol with V16 and V17
+
+This section is appended; sections 1-18 are unchanged.
+
+**The protocol.** The user relaxed the objective so that a certain collision may end in a permanent stop, and fixed the protocol's loose ends ([emergency-stop protocol](SAFETY_ESTOP_PROTOCOL.md)):
+- An onboard detector stops the boat (full astern, rudder centred, permanent) when every candidate command and continuation is predicted to make physical contact within W = 1.5 s.
+- Target ships then brake to rest at 0.471 m/s².
+- The episode ends as "stopped" once the boat and all targets are still.
+- A target hitting the stopped boat is "collision by target ship".
+
+**Choice of W.** A screen on saved development traces showed that the obstacle memory (remembered static LiDAR points near the hull) causes every short-window false alarm. The user chose to keep it in the trigger and accept the false alarms.
+
+**Test set v4, 1,000 scenarios, paired with fresh OFF and V16:**
+
+| Controller | Goals | Own-ship contacts | Target strikes on the stopped ship | Stopped | Timeout |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| OFF | 865 | 135 | - | - | 0 |
+| V16 | 904 | 96 | - | - | 0 |
+| V16 + stop | 865 | 78 | 15 | 41 | 1 |
+| V17 + stop | 866 | 77 | 11 | 46 | 0 |
+
+**Effect on V16.**
+- Contacts: the stop turns 15 V16 contacts into stops or a timeout, and 9 into strikes by a target on the stopped boat.
+- Goals: it turns 27 V16 goals into false-alarm stops and 12 into contacts.
+
+The rule reduces own-ship contacts by about a fifth, but total contacts barely change and goals fall by about 4 %. V16 remains the reference.
