@@ -184,3 +184,9 @@ code matches baseline-v3
 2026-10-11 17:37:19    test set v4, ppos1_bl3 exit 0 (results/test_set/v4/ppos1_bl3/summary.txt)
 2026-10-11 17:37:20 == ppos1_bl3 run done
 2026-10-11 21:30:33    ppos2_bl3: runner stopped; training continues to 3.0 M, evaluations and test set v4 held until requested (decision, 2026-10-11)
+2026-10-12 16:10:57 == sacs1_bl3 CPU benchmark: pinned / pinned with 4 threads / unpinned (4,096-step smoke runs)
+2026-10-12 17:05:28    sacs1_bl3 CPU benchmark: fastest PIN=1 THREADS=4 (14.71 steps/s; results/bench_cpu_sac.txt)
+code matches baseline-v3
+2026-10-12 17:06:19 == sacs1_bl3: training 0 -> 3.0 M in one run (baseline-v3, stages on the 2.5 M schedule; PIN=1, THREADS=4)
+2026-10-12 17:08:22    pinned learner 19248
+2026-10-13 22:03:49 == recurrent_ppos1_bl3 armed: train_asv.py starts once sacs1_bl3 has finished

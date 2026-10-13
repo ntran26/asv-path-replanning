@@ -26,6 +26,8 @@ F96 (baseline-v2), F102 (the frozen suite, suite 3.4), F107 (baseline-v3); `OPEN
 |---|---|
 | The frozen formulation, and the planned learners × seeds | `configs/baseline_v3.json` (`campaign` block: 4 learners × seeds 0–2; `configs/baseline_v1.json` and `_v2.json` are kept for the record) |
 | Train and evaluate one run | `results/train_seed.sh` |
+| Train one run from Python (new, continue, extend) | `train_asv.py` (section 3, *From Python*) |
+| Watch a policy in a window, or save an episode as MP4 | `test_asv.py` (section 3, *Watching a policy*); videos in `results/videos/` |
 | Status of every planned run | `python tools/run_status.py` |
 | One folder per run | `runs/<learner>_formulation_seed<N>_bl3/` |
 | Training output of a run | `runs/<learner>_formulation_seed<N>_bl3.log` |
@@ -141,9 +143,12 @@ TQC, `bash results/bench_cpu.sh <algo> <seed>` measures three 4,096-step smoke r
 4 PyTorch threads, and unpinned), writes `results/bench_cpu_<algo>.txt` and starts the
 run with the fastest (for seeds 1-2 it starts `results/run_bl3_3m.sh`). Later seeds of
 the same learner reuse the winner (`PIN=0|1 THREADS=n bash results/run_bl3_3m.sh <algo>
-<seed>`). Measured winner for TQC: pinned with 4 threads (10.5 steps/s in the
-benchmark, about 14-16 in training; `run_bl3_3m.sh`'s TQC default). SAC has not been
-benchmarked yet: its seed 1 goes through `bench_cpu.sh` first.
+<seed>`). Measured winners: TQC pinned with 4 threads (10.5 steps/s in the
+benchmark, against 8.7 pinned and 6.7 unpinned; about 14-16 in training;
+`run_bl3_3m.sh`'s TQC default) and SAC pinned with 4 threads too (14.7, against 10.3
+pinned and 10.8 unpinned, 2026-10-12; about 17-22 in training). `run_bl3_3m.sh` pins
+SAC by default but keeps PyTorch's default threads, so SAC seed 2 from the shell is
+`THREADS=4 bash results/run_bl3_3m.sh sac 2`; `train_asv.py` applies both settings.
 
 **Safety layer in evaluations (decision, 2026-10-07).** Runs evaluate with the
 safety layer off only: `train_seed.sh` passes `--eval-safety-override off` to the
@@ -159,6 +164,47 @@ another:
 ```bash
 bash results/train_seed.sh ppo 1 && bash results/train_seed.sh recurrent_ppo 1
 ```
+
+**From Python (2026-10-13): `train_asv.py`.** The same training as `run_bl3_3m.sh`
+(baseline-v3, stages on the 2.5 M schedule, validation set every 200,000 steps with the
+safety layer off, the 2.5 M evaluation for SAC and TQC, the measured CPU setting),
+started from Python:
+
+```bash
+python train_asv.py --algo sac --seed 2                              # new run to 3.0 M
+python train_asv.py --algo ppo --seed 3 --timesteps 1000000          # shorter: stops partway through the curriculum
+python train_asv.py --algo sac --seed 2 --resume                     # continue; empty replay buffer, refilled first
+python train_asv.py --algo sac --seed 2 --resume --replay-buffer     # continue on the buffer saved with the checkpoint
+python train_asv.py --algo tqc --seed 0 --resume --timesteps 3500000 # continue past the budget
+python train_asv.py --algo tqc --seed 1 --dry-run                    # print what would run
+```
+
+It refuses to start a run whose folder exists (`--resume`, or `--tag` for a separate
+run) or one another process is training, and warns when another run is training. A
+continued run keeps its stage boundaries on the original budget (`--extend-to` records
+it as `curriculum_budget`). Output goes to the console, `runs/<run>.log` and
+`results/train_seed.log`; training stops with the terminal, so a long run is better
+started in its own window and continued with `--resume` after any stop. The
+evaluations and test set v4 are not part of it: the commands are printed at the end
+(`bash results/train_seed.sh <algo> <seed>`, then `tools/tiers/test_set.py --version 4`).
+
+**Watching a policy: `test_asv.py`.** Loads any of the four learners (a run's
+`best_model.zip` by default) and runs episodes in the renderer window, with the
+telemetry panel (SPACE pause, N next episode, 1-7 panel blocks, ESC quit):
+
+```bash
+python test_asv.py --algo sac --seed 1                               # a random test set v4 episode
+python test_asv.py --algo sac --seed 1 --scenario BAS-HO-CV-001      # a chosen one
+python test_asv.py --algo ppo --seed 2 --set validation --encounter crossing --episodes 3
+python test_asv.py --algo tqc --set training --episodes 2             # stage-7 training scenarios
+python test_asv.py --algo sac --seed 1 --scenario BAS-CR-CV-003 --save-mp4 --headless
+```
+
+Test set v4 episodes run exactly as `tools/tiers/test_set.py` runs them, and validation
+episodes as the training evaluations do (checked 2026-10-13: outcomes and step counts
+identical for PPO and RecurrentPPO). The validation set is built once (several minutes)
+and cached in `results/validation_set/`. `--save-mp4` writes H.264 at real time (2 fps)
+to `results/videos/<run>_<scenario>.mp4`; `--safety on` runs the safety layer.
 
 ---
 

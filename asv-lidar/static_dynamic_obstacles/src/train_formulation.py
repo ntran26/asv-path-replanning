@@ -662,12 +662,18 @@ def main() -> None:
                          "(learner, budget and switches are read from its config.json)")
     ap.add_argument("--extend-to", type=int, default=None,
                     help="with --resume: raise the run's step budget to this total (recorded in "
-                         "config.json); the curriculum keeps its final stage past the old budget")
+                         "config.json); the stage boundaries stay on the run's original budget, so "
+                         "the curriculum keeps its final stage past it")
+    ap.add_argument("--replay-buffer", default="auto",
+                    help="off-policy --resume: 'auto' restores the buffer saved with the checkpoint "
+                         "(refilling it when none is found), 'none' starts from an empty buffer and "
+                         "refills it before updating, or the path of a saved buffer (.pkl)")
     ap.add_argument("--train-to", type=int, default=None,
                     help="with --config, a new run: train straight to this many steps.  The stage "
-                         "boundaries stay fractions of the frozen budget and the final stage holds "
-                         "past it -- the curriculum timing of a run extended with --extend-to, "
-                         "without the stop (decision, 2026-10-10: seeds 1-2)")
+                         "boundaries stay fractions of the frozen budget: past it the final stage "
+                         "holds -- the curriculum timing of a run extended with --extend-to, without "
+                         "the stop (decision, 2026-10-10: seeds 1-2); short of it the run stops "
+                         "partway through the curriculum")
     ap.add_argument("--extra-evals", type=str, default=None,
                     help="comma-separated evaluation timesteps besides every --eval-freq, e.g. "
                          "2500000 where an extended run's first phase ended")
@@ -776,8 +782,14 @@ def main() -> None:
                 raise SystemExit(f"--extend-to {args.extend_to:,} must exceed the run's budget "
                                  f"{args.timesteps:,}")
             print(f"[EXTEND] budget {args.timesteps:,} -> {int(args.extend_to):,} steps", flush=True)
-            # The stage schedule is fractions of the budget; every fraction past
-            # the old budget lies beyond the last stage start, so the final stage holds.
+            # The stage schedule is fractions of a budget.  It stays on the run's
+            # original budget (before any earlier extension), so the final stage
+            # holds however far the run is extended; on the new budget, a resume
+            # point short of the last stage start would fall back a stage.
+            if not getattr(args, "curriculum_budget", None):
+                earlier = [int(r["extended_from"]) for r in previous.get("resumes", [])
+                           if r.get("extended_from")]
+                args.curriculum_budget = min(earlier + [int(args.timesteps)])
             args.timesteps = int(args.extend_to)
         print(f"[RESUME] {run_dir.name} from {resume_steps:,} of {args.timesteps:,} steps", flush=True)
     elif args.extend_to:
@@ -788,17 +800,23 @@ def main() -> None:
                                    + ("_smoke" if args.smoke else ""))
     if not hasattr(args, "curriculum_budget"):
         args.curriculum_budget = None
-    if args.train_to and not args.resume:
-        # After the frozen config has set its budget: train past it in one go, with the
-        # stage boundaries kept on that budget (the final stage holds beyond it).
-        if int(args.train_to) <= int(args.timesteps):
-            raise SystemExit(f"--train-to {args.train_to:,} must exceed the budget {args.timesteps:,}")
-        args.curriculum_budget = int(args.timesteps)
-        args.timesteps = int(args.train_to)
-        print(f"[TRAIN-TO] {args.timesteps:,} steps in one run; stages on the "
-              f"{args.curriculum_budget:,}-step schedule, the final stage holding past it", flush=True)
+    if args.train_to and args.smoke:
+        print("[TRAIN-TO] ignored in a smoke run", flush=True)
+    elif args.train_to and not args.resume:
+        # After the frozen config has set its budget: train to this many steps in one go,
+        # with the stage boundaries kept on that budget (past it the final stage holds;
+        # short of it the run stops partway through the curriculum).
+        if int(args.train_to) != int(args.timesteps):
+            args.curriculum_budget = int(args.timesteps)
+            args.timesteps = int(args.train_to)
+            print(f"[TRAIN-TO] {args.timesteps:,} steps in one run; stages on the "
+                  f"{args.curriculum_budget:,}-step schedule, "
+                  + ("the final stage holding past it" if args.timesteps > args.curriculum_budget
+                     else "stopping before the schedule ends"), flush=True)
     elif args.train_to:
         print("[TRAIN-TO] ignored on a resume: the run's config.json decides its budget", flush=True)
+    if args.replay_buffer != "auto" and not (args.resume and args.algo in OFF_POLICY):
+        raise SystemExit("--replay-buffer applies to resuming an off-policy run (SAC, TQC, TD3)")
     extra = args.extra_evals
     args.extra_evals = sorted({int(x) for x in (extra.split(",") if isinstance(extra, str) else (extra or []))
                                if str(x).strip()})
@@ -872,6 +890,7 @@ def main() -> None:
         if args.extend_to:
             config["resumes"][-1]["extended_from"] = previous.get("timesteps")
             config["timesteps"] = args.timesteps
+            config["curriculum_budget"] = args.curriculum_budget
     with open(run_dir / "config.json", "w") as fh:
         json.dump(config, fh, indent=1, default=str)
 
@@ -909,17 +928,25 @@ def main() -> None:
         model = ALGORITHMS[args.algo].load(str(resume_ckpt), env=vec, device="cpu",
                                            tensorboard_log=str(args.runs_dir / "tensorboard"))
         if args.algo in OFF_POLICY:
-            found = [b for b in (replay_buffer_path(run_dir, args.algo, resume_steps),
-                                 run_dir / f"{args.algo}_replay_buffer_{resume_steps}_steps.pkl")
-                     if b.exists()]
+            if args.replay_buffer == "none":
+                found = []
+            elif args.replay_buffer != "auto":
+                found = [Path(args.replay_buffer)]
+                if not found[0].exists():
+                    raise SystemExit(f"replay buffer not found: {found[0]}")
+            else:
+                found = [b for b in (replay_buffer_path(run_dir, args.algo, resume_steps),
+                                     run_dir / f"{args.algo}_replay_buffer_{resume_steps}_steps.pkl")
+                         if b.exists()]
             if found:
                 model.load_replay_buffer(str(found[0]))
                 status = f"restored ({found[0]})"
             else:
-                # No buffer for this checkpoint: refill before updating again, rather
-                # than training on a nearly empty buffer.
+                # No buffer for this checkpoint (or none wanted): refill before updating
+                # again, rather than training on a nearly empty buffer.
                 model.learning_starts = model.num_timesteps + int(hyperparameters["learning_starts"])
-                status = f"missing -- refilled {int(hyperparameters['learning_starts']):,} steps before updating"
+                status = (("not loaded (--replay-buffer none)" if args.replay_buffer == "none" else "missing")
+                          + f" -- refilled {int(hyperparameters['learning_starts']):,} steps before updating")
             print(f"[RESUME] replay buffer {status}", flush=True)
         else:
             status = "n/a"

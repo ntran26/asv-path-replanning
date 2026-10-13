@@ -1,0 +1,5 @@
+CPU benchmark for sac seed 1, 2026-10-12 16:10, steps/s after 1,500 steps
+PIN=1 THREADS=default: 10.25 steps/s
+PIN=1 THREADS=4: 14.71 steps/s
+PIN=0 THREADS=default: 10.79 steps/s
+fastest: PIN=1 THREADS=4 (14.71 steps/s)

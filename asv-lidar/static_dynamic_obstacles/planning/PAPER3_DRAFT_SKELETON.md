@@ -599,6 +599,8 @@ P.6 Results
 
 - Disturbance rejection under wave and current loading
 
+- Closing the sim-to-field gap with logged field runs: fine-tuning the deployed policy in a field-calibrated simulator, or offline RL from the field logs (`planning/FUTURE_WORK_IDEAS.md`, idea 1; a candidate conference paper)
+
 - \[S13(b)\] Physical-transfer assessment: system identification, randomisation over identified uncertainty, basin encounter trials
 
 *(Revision 3's section 8.3 "Why two-vessel encounters" moved to section 2.1.1.)*
