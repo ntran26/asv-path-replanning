@@ -310,9 +310,9 @@ Use facts section 6.
   episodes: 120 decoupled + 150 coupled; checkpoint selection, comparator
   tuning and learning curves) /
   the **test set** (test set v4: 1,000 held-out episodes, 664 decoupled + 336 coupled,
-  touched once per policy) / robustness set / width sweep and perception
-  degradation (planned studies), with a seed-namespace diagram showing they
-  never overlap; checkpoint selection score.
+  touched once per policy) / robustness set, with a seed-namespace diagram
+  showing they never overlap; checkpoint selection score. (No width sweep or
+  perception-degradation study: excluded from the paper, 2026-10-14.)
 
 ### 9. Safety layer and evaluation design (added)
 - The runtime stop safety layer (facts section 5): trigger, maneuver, hand-back; off in

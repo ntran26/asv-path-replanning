@@ -190,3 +190,13 @@ code matches baseline-v3
 2026-10-12 17:06:19 == sacs1_bl3: training 0 -> 3.0 M in one run (baseline-v3, stages on the 2.5 M schedule; PIN=1, THREADS=4)
 2026-10-12 17:08:22    pinned learner 19248
 2026-10-13 22:03:49 == recurrent_ppos1_bl3 armed: train_asv.py starts once sacs1_bl3 has finished
+2026-10-14 15:44:20    sacs1_bl3 3.0 M exit 0
+code matches baseline-v3
+2026-10-14 15:45:00 == sac seed 1: already trained
+2026-10-14 15:48:35    tier 1 sacs1_bl3 supervisor off exit 0
+2026-10-14 16:04:48    frozen suite sacs1_bl3 exit 0
+2026-10-14 16:30:59    Paper 2 set sacs1_bl3 exit 0
+2026-10-14 16:31:00 == sac seed 1 done
+2026-10-14 16:43:01    test set v4, sacs1_bl3 exit 0 (results/test_set/v4/sacs1_bl3/summary.txt)
+2026-10-14 16:43:02 == sacs1_bl3 run done
+2026-10-14 16:46:42 == recurrent_ppos1_bl3: training 0 -> 3,000,000 steps via train_asv.py (baseline-v3; CPU unpinned, default threads)

@@ -19,6 +19,8 @@
 > R4 width sweep, since Tier B no longer spans the rule thresholds. COLREGs-VO
 > (Kuwata) is built; both VO comparators are tuned on the validation set and
 > pinned in `configs/comparators_v1.json` (F97, F98).
+>
+> - **2026-10-14:** Study 1 (the channel-width sweep, R4) and Study 2 (perception degradation, R5) are excluded from the paper, which is already long; field trials are in the paper (S13(a)), with the design still open (`PAPER3_DRAFT_SKELETON.md`, S13-S14).
 
 **Revision 2** — repositioned to two-vessel encounters with static obstacles.
 Supersedes the multi-vessel version of this document set.

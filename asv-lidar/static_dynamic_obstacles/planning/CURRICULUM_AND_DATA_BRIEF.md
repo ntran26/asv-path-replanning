@@ -44,8 +44,8 @@ blocks in the gaps for the coupled validation and test episodes:
 | — (own block) | 360,000 + | the coupled part of the validation set (150 episodes), in a gap no namespace uses |
 | `frozen_eval` | 300,000 – 309,999 | the frozen benchmark: source of the test set's decoupled part |
 | — (dedicated test blocks) | 310,000 – 349,999; 450,000 +; 600,000 + | the test set's coupled episodes |
-| `study1` | 400,000 – 409,999 | the channel-width sweep (R4) |
-| `study2` | 500,000 – 509,999 | perception degradation (R5) |
+| `study1` | 400,000 – 409,999 | reserved for the channel-width sweep (R4), excluded from the paper (2026-10-14) |
+| `study2` | 500,000 – 509,999 | reserved for perception degradation (R5), excluded from the paper (2026-10-14) |
 
 $$\text{seed}(\text{ns}, i) = \mathrm{lo}_{\text{ns}} + \big(i \bmod (\mathrm{hi}_{\text{ns}} - \mathrm{lo}_{\text{ns}} + 1)\big)$$
 

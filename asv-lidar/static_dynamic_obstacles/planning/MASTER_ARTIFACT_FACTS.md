@@ -262,9 +262,8 @@ context; it is not a Paper 3 comparator.
 closer than 1 m are lost in a dead zone). Pose noise 0.03 m / 0.2°, surge
 noise 0.05 m/s, yaw-rate noise 1°/s. One scan per 0.5 s decision. Ranges are
 exact ray casts: no per-beam range noise and no isolated beam dropout in
-training (both left at zero until characterized from field data). The planned
-perception-degradation study sweeps detection dropout from zero to the point of
-track loss rather than using one fixed rate.
+training (both left at zero until characterized from field data). No separate
+perception-degradation study is part of the paper (decision, 2026-10-14).
 
 **Pipeline, in order:**
 
@@ -496,8 +495,6 @@ coupled test episodes from dedicated blocks at 310,000–349,999, 450,000+ and
 | Test set (test set v4; headline) | 1,000 held-out episodes: **664 decoupled** (basin and channel encounters of every type, with constant-velocity, reactive and non-compliant targets) and **336 coupled** (three-obstacle layouts with constant- and varying-speed targets); near-duplicates trimmed; every episode passes the fairness check (6.5) | touched once per policy |
 | Frozen benchmark | the 800 basin and channel encounter episodes the test set's decoupled part is drawn from: 8 cells × 100 (basin head-on, crossing, overtaking, being overtaken and null; channel head-on, crossing and overtaking) | continuity with earlier tables |
 | Robustness set | the same scenarios with a reactive target (700; it follows the COLREGs-VO rule from its own side) and, in head-ons, a non-compliant target that turns to port (200) | robustness to target behavior |
-| Width sweep (planned) | channels 10, 8, 7, 6, 5, 4.5, 4, 3.5 m | how the response changes with room |
-| Perception degradation (planned) | pose drift, detection dropout, occlusion, velocity-estimate noise, separately and jointly | robustness to sensing |
 
 Selection score: goal rate − 2 × collision rate on the whole validation set
 (both parts, 270 episodes), safety layer off, every 200,000 steps.

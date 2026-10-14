@@ -9,6 +9,8 @@
 > - Control and decisions run at **2 Hz** (F38); the LiDAR's 10 Hz scan rate is unchanged.
 >
 > The rationale below still stands where it is not listed. `F..` = `PROJECT_STATE.md`, `A..` = `OPEN_PROBLEMS.md`.
+>
+> - **2026-10-14:** Study 1 (the channel-width sweep, R4) and Study 2 (perception degradation, R5) are excluded from the paper, which is already long; field trials are in the paper (S13(a)), with the design still open (`PAPER3_DRAFT_SKELETON.md`, S13-S14).
 
 > Update the two fields below each time. Everything else is stable until a decision changes.
 > **Revision 2** — repositioned to two-vessel encounters. Supersedes the multi-vessel version.
