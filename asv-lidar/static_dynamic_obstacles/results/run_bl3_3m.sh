@@ -14,7 +14,9 @@
 # final_model_2500000.zip, as for seed 0.
 #
 # Then train_seed.sh's evaluations on the best checkpoint (Tier 1, frozen suite,
-# reference layouts) and test set v4 (report only), safety layer off.
+# reference layouts) and test set v4 (report only), safety layer off; test set v4 also
+# runs on the final model as a checkpoint-selection sensitivity check (decision,
+# 2026-10-15), reported beside the best checkpoint under the tag <id>_final.
 #
 # CPU: PIN=1 pins the learner to the P-cores (0x00F, AboveNormal) and its workers to the
 # E-cores (0xFF0); PIN=0 leaves everything on all 12 CPUs. THREADS=n sets PyTorch's thread
@@ -94,4 +96,7 @@ bash results/train_seed.sh $A $S $CONFIG || { note "$ID evaluations FAILED"; exi
 python tools/tiers/test_set.py --version 4 --model $RUN/best_model.zip --tag $ID --safety off --processes 4 \
   > results/test_set_v4_$ID.log 2>&1
 note "   test set v4, $ID exit $? (results/test_set/v4/$ID/summary.txt)"
+python tools/tiers/test_set.py --version 4 --model $RUN/final_model.zip --tag ${ID}_final --safety off --processes 4 \
+  > results/test_set_v4_${ID}_final.log 2>&1
+note "   test set v4 (final model), $ID exit $? (results/test_set/v4/${ID}_final/summary.txt)"
 note "== $ID run done"

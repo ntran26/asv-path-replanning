@@ -323,6 +323,8 @@ def main() -> int:
         print(f"  evaluations      bash results/train_seed.sh {args.algo} {args.seed} {CONFIG.as_posix()}")
     print(f"  test set v4      python tools/tiers/test_set.py --version 4 --model {rel}/best_model.zip "
           f"--tag {p.run_id} --safety off --processes 4")
+    print(f"  final-model check python tools/tiers/test_set.py --version 4 --model {rel}/final_model.zip "
+          f"--tag {p.run_id}_final --safety off --processes 4")
     print(f"  watch the policy python test_asv.py --model {rel}")
     return 0
 

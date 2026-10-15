@@ -33,7 +33,8 @@ F96 (baseline-v2), F102 (the frozen suite, suite 3.4), F107 (baseline-v3); `OPEN
 | Training output of a run | `runs/<learner>_formulation_seed<N>_bl3.log` |
 | Event log (started / resumed / finished / evaluated) | `results/train_seed.log` (`results/baseline_campaign.log` holds the seed-0 campaign's events) |
 | Tier 1 of a finished run (validation set, a diagnostic) | `results/tiers/tier1_<learner>s<N>_bl3_supervisor_off/summary.txt` |
-| **Test set v4 of a finished run (the headline)** | `results/test_set/v4/<learner>s<N>_bl3/summary.txt` — 1,000 episodes, 664 decoupled + 336 coupled, safety layer off |
+| **Test set v4 of a finished run (the headline)** | `results/test_set/v4/<learner>s<N>_bl3/summary.txt` — 1,000 episodes, 664 decoupled + 336 coupled, safety layer off, on the best validation-set checkpoint |
+| Test set v4 of the run's final model (selection-sensitivity check, decision 2026-10-15) | `results/test_set/v4/<learner>s<N>_bl3_final/summary.txt` — same set, the 3.0 M final model; reported beside the headline |
 | Frozen suite of a finished run | `results/frozen_suite/<learner>s<N>_bl3/summary.txt` — **Tier B**, suite 3.4: the 800-episode decoupled set and the 900-episode robustness set, safety layer off. Tier A is the **extended** set and runs only on request (`--tiers a,b`) |
 | Reference-layout (Paper 2) set of a finished run | `results/paper2_set/<learner>s<N>_bl3/summary.txt` — 630 episodes on L1–L3, safety layer off |
 | TensorBoard curves | `runs/tensorboard/` |
@@ -119,7 +120,14 @@ trains, calls `train_seed.sh` for the evaluations and then runs test set v4:
   resume.
 
 Both wrappers resume from the last checkpoint, apply the CPU setting below, and take
-`--after-evaluations` to wait until no evaluation is running.
+`--after-evaluations` to wait until no evaluation is running. `run_bl3_3m.sh` also runs
+test set v4 on the final model (tag `<id>_final`, decision 2026-10-15), a
+checkpoint-selection sensitivity check reported beside the best checkpoint; for runs
+finished before then, it is one command:
+
+```bash
+python tools/tiers/test_set.py --version 4 --model runs/<run>/final_model.zip --tag <id>_final --safety off --processes 4
+```
 
 It is safe to start again at any time with the same learner and seed: it picks up
 where it stopped. (`bash results/train_seed.sh tqc 0` would, for instance, run

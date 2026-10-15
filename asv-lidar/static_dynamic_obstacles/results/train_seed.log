@@ -200,3 +200,5 @@ code matches baseline-v3
 2026-10-14 16:43:01    test set v4, sacs1_bl3 exit 0 (results/test_set/v4/sacs1_bl3/summary.txt)
 2026-10-14 16:43:02 == sacs1_bl3 run done
 2026-10-14 16:46:42 == recurrent_ppos1_bl3: training 0 -> 3,000,000 steps via train_asv.py (baseline-v3; CPU unpinned, default threads)
+2026-10-15 06:51:59    recurrent_ppos1_bl3: waiter stopped; training continues to 3.0 M, evaluations and test set v4 held until requested (decision, 2026-10-15)
+2026-10-15 07:04:51    recurrent_ppos1_bl3: trained to 3 M -> runs\recurrent_ppo_formulation_seed1_bl3
