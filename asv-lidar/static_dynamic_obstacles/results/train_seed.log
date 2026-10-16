@@ -202,3 +202,6 @@ code matches baseline-v3
 2026-10-14 16:46:42 == recurrent_ppos1_bl3: training 0 -> 3,000,000 steps via train_asv.py (baseline-v3; CPU unpinned, default threads)
 2026-10-15 06:51:59    recurrent_ppos1_bl3: waiter stopped; training continues to 3.0 M, evaluations and test set v4 held until requested (decision, 2026-10-15)
 2026-10-15 07:04:51    recurrent_ppos1_bl3: trained to 3 M -> runs\recurrent_ppo_formulation_seed1_bl3
+code matches baseline-v3
+2026-10-16 16:51:55 == sacs2_bl3: training 0 -> 3.0 M in one run (baseline-v3, stages on the 2.5 M schedule; PIN=1, THREADS=4)
+2026-10-16 16:53:58    pinned learner 4952

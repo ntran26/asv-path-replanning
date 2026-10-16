@@ -1,0 +1,23 @@
+[
+ {
+  "timesteps": 200000,
+  "supervisor": "off",
+  "episodes": 270,
+  "goal_rate": 0.2111111111111111,
+  "collision_rate": 0.7888888888888889,
+  "timeout_rate": 0.0,
+  "dev/goal": 0.3333333333333333,
+  "dev/collision": 0.6666666666666666,
+  "field/goal": 0.11333333333333333,
+  "field/collision": 0.8866666666666667,
+  "mean_return": -266.66705386277033,
+  "intervention_rate": 0.0,
+  "eval_wall_s": 168.3,
+  "field/NT/goal": 0.3,
+  "field/HO/goal": 0.038461538461538464,
+  "field/CRP/goal": 0.11538461538461539,
+  "field/CRS/goal": 0.0,
+  "field/OT/goal": 0.11538461538461539,
+  "field/BO/goal": 0.15384615384615385
+ }
+]
