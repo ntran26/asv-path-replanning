@@ -46,8 +46,10 @@ a_t = [a_δ, a_n] ∈ [−1, 1]²
 o_t = {lidar ∈ [0,1]^27, boundary ∈ [0,1]^7, ego ∈ [−1,1]^3, path ∈ [−1,1]^3,
 target ∈ R^16, context ∈ R^14} — 70 values.
 
-**3.1 lidar (27).** Static returns only, ±135° swath (the aft 90° is left to the
-tracker). Sectors: 15 × 6° within ±45°, 8 × 11.25° abeam, 4 × 22.5° on the
+**3.1 lidar (27).** All gated returns in a ±135° swath: static obstacles and the
+target hull alike, because the pooling precedes segmentation and tracking
+(corrected 2026-10-17; earlier text said static returns only). The aft 90° is
+left to the tracker. Sectors: 15 × 6° within ±45°, 8 × 11.25° abeam, 4 × 22.5° on the
 quarters. Each sector's beams {ρ_j} are pooled by **feasibility pooling**
 (Meyer et al., 2020a, Algorithm 1; unchanged from Paper 2): the pooled range
 ρ̄_k is the largest range at which an opening wider than the safe width

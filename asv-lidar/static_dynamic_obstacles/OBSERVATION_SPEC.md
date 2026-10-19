@@ -22,7 +22,7 @@ and the feature names.
 
 | Branch | Contents | Dims | Range |
 |---|---|---|---|
-| `lidar` | `c_t` sector closeness, **static obstacles only** | 27 | [0, 1] |
+| `lidar` | `c_t` sector closeness from **all gated returns** (static obstacles and the target hull) | 27 | [0, 1] |
 | `boundary` | virtual boundary raycast, normalised | 7 | [0, 1] |
 | `ego` | u, v, r | 3 | [-1, 1] |
 | `path` | e_y, χ̃, χ̃_LA | 3 | [-1, 1] |
@@ -85,10 +85,13 @@ Pooled sector closeness, `1 - range / 16.0`, clipped to [0, 1]. **1 = touching,
 0 = clear to max range.** The LiDAR is 720 beams at 0.5°, 16 m range, 1.0 m
 minimum range.
 
-Carries **static obstacles only**. Returns classified as moving by the
-free-space consistency test (F37) go to the tracker and reach the policy through
-`target`; the channel boundary is gated out and reaches the policy through
-`boundary`.
+Pooled from **all gated returns** in the swath: static obstacles and the target
+ship's hull alike. (Corrected 2026-10-17. The design intended static obstacles
+only, but `env._perceive` pools the gated scan before segmentation and tracking,
+and every baseline-v3 policy trained this way.) A target therefore appears here as
+an obstacle and, once the free-space consistency test (F37) classifies it as
+moving, in `target` as a track. The channel boundary is gated out and reaches the
+policy through `boundary`.
 
 Sectors run **port to starboard**, index 0 outboard on the port quarter.
 Non-uniform allocation, ±135° swath, 540 of the 720 raw beams. The aft 90°

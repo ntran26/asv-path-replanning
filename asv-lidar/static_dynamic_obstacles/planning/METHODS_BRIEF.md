@@ -151,7 +151,7 @@ boundary, as used on the vessel).
 
 | Branch | Values | Contents |
 |---|---|---|
-| lidar | 27 | closeness per bearing sector over ±135°, static returns only; sectors finest ahead (6°), coarser abeam |
+| lidar | 27 | closeness per bearing sector over ±135°, from all gated returns (static obstacles and the target hull; corrected 2026-10-17); sectors finest ahead (6°), coarser abeam |
 | boundary | 7 | virtual boundary distance at −90…+90° (30° apart) |
 | ego | 3 | surge, sway, yaw rate |
 | path | 3 | cross-track error **scaled by the local channel half-width on that side** (F72), course error, look-ahead course error |

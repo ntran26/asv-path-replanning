@@ -283,7 +283,7 @@ The threshold at which a channel becomes "narrow" for a given encounter is itsel
 
 2.3.1 Perception pipeline
 
-Raw LiDAR: 360°, 720 beams, 0.5° angular resolution, 10 Hz. Returns falling outside the known channel polygon are gated geometrically, because the sensor is mounted above the basin wall and would otherwise register objects beyond it as obstacles or, worse, as phantom targets with plausible velocities. Remaining returns are clustered, ego-motion compensated, associated to tracks, and velocity-estimated by a constant-velocity Kalman filter. Static clusters feed the pooled sector channel; the dynamic track feeds the target branch.
+Raw LiDAR: 360°, 720 beams, 0.5° angular resolution, 10 Hz. Returns falling outside the known channel polygon are gated geometrically, because the sensor is mounted above the basin wall and would otherwise register objects beyond it as obstacles or, worse, as phantom targets with plausible velocities. Remaining returns are clustered, ego-motion compensated, associated to tracks, and velocity-estimated by a constant-velocity Kalman filter. The pooled sector channel is built from all gated returns, the target hull included (corrected 2026-10-17); the dynamic track feeds the target branch.
 
 *\[Figure: perception pipeline block diagram.\]*
 

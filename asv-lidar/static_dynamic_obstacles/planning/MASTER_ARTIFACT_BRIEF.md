@@ -241,6 +241,63 @@ equations file section 4):
    an obstacle field; a slider moves a gap narrower/wider than the 0.80 m safe
    width; show all three pooled ranges and the closeness value; explain which
    is right and why.
+10. **What each line in the simulator view means** (added 2026-10-17: the
+    simulator window overlays so many rays that the layers cannot be told
+    apart). ▶ **Layer explorer:** one scene drawn like the simulator view
+    (basin, three panels, a crossing target, the own ship), with a legend
+    where every layer has its own checkbox, a **solo** button (show only this
+    layer) and **all on / all off**. Hovering a line shows its layer, bearing
+    and range. A step slider plays about ten decisions of the encounter, so
+    the layers can be watched changing. Default view: own ship, panels and
+    target only; the reader adds layers one at a time. Give each layer a
+    distinct colour in the artifact, and state in the legend how the same
+    layer looks in the simulator window, so the reader can then read the real
+    renderer images (simulator colours in brackets below). Each legend entry
+    names what the layer is and which observation branch it feeds, or that the
+    policy never sees it:
+    - **Raw LiDAR beams**, 720 at 0.5°; split into beams with a return and
+      beams reaching the 16 m maximum (no return). The simulator draws every
+      fourth beam, dim (beams with a return lighter purple, beams without dark
+      blue-grey). Not fed to the policy directly.
+    - **Gated returns:** returns outside the navigable polygon (the facility
+      walls) removed by the map gate. Shown greyed out. Not fed to the policy.
+    - **Pooled sector lines** — what the policy's `lidar` branch (27 values)
+      receives: one line per sector over ±135° (the aft 90° excluded), its
+      length the feasibility-pooled range, coloured from blue (clear) to red
+      (close), with a dot at the end (simulator: thick lines, blue to red).
+      They are pooled from **all gated returns, static panels and the target
+      ship's hull alike** (facts section 4): a target appears both here, as an
+      obstacle, and in the target branch, as a track.
+    - **Boundary rays:** 7 rays at −90°, −60°, …, +90° cast against the map's
+      navigable polygon from the estimated pose — the `boundary` branch
+      (7 values). From the map, not the sensor (simulator: thin steel-blue lines).
+    - **Navigable boundary polygon and facility walls:** the polygon the
+      vessel must stay inside (from the map) and the walls beyond it that the
+      sensor actually sees. The simulator draws neither explicitly, only the
+      map's outer border (red rectangle).
+    - **Segmented clusters and the association gate:** each cluster's points
+      and the 0.70 m gate circle around each predicted track. Intermediate
+      perception steps; not fed to the policy.
+    - **Static/moving verdict:** clusters coloured static or moving by the
+      free-space test. Decides what becomes a target track.
+    - **Tracked target estimate:** the Kalman position (circle) and its
+      velocity drawn 3 s ahead (simulator: white circle and line) — the
+      `target` branch (16 values) and, through the encounter module, the
+      `context` branch (14 values).
+    - **Target ship, true hull** (simulator: orange). Simulator truth: the
+      policy sees only the estimate and the pooled returns. Toggling truth
+      against estimate shows the tracking error.
+    - **Ship domain and CPA:** the target's asymmetric domain and the
+      predicted closest point of approach (links to section 8 of this list).
+    - **Static obstacles:** the 1.0 m panels (simulator: red squares).
+      Perceived only through the pooled sectors.
+    - **Own ship:** hull outline with the 0.15 m contact margin and the LiDAR
+      origin at the bow, 0.8625 m ahead of the reference point (simulator:
+      grey icon, red outline).
+    - **Path elements:** the reference path (green), the path tracking point
+      (dark red), the look-ahead point (cyan) and the goal (magenta); they
+      feed the `path` branch (3 values) through the cross-track and course
+      errors.
 - Sources: Kalman (1960); Bar-Shalom et al. (2001) [VERIFY]; Borges & Aldon
   (2004) [VERIFY]; Meyer et al. (2020a); Paper 2; Waltz & Okhrin (2023);
   Helgesen et al. (2022) for why tracking quality depends on the environment.

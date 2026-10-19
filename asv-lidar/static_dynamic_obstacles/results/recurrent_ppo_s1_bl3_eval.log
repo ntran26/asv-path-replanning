@@ -1,0 +1,8 @@
+2026-10-18 19:23:38 == recurrent_ppo seed 1: already trained
+2026-10-18 19:25:37    tier 1 recurrent_ppos1_bl3 supervisor off exit 0
+2026-10-18 19:36:06    frozen suite recurrent_ppos1_bl3 exit 0
+2026-10-18 19:52:36    Paper 2 set recurrent_ppos1_bl3 exit 0
+2026-10-18 19:52:36 == recurrent_ppo seed 1 done
+2026-10-18 19:59:30    test set v4, recurrent_ppos1_bl3 exit 0 (results/test_set/v4/recurrent_ppos1_bl3/summary.txt)
+2026-10-18 20:07:39    test set v4 (final model), recurrent_ppos1_bl3 exit 0 (results/test_set/v4/recurrent_ppos1_bl3_final/summary.txt)
+2026-10-18 20:07:40 == recurrent_ppos1_bl3 run done

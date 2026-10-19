@@ -205,3 +205,49 @@ code matches baseline-v3
 code matches baseline-v3
 2026-10-16 16:51:55 == sacs2_bl3: training 0 -> 3.0 M in one run (baseline-v3, stages on the 2.5 M schedule; PIN=1, THREADS=4)
 2026-10-16 16:53:58    pinned learner 4952
+2026-10-18 18:01:06    sacs2_bl3 3.0 M exit 0
+code matches baseline-v3
+2026-10-18 18:01:40 == sac seed 2: already trained
+2026-10-18 18:03:49    tier 1 sacs2_bl3 supervisor off exit 0
+2026-10-18 18:13:30    frozen suite sacs2_bl3 exit 0
+2026-10-18 18:28:27    Paper 2 set sacs2_bl3 exit 0
+2026-10-18 18:28:27 == sac seed 2 done
+2026-10-18 18:35:44    test set v4, sacs2_bl3 exit 0 (results/test_set/v4/sacs2_bl3/summary.txt)
+2026-10-18 18:42:33    test set v4 (final model), sacs2_bl3 exit 0 (results/test_set/v4/sacs2_bl3_final/summary.txt)
+2026-10-18 18:42:33 == sacs2_bl3 run done
+2026-10-18 18:42:52 == evaluation queue (decision, 2026-10-18): ppos2_bl3 and recurrent_ppos1_bl3 evaluations, then final-model checks of ppos0, ppos1, recurrent_ppos0, sacs0, sacs1, tqcs0
+code matches baseline-v3
+code matches baseline-v3
+2026-10-18 18:43:55 == ppo seed 2: already trained
+2026-10-18 18:45:39    tier 1 ppos2_bl3 supervisor off exit 0
+2026-10-18 18:54:23    frozen suite ppos2_bl3 exit 0
+2026-10-18 19:09:43    Paper 2 set ppos2_bl3 exit 0
+2026-10-18 19:09:43 == ppo seed 2 done
+2026-10-18 19:16:08    test set v4, ppos2_bl3 exit 0 (results/test_set/v4/ppos2_bl3/summary.txt)
+2026-10-18 19:22:38    test set v4 (final model), ppos2_bl3 exit 0 (results/test_set/v4/ppos2_bl3_final/summary.txt)
+2026-10-18 19:22:38 == ppos2_bl3 run done
+code matches baseline-v3
+code matches baseline-v3
+2026-10-18 19:23:38 == recurrent_ppo seed 1: already trained
+2026-10-18 19:25:37    tier 1 recurrent_ppos1_bl3 supervisor off exit 0
+2026-10-18 19:36:06    frozen suite recurrent_ppos1_bl3 exit 0
+2026-10-18 19:52:36    Paper 2 set recurrent_ppos1_bl3 exit 0
+2026-10-18 19:52:36 == recurrent_ppo seed 1 done
+2026-10-18 19:59:30    test set v4, recurrent_ppos1_bl3 exit 0 (results/test_set/v4/recurrent_ppos1_bl3/summary.txt)
+2026-10-18 20:07:39    test set v4 (final model), recurrent_ppos1_bl3 exit 0 (results/test_set/v4/recurrent_ppos1_bl3_final/summary.txt)
+2026-10-18 20:07:40 == recurrent_ppos1_bl3 run done
+2026-10-18 20:07:40 == ppos0_bl3: final-model check (test set v4)
+2026-10-18 20:16:20    test set v4 (final model), ppos0_bl3 exit 0 (results/test_set/v4/ppos0_bl3_final/summary.txt)
+2026-10-18 20:16:21 == ppos1_bl3: final-model check (test set v4)
+2026-10-18 20:24:29    test set v4 (final model), ppos1_bl3 exit 0 (results/test_set/v4/ppos1_bl3_final/summary.txt)
+2026-10-18 20:24:29 == recurrent_ppos0_bl3: final-model check (test set v4)
+2026-10-18 20:34:33    test set v4 (final model), recurrent_ppos0_bl3 exit 0 (results/test_set/v4/recurrent_ppos0_bl3_final/summary.txt)
+2026-10-18 20:34:33 == sacs0_bl3: final-model check (test set v4)
+2026-10-18 20:41:22    test set v4 (final model), sacs0_bl3 exit 0 (results/test_set/v4/sacs0_bl3_final/summary.txt)
+2026-10-18 20:41:23 == sacs1_bl3: final-model check (test set v4)
+2026-10-18 20:47:49    test set v4 (final model), sacs1_bl3 exit 0 (results/test_set/v4/sacs1_bl3_final/summary.txt)
+2026-10-18 20:47:50 == tqcs0_bl3: final-model check (test set v4)
+2026-10-18 20:54:37    test set v4 (final model), tqcs0_bl3 exit 0 (results/test_set/v4/tqcs0_bl3_final/summary.txt)
+2026-10-18 20:54:37 == evaluation queue done
+code matches baseline-v3
+2026-10-18 20:55:52 == recurrent_ppos2_bl3: training 0 -> 3.0 M in one run (baseline-v3, stages on the 2.5 M schedule; PIN=0, THREADS=default)

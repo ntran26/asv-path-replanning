@@ -227,8 +227,8 @@ Eq. 6–8, Table 5) — **the heart of contribution C2**
   (returns appearing where beams passed through empty water, or vacating where
   the object was), not a speed threshold (F31). A panel's centroid slides as
   the viewpoint changes, and a speed test promoted panels to vessels in 28–33 %
-  of frames. Static returns feed the sector branch; the moving track feeds the
-  target slot.
+  of frames. The moving track feeds the target slot. The sector branch is pooled
+  from all gated returns, the target hull included (corrected 2026-10-17).
 - **Information parity:** the classical comparators consume the same tracks
   (Section 3.3).
 - **Figure 3:** pipeline block diagram from scan to the observation branches
@@ -239,7 +239,7 @@ Eq. 6–8, Table 5) — **the heart of contribution C2**
 
 | Branch | Values | Contents |
 |---|---|---|
-| lidar | 27 | closeness per sector over ±135°, static returns only; sectors finest ahead (6°), coarser abeam |
+| lidar | 27 | closeness per sector over ±135°, from all gated returns (static obstacles and the target hull); sectors finest ahead (6°), coarser abeam |
 | boundary | 7 | map ray-cast at −90…+90° (30° apart) from the estimated pose |
 | ego | 3 | surge, sway, yaw rate |
 | path | 3 | cross-track error scaled by the local half-width on that side, course error, look-ahead course error |

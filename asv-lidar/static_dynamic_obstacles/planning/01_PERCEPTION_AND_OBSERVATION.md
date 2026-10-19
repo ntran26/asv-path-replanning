@@ -54,7 +54,10 @@ Required so the tracker can detect a vessel overtaking from astern (Rule 13, and
 ### 2.2 Pooled `c_t` — forward-biased, obstacles only
 
 `c_t` carries **static obstacles only**. Borders are gated out (section 3); the dynamic target
-goes through the target branch (section 5). A static obstacle directly astern has been passed,
+goes through the target branch (section 5).
+**Correction (2026-10-17):** the implementation pools all gated returns, the target hull
+included, so the target appears in `c_t` as an obstacle as well as in the target branch
+(`OBSERVATION_SPEC.md`, `lidar`). The sentence above records the design intent. A static obstacle directly astern has been passed,
 and the action space has no reverse, so aft sectors would be dead input.
 
 Swath **±135°**; aft 90° reserved for the tracker. 27 sectors:

@@ -324,14 +324,22 @@ perception-degradation study is part of the paper (decision, 2026-10-14).
    τ_p = max(0.25, 5√2 σ_pose). (Related idea: free-space/ray-casting evidence
    in occupancy mapping and vehicle tracking, e.g. Petrovskaya & Thrun, 2009.)
 
-   Static clusters feed the lidar branch; the moving track feeds the target
-   branch and the encounter module.
+   The moving track feeds the target branch and the encounter module. The
+   static/moving verdict decides what becomes a target track; it does **not**
+   remove the target's returns from the pooled sectors (next paragraph).
 
 7. **Encounter classification and CPA** — equations in
    `FORMULATION_EQUATIONS.md` section 4 (CPA, ship domain, CRI after Waltz & Okhrin,
    2023, classification bands, engagement/latch).
 
-**Sector pooling (feasibility pooling, Paper 2; Meyer et al., 2020a).** 27
+**Sector pooling (feasibility pooling, Paper 2; Meyer et al., 2020a).** The
+pooled `lidar` branch is computed right after the gate, from **all gated
+returns** in the ±135° swath: static panels and the target ship's hull alike
+(the order in the code is ray cast → gate → pool → segment → track). Checked
+on 2026-10-17: at one instant of a head-on episode, removing the target hull
+from the scan changes exactly the two sectors it covers (closeness 0.74 and
+0.75 with it, 0 without). A target therefore reaches the policy twice: as an
+obstacle in the pooled sectors and as a track in the target branch. 27
 sectors over ±135° (15 × 6° ahead, 8 × 11.25° abeam, 4 × 22.5° on the
 quarters). For each sector with beam ranges ρ₁…ρ_M in angular order:
 

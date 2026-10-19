@@ -149,6 +149,7 @@ Define **decoupled** and **coupled** once, in Section 2.1.4:
 | Training targets | constant velocity | never give way; constant velocity, except that in stage 7, 30 % of the targets in coupled layouts change speed once |
 | Target speeds | "0.20–0.75 m/s" | by encounter type, as in the training, validation and test sets: overall about 0.22–1.11 m/s (section 4, Section 2.1.4) |
 | Width thresholds | 3.8 / 6.3 / 4.9 m, tested by a width sweep | crossing 7.60 m, head-on 3.80 m (target on its own side) or 6.30 m (target on the centerline), overtaking 4.26 m; design reasoning, not tested by a sweep (section 4, Section 2.2.4) |
+| Lidar branch (Sections 2.3.1–2.3.2, Table 6) | "static returns only" | all gated returns, static obstacles and the target hull alike (pooled before segmentation and tracking); the target also enters the target branch as a track |
 | Runtime layer | "evaluated both with and without it" | off in training and in every result reported for the learned policy; the safety-on evaluation is a placeholder (section 1.7) |
 
 ### 1.7 Decisions on the open items (2026-10-14)
@@ -603,15 +604,44 @@ Define **decoupled** and **coupled** once, in Section 2.1.4:
   - Static/moving test — add the hysteresis: "promoted to moving after two consecutive motion
     updates (1 s) and demoted after four quiet ones (2 s), biased toward under-detection because
     calling a panel a vessel has COLREGs consequences."
+  - **Correction (what feeds the lidar branch).** The draft says the lidar branch carries static
+    returns only. The frozen code pools the 27 sectors from the gated scan, **before** segmentation
+    and tracking, so the pooled sectors contain every gated return: the static panels and the
+    target ship's hull alike. The static/moving test decides what becomes a target track; it does
+    not remove the target's returns from the sectors. (Verified on 2026-10-17: removing the target
+    hull from one scan changes exactly the sectors it covers.)
+    - After the gating sentence, add: "The gated scan is pooled at once into the sectors of the
+      lidar branch (Section 2.3.2), so that branch contains every gated return, the target's hull
+      included."
+    - Replace the paragraph's last sentence, "Static returns feed the lidar branch of the
+      observation, and the moving track feeds the target branch.", with: "The moving track feeds
+      the target branch. A target therefore reaches the policy twice: as an obstacle at its range in
+      the pooled sectors, and as a track, with its velocity, in the target branch."
 - **Paragraph 3** — append: "In the field trials, the same modules run on the real scan and pose
   (Section 5)."
-- **Figure 3 placeholder:** "clustering" → "segmentation".
+- **Figure 3 placeholder:** "clustering" → "segmentation". Redraw the flow as: LiDAR scan → map gate
+  → (i) feasibility pooling of all gated returns → lidar branch, and (ii) segmentation →
+  ego-motion compensation → association → Kalman filter → free-space static/moving test → moving
+  track → target branch and the encounter module. Replace "Static returns → lidar branch" with
+  "All gated returns → pooled sectors → lidar branch".
 
 ### 2.3.2 Observation
 
-- No change to the content (70 values, six branches).
+- No change to the values (70 values, six branches).
 - In the context-branch paragraph and Table 6, wherever σ is described, use "required turn
   sense".
+- **Lidar paragraph, first sentence** — replace "The lidar branch carries static returns only, over a
+  ±135° swath; the aft 90° is left to the tracker." with: "The lidar branch pools all gated returns
+  over a ±135° swath, static obstacles and the target's hull alike; the aft 90° is left to the
+  tracker."
+- **Target-branch paragraph** — replace "Pooled range sensing is velocity-blind: a wall and a
+  closing vessel at the same range produce the same closeness. Target kinematics therefore enter
+  through explicit tracking," with: "Pooled range sensing is velocity-blind: the target's hull
+  registers in the lidar branch as an obstacle at its range, but a wall and a closing vessel at the
+  same range produce the same closeness. Target kinematics therefore enter through explicit
+  tracking,". Keep the rest of the sentence.
+- **Table 6, lidar row, Contents** — replace "Static returns over ±135°:" with "All gated returns
+  (static obstacles and the target hull) over ±135°:".
 
 ### 2.3.3 Reward
 
