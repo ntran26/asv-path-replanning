@@ -138,8 +138,12 @@ Paper 2 (Tran et al., 2026) for the platform.
 
 All comparators use the same perception (LiDAR scan, tracker, map boundary) as
 the learned policies and the same actuator limits; they differ only in the
-avoidance logic. Tuned on the validation set by coordinate descent, scored
-by goal − 2 × collision.
+avoidance logic. Tuned on the decoupled part of the validation set (120
+episodes) by coordinate descent, scored by goal − 2 × collision: COLREGs-VO
+raised its course-change weight from 0.3 to 0.8 (+0.525 → +0.575 on all 120
+episodes); DWA kept its defaults (+0.650 either way). Both are pinned in
+`configs/comparators_v1.json` (digest `0dd8eab26bbf954f`). Pseudocode:
+`PAPER3_ALGORITHMS.md`, Algorithms A1 and A2.
 
 **2.1 LOS guidance + heading PID (path following, shared).** Line-of-sight
 guidance (Fossen, 2021): aim at a point Δ = 2.5 m ahead on the path,
@@ -159,11 +163,12 @@ rollouts run the same law on the same dynamics, so the trajectories it scores
 are the ones the vessel sails; with this value the nine set-points spread over
 about 9–36° of heading change in 6 s at cruise (check of 2026-10-10,
 `results/classical/dwa_yaw_gain_check.md`).
-Speed: rpm = u_d / (speed per rpm) + 6 (u_d − u).
+Speed: rpm = u_d / (0.093 m/s per rpm) + 6 (u_d − u), clipped to 0–12 rpm.
 
 **2.2 LOS-PID + Dynamic Window Approach (DWA)** (Fox, Burgard & Thrun, 1997).
-LOS-PID drives the vessel until anything comes within 9 m (a track, a scan
-point ahead, or within a hull length of the boundary). Then, each decision:
+LOS-PID drives the vessel until a track or a scan point comes within 9 m (a
+point no more than 1 m abaft the own-ship centre), or the hull comes within
+1.0 m of the boundary. Then, each decision:
 
 1. **Candidates:** yaw-rate set-points r_d ∈ {−9, −6.75, …, +9} °/s × speeds
    {1.0, 0.5, 0} × U_nom × hold times {3, 6} s, plus plain LOS-PID at full
@@ -173,8 +178,9 @@ point ahead, or within a hull length of the boundary). Then, each decision:
    as an ideal arc, because this hull needs about 5 s to build a turn. After the
    hold time the prediction hands back to LOS-PID.
 3. **Admissibility:** inadmissible if the predicted hull comes within 0.20 m of
-   a scan point or of the boundary over the first 5.5 m of travel, or of a
-   tracked target (constant velocity) within 10 s.
+   a scan point or within 0.05 m of the boundary over the first 5.5 m of travel
+   (the map polygon is exact, the scan is not), or within 0.20 m of a tracked
+   target's hull (constant velocity) within 10 s.
 4. **Objective** (maximized over admissible candidates):
 
    G = 1.0·heading + 1.0·clearance + 0.5·velocity + 0.6·path − 0.25·smoothness
@@ -182,13 +188,17 @@ point ahead, or within a hull length of the boundary). Then, each decision:
    heading = 1 − |LOS heading at the end point − predicted heading|/π;
    clearance = min(clearance, 1.5 m)/1.5 m, with clearance measured over the
    same windows as admissibility (fixed obstacles and the boundary over the
-   first 5.5 m of travel, the tracked target over the first 10 s);
-   velocity = mean speed/U_nom; path = 1 − mean|cross-track|/2 m;
+   first 5.5 m of travel, the tracked target over the first 10 s; the boundary
+   clearance enters raised by 0.15 m, so its 0.05 m limit sits on the same
+   0.20 m scale);
+   velocity = mean predicted speed over the first 10 s/U_nom; path = 1 − mean
+   |cross-track| over the first 5.5 m of travel/2 m;
    smoothness = |r_d − r_d,prev|/(18 °/s) when both the candidate and the last
-   choice are yaw-rate set-points, 1 when one of them is plain LOS-PID, plus
-   |speed fraction − last speed fraction|.
+   choice are yaw-rate set-points, 0 when both are plain LOS-PID, 1 when one of
+   each, plus |speed fraction − last speed fraction|; 0 at the first decision
+   of an avoidance.
 5. **Fallback** if none is admissible: the candidate whose first violation
-   comes latest, then most clearance.
+   comes latest, then most clearance, then the highest objective.
 
 **DWA knows obstacles, not rules** — it is the "no COLREGs" reference.
 
@@ -204,23 +214,35 @@ Shiller, 1998):
    own hull comes within 0.20 m of a target's hull within 20 s (target at
    constant velocity), or within 0.15 m of a scan point / 0.05 m of the
    boundary within 10 s.
-4. **Classification (open-water roles):** being overtaken if the target
-   bearing |α| ≥ 112.5°; overtaking if the own ship is ≥ 112.5° off the
-   target's bow and faster; head-on if |α| ≤ 22.5° and the reciprocal angle
-   ≤ 22.5°; otherwise crossing — give-way if the target is to starboard
-   (α > 0), stand-on if to port.
+4. **Classification (open-water roles):** α is the target's bearing from the
+   own heading and β the own ship's bearing from the target's heading (both
+   wrapped to ±180°). Being overtaken if |α| ≥ 112.5°; overtaking if
+   |β| ≥ 112.5° (the own ship more than 22.5° abaft the target's beam) and the
+   own ship is faster; head-on if |α| ≤ 22.5° and |β| ≤ 22.5° (each vessel
+   within 22.5° of the other's bow); otherwise crossing — give-way if the
+   target is to starboard (α > 0), stand-on if to port. The roles are
+   recomputed every decision from the instantaneous heading, with no hold,
+   hysteresis or latch.
 5. **COLREGs constraint (give-way classes):** while the encounter is "live"
    (closing, predicted miss < 2.5 m within 20 s) the relative velocity must lie
    to starboard of the line of sight: (**p**_TS − **p**_OS) × (**v**_OS − **v**_TS)
-   < 0 — "alter to starboard and pass astern".
-6. **Stand-on (Rule 17):** hold course and speed while the preferred candidate
-   stays clear for more than 12 s.
+   < 0 — "alter to starboard and pass astern". "Live" is judged per candidate,
+   on that candidate's own velocity, so a candidate that by itself opens the
+   pass beyond 2.5 m is exempt (a quick turn to port in a near-reciprocal
+   head-on can qualify). Kuwata et al. judge it once on the encounter; decision
+   A35 (2026-10-19) adopts their form for the reported comparator (settings v2, built after
+   TQC seeds 1–2); the per-candidate form above is the frozen v1.
+6. **Stand-on (Rule 17):** while a crossing target is to port or a target is
+   overtaking it, the own ship keeps the preferred candidate (the LOS course at
+   U_nom, i.e. it follows its path) as long as that candidate meets no hard
+   limit within 12 s (targets) or 10 s (scan points and the boundary).
 7. **Cost** over the allowed candidates:
    J = 1.0·|χ − χ_LOS|/π + 0.5·max(0, U_pref − U)/U_pref + 1.0·J_prox
-   + 0.3·|χ − χ_prev|/π, with U_pref = U_nom = 0.558 m/s and
-   J_prox = max(0, 0.60 m − c_min)/(0.60 m − 0.15 m), c_min being the candidate's
-   smallest clearance to scan points and the boundary over 10 s (a soft margin
-   above the 0.15 m hard limit).
+   + 0.8·|χ − χ_prev|/π (course-change weight tuned from 0.3), with
+   U_pref = U_nom = 0.558 m/s and J_prox = max(0, 0.60 m − c_min)/(0.60 m − 0.15 m),
+   c_min being the candidate's smallest clearance to scan points and to the
+   boundary (the boundary clearance raised by 0.10 m) over 10 s — a soft margin
+   above the 0.15 m hard limit.
 8. **Fallback:** if nothing satisfies both the velocity obstacle and the
    COLREGs constraint, drop the constraint rather than accept a collision
    (Kuwata's own rule); if nothing is safe, take the latest first contact.

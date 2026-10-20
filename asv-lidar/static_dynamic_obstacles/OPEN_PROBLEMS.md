@@ -53,7 +53,7 @@ generator, the scale audit, noise and randomisation.
 
 | Part | Kind | Needs |
 |---|---|---|
-| **A** | Decisions | decisions to take — **3 items (A35, A37, A38)**; A36 closed by suite 3.4; A34, A32, A33, A26, A10, A3/A4/A6 and the freeze sign-off decided 2026-09-26 |
+| **A** | Decisions | decisions to take — **2 items (A37, A38)**; A35 decided 2026-10-19 (option 1, built after the TQC seeds); A36 closed by suite 3.4; A34, A32, A33, A26, A10, A3/A4/A6 and the freeze sign-off decided 2026-09-26 |
 | **B** | Measurements | basin time — `PART2_BASIN_PLAN.md`, with one addition proposed |
 | **C** | Build work | implementation time — 8 items |
 
@@ -138,14 +138,16 @@ Cost: none to training (D1 keeps training on `T-CV`); the frozen suite has not r
 
 **A37 — physical transfer: in this paper or the field paper (skeleton S13, opened 2026-09-28).** Introduction draft 4 calls the physical-transfer assessment "planned", lists four contributions without it, and its roadmap has no field section; revision 36 had kept field work *in* this paper (RQ4, claim C-6, old contribution C7, Study 3). Options: **(a)** keep the basin trials here -- add a field section after Results and restore RQ4/C-6 in section 1.3; **(b)** move them to the field paper -- drop RQ4 and C-6, keep system identification only as the model's provenance, and list the transfer as future work. Draft 4's wording ("planned", transfer evidence "reported separately") reads as (b); until this is decided, the skeleton parks the old section 7 unnumbered after section 4 and the ledger marks C-6 open.
 
-**A35 — the COLREGs-VO comparator applies its side rule per candidate (found building A34, F100).** `colregs_vo._colregs_ok` decides whether the encounter is "live" (closing, DCPA < `SIDE_FREE_DCPA_M` = 2.5 m) **separately for each candidate velocity**. Any candidate that itself opens the pass beyond 2.5 m is exempt from "pass to starboard", so a quick turn to **port** in a head-on counts as compliant. Measured on a head-on 0.3 m off the reciprocal: the comparator as tuned picks 160° (port); judged on the encounter it picks 200° (starboard). Kuwata et al. apply the COLREGS constraint to an obstacle once the encounter is judged dangerous on the present velocities, then to every candidate — which is what `T-RE` now does (`side_live`).
+**A35 — decided 2026-10-19: option 1 (judge the side rule on the encounter, as published), built once TQC seeds 1 and 2 have finished.** Plan: the comparator decides "live" once from the present velocities, latched while closing (the `side_live` path `T-RE` already uses); re-validate on the 120 decoupled validation episodes and re-tune `W_CHANGE` only if the score falls; freeze `comparators_v2.json`; run test set v4 once with v2. The v1 test-set run (2026-10-08, success 0.687) is superseded and not reported; the deviation was found on 2026-09-26, before any test-set result, and the change makes the comparator match its published method, so it is not selection on test results.
+
+*Original entry:* **A35 — the COLREGs-VO comparator applies its side rule per candidate (found building A34, F100).** `colregs_vo._colregs_ok` decides whether the encounter is "live" (closing, DCPA < `SIDE_FREE_DCPA_M` = 2.5 m) **separately for each candidate velocity**. Any candidate that itself opens the pass beyond 2.5 m is exempt from "pass to starboard", so a quick turn to **port** in a head-on counts as compliant. Measured on a head-on 0.3 m off the reciprocal: the comparator as tuned picks 160° (port); judged on the encounter it picks 200° (starboard). Kuwata et al. apply the COLREGS constraint to an obstacle once the encounter is judged dangerous on the present velocities, then to every candidate — which is what `T-RE` now does (`side_live`).
 
 | Option | Change | Cost |
 |---|---|---|
 | **1. Judge on the encounter, as published (recommended)** | the comparator passes `side_live` from its present velocity (latched until it stops closing, as `T-RE` does); re-validate on the 120 validation episodes and re-tune `W_CHANGE` only if the score falls | ~1 h of evaluation, run in a gap between trainings; `comparators_v1.json` → v2 |
 | 2. Keep it as tuned | report the deviation from the paper in the methods | a reviewer can call the COLREGs-VO row a weakened Kuwata |
 
-No comparator result has been reported, so either is free now.
+No comparator result has been reported, so either is free now. *(Superseded: both comparators ran on test set v4 on 2026-10-08; see the decision above.)*
 
 **A32 — the crossing side bias (F92) — decided 2026-09-26 (recommended action): option 4, keep the formulation and report crossing compliance by side for every learner.** Option 1 measured (F94): the reward is not the cause. From the same engagement state, turning the compliant way is worth **+61** (discounted, 30 deg) over the wrong way from port **and** from starboard; the reward prefers compliance in every pair that reaches the goal both ways, and the compliant turn costs nothing on the path terms. Option 2 is ruled out (it would scale a signal already large and symmetric). What remains is how the learner turns a clear signal into a side-conditioned action, which is what the five-learner comparison measures: **recommendation now option 4 — keep baseline-v1, report crossing compliance by side for every learner**, with option 3 (symmetric, mirrored crossing draws) as the fix to try only if all five learners show the bias.
 
@@ -853,7 +855,7 @@ settled.
 | ~~C3a~~ | comparator tuning and COLREGs-VO | **done** (F97): tuned on the validation set, validated on all 120, pinned in `configs/comparators_v1.json` | — | COLREGs-VO built |
 | ~~B6a~~ | claim ledger: C-2/C-3 evidence moves from Tier B to R4 | **signed off** | — | 2026-09-26 |
 | **A34** | frozen suite target behaviours | **decided** (option a), built: suite 3.2 | — | F99, F100 |
-| **A35** | COLREGs-VO comparator judges its side rule per candidate | **decision** | the COLREGs-VO row | recommend option 1 |
+| **A35** | COLREGs-VO comparator judges its side rule per candidate | **decided 2026-10-19** | the COLREGs-VO row | option 1, built after TQC seeds 1-2; comparators v2 |
 | ~~A36~~ | being overtaken / null in a channel is untrained geometry | **closed**: suite 3.4 evaluates only trained combinations | — | F102 |
 | ~~C3a-old~~ | **comparator tuning**: parameters ported to `src/constant_temp.py` (single source, digest-safe); **tune on the validation set after the campaign**, same score as the RL checkpoints (goal − 2 × collision), search reported, tuned values pinned with each result | build | a fair classical baseline (N2) | mine, ~2 h compute |
 | ~~A20~~ | freeze class and sense per engagement | **decided** (option 1) | — | built, F58 |

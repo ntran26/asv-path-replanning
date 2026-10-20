@@ -1,1 +1,10 @@
 2026-10-18 20:55:52 == recurrent_ppos2_bl3: training 0 -> 3.0 M in one run (baseline-v3, stages on the 2.5 M schedule; PIN=0, THREADS=default)
+2026-10-19 08:59:04    recurrent_ppos2_bl3 3.0 M exit 0
+2026-10-19 08:59:44 == recurrent_ppo seed 2: already trained
+2026-10-19 09:02:35    tier 1 recurrent_ppos2_bl3 supervisor off exit 0
+2026-10-19 09:22:58    frozen suite recurrent_ppos2_bl3 exit 0
+2026-10-19 09:52:14    Paper 2 set recurrent_ppos2_bl3 exit 0
+2026-10-19 09:52:14 == recurrent_ppo seed 2 done
+2026-10-19 10:02:15    test set v4, recurrent_ppos2_bl3 exit 0 (results/test_set/v4/recurrent_ppos2_bl3/summary.txt)
+2026-10-19 10:13:35    test set v4 (final model), recurrent_ppos2_bl3 exit 0 (results/test_set/v4/recurrent_ppos2_bl3_final/summary.txt)
+2026-10-19 10:13:36 == recurrent_ppos2_bl3 run done

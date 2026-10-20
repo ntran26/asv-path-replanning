@@ -48,6 +48,31 @@ and the tables that decide them, in one file.
 > - **Checkpoint selection (decision 2026-10-15).** Headline rows stay on each run's best
 >   validation-set checkpoint; every run's final 3.0 M model is also run on test set v4 (tag
 >   `<id>_final`) and reported beside it as a selection-sensitivity check (skeleton S15).
+> - **Seed retention (decision 2026-10-19).** Every trained seed is reported; none is re-trained
+>   or replaced because of its result, only for a documented defect (a code or configuration
+>   mismatch, an interrupted or corrupted run). RecurrentPPO seed 1 has no defect: its
+>   mid-training collapse (between 1.0 and 2.4 M, 258 of 273 updates stopped at the first epoch on
+>   the KL limit; validation-set score down to -0.91 at 2.0 M, recovery after 2.4 M) is reported as
+>   a property of the recurrent on-policy baseline, beside seeds 0 and 2, which show none of it
+>   (skeleton S16).
+> - **Test set v4 by seed (2026-10-19; safety off; success, decoupled / coupled).**
+>
+>   | Run | Best checkpoint (headline) | Final 3.0 M model |
+>   |---|---|---|
+>   | PPO seed 0 | 0.751 (0.827 / 0.601) | 0.712 (0.780 / 0.577) |
+>   | PPO seed 1 | 0.747 (0.830 / 0.583) | 0.777 (0.849 / 0.634) |
+>   | PPO seed 2 | 0.753 (0.810 / 0.640) | 0.756 (0.818 / 0.634) |
+>   | RecurrentPPO seed 0 | 0.757 (0.834 / 0.604) | 0.774 (0.858 / 0.607) |
+>   | RecurrentPPO seed 1 | 0.638 (0.730 / 0.455) | 0.669 (0.789 / 0.432) |
+>   | RecurrentPPO seed 2 | 0.756 (0.833 / 0.604) | same model |
+>   | SAC seed 0 | 0.865 (0.931 / 0.735) | 0.859 (0.929 / 0.720) |
+>   | SAC seed 1 | 0.827 (0.884 / 0.714) | 0.819 (0.875 / 0.708) |
+>   | SAC seed 2 | 0.845 (0.887 / 0.762) | same model |
+>   | TQC seed 0 | 0.837 (0.895 / 0.723) | same model |
+>
+>   Learner means at the best checkpoint: SAC 0.846 (0.827-0.865), PPO 0.750 (0.747-0.753),
+>   RecurrentPPO 0.717 (0.638-0.757), TQC 0.837 (seed 0; seeds 1-2 to train). The final model
+>   changes single runs by at most 0.039 (on-policy learners) and leaves the learner order unchanged.
 > - **Scope (decisions 2026-10-14).** The width sweep (R4) and perception-degradation study (R5) are excluded from the paper (decision, 2026-10-14: the paper is already long): C-2, C-3 and tables R4 and R5 are
 >   dropped, and RQ6 and RQ3 with them. The width thresholds stay in Section 2.2.4 as design
 >   reasoning. Field trials are in this paper (S13(a)): RQ4, C-6 and the old C7 return, with
@@ -88,8 +113,9 @@ and the tables that decide them, in one file.
 >   implemented with a 2D LiDAR; LiDAR stays out of the title and the contribution names
 >   (supervisors' guidance, as for Paper 2), and other range sensors such as radar are a design
 >   scope, not a tested result.
-> - **Runs.** Of the four-learner, three-seed campaign, baseline-v3 SAC, PPO, RecurrentPPO
->   seed 0 exist (2026-10-08), and TQC seed 0 (2026-10-11). The baseline-v1 and baseline-v2 runs were removed on 2026-10-04, but their result
+> - **Runs (status 2026-10-19).** Of the four-learner, three-seed baseline-v3 campaign, PPO,
+>   RecurrentPPO and SAC seeds 0-2 and TQC seed 0 are complete (evaluations, test set v4, final-model
+>   check); TQC seed 1 trains from 2026-10-19, then TQC seed 2. The baseline-v1 and baseline-v2 runs were removed on 2026-10-04, but their result
 >   summaries are kept. The campaign's formulation is baseline-v3: the v4.3
 >   candidate was trained in full and not adopted (`BASELINE_V4_PLAN.md`, section 5e).
 > - **The tables below still describe suite 3.0.** R1, the Tier B holdout, becomes the test-set

@@ -13688,3 +13688,49 @@ Early stopping at step 1 due to reaching max kl: 0.06
 |    std                  | 0.471       |
 |    value_loss           | 0.969       |
 -----------------------------------------
+Early stopping at step 2 due to reaching max kl: 0.05
+[EVAL] t=3,000,000 safety off goal 0.66 collision 0.34 | dev goal 0.84 | field goal 0.51 (NT 0.85 HO 0.50 CRP 0.42 CRS 0.38 OT 0.54 BO 0.42) (345.3 s)
+-----------------------------------------
+| eval_supervisor_off/    |             |
+|    collision_rate       | 0.344       |
+|    dev/collision        | 0.158       |
+|    dev/goal             | 0.842       |
+|    episodes             | 270         |
+|    eval_wall_s          | 345         |
+|    field/BO/goal        | 0.423       |
+|    field/CRP/goal       | 0.423       |
+|    field/CRS/goal       | 0.385       |
+|    field/HO/goal        | 0.5         |
+|    field/NT/goal        | 0.85        |
+|    field/OT/goal        | 0.538       |
+|    field/collision      | 0.493       |
+|    field/goal           | 0.507       |
+|    goal_rate            | 0.656       |
+|    intervention_rate    | 0           |
+|    mean_return          | -107        |
+|    timeout_rate         | 0           |
+|    timesteps            | 3000000     |
+| rollout/                |             |
+|    ep_len_mean          | 52.7        |
+|    ep_rew_mean          | -124        |
+| time/                   |             |
+|    fps                  | 70          |
+|    iterations           | 586         |
+|    time_elapsed         | 42777       |
+|    total_timesteps      | 3000320     |
+| train/                  |             |
+|    approx_kl            | 0.045286406 |
+|    clip_fraction        | 0.181       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -1.32       |
+|    explained_variance   | 0.846       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 0.154       |
+|    n_updates            | 5850        |
+|    policy_gradient_loss | -0.00244    |
+|    std                  | 0.47        |
+|    value_loss           | 0.878       |
+-----------------------------------------
+Early stopping at step 1 due to reaching max kl: 0.05
+[EVAL] t=3,000,320 safety off goal 0.68 collision 0.32 | dev goal 0.82 | field goal 0.56 (NT 0.85 HO 0.54 CRP 0.54 CRS 0.38 OT 0.58 BO 0.54) (300.4 s)
+done in 11.97 h -> C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\runs\recurrent_ppo_formulation_seed2_bl3

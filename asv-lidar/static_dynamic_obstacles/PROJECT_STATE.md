@@ -90,7 +90,7 @@ moves almost everything else.**
 | ~~B5~~ | ~~Curriculum steps per stage and total budget~~ — **decided**: stage fractions (F75), 2 M steps × 5 seeds, ratio 1.0 (A26, F95) | — | — |
 | ~~B6~~ | ~~Claim ledger and result tables unsigned~~ — **signed off** 2026-09-26 | — | — |
 | ~~B7~~ | ~~`T-RE` a placeholder~~ — **on the COLREGs-VO rule** (F100) | — | — |
-| **B8** | Classical comparators built and tuned (F83, F97); `T-RE` runs the COLREGs-VO rule (F100); **open: the comparator's per-candidate side rule (A35)** | decision | COLREGs-VO row of R1 |
+| **B8** | Classical comparators built and tuned (F83, F97); `T-RE` runs the COLREGs-VO rule (F100); **A35 decided 2026-10-19: option 1** (the side rule judged on the encounter, as published), built after TQC seeds 1-2, then comparators v2 re-validated and run once on test set v4 | scheduled | COLREGs-VO row of R1 |
 | **B9** | `metrics.py` does not read the reward keys | 04 | 04a section 10's metric set |
 | ~~B10~~ | ~~the scenario generator is not wired into `env.py`~~ — **wired** (F44) | — | — |
 

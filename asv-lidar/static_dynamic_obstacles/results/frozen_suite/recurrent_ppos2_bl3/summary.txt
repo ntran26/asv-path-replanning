@@ -1,0 +1,61 @@
+Frozen suite (recurrent_ppos2_bl3) — model runs\recurrent_ppo_formulation_seed2_bl3\best_model.zip
+1700 episodes, suite manifest 61788ff19fc317c9, 1215 s
+
+== Tier B (headline, R1)
+-- by safety layer
+              n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+supervisor                                                                            
+off         800    0.786        0.194        0.02    0.909      2.145  -26.539     0.0
+
+-- by class (safety layer off)
+                   n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+class                                                                                      
+being_overtaken  100    0.950        0.000       0.050    0.431      1.788  -22.320     0.0
+crossing         200    0.495        0.485       0.020    0.721      1.682  -18.858     0.0
+head_on          200    0.720        0.275       0.005    0.796      1.863  -22.601     0.0
+null             100    0.990        0.000       0.010    1.093      7.628   -2.025     0.0
+overtaking       200    0.960        0.015       0.025    1.358      2.773  -52.525     0.0
+
+-- by stratum (safety layer off)
+           n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+stratum                                                                            
+basin    500    0.834        0.144       0.022    0.912      2.265  -21.881     0.0
+channel  300    0.707        0.277       0.017    0.905      1.973  -34.302     0.0
+
+-- by target behaviour (safety layer off)
+             n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+behaviour                                                                            
+cv         800    0.786        0.194        0.02    0.909      2.145  -26.539     0.0
+
+-- crossings by side (safety layer off), the A32 split
+                 n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+crossing_side                                                                            
+port           111    0.586        0.405       0.009    0.715      1.802   -11.15     0.0
+starboard       89    0.382        0.584       0.034    0.730      1.621   -28.47     0.0
+
+== Robustness set (R3): the headline's scenarios with reactive (re) and, in head-ons,
+   non-compliant (nc) targets, on the same seeds
+-- by behaviour (safety layer off)
+             n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+behaviour                                                                            
+nc         200    0.980        0.010       0.010    1.027      3.814   -5.682     0.0
+re         700    0.906        0.066       0.029    1.042      2.289  -26.159     0.0
+
+-- by class and behaviour (safety layer off)
+                             n  success  coll_target  coll_other  rms_cte  min_range  colregs  estops
+class           behaviour                                                                            
+being_overtaken re         100    0.950        0.010       0.040    0.435      2.169  -22.024     0.0
+crossing        re         200    0.865        0.080       0.055    1.210      2.460  -21.995     0.0
+head_on         nc         200    0.980        0.010       0.010    1.027      3.814   -5.682     0.0
+                re         200    0.865        0.135       0.000    0.867      1.870   -7.444     0.0
+overtaking      re         200    0.965        0.010       0.025    1.352      2.788  -51.106     0.0
+
+-- paired with the constant-velocity twin (safety layer off)
+                             n  success_cv_twin  success   lost  gained
+class           behaviour                                              
+being_overtaken re         100            0.950    0.950  0.020   0.020
+crossing        re         200            0.495    0.865  0.040   0.410
+head_on         nc         200            0.720    0.980  0.015   0.275
+                re         200            0.720    0.865  0.095   0.240
+overtaking      re         200            0.960    0.965  0.005   0.010
+

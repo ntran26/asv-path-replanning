@@ -20,7 +20,7 @@ section 1.7). **Document to revise:** `Paper3_Sections1-2_Introduction_Formulati
 **Reference files** (attach with the document): `MASTER_ARTIFACT_FACTS.md` (verified values for
 the vessel, comparators, perception, safety layer, curriculum and data sets),
 `FORMULATION_EQUATIONS.md` (equations), `PAPER3_DRAFT_SKELETON.md` (framing, scope decisions
-S1–S14, the COLREGs scope table). **Precedence** where sources disagree: this brief, then
+S1–S17, the COLREGs scope table), `PAPER3_ALGORITHMS.md` (the algorithm boxes, decision S17). **Precedence** where sources disagree: this brief, then
 `MASTER_ARTIFACT_FACTS.md`, then `FORMULATION_EQUATIONS.md` (its rudder line, δc = 100 aδ, is
 superseded by the facts and this brief), then the skeleton, then the draft. **Symbols:** keep the
 draft's names where `FORMULATION_EQUATIONS.md` uses others — beam ranges d (file: ρ), smoothness
@@ -46,8 +46,9 @@ deleted.
   every other new quantity is stated in words.
 - **Markers:**
   - Keep every existing **[CITE]** marker that this brief does not resolve.
-  - Use **[PENDING — …]** for the two items the author will supply later (the field-trial design
-    and the safety-on evaluation). Copy the wording given below verbatim.
+  - Use **[PENDING — …]** for the three items the author will supply later (the field-trial
+    design, the safety-on evaluation and the safety-layer algorithm). Copy the wording given
+    below verbatim.
   - Use **[CHECK — …]** only where this brief says so.
 - At the end of the document, add a short list of the markers that remain.
 
@@ -583,7 +584,16 @@ Define **decoupled** and **coupled** once, in Section 2.1.4:
 
   - Add after the paragraph: **[CHECK — wall-margin convention: the reference widths measure
     dwall = 0.65 m from each vessel's track, whereas Eq. (10) measures cwall = 0.65 m from the
-    hull side; measured from the hull, every reference width grows by one breadth (0.5 m)]**.
+    hull side. Measured from the hull, each margin grows by a half-breadth (0.25 m): the head-on
+    and overtaking widths grow by one breadth (to 4.30, 6.80 and 4.76 m) and the crossing width,
+    where the margin enters four times, by two breadths (to 8.60 m)]**.
+- **Algorithm 1 (new box, end of 2.2.4).** Insert "Algorithm 1. Encounter assessment for one
+  tracked vessel at each decision step" from `PAPER3_ALGORITHMS.md`, with a lead-in sentence: "Algorithm 1
+  gathers the classification, engagement and latch, and the admissibility and stopping tests of
+  Sections 2.2.2–2.2.4 into the order in which they run at each decision step; its inputs are the
+  perceived tracks of Section 2.3.1." Keep the box's symbols (they are the draft's) and its
+  parameter table; reference it from 2.2.2 and 2.2.3 where the classifier and the latch are
+  introduced.
 
 ### 2.3.1 Perception
 
@@ -619,6 +629,16 @@ Define **decoupled** and **coupled** once, in Section 2.1.4:
       the pooled sectors, and as a track, with its velocity, in the target branch."
 - **Paragraph 3** — append: "In the field trials, the same modules run on the real scan and pose
   (Section 5)."
+- **Algorithms 2 and 3 (new boxes, two separate boxes).** From `PAPER3_ALGORITHMS.md`:
+  - "Algorithm 2. Feasibility sector pooling" after the gating sentence, citing Paper 2 (its
+    Algorithm 1) and Meyer et al. (2020a), followed by the three changes from Paper 2 listed
+    under the box: the gated input contains the target's hull; 27 non-uniform sectors assigned by
+    bearing (Paper 2: 25 uniform sectors); the true 0.5° beam spacing (Paper 2: 1.205°), so pooled
+    values are not comparable across the two papers.
+  - "Algorithm 3. Target detection and tracking at each decision step" after the pipeline
+    paragraph; the paragraph keeps its prose (segmentation, association, Kalman filter,
+    static/moving test with its hysteresis) and points to the box for the order of the steps
+    and the parameter values.
 - **Figure 3 placeholder:** "clustering" → "segmentation". Redraw the flow as: LiDAR scan → map gate
   → (i) feasibility pooling of all gated returns → lidar branch, and (ii) segmentation →
   ego-motion compensation → association → Kalman filter → free-space static/moving test → moving
@@ -667,6 +687,11 @@ Replace the trigger sentence and its [CHECK], and the evaluation sentence, with:
 > attributed to the policy. [PENDING — safety-on evaluation: to be finalized and reported] In the
 > field trials, the same code also serves as an operator-latched stop (Section 5)."
 
+- **Appendix algorithm.** The layer gets an algorithm box in the appendix, beside the two
+  classical comparators; until the layer is finalized, add only the placeholder "[PENDING —
+  safety-layer algorithm: Appendix, to be added once the layer is finalized]" at the end of this
+  subsection.
+
 Keep the sentences on the overridden commands, and on the distinction between learned behavior
 and external intervention.
 
@@ -711,6 +736,12 @@ and external intervention.
     stages 6–7 the share applies to the episodes that are not coupled layouts.
   - Delete the [CHECK] marker on the stage 1–2 channel use and the obstacle counts; the stage
     1–2 basin-only use and the obstacle counts are confirmed.
+- **Algorithm 4 (new box, after Table 8).** Insert "Algorithm 4. Episode generation" from
+  `PAPER3_ALGORITHMS.md`, with its class-band table, and the lead-in: "Every episode, in training
+  and in the validation and test sets, is drawn by Algorithm 4 from a seed in the set's own range,
+  so no episode is shared between sets (Section 3)." Reference it from Section 2.1.4, where
+  decoupled and coupled scenarios are defined. The test-set fairness check is not a box; it stays
+  in the evaluation design (Section 3).
 
 ---
 
@@ -745,7 +776,8 @@ and the ship-domain review (Section 2.2.2).
 |---|---|---|
 | [PENDING — field-trial design] | 1.2.4, 1.3 (scope, contribution 5) | the author: target vessel, encounter types, layouts, number of runs |
 | [PENDING — safety-on evaluation] | 2.3.4 | the author: the safety layer is being finalized, then reported |
+| [PENDING — safety-layer algorithm] | 2.3.4 (box in the appendix) | the author: written once the layer is finalized |
 | [CHECK — Appendix D] | 2.1.2 | identified parameters with bootstrap spread |
-| [CHECK — wall-margin convention] | 2.2.4 | whether the reference widths keep the track-based 0.65 m margin or add one breadth |
+| [CHECK — wall-margin convention] | 2.2.4 | whether the reference widths keep the track-based 0.65 m margin or measure it from the hull (one breadth more for head-on and overtaking, two for crossing) |
 | [VERIFY] | 1.2.5 gap paragraph (optional clause) | "physical encounter trials of learned COLREGs-aware policies remain rare" |
 | [CITE] ×2 | 2.1.5, 2.2.2 | Froude scaling; ship-domain review |
