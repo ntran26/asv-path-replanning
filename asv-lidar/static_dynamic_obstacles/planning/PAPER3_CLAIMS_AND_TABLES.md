@@ -35,7 +35,7 @@ and the tables that decide them, in one file.
 >   | SAC 3 M, baseline-v4.3 seed 0 (not adopted) | v4 | 0.833 |
 >   | SAC 3 M, baseline-v3 seed 0 | v1 | 0.857 |
 >   | LOS-DWA | v1 | 0.804 |
->   | COLREGs-VO | v1 | 0.703 |
+>   | COLREGs-VO (not reported; replaced by the encounter-specific VO, S18) | v1 | 0.703 |
 >
 >   Seed-0 comparison of the three baseline-v3 learners (test set v4 by family and
 >   encounter, frozen suite, reference layouts, no-target counts, paired differences):
@@ -48,6 +48,12 @@ and the tables that decide them, in one file.
 > - **Checkpoint selection (decision 2026-10-15).** Headline rows stay on each run's best
 >   validation-set checkpoint; every run's final 3.0 M model is also run on test set v4 (tag
 >   `<id>_final`) and reported beside it as a selection-sensitivity check (skeleton S15).
+> - **Velocity-obstacle comparator (decision 2026-10-20, skeleton S18).** The encounter-specific
+>   VO (after Thyri and Breivik 2022) replaces COLREGs-VO: it shares the formulation's encounter
+>   assessment and narrow-channel convention, so the comparison measures the method, not the rule
+>   set. Comparators v2 (built after TQC seeds 1-2) judges its passing side on the encounter (A35),
+>   tunes it on the 120 decoupled validation episodes and runs test set v4 once. No claim says a
+>   comparator measures the effect of the convention.
 > - **Seed retention (decision 2026-10-19).** Every trained seed is reported; none is re-trained
 >   or replaced because of its result, only for a documented defect (a code or configuration
 >   mismatch, an interrupted or corrupted run). RecurrentPPO seed 1 has no defect: its
@@ -105,7 +111,7 @@ and the tables that decide them, in one file.
 >   learner-comparison study. Proposed method: the frozen formulation and the deployed policy, the
 >   better of SAC and TQC on test set v4 (three-seed mean; the deployed seed by validation score),
 >   the test set being larger and more balanced than the validation set. Baselines: the other
->   learners on the identical formulation and the classical references (LOS-PID + DWA, COLREGs-VO),
+>   learners on the identical formulation and the classical references (LOS-PID + DWA, encounter-specific VO),
 >   all on the same test set. Within each run the checkpoint is still selected on the validation set.
 >   The test set therefore also chooses the learner family: the paper states this, and the field
 >   trials (S13) are the independent evaluation of the deployed policy. Sensing: the formulation is
@@ -202,7 +208,6 @@ The prototype's reference controller is a supplementary comparator, not one of t
 | SAC, no COLREGs terms (ablation) | | | | | | | |
 | Prior SAC (Paper 2, frozen) | | | | | | | |
 | Encounter-specific VO | | | | | | | |
-| COLREGs-VO | | | | | | | |
 | LOS-PID + DWA | | | | | | | |
 | Reference controller (supplementary) | | | | | | | |
 

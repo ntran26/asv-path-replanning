@@ -136,7 +136,9 @@ Paper 2 (Tran et al., 2026) for the platform.
 
 ## 2. Classical comparators (Section 4)
 
-All comparators use the same perception (LiDAR scan, tracker, map boundary) as
+The reported comparators are LOS-PID + DWA (2.2) and the encounter-specific VO (2.4;
+decision S18, 2026-10-20). COLREGs-VO (2.3) is not a reported comparator; its rule drives the
+test set's reactive target. All comparators use the same perception (LiDAR scan, tracker, map boundary) as
 the learned policies and the same actuator limits; they differ only in the
 avoidance logic. Tuned on the decoupled part of the validation set (120
 episodes) by coordinate descent, scored by goal − 2 × collision: COLREGs-VO
@@ -203,7 +205,8 @@ point no more than 1 m abaft the own-ship centre), or the hull comes within
 **DWA knows obstacles, not rules** — it is the "no COLREGs" reference.
 
 **2.3 COLREGs-VO** (Kuwata et al., 2014; velocity obstacles after Fiorini &
-Shiller, 1998):
+Shiller, 1998) — not a reported comparator (S18); described because the test set's reactive
+target (`T-RE`) runs this rule from its own side:
 
 1. **Candidates:** course offsets −90° … +90° in 5° steps about the present
    heading, plus the LOS course; speeds {1, 0.75, 0.5, 0.25, 0} × U_nom.
@@ -246,6 +249,40 @@ Shiller, 1998):
 8. **Fallback:** if nothing satisfies both the velocity obstacle and the
    COLREGs constraint, drop the constraint rather than accept a collision
    (Kuwata's own rule); if nothing is safe, take the latest first contact.
+
+**2.4 Encounter-specific VO** (an interpretation of Thyri & Breivik, 2022, a method for
+confined waters; velocity obstacles after Fiorini & Shiller, 1998) — the reported
+velocity-obstacle comparator (S18). Values are comparators v1 (untuned defaults); comparators
+v2 tunes them on the validation set and judges the passing side on the encounter.
+
+1. **Encounter assessment:** the formulation's own encounter context (Algorithm 1): the
+   latched class, required turn sense, engagement and in-extremis flag, the same assessment the
+   learned policy observes.
+2. **Candidates and motion model:** as COLREGs-VO: course offsets −90° … +90° in 5° steps
+   about the present heading plus the LOS course, at {1, 0.75, 0.5, 0.25, 0} × U_nom; each swept
+   along the turn model (1 s lag, 6°/s, speed time constants 60 s down, 20 s up), sampled every
+   0.25 s.
+3. **Hard velocity obstacles:** the own hull within 0.20 m of a target's hull within 20 s
+   (constant velocity), or within 0.15 m of a scan point or 0.05 m of the boundary within 10 s.
+4. **Encounter domain (soft):** the target's deepest penetration of the own-ship domain (the
+   formulation's fore, aft and lateral semi-axes) scaled per class as (fore, aft, lateral):
+   head-on (1.0, 1.0, 1.2), crossing (1.5, 1.0, 1.0), overtaking (1.0, 1.0, 1.2), being
+   overtaken and none (1, 1, 1). Penalised, not forbidden, so in a narrow channel a small
+   intrusion is allowed where no clear pass exists.
+5. **Passing side (hard, give-way classes):** head-on: the target passes down the own ship's
+   port side (Rule 14); crossing: pass astern of the target, from either side (the
+   narrow-channel convention, S3); overtaking: pass on the side the required turn sense names.
+   A candidate whose closest approach is beyond 2.5 m is exempt (per candidate in v1; v2 judges
+   it on the encounter). Released in extremis, or when no lawful clear candidate exists.
+6. **Stand-on (being overtaken):** keep the LOS course at cruise while that velocity meets no
+   hard limit within 12 s and keeps the passing side (Rule 17(a)); otherwise act as for any
+   obstacle.
+7. **Cost:** J = 1.0·|χ − χ_LOS|/π + 0.5·max(0, U_pref − U)/U_pref + 3.0·domain penetration
+   + 0.3·|χ − χ_prev|/π + 1.0·static penalty, the static penalty rising from 0 at 0.6 m
+   clearance to scan points and the boundary to 1 at the 0.15 m hard limit.
+8. **Fallback:** if nothing is clear, the candidate whose first violation comes latest, then
+   the lowest cost. The choice is flown by the course autopilot (at 6°/s) and the speed loop
+   of 2.1.
 
 **Artificial potential field (APF) — background only.** Paper 2's comparator
 (LOS + APF): the goal attracts, obstacles repel, and the vessel follows the

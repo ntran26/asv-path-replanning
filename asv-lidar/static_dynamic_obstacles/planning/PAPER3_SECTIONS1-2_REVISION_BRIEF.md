@@ -144,7 +144,7 @@ Define **decoupled** and **coupled** once, in Section 2.1.4:
 | Training budget | 2 × 10⁶ steps, 5 stages | 3.0 × 10⁶ steps, 7 stages; boundaries at 0.16, 0.36, 0.64, 1.0, 1.5, 2.0 M (fractions 6.4, 14.4, 25.6, 40, 60, 80 % of a 2.5 M base budget); stage 7 from 2.0 M to the end |
 | Headline evaluation | 800 held-out constant-velocity scenarios per seed | test set of 1,000 episodes: 664 decoupled (basin and channel encounters; constant-velocity, reactive and noncompliant targets) + 336 coupled (three-obstacle layouts; constant- and varying-speed targets); every episode passes a feasibility check |
 | Checkpoint selection | development set | validation set, 270 episodes (120 decoupled + 150 coupled), score = goal rate − 2 × collision rate, safety layer off, every 2 × 10⁵ steps |
-| Classical comparators | COLREGs-VO, a narrow-channel adaptation of it, LOS + DWA | COLREGs-VO (Kuwata et al., open-water roles) and LOS guidance with heading PID and a DWA avoidance layer (obstacles only, no rules); the narrow-channel VO adaptation is **dropped** |
+| Classical comparators | COLREGs-VO, a narrow-channel adaptation of it, LOS + DWA | the encounter-specific VO (after Thyri and Breivik, 2022; the same encounter assessment and narrow-channel convention as the formulation) and LOS guidance with heading PID and a DWA avoidance layer (obstacles only, no rules); COLREGs-VO (Kuwata et al.) is **not** a comparator (decision S18, 2026-10-20) |
 | Rudder command (Eq. 2) | δc = 100 aδ (% of full deflection) | δc = −40° · aδ; δ is positive to port in the identified model, so a positive aδ turns the vessel to starboard |
 | Propulsion command (Eq. 2) | RPM | unchanged: RPM, nc = clip(6 + 6an, 0, 12) |
 | Training targets | constant velocity | never give way; constant velocity, except that in stage 7, 30 % of the targets in coupled layouts change speed once |
@@ -219,10 +219,12 @@ Define **decoupled** and **coupled** once, in Section 2.1.4:
 
 ### 1.2.1 Classical and explicitly constrained collision avoidance
 
-- **Last sentence of the section** — replace with: "In this study, a COLREGs-aware VO method
-  following Kuwata et al. [19], which keeps the open-water role assignment, and line-of-sight
+- **Last sentence of the section** — replace with: "In this study, an encounter-specific VO
+  method after Thyri and Breivik [new reference], designed for confined waters and given the same
+  encounter assessment and narrow-channel convention as the learned policies, and line-of-sight
   guidance with a DWA avoidance layer, which avoids obstacles without encoding the rules, serve
   as the classical references; both receive the same perception as the learned policies."
+  Keep Kuwata et al. [19] where the paragraph reviews VO methods.
 
 ### 1.2.2 Deep reinforcement learning for path following and COLREGs-aware navigation
 
@@ -535,9 +537,9 @@ Define **decoupled** and **coupled** once, in Section 2.1.4:
   stand on for a target crossing from port, and the classical comparators include a
   velocity-obstacle method with open-water roles [19] alongside an adaptation to the adopted
   convention, so that the effect of the convention can be measured (Section 3.3)." with "Under
-  the open-water rules the own ship would stand on for a target crossing from port; the
-  COLREGs-aware velocity-obstacle comparator keeps those open-water roles [19], so its behavior
-  in port crossings differs from the adopted convention by design (Section 3.3)."
+  the open-water rules the own ship would stand on for a target crossing from port. The
+  velocity-obstacle comparator follows the adopted convention as well (Section 3.3), so the
+  comparison isolates the method from the rule set."
 - **Figure 2 placeholder:** no change.
 
 ### 2.2.4 Geometric framework for constrained encounter responses
@@ -764,6 +766,10 @@ abbreviations; the author completes and checks the DOIs):
 - Bar-Shalom, Y.; Li, X.R.; Kirubarajan, T. *Estimation with Applications to Tracking and
   Navigation*; Wiley: New York, NY, USA, 2001. (Section 2.3.1; with Kalman, resolves the tracking
   [CITE])
+- Thyri, E.H.; Breivik, M. Partly COLREGs-compliant collision avoidance for ASVs using
+  encounter-specific velocity obstacles. In *Proceedings of the 14th IFAC Conference on Control
+  Applications in Marine Systems, Robotics, and Vehicles (CAMS)*, Copenhagen, Denmark, 2022
+  (IFAC-PapersOnLine; volume and pages to be checked). (Section 1.2.1; decision S18)
 
 The two remaining [CITE] markers stay: Froude scaling of ship maneuvering models (Section 2.1.5)
 and the ship-domain review (Section 2.2.2).

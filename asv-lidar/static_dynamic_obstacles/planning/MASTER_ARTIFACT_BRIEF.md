@@ -160,10 +160,12 @@ equations" box (what bold vectors, hats and subscripts mean).
 - **LOS-PID + DWA** (facts section 2.2): candidate set, closed-loop prediction through
   the vessel model, admissibility, objective G, fallback; "knows obstacles, not
   rules".
-- **COLREGs-VO** (facts section 2.3): candidates, own-ship turn model, hard velocity
-  obstacle, open-water classification, the starboard constraint
-  (cross product), stand-on rule, cost J, the drop-the-rule fallback; and the
-  narrow-channel variant.
+- **Encounter-specific VO** (facts section 2.4; the reported VO comparator, decision S18):
+  candidates, own-ship turn model, hard velocity obstacles, the encounter domain scaled per
+  class (penalised, not forbidden), passing side per class with the narrow-channel crossing
+  convention, stand-on, cost J, fallback; it reads the formulation's own encounter context.
+- **COLREGs-VO** (facts section 2.3): not a comparator; shown only as the rule the test set's
+  reactive target follows from its own side (open-water roles, the starboard constraint).
 - ▶ **LOS widget:** drag the vessel; change the look-ahead Δ; see the desired
   heading.
 - ▶ **DWA widget:** a vessel, a panel and a target; show all candidate

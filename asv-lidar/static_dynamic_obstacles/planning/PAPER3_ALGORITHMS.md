@@ -16,7 +16,7 @@ w with a subscript a reward weight).
 | Algorithm 2 | Feasibility sector pooling (Paper 2, Algorithm 1, with the Paper 3 changes) | 2.3.1 |
 | Algorithm 3 | Target detection and tracking | 2.3.1 |
 | Algorithm 4 | Episode generation (one generator for the training, validation and test sets) | 2.3.5 |
-| Algorithm A1 | COLREGs-aware velocity-obstacle comparator (after Kuwata et al. 2014; open-water roles) | Appendix, referenced from 3.3 (shared inputs: one paragraph ahead of it) |
+| Algorithm A1 | Encounter-specific VO comparator (after Thyri and Breivik 2022; decision S18) — to be drafted from comparators v2, `src/classical/encounter_vo.py` | Appendix, referenced from 3.3 (shared inputs: one paragraph ahead of it) |
 | Algorithm A2 | LOS-DWA comparator (after Fox et al. 1997; no COLREGs) | Appendix, referenced from 3.3 |
 | Algorithm A3 | Runtime safety layer | Appendix, **[PENDING]** until the layer is finalized |
 
@@ -356,7 +356,12 @@ Shared steps:
 
 ---
 
-## Algorithm A1. COLREGs-aware velocity-obstacle comparator (one 2 Hz decision)
+## Superseded: COLREGs-aware velocity-obstacle comparator (one 2 Hz decision)
+
+*Not a Paper 3 comparator (decision S18, 2026-10-20): Algorithm A1 becomes the
+encounter-specific VO, drafted from comparators v2. This box is kept because the test set's
+reactive target runs the same rule from its own side, and the shared inputs above apply to the
+new A1 unchanged.*
 
 **Placement.** Appendix, referenced from Section 3.3. Cite Kuwata et al. (2014) for the method
 and Fiorini and Shiller (1998) for velocity obstacles.
