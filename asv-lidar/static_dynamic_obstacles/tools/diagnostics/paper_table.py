@@ -2,7 +2,9 @@
 
 One column per method (training seeds pooled), one row per metric: a point estimate
 with a stratified bootstrap 95 % interval (stratified by test-set cell, pooled over
-runs, 5,000 resamples). Rate metrics (*) are means of per-episode 0/1 outcomes;
+runs, 5,000 resamples, drawn as index matrices in blocks of 1,000 so that a pooled three-seed
+column takes seconds; the method is that of `metrics.stratified_bootstrap_ci`). Rate metrics (*)
+are means of per-episode 0/1 outcomes;
 continuous metrics are interquartile means (IQM), because a mean of a binary rate is
 what a rate is, while IQM resists the long tails of truncated episodes. Definitions
 follow Paper 2 (`src/metrics.py`), plus target-ship metrics. Written for test set v4,
@@ -35,7 +37,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
-from metrics import iqm, stratified_bootstrap_ci  # noqa: E402
+from metrics import iqm  # noqa: E402
 
 DEFAULT = ("SAC=sacs0_bl3_metrics;PPO=ppos0_bl3_metrics;RecurrentPPO=recurrent_ppos0_bl3_metrics;TQC=tqcs0_bl3;"
            "LOS-DWA=los_dwa;COLREGs-VO=colregs_vo")
@@ -102,6 +104,24 @@ def subset(d, flt):
     return d
 
 
+def bootstrap_ci(vals, strata, kind, n_boot, rng, block=1000):
+    """Percentile 95 % interval of the mean (rates) or the IQM, resampling within each stratum."""
+    groups = [np.flatnonzero(strata == g) for g in np.unique(strata)]
+    stats = []
+    for start in range(0, n_boot, block):
+        b = min(block, n_boot - start)
+        idx = np.concatenate([g[rng.integers(0, g.size, (b, g.size))] for g in groups], axis=1)
+        x = vals[idx]
+        if kind == "rate" or x.shape[1] < 4:
+            stats.append(x.mean(axis=1))
+        else:
+            lo, hi = np.percentile(x, [25.0, 75.0], axis=1)
+            m = (x >= lo[:, None]) & (x <= hi[:, None])
+            stats.append((x * m).sum(axis=1) / np.maximum(m.sum(axis=1), 1))
+    lo, hi = np.percentile(np.concatenate(stats), [2.5, 97.5])
+    return float(lo), float(hi)
+
+
 def cell(d, col, kind, flt, n_boot, rng):
     s = subset(d, flt)
     vals = (col(s) if callable(col) else s[col]).astype(float).to_numpy()
@@ -112,7 +132,7 @@ def cell(d, col, kind, flt, n_boot, rng):
         return "—", float("nan"), float("nan"), float("nan")
     stat = np.mean if kind == "rate" else iqm
     point = float(stat(vals))
-    lo, hi = stratified_bootstrap_ci(vals, strata, stat, n_boot, rng=rng)
+    lo, hi = bootstrap_ci(vals, strata, kind, n_boot, rng)
     fmt = "{:.3f}" if kind == "rate" or abs(point) < 10 else "{:.1f}"
     return f"{fmt.format(point)} [{fmt.format(lo)}, {fmt.format(hi)}]", point, lo, hi
 
@@ -203,6 +223,7 @@ def main() -> None:
         for scope_name, src in SCOPES:
             a = data[ref_name] if src is None else data[ref_name][data[ref_name].source == src]
             b = data[name] if src is None else data[name][data[name].source == src]
+            a, b = a[a.run == a.run.iloc[0]], b[b.run == b.run.iloc[0]]   # first run of each method
             prows += paired(a, b, ref_name, name, scope_name)
     if prows:
         cols = list(prows[0].keys())

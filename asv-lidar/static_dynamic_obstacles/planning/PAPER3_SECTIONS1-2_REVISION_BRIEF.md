@@ -767,9 +767,10 @@ abbreviations; the author completes and checks the DOIs):
   Navigation*; Wiley: New York, NY, USA, 2001. (Section 2.3.1; with Kalman, resolves the tracking
   [CITE])
 - Thyri, E.H.; Breivik, M. Partly COLREGs-compliant collision avoidance for ASVs using
-  encounter-specific velocity obstacles. In *Proceedings of the 14th IFAC Conference on Control
-  Applications in Marine Systems, Robotics, and Vehicles (CAMS)*, Copenhagen, Denmark, 2022
-  (IFAC-PapersOnLine; volume and pages to be checked). (Section 1.2.1; decision S18)
+  encounter-specific velocity obstacles. *IFAC-PapersOnLine* 2022, 55(31), 37–43 (14th IFAC
+  Conference on Control Applications in Marine Systems, Robotics, and Vehicles, CAMS 2022,
+  Kongens Lyngby, Denmark). https://doi.org/10.1016/j.ifacol.2022.10.406 (Section 1.2.1;
+  decision S18)
 
 The two remaining [CITE] markers stay: Froude scaling of ship maneuvering models (Section 2.1.5)
 and the ship-domain review (Section 2.2.2).

@@ -97,7 +97,7 @@ and the direct prior work.
 |---|---|---|---|
 | | Fiorini, P. & Shiller, Z. (1998). Motion planning in dynamic environments using velocity obstacles. *International Journal of Robotics Research* 17(7):760–772 | foundation | The velocity-obstacle idea both VO comparators build on |
 | ★ | Kuwata, Y., Wolf, M. T., Zarzhitsky, D. & Huntsberger, T. L. (2014). Safe maritime autonomous navigation with COLREGS, using velocity obstacles. *IEEE Journal of Oceanic Engineering* 39(1):110–119 | cited (`04` section 5, Introduction draft 4 section 1.2.1) | The COLREGs-VO comparator (C3, not yet built) |
-| | Thyri, E. H. & Breivik, M. (2022). Partly COLREGs-compliant collision avoidance for ASVs using encounter-specific velocity obstacles. *IFAC-PapersOnLine* 55(31) — **verify title** | cited (`03a` section 5.3, `04`) | The encounter-specific VO comparator, **and** the `T-RE` reactive target model; confined-water domains |
+| | Thyri, E. H. & Breivik, M. (2022). Partly COLREGs-compliant collision avoidance for ASVs using encounter-specific velocity obstacles. *IFAC-PapersOnLine* 55(31):37–43 (CAMS 2022, Kongens Lyngby). doi:10.1016/j.ifacol.2022.10.406 (verified 2026-10-21) | cited (`03a` section 5.3, `04`) | The encounter-specific VO comparator, **and** the `T-RE` reactive target model; confined-water domains |
 | | Fox, D., Burgard, W. & Thrun, S. (1997). The dynamic window approach to collision avoidance. *IEEE Robotics & Automation Magazine* 4(1):23–33 | foundation | The LOS-PID + DWA comparator |
 | | Gonzalez-Garcia et al. (2022) — **verify full reference** | cited (`04`, draft section 2) | Optional NMPC comparator with LiDAR-based avoidance and physical experiments |
 

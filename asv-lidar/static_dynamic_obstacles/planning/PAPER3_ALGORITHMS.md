@@ -329,8 +329,8 @@ sentence: both comparators see what the policy sees, and nothing else. Cite Foss
 Skjetne (2003) for LOS guidance.
 
 Each 0.5 s decision builds one snapshot from onboard quantities; simulator truth never enters
-action selection. The encounter context of Algorithm 1 is computed, but neither comparator reads
-it.
+action selection. The encounter context of Algorithm 1 is computed in every episode; the
+encounter-specific VO reads it (decision S18), and LOS-DWA does not.
 
 | Input | Content |
 |---|---|

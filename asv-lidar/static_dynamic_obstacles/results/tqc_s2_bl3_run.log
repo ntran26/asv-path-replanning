@@ -1,0 +1,2 @@
+2026-10-22 05:22:27 == tqcs2_bl3: training 0 -> 3.0 M in one run (baseline-v3, stages on the 2.5 M schedule; PIN=1, THREADS=4)
+2026-10-22 05:24:29    pinned learner 30368

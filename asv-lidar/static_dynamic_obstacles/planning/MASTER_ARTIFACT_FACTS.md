@@ -297,8 +297,17 @@ context; it is not a Paper 3 comparator.
   (running scale, clip 10); 10 parallel simulators; 3.0 × 10⁶ environment
   steps (baseline-v3 curriculum, Section 6; stage 7 runs from 2.0 M to the end); validation-set evaluation every
   2 × 10⁵ steps; each seed represented by its best validation-set checkpoint
-  (score = goal rate − 2 × collision rate); 3 seeds per learner; learners use
-  their original papers' default hyperparameters, no per-learner tuning.
+  (score = goal rate − 2 × collision rate); 3 seeds per learner; no setting
+  tuned per learner or per seed. Settings are the Stable-Baselines3 /
+  sb3-contrib defaults except: the common discount; PPO's 512 steps per
+  simulator (library 2,048), minibatch 512 (library 64) and target KL 0.03
+  (library none; added during development, when ten epochs over one rollout
+  overfit it); SAC's and TQC's 10⁴ random warm-up steps (library 100). They are
+  **not** the original papers' settings: PPO's paper used 2,048-step rollouts and
+  minibatch 64 on MuJoCo, and the TQC paper 5 critics × 25 atoms with the
+  number dropped set per environment; TQC here keeps the library's 2 critics
+  (the comment in `src/train_formulation.py` calling them the paper's defaults
+  is wrong; the frozen code is left unchanged).
 
 | Learner | Type | Key settings |
 |---|---|---|
@@ -344,7 +353,8 @@ perception-degradation study is part of the paper (decision, 2026-10-14).
    sort all track–cluster distances; accept the smallest unused
    pairs while the distance ≤ gate g = max(2.5 U_nom Δt, 0.30) = 0.70 m.
    Unmatched clusters start tentative tracks; confirmed after 2 hits; dropped
-   after 3 consecutive misses (1.5 s).
+   when more than 3 consecutive updates are missed (a track coasts through up to
+   3 misses, 1.5 s, and is removed at the 4th; `TRACK_MAX_MISSES` = 3).
 5. **Estimate velocity** — constant-velocity Kalman filter (Kalman, 1960) per
    track, state **s** = [x, y, vₓ, v_y]ᵀ, Δt = 0.5 s:
 
@@ -356,9 +366,11 @@ perception-degradation study is part of the paper (decision, 2026-10-14).
      (piecewise-constant white acceleration), σ_a = 0.10 m/s²;
      R = σ_z² I, σ_z = 0.05 m; initial velocity variance 0.5 (m/s)².
 
-   **z** is the cluster centroid plus a learned offset to the hull centre (a
-   cluster only shows the faces the sensor sees). Speed = |(vₓ, v_y)|,
-   course = atan2(vₓ, v_y).
+   **z** is the cluster centroid (`TRACK_MEASUREMENT = "centroid"` in
+   baseline-v3, decision F64). A hull-fit measurement (the centroid plus a learned
+   offset to the centre of a fitted LOA × B hull) is implemented but off: it cut
+   close-range error but worsened the course estimate at 6–9 m, where encounters
+   engage. Speed = |(vₓ, v_y)|, course = atan2(vₓ, v_y).
 6. **Static or moving? — free-space motion evidence** (not a speed threshold).
    A speed threshold fails because a static panel's centroid slides as the
    viewpoint changes (the visible face changes), promoting panels to "vessels"
@@ -576,7 +588,7 @@ only if some manoeuvre that starts at or after that moment reaches the goal with
 clearance throughout; otherwise it is replaced by a fresh episode of the same kind that passes.
 Of the 1,000 episodes, 67 were replaced (`src/oracle_feasibility.py`).
 
-## 7. Field trials and the UDP bridge (Section 10)
+## 7. Field trials and the UDP bridge (Section 11)
 
 (Paper 2's basin trials; Paper 3's physical encounter trials are planned. Take
 the trial description — site, panels, procedure, results — from Paper 2.)

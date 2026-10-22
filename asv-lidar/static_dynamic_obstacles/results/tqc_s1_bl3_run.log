@@ -1,2 +1,11 @@
 2026-10-19 10:15:25 == tqcs1_bl3: training 0 -> 3.0 M in one run (baseline-v3, stages on the 2.5 M schedule; PIN=1, THREADS=4)
 2026-10-19 10:17:27    pinned learner 8904
+2026-10-22 04:21:10    tqcs1_bl3 3.0 M exit 0
+2026-10-22 04:21:54 == tqc seed 1: already trained
+2026-10-22 04:24:33    tier 1 tqcs1_bl3 supervisor off exit 0
+2026-10-22 04:38:31    frozen suite tqcs1_bl3 exit 0
+2026-10-22 05:03:11    Paper 2 set tqcs1_bl3 exit 0
+2026-10-22 05:03:11 == tqc seed 1 done
+2026-10-22 05:11:29    test set v4, tqcs1_bl3 exit 0 (results/test_set/v4/tqcs1_bl3/summary.txt)
+2026-10-22 05:21:37    test set v4 (final model), tqcs1_bl3 exit 0 (results/test_set/v4/tqcs1_bl3_final/summary.txt)
+2026-10-22 05:21:38 == tqcs1_bl3 run done
