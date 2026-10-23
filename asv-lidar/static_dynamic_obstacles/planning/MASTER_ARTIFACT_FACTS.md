@@ -571,9 +571,9 @@ coupled test episodes from dedicated blocks at 310,000–349,999, 450,000+ and
 | Training set | generated on the fly from the training seeds | seeds 0–99,999 |
 | Validation set, decoupled part | 120 episodes: 20 per episode type × 6 (stage-5 generator) | checkpoint selection for the learners, tuning of the classical comparators, and the learning curves |
 | Validation set, coupled part | 150 episodes: 20 no-target + per encounter (head-on, crossing from port, crossing from starboard, overtaking, being overtaken) 20 constant-speed + 6 varying-speed, all space-time solvable | the same uses, together with the decoupled part (270 episodes in all) |
-| Test set (test set v4; headline) | 1,000 held-out episodes: **664 decoupled** (basin and channel encounters of every type, with constant-velocity, reactive and non-compliant targets) and **336 coupled** (three-obstacle layouts with constant- and varying-speed targets); near-duplicates trimmed; every episode passes the fairness check (6.5) | touched once per policy |
+| Test set (test set v4; headline) | 1,000 held-out episodes: **664 decoupled** (basin and channel encounters of every type, with constant-velocity, reactive and noncompliant targets) and **336 coupled** (three-obstacle layouts with constant- and varying-speed targets); near-duplicates trimmed; every episode passes the fairness check (6.5) | touched once per policy |
 | Frozen benchmark | the 800 basin and channel encounter episodes the test set's decoupled part is drawn from: 8 cells × 100 (basin head-on, crossing, overtaking, being overtaken and null; channel head-on, crossing and overtaking) | continuity with earlier tables |
-| Robustness set | the same scenarios with a reactive target (700; it follows the COLREGs-VO rule from its own side) and, in head-ons, a non-compliant target that turns to port (200) | robustness to target behavior |
+| Robustness set | the same scenarios with a reactive target (700; it follows the COLREGs-VO rule from its own side) and, in head-ons, a noncompliant target that turns to port (200) | robustness to target behavior |
 
 Selection score: goal rate − 2 × collision rate on the whole validation set
 (both parts, 270 episodes), safety layer off, every 200,000 steps.

@@ -129,5 +129,12 @@
   "MOTION_CLASSIFIER": "free_space",
   "PF_OVERSPEED_TOL": 0.2,
   "PF_OVERSPEED_SPAN": 0.5
- }
+ },
+ "resumes": [
+  {
+   "from_steps": 750000,
+   "at": "2026-10-22 22:57:15",
+   "replay_buffer": "restored (C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv_replay_buffers\\tqc_formulation_seed2_bl3\\tqc_replay_buffer_750000_steps.pkl)"
+  }
+ ]
 }

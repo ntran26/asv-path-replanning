@@ -1,2 +1,6 @@
 2026-10-22 05:22:27 == tqcs2_bl3: training 0 -> 3.0 M in one run (baseline-v3, stages on the 2.5 M schedule; PIN=1, THREADS=4)
 2026-10-22 05:24:29    pinned learner 30368
+2026-10-22 22:55:35    tqcs2_bl3 3.0 M exit 127
+2026-10-22 22:55:36 tqcs2_bl3 FAILED (see runs/tqc_formulation_seed2_bl3.log)
+2026-10-22 22:57:09 == tqcs2_bl3: resuming the straight run to 3.0 M (baseline-v3)
+2026-10-22 22:59:11    pinned learner 20548

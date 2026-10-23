@@ -1,6 +1,6 @@
 # Paper 3 results for the master artifact (generated)
 
-Generated 2026-10-22 15:38 by `tools/diagnostics/artifact_results.py` from the recorded result files; chart data in `master_artifact_results.json`. Safety layer off throughout. Test set v4: 1,000 episodes (664 decoupled, 336 coupled). Each run is represented by its best validation-set checkpoint; the final 3.0 M model is the selection-sensitivity check. Rates are fractions of episodes; the bracket after a run's success is its Wilson 95 % interval.
+Generated 2026-10-22 23:21 by `tools/diagnostics/artifact_results.py` from the recorded result files; chart data in `master_artifact_results.json`. Safety layer off throughout. Test set v4: 1,000 episodes (664 decoupled, 336 coupled). Each run is represented by its best validation-set checkpoint; the final 3.0 M model is the selection-sensitivity check. Rates are fractions of episodes; the bracket after a run's success is its Wilson 95 % interval.
 
 ## 1. Status
 
@@ -236,7 +236,7 @@ From `results/baseline_v3/paper_table.csv`. Runs pooled per method: SAC: sacs0_b
 | SAC seed 2 | final (end check) | +0.367 | -0.367 / -0.044 / +0.322 |
 | TQC seed 0 | final (end check) | +0.267 | -0.400 / -0.067 / +0.222 |
 | TQC seed 1 | 2.8 M | +0.311 | -0.578 / -0.011 / +0.200 |
-| TQC seed 2 (training) | 0.2 M | -1.178 | — / — / — |
+| TQC seed 2 (training) | 0.6 M | -0.833 | — / — / — |
 | PPO seed 0 | 2.8 M | -0.033 | -0.489 / -0.167 / -0.100 |
 | PPO seed 1 | 2.4 M | +0.089 | -0.367 / -0.267 / -0.044 |
 | PPO seed 2 | 3.0 M | +0.100 | -0.467 / -0.056 / +0.100 |

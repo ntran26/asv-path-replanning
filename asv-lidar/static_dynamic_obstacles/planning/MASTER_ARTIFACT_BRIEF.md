@@ -210,7 +210,7 @@ Build up from zero:
     atoms to drop; show the resulting estimate.
 11. Comparison table of the four (on/off-policy, memory, exploration,
     over-estimation control, sample efficiency, cost per step).
-12. How this study trains them: facts section 3 (identical network, defaults,
+12. How this study trains them: facts section 3 (identical network, library defaults with the listed exceptions,
     3 M steps, 3 seeds, validation-set checkpoint selection, why the test
     suite is touched once). ▶ **Network diagram** of the two-encoder
     architecture with the six observation branches.
@@ -231,7 +231,7 @@ equations file section 4):
 4. Ego-motion compensation: body scan → world points with the estimated pose
    (and why pose error makes static objects appear to move).
 5. Association: nearest neighbour inside a 0.70 m gate; confirm after 2 hits,
-   drop after 3 misses. ▶ animation of gates over two scans.
+   drop after more than 3 consecutive misses (a track coasts up to 1.5 s). ▶ animation of gates over two scans.
 6. **Kalman filter** — predict/update equations, each matrix explained;
    covariance as "uncertainty ellipse". ▶ **KF widget:** noisy centroid
    measurements of a crossing target; the estimate and its velocity converge;
@@ -488,11 +488,11 @@ is across seeds and checkpoint choice. / Which results are still to come.
 
 **10.6 By target behavior** (the paper's Table R3 as a figure)
 - ▶ **Figure: target behavior** — three panels behind a segmented control: (a) head-on only
-  (constant velocity, reactive, non-compliant; the only class with all three); (b) all
+  (constant velocity, reactive, noncompliant; the only class with all three); (b) all
   decoupled classes, constant velocity versus reactive; (c) coupled layouts, constant speed
   versus one speed change on the approach. Seed dots, means and ranges; n per group. Text
   defines the behaviors: constant velocity; reactive, giving way by the COLREGs-VO rule from its
-  own side (Section 4); non-compliant, turning to port in a head-on.
+  own side (Section 4); noncompliant, turning to port in a head-on.
 
 **10.7 Target-ship safety**
 - ▶ **Figure: closest approach** — empirical cumulative distribution over target episodes

@@ -56,6 +56,8 @@ confirmed as written (decision, 2026-10-10).
   is right: the plain LOS-PID candidates run at full and half U_nom.
 - **F16** Remove the narrow-channel VO variant from Section 4: the encounter-specific VO is not a
   Paper 3 comparator (decision 2026-10-08). The comparators are LOS-PID + DWA and COLREGs-VO.
+  *Superseded 2026-10-20 (decision S18):* the encounter-specific VO is the reported VO
+  comparator and COLREGs-VO only drives the reactive target (facts section 2.4).
 - **F17** Verified: Khatib, O. (1986). Real-time obstacle avoidance for manipulators and mobile
   robots. *Int. J. Robotics Research* 5(1):90–98. Fiorini, P. & Shiller, Z. (1998). Motion
   planning in dynamic environments using velocity obstacles. *Int. J. Robotics Research*
@@ -73,6 +75,8 @@ confirmed as written (decision, 2026-10-10).
   through the pose (0.03 m / 0.2°), surge (0.05 m/s) and yaw-rate (1°/s) measurements.
 - **F22** Not a single rate: the planned study sweeps detection dropout from zero up to the
   point of track loss. Keep 20 % in the scan viewer, labeled illustrative.
+  *Superseded 2026-10-14:* the perception study is not part of the paper; the 20 % stays,
+  labeled illustrative, with no reference to a planned study.
 - **F23** Verified: Borges, G. A. & Aldon, M.-J. (2004). Line extraction in 2D range images for
   mobile robotics. *J. Intelligent and Robotic Systems* 40(3):267–297. Bar-Shalom, Y., Li, X. R.
   & Kirubarajan, T. (2001). *Estimation with Applications to Tracking and Navigation*. Wiley.
@@ -175,7 +179,9 @@ confirmed as written (decision, 2026-10-10).
   to ±67.5° and ±20°).
 - **Q7** Keep: they are the code's seed namespaces (training 0–99,999; validation decoupled
   200,000–209,999; frozen benchmark 300,000–309,999; width sweep 400,000–409,999; perception
-  study 500,000–509,999).
+  study 500,000–509,999). *Superseded 2026-10-14:* the width sweep and the perception study
+  are not part of the paper; their blocks stay reserved in the code and are not shown as
+  planned data sets (`CURRICULUM_AND_DATA_BRIEF.md`).
 - **Q8** First and third assumptions right: the decoupled pool is the frozen benchmark under
   three target behaviors (constant velocity, reactive and, in head-ons, noncompliant: 340 / 258
   / 66 of the 664), and trimming came before the fairness check. The second needs correcting:

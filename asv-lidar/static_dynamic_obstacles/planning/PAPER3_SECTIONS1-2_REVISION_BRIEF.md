@@ -20,7 +20,7 @@ section 1.7). **Document to revise:** `Paper3_Sections1-2_Introduction_Formulati
 **Reference files** (attach with the document): `MASTER_ARTIFACT_FACTS.md` (verified values for
 the vessel, comparators, perception, safety layer, curriculum and data sets),
 `FORMULATION_EQUATIONS.md` (equations), `PAPER3_DRAFT_SKELETON.md` (framing, scope decisions
-S1–S17, the COLREGs scope table), `PAPER3_ALGORITHMS.md` (the algorithm boxes, decision S17). **Precedence** where sources disagree: this brief, then
+S1–S18, the COLREGs scope table), `PAPER3_ALGORITHMS.md` (the algorithm boxes, decision S17). **Precedence** where sources disagree: this brief, then
 `MASTER_ARTIFACT_FACTS.md`, then `FORMULATION_EQUATIONS.md` (its rudder line, δc = 100 aδ, is
 superseded by the facts and this brief), then the skeleton, then the draft. **Symbols:** keep the
 draft's names where `FORMULATION_EQUATIONS.md` uses others — beam ranges d (file: ρ), smoothness
@@ -338,8 +338,9 @@ Define **decoupled** and **coupled** once, in Section 2.1.4:
   fairly.** PPO, recurrent PPO, SAC, and TQC are trained on the frozen formulation under one
   protocol (3.0 million environment steps, three training seeds, checkpoints selected on a
   separate validation set). The policy for deployment is the better of SAC and TQC on the
-  held-out test set, where it is benchmarked against the other learners and against a
-  COLREGs-aware velocity-obstacle method [19] and line-of-sight guidance with
+  held-out test set, where it is benchmarked against the other learners and against an
+  encounter-specific velocity-obstacle method [Thyri and Breivik (2022); decision S18, replacing
+  the COLREGs-aware velocity-obstacle method of [19]] and line-of-sight guidance with
   proportional–integral–derivative heading control and a dynamic-window avoidance layer [21], all
   using the same perception pipeline. Seed variability is reported with every learner result."
 - **Contribution 4** — replace the whole item with: "**An evaluation design separating task

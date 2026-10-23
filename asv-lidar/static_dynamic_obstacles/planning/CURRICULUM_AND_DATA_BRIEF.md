@@ -224,7 +224,7 @@ points (not a real run: results are not stated); drop a marker each time a new b
 
 1,000 held-out episodes. The cells are:
 - **Decoupled (664):** basin and channel encounters of every class, drawn from the frozen
-  benchmark (8 cells × 100), with constant-velocity, reactive (`T-RE`) and non-compliant (`T-NC`)
+  benchmark (8 cells × 100), with constant-velocity, reactive (`T-RE`) and noncompliant (`T-NC`)
   targets.
 - **Coupled (336):** three-obstacle layouts with constant-speed and varying-speed targets.
 
