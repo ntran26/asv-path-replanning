@@ -2,7 +2,7 @@
 
 **Produced at:** commit `986245c73d62cde2cb1dedf16166783ecdf233c8` (branch `master`, tree clean).
 **Reference read:** `static_obstacles/src/` (read-only). Nothing under `static_obstacles/` was written.
-**Authoritative spec:** `planning/01_PERCEPTION_AND_OBSERVATION.md`.
+**Authoritative spec:** `planning_records/01_PERCEPTION_AND_OBSERVATION.md`.
 
 Step 0 deliverable per `KICKOFF_01_PERCEPTION.md` section 2, kept current as the planning set
 has moved.
@@ -538,7 +538,7 @@ perception bug.
 
 ### 5.7 F17 — `02a_REWARD_SPECIFICATION.md` conflicts with the code on two conventions
 
-`planning/02a_REWARD_SPECIFICATION.md` appeared alongside the Revision 2 planning
+`planning_records/02a_REWARD_SPECIFICATION.md` appeared alongside the Revision 2 planning
 set. It is 02's deliverable and the reward is not built here, but its section 1
 conventions table is binding on quantities 01 already produces, and **two of them
 disagree with what the code does**. Both verified empirically, not read off.

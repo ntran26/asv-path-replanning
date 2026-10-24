@@ -3,7 +3,7 @@
 *Repositioned to two-vessel encounters with static obstacles · Revision 4 (2026-09-28: the literature review moved into the Introduction and the paper renumbered to the six-section roadmap of Introduction draft 4; revision 3, 2026-09-27, rewrote the introduction, scope and novelty against the frozen formulation baseline-v2)*
 
 > **Status note (2026-09-28, revision 4).** The Introduction is now written:
-> **`planning/Paper3_Introduction_draft4.docx`** (draft 4, 28 Sep) is the
+> **`planning_records/Paper3_Introduction_draft4.docx`** (draft 4, 28 Sep) is the
 > authoritative text of Section 1; section 1 below summarises it and keeps the planning
 > notes that sit behind it. The literature review is no longer a section of its
 > own: it is **section 1.2** (five subsections), and the paper follows draft 4's
@@ -126,7 +126,7 @@ Autonomous surface vessels in restricted waterways must follow a planned route, 
 
 1\. Introduction
 
-*Text: `planning/Paper3_Introduction_draft4.docx` (draft 4, 28 Sep 2026). The notes below summarise each subsection and keep the planning material behind it; edit the docx, not these notes, for wording. `planning/INTRODUCTION_DRAFT.md` (first draft, 27 Sep) is superseded.*
+*Text: `planning_records/Paper3_Introduction_draft4.docx` (draft 4, 28 Sep 2026). The notes below summarise each subsection and keep the planning material behind it; edit the docx, not these notes, for wording. `planning/INTRODUCTION_DRAFT.md` (first draft, 27 Sep) is superseded.*
 
 1.1 Problem statement and importance
 
@@ -212,7 +212,7 @@ Paper structure (draft 4's last paragraph): Section 2 the formulation (problem a
 
 2\. Formulation
 
-*Writing plan with verified numbers, figures, equations and drafting inputs: `planning/FORMULATION_PLAN.md` (2026-09-28). Where the notes below disagree with it (its section 6), the plan is right.*
+*Writing plan with verified numbers, figures, equations and drafting inputs: `planning_records/FORMULATION_PLAN.md` (2026-09-28). Where the notes below disagree with it (its section 6), the plan is right.*
 
 2.1 Problem and workspace
 
@@ -425,7 +425,7 @@ Geometric only: channel width in ship breadths, spawn TCPA, static clutter count
 
 **Intervention dependence** (draft 4 C4). Safety layer intervention rate, reported apart from learned compliance.
 
-\[TBC — presentation format for multi-axis results. A weighted scalar will be contested; prefer a per-axis table or a Pareto view.\]
+**Decided (2026-10-24): per-axis tables, no Pareto view and no weighted scalar.** The aim is a table a reader can take in: the main-text results table carries a short set of metrics (success, collisions by type, target-ship safety, path keeping), and the full per-axis table of `results/baseline_v3/paper_table.md` (speed, actuation, intrusion depth and time, clearances) goes to an appendix.
 
 3.4.5 Ablation matrix
 
@@ -645,7 +645,6 @@ Pending, not blocking
 | Head-on classification band width — the source value of ±5° is narrow relative to practice | Section 2.3.3           |
 | Final ship domain values from turning-circle data                                          | Sections 2.3.3, 4.4     |
 | Target vessel platform and field repeatability protocol                                    | P.5              |
-| Presentation format for multi-axis results                                                 | Sections 3.4.4, 4.1     |
 | Prior-paper SAC and NMPC as comparators (named in revision 3, not in draft 4)              | Sections 3.3, 4.1       |
 
 Resolved
@@ -661,3 +660,4 @@ Resolved
 | Ground truth        | No external instrumentation; scan-to-map registration against surveyed facility geometry                                                  |
 | Ship domain         | Compressed asymmetric, 3.14 / 1.57 / 1.25 m ahead, astern and abeam (2.0 / 1.0 / 0.796 Lpp), d_req = 2.5 m (frozen in baseline-v2)         |
 | Recurrence          | RecurrentPPO is one of the four learners                                                                                                  |
+| Multi-axis results  | Per-axis tables (2026-10-24): a short main-text table, the full per-axis table in an appendix; no Pareto view, no weighted scalar         |

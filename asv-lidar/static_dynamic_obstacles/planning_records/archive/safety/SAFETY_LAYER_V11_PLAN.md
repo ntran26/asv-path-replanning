@@ -1,6 +1,6 @@
 # Safety layer V10-V16 development
 
-Status: experimental. Completed V16 matched comparison:25/32 goals; separate40-case paired challenge complete:25 goals versus freshSAC21, eight rescues and four broken SAC successes. Current details: `planning/archive/safety/SAFETY_LAYER_V16_PLAN.md` and `results/safety_dev/v10_iterations/report.md`. No claim of 100% safety or preservation of every SAC success. The checkpoint is SAC baseline 3, kept best at 3M timesteps. No policy retraining or constants edits.
+Status: experimental. Completed V16 matched comparison:25/32 goals; separate40-case paired challenge complete:25 goals versus freshSAC21, eight rescues and four broken SAC successes. Current details: `planning_records/archive/safety/SAFETY_LAYER_V16_PLAN.md` and `results/safety_dev/v10_iterations/report.md`. No claim of 100% safety or preservation of every SAC success. The checkpoint is SAC baseline 3, kept best at 3M timesteps. No policy retraining or constants edits.
 
 ## Objective and acceptance
 

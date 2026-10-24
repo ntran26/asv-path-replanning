@@ -11,5 +11,5 @@ was updated. They are the record of finished work. They are no longer current.
 | `SAC_RECOVERY_PLAN.md` | The SAC 3 M recovery plan; finished 30 Sep (the kept 3 M policy). Its stage-8 and fix-1 runs were removed |
 | `HANDBACK_STARTS_PLAN.md` | Hand-back starts; on hold since 1 Oct. Superseded by the hard-state starts of baseline-v4.3 (item G), which reuse its replay mechanism |
 | `RENDER_PANEL_SPEC.md` | The telemetry-panel specification; implemented in `src/render.py` |
-| `safety/SAFETY_LAYER_V2_PLAN.md` … `safety/SAFETY_LAYER_V19_PLAN.md` | The per-version safety-layer plans; consolidated in `planning/SAFETY_LAYER_COMPLETE_SUMMARY.md` |
+| `safety/SAFETY_LAYER_V2_PLAN.md` … `safety/SAFETY_LAYER_V19_PLAN.md` | The per-version safety-layer plans; consolidated in `planning_records/SAFETY_LAYER_COMPLETE_SUMMARY.md` |
 | `safety/SAFETY_LAYER_NOTES.md` | The chronological safety-layer debugging notes; consolidated in the same summary |

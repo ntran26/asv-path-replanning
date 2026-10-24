@@ -26,7 +26,7 @@ Two further causal physical-model-bank audits (one-step and continuous training 
 
 ## Primary evaluation target: test set v3 (decision, 2026-10-03)
 
-**Test set v3 is now the main evaluation set.** Start with `planning/SAFETY_EVALUATION_PROTOCOL.md` and `results/safety_dev/testset_v3_main/README.md`. The canonical frozen set has 1,000 cases (664 decoupled, 336 coupled); 755 geometry/seed pairs are shared with v2 and 245 are new or changed. It is not wholly unseen because v2 was used for development. Earlier v2/DV3 results below remain historical development evidence, not v3 results.
+**Test set v3 is now the main evaluation set.** Start with `planning_records/SAFETY_EVALUATION_PROTOCOL.md` and `results/safety_dev/testset_v3_main/README.md`. The canonical frozen set has 1,000 cases (664 decoupled, 336 coupled); 755 geometry/seed pairs are shared with v2 and 245 are new or changed. It is not wholly unseen because v2 was used for development. Earlier v2/DV3 results below remain historical development evidence, not v3 results.
 
 The generic safety runner now defaults to the complete v3 selection and writes TS3 results under `results/safety_dev/testset_v3_main/runs/<tag>/`. Explicit historical selections keep their old output root. IDs are namespaced `TS3:` and checked against the original cached geometry and episode seeds; no scene regeneration occurs. A `--cases` quick subset is explicitly labelled as a subset, not the full benchmark.
 
@@ -36,7 +36,7 @@ The benchmark switch prepares the suite and runner; it does not itself launch a 
 
 ## Previous completed work: V16, V17 and paired challenge (2026-10-03)
 
-Start with `results/safety_dev/v10_iterations/report.md`, `planning/archive/safety/SAFETY_LAYER_V16_PLAN.md` and `planning/archive/safety/SAFETY_LAYER_V17_PLAN.md`. All **399 new episode runs are complete**, covering 72 distinct scenarios across 19 experiment tags, with no retries or queued evaluations. `final_verification.json` and `campaign_status.json` record completion and unchanged constants/checkpoint hashes. The earlier 96-run V9 pilot and all older ledgers remain separate.
+Start with `results/safety_dev/v10_iterations/report.md`, `planning_records/archive/safety/SAFETY_LAYER_V16_PLAN.md` and `planning_records/archive/safety/SAFETY_LAYER_V17_PLAN.md`. All **399 new episode runs are complete**, covering 72 distinct scenarios across 19 experiment tags, with no retries or queued evaluations. `final_verification.json` and `campaign_status.json` record completion and unchanged constants/checkpoint hashes. The earlier 96-run V9 pilot and all older ledgers remain separate.
 
 **The objective is not achieved.** Default V16 reaches 25/32 goals versus SAC/V9 16, rescuing 11 SAC failures and preserving 14/16 SAC successes. All six successful controls remain goals. BAS-HO-NC-059 (target) and BAS-NU-CV-070 (boundary) are the two broken SAC successes. There are four target, two obstacle and one boundary contacts. See `reports/motion_axis32` in the campaign folder for the verified disjoint 5+27 cohort.
 
@@ -60,7 +60,7 @@ New episodes were authorized to compare V9. The separate campaign
 `results/safety_dev/v9_paired_pilot/` is **complete: 96 fresh runs, no retries**,
 32 fixed scenarios x SAC alone/V8/default V9, one process and one Torch thread,
 28 minutes. No older queue or ledger was restarted. Start with its `report.md`
-and `planning/archive/safety/SAFETY_LAYER_V9_PLAN.md`.
+and `planning_records/archive/safety/SAFETY_LAYER_V9_PLAN.md`.
 
 **V9 did not improve the net goal count in this pilot:** all three controllers
 reach 16/32. V9 gains six goals over V8 and loses six. Relative to SAC, V8 rescues
@@ -91,7 +91,7 @@ episodes were run at that stage. Its then-current restriction permitted saved-da
 analysis and code tests only; the later pilot above was separately authorized.
 Do not restart the completed phases or any old
 evaluation queue. Start with `results/safety_dev/v8_followup_offline/report.md`
-and `planning/archive/safety/SAFETY_LAYER_V9_PLAN.md`.
+and `planning_records/archive/safety/SAFETY_LAYER_V9_PLAN.md`.
 
 Confirmed saved outcomes: V8 912/1000 test-set-v2 goals, 57 rescues and 17 lost
 SAC successes; DV3 127/150, 20 rescues and four losses. V8's unchecked stored-plan
@@ -122,7 +122,7 @@ test was not run. Constants, SAC, Paper 2's project and live PPO work are untouc
 not fire when the policy would solve the case without it.
 
 > **Status (2026-10-03, 07:00): this plan is being run in the main development workstream**, as
-> decided. Results and next steps are in `planning/archive/safety/SAFETY_LAYER_V8_PLAN.md`.
+> decided. Results and next steps are in `planning_records/archive/safety/SAFETY_LAYER_V8_PLAN.md`.
 > - Phase 1 done: 429 episodes.
 > - Headline: v7 fires in 61 % of episodes the policy alone solves, but breaks only 13 overall,
 >   against 79 rescues (oracle +79, v7 +66).
@@ -241,7 +241,7 @@ be **policy-aware**.
 **Outputs:**
 - data: `results/safety_dev/trigger_counterfactual/`;
 - scripts: `tools/diagnostics/safety/`;
-- notes: a new `planning/archive/safety/SAFETY_LAYER_V8_PLAN.md`, or a section in the V7 plan.
+- notes: a new `planning_records/archive/safety/SAFETY_LAYER_V8_PLAN.md`, or a section in the V7 plan.
 
 **CPU:**
 - The PPO baseline-v3 run (`runs/ppo_formulation_seed0_bl3`) is training, and the baseline-v4 G4
@@ -262,7 +262,7 @@ remaining V6 slot, restart an evaluation, or count v2 as untouched validation
 for the safety layer developed from it.
 
 Start with `results/safety_dev/testset_v2_offline/report.md` and
-`planning/archive/safety/SAFETY_LAYER_V7_PLAN.md`. Saved SAC has 872/1000 goals, 61 target,
+`planning_records/archive/safety/SAFETY_LAYER_V7_PLAN.md`. Saved SAC has 872/1000 goals, 61 target,
 55 obstacle and 12 boundary contacts. Crossings contribute 76 failures; L2
 head-on fails 15/15. The offline inventory includes all 128 failures and 151
 nearby successful controls. There are no saved v2 decision traces, so episode
@@ -672,8 +672,8 @@ beats the policy alone on goals.**
 | Shared prediction helpers (Perception snapshot, Actuators, rollout, clearances, LOS) | `src/classical/common.py` |
 | Where the filter is called (top of `step()`; `SAFETY_VERSION` 2 or 3 selects it; braking via `_v2_brake`) | `src/env.py` |
 | Tests | `tests/test_safety_v2.py`, `tests/test_safety_v3.py` |
-| v2 plan, iteration log, reverse-thrust caveat | `planning/archive/safety/SAFETY_LAYER_V2_PLAN.md` |
-| v3 plan, literature basis, evaluation matrix, development log | `planning/archive/safety/SAFETY_LAYER_V3_PLAN.md` |
+| v2 plan, iteration log, reverse-thrust caveat | `planning_records/archive/safety/SAFETY_LAYER_V2_PLAN.md` |
+| v3 plan, literature basis, evaluation matrix, development log | `planning_records/archive/safety/SAFETY_LAYER_V3_PLAN.md` |
 | Development-set evaluation (150 episodes, kept 3 M SAC policy) | `tools/diagnostics/safety/dev_eval.py` |
 | Step-by-step trace of one dev case | `tools/diagnostics/safety/trace_case.py` |
 | Trace of policy holding straight at the L1 obstacle | `tools/diagnostics/safety/trace_dead_ahead.py` |
@@ -759,7 +759,7 @@ The full logs are in the two plan files.
 | Code | `src/` (e.g. `src/safety_v3.py`, or a new `src/safety_v4.py` selected by `SAFETY_VERSION = 4` in the `env.step` hook) |
 | Diagnostics and scripts | `tools/diagnostics/safety/` |
 | Results (CSV, figures) | `results/safety_dev/` (new folder; older results stay in `results/` as `safety_v2_dev_*.csv`) |
-| Notes and decisions | append to `planning/archive/safety/SAFETY_LAYER_V3_PLAN.md`, or a new `planning/archive/safety/SAFETY_LAYER_V4_PLAN.md` |
+| Notes and decisions | append to `planning_records/archive/safety/SAFETY_LAYER_V3_PLAN.md`, or a new `planning_records/archive/safety/SAFETY_LAYER_V4_PLAN.md` |
 | Tests | `tests/test_safety_*.py` |
 
 ## Constraints

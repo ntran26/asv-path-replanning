@@ -34,7 +34,7 @@ Target diagnostic: saved `TS2:BAS-HO-NC-059`, V16 decisions 20 to 21. Target 0 c
 
 The [new core](../../../src/safety_reachability.py) includes two analytically justified improvements. The servo update is monotone in state and command, with extrema at response/rate-limit endpoints. Evaluating those corners avoids repeated-variable inflation from `s + (c-s)*a`. The body calculation combines the common yaw product before interval evaluation, uses a nonnegative square for cross-flow drag, and evaluates signed-square damping by its monotone endpoint image. No uncertainty bounds, trigger margins or policy actions were tuned.
 
-The architectural inspiration is [Kochdumper et al.'s reachable-set shield](https://arxiv.org/abs/2210.10691). This prototype does not implement its polynomial-zonotope method or inherit its theorem. The elementary algebraic arguments, other method citations and their limits are documented in the [stage-1 plan](../../../planning/SAFETY_REACHABILITY_STAGE1_PLAN.md). In particular, the retained feedback and terminal-controller obligations from [Li et al.](https://arxiv.org/html/2311.06769v1) are planned and remain unimplemented.
+The architectural inspiration is [Kochdumper et al.'s reachable-set shield](https://arxiv.org/abs/2210.10691). This prototype does not implement its polynomial-zonotope method or inherit its theorem. The elementary algebraic arguments, other method citations and their limits are documented in the [stage-1 plan](../../../planning_records/SAFETY_REACHABILITY_STAGE1_PLAN.md). In particular, the retained feedback and terminal-controller obligations from [Li et al.](https://arxiv.org/html/2311.06769v1) are planned and remain unimplemented.
 
 ## Validation and provenance
 

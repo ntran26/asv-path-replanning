@@ -6,7 +6,7 @@ currently blocking a full training run and a full evaluation.**
 
 | | |
 |---|---|
-| **Revision** | 12 — **TD3 out of the baseline; four learners x 3 seeds = 12 runs; final replay buffer kept for continuation** (F98); suite **3.1** (F97): Tier B floored at 7.5 m and the default frozen suite, Tier A extended; comparators tuned and COLREGs-VO built; **baseline-v2** (F96): Rule 17(b) draws out of training and the suite; field work delayed not deferred; formulation + five-learner framing; campaign to restart on `configs/baseline_v2.json`; method in `planning/METHODS_BRIEF.md` |
+| **Revision** | 12 — **TD3 out of the baseline; four learners x 3 seeds = 12 runs; final replay buffer kept for continuation** (F98); suite **3.1** (F97): Tier B floored at 7.5 m and the default frozen suite, Tier A extended; comparators tuned and COLREGs-VO built; **baseline-v2** (F96): Rule 17(b) draws out of training and the suite; field work delayed not deferred; formulation + five-learner framing; campaign to restart on `configs/baseline_v2.json`; method in `planning_records/METHODS_BRIEF.md` |
 | **Last updated** | 2026-09-26 |
 | **Tests** | **515 passing, none expected to fail** (T1 passes since F24 was decided) |
 | **Blocking a headline training run** | **none -- the baseline-v1 campaign runs on this machine (F95)** until a cluster is set up. Known limits of v1, where a fix would mean baseline-v2 and retraining: crossing side bias under PPO (A32, a learner property per F94), narrow head-ons without starboard room (A33), being overtaken by a non-yielding vessel (A30, on hold) |
@@ -2781,7 +2781,7 @@ path. **The paper is a formulation plus a five-learner comparison**, so
 restating before sign-off, and the classical comparators (C3-C6) become
 essential rather than optional -- they carry N2.
 
-*Also from the review, fixed in `planning/METHODS_BRIEF.md`:* the crossing
+*Also from the review, fixed in `planning_records/METHODS_BRIEF.md`:* the crossing
 convention now leads with **Rule 9(b)** and reports the 0.32 stand-on figure as
 corroboration rather than as the basis (the earlier ordering let the target
 model decide the rule interpretation); **Around the Clock** is named in the
@@ -3362,4 +3362,4 @@ Machine-checked in `suite.freeze_checklist()`.
 | **7** | **2026-09-14** | **2 Hz everywhere; corridor fixed at 10 m; free-space static/dynamic classifier and sensor-origin fix; bridge e-stop latch; crash-stop block in the basin plan; refit v4 (not adopted) and v4b; F35, F36 fixed; F37–F41; then the pose race fixed (0 of 1,085 stale on replay) and the rudder limiter made a true rate limit, off by default in bridge and simulator** |
 | **8** | **2026-09-14** | **F24 decided (0.55 m/s); virtual corridors restored; scenario generator wired into the environment; e-stop reward (A8); nominal pose/ego noise; hull randomisation 1.0; reward scale audit; single-seed PPO formulation run; F42–F48** |
 | **10** | **2026-09-23** | **baseline-v2 (F96): below-floor being-overtaken draws removed from training and the suite (S5); Rev 2 review answered — Rule 9(b) leads the crossing convention, Around the Clock named, D2 change recorded, C-4 needs a third rung; field work delayed within this paper; formulation + five-learner framing** |
-| **9** | **2026-09-22** | **Formulation work F49–F95 (runs 1–12, basin mode, five learners) recorded in section 3; baseline-v1 frozen (F93); A26 decided and the campaign launched (F95); `OBSERVATION_SPEC.md`, `CONSTANTS_AND_SCALES.md` and this header brought up to date; stale planning specs carry dated status notes; `planning/METHODS_BRIEF.md` added** |
+| **9** | **2026-09-22** | **Formulation work F49–F95 (runs 1–12, basin mode, five learners) recorded in section 3; baseline-v1 frozen (F93); A26 decided and the campaign launched (F95); `OBSERVATION_SPEC.md`, `CONSTANTS_AND_SCALES.md` and this header brought up to date; stale planning specs carry dated status notes; `planning_records/METHODS_BRIEF.md` added** |

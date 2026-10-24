@@ -1,6 +1,6 @@
 # Primary safety benchmark: test set v3
 
-The main evaluation target is now the complete frozen 1,000-case test set v3. [Protocol and commands](../../../planning/SAFETY_EVALUATION_PROTOCOL.md).
+The main evaluation target is now the complete frozen 1,000-case test set v3. [Protocol and commands](../../../planning_records/SAFETY_EVALUATION_PROTOCOL.md).
 
 - [Frozen selection](selection.json): all 1,000 cases with explicit seeds and geometry digests.
 - [Inventory](inventory.json): 664 decoupled cases, 336 coupled cases; 755 exact v2 geometry/seed pairs and 245 new or changed cases.

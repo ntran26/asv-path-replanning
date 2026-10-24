@@ -2,7 +2,7 @@
 
 Frozen selection: [`selection.json`](selection.json), all 1,000 scenarios of test set v4 in definition order. [`inventory.json`](inventory.json) describes the suite. Runs read the trusted saved cache, verified against its definition and manifest digest, and never regenerate a scene. Test set v4 overlaps earlier v2/v3 development exposure, so it is not wholly unseen.
 
-Protocol and decisions: [planning/SAFETY_V20_PLAN.md](../../../planning/SAFETY_V20_PLAN.md) section 17. Runs used the Python 3.11.17 environment of the V20 development runs, with one thread per process, at most two processes, and compact gzip traces.
+Protocol and decisions: [planning_records/SAFETY_V20_PLAN.md](../../../planning_records/SAFETY_V20_PLAN.md) section 17. Runs used the Python 3.11.17 environment of the V20 development runs, with one thread per process, at most two processes, and compact gzip traces.
 
 | Path | Content |
 | --- | --- |
@@ -22,7 +22,7 @@ Revision 2 has the same contact count as V16 (96) with 23 fewer goals. V16 remai
 
 ## Emergency-stop protocol (2026-10-11)
 
-`runs/ts4_estop_c01`-`c20` run V16 and V17 with the permanent emergency stop ([protocol](../../../planning/SAFETY_ESTOP_PROTOCOL.md)). Report: [`reports/off_v16_estop_1000/`](reports/off_v16_estop_1000/report.md).
+`runs/ts4_estop_c01`-`c20` run V16 and V17 with the permanent emergency stop ([protocol](../../../planning_records/SAFETY_ESTOP_PROTOCOL.md)). Report: [`reports/off_v16_estop_1000/`](reports/off_v16_estop_1000/report.md).
 
 | Controller | Goals | Own-ship contacts | Target strikes on the stopped ship | Stopped | Timeout |
 | --- | ---: | ---: | ---: | ---: | ---: |

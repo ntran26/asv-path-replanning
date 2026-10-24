@@ -8,7 +8,7 @@
 is recorded in `configs/baseline_v1.json` (git tag `baseline-v1`), which a run
 checks against before it starts; **where this document and the config differ,
 the config is right.** The paper-ready statement of the formulation is
-`planning/METHODS_BRIEF.md`. This revision corrects the rows below that still
+`planning_records/METHODS_BRIEF.md`. This revision corrects the rows below that still
 quoted values from the 1.116 m/s plant or from 10 Hz as current (pose noise,
 track gate, DCPA/TCPA clips, being-overtaken speed margin, encounter hold, the
 R-2 speed reference); earlier revision notes are kept as history. New rows since
@@ -53,10 +53,10 @@ consumer buries a magic number in a function body.
 
 | Marker | Owner |
 |---|---|
-| `TODO(02)` | `planning/02_REWARD_AND_COLREGS.md` |
-| `TODO(03)` | `planning/03_ENVIRONMENT_AND_TARGETS.md` |
-| `TODO(04)` | `planning/04_SCENARIOS_AND_EVALUATION.md` |
-| `TODO(05)` | `planning/05_VESSEL_MODEL_AND_SIM2REAL.md` |
+| `TODO(02)` | `planning_records/02_REWARD_AND_COLREGS.md` |
+| `TODO(03)` | `planning_records/03_ENVIRONMENT_AND_TARGETS.md` |
+| `TODO(04)` | `planning_records/04_SCENARIOS_AND_EVALUATION.md` |
+| `TODO(05)` | `planning_records/05_VESSEL_MODEL_AND_SIM2REAL.md` |
 | `TODO(decision)` | needs a call no open item currently covers |
 
 **One `TODO(decision)` remains**, and it is `D_SAFE` (section 12.3) — 02a's own

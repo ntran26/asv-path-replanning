@@ -1,12 +1,12 @@
 # Paper 3 — Section 2 equations: action, observation, encounter geometry and reward
 
-> **Status note (2026-10-08).** Current for **baseline-v3** (`configs/baseline_v3.json`), a curriculum overlay that changes none of these equations; values checked against the frozen config on 2026-10-08. The baseline-v4.3 candidate (fix 1 on, a denser coupled curriculum, hard-state starts) was trained and not adopted (`planning/BASELINE_V4_PLAN.md`, section 5e).
+> **Status note (2026-10-08).** Current for **baseline-v3** (`configs/baseline_v3.json`), a curriculum overlay that changes none of these equations; values checked against the frozen config on 2026-10-08. The baseline-v4.3 candidate (fix 1 on, a denser coupled curriculum, hard-state starts) was trained and not adopted (`planning_records/BASELINE_V4_PLAN.md`, section 5e).
 
 **Written 2026-09-29** from the code of the frozen formulation baseline-v2
 (`configs/baseline_v2.json`, formulation `3d697858e95e5adf`). Every expression
 below is what the code computes, with the constant values in force during
 training; source files are named per block. This is the companion to
-`planning/FORMULATION_PLAN.md`: the plan gives structure and argument, this
+`planning_records/FORMULATION_PLAN.md`: the plan gives structure and argument, this
 file gives the exact equations for the MDP subsection (observation, action,
 reward) in the style of Paper 2.
 

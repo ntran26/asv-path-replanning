@@ -1,6 +1,6 @@
 # Paper 3 master artifact — verified technical facts
 
-> **Kept current (decision, 2026-10-04).** This file describes only the best formulation: **baseline-v3**, the kept SAC 3 M policy (`configs/baseline_v3.json`, `src/formulation_v3.py`). Earlier versions are not described. Baseline-v4.3 was trained in full and not adopted (`planning/BASELINE_V4_PLAN.md`, section 5e), so baseline-v3 is the campaign's formulation. Terminology (2026-10-08): *decoupled* / *coupled* scenarios and the *validation set*.
+> **Kept current (decision, 2026-10-04).** This file describes only the best formulation: **baseline-v3**, the kept SAC 3 M policy (`configs/baseline_v3.json`, `src/formulation_v3.py`). Earlier versions are not described. Baseline-v4.3 was trained in full and not adopted (`planning_records/BASELINE_V4_PLAN.md`, section 5e), so baseline-v3 is the campaign's formulation. Terminology (2026-10-08): *decoupled* / *coupled* scenarios and the *validation set*.
 
 **Written 2026-09-29 from the project's code**, as the source for the
 master explainer artifact (`MASTER_ARTIFACT_BRIEF.md`). Every number here is
@@ -249,6 +249,18 @@ target (`T-RE`) runs this rule from its own side:
 8. **Fallback:** if nothing satisfies both the velocity obstacle and the
    COLREGs constraint, drop the constraint rather than accept a collision
    (Kuwata's own rule); if nothing is safe, take the latest first contact.
+9. **As the reactive target runs it** (`src/targets.py`, `T-RE`; checked 2026-10-24): every
+   0.5 s the target classifies the encounter by the open-water roles with the own ship as its
+   only traffic, and takes the course the rule picks, with these departures from items 1–8:
+   - **course only:** its single candidate speed is its own speed; it never slows;
+   - **preferred course:** its initial course, so it returns to that course once the pass is clear;
+   - **side rule on the encounter:** the starboard constraint of item 5 is judged once for the
+     encounter, not per candidate, and holds from the moment the encounter is live until the
+     target stops closing (Kuwata's form, A35);
+   - **hard clearance:** 0.75 m between hulls (the 1.25 m abeam semi-axis less 0.50 m), not
+     0.20 m; with 0.20 m the target cut back 0.6 m ahead of the own ship;
+   - **static panels:** ignored; at a fairway edge it stops maneuvering and keeps the edge heading;
+   - **turn rate:** it turns toward the chosen course at 8°/s (it plans with item 2's 6°/s model).
 
 **2.4 Encounter-specific VO** (an interpretation of Thyri & Breivik, 2022, a method for
 confined waters; velocity obstacles after Fiorini & Shiller, 1998) — the reported
@@ -268,12 +280,18 @@ v2 tunes them on the validation set and judges the passing side on the encounter
    formulation's fore, aft and lateral semi-axes) scaled per class as (fore, aft, lateral):
    head-on (1.0, 1.0, 1.2), crossing (1.5, 1.0, 1.0), overtaking (1.0, 1.0, 1.2), being
    overtaken and none (1, 1, 1). Penalised, not forbidden, so in a narrow channel a small
-   intrusion is allowed where no clear pass exists.
+   intrusion is allowed where no clear pass exists. The penetration is
+   P_dom = max(0, 1 − ℓ), taken at its largest over the targets and the prediction, with
+   ℓ = √((x/a_x)² + (y/a_y)²) the target centre's normalized elliptical distance in the own
+   ship's frame at each point of the candidate's sweep: x ahead, y to starboard,
+   a_x = fore × 3.14 m ahead of the own ship or aft × 1.57 m astern of it, a_y = lateral × 1.25 m.
+   P_dom is 0 on the domain's edge and 1 at the own ship's reference point
+   (`src/classical/encounter_vo.py`).
 5. **Passing side (hard, give-way classes):** head-on: the target passes down the own ship's
    port side (Rule 14); crossing: pass astern of the target, from either side (the
    narrow-channel convention, S3); overtaking: pass on the side the required turn sense names.
    A candidate whose closest approach is beyond 2.5 m is exempt (per candidate in v1; v2 judges
-   it on the encounter). Released in extremis, or when no lawful clear candidate exists.
+   it on the encounter). Released in extremis, or when no clear candidate keeps the required side.
 6. **Stand-on (being overtaken):** keep the LOS course at cruise while that velocity meets no
    hard limit within 12 s and keeps the passing side (Rule 17(a)); otherwise act as for any
    obstacle.
@@ -302,7 +320,10 @@ context; it is not a Paper 3 comparator.
   sb3-contrib defaults except: the common discount; PPO's 512 steps per
   simulator (library 2,048), minibatch 512 (library 64) and target KL 0.03
   (library none; added during development, when ten epochs over one rollout
-  overfit it); SAC's and TQC's 10⁴ random warm-up steps (library 100). They are
+  overfit it); SAC's and TQC's 10⁴ random warm-up steps (library 100) and one
+  gradient step per collected transition, that is 10 per vectorized step of the
+  10 simulators (`gradient_steps = 10`; the library's 1 per vectorized step would
+  be one per 10 transitions). They are
   **not** the original papers' settings: PPO's paper used 2,048-step rollouts and
   minibatch 64 on MuJoCo, and the TQC paper 5 critics × 25 atoms with the
   number dropped set per environment; TQC here keeps the library's 2 critics
@@ -311,7 +332,7 @@ context; it is not a Paper 3 comparator.
 
 | Learner | Type | Key settings |
 |---|---|---|
-| PPO (Schulman et al., 2017) | on-policy, policy gradient with clipped surrogate | lr 3e-4; 512 steps × 10 envs per update; minibatch 512; 10 epochs; GAE λ = 0.95 (Schulman et al., 2016); clip ε = 0.2; target KL 0.03 |
+| PPO (Schulman et al., 2017) | on-policy, policy gradient with clipped surrogate | lr 3e-4; 512 steps × 10 envs per update (5,120 transitions); minibatch 512; 10 epochs, so up to 100 gradient steps per update, fewer when the KL limit stops the epochs early; GAE λ = 0.95 (Schulman et al., 2016); clip ε = 0.2; target KL 0.03 |
 | RecurrentPPO | on-policy, PPO + LSTM memory (Hochreiter & Schmidhuber, 1997) | PPO settings + one 256-unit LSTM layer for the actor and a separate one for the critic, placed after the features extractor and before the 256 × 256 heads |
 | SAC (Haarnoja et al., 2018) | off-policy, maximum-entropy actor–critic | lr 3e-4; replay buffer 10⁶; batch 256; τ = 0.005; 10⁴ random warm-up steps; automatic entropy temperature with target entropy −2 (= −dim of the action; the library default, not overridden); 1 gradient step per environment step |
 | TQC (Kuznetsov et al., 2020) | off-policy, distributional (quantile) SAC | SAC settings; 2 critics × 25 quantiles; drop the top 2 quantiles per critic |

@@ -1,9 +1,9 @@
 # Paper 3 — Section 2 (Formulation): writing plan and verified facts
 
-> **Status note (2026-10-04).** The facts below are baseline-v2's and still hold for baseline-v3. The evaluation now uses the 1,000-episode test set (version 4), and the claims and tables are in `planning/PAPER3_CLAIMS_AND_TABLES.md`. Baseline-v4 is under test (`planning/BASELINE_V4_PLAN.md`).
+> **Status note (2026-10-04).** The facts below are baseline-v2's and still hold for baseline-v3. The evaluation now uses the 1,000-episode test set (version 4), and the claims and tables are in `planning/PAPER3_CLAIMS_AND_TABLES.md`. Baseline-v4 is under test (`planning_records/BASELINE_V4_PLAN.md`).
 
 **Written 2026-09-28** for drafting Section 2 in the six-section structure of
-Introduction draft 4 (`planning/Paper3_Introduction_draft4.docx`; skeleton
+Introduction draft 4 (`planning_records/Paper3_Introduction_draft4.docx`; skeleton
 revision 4). Every number below was read from the frozen config
 `configs/baseline_v2.json` (formulation `3d697858e95e5adf`) or the source, not
 from the older planning specs. Where this plan and an older document disagree,
@@ -318,7 +318,7 @@ Eq. 6–8, Table 5) — **the heart of contribution C2**
 training, evaluated separately, interventions not attributed to the policy
 (S10, C-7). Rule 8(e) in two layers: the learned policy slackens speed; the
 engineered layer takes all way off. **[Open, A38:]** the current safety layer
-lowers success slightly (`planning/archive/safety/SAFETY_LAYER_V2_PLAN.md`). Describe the layer
+lowers success slightly (`planning_records/archive/safety/SAFETY_LAYER_V2_PLAN.md`). Describe the layer
 that is actually evaluated; if safety layer v2 is adopted, it goes here instead.
 
 **2.3.5 Curriculum** (~350 words, Table 8)
@@ -418,9 +418,9 @@ Attach these (in this order of importance):
 
 | # | File | Why | Note |
 |---|---|---|---|
-| 1 | `planning/FORMULATION_PLAN.md` (this file) | structure, verified numbers, what not to claim | the authority where sources disagree |
-| 2 | `planning/Paper3_Introduction_draft4.docx` | voice, terminology, spelling, citation style, the claims Section 2 must support | |
-| 3 | `planning/METHODS_BRIEF.md` | rationale for each choice (F/A numbers) | Sections 7–10 are partly stale (five learners, five seeds, "pending" status); Section 2 uses only sections 1–6 |
+| 1 | `planning_records/FORMULATION_PLAN.md` (this file) | structure, verified numbers, what not to claim | the authority where sources disagree |
+| 2 | `planning_records/Paper3_Introduction_draft4.docx` | voice, terminology, spelling, citation style, the claims Section 2 must support | |
+| 3 | `planning_records/METHODS_BRIEF.md` | rationale for each choice (F/A numbers) | Sections 7–10 are partly stale (five learners, five seeds, "pending" status); Section 2 uses only sections 1–6 |
 | 4 | `OBSERVATION_SPEC.md` | exact feature definitions and normalizations | for Table 6 and the observation text |
 | 5 | `planning/PAPER3_DRAFT_SKELETON.md` | Section 2 notes, scope table S1–S13, the rule and response tables | its section 2 numbers are superseded by this plan (section 6) |
 | 6 | Paper 2 PDF (Tran et al., 2026, *Drones* 10(9):680) | platform, basin, LiDAR pooling, consistent description | |

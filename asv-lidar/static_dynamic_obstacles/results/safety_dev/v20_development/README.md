@@ -1,6 +1,6 @@
 # V20 development results
 
-Plan, pre-registered gates and revision 1: [planning/SAFETY_V20_PLAN.md](../../../planning/SAFETY_V20_PLAN.md) (section 13 records the gate results and the revised configuration). Candidate: `src/safety_v20.py`, V16 plus a committed stop-terminal contingency. In the phase-1 default it replaces only V16's unchecked `last certificate` and `no escape` decisions; revision 1 (`REVISION1_OPTIONS`, runner mode `v20_r1`) also enforces the certificate at checked decisions (gatekeeper). Certificate: `src/safety_v20_contingency.py`. Allowance tables: `src/safety_v20_tubes.py`.
+Plan, pre-registered gates and revision 1: [planning_records/SAFETY_V20_PLAN.md](../../../planning_records/SAFETY_V20_PLAN.md) (section 13 records the gate results and the revised configuration). Candidate: `src/safety_v20.py`, V16 plus a committed stop-terminal contingency. In the phase-1 default it replaces only V16's unchecked `last certificate` and `no escape` decisions; revision 1 (`REVISION1_OPTIONS`, runner mode `v20_r1`) also enforces the certificate at checked decisions (gatekeeper). Certificate: `src/safety_v20_contingency.py`. Allowance tables: `src/safety_v20_tubes.py`.
 
 This directory holds development evidence only. Test-set-v4 runs are under [`../testset_v4_main/`](../testset_v4_main/). Nothing here was tuned on a test-set outcome.
 

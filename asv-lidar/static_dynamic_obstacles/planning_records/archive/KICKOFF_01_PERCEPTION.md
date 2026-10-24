@@ -1,6 +1,6 @@
 # Kickoff — Paper 3, Perception and Observation Rebuild
 
-> **Status note (2026-09-22).** Historical: the kickoff for the perception rebuild, delivered (observation v2, since extended to v3, F72). Kept as a record; the current method is `planning/METHODS_BRIEF.md` and `configs/baseline_v1.json` (baseline-v1).
+> **Status note (2026-09-22).** Historical: the kickoff for the perception rebuild, delivered (observation v2, since extended to v3, F72). Kept as a record; the current method is `planning_records/METHODS_BRIEF.md` and `configs/baseline_v1.json` (baseline-v1).
 
 **Repo:** `asv-lidar`
 **Reference (read-only):** `asv-lidar/static_obstacles/src/`

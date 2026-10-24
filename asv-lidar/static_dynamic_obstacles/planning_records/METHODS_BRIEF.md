@@ -1,6 +1,6 @@
 # Methods brief — Paper 3, formulation baseline-v3
 
-> **Status note (2026-10-08).** Current for **baseline-v3** (`configs/baseline_v3.json`, formulation digest `03a9c0c22f53ee0b`): baseline-v2's reward, observation, vessel model and learners, unchanged, plus the curriculum overlay `src/formulation_v3.py` (coupled layouts in stages 6–7, a 2.5 M budget extended to 3.0 M). The headline evaluation is the 1,000-episode test set, version 4 (`tools/tiers/test_set.py`). The baseline-v4.3 candidate was trained and **not adopted**: it gained on the validation set and lost on the held-out sets (`planning/BASELINE_V4_PLAN.md`, section 5e).
+> **Status note (2026-10-08).** Current for **baseline-v3** (`configs/baseline_v3.json`, formulation digest `03a9c0c22f53ee0b`): baseline-v2's reward, observation, vessel model and learners, unchanged, plus the curriculum overlay `src/formulation_v3.py` (coupled layouts in stages 6–7, a 2.5 M budget extended to 3.0 M). The headline evaluation is the 1,000-episode test set, version 4 (`tools/tiers/test_set.py`). The baseline-v4.3 candidate was trained and **not adopted**: it gained on the validation set and lost on the held-out sets (`planning_records/BASELINE_V4_PLAN.md`, section 5e).
 
 **Purpose.** One current, paper-ready statement of the method, for drafting the
 Methods, Experimental Setup and Limitations sections. It states the formulation
@@ -350,7 +350,7 @@ it is why a search is validated rather than trusted.
 | Set | Size | Use |
 |---|---|---|
 | Validation set | **270 episodes**: 120 decoupled (20 per class × 6) + 150 coupled (the v3 coupled validation set: 20 no-target, 20 constant-speed and 6 varying-speed per encounter, 3 in 10 near a reference layout), development namespace | checkpoint selection, diagnostics |
-| **Test set v4 (headline)** | **1,000 episodes**: 664 decoupled (from the frozen suite) + 336 coupled (generated coupled layouts and the reference layouts L1–L3); episodes no controller can solve after the target is first tracked are replaced by oracle-checked draws of the same cell | headline results, safety layer off, touched once per policy (`planning/BASELINE_V4_PLAN.md`, section 5e) |
+| **Test set v4 (headline)** | **1,000 episodes**: 664 decoupled (from the frozen suite) + 336 coupled (generated coupled layouts and the reference layouts L1–L3); episodes no controller can solve after the target is first tracked are replaced by oracle-checked draws of the same cell | headline results, safety layer off, touched once per policy (`planning_records/BASELINE_V4_PLAN.md`, section 5e) |
 | Reference-layout set | 630 episodes on L1–L3 with and without a target, five encounters, fixed and varying target speed | secondary, safety layer off |
 | **Tier B — the frozen suite** | **800 episodes** per seed, suite 3.4: 8 cells × 100 = 800 constant-velocity episodes, drawn like the validation set (only positions differ) — every class in the basin, head-on / crossing / overtaking in 7.5–10 m channels — plus a robustness set of the same scenarios with reactive (700) and, in head-ons, non-compliant (200) targets | decoupled results and the robustness set; most of its episodes are also in the test set |
 | Tier A — **out of this paper** (decision, 2026-09-24) | 38 defined (35 realised), incl. basin cases and pre-committed expected failures | kept in the suite, runnable with `--tiers a`; no claim depends on it |
@@ -457,8 +457,8 @@ of 0.92 and 0.88 on two seeds, head-on 1.00 on both, crossing 0.75 and 0.55.
 | Each constant and why | `CONSTANTS_AND_SCALES.md` |
 | Findings F1–F95 (full rationale, chronological) | `PROJECT_STATE.md` |
 | Open decisions and known limits | `OPEN_PROBLEMS.md` |
-| Basin geometry | `planning/06_BASIN_MODE_SPECIFICATION.md` |
+| Basin geometry | `planning_records/06_BASIN_MODE_SPECIFICATION.md` |
 | Claims and pre-committed tables | `planning/PAPER3_CLAIMS_AND_TABLES.md` |
 | Equations, as frozen | `planning/FORMULATION_EQUATIONS.md` |
-| Curriculum, sets and test-set construction | `planning/CURRICULUM_AND_DATA_BRIEF.md`, `planning/BASELINE_V4_PLAN.md` (section 5e) |
+| Curriculum, sets and test-set construction | `planning/CURRICULUM_AND_DATA_BRIEF.md`, `planning_records/BASELINE_V4_PLAN.md` (section 5e) |
 | Running the campaign | `TRAINING_GUIDE.md` |

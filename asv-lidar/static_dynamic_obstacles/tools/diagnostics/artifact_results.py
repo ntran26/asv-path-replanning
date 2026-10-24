@@ -108,7 +108,9 @@ CDF_GRID = {"closest_approach_m": ("min_target_range", np.round(np.arange(0.0, 8
 
 
 def r3(x):
-    return None if x is None or (isinstance(x, float) and not math.isfinite(x)) else round(float(x), 4)
+    # Six decimals: readers round again to three, and rounding to four first moved some values
+    # by 0.001 (0.87048 -> 0.8705 -> 0.871).
+    return None if x is None or (isinstance(x, float) and not math.isfinite(x)) else round(float(x), 6)
 
 
 def wilson(k, n, z=1.959964):

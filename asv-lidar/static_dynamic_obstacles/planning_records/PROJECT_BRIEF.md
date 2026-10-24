@@ -1,6 +1,6 @@
 # PROJECT BRIEF — read at the start of each work session
 
-> **Status note (2026-09-22, updated 2026-10-08).** Parts of this brief are superseded. The formulation was frozen as **baseline-v1** (`configs/baseline_v1.json`), then **baseline-v2** (`configs/baseline_v2.json`; reward and observation unchanged since), **baseline-v3** (a curriculum overlay, `src/formulation_v3.py`), **the current formulation**; the baseline-v4.3 candidate was trained and not adopted. Current state: `planning/FORMULATION_EQUATIONS.md` and `planning/METHODS_BRIEF.md` (the method), `planning/BASELINE_V4_PLAN.md` (test set v4, the v4.3 result) and `PROJECT_STATE.md` (findings). Superseded here (as of baseline-v1):
+> **Status note (2026-09-22, updated 2026-10-08).** Parts of this brief are superseded. The formulation was frozen as **baseline-v1** (`configs/baseline_v1.json`), then **baseline-v2** (`configs/baseline_v2.json`; reward and observation unchanged since), **baseline-v3** (a curriculum overlay, `src/formulation_v3.py`), **the current formulation**; the baseline-v4.3 candidate was trained and not adopted. Current state: `planning/FORMULATION_EQUATIONS.md` and `planning_records/METHODS_BRIEF.md` (the method), `planning_records/BASELINE_V4_PLAN.md` (test set v4, the v4.3 result) and `PROJECT_STATE.md` (findings). Superseded here (as of baseline-v1):
 >
 > - "SAC primary; PPO, RecurrentPPO, TQC as …": the baseline set is PPO, RecurrentPPO, TD3, SAC and TQC on one frozen formulation (F76, F77, F93); the framing is open (`METHODS_BRIEF.md` section 9).
 >

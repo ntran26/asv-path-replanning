@@ -1,6 +1,6 @@
 # Curriculum, scenario generation, and the three data sets — a visualisation brief
 
-> **Kept current (decision, 2026-10-04).** This file describes only the best formulation: **baseline-v3**, the kept SAC 3 M policy (`configs/baseline_v3.json`, `src/formulation_v3.py`). Earlier versions are not described. Baseline-v4.3 was trained in full and not adopted (`planning/BASELINE_V4_PLAN.md`, section 5e), so baseline-v3 is the campaign's formulation. Terminology (2026-10-08): *decoupled* / *coupled* scenarios and the *validation set*.
+> **Kept current (decision, 2026-10-04).** This file describes only the best formulation: **baseline-v3**, the kept SAC 3 M policy (`configs/baseline_v3.json`, `src/formulation_v3.py`). Earlier versions are not described. Baseline-v4.3 was trained in full and not adopted (`planning_records/BASELINE_V4_PLAN.md`, section 5e), so baseline-v3 is the campaign's formulation. Terminology (2026-10-08): *decoupled* / *coupled* scenarios and the *validation set*.
 
 **Purpose.** A self-contained description of how scenarios are made, how the
 curriculum orders them, and how the training / validation / test sets are kept
@@ -9,7 +9,7 @@ equations and animations. Every number is read from the code (`src/scenario.py`,
 `src/field_training.py`, `src/formulation_v3.py`, `src/constants.py`,
 `tools/tiers/test_set.py`); sections 4, 5 and 7 updated 2026-10-04 for baseline-v3.
 
-Companion documents: `planning/METHODS_BRIEF.md` (the method as frozen),
+Companion documents: `planning_records/METHODS_BRIEF.md` (the method as frozen),
 `configs/baseline_v3.json` (every constant), `PROJECT_STATE.md` (findings).
 
 ---

@@ -243,13 +243,15 @@ disjoint seed ranges); the set sizes and composition go in a table beside the bo
 
 **Require:** a seed from the set's range; the stage's parameters (classes and their weights,
 channel share and width range, obstacle counts, CPA guard fraction, coupled-layout share,
-varying-speed share, space-time solvability flag).
+varying-speed share, space-time solvability flag); for the test set's reference layouts, a fixed
+layout (a leg and three panels).
 
 **Ensure:** a layout (basin leg or channel), the own ship's start, a target (or none) with its
 initial state and behaviour, and the static panels.
 
 ```
- 1: if the stage has coupled layouts, then with the stage's coupled share return COUPLED-LAYOUT()   ▷ lines 22–27
+ 1: if a fixed layout is given then return COUPLED-LAYOUT(); else if the stage has coupled layouts, then with
+    the stage's coupled share return COUPLED-LAYOUT()   ▷ lines 22–27
  2: draw the class 𝒞 from the stage's classes and weights
  3: geometry ← a channel with the stage's channel share if 𝒞 ∈ {head-on, crossing, overtaking}, else the basin;
     a channel's nominal width is drawn from the stage range and varies along it (ratio of widest to
@@ -282,16 +284,26 @@ initial state and behaviour, and the static panels.
     any direction or waiting; every 0.5 s the reachable set grows by 0.55 m and every cell within 1.3 m of the
     target's position at that time is removed; solvable if a cell within 0.5 m of the goal is reached in time
 21:
-22: COUPLED-LAYOUT(): a basin leg with start and goal x ∈ [2, 8] m (slant ≤ 14.1°)
-23:     three 1 m panels in one motif along 28–85 % of the leg, ≥ 0.9 m from the walls and ≥ 0.4 m apart:
-        gate + on-path (0.40), slalom (0.30), side + on-path (0.30)
+22: COUPLED-LAYOUT(): the fixed layout's leg if one is given; otherwise a basin leg with start and goal
+    x ∈ [2, 8] m (slant ≤ 14.1°)
+23:     the fixed layout's three panels if one is given; otherwise three 1 m panels in one motif along 28–85 %
+        of the leg, ≥ 0.9 m from the walls and ≥ 0.4 m apart: gate + on-path (0.40), slalom (0.30),
+        side + on-path (0.30)
 24:     the encounter by lines 2–14 on this leg, with the panels fixed and no CPA guard; the target starts inside
         the basin, keeps 0.20–1.10 m/s, stops short of the wall, and its straight track clears every panel
         by 0.30 m
 25:     stage 7: with probability 0.30 the target changes speed once (one step, bounded acceleration)
-26:     reject unless SPACE-TIME-SOLVABLE()
+26:     if the panels were drawn (no fixed layout) then reject unless SPACE-TIME-SOLVABLE()
 27:     return the episode
 ```
+
+Fixed layouts (added 2026-10-24): the 108 reference-layout episodes of test set v4 are drawn by the
+same generator (`ScenarioGenerator.sample` at the stage-5 setting) with the layout's published leg
+and three panels passed in as fixed (`src/paper2_set.py`, `_flags`; `tools/tiers/test_set.py`,
+`_layout_episode`). They meet the field rules of line 24 (`FIELD_TARGET_SPEED_RANGE`, the stop
+box, `TARGET_PANEL_CLEARANCE_M`); the generation does not filter them by the space-time check
+(neither file calls it), and like every test episode they pass the test set's feasibility check
+(Section 3.4.1).
 
 CPA guard fraction: 0.4 in stages 1–5 (the decoupled scenarios), 0.2 in stage 6, none in stage 7.
 
