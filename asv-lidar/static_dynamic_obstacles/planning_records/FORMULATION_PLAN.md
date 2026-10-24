@@ -422,7 +422,7 @@ Attach these (in this order of importance):
 | 2 | `planning_records/Paper3_Introduction_draft4.docx` | voice, terminology, spelling, citation style, the claims Section 2 must support | |
 | 3 | `planning_records/METHODS_BRIEF.md` | rationale for each choice (F/A numbers) | Sections 7–10 are partly stale (five learners, five seeds, "pending" status); Section 2 uses only sections 1–6 |
 | 4 | `OBSERVATION_SPEC.md` | exact feature definitions and normalizations | for Table 6 and the observation text |
-| 5 | `planning/PAPER3_DRAFT_SKELETON.md` | Section 2 notes, scope table S1–S13, the rule and response tables | its section 2 numbers are superseded by this plan (section 6) |
+| 5 | `planning/PAPER/PAPER3_DRAFT_SKELETON.md` | Section 2 notes, scope table S1–S13, the rule and response tables | its section 2 numbers are superseded by this plan (section 6) |
 | 6 | Paper 2 PDF (Tran et al., 2026, *Drones* 10(9):680) | platform, basin, LiDAR pooling, consistent description | |
 
 Optional, for a constant's justification: `CONSTANTS_AND_SCALES.md`

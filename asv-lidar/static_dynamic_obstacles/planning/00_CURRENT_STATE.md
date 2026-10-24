@@ -60,45 +60,41 @@ history or rationale only.
   `OPEN_PROBLEMS.md` (A-numbered items), in `static_dynamic_obstacles/`. The skeleton's table S1–S19
   summarizes the ones that shape the paper, and section 4 below the ones in force.
 
-## 3. Status of the work (2026-10-24, 09:30)
+## 3. Status of the work (2026-10-25, 07:00)
 
-**Training campaign** (baseline-v3, 3.0 M steps per run, seven-stage curriculum, checkpoints
-selected on the validation set):
-- PPO, RecurrentPPO and SAC: seeds 0–2 complete. Each was evaluated on test set v4 at its best
-  validation checkpoint and as the final model.
-- TQC: seeds 0–1 complete.
-- TQC seed 2 is training, at about 2.1 M steps in stage 7.
-  - Its best validation-set score so far is +0.144 at 2.0 M.
-  - It resumed from its 750k checkpoint after the disk filled on 2026-10-22.
-  - Expected to finish about 2026-10-25, then its evaluations and both test-set runs.
+**Training campaign: complete.** All twelve baseline-v3 runs (four learners × three seeds, 3.0 M
+steps each, seven-stage curriculum) are trained. Each was evaluated on test set v4 at its best
+validation checkpoint and as the final model. TQC seed 2 resumed from its 750k checkpoint after the
+disk filled on 2026-10-22, a documented interruption; its best checkpoint is 3.0 M (validation
+score +0.378).
 
 **Test set v4 success at the best checkpoint** (seed mean, seed range; from the results file,
-2026-10-22):
+2026-10-25):
 
 | Method | Success |
 |---|---|
 | SAC | 0.846 (0.827–0.865) |
-| TQC (seeds 0–1) | 0.826 (0.815–0.837) |
+| TQC | 0.830 (0.815–0.838) |
 | PPO | 0.750 (0.747–0.753) |
 | RecurrentPPO | 0.717 (0.638–0.757) |
 | LOS-PID + DWA (comparators v1) | 0.770 |
 | Encounter-specific VO | pending (comparators v2) |
 
-**Deployed policy:** the better of SAC and TQC by three-seed mean success on test set v4; within
-it, the seed with the best validation-set score. Pending TQC seed 2: TQC's mean exceeds SAC's only
-if seed 2 succeeds in more than 885 of the 1,000 test episodes.
+**Deployed policy: SAC seed 0** (decided by the rule on 2026-10-25).
+- SAC has the better three-seed mean on test set v4 (0.846 against TQC's 0.830).
+- Within SAC, seed 0 has the best validation-set score (+0.411).
+- Its test set v4 success is 0.865 (decoupled 0.931, coupled 0.735), at the best checkpoint (3.0 M).
 
 **Still to run, in order:**
-1. TQC seed 2: finish, evaluate, then decide the deployed policy.
-2. Reward scale audit (table R7, S19), for the deployed policy only:
+1. Reward scale audit (table R7, S19), for the deployed policy only:
    - the evaluation tool records the per-episode integral of the seven task terms, which needs no
      `src/` change;
    - one test set v4 pass, checked to reproduce the recorded outcomes and returns.
-3. Comparators v2: the encounter-specific VO tuned and run on test set v4, with LOS-PID + DWA
+2. Comparators v2: the encounter-specific VO tuned and run on test set v4, with LOS-PID + DWA
    re-run under the same settings file.
-4. The trajectory snapshots of each encounter type for the deployed policy.
-5. The safety-layer-on test-set evaluation, run only when requested.
-6. The field trials, whose design is open.
+3. The trajectory snapshots of each encounter type for the deployed policy.
+4. The safety-layer-on test-set evaluation, run only when requested.
+5. The field trials, whose design is open.
 
 ## 4. Decisions in force
 
@@ -218,19 +214,17 @@ These are facts that earlier drafts or planning files had wrong; the current fil
 ## 7. Write-up state (2026-10-24)
 
 - **Paper draft:**
-  - Current file: `Paper3_Sections1-3_with_placeholders_rev22Oct_corrected_tracked.docx`, in
+  - Current file: `Paper3_Sections1-3_with_placeholders_rev24Oct_tracked.docx`, in
     `PhD/3 Second Journal Paper - Dynamic Obstacle/Revision/` (outside the repository).
   - Sections 1–3 and Appendices B–F are drafted, with Discussion 6.2–6.3.
-  - Sections 4, 5, 6.1 and 7 and Appendix A are placeholders.
-  - The ten corrections of 2026-10-22 are applied and checked against the code.
-  - A further nine-item correction list (2026-10-24) is pending; the next file is to be
-    `..._rev24Oct_tracked.docx`. Its items: the 30 no-target coupled layouts (1.3, 3.4.1, Table
-    A4); the 2.2.4 width sentence (entirely above 3.80 and 4.26 m, mostly above 6.30 m); "RMS"
-    spelled out in 3.4.3; the multi-axis sentence in 3.4.3 with a new Appendix G placeholder
-    (full results tables); the fixed-layout branch of Algorithm 4; the Appendix E digest
-    sentence; "Stable-Baselines3 or sb3-contrib" in 3.1; the marker list.
-- **Section 4 (results)**, restated 2026-10-24 (skeleton S19; the draft gets the matching edits
-  next): 4.1 overall, 4.2 snapshots, 4.3 target behavior, 4.4 reward scale audit, 4.5 runtime
+  - Sections 4, 5, 6.1 and 7 and Appendices A and G are placeholders.
+  - Applied and checked against the code (2026-10-25): the ten corrections of 2026-10-22 and the
+    seventeen items of 2026-10-24 (the test-set composition, the fixed-layout branch of Algorithm
+    4, the multi-axis sentence with Appendix G, and decision S19: no ablation, Section 4 renumbered
+    to 4.1–4.5). Edit history: `planning/PAPER/PAPER3_PROMPTS.md`.
+  - Next: the Section 4 draft, once TQC seed 2 has its test-set run.
+- **Section 4 (results)**, restated 2026-10-24 (skeleton S19; the draft carries the matching
+  structure): 4.1 overall, 4.2 snapshots, 4.3 target behavior, 4.4 reward scale audit, 4.5 runtime
   safety layer.
   - 4.1 and 4.3 can be written with placeholders now. Final numbers need TQC seed 2 and
     comparators v2, and the deployed-policy column needs the TQC seed 2 test-set run.
@@ -241,23 +235,22 @@ These are facts that earlier drafts or planning files had wrong; the current fil
     `DENSE_TERMS`, `src/reward/terms.py`). Adding those to the evaluation output is a tools change (no `src/` change, no digest effect, an estimated 1–2 h),
     then one pass of the deployed policy over the test set (about 9 min ideal).
   - 4.5 and Section 5 wait for the safety-on evaluation and the field-trial design.
-- **Explainer artifact** (version checked 2026-10-24: 1792804596-231b):
+- **Explainer artifact** (version checked 2026-10-24: 1792859529-ce15):
   - **Built:** Sections 0–8, 10 and 12. **Titled placeholders:** Section 9 (safety layer and
     evaluation design) and Section 11 (field trials and the vessel–computer link).
   - **Section 10, "Results in simulation":** complete (10.1–10.12 and the takeaways). Every number
     is rendered from the embedded results data. TQC is shown over seeds 0–1, and the
     encounter-specific VO and the deployed policy as pending.
   - **Section 4:** presents the encounter-specific VO with the comparators v1 values, the v2 values
-    marked as still to come. COLREGs-VO appears only as the reactive target's rule.
-  - **Still to fix in Section 4:**
-    - the head-on test of that rule (it must test |β|, as in section 5 above);
-    - two open flags, the domain-depth measure and the reactive target's settings (facts 2.3
-      item 9 and 2.4 item 4 now hold both).
+    marked as still to come, and its domain-depth measure. COLREGs-VO appears only as the reactive
+    target's rule, with the |α|, |β| head-on test of section 5 above and the target's six
+    departures from the rule's settings.
   - **Removed 2026-10-24:** the width sweep and the perception study, from Sections 1, 6 and 8 and
     the glossary. Section 5's list of non-default learner settings now includes the SAC and TQC
     gradient steps.
   - **Next:** the results data is refreshed after TQC seed 2 and again after comparators v2;
-    Section 4's values are updated after comparators v2.
+    Section 4's values are updated after comparators v2. The pending change blocks are in
+    `MASTER_ARTIFACT/MASTER_ARTIFACT_PROMPTS.md`.
 - **Decided 2026-10-24** (skeleton S19):
   - **Multi-axis results:** per-axis tables, the principal metrics in the main-text table and the
     full set in an appendix; no Pareto view and no weighted score.
