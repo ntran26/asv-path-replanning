@@ -3,7 +3,7 @@
 > **Kept current (decision, 2026-10-04).** This file describes only the best formulation: **baseline-v3**, the kept SAC 3 M policy (`configs/baseline_v3.json`, `src/formulation_v3.py`). Earlier versions are not described. Baseline-v4.3 was trained in full and not adopted (`planning_records/BASELINE_V4_PLAN.md`, section 5e), so baseline-v3 is the campaign's formulation. Terminology (2026-10-08): *decoupled* / *coupled* scenarios and the *validation set*.
 
 **Written 2026-09-29 from the project's code**, as the source for the
-master explainer artifact (`MASTER_ARTIFACT_BRIEF.md`). Every number here is
+master explainer artifact (`MASTER_ARTIFACT/MASTER_ARTIFACT_BRIEF.md`). Every number here is
 what the simulator, controllers and tracker actually use. The observation,
 encounter geometry and reward equations are in the companion file
 `FORMULATION_EQUATIONS.md` and are not repeated here. Where a citation is
@@ -145,7 +145,7 @@ episodes) by coordinate descent, scored by goal − 2 × collision: COLREGs-VO
 raised its course-change weight from 0.3 to 0.8 (+0.525 → +0.575 on all 120
 episodes); DWA kept its defaults (+0.650 either way). Both are pinned in
 `configs/comparators_v1.json` (digest `0dd8eab26bbf954f`). Pseudocode:
-`PAPER3_ALGORITHMS.md`, Algorithms A1 and A2.
+`PAPER/PAPER3_ALGORITHMS.md`, Algorithms A1 and A2.
 
 **2.1 LOS guidance + heading PID (path following, shared).** Line-of-sight
 guidance (Fossen, 2021): aim at a point Δ = 2.5 m ahead on the path,

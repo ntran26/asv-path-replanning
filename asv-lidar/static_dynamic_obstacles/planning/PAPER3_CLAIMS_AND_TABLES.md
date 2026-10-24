@@ -101,7 +101,7 @@ and the tables that decide them, in one file.
 >   alteration only when the target is not already clear (9(a)); crossings given way by passing
 >   astern, a port alteration for a target from port (A17); Rule 17(a)(i) with the hold penalty
 >   released in extremis. The behaviour is called COLREGs-aware, not COLREGs-compliant (working
->   title, N1, C-1). `PAPER3_DRAFT_SKELETON.md` section 2.2 carries the tables.
+>   title, N1, C-1). `PAPER/PAPER3_DRAFT_SKELETON.md` section 2.2 carries the tables.
 > - **Learner-comparison figures (decision 2026-10-08)**, `tools/diagnostics/paper_figures.py`
 >   (`results/baseline_v3/figures_draft`): A, success rate by encounter type on the whole test set as
 >   grouped bars, seed mean with individual seeds and the seed range, classical comparators hatched
@@ -127,6 +127,12 @@ and the tables that decide them, in one file.
 >   check); TQC seed 2 trains from 2026-10-22. The baseline-v1 and baseline-v2 runs were removed on 2026-10-04, but their result
 >   summaries are kept. The campaign's formulation is baseline-v3: the v4.3
 >   candidate was trained in full and not adopted (`BASELINE_V4_PLAN.md`, section 5e).
+> - **Section 4 scope (decisions 2026-10-24, skeleton S19).** The ablation is dropped, so C-4 and
+>   R6 go; a one-variant reserve on the deployed learner (encounter context hidden, COLREGs terms
+>   kept, three seeds) is run only if review asks for it. The reward scale audit R7 covers the
+>   deployed policy only, on test set v4, after TQC seed 2. The prior-paper SAC is removed from
+>   every table. Multi-axis results are per-axis tables: the principal metrics in the main text,
+>   the full set in an appendix.
 > - **The tables below still describe suite 3.0.** R1, the Tier B holdout, becomes the test-set
 >   table, and cells are filled only once the final formulation is fixed.
 
@@ -136,7 +142,7 @@ and the tables that decide them, in one file.
 It becomes binding once signed off and committed with the frozen suite.
 After that, a claim may be weakened or withdrawn, but not added or moved to fit a result.
 
-> **Status note (2026-09-28).** The Introduction is now draft 4 (`planning_records/Paper3_Introduction_draft4.docx`), with the literature review moved into section 1.2 and the paper renumbered to six sections (`PAPER3_DRAFT_SKELETON.md` revision 4). Contributions are now **C1-C4** (C1 formulation; C2 geometric framework for constrained encounter responses, absorbing the old width-sweep C4; C3 four-learner comparison with classical references; C4 evaluation design, absorbing the old perception C5 and protocol C6); the old field C7 and **RQ4 / C-6 are open (S13)** because draft 4 calls physical transfer "planned". Draft 4 adds **RQ6** (how the response changes as maneuvering room decreases), which C-2 and C-3 now serve. Paper sections cited below use the revision-4 numbers.
+> **Status note (2026-09-28).** The Introduction is now draft 4 (`planning_records/Paper3_Introduction_draft4.docx`), with the literature review moved into section 1.2 and the paper renumbered to six sections (`PAPER/PAPER3_DRAFT_SKELETON.md` revision 4). Contributions are now **C1-C4** (C1 formulation; C2 geometric framework for constrained encounter responses, absorbing the old width-sweep C4; C3 four-learner comparison with classical references; C4 evaluation design, absorbing the old perception C5 and protocol C6); the old field C7 and **RQ4 / C-6 are open (S13)** because draft 4 calls physical transfer "planned". Draft 4 adds **RQ6** (how the response changes as maneuvering room decreases), which C-2 and C-3 now serve. Paper sections cited below use the revision-4 numbers.
 >
 > **Status note (2026-09-23).** Three decisions are now made and this draft needs restating before sign-off (B6). **Framing:** the paper is a **formulation plus a five-learner comparison**, so there is no "Proposed (SAC, full)" method — the five learners are the comparison, and the classical comparators carry N2. **Formulation:** baseline-v2 (F96) — the Rule 17(b) below-floor being-overtaken draws are out of training and the suite, so any row or claim resting on them goes. **Field work** is delayed within this paper, so N3, RQ4 and C-6 stand. Still to settle: which learner carries the ablations, and C-4's comparison, which needs a **third rung** (no encounter feature / class one-hot / full context branch) now that the observation has a context branch.
 
@@ -151,7 +157,7 @@ tests it. **Status** is `pending` until that evidence exists.
 | C-1 | One end-to-end policy does path following, static avoidance and COLREGs-aware manoeuvring in a laterally bounded basin and channel from onboard range sensing alone | RQ1 | R1 (test set v4: 1,000 episodes, 664 decoupled + 336 coupled; learners at 3 seeds). **R8 dropped**: Tier A is out of the paper and Around the Clock is not built (2026-09-24) | The deployed policy (the better of SAC and TQC on test set v4) exceeds every classical comparator's success overall; per-cell intervals reported; differences to the other learners reported with seed variability | pending |
 | C-2 | Rule 9 governs Rules 13–15 below a width threshold, and the policy's manoeuvre mode switches from alteration to 8(e) speed reduction there | RQ6, C2, Study 1 | **R4 + manoeuvre-mode curve only** — suite 3.4 draws Tier B channels at 7.5–10 m, above the head-on (3.80 m) and overtaking (4.26 m) thresholds, so Tier B cannot show the switch (2026-09-24, 2026-09-27) | **Crossing** mode share crosses 50 % between **8 m and 7 m**; **overtaking** between **4.5 m and 4.0 m**; **head-on** is resolved by channel-keeping at every width and never crosses (04a section 6) | pending |
 | C-3 | The width at which each classical comparator becomes inadmissible is predicted by the precedence-table thresholds (head-on, overtaking 4.26 m, crossing 7.60 m) | RQ6, C2, Study 1 | R4 (the sweep keeps widths to 3.5 m; comparators are COLREGs-VO (Kuwata) and the encounter-specific VO, tuned on the validation set and pinned in `configs/comparators_v1.json`) | Each comparator's admissibility loss falls within ±0.5 m of its predicted threshold | pending |
-| C-4 | Supplying the encounter class as an observation feature improves compliance over reward shaping alone | RQ2 | R6 (2 × 2 ablation) | Violation rate lower with the feature in both reward conditions; effect size reported with seed CIs | pending |
+| C-4 | Supplying the encounter class as an observation feature improves compliance over reward shaping alone | RQ2 | R6 (2 × 2 ablation) | Violation rate lower with the feature in both reward conditions; effect size reported with seed CIs | dropped (S19, 2026-10-24) |
 | C-5 | Under degraded perception the policy fails conservatively before it fails unsafely | RQ3, C1/C4, Study 2 | R5, failure-mode ratio FMR | FMR ≥ 1 at every level up to 2× nominal on each axis; the first axis to drive FMR < 1 is occlusion duration | pending |
 | C-6 | Domain randomisation over identified uncertainty closes more of the sim-to-field gap than nominal identification alone | RQ4 [open, S13] | R9 (field) | Randomised policy's field success exceeds the nominal policy's; if not, the gap is attributed to localisation or disturbance, which is also reportable | pending |
 | C-7 | **8(e) in two layers**: the learned policy slackens speed; an engineered runtime safety layer takes all way off. Only the first is a learned-compliance claim | F68 | R1/R2 with safety layer off; intervention rate as its own column | Validation-set intervention rate ≤ 5 % for the proposed method; compliance metrics reported with the safety layer **off** | pending |
@@ -193,7 +199,7 @@ not separable, so learner comparisons are made on the headline and crossing
 behaviour is reported descriptively, per seed. The deployed learner is chosen on the
 headline (decision, 2026-10-10).
 
-> **Status note (2026-09-28).** The Introduction is now draft 4 (`planning_records/Paper3_Introduction_draft4.docx`), with the literature review moved into section 1.2 and the paper renumbered to six sections (`PAPER3_DRAFT_SKELETON.md` revision 4). Contributions are now **C1-C4** (C1 formulation; C2 geometric framework for constrained encounter responses, absorbing the old width-sweep C4; C3 four-learner comparison with classical references; C4 evaluation design, absorbing the old perception C5 and protocol C6); the old field C7 and **RQ4 / C-6 are open (S13)** because draft 4 calls physical transfer "planned". Draft 4 adds **RQ6** (how the response changes as maneuvering room decreases), which C-2 and C-3 now serve. Paper sections cited below use the revision-4 numbers.
+> **Status note (2026-09-28).** The Introduction is now draft 4 (`planning_records/Paper3_Introduction_draft4.docx`), with the literature review moved into section 1.2 and the paper renumbered to six sections (`PAPER/PAPER3_DRAFT_SKELETON.md` revision 4). Contributions are now **C1-C4** (C1 formulation; C2 geometric framework for constrained encounter responses, absorbing the old width-sweep C4; C3 four-learner comparison with classical references; C4 evaluation design, absorbing the old perception C5 and protocol C6); the old field C7 and **RQ4 / C-6 are open (S13)** because draft 4 calls physical transfer "planned". Draft 4 adds **RQ6** (how the response changes as maneuvering room decreases), which C-2 and C-3 now serve. Paper sections cited below use the revision-4 numbers.
 >
 > **Status note (2026-09-23).** Three decisions are now made and this draft needs restating before sign-off (B6). **Framing:** the paper is a **formulation plus a five-learner comparison**, so there is no "Proposed (SAC, full)" method — the five learners are the comparison, and the classical comparators carry N2. **Formulation:** baseline-v2 (F96) — the Rule 17(b) below-floor being-overtaken draws are out of training and the suite, so any row or claim resting on them goes. **Field work** is delayed within this paper, so N3, RQ4 and C-6 stand. Still to settle: which learner carries the ablations, and C-4's comparison, which needs a **third rung** (no encounter feature / class one-hot / full context branch) now that the observation has a context branch.
 
@@ -208,8 +214,6 @@ The prototype's reference controller is a supplementary comparator, not one of t
 | TQC (distributional) | | | | | | | |
 | RecurrentPPO | | | | | | | |
 | PPO | | | | | | | |
-| SAC, no COLREGs terms (ablation) | | | | | | | |
-| Prior SAC (Paper 2, frozen) | | | | | | | |
 | Encounter-specific VO | | | | | | | |
 | LOS-PID + DWA | | | | | | | |
 | Reference controller (supplementary) | | | | | | | |
@@ -255,7 +259,7 @@ Plus: width at which each classical comparator becomes inadmissible.
 | Velocity-estimate noise | | | | | | |
 | Joint corner (2×) | | | | | | |
 
-### R6 — ablation (2 × 2 plus leave-one-out)
+### R6 — ablation (2 × 2 plus leave-one-out): dropped (S19, 2026-10-24)
 
 | COLREGs reward terms | Encounter feature | Success | Violation rate | Target coll. |
 |---|---|---|---|---|
@@ -268,7 +272,7 @@ Leave-one-out rows (3 seeds, stated): −v_port, −v_bow, −v_side, −v_hold,
 
 ### R7 — reward scale audit
 
-Per-term episode-integrated contribution, random policy and trained policy, both geometry modes, with the 02a section 8.1 ordering checked.
+Per-term episode-integrated contribution under the deployed policy on test set v4, with the ordering checked against the magnitude hierarchy (S19, 2026-10-24: deployed policy only, no random-policy row).
 
 ### R8 — Around the Clock (24 + 24 × 3 widths)
 

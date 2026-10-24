@@ -8,8 +8,10 @@
 must use are in `MASTER_ARTIFACT_FACTS.md` (vessel model, classical methods,
 learners, perception, data generation, field bridge) and
 `FORMULATION_EQUATIONS.md` (action, observation, encounter geometry, reward).
-The scope, contributions and literature come from
-`Paper3_Introduction_draft4.docx`; the platform and field trials from Paper 2
+The scope, contributions and literature come from the current draft of the
+paper's Sections 1–3, with the decisions in force in `00_CURRENT_STATE.md`
+(Introduction draft 4, the earlier source, is superseded and kept in
+`planning_records/`); the platform and field trials from Paper 2
 (Tran et al., 2026, *Drones* 10(9):680).
 
 ---
@@ -103,7 +105,8 @@ equations" box (what bold vectors, hats and subscripts mean).
 - Why onboard LiDAR only (no AIS), and why the navigable boundary comes from a
   map (a channel edge is often a depth contour, not a wall).
 - The workspace: 10 × 25 m basin (model scale) and parallel-walled channels.
-- Objective, the four contributions and the central questions (draft 4, section 1.3),
+- Objective, the four contributions and the central questions (the current draft's Section 1;
+  the width sweep and the perception study are out, `00_CURRENT_STATE.md` section 4),
   and what is out of scope (multi-target, restricted visibility, Rule 17(b),
   Rule 18, legal compliance).
 - ▶ **Overview animation:** top-down basin; the own ship follows a slanted leg
