@@ -875,7 +875,7 @@ That is worth reading again in run 4 before touching the weight.
 *Housekeeping.* Runs 2 and 3, the smoke run, their TensorBoard logs, the C14
 diagnostics and the test logs were moved from `C:\Users\hntran\asv_runs` into
 `runs/`, `results/` and `tools/diagnostics/` (76 files, 71.8 MB, sizes
-verified), and the home-folder copy removed. `planning/READING_LIST.md`
+verified), and the home-folder copy removed. `planning/PAPER/READING_LIST.md`
 lists the literature behind every method in the tree.
 
 **F58 — A20 built (option 1): an engaged encounter keeps its class, side and

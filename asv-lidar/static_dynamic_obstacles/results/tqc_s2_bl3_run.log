@@ -4,3 +4,12 @@
 2026-10-22 22:55:36 tqcs2_bl3 FAILED (see runs/tqc_formulation_seed2_bl3.log)
 2026-10-22 22:57:09 == tqcs2_bl3: resuming the straight run to 3.0 M (baseline-v3)
 2026-10-22 22:59:11    pinned learner 20548
+2026-10-25 04:58:08    tqcs2_bl3 3.0 M exit 0
+2026-10-25 04:59:03 == tqc seed 2: already trained
+2026-10-25 05:02:41    tier 1 tqcs2_bl3 supervisor off exit 0
+2026-10-25 05:21:58    frozen suite tqcs2_bl3 exit 0
+2026-10-25 06:14:20    Paper 2 set tqcs2_bl3 exit 0
+2026-10-25 06:14:21 == tqc seed 2 done
+2026-10-25 06:32:25    test set v4, tqcs2_bl3 exit 0 (results/test_set/v4/tqcs2_bl3/summary.txt)
+2026-10-25 06:50:20    test set v4 (final model), tqcs2_bl3 exit 0 (results/test_set/v4/tqcs2_bl3_final/summary.txt)
+2026-10-25 06:50:21 == tqcs2_bl3 run done

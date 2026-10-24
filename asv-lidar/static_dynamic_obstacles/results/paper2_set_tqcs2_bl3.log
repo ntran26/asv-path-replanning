@@ -1,0 +1,49 @@
+Paper 2 deployment-layout set (tqcs2_bl3) -- runs\tqc_formulation_seed2_bl3\best_model.zip
+630 episodes, set revision 2.0, manifest 67311d204bcc01d7, 304 s
+
+-- by safety layer
+              n  success  coll_target  coll_other  rms_cte  min_range  estops
+supervisor                                                                   
+off         630    0.632        0.133       0.235    1.326      3.195     0.0
+
+-- no target, by layout (safety layer off)
+         n  success  coll_target  coll_other  rms_cte  min_range  estops
+layout                                                                  
+L1      10      1.0          0.0         0.0    1.321        inf     0.0
+L2      10      1.0          0.0         0.0    1.657        inf     0.0
+L3      10      0.6          0.0         0.4    1.902        inf     0.0
+
+-- with a target, by encounter and speed
+                  n  success  coll_target  coll_other  rms_cte  min_range  estops
+encounter speed                                                                  
+BO        FIX    60    0.617        0.017       0.367    0.694      4.129     0.0
+          VAR    60    0.633        0.000       0.367    0.691      4.290     0.0
+CRP       FIX    60    0.500        0.300       0.200    1.122      1.688     0.0
+          VAR    60    0.550        0.317       0.133    1.122      1.616     0.0
+CRS       FIX    60    0.450        0.283       0.267    0.924      2.447     0.0
+          VAR    60    0.433        0.300       0.267    0.934      2.491     0.0
+HO        FIX    60    0.733        0.000       0.267    1.981      3.587     0.0
+          VAR    60    0.717        0.000       0.283    1.987      3.544     0.0
+OT        FIX    60    0.783        0.083       0.133    1.807      2.762     0.0
+          VAR    60    0.783        0.100       0.117    1.849      2.718     0.0
+
+-- with a target, by layout and speed
+                n  success  coll_target  coll_other  rms_cte  min_range  estops
+layout speed                                                                   
+L1     FIX    100     0.49         0.15        0.36    1.013      3.146     0.0
+       VAR    100     0.49         0.17        0.34    1.031      2.998     0.0
+L2     FIX    100     0.63         0.15        0.22    1.550      2.913     0.0
+       VAR    100     0.63         0.15        0.22    1.585      3.064     0.0
+L3     FIX    100     0.73         0.11        0.16    1.354      3.126     0.0
+       VAR    100     0.75         0.11        0.14    1.334      3.255     0.0
+
+-- VAR against its FIX twin (same scenario and seed; only the speed differs)
+      n  success_fix  success_var   lost  gained
+enc                                             
+BO   60        0.617        0.633  0.000   0.017
+CRP  60        0.500        0.550  0.067   0.117
+CRS  60        0.450        0.433  0.033   0.017
+HO   60        0.733        0.717  0.033   0.017
+OT   60        0.783        0.783  0.050   0.050
+
+

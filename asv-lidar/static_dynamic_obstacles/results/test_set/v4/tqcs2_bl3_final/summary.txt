@@ -1,0 +1,60 @@
+Test set 4.0 (tqcs2_bl3_final) -- runs\tqc_formulation_seed2_bl3\final_model.zip
+1000 episodes, digest a8c40beb234ea7f9, 1070 s
+
+-- overall
+           n  success  coll_target  coll_other  timeout
+safety                                                 
+off     1000    0.839        0.061         0.1      0.0
+
+-- by source (safety off)
+          n  success  coll_target  coll_other  timeout
+source                                                
+frozen  664    0.904        0.053       0.044      0.0
+paper2  336    0.711        0.077       0.211      0.0
+
+-- by cell (safety off)
+                                n  success  coll_target  coll_other  timeout
+source cell                                                                 
+frozen basin-being_overtaken   95    0.842        0.105       0.053      0.0
+       basin-crossing         100    0.870        0.100       0.030      0.0
+       basin-head_on          100    0.940        0.040       0.020      0.0
+       basin-null              75    0.947        0.000       0.053      0.0
+       basin-overtaking        54    0.944        0.037       0.019      0.0
+       channel-crossing       100    0.850        0.050       0.100      0.0
+       channel-head_on         98    0.929        0.041       0.031      0.0
+       channel-overtaking      42    0.976        0.000       0.024      0.0
+paper2 FS-BO                   25    0.760        0.040       0.200      0.0
+       FS-CRP                  29    0.621        0.172       0.207      0.0
+       FS-CRS                  27    0.667        0.111       0.222      0.0
+       FS-HO                   25    0.920        0.000       0.080      0.0
+       FS-NT                   27    0.963        0.000       0.037      0.0
+       FS-OT                   95    0.705        0.042       0.253      0.0
+       L1-BO                   10    1.000        0.000       0.000      0.0
+       L1-CRP                  11    0.182        0.273       0.545      0.0
+       L1-CRS                  12    0.500        0.167       0.333      0.0
+       L1-HO                   10    0.900        0.000       0.100      0.0
+       L1-NT                    1    1.000        0.000       0.000      0.0
+       L1-OT                   10    0.700        0.100       0.200      0.0
+       L2-BO                    5    1.000        0.000       0.000      0.0
+       L2-CRP                   5    0.400        0.600       0.000      0.0
+       L2-CRS                   6    0.333        0.167       0.500      0.0
+       L2-HO                    5    0.000        0.000       1.000      0.0
+       L2-NT                    1    1.000        0.000       0.000      0.0
+       L2-OT                    5    1.000        0.000       0.000      0.0
+       L3-BO                    5    0.600        0.000       0.400      0.0
+       L3-CRP                   6    0.833        0.167       0.000      0.0
+       L3-CRS                   5    0.200        0.400       0.400      0.0
+       L3-HO                    5    0.800        0.000       0.200      0.0
+       L3-NT                    1    1.000        0.000       0.000      0.0
+       L3-OT                    5    0.800        0.000       0.200      0.0
+
+-- by variant (safety off)
+                  n  success  coll_target  coll_other  timeout
+source variant                                                
+frozen CV       340    0.897        0.071       0.032      0.0
+       NC        66    0.955        0.030       0.015      0.0
+       RE       258    0.899        0.035       0.066      0.0
+paper2           30    0.967        0.000       0.033      0.0
+       FIX      156    0.712        0.096       0.192      0.0
+       VAR      150    0.660        0.073       0.267      0.0
+
