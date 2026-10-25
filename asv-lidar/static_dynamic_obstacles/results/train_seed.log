@@ -293,3 +293,10 @@ code matches baseline-v3
 2026-10-25 06:32:25    test set v4, tqcs2_bl3 exit 0 (results/test_set/v4/tqcs2_bl3/summary.txt)
 2026-10-25 06:50:20    test set v4 (final model), tqcs2_bl3 exit 0 (results/test_set/v4/tqcs2_bl3_final/summary.txt)
 2026-10-25 06:50:21 == tqcs2_bl3 run done
+2026-10-25 07:41:07 == reward scale audit (R7, S19): SAC seed 0 best checkpoint on test set v4, safety off
+2026-10-25 07:46:23    test set v4, sacs0_bl3_audit exit 0 (results/test_set/v4/sacs0_bl3_audit/summary.txt)
+2026-10-25 08:36:50 == comparators v2 (S18, A35): test set v4, encounter-specific VO then LOS-PID + DWA, safety off (10 processes)
+code matches comparators-v2 (digest 617782d1483005d7)
+2026-10-25 08:53:58    test set v4, encounter_vo_v2 exit 0 (results/test_set/v4/encounter_vo_v2/summary.txt)
+code matches comparators-v2 (digest 617782d1483005d7)
+2026-10-25 09:25:33    test set v4, los_dwa_v2 exit 0 (results/test_set/v4/los_dwa_v2/summary.txt)

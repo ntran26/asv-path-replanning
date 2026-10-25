@@ -22,7 +22,11 @@ candidate and each tracked target (constant velocity, over `TAU_S`):
     - crossing: pass astern of the target (Rules 15/16; this project's S3
       makes the own ship give way from either side, A17);
     - overtaking: pass on the side `compliant_turn_sense` names (Rule 13).
-  A candidate whose CPA is outside `SIDE_FREE_DCPA_M` is free of it.
+  Judged on the encounter (`SIDE_ON_ENCOUNTER`, comparators v2, A35): while
+  the encounter context reports the encounter engaged, every candidate that
+  closes on the target must keep the side.  (v1 judged it per candidate: one
+  whose own CPA was outside `SIDE_FREE_DCPA_M` was free of it, so a quick
+  turn to port opened a head-on pass and counted as compliant.)
 * **static margin (soft)** -- scan points and the map inside `STATIC_SOFT_M`
   are penalised, as the domain is for targets;
 * **stand-on** -- being overtaken: hold the LOS course at cruise (Rule 17(a))
@@ -75,6 +79,7 @@ HARD_GAP_M = ct.CLASSICAL_VO_HARD_GAP_M
 STATIC_GAP_M = ct.CLASSICAL_VO_STATIC_GAP_M
 BOUNDARY_GAP_M = ct.CLASSICAL_VO_BOUNDARY_GAP_M
 SIDE_FREE_DCPA_M = ct.CLASSICAL_VO_SIDE_FREE_DCPA_M  # 2.5 m: the pass is clear either side
+SIDE_ON_ENCOUNTER = ct.CLASSICAL_VO_SIDE_ON_ENCOUNTER  # v2: the side rule binds while engaged
 # Rule 17(a)(ii)/(b): stand on until a hard violation is this close.  8 s was
 # too late for this hull to sidestep a faster overtaker coming up its track
 # (no clear velocity left by the time it released); 12 s leaves one.
@@ -232,7 +237,13 @@ def _wrong_side(ob: Obstacle, position, vel, courses) -> np.ndarray:
     cpa = p_rel + t_cpa[:, None] * v_rel               # target from own at the CPA
     dcpa = np.linalg.norm(cpa, axis=1)
     approaching = (v_rel @ p_rel) < 0.0
-    constrained = approaching & (dcpa < SIDE_FREE_DCPA_M)
+    if SIDE_ON_ENCOUNTER:
+        # Judged once, on the encounter: Algorithm 1 engaged it on the present
+        # velocities and holds it until clearing.  A candidate that does not
+        # close on the target (slowing behind an overtaken vessel) has no pass.
+        constrained = approaching & bool(ob.engaged)
+    else:
+        constrained = approaching & (dcpa < SIDE_FREE_DCPA_M)
     stbd = np.stack([np.cos(courses), -np.sin(courses)], axis=1)
     target_to_starboard = np.sum(cpa * stbd, axis=1) > 0.0
     if ob.cls == "head_on":

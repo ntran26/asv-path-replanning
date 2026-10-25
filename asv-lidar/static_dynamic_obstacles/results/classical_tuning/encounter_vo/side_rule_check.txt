@@ -1,0 +1,5 @@
+Encounter-specific VO, side rule (A35): 120 decoupled validation episodes (baseline-v3 build); score = goal - 2 x collision
+
+per-candidate rule, W_CHANGE 0.3 (comparators v1)  score +0.475  goal 0.825  target collision 0.083  | goal by class {'being_overtaken': 0.9, 'crossing': 0.35, 'head_on': 0.95, 'no_target': 0.9, 'null': 0.95, 'overtaking': 0.9}
+per-candidate rule, W_CHANGE 0.8                   score +0.500  goal 0.833  target collision 0.083  | goal by class {'being_overtaken': 0.9, 'crossing': 0.4, 'head_on': 0.95, 'no_target': 0.95, 'null': 0.95, 'overtaking': 0.85}
+encounter rule, W_CHANGE 0.8 (comparators v2)      score +0.475  goal 0.825  target collision 0.075  | goal by class {'being_overtaken': 0.9, 'crossing': 0.45, 'head_on': 0.95, 'no_target': 0.95, 'null': 0.95, 'overtaking': 0.75}

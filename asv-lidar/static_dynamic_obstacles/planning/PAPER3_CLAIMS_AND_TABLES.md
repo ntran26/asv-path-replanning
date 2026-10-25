@@ -54,7 +54,9 @@ and the tables that decide them, in one file.
 >   assessment and narrow-channel convention, so the comparison measures the method, not the rule
 >   set. Comparators v2 (built after TQC seeds 1-2) judges its passing side on the encounter (A35),
 >   tunes it on the 120 decoupled validation episodes and runs test set v4 once. No claim says a
->   comparator measures the effect of the convention.
+>   comparator measures the effect of the convention. **Built 2026-10-25:** success 0.675
+>   (decoupled 0.774, coupled 0.479); only the course-change weight moved in the tuning (0.3 to
+>   0.8); LOS-PID + DWA re-run under the v2 settings file reproduces v1 in all 1,000 episodes.
 > - **Seed retention (decision 2026-10-19).** Every trained seed is reported; none is re-trained
 >   or replaced because of its result, only for a documented defect (a code or configuration
 >   mismatch, an interrupted or corrupted run). RecurrentPPO seed 1 has no defect: its
@@ -276,6 +278,8 @@ Leave-one-out rows (3 seeds, stated): −v_port, −v_bow, −v_side, −v_hold,
 ### R7 — reward scale audit
 
 Per-term episode-integrated contribution under the deployed policy on test set v4, with the ordering checked against the magnitude hierarchy (S19, 2026-10-24: deployed policy only, no random-policy row).
+
+**Done (2026-10-25):** `results/baseline_v3/reward_scale_audit.md` (run `sacs0_bl3_audit`, SAC seed 0, best checkpoint; same episodes as the Table R1 run, terms sum to each return). Per active step the boundary term stays the largest (5.36 of 15.0); the COLREGs group (2.34) sits above the obstacle term (2.06), except in coupled episodes (obstacles 2.44, COLREGs 2.35); the domain term realizes 0.47 of 12.5 and acts in 8.4 % of the episodes; progress (1.45) sits above path following (1.37). Over episodes, path following and progress dominate and nearly cancel (−66.4, +69.7); goal episodes return +26.2, collision episodes −361.1.
 
 ### R8 — Around the Clock (24 + 24 × 3 widths)
 

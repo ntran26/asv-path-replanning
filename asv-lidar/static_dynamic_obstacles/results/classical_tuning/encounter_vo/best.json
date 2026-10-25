@@ -1,0 +1,14 @@
+{
+ "controller": "encounter_vo",
+ "score": 0.45,
+ "episodes": 60,
+ "per_class": 10,
+ "validation_set": "v3",
+ "values": {
+  "CLASSICAL_VO_TAU_S": 20.0,
+  "CLASSICAL_VO_HARD_GAP_M": 0.2,
+  "CLASSICAL_VO_STAND_ON_RELEASE_S": 12.0,
+  "CLASSICAL_VO_W_CHANGE": 0.8,
+  "CLASSICAL_VO_W_DOMAIN": 3.0
+ }
+}
