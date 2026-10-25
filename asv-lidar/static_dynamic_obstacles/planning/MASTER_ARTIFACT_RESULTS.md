@@ -1,6 +1,6 @@
 # Paper 3 results for the master artifact (generated)
 
-Generated 2026-10-25 06:57 by `tools/diagnostics/artifact_results.py` from the recorded result files; chart data in `master_artifact_results.json`. Safety layer off throughout. Test set v4: 1,000 episodes (664 decoupled, 336 coupled). Each run is represented by its best validation-set checkpoint; the final 3.0 M model is the selection-sensitivity check. Rates are fractions of episodes; the bracket after a run's success is its Wilson 95 % interval.
+Generated 2026-10-25 07:54 by `tools/diagnostics/artifact_results.py` from the recorded result files; chart data in `master_artifact_results.json`. Safety layer off throughout. Test set v4: 1,000 episodes (664 decoupled, 336 coupled). Each run is represented by its best validation-set checkpoint; the final 3.0 M model is the selection-sensitivity check. Rates are fractions of episodes; the bracket after a run's success is its Wilson 95 % interval.
 
 ## 1. Status
 
@@ -257,4 +257,41 @@ From `results/baseline_v3/paper_table.csv`. Runs pooled per method: SAC: sacs0_b
 
 - RecurrentPPO seed 1 collapsed mid-training: between 1.0 and 2.4 M steps, 258 of 273 updates stopped at the first epoch on the KL limit, the validation-set score fell to -0.91 at 2.0 M, and it recovered after 2.4 M. No defect was found, so the seed is kept and reported beside seeds 0 and 2, which show none of it (seed retention, skeleton S16; planning/PAPER3_CLAIMS_AND_TABLES.md).
 - Decoupled channel cells: recorded nominal widths 6.9-10.6 m (median 8.7 m); 16 of 240 below 7.60 m.
+
+## 17. Reward scale audit of the deployed policy (Table R7)
+
+Run `sacs0_bl3_audit`: SAC seed 0 (the deployed policy), best validation-set checkpoint, on test set v4 (1000 episodes), safety layer off. From `results/baseline_v3/reward_scale_audit.csv (tools/diagnostics/reward_scale_audit.py)`. Weight = the term's largest per-step contribution; integral = mean weighted episode integral; share = mean share of the episode's absolute dense reward; active = share of episodes in which the term was ever non-zero; per step = mean magnitude per step when active.
+
+- Terms add up to the return: largest per-episode gap 1.28e-13 over 1000 episodes.
+- Same episodes as the Table R1 run `sacs0_bl3_metrics`: outcome identical in 1000 of 1000, steps identical in 1000, largest return difference 0.00e+00.
+
+### All episodes
+
+| Term | Weight | Mean episode integral | Share of dense abs. | Episodes active | Per step when active |
+|---|---:|---:|---:|---:|---:|
+| Boundary r_bnd | 15.00 | -1.25 | 0.004 | 0.034 | 5.358 |
+| Ship domain r_dom | 12.50 | -0.17 | 0.002 | 0.084 | 0.470 |
+| Static obstacle r_obs | 11.00 | -20.60 | 0.094 | 0.616 | 2.059 |
+| COLREGs group r_col | 9.00 | -26.86 | 0.126 | 0.840 | 2.337 |
+| Path following r_pf | 3.00 | -66.39 | 0.306 | 1.000 | 1.373 |
+| Progress r_prog | 1.50 | +69.71 | 0.338 | 1.000 | 1.452 |
+| Smoothness r_smooth | 0.50 | -14.62 | 0.071 | 1.000 | 0.304 |
+| Existence r_exist | 0.25 | -11.94 | 0.058 | 1.000 | 0.250 |
+| Terminal (+100 goal, -300 collision) | — | +46.00 | — | 1.000 | — |
+| Episode return | — | -26.12 | — | — | — |
+
+Order by per-step magnitude when active: bnd > col > obs > prog > pf > dom > smooth > exist (designed, by weight: bnd > dom > obs > col > pf > prog > smooth > exist).
+
+### Per step when active, by scope
+
+| Term | All episodes (n = 1000) | Decoupled (n = 664) | Coupled (n = 336) | Goal episodes (n = 865) | Collision episodes (n = 135) |
+|---|---:|---:|---:|---:|---:|
+| Boundary r_bnd | 5.358 | 5.393 | 5.313 | 2.699 | 9.156 |
+| Ship domain r_dom | 0.470 | 0.437 | 0.512 | 0.203 | 0.627 |
+| Static obstacle r_obs | 2.059 | 1.623 | 2.444 | 1.818 | 3.318 |
+| COLREGs group r_col | 2.337 | 2.332 | 2.346 | 2.274 | 2.710 |
+| Path following r_pf | 1.373 | 1.305 | 1.508 | 1.445 | 0.915 |
+| Progress r_prog | 1.452 | 1.460 | 1.437 | 1.464 | 1.381 |
+| Smoothness r_smooth | 0.304 | 0.303 | 0.307 | 0.303 | 0.308 |
+| Existence r_exist | 0.250 | 0.250 | 0.250 | 0.250 | 0.250 |
 

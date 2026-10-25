@@ -261,6 +261,9 @@ These are facts that earlier drafts or planning files had wrong; the current fil
       named in Section 10; checked by rendering the page with the new data;
     - block D, ready: Sections 0 and 1 aligned with the framing, after
       `PAPER/PAPER3_SECTIONS1-2_REVISION_BRIEF.md` sections 1.1 and 1.3;
+    - block E, ready: a new subsection 10.12 on the reward scale audit (Table R7) of the deployed
+      policy, from the results files' `reward_audit` block (`MASTER_ARTIFACT_RESULTS.md` section
+      17), with "Still to come" becoming 10.13;
     - after comparators v2: the data again, and Section 4's values.
 - **Decided 2026-10-24** (skeleton S19):
   - **Multi-axis results:** per-axis tables, the principal metrics in the main-text table and the
