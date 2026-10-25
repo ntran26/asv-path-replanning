@@ -27,9 +27,12 @@ decides, how it is trained and how it is tested.
 
 Paper 3 in one sentence: a small autonomous boat follows a planned path through
 confined water, avoids fixed obstacles and one other moving vessel in a way
-consistent with the collision regulations (COLREGs), using only its own LiDAR
-— and four deep reinforcement learning algorithms are trained and compared on
-one fixed problem formulation, against classical controllers.
+consistent with the collision regulations (COLREGs), using only its own onboard
+perception (here a LiDAR). The paper develops one fixed problem formulation and
+deploys a policy trained on it. Four deep reinforcement learning algorithms are
+trained on the formulation, the deployed policy is the better of SAC and TQC on
+the test set, and the other learners and two classical controllers are its
+baselines (framing decision, 2026-10-10; it is not a learner-comparison study).
 
 ## 2. Global rules
 
@@ -105,8 +108,10 @@ equations" box (what bold vectors, hats and subscripts mean).
 - Why onboard LiDAR only (no AIS), and why the navigable boundary comes from a
   map (a channel edge is often a depth contour, not a wall).
 - The workspace: 10 × 25 m basin (model scale) and parallel-walled channels.
-- Objective, the four contributions and the central questions (the current draft's Section 1;
-  the width sweep and the perception study are out, `00_CURRENT_STATE.md` section 4),
+- Objective, the contributions (five, the fifth being the physical encounter trials) and the
+  three central questions, as worded in `PAPER/PAPER3_SECTIONS1-2_REVISION_BRIEF.md` sections
+  1.1 and 1.3 (a formulation and a deployed policy; the width sweep and the perception study are
+  out, `00_CURRENT_STATE.md` section 4); the deployed policy itself is named only in Section 10,
   and what is out of scope (multi-target, restricted visibility, Rule 17(b),
   Rule 18, legal compliance).
 - ▶ **Overview animation:** top-down basin; the own ship follows a slanted leg

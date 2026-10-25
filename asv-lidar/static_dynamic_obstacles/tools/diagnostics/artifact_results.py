@@ -62,7 +62,7 @@ SEEDS = (0, 1, 2)
 COMPARATORS = [  # id, display name, test-set tag or None, status
     ("los_dwa", "LOS-PID + DWA", "los_dwa", "comparators v1 (tuned on the 120 decoupled validation episodes; "
      "DWA kept its defaults); re-run under comparators v2"),
-    ("evo", "Encounter-specific VO", None, "pending: comparators v2 (decision S18, A35) after TQC seeds 1-2"),
+    ("evo", "Encounter-specific VO", None, "pending: comparators v2 (decision S18, A35)"),
 ]
 TABLE_NAME = {"los_dwa": "LOS-DWA", "evo": "Encounter-VO"}  # method names in paper_table.py
 STAGES = [0, 160_000, 360_000, 640_000, 1_000_000, 1_500_000, 2_000_000]
@@ -108,9 +108,9 @@ CDF_GRID = {"closest_approach_m": ("min_target_range", np.round(np.arange(0.0, 8
 
 
 def r3(x):
-    # Six decimals: readers round again to three, and rounding to four first moved some values
-    # by 0.001 (0.87048 -> 0.8705 -> 0.871).
-    return None if x is None or (isinstance(x, float) and not math.isfinite(x)) else round(float(x), 6)
+    # Nine decimals: readers round again to three, and rounding to four first moved some values
+    # by 0.001 (0.87048 -> 0.8705 -> 0.871); six still did once (0.81649995 -> 0.8165 -> 0.817).
+    return None if x is None or (isinstance(x, float) and not math.isfinite(x)) else round(float(x), 9)
 
 
 def wilson(k, n, z=1.959964):

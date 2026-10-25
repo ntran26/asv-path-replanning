@@ -1,6 +1,6 @@
 # Paper 3 results for the master artifact (generated)
 
-Generated 2026-10-25 06:53 by `tools/diagnostics/artifact_results.py` from the recorded result files; chart data in `master_artifact_results.json`. Safety layer off throughout. Test set v4: 1,000 episodes (664 decoupled, 336 coupled). Each run is represented by its best validation-set checkpoint; the final 3.0 M model is the selection-sensitivity check. Rates are fractions of episodes; the bracket after a run's success is its Wilson 95 % interval.
+Generated 2026-10-25 06:57 by `tools/diagnostics/artifact_results.py` from the recorded result files; chart data in `master_artifact_results.json`. Safety layer off throughout. Test set v4: 1,000 episodes (664 decoupled, 336 coupled). Each run is represented by its best validation-set checkpoint; the final 3.0 M model is the selection-sensitivity check. Rates are fractions of episodes; the bracket after a run's success is its Wilson 95 % interval.
 
 ## 1. Status
 
@@ -9,7 +9,7 @@ Generated 2026-10-25 06:53 by `tools/diagnostics/artifact_results.py` from the r
 - PPO: seeds done 0, 1, 2
 - RecurrentPPO: seeds done 0, 1, 2
 - LOS-PID + DWA: comparators v1 (tuned on the 120 decoupled validation episodes; DWA kept its defaults); re-run under comparators v2
-- Encounter-specific VO: pending: comparators v2 (decision S18, A35) after TQC seeds 1-2
+- Encounter-specific VO: pending: comparators v2 (decision S18, A35)
 - Deployed policy: the better of SAC and TQC by three-seed mean success on test set v4; within it, the seed with the best validation-set score (decision 2026-10-10). Status: decided by the rule. Deployed: SAC seed 0 (validation score +0.411).
 
 ## 2. Test set v4 by run (success; collisions by type)
@@ -167,7 +167,7 @@ From `results/baseline_v3/paper_table.csv`. Runs pooled per method: SAC: sacs0_b
 | Mean speed (m/s) | 0.749 [0.746, 0.752] | 0.713 [0.711, 0.716] | 0.608 [0.604, 0.612] | 0.602 [0.599, 0.605] | 0.495 [0.491, 0.499] |
 | Minimum speed (m/s) | 0.504 [0.500, 0.508] | 0.503 [0.499, 0.506] | 0.389 [0.383, 0.395] | 0.429 [0.423, 0.434] | 0.322 [0.312, 0.333] |
 | Min obstacle clearance (m) | 0.664 [0.641, 0.687] | 0.599 [0.578, 0.620] | 0.746 [0.718, 0.776] | 0.838 [0.808, 0.868] | 0.634 [0.591, 0.678] |
-| Min boundary clearance (m) | 0.813 [0.810, 0.816] | 0.818 [0.816, 0.821] | 0.818 [0.815, 0.821] | 0.817 [0.814, 0.819] | 0.824 [0.820, 0.828] |
+| Min boundary clearance (m) | 0.813 [0.810, 0.816] | 0.818 [0.816, 0.821] | 0.818 [0.815, 0.821] | 0.816 [0.814, 0.819] | 0.824 [0.820, 0.828] |
 | Ship-domain intrusion rate | 0.112 [0.101, 0.123] | 0.125 [0.114, 0.137] | 0.239 [0.225, 0.253] | 0.251 [0.236, 0.265] | 0.142 [0.123, 0.162] |
 | Deepest intrusion, episodes with one (fraction of radius) | 0.208 [0.188, 0.228] | 0.192 [0.175, 0.209] | 0.232 [0.218, 0.247] | 0.271 [0.257, 0.285] | 0.215 [0.182, 0.251] |
 | Time inside the domain, episodes with an intrusion (s) | 1.567 [1.420, 1.636] | 1.622 [1.430, 1.684] | 1.755 [1.619, 1.813] | 2.296 [1.811, 2.353] | 2.117 [1.900, 2.318] |
