@@ -32,6 +32,9 @@ import train_formulation as tf  # noqa: E402
 
 RESULTS = ROOT / "results" / "tiers"
 COLREGS_PARTS = ("port", "bow", "side", "hold", "r8")
+# The dense reward terms (`reward.terms.DENSE_TERMS`): the seven task terms and the
+# COLREGs group.
+REWARD_TERMS = ("pf", "prog", "exist", "smooth", "obs", "bnd", "dom", "col")
 HEAD_ON_WIDTHS = (5.0, 6.0, 7.0, 8.0, 10.0)
 
 
@@ -128,6 +131,10 @@ def run_episode(env, built, seed: int, policy: str, model=None, obstacles: Optio
     total, col, speeds, steps, ctes = 0.0, 0.0, [], 0, []
     frames = Counter()
     integrals = Counter()
+    # Reward scale audit (Table R7, decision S19, 2026-10-24): the weighted episode
+    # integral of every reward term and the steps on which each term was non-zero,
+    # read from the per-step breakdown the environment already reports.
+    reward_int, reward_active = Counter(), Counter()
     first_engaged_cls, port_sense_frames, engaged_frames = None, 0, 0
     stops, stop_steps, r_path_max = [], [], 0.0
     min_range = float("inf")
@@ -170,6 +177,12 @@ def run_episode(env, built, seed: int, policy: str, model=None, obstacles: Optio
         steps += 1
         total += float(reward)
         col += float(info["reward/weighted/col"])
+        for name in REWARD_TERMS:
+            value = float(info.get(f"reward/weighted/{name}", 0.0))
+            reward_int[name] += value
+            reward_active[name] += int(value != 0.0)
+        reward_int["terminal"] += float(info.get("reward/terminal", 0.0))
+        reward_int["intervention"] += float(info.get("reward/intervention", 0.0))
         speeds.append(float(info["speed_mps"]))
         ctes.append(float(env.cross_track_error))
         r_path_max = max(r_path_max, abs(float(info["r_path_radps"])))
@@ -261,6 +274,10 @@ def run_episode(env, built, seed: int, policy: str, model=None, obstacles: Optio
         "domain_intrusion_max": dom_max,
         "domain_time_s": dom_steps * float(cfg.UPDATE_RATE),
         "colregs_violation_time_s": viol_steps * float(cfg.UPDATE_RATE),
+        # reward scale audit (Table R7): weighted episode integral per term, the terminal
+        # and safety-layer rewards, and the steps on which each term was non-zero
+        **{f"reward_int_{n}": reward_int[n] for n in (*REWARD_TERMS, "terminal", "intervention")},
+        **{f"reward_active_{n}": reward_active[n] for n in REWARD_TERMS},
     }
     if keep_traj:
         row["_traj"] = traj
