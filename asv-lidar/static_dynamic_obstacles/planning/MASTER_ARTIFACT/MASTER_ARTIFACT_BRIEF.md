@@ -422,14 +422,16 @@ data they describe and re-checked whenever the data file is replaced.
 
 **What to show and what not to.** Describe the numbers; never declare a claim confirmed or a
 learner "best" beyond what the data show with its spread. Learners always with their seeds (a
-dot per seed, the mean, the range); the classical comparator labeled with its version (v1) and
-drawn without a seed spread, because it is deterministic. COLREGs behavior is not given as
-compliance rates (it is shown by the trajectory snapshots, which are pending). The deployed
-policy is not named until it is decided. COLREGs-VO is not a reported comparator (decision S18)
+dot per seed, the mean, the range); the two classical comparators, LOS-PID + DWA and the
+encounter-specific VO, labeled with their settings version (v2) and drawn without a seed spread,
+because each is one deterministic run. In running text the second is "the encounter-specific
+VO", lower case. COLREGs behavior is not given as compliance rates (it is shown by the
+trajectory snapshots, which are pending). The deployed policy (SAC seed 0 since 2026-10-25) is
+read from the data and named only in this section. COLREGs-VO is not a reported comparator (decision S18)
 and appears nowhere in this section. No mention of a field-deployment test set; the coupled
 cells are named only by encounter type.
 
-"In this section": what the four learners and the classical comparator achieve on the held-out
+"In this section": what the four learners and the two classical comparators achieve on the held-out
 test set, broken down by family, encounter type, place and target behavior, and how stable that
 is across seeds and checkpoint choice. / Which results are still to come.
 
@@ -443,17 +445,18 @@ is across seeds and checkpoint choice. / Which results are still to come.
   episode succeeds when the vessel reaches the goal without touching the target, a panel or the
   boundary within the time limit; otherwise it ends as a collision (by type) or a timeout.
 - **Status board** (small grid of chips, from the JSON `meta`, `learner_summary`,
-  `comparators` and `deployment`): learners and seeds done; TQC seed 2 training; LOS-PID + DWA
-  at comparators v1, to be re-run under comparators v2; encounter-specific VO pending
-  (comparators v2); deployed policy pending (the rule stated: the better of SAC and TQC by
+  `comparators` and `deployment`): learners and seeds done; LOS-PID + DWA and the
+  encounter-specific VO at comparators v2, each with one line on its settings from its status
+  string; the deployed policy and the rule that chose it (the better of SAC and TQC by
   three-seed mean success on the test set, then the seed with the best validation score);
   COLREGs trajectory snapshots pending (for the deployed policy); safety-layer-on test-set
   evaluation pending; field trials in Section 11.
 
 **10.2 Headline success**
 - ▶ **Figure: success on test set v4** — horizontal dot plot, one row per method, grouped
-  off-policy (SAC, TQC), on-policy (PPO, RecurrentPPO), classical (LOS-PID + DWA v1;
-  encounter-specific VO as an empty dashed row marked "pending"). Per learner: a dot per seed
+  off-policy (SAC, TQC), on-policy (PPO, RecurrentPPO), classical (LOS-PID + DWA and the
+  encounter-specific VO, v2; a comparator without test-set data would be an empty dashed row
+  marked "pending"). Per learner: a dot per seed
   with its Wilson whisker, a thick tick at the seed mean, a light band over the seed range. The
   comparator: a hatched bar with its Wilson whisker. Segmented control: All / Decoupled /
   Coupled. Values on hover and keyboard focus.
@@ -468,7 +471,7 @@ is across seeds and checkpoint choice. / Which results are still to come.
   minimum panel and boundary clearance), target ship (ship-domain intrusion rate, deepest
   intrusion and time inside, closest approach centre to centre, minimum hull-to-hull
   clearance), actuation (rudder saturation, mean rudder rate, control effort). Columns: SAC,
-  TQC, PPO, RecurrentPPO, LOS-PID + DWA (v1), encounter-specific VO (greyed, "pending"). Each
+  TQC, PPO, RecurrentPPO, LOS-PID + DWA (v2), encounter-specific VO (v2). Each
   cell: point and [lower, upper]. Scope tabs All / Decoupled / Coupled. No bold "best" cells.
   Footnotes from the results file (IQM for continuous metrics; which episodes each row covers;
   the ship domain 3.14 m ahead, 1.57 m astern, 1.25 m abeam, entered by the target's centre;
@@ -478,7 +481,7 @@ is across seeds and checkpoint choice. / Which results are still to come.
 - ▶ **Figure: success by encounter type** — grouped vertical bars: head-on, crossing from port,
   crossing from starboard, overtaking, being overtaken, null (target present, no risk of
   collision), no target. Per learner: bar at the seed mean, seed dots, a whisker over the seed
-  range; the comparator hatched, without an interval. All / Decoupled / Coupled (null exists
+  range; the comparators hatched, without an interval. All / Decoupled / Coupled (null exists
   only in the decoupled family, no target only in the coupled one); the episode count n under
   each group.
 - ▶ **Figure: success by cell** — heat map, rows = methods, columns = the 8 decoupled cells
@@ -504,7 +507,7 @@ is across seeds and checkpoint choice. / Which results are still to come.
 
 **10.7 Target-ship safety**
 - ▶ **Figure: closest approach** — empirical cumulative distribution over target episodes
-  (JSON `cdf`), one line per method (seeds pooled; the comparator dashed). Toggle: closest
+  (JSON `cdf`), one line per method (seeds pooled; the comparators dashed). Toggle: closest
   approach centre to centre (0–8 m, with marks at the ship domain's 1.25 m abeam and 3.14 m
   ahead semi-axes) / minimum hull-to-hull clearance (0–6 m; 0 = contact). Reading aid: a line
   further right means more separation; the height at a given distance is the fraction of
@@ -516,7 +519,7 @@ is across seeds and checkpoint choice. / Which results are still to come.
   episodes), mean speed, rudder saturation fraction: per method a bar at the pooled value with
   its bootstrap whisker and the per-seed IQMs as dots. Text describes the pattern without a
   trade-off plot: the learned policies finish sooner and faster and sit further from the
-  reference path than the classical controller.
+  reference path than either classical comparator.
 
 **10.9 Learning curves** (the paper's Figure B)
 - ▶ **Figure: validation-set score during training** — x = training steps 0–3.0 M with the seven
@@ -578,14 +581,12 @@ is across seeds and checkpoint choice. / Which results are still to come.
   for how large each gets.
 
 **10.13 Still to come**
-- The deployed-policy rule and its status; the encounter-specific VO (comparators v2: tuned on
-  the 120 decoupled validation episodes, passing side judged on the encounter) and the v2 re-run
-  of LOS-PID + DWA; the trajectory snapshots of each encounter type for the deployed policy; the
+- The deployed policy and its rule; the trajectory snapshots of each encounter type for the deployed policy; the
   safety-layer-on evaluation and its intervention rate, reported separately from learned
   behavior; the field trials (Section 11). Each as a short `.planned`-style list item.
 
 **Takeaways** (three bullets, numbers rendered from the data): which learners succeed most often,
-with seed ranges, against the classical comparator (v1); that coupled layouts and crossings are
+with seed ranges, against the two classical comparators (v2); that coupled layouts and crossings are
 the hardest cases for every learner; that the order holds under checkpoint choice and the
 largest seed effect is RecurrentPPO's seed 1.
 

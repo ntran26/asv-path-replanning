@@ -60,7 +60,7 @@ history or rationale only.
   `OPEN_PROBLEMS.md` (A-numbered items), in `static_dynamic_obstacles/`. The skeleton's table S1–S19
   summarizes the ones that shape the paper, and section 4 below the ones in force.
 
-## 3. Status of the work (2026-10-25, 07:00)
+## 3. Status of the work (2026-10-25, 09:40)
 
 **Training campaign: complete.** All twelve baseline-v3 runs (four learners × three seeds, 3.0 M
 steps each, seven-stage curriculum) are trained. Each was evaluated on test set v4 at its best
@@ -77,8 +77,8 @@ score +0.378).
 | TQC | 0.830 (0.815–0.838) |
 | PPO | 0.750 (0.747–0.753) |
 | RecurrentPPO | 0.717 (0.638–0.757) |
-| LOS-PID + DWA (comparators v1) | 0.770 |
-| Encounter-specific VO | pending (comparators v2) |
+| LOS-PID + DWA (comparators v2) | 0.770 (decoupled 0.870, coupled 0.571) |
+| Encounter-specific VO (comparators v2) | 0.675 (decoupled 0.774, coupled 0.479) |
 
 **Deployed policy: SAC seed 0** (decided by the rule on 2026-10-25).
 - SAC has the better three-seed mean on test set v4 (0.846 against TQC's 0.830).
@@ -91,12 +91,27 @@ score +0.378).
 - The recorded terms add up to every episode's return, and the run reproduces the table R1 run
   exactly (same outcomes, steps and returns).
 
+**Comparators v2 (S18, A35): done 2026-10-25.** Settings file `configs/comparators_v2.json`
+(digest 617782d1483005d7; `tools/diagnostics/comparators_config.py --check` before each run).
+- Side rule: the encounter-specific VO's passing side binds every closing candidate while the
+  encounter context reports the encounter engaged (Algorithm 1's danger test, latched until
+  clearing), not per candidate from its own DCPA (`CLASSICAL_VO_SIDE_ON_ENCOUNTER`). On a
+  head-on 0.3 m to starboard of the reciprocal, v1 turns to port (335°) and v2 to starboard (35°).
+- Tuning: coordinate descent over five parameters (horizon, hard gap, stand-on release,
+  course-change weight, domain weight) on 60 decoupled validation episodes, re-scored on all 120,
+  baseline-v3 build of the set. Only the course-change weight moved, 0.3 → 0.8: +0.350 → +0.475
+  (success 0.783 → 0.825). Search and validation in `results/classical_tuning/encounter_vo/`.
+- The side rule on the validation set (`side_rule_check.txt`): per-candidate rule with the v1
+  settings +0.475, per-candidate rule with weight 0.8 +0.500, comparators v2 +0.475.
+- Test set v4: `results/test_set/v4/encounter_vo_v2/` and `los_dwa_v2/`. LOS-PID + DWA (values
+  unchanged) reproduces its v1 run in all 1,000 episodes and now carries the reward-term columns.
+  The encounter-specific VO is weakest in crossing (basin 0.55, channel 0.60) and overtaking
+  (basin 0.741, channel 0.714, coupled 0.295).
+
 **Still to run, in order:**
-1. Comparators v2: the encounter-specific VO tuned and run on test set v4, with LOS-PID + DWA
-   re-run under the same settings file.
-2. The trajectory snapshots of each encounter type for the deployed policy.
-3. The safety-layer-on test-set evaluation, run only when requested.
-4. The field trials, whose design is open.
+1. The trajectory snapshots of each encounter type for the deployed policy.
+2. The safety-layer-on test-set evaluation, run only when requested.
+3. The field trials, whose design is open.
 
 ## 4. Decisions in force
 
@@ -224,14 +239,15 @@ These are facts that earlier drafts or planning files had wrong; the current fil
     seventeen items of 2026-10-24 (the test-set composition, the fixed-layout branch of Algorithm
     4, the multi-axis sentence with Appendix G, and decision S19: no ablation, Section 4 renumbered
     to 4.1–4.5). Edit history: `planning/PAPER/PAPER3_PROMPTS.md`.
-  - Next: the Section 4 draft (block C of `planning/PAPER/PAPER3_PROMPTS.md`, written 2026-10-25 from the
-    twelve runs, with the encounter-specific VO pending): 4.1, 4.2 and 4.3, Appendix G, and four
+  - Next: the Section 4 draft (blocks C, D and E of `planning/PAPER/PAPER3_PROMPTS.md`, written 2026-10-25 from
+    the twelve runs, the reward scale audit and comparators v2): 4.1, 4.2 and 4.3, Appendix G, and four
     corrections elsewhere (3.2 resume of TQC seed 2, 3.4.3, 6.2 training budget, 1.2.2).
 - **Section 4 (results)**, restated 2026-10-24 (skeleton S19; the draft carries the matching
   structure): 4.1 overall, 4.2 snapshots, 4.3 target behavior, 4.4 reward scale audit, 4.5 runtime
   safety layer.
-  - 4.1 and 4.3: written from the twelve runs in block C; the encounter-specific VO column stays
-    pending until comparators v2, and LOS-PID + DWA is re-run under v2.
+  - 4.1 and 4.3: written from the twelve runs in block C; block E adds the encounter-specific VO
+    (comparators v2: test set v4 success 0.675), the 3.3 tuning text and Algorithm A1, and removes
+    the LOS-PID + DWA check (its v2 re-run reproduces v1 in all 1,000 episodes).
   - 4.2: the snapshot figure of 2026-10-06 used the deployed policy's model file (SAC seed 0), so
     block C writes it now. Its being-overtaken panel shows the domain-term competition (a turn of
     about 20° and slowing near the CPA); a steadier case could replace it.
@@ -241,30 +257,31 @@ These are facts that earlier drafts or planning files had wrong; the current fil
     existence, against the weights' boundary > domain > obstacles > COLREGs > path following > progress >
     smoothness > existence; no term exceeds its weight.
   - 4.5 and Section 5 wait for the safety-on evaluation and the field-trial design.
-- **Explainer artifact** (version checked 2026-10-24: 1792859529-ce15):
+- **Explainer artifact** (version checked 2026-10-25: 1792859529-ce15; no change block applied
+  since 2026-10-24):
   - **Built:** Sections 0–8, 10 and 12. **Titled placeholders:** Section 9 (safety layer and
     evaluation design) and Section 11 (field trials and the vessel–computer link).
   - **Section 10, "Results in simulation":** complete (10.1–10.12 and the takeaways). Every number
-    is rendered from the embedded results data. TQC is shown over seeds 0–1, and the
-    encounter-specific VO and the deployed policy as pending.
-  - **Section 4:** presents the encounter-specific VO with the comparators v1 values, the v2 values
-    marked as still to come, and its domain-depth measure. COLREGs-VO appears only as the reactive
-    target's rule, with the |α|, |β| head-on test of section 5 above and the target's six
-    departures from the rule's settings.
+    is rendered from the embedded results data, still that of 2026-10-22: TQC over seeds 0–1, the
+    deployed policy pending, LOS-PID + DWA at v1, and the encounter-specific VO pending.
+  - **Section 4:** presents the encounter-specific VO with the comparators v1 values and its
+    domain-depth measure. COLREGs-VO appears only as the reactive target's rule, with the |α|, |β|
+    head-on test of section 5 above and the target's six departures from the rule's settings.
   - **Removed 2026-10-24:** the width sweep and the perception study, from Sections 1, 6 and 8 and
     the glossary. Section 5's list of non-default learner settings now includes the SAC and TQC
     gradient steps.
   - **Sections 0 and 1** still frame the paper as a comparison of four learners, against the
     framing decision of 2026-10-10.
-  - **Next** (change blocks in `MASTER_ARTIFACT/MASTER_ARTIFACT_PROMPTS.md`):
-    - block B, ready: the results data of 2026-10-25, all twelve runs, with the deployed policy
-      named in Section 10; checked by rendering the page with the new data;
-    - block D, ready: Sections 0 and 1 aligned with the framing, after
-      `PAPER/PAPER3_SECTIONS1-2_REVISION_BRIEF.md` sections 1.1 and 1.3;
-    - block E, ready: a new subsection 10.12 on the reward scale audit (Table R7) of the deployed
-      policy, from the results files' `reward_audit` block (`MASTER_ARTIFACT_RESULTS.md` section
-      17), with "Still to come" becoming 10.13;
-    - after comparators v2: the data again, and Section 4's values.
+  - **Next:** four change blocks, all ready, in `MASTER_ARTIFACT/MASTER_ARTIFACT_PROMPTS.md`:
+    - **B:** the results data of 2026-10-25 (all twelve runs, the deployed policy SAC seed 0, both
+      comparators at v2, the reward audit), with Section 10's wording made plural for two
+      comparators. Checked by rendering the page with the new data: every computed sentence holds.
+    - **C:** Section 4 at comparators v2. The course-change weight becomes 0.8 and the passing side
+      is judged on the engaged encounter; with 0.8 the worked cost example no longer favors the turn.
+    - **D:** Sections 0 and 1 aligned with the framing, after
+      `PAPER/PAPER3_SECTIONS1-2_REVISION_BRIEF.md` sections 1.1 and 1.3.
+    - **E:** a new subsection 10.12 on the reward scale audit (Table R7) of the deployed policy;
+      "Still to come" becomes 10.13.
 - **Decided 2026-10-24** (skeleton S19):
   - **Multi-axis results:** per-axis tables, the principal metrics in the main-text table and the
     full set in an appendix; no Pareto view and no weighted score.

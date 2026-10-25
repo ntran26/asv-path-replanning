@@ -15,6 +15,17 @@ rather than "some numbers were tried".
 
     python tools/diagnostics/tune_classical.py --controller colregs_vo
     python tools/diagnostics/tune_classical.py --controller los_dwa --per-class 10
+    python tools/diagnostics/tune_classical.py --controller encounter_vo            # comparators v2
+    python tools/diagnostics/tune_classical.py --controller encounter_vo --validate
+
+The development set here is the decoupled part of the validation set (120
+episodes, 20 per class); comparators v2 (S18) tunes the encounter-specific VO on
+it with its passing side judged on the encounter (A35).  `--validation-set v3`
+(the default) builds it as the baseline-v3 runs were selected on: the
+`formulation_v3` overlay installed in the main process and every worker, which
+keeps the encounters and changes the panels drawn at stage 5 (53 of 120 episodes
+with three panels, against 29 without it).  Comparators v1 was tuned on the
+baseline-v2 build (`--validation-set v2`).
 
 Writes `results/classical_tuning/<controller>/`: `search.csv` (every
 configuration tried, its score and per-class outcomes), `best.json` (the chosen
@@ -51,6 +62,18 @@ GRIDS = {
          [8.0, 12.0, 18.0]),
         ("classical.colregs_vo", "W_CHANGE", "CLASSICAL_KVO_W_CHANGE", [0.0, 0.3, 0.8]),
     ],
+    # Comparators v2 (S18).  The COLREGs-VO grid less SIDE_FREE_DCPA_M, which the
+    # encounter-judged side rule no longer reads, plus the domain weight, the
+    # method's own term.  The manoeuvre model (TURN_*, SPEED_TAU_*) is not swept:
+    # `colregs_vo` imports `sweep`, so the test set's reactive target reads it too.
+    "encounter_vo": [
+        ("classical.encounter_vo", "TAU_S", "CLASSICAL_VO_TAU_S", [12.0, 20.0, 30.0]),
+        ("classical.encounter_vo", "HARD_GAP_M", "CLASSICAL_VO_HARD_GAP_M", [0.20, 0.35, 0.50]),
+        ("classical.encounter_vo", "STAND_ON_RELEASE_S", "CLASSICAL_VO_STAND_ON_RELEASE_S",
+         [8.0, 12.0, 18.0]),
+        ("classical.encounter_vo", "W_CHANGE", "CLASSICAL_VO_W_CHANGE", [0.0, 0.3, 0.8]),
+        ("classical.encounter_vo", "W_DOMAIN", "CLASSICAL_VO_W_DOMAIN", [1.5, 3.0, 6.0]),
+    ],
     "los_dwa": [
         ("classical.los_dwa", "SAFE_GAP_M", "CLASSICAL_DWA_SAFE_GAP_M", [0.15, 0.20, 0.35]),
         ("classical.los_dwa", "TARGET_HORIZON_S", "CLASSICAL_DWA_TARGET_HORIZON_S",
@@ -65,7 +88,7 @@ GRIDS = {
 _W = {}
 
 
-def _init(controller: str, settings: dict) -> None:
+def _init(controller: str, settings: dict, overlay: bool = False) -> None:
     import importlib
 
     import torch
@@ -73,6 +96,10 @@ def _init(controller: str, settings: dict) -> None:
     import constant_temp as ct
     import curriculum
     import train_formulation as tf
+    if overlay:
+        import constants as cfg
+        import formulation_v3
+        formulation_v3.apply(cfg)          # the env draws stage-5 panels from it at reset
     for (module_name, attr, const_name), value in settings.items():
         setattr(ct, const_name, value)
         module = importlib.import_module(module_name)
@@ -94,10 +121,11 @@ def _score(rows: pd.DataFrame) -> float:
     return float((rows.outcome == "goal").mean() - 2.0 * rows.collided.mean())
 
 
-def evaluate(controller: str, settings: dict, scenarios, processes: int) -> pd.DataFrame:
+def evaluate(controller: str, settings: dict, scenarios, processes: int,
+             overlay: bool = False) -> pd.DataFrame:
     jobs = [(b, 900_000 + i) for i, b in enumerate(scenarios)]
     with ProcessPoolExecutor(processes, initializer=_init,
-                             initargs=(controller, settings)) as pool:
+                             initargs=(controller, settings, overlay)) as pool:
         return pd.DataFrame(list(pool.map(_episode, jobs, chunksize=1)))
 
 
@@ -107,6 +135,8 @@ def main() -> int:
     ap.add_argument("--per-class", type=int, default=10, help="development episodes per class")
     ap.add_argument("--processes", type=int, default=10)
     ap.add_argument("--passes", type=int, default=1, help="coordinate-descent passes")
+    ap.add_argument("--validation-set", choices=("v3", "v2"), default="v3",
+                    help="v3: the baseline-v3 build (formulation_v3 overlay); v2: comparators v1's")
     ap.add_argument("--validate", action="store_true",
                     help="score the defaults and the tuned values from best.json on the "
                          "full development set, instead of searching")
@@ -114,6 +144,11 @@ def main() -> int:
 
     import constant_temp as ct
     from common import development_set
+    overlay = args.validation_set == "v3"
+    if overlay:
+        import constants as cfg
+        import formulation_v3
+        formulation_v3.apply(cfg)
     out = OUT / args.controller
     out.mkdir(parents=True, exist_ok=True)
 
@@ -126,7 +161,7 @@ def main() -> int:
     started, rows, history = time.time(), [], []
 
     def run(label, trial):
-        d = evaluate(args.controller, trial, scenarios, args.processes)
+        d = evaluate(args.controller, trial, scenarios, args.processes, overlay)
         s = _score(d)
         by_class = d.groupby("class").apply(lambda x: (x.outcome == "goal").mean(),
                                             include_groups=False).round(2).to_dict()
@@ -140,8 +175,8 @@ def main() -> int:
         print(f"  {label:44s} score {s:+.3f}  goal {(d.outcome == 'goal').mean():.2f}", flush=True)
         return s
 
-    print(f"{args.controller}: {len(scenarios)} development episodes per configuration, "
-          f"{args.processes} workers", flush=True)
+    print(f"{args.controller}: {len(scenarios)} development episodes per configuration "
+          f"({args.validation_set} build), {args.processes} workers", flush=True)
     if args.validate:
         # A 60-episode search can chase noise, so the chosen values are confirmed
         # on every development episode before they are saved.
@@ -177,6 +212,7 @@ def main() -> int:
     with open(out / "best.json", "w") as fh:
         json.dump({"controller": args.controller, "score": best,
                    "episodes": len(scenarios), "per_class": per,
+                   "validation_set": args.validation_set,
                    "values": {k: list(v) if isinstance(v, tuple) else v
                               for k, v in chosen.items()}}, fh, indent=1)
     lines = [f"Tuning {args.controller} on {len(scenarios)} development episodes "

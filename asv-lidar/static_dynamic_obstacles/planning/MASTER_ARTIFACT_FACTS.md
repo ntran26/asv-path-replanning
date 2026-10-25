@@ -140,12 +140,24 @@ The reported comparators are LOS-PID + DWA (2.2) and the encounter-specific VO (
 decision S18, 2026-10-20). COLREGs-VO (2.3) is not a reported comparator; its rule drives the
 test set's reactive target. All comparators use the same perception (LiDAR scan, tracker, map boundary) as
 the learned policies and the same actuator limits; they differ only in the
-avoidance logic. Tuned on the decoupled part of the validation set (120
-episodes) by coordinate descent, scored by goal − 2 × collision: COLREGs-VO
-raised its course-change weight from 0.3 to 0.8 (+0.525 → +0.575 on all 120
-episodes); DWA kept its defaults (+0.650 either way). Both are pinned in
-`configs/comparators_v1.json` (digest `0dd8eab26bbf954f`). Pseudocode:
-`PAPER/PAPER3_ALGORITHMS.md`, Algorithms A1 and A2.
+avoidance logic. Each is tuned on the decoupled part of the validation set (120 episodes) by
+coordinate descent, scored by goal − 2 × collision, and pinned in a settings file whose digest
+the code is checked against before a run.
+- **Comparators v2 (2026-10-25), the reported settings:** `configs/comparators_v2.json` (digest
+  `617782d1483005d7`).
+  - The encounter-specific VO was searched on 60 of the 120 episodes (10 per class) over its
+    horizon, hard gap, stand-on release, course-change weight and domain weight. Only the
+    course-change weight moved, from the default 0.3 to 0.8 (score +0.350 → +0.475 on all 120).
+  - Its passing side is judged on the engaged encounter (2.4 item 5).
+  - The tuning used the baseline-v3 build of the validation episodes, the build that reproduces
+    the learned policies' recorded validation runs.
+  - LOS-PID + DWA is unchanged from v1: its v2 test-set run reproduces the v1 run in all 1,000
+    episodes.
+- **Comparators v1 (2026-10-19):** `configs/comparators_v1.json` (digest `0dd8eab26bbf954f`).
+  COLREGs-VO raised its course-change weight from 0.3 to 0.8 (+0.525 → +0.575 on all 120); DWA
+  kept its defaults (+0.650 either way).
+
+Pseudocode: `PAPER/PAPER3_ALGORITHMS.md`, Algorithms A1 and A2.
 
 **2.1 LOS guidance + heading PID (path following, shared).** Line-of-sight
 guidance (Fossen, 2021): aim at a point Δ = 2.5 m ahead on the path,
@@ -264,8 +276,9 @@ target (`T-RE`) runs this rule from its own side:
 
 **2.4 Encounter-specific VO** (an interpretation of Thyri & Breivik, 2022, a method for
 confined waters; velocity obstacles after Fiorini & Shiller, 1998) — the reported
-velocity-obstacle comparator (S18). Values are comparators v1 (untuned defaults); comparators
-v2 tunes them on the validation set and judges the passing side on the encounter.
+velocity-obstacle comparator (S18). Values are comparators v2 (2026-10-25, section 2 above):
+the v1 defaults except the course-change weight, tuned from 0.3 to 0.8, and the passing side
+judged on the engaged encounter (item 5).
 
 1. **Encounter assessment:** the formulation's own encounter context (Algorithm 1): the
    latched class, required turn sense, engagement and in-extremis flag, the same assessment the
@@ -290,13 +303,19 @@ v2 tunes them on the validation set and judges the passing side on the encounter
 5. **Passing side (hard, give-way classes):** head-on: the target passes down the own ship's
    port side (Rule 14); crossing: pass astern of the target, from either side (the
    narrow-channel convention, S3); overtaking: pass on the side the required turn sense names.
-   A candidate whose closest approach is beyond 2.5 m is exempt (per candidate in v1; v2 judges
-   it on the encounter). Released in extremis, or when no clear candidate keeps the required side.
+   - **In v2**, while the formulation's encounter context reports the encounter engaged (Eq. 7:
+     class ≠ none, 0 < TCPA ≤ 25 s, DCPA < 3.75 m, latched until clearing), the side binds every
+     candidate that closes on the target. A candidate that does not close on it (slowing behind
+     an overtaken vessel) has no pass to keep.
+   - **v1** exempted any candidate whose own closest approach was beyond 2.5 m, so a quick turn
+     to port could open a head-on pass. Example: a head-on target 0.3 m to starboard of the
+     reciprocal track at 10 m; v1 turns to port (335°), v2 to starboard (35°).
+   - The side is released in extremis, or when no clear candidate keeps the required side.
 6. **Stand-on (being overtaken):** keep the LOS course at cruise while that velocity meets no
    hard limit within 12 s and keeps the passing side (Rule 17(a)); otherwise act as for any
    obstacle.
 7. **Cost:** J = 1.0·|χ − χ_LOS|/π + 0.5·max(0, U_pref − U)/U_pref + 3.0·domain penetration
-   + 0.3·|χ − χ_prev|/π + 1.0·static penalty, the static penalty rising from 0 at 0.6 m
+   + 0.8·|χ − χ_prev|/π (0.3 in v1) + 1.0·static penalty, the static penalty rising from 0 at 0.6 m
    clearance to scan points and the boundary to 1 at the 0.15 m hard limit.
 8. **Fallback:** if nothing is clear, the candidate whose first violation comes latest, then
    the lowest cost. The choice is flown by the course autopilot (at 6°/s) and the speed loop

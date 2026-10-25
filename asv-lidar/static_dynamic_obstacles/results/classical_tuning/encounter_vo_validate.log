@@ -1,0 +1,5 @@
+encounter_vo: 60 development episodes per configuration (v3 build), 10 workers
+  defaults (120 episodes)                      score +0.350  goal 0.78
+  tuned (120 episodes)                         score +0.475  goal 0.82
+Validation on 120 development episodes: defaults +0.350, tuned +0.475 -> keep tuned
+

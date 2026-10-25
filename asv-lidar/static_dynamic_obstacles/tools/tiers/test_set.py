@@ -780,8 +780,12 @@ def main() -> int:
     if args.build or not (args.model or args.policy):
         return 0
     if args.policy:
-        for policy in args.policy.split(","):
-            evaluate(kept, report, policy=policy.strip(), tag=policy.strip(), args=args, t0=time.time())
+        policies = [p.strip() for p in args.policy.split(",")]
+        for policy in policies:
+            # `--tag` names a single comparator's run (comparators v2: encounter_vo_v2,
+            # los_dwa_v2), so a new settings file never overwrites or reuses an older run.
+            tag = args.tag if args.tag and len(policies) == 1 else policy
+            evaluate(kept, report, policy=policy, tag=tag, args=args, t0=time.time())
         return 0
     model = args.model if args.model.is_absolute() else ROOT / args.model
     evaluate(kept, report, model=model, tag=args.tag or model.parent.name, args=args, t0=t0)

@@ -129,9 +129,10 @@ def test_clear_path_is_followed_to_the_goal(env, controller):
 U = 0.55
 
 
-def _vessel(x, y, heading_deg, speed, cls, sense=0):
+def _vessel(x, y, heading_deg, speed, cls, sense=0, engaged=True):
     a = math.radians(heading_deg)
-    return Obstacle(np.array([x, y]), speed * np.array([math.sin(a), math.cos(a)]), a, cls, sense)
+    return Obstacle(np.array([x, y]), speed * np.array([math.sin(a), math.cos(a)]), a, cls, sense,
+                    engaged=engaged)
 
 
 def _pass(choice, ob):
@@ -154,6 +155,21 @@ def test_vo_head_on_passes_port_to_port():
     assert choice.course > 0.0, "alteration to starboard"
     stbd = np.array([math.cos(choice.course), -math.sin(choice.course)])
     assert _pass(choice, ob) @ stbd < 0.0, "target passes down the port side"
+
+
+def test_vo_side_rule_is_judged_on_the_encounter(monkeypatch):
+    """A35 (comparators v2): a head-on 0.3 m to starboard of the reciprocal.  Judged
+    per candidate, a turn to port opens the pass beyond SIDE_FREE_DCPA_M by itself
+    and is exempt; judged on the engaged encounter, it is not."""
+    ob = _vessel(0.3, 10.0, 180.0, 0.5, "head_on")
+    monkeypatch.setattr(vo, "SIDE_ON_ENCOUNTER", False)
+    assert select_velocity(np.zeros(2), 0.0, U, 0.0, U, [ob]).course < 0.0, "v1: to port"
+    monkeypatch.setattr(vo, "SIDE_ON_ENCOUNTER", True)
+    choice = select_velocity(np.zeros(2), 0.0, U, 0.0, U, [ob])
+    assert choice.feasible and not choice.released and choice.course > 0.0, "v2: to starboard"
+    # Not engaged (Algorithm 1 has not judged it dangerous): no side rule.
+    free = _vessel(0.3, 10.0, 180.0, 0.5, "head_on", engaged=False)
+    assert not vo._wrong_side(free, np.zeros(2), np.array([[0.0, U]]), np.array([0.0])).any()
 
 
 @pytest.mark.parametrize("side, x0, heading", [("starboard", 5.0, 270.0), ("port", -5.0, 90.0)])

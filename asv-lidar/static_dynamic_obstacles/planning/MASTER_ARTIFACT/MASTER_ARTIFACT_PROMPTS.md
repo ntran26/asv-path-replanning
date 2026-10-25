@@ -1,6 +1,6 @@
 # Explainer artifact: edit instructions (kept current)
 
-> **Kept current.** Last updated 2026-10-25 (TQC seed 2 done). This file holds the next edit instructions for the
+> **Kept current.** Last updated 2026-10-25 (comparators v2 done). This file holds the next edit instructions for the
 > explainer artifact (https://claude.ai/artifact/S1Bm5Lf1199eXx2fC41hYF), each as a block to paste
 > into the chat that holds the artifact. The blocks name planning files by path. That chat reads
 > them from the synced project, so each push needs a Sync before the next block is sent. Only files
@@ -8,44 +8,90 @@
 
 ## 1. State of the artifact
 
-The artifact was last checked on 2026-10-24, at version 1792859529-ce15 (13,104 lines).
+The artifact was last checked on 2026-10-25, at version 1792859529-ce15 (13,104 lines). None of
+the blocks below has been applied yet.
 
 - **Built:** Sections 0–8, 10 and 12. Sections 9 (safety layer and evaluation design) and 11
   (field trials) are titled placeholders.
-- **Section 10:** complete, but its embedded data is that of 2026-10-22 (TQC over seeds 0–1, the
-  deployed policy pending). Block B brings in the twelve-run data of 2026-10-25.
-- **Section 4:** presents the encounter-specific VO with the comparators v1 values, and the
-  reactive target's rule (COLREGs-VO) with the |α|, |β| head-on test and the target's six
-  departures. The only flags left wait for comparators v2.
-- **Sections 0 and 1** still frame the paper as a comparison of four learners; block D aligns them
-  with the framing decision of 2026-10-10 (a formulation and a deployed policy).
-- **The width sweep and the perception study** are gone from every section (2026-10-24).
-- **Nomenclature:** ℓ and β each have two entries now, each with its own meaning and section:
-  - ℓ: Section 3's rudder lever arm and Section 4's normalized domain distance;
-  - β: Section 4's bearing in the COLREGs velocity obstacle and Section 8's bearing of the null
-    target.
+- **Section 10:** complete, but its embedded data dates from 2026-10-22:
+  - TQC over seeds 0–1;
+  - the deployed policy pending;
+  - LOS-PID + DWA at v1;
+  - the encounter-specific VO pending.
 
-## 2. Next: block B, then D, then E
+  Block B brings in the data of 2026-10-25: all twelve runs, the deployed policy (SAC seed 0),
+  both comparators at v2, and the reward audit.
+- **Section 4:** presents the encounter-specific VO with the comparators v1 values. Block C moves
+  it to v2: course-change weight 0.8, and the passing side judged on the engaged encounter. With
+  0.8, the worked cost example no longer favors the turn.
+- **Sections 0 and 1** still frame the paper as a comparison of four learners (block D).
+- **The reward scale audit (Table R7)** has no subsection yet (block E).
 
-### Block B: the results data refresh (send now)
+## 2. Next: blocks B, C, D and E, in that order
 
-When: now (results of 2026-10-25, all twelve runs), and again after comparators v2.
+They need the comparators v2 commit synced (it comes after 576d4ed4). None needs attachments.
 
-The 2026-10-25 data was checked before sending:
-- The current artifact was rendered locally with the new data swapped in.
-- Every interpretive sentence of Section 10 still holds with TQC seed 2 included.
-- The status board reads "Decided: SAC seed 0", and every "two of three seeds" mention is gone.
+### Block B: the results data of 2026-10-25, and two comparators in Section 10
+
+The current page was rendered locally with this data swapped in.
+- The charts, the status board, the still-to-come list and every computed sentence handle the
+  second comparator correctly.
+- All 1,080 pooled-table cells match `results/baseline_v3/paper_table.md`.
 - The console is clean.
-- The pooled table matches `results/baseline_v3/paper_table.md` in every cell (the generator now
-  keeps nine decimals).
-
-Needs: the results commit synced into the project. No attachments.
+- What remains is hand-written wording that assumes one comparator.
 
 ```
-Replace the contents of the <script type="application/json" id="results-data"> block in the Master Artifact with the project's planning/master_artifact_results.json, verbatim. Change nothing else in the code. Then re-read every interpretive sentence in Section 10 against planning/MASTER_ARTIFACT_RESULTS.md, and correct any that no longer hold. Confirm that the status board, the pending list, the seed counts ("two of three seeds so far") and the deployed-policy line now reflect the data.
+Update the Master Artifact in place with targeted edits only (no full reprint).
+
+1. Data. Replace the contents of the <script type="application/json" id="results-data"> block with the project's planning/master_artifact_results.json, verbatim. The file now holds:
+   - all twelve runs;
+   - the deployed policy (SAC seed 0);
+   - both classical comparators at comparators v2: LOS-PID + DWA, and the encounter-specific VO, which now has test-set data;
+   - the reward scale audit that 10.12 will use.
+   planning/MASTER_ARTIFACT_RESULTS.md has the same numbers as text.
+
+2. Section 10 now has two classical comparators with data. The charts and the computed sentences already handle both. These hand-written phrases still assume one:
+   a. "In this section": "what the four learners and the classical comparator achieve" → "what the four learners and the two classical comparators achieve".
+   b. 10.1 callout, the comparator item. It renders as "The classical comparator. LOS-PID + DWA (v2) and Encounter-specific VO (v2) is deterministic: one run, so it has no seed spread and its result carries no seed range (Section 4.6)." With more than one comparator, make it plural: "The classical comparators. LOS-PID + DWA (v2) and the encounter-specific VO (v2) are deterministic: one run each, so neither has a seed spread or a seed range", and cite both sections, XS(4, 'dwa') and XS(4, 'esvo').
+   c. 10.2: "the classical comparator, being deterministic, gets a single bar" → "the classical comparators, being deterministic, get a single bar each". In Figure 10.1's caption: "Classical comparator: a hatched bar" → "Classical comparators: a hatched bar each". Show "A dashed row is still to run." only while some comparator has no test data.
+   d. The comparisons in 10.2 and 10.8, and the first takeaway, name only LOS-PID + DWA. Extend each to every comparator with data, computed the same way. On the present data:
+      - every SAC, TQC and PPO seed, and two of the three RecurrentPPO seeds, succeed more often than the encounter-specific VO (v2);
+      - the learned policies finish sooner and faster, and further from the reference path, than both comparators.
+      The first takeaway gives both comparators' success.
+   e. In running text, write the encounter-specific VO's name in lower case where it does not start a sentence ("the encounter-specific VO (v2)"). Keep the capital in labels, legends and table headers.
+   f. The status board's card for the encounter-specific VO has no description line. Give it one from its status string, as the card for LOS-PID + DWA has: "Tuned on the 120 decoupled validation episodes; passing side judged on the engaged encounter."
+
+3. Re-read every interpretive sentence in Section 10 against planning/MASTER_ARTIFACT_RESULTS.md, and correct any that no longer hold. Then confirm that:
+   - the status board, the seed counts and the deployed-policy line reflect the data;
+   - the still-to-come list no longer has the comparator items;
+   - the console is clean.
 ```
 
-### Block D: Sections 0 and 1, the framing (send after block B)
+### Block C: Section 4 at comparators v2
+
+```
+Update Section 4 of the Master Artifact to comparators v2, with targeted edits only (no full reprint). The values are in the project's planning/MASTER_ARTIFACT_FACTS.md: section 2 (the tuning paragraph) and section 2.4 (items 5 and 7), updated 2026-10-25. Two things changed from v1: the encounter-specific velocity obstacle's course-change weight, from 0.3 to 0.8, and its passing side, now judged on the engaged encounter. Everything else kept its v1 value.
+
+1. Replace the paragraph that begins "The values below are those of comparators v1, the method’s untuned defaults." and ends "Its tuned values are [TBD: comparators v2]." The new paragraph says:
+   - the values are those of comparators v2, tuned by coordinate descent on the 120 decoupled validation episodes (XS(4, 'fair'));
+   - only the course-change weight moved, from its default 0.3 to 0.8; every other value kept its default.
+2. Step 5 (the passing side). Replace "A candidate whose own closest approach is beyond 2.5 m is exempt, because it opens the pass by itself." with the v2 rule. While the formulation's encounter assessment reports the encounter engaged (XS(2, 'engage')), the side binds every candidate that closes on the target; a candidate that does not close on it, such as slowing behind a slower vessel, has no pass to keep. Add one sentence on why. Judged for each candidate on its own, a quick turn to port could open a head-on pass by itself and so escape the rule. Example: a head-on target 0.3 m to starboard of the reciprocal track at 10 m; judged per candidate the comparator turned to port, judged on the encounter it turns to starboard.
+3. Step 7 (the cost):
+   - In the classical-methods module, set K.J.change from 0.3 to 0.8, with the comment "encounter-specific VO, comparators v2 (facts 2.4)".
+   - In the cost equation and its "In words", change the switching weight from 0.3 to 0.8.
+   - The worked example. With 0.8, the 30° turn at full speed costs 30/180 + 0.8 × 30/180 = 0.300, more than holding course at half speed, 0.5 × 0.5 = 0.250. Rewrite the conclusion from the computed values (compare J1 and J2 in code). Its new content: when nothing else differs, the comparator now prefers slowing down to a fresh 30° turn, which is what the higher switching weight buys; a turn that is kept pays the switching cost only at the decision that starts it, while the course term keeps charging until the vessel is back on its line-of-sight course.
+   - Keep the c_min and encounter-domain sentences, recomputing any comparison in them.
+4. Check the pipeline figure and the comparison-table row for the encounter-specific VO, and replace any v1 statement with its v2 equivalent.
+5. In the VO widget's subsection, delete the sentence "The same view for the encounter-specific velocity obstacle, with its domain and passing sides, is still to come [TBD: after comparators v2]." No such widget is planned.
+
+Then check:
+- no "[TBD: comparators v2]" and no v1 value remain in Section 4;
+- every value matches facts 2.4;
+- the VO widget is unaffected (it runs the reactive target's rule, whose weights did not change);
+- the console is clean.
+```
+
+### Block D: Sections 0 and 1, the framing (send after block C)
 
 Needs: the same commit synced. No attachments.
 
@@ -74,11 +120,12 @@ Update Sections 0 and 1 of the Master Artifact in place, with targeted edits onl
 Then check that the page names no deployed seed outside Section 10, that the rail and pager still work, and that the console is clean.
 ```
 
-### Block E: Section 10.12, how the deployed policy uses the reward (send after block D)
+### Block E: Section 10.12, how the deployed policy uses the reward (send last)
 
 The results files carry the reward scale audit (Table R7) of the deployed policy from 2026-10-25:
-the JSON's `reward_audit` block, and section 17 of `MASTER_ARTIFACT_RESULTS.md`. Nothing else in
-them changed since block B. Needs the commit that adds them, synced. No attachments.
+the JSON's `reward_audit` block, and section 17 of `MASTER_ARTIFACT_RESULTS.md`. Block B has
+already embedded this data, so step 1 below re-embeds the same file and changes nothing. No
+attachments.
 
 ```
 Update the Master Artifact in place with targeted edits only (no full reprint). This adds subsection 10.12, "How the deployed policy uses the reward" (the paper's Table R7), as specified under "10.12 How the deployed policy uses the reward" in the project's planning/MASTER_ARTIFACT/MASTER_ARTIFACT_BRIEF.md. The present "Still to come" becomes 10.13.
@@ -102,16 +149,7 @@ Then check:
 - the console is clean.
 ```
 
-## 3. Waiting: block C, Section 4 at comparators v2 (draft)
-
-When: after comparators v2 has run and `MASTER_ARTIFACT_FACTS.md` section 2.4 holds its tuned
-values. This draft is finalized then.
-
-```
-Update Section 4 of the Master Artifact to comparators v2, with targeted edits only. Take the tuned values of the encounter-specific velocity obstacle from the project's planning/MASTER_ARTIFACT_FACTS.md, section 2.4, and replace every comparators v1 value in its subsection, its pipeline figure, its cost equation and example, and its comparison-table row. Remove "[TBD: comparators v2]". Describe the passing-side exemption as judged once for the encounter. Change "The values below are those of comparators v1" to state that they are the comparators v2 values tuned on the 120 decoupled validation episodes. If LOS-PID + DWA's settings changed under v2 (facts section 2.2), update them the same way. Check that no v1 value remains and that the console is clean.
-```
-
-## 4. Log of applied blocks
+## 3. Log of applied blocks
 
 | Date | Block | Artifact version after it | Check |
 |---|---|---|---|

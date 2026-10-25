@@ -16,7 +16,7 @@ w with a subscript a reward weight).
 | Algorithm 2 | Feasibility sector pooling (Paper 2, Algorithm 1, with the Paper 3 changes) | 2.3.1 |
 | Algorithm 3 | Target detection and tracking | 2.3.1 |
 | Algorithm 4 | Episode generation (one generator for the training, validation and test sets) | 2.3.5 |
-| Algorithm A1 | Encounter-specific VO comparator (after Thyri and Breivik 2022; decision S18) — to be drafted from comparators v2, `src/classical/encounter_vo.py` | Appendix, referenced from 3.3 (shared inputs: one paragraph ahead of it) |
+| Algorithm A1 | Encounter-specific VO comparator (after Thyri and Breivik 2022; decision S18), drafted 2026-10-25 from comparators v2, `src/classical/encounter_vo.py` | Appendix, referenced from 3.3 (shared inputs: one paragraph ahead of it) |
 | Algorithm A2 | LOS-DWA comparator (after Fox et al. 1997; no COLREGs) | Appendix, referenced from 3.3 |
 | Algorithm A3 | Runtime safety layer | Appendix, **[PENDING]** until the layer is finalized |
 
@@ -368,6 +368,114 @@ Shared steps:
 
 ---
 
+## Algorithm A1. Encounter-specific VO comparator (one 2 Hz decision; comparators v2)
+
+**Placement.** Appendix F, after the shared inputs; referenced from Section 3.3. Cite Thyri and
+Breivik (2022) for the method and Fiorini and Shiller (1998) for velocity obstacles. The box is an
+interpretation written for this study, not the authors' implementation (Section 6.2). Drafted
+2026-10-25 from comparators v2 (decision S18, A35).
+
+**Require:** the snapshot (shared inputs above); for each track, its encounter context from
+Algorithm 1 (latched class 𝒞, required turn sense σ, engaged, in extremis); the course chosen at the
+previous decision (none at the start).
+
+**Ensure:** the action a = [a_δ, a_n]; for the log, whether the passing-side constraints were
+released and whether the own ship stood on.
+
+```
+ 1: LOS course ← ψ_path + atan2(−e_y, 2.5 m)                                  ▷ a ground course
+ 2: candidates ← courses ψ + {−90°, −85°, …, +90°} and the LOS course, each at speeds
+                {1, 0.75, 0.5, 0.25, 0} × U_nom                                     ▷ 38 × 5 = 190
+ 3: for each candidate (course, speed) do
+ 4:     sweep the own ship from p_OS: hold ψ for 1 s, then turn toward the course at 6°/s; the speed
+        moves from u toward the candidate's with time constant 60 s (slowing) or 20 s (speeding up);
+        samples every 0.25 s to 20 s
+ 5:     first contact ← earliest sample at which the gap to any track's hull, moved at constant
+        velocity, is < 0.20 m (∞ if none)
+ 6:     first static ← earliest sample within 10 s at which the clearance to a static point is
+        < 0.15 m or to the boundary is < 0.05 m (∞ if none)
+ 7:     static penalty ← max(0, 0.60 m − smallest static clearance within 10 s) / 0.45 m
+        (the boundary clearance enters raised by 0.10 m)
+ 8:     domain penalty ← the largest, over the tracks and the samples, of max(0, 1 − q), where q is
+        the target's position in the swept own-ship frame measured in the own ship's domain scaled
+        for the track's class 𝒞 (q = 1 on the domain's edge, 0 at its centre)
+ 9:     wrong side ← false
+10:     for each track whose class 𝒞 is head-on, crossing or overtaking do
+11:         if the track is engaged (Algorithm 1) and the candidate velocity, held from now,
+            closes on it then                                     ▷ judged on the encounter (v2)
+12:             CPA of the candidate velocity against the track's, TCPA clipped to [0, 20 s]
+13:             head-on: wrong side ← true if the target lies to starboard at the CPA
+                crossing: wrong side ← true if the own ship lies ahead of the target at the CPA
+                          (no test if the target moves slower than 0.05 m/s)
+                overtaking: wrong side ← true if the target lies on the side σ forbids
+                          (σ = −1, a port pass, also when σ = 0: the target must lie to starboard)
+14:     end for
+15:     cost ← 1.0 |course − LOS course|/π + 0.5 max(0, U_nom − speed)/U_nom + 3.0 domain penalty
+               + 0.8 |course − previous course|/π + 1.0 static penalty
+16: end for
+17: clear ← first contact = ∞ and first static = ∞
+18: preferred ← the candidate nearest to (LOS course, U_nom)
+19: if a track's class is being overtaken and min(first contact, first static) of preferred > 12 s
+       and preferred is not on the wrong side then
+20:     choice ← preferred                                      ▷ Rule 17(a)(i): hold course and speed
+21: else
+22:     allowed ← clear and not wrong side
+23:     if a track is in extremis or no candidate is allowed then allowed ← clear
+                                              ▷ release the passing side, never the clearance
+24:     if some candidate is allowed then choice ← the allowed candidate of least cost
+25:     else choice ← the candidate whose min(first contact, first static) is latest; ties by cost
+26: previous course ← the choice's course
+27: heading error ← wrap(the choice's course − sideslip − ψ)
+28: a_δ ← YAW-RATE-LOOP(clip(0.3 s⁻¹ × heading error, −6°/s, 6°/s));  a_n ← SPEED-LOOP(the choice's speed)
+29: return a
+```
+
+| Parameter | Value |
+|---|---|
+| Candidate courses | ψ + (−90° to +90° in 5° steps), plus the LOS course (38) |
+| Candidate speeds | {1, 0.75, 0.5, 0.25, 0} × U_nom, U_nom = 0.558 m/s (6 rpm); 0 = zero rpm, coasting |
+| Horizons, sample step | 20 s for tracks; 10 s for static points and the boundary; 0.25 s |
+| Manoeuvre model of the sweep | 1 s before the turn starts, then 6°/s; speed time constants 60 s down, 20 s up |
+| Hard gaps | 0.20 m between the inflated hulls; 0.15 m to a static point; 0.05 m to the boundary |
+| Ship domain | the own ship's, 3.14 m ahead, 1.57 m astern, 1.25 m abeam; scaled (ahead, astern, abeam) by (1.0, 1.0, 1.2) head-on, (1.5, 1.0, 1.0) crossing, (1.0, 1.0, 1.2) overtaking, (1, 1, 1) otherwise |
+| Passing side | head-on: target to port at the CPA; crossing: own ship astern of the target at the CPA; overtaking: the side σ names; binds every closing candidate while the encounter is engaged (Algorithm 1: engaged when 0 < TCPA ≤ 25 s and DCPA < 3.75 m, held until TCPA < 0 or DCPA > 6.25 m); released in extremis or when no clear candidate keeps it |
+| Stand-on | being overtaken: the preferred candidate, while it stays clear for more than 12 s and keeps any passing side |
+| Cost weights | course 1.0, speed 0.5, domain 3.0, course change 0.8, static 1.0 (course terms per π rad, speed per U_nom) |
+| Static soft margin | penalty 1 at 0.15 m, 0 at 0.60 m (boundary raised by 0.10 m) |
+| Course autopilot | yaw-rate demand 0.3 s⁻¹ × heading error, capped at ±6°/s, the sweep's turn rate |
+| Tuning (comparators v2) | coordinate descent on the validation set's decoupled part, in the build the learners were selected on (search on 60 episodes, 10 per type; winner rescored on all 120; score goal − 2 × collision): horizon {12, 20, 30} s, hard gap {0.20, 0.35, 0.50} m, stand-on release {8, 12, 18} s, course-change weight {0, 0.3, 0.8}, domain weight {1.5, 3, 6}. Only the course-change weight moved, 0.3 → 0.8 (all 120: +0.350 → +0.475, success 0.783 → 0.825). Pinned in `configs/comparators_v2.json` (digest `617782d1483005d7`) |
+
+**Notes for the text.**
+- **Same rule set as the formulation.** The class, σ, engagement and in-extremis flag are those of
+  Algorithm 1, so the comparator follows the narrow-channel convention (a crossing target from
+  either side is passed astern) and Rule 9's overtaking side; it has no room or stopping test of
+  its own (Eqs. 10–12): the boundary acts through lines 6–7.
+- **Side rule judged on the encounter (A35, v2).** While the encounter is engaged, every candidate
+  that closes on the target must keep the side; a candidate that does not close (slowing behind an
+  overtaken vessel, opening the range) makes no pass and is free. Comparators v1 judged it per
+  candidate (closing and that candidate's own DCPA < 2.5 m), so a candidate that opened the pass
+  by itself was exempt: on a head-on 0.3 m to starboard of the reciprocal at 10 m, v1 turns to port and v2 to
+  starboard (`tests/test_classical.py`, `test_vo_side_rule_is_judged_on_the_encounter`). On the validation set, the
+  per-candidate rule with the v1 settings scored +0.475 and the encounter rule with them +0.350;
+  re-tuning the course-change weight recovered the difference (v2: +0.475).
+- **Adaptations for this problem**, as for Algorithm A2: the tracks of Algorithm 3 replace the
+  published method's vessel states, a track's hull is the own ship's rectangle at the track's hull
+  heading, static points and the map boundary are velocity obstacles over 10 s with a soft margin,
+  and candidates are swept along a turn model (line 4) because this hull needs about 5 s to build
+  its turn rate; the side rule uses the candidate velocity itself, which states intent, not the
+  transient.
+- **Test set v4 (2026-10-25):** success 0.675 (decoupled 0.774, coupled 0.479); collisions with the
+  target 0.116, obstacles 0.130, boundary 0.079 (`planning/MASTER_ARTIFACT_RESULTS.md`).
+- Sources: `src/classical/encounter_vo.py` (`select_velocity`, `_wrong_side`, `sweep`,
+  `EncounterVOController.action`), `src/classical/common.py` (`Perception.snapshot`,
+  `los_heading`, `course_rudder`, `yaw_rate_rudder`, `speed_rpm`, `point_clearance`,
+  `boundary_clearance`), `src/reference_controller.py` (`hull_separation`),
+  `src/constant_temp.py` (`CLASSICAL_VO_*`), `configs/comparators_v2.json`,
+  `results/classical_tuning/encounter_vo/` (`best.json`, `validation.txt`, `side_rule_check.txt`),
+  `tools/diagnostics/tune_classical.py`.
+
+---
+
 ## Superseded: COLREGs-aware velocity-obstacle comparator (one 2 Hz decision)
 
 *Not a Paper 3 comparator (decision S18, 2026-10-20): Algorithm A1 becomes the
@@ -475,9 +583,9 @@ second vector to starboard of the first. "Alter to starboard and pass astern" in
   candidate's own velocity, so a candidate that opens the pass beyond d_req by itself, for
   instance a quick turn to port in a head-on, is exempt. On a head-on 0.3 m off the reciprocal
   the frozen comparator picks 160° (port); judged once on the encounter, as Kuwata et al. apply
-  it, it picks 200° (starboard). With A35 decided for the published form, line 15 becomes one
-  test on the present velocities, latched while closing; this box is updated when comparators v2
-  is built, and v2 is the version the paper reports.
+  it, it picks 200° (starboard). A35 was decided for the published form; the paper's VO comparator
+  is the encounter-specific VO of Algorithm A1 (comparators v2), whose side rule is judged on the
+  engaged encounter. This superseded box keeps the per-candidate form of `colregs_vo.py`.
 - The reactive target of the robustness set runs the same selection from its own side, with
   course-only candidates, the side rule judged on the encounter and a 0.75 m hard gap.
 - Sources: `src/classical/colregs_vo.py` (`classify`, `_colregs_ok`, `select_velocity`,

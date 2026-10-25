@@ -64,9 +64,10 @@ LEARNERS = [  # id, display name, family, run-name prefix, test-set tag prefix
 ]
 SEEDS = (0, 1, 2)
 COMPARATORS = [  # id, display name, test-set tag or None, status
-    ("los_dwa", "LOS-PID + DWA", "los_dwa", "comparators v1 (tuned on the 120 decoupled validation episodes; "
-     "DWA kept its defaults); re-run under comparators v2"),
-    ("evo", "Encounter-specific VO", None, "pending: comparators v2 (decision S18, A35)"),
+    ("los_dwa", "LOS-PID + DWA", "los_dwa_v2", "comparators v2: values unchanged from v1 (tuned on the 120 "
+     "decoupled validation episodes; DWA kept its defaults); reproduces its v1 run in all 1,000 episodes"),
+    ("evo", "Encounter-specific VO", "encounter_vo_v2", "comparators v2 (decision S18, A35): passing side judged on "
+     "the engaged encounter; tuned on the 120 decoupled validation episodes (course-change weight 0.3 -> 0.8)"),
 ]
 TABLE_NAME = {"los_dwa": "LOS-DWA", "evo": "Encounter-VO"}  # method names in paper_table.py
 STAGES = [0, 160_000, 360_000, 640_000, 1_000_000, 1_500_000, 2_000_000]
@@ -467,7 +468,7 @@ def markdown(data):
     for c in data["comparators"]:
         if "test" in c:
             t, w = c["test"], c["success_wilson"]
-            L.append(f"| {c['name']} (v1) | — | — | {rate(t['all']):.3f} ({w[0]:.3f}–{w[1]:.3f}) | {rate(t['decoupled']):.3f} | "
+            L.append(f"| {c['name']} (v2) | — | — | {rate(t['all']):.3f} ({w[0]:.3f}–{w[1]:.3f}) | {rate(t['decoupled']):.3f} | "
                      f"{rate(t['coupled']):.3f} | {rate(t['all'], 'target'):.3f} | {rate(t['all'], 'obstacle'):.3f} | "
                      f"{rate(t['all'], 'boundary'):.3f} | {rate(t['all'], 'timeout'):.3f} | deterministic |")
         else:
@@ -497,7 +498,7 @@ def markdown(data):
             rows.append(f"| {names[lid]} | " + " | ".join(cells) + " |")
         for c in data["comparators"]:
             if "test" in c:
-                rows.append(f"| {c['name']} (v1) | " + " | ".join(
+                rows.append(f"| {c['name']} (v2) | " + " | ".join(
                     f"{rate(c['test'][key].get(k)):.3f}" if c["test"][key].get(k) else "—" for k in labels) + " |")
         return [f"## {title}", "", "Success: seed mean (seed range), n = episodes per run.", ""] + rows + [""]
 

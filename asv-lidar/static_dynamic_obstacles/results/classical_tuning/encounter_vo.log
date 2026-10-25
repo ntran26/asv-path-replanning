@@ -1,0 +1,21 @@
+encounter_vo: 60 development episodes per configuration (v3 build), 10 workers
+  defaults                                     score +0.350  goal 0.78
+  pass1 TAU_S=12.0                             score +0.300  goal 0.77
+  pass1 TAU_S=30.0                             score +0.350  goal 0.78
+  pass1 HARD_GAP_M=0.35                        score +0.250  goal 0.75
+  pass1 HARD_GAP_M=0.5                         score +0.150  goal 0.72
+  pass1 STAND_ON_RELEASE_S=8.0                 score +0.300  goal 0.77
+  pass1 STAND_ON_RELEASE_S=18.0                score +0.350  goal 0.78
+  pass1 W_CHANGE=0.0                           score +0.300  goal 0.77
+  pass1 W_CHANGE=0.8                           score +0.450  goal 0.82
+  pass1 W_DOMAIN=1.5                           score +0.450  goal 0.82
+  pass1 W_DOMAIN=6.0                           score +0.450  goal 0.82
+
+== chosen
+  CLASSICAL_VO_TAU_S = 20.0
+  CLASSICAL_VO_HARD_GAP_M = 0.2
+  CLASSICAL_VO_STAND_ON_RELEASE_S = 12.0
+  CLASSICAL_VO_W_CHANGE = 0.8
+  CLASSICAL_VO_W_DOMAIN = 3.0
+
+defaults scored +0.350; chosen +0.450

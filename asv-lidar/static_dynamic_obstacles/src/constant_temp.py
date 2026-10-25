@@ -101,6 +101,12 @@ CLASSICAL_VO_HARD_GAP_M = 0.20           # hull-to-hull clearance treated as a h
 CLASSICAL_VO_STATIC_GAP_M = 0.15
 CLASSICAL_VO_BOUNDARY_GAP_M = 0.05
 CLASSICAL_VO_SIDE_FREE_DCPA_M = 2.0 * cfg.DOMAIN_LATERAL   # 2.5 m: the pass is clear either side
+# A35 / S18 (comparators v2): the passing side is judged on the encounter -- it
+# binds every closing candidate while the encounter context reports the encounter
+# engaged (Algorithm 1's danger test, latched until clearing) -- not per candidate
+# from that candidate's own DCPA (v1, False), which exempted a quick turn to port
+# in a head-on because it opened the pass by itself.
+CLASSICAL_VO_SIDE_ON_ENCOUNTER = True
 CLASSICAL_VO_STAND_ON_RELEASE_S = 12.0   # 17(a)(ii): act when the give-way vessel has not
 CLASSICAL_VO_TURN_LAG_S = 1.0            # assumed response lag of the other vessel
 CLASSICAL_VO_TURN_RATE_DPS = 6.0         # assumed turn rate when projecting a response
@@ -122,7 +128,8 @@ CLASSICAL_VO_DOMAIN_SCALE = {
 # Cost weights over the candidate (course, speed) set.
 CLASSICAL_VO_W_COURSE = 1.0              # per pi rad from the preferred course
 CLASSICAL_VO_W_SPEED = 0.5               # per cruise speed below preferred
-CLASSICAL_VO_W_CHANGE = 0.3              # per pi rad from the previous course
+CLASSICAL_VO_W_CHANGE = 0.8              # per pi rad from the previous course; comparators v2
+                                         # tuning, 0.3 -> 0.8 (+0.350 -> +0.475 on 120 validation episodes)
 CLASSICAL_VO_W_DOMAIN = 3.0              # per unit of ship-domain penetration
 CLASSICAL_VO_STATIC_SOFT_M = 0.6         # static cost reaches zero here
 CLASSICAL_VO_W_STATIC = 1.0              # at the hard gap

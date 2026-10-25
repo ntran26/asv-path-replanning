@@ -1,0 +1,247 @@
+{
+ "id": "comparators-v2",
+ "frozen_at": "2026-10-25",
+ "supersedes": "comparators-v1",
+ "git": {
+  "head": "576d4ed4d069ce34d113c69ba5fe792b848095e7",
+  "uncommitted": [
+   "asv-lidar/static_dynamic_obstacles/src/classical/encounter_vo.py",
+   "asv-lidar/static_dynamic_obstacles/src/constant_temp.py",
+   "asv-lidar/static_dynamic_obstacles/tools/diagnostics/tune_classical.py"
+  ]
+ },
+ "digest": "617782d1483005d7",
+ "provenance": {
+  "decision": "S18 / A35: the encounter-specific VO is the velocity-obstacle comparator; its passing side is judged on the encounter (CLASSICAL_VO_SIDE_ON_ENCOUNTER) -- it binds every closing candidate while the encounter context reports the encounter engaged",
+  "tuned_on": "validation set, decoupled part (60 of 120 episodes in the search, 10 per class; baseline-v3 build, formulation_v3 overlay); the test set was not used",
+  "score": "goal rate - 2 x collision rate, the rule RL checkpoints are selected by",
+  "search": "coordinate descent over the encounter_vo grid in tools/diagnostics/tune_classical.py (results/classical_tuning/encounter_vo/search.csv)",
+  "validation": "Validation on 120 decoupled validation episodes: defaults +0.350, tuned +0.475 -> keep tuned",
+  "search_best": {
+   "score": 0.45,
+   "values": {
+    "CLASSICAL_VO_TAU_S": 20.0,
+    "CLASSICAL_VO_HARD_GAP_M": 0.2,
+    "CLASSICAL_VO_STAND_ON_RELEASE_S": 12.0,
+    "CLASSICAL_VO_W_CHANGE": 0.8,
+    "CLASSICAL_VO_W_DOMAIN": 3.0
+   }
+  },
+  "los_dwa": "unchanged from comparators v1 (tuned 2026-09-23, defaults kept)",
+  "colregs_vo": "not a comparator (S18); its CLASSICAL_KVO_* values stay because the test set's reactive target (T-RE) runs its rule",
+  "changed_from_v1": {
+   "CLASSICAL_VO_SIDE_ON_ENCOUNTER": {
+    "v1": null,
+    "v2": true
+   },
+   "CLASSICAL_VO_W_CHANGE": {
+    "v1": 0.3,
+    "v2": 0.8
+   }
+  }
+ },
+ "values": {
+  "CLASSICAL_DWA_BOUNDARY_GAP_M": 0.05,
+  "CLASSICAL_DWA_COMMIT_S": [
+   3.0,
+   6.0
+  ],
+  "CLASSICAL_DWA_DIST_CAP_M": 1.5,
+  "CLASSICAL_DWA_ENGAGE_RANGE_M": 9.0,
+  "CLASSICAL_DWA_LOS_SPEED_FRACTIONS": [
+   1.0,
+   0.5
+  ],
+  "CLASSICAL_DWA_MAX_HORIZON_S": 16.0,
+  "CLASSICAL_DWA_PATH_SCALE_M": 2.0,
+  "CLASSICAL_DWA_SAFE_GAP_M": 0.2,
+  "CLASSICAL_DWA_SPEED_FRACTIONS": [
+   1.0,
+   0.5,
+   0.0
+  ],
+  "CLASSICAL_DWA_TARGET_HORIZON_S": 10.0,
+  "CLASSICAL_DWA_TRAVEL_M": 5.5,
+  "CLASSICAL_DWA_YAW_RATES_DPS": [
+   -9.0,
+   -6.75,
+   -4.5,
+   -2.25,
+   0.0,
+   2.25,
+   4.5,
+   6.75,
+   9.0
+  ],
+  "CLASSICAL_KVO_BOUNDARY_GAP_M": 0.05,
+  "CLASSICAL_KVO_COURSE_OFFSETS_DEG": [
+   -90.0,
+   -85.0,
+   -80.0,
+   -75.0,
+   -70.0,
+   -65.0,
+   -60.0,
+   -55.0,
+   -50.0,
+   -45.0,
+   -40.0,
+   -35.0,
+   -30.0,
+   -25.0,
+   -20.0,
+   -15.0,
+   -10.0,
+   -5.0,
+   0.0,
+   5.0,
+   10.0,
+   15.0,
+   20.0,
+   25.0,
+   30.0,
+   35.0,
+   40.0,
+   45.0,
+   50.0,
+   55.0,
+   60.0,
+   65.0,
+   70.0,
+   75.0,
+   80.0,
+   85.0,
+   90.0
+  ],
+  "CLASSICAL_KVO_DT": 0.25,
+  "CLASSICAL_KVO_HARD_GAP_M": 0.2,
+  "CLASSICAL_KVO_HEAD_ON_HALF_DEG": 22.5,
+  "CLASSICAL_KVO_OVERTAKING_DEG": 112.5,
+  "CLASSICAL_KVO_SIDE_FREE_DCPA_M": 2.5,
+  "CLASSICAL_KVO_SPEED_FRACTIONS": [
+   1.0,
+   0.75,
+   0.5,
+   0.25,
+   0.0
+  ],
+  "CLASSICAL_KVO_STAND_ON_RELEASE_S": 12.0,
+  "CLASSICAL_KVO_STATIC_GAP_M": 0.15,
+  "CLASSICAL_KVO_STATIC_SOFT_M": 0.6,
+  "CLASSICAL_KVO_TAU_S": 20.0,
+  "CLASSICAL_KVO_TAU_STATIC_S": 10.0,
+  "CLASSICAL_KVO_TURN_RATE_DPS": 6.0,
+  "CLASSICAL_KVO_W_CHANGE": 0.8,
+  "CLASSICAL_KVO_W_COURSE": 1.0,
+  "CLASSICAL_KVO_W_SPEED": 0.5,
+  "CLASSICAL_KVO_W_STATIC": 1.0,
+  "CLASSICAL_LOS_LOOKAHEAD_M": 2.5,
+  "CLASSICAL_MAX_RUDDER_DEG": 40.0,
+  "CLASSICAL_MAX_RUDDER_RAD": 0.6981317007977318,
+  "CLASSICAL_MAX_SIDESLIP_DEG": 20.0,
+  "CLASSICAL_MAX_SIDESLIP_RAD": 0.3490658503988659,
+  "CLASSICAL_PID_I_GATE_DEG": 10.0,
+  "CLASSICAL_PID_I_LIMIT": 0.15,
+  "CLASSICAL_PID_KD": 0.05555555555555555,
+  "CLASSICAL_PID_KI": 0.0016666666666666668,
+  "CLASSICAL_PID_KP": 0.02857142857142857,
+  "CLASSICAL_PRED_DT": 0.125,
+  "CLASSICAL_SCAN_MEMORY_FRAMES": 4,
+  "CLASSICAL_SPEED_KP_RPM": 6.0,
+  "CLASSICAL_TRACK_EXCLUSION_M": 1.8,
+  "CLASSICAL_VO_BOUNDARY_GAP_M": 0.05,
+  "CLASSICAL_VO_COURSE_OFFSETS_DEG": [
+   -90.0,
+   -85.0,
+   -80.0,
+   -75.0,
+   -70.0,
+   -65.0,
+   -60.0,
+   -55.0,
+   -50.0,
+   -45.0,
+   -40.0,
+   -35.0,
+   -30.0,
+   -25.0,
+   -20.0,
+   -15.0,
+   -10.0,
+   -5.0,
+   0.0,
+   5.0,
+   10.0,
+   15.0,
+   20.0,
+   25.0,
+   30.0,
+   35.0,
+   40.0,
+   45.0,
+   50.0,
+   55.0,
+   60.0,
+   65.0,
+   70.0,
+   75.0,
+   80.0,
+   85.0,
+   90.0
+  ],
+  "CLASSICAL_VO_DOMAIN_SCALE": {
+   "being_overtaken": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "crossing": [
+    1.5,
+    1.0,
+    1.0
+   ],
+   "head_on": [
+    1.0,
+    1.0,
+    1.2
+   ],
+   "none": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "overtaking": [
+    1.0,
+    1.0,
+    1.2
+   ]
+  },
+  "CLASSICAL_VO_DT": 0.25,
+  "CLASSICAL_VO_HARD_GAP_M": 0.2,
+  "CLASSICAL_VO_SIDE_FREE_DCPA_M": 2.5,
+  "CLASSICAL_VO_SIDE_ON_ENCOUNTER": true,
+  "CLASSICAL_VO_SPEED_FRACTIONS": [
+   1.0,
+   0.75,
+   0.5,
+   0.25,
+   0.0
+  ],
+  "CLASSICAL_VO_SPEED_TAU_DOWN_S": 60.0,
+  "CLASSICAL_VO_SPEED_TAU_UP_S": 20.0,
+  "CLASSICAL_VO_STAND_ON_RELEASE_S": 12.0,
+  "CLASSICAL_VO_STATIC_GAP_M": 0.15,
+  "CLASSICAL_VO_STATIC_SOFT_M": 0.6,
+  "CLASSICAL_VO_TAU_S": 20.0,
+  "CLASSICAL_VO_TAU_STATIC_S": 10.0,
+  "CLASSICAL_VO_TURN_LAG_S": 1.0,
+  "CLASSICAL_VO_TURN_RATE_DPS": 6.0,
+  "CLASSICAL_VO_W_CHANGE": 0.8,
+  "CLASSICAL_VO_W_COURSE": 1.0,
+  "CLASSICAL_VO_W_DOMAIN": 3.0,
+  "CLASSICAL_VO_W_SPEED": 0.5,
+  "CLASSICAL_VO_W_STATIC": 1.0,
+  "CLASSICAL_YAW_RATE_GAIN_DPS": 10.4,
+  "CLASSICAL_YAW_RATE_KP": 0.08
+ }
+}
