@@ -542,7 +542,42 @@ is across seeds and checkpoint choice. / Which results are still to come.
   stage as a small line chart. Text: why off-policy learners take longer per step (one gradient
   update per environment step against PPO's batched updates).
 
-**10.12 Still to come**
+**10.12 How the deployed policy uses the reward** (the paper's Table R7; added 2026-10-25)
+- **Data:** JSON `reward_audit`, from `results/baseline_v3/reward_scale_audit.csv`. Run
+  `sacs0_bl3_audit` is the deployed policy (SAC seed 0) at its selected checkpoint on test set v4,
+  with the safety layer off. It covers the same 1,000 episodes as the Table R1 run, with identical
+  outcomes and returns (the `checks` list). For each scope (all, decoupled, coupled, goal episodes,
+  collision episodes) and each of the eight dense terms the block holds:
+  - the weight;
+  - the mean weighted episode integral;
+  - the share of the episode's absolute dense reward;
+  - the share of episodes in which the term was active;
+  - the mean active steps;
+  - the mean per-step magnitude when active.
+  The terminal reward and the episode return are added rows.
+- ▶ **Figure: designed against realized.** One row per dense term, ordered by weight. Each row
+  has an outline bar at the weight (the largest per-step contribution, Section 7) and a filled
+  bar at the mean per-step magnitude when active, with the share of episodes in which the term
+  was active printed beside it. Segmented control: All / Decoupled / Coupled / Goal episodes /
+  Collision episodes. Reading aid: the weight fixes how large a term can get; the filled bar shows
+  how large it gets under the deployed policy.
+- ▶ **Figure: where the return comes from.** The mean weighted episode integral of each term as
+  a diverging bar (costs left, progress right), then the terminal reward and the episode return,
+  under the same control.
+- **Text from the data:**
+  - the realized per-step order against the designed one;
+  - the domain term's realized fraction of its weight, and how often it is active;
+  - the boundary and domain terms' share of the absolute dense reward;
+  - the combined share of path following and progress, and how nearly they cancel;
+  - the terminal reward setting the sign of the return (mean return in goal against collision
+    episodes);
+  - no term exceeding its weight.
+  The audit describes how the deployed policy realizes the design; the weights and the designed
+  hierarchy are unchanged, and the text passes no verdict on the design.
+- **Section 7** says that the bounded weights fix how large each term can get, and points here
+  for how large each gets.
+
+**10.13 Still to come**
 - The deployed-policy rule and its status; the encounter-specific VO (comparators v2: tuned on
   the 120 decoupled validation episodes, passing side judged on the encounter) and the v2 re-run
   of LOS-PID + DWA; the trajectory snapshots of each encounter type for the deployed policy; the
@@ -564,7 +599,8 @@ artifact's meanings: success `--testing`, target collision `--target`, panel col
 
 **Nomenclature additions:** IQM (interquartile mean), CDF (cumulative distribution function),
 Wilson interval, stratified bootstrap, RMS (root mean square), selected checkpoint, final model,
-seed, and the outcome terms (success, collision by type, timeout).
+seed, the outcome terms (success, collision by type, timeout), and, for 10.12, the weighted
+episode integral and a term's realized per-step magnitude.
 
 ### 11. Field trials and the vessel–computer link
 - Paper 2's basin trials (platform, basin, panels, procedure) from the Paper 2

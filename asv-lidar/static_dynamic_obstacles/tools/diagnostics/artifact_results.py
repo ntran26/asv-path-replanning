@@ -12,7 +12,9 @@ the page carries numbers read from the runs and not retyped:
     `results/baseline_v3/paper_table.csv` (run `paper_table.py` first with every finished seed);
   * the validation-set learning curves (goal - 2 x collision, safety layer off);
   * closest-approach and hull-clearance distributions (empirical CDFs) on target episodes;
-  * the ideal compute budget (`results/baseline_v3/compute_budget.md`).
+  * the ideal compute budget (`results/baseline_v3/compute_budget.md`);
+  * the reward scale audit of the deployed policy, Table R7
+    (`results/baseline_v3/reward_scale_audit.csv`, from `reward_scale_audit.py`).
 
 Writes `planning/master_artifact_results.json` (chart data, counts not rates, so the page
 computes rates and Wilson intervals itself) and `planning/MASTER_ARTIFACT_RESULTS.md` (the
@@ -49,6 +51,8 @@ RUNS = ROOT / "runs"
 PAPER_TABLE = ROOT / "results" / "baseline_v3" / "paper_table.csv"
 PAIRED = ROOT / "results" / "baseline_v3" / "paper_table_paired.csv"
 BUDGET = ROOT / "results" / "baseline_v3" / "compute_budget.md"
+AUDIT = ROOT / "results" / "baseline_v3" / "reward_scale_audit.csv"
+AUDIT_MD = ROOT / "results" / "baseline_v3" / "reward_scale_audit.md"
 OUT_JSON = ROOT / "planning" / "master_artifact_results.json"
 OUT_MD = ROOT / "planning" / "MASTER_ARTIFACT_RESULTS.md"
 
@@ -237,6 +241,30 @@ def budget():
             "steps_per_s_by_stage": speeds, "ideal_hours_per_run": hours}
 
 
+def reward_audit():
+    # Table R7: how the deployed policy realises each reward term, per scope (all, decoupled,
+    # coupled, goal and collision episodes). Rows: the eight dense terms, the terminal reward
+    # and the episode return; the audit's own checks come from its report.
+    if not AUDIT.exists():
+        return None
+    scopes = {}
+    for r in pd.read_csv(AUDIT).itertuples():
+        s = scopes.setdefault(r.scope, {"n": int(r.n), "rows": []})
+        s["rows"].append({"term": r.term, "label": r.label, "weight": r3(r.weight),
+                          "mean_integral": r3(r.mean_integral), "share_of_dense_abs": r3(r.share_of_dense_abs),
+                          "episodes_active": r3(r.episodes_active), "mean_active_steps": r3(r.mean_active_steps),
+                          "per_step_when_active": r3(r.per_step_when_active)})
+    text = AUDIT_MD.read_text(encoding="utf-8") if AUDIT_MD.exists() else ""
+    run = re.search(r"^Run `([^`]+)`: (.+?)\. Generated", text, re.M)
+    checks = (re.findall(r"^- (.+)$", text.split("## Checks", 1)[1].split(chr(10) + "## ", 1)[0], re.M)
+              if "## Checks" in text else [])
+    return {"source": "results/baseline_v3/reward_scale_audit.csv (tools/diagnostics/reward_scale_audit.py)",
+            "run": run.group(1) if run else None, "policy": run.group(2) if run else None,
+            "checks": checks, "dense_terms": [r["term"] for r in next(iter(scopes.values()))["rows"]
+                                              if r["weight"] is not None] if scopes else [],
+            "scopes": scopes}
+
+
 def pooled():
     if not PAPER_TABLE.exists():
         return None, None
@@ -384,7 +412,7 @@ def main() -> int:
             "validation_bands": bands,
             "cdf": {k: cdf(v) for k, v in frames_by.items()},
             "pooled_table": pool, "paired_vs_first": paired, "compute": budget(), "deployment": deployment,
-            "notes": NOTES}
+            "notes": NOTES, "reward_audit": reward_audit()}
     OUT_JSON.write_text(json.dumps(data, separators=(",", ":"), allow_nan=False), encoding="utf-8")
     OUT_MD.write_text(markdown(data), encoding="utf-8")
     print(f"-> {OUT_JSON} ({OUT_JSON.stat().st_size / 1024:.0f} kB)\n-> {OUT_MD}")
@@ -535,6 +563,32 @@ def markdown(data):
                      + ", ".join(f"{x:.0f}" for x in comp["steps_per_s_by_stage"].get(nm, [])) + " |")
         L.append("")
     L += ["## 16. Notes", ""] + [f"- {v}" for v in data["notes"].values() if v] + [""]
+    aud = data.get("reward_audit")
+    if aud and aud["scopes"]:
+        dense = aud["dense_terms"]
+        allr = {r["term"]: r for r in aud["scopes"]["All episodes"]["rows"]}
+        L += ["## 17. Reward scale audit of the deployed policy (Table R7)", "",
+              f"Run `{aud['run']}`: {aud['policy']}. From `{aud['source']}`. "
+              "Weight = the term's largest per-step contribution; integral = mean weighted episode integral; "
+              "share = mean share of the episode's absolute dense reward; active = share of episodes in which "
+              "the term was ever non-zero; per step = mean magnitude per step when active.", ""]
+        L += [f"- {c}" for c in aud["checks"]] + [""]
+        L += ["### All episodes", "", "| Term | Weight | Mean episode integral | Share of dense abs. | Episodes active "
+              "| Per step when active |", "|---|---:|---:|---:|---:|---:|"]
+        f = lambda x, fmt: "—" if x is None else format(x, fmt)
+        for r in aud["scopes"]["All episodes"]["rows"]:
+            L.append(f"| {r['label']} | {f(r['weight'], '.2f')} | {f(r['mean_integral'], '+.2f')} | "
+                     f"{f(r['share_of_dense_abs'], '.3f')} | {f(r['episodes_active'], '.3f')} | "
+                     f"{f(r['per_step_when_active'], '.3f')} |")
+        by = lambda key: " > ".join(sorted(dense, key=lambda t: -abs(allr[t][key])))
+        L += ["", f"Order by per-step magnitude when active: {by('per_step_when_active')} "
+              f"(designed, by weight: {by('weight')}).", "", "### Per step when active, by scope", "",
+              "| Term | " + " | ".join(f"{k} (n = {v['n']})" for k, v in aud["scopes"].items()) + " |",
+              "|---|" + "---:|" * len(aud["scopes"])]
+        for t in dense:
+            cells = [next(r for r in v["rows"] if r["term"] == t)["per_step_when_active"] for v in aud["scopes"].values()]
+            L.append(f"| {allr[t]['label']} | " + " | ".join(f(c, '.3f') for c in cells) + " |")
+        L.append("")
     return "\n".join(L) + "\n"
 
 
