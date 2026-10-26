@@ -470,12 +470,65 @@ quarters). For each sector with beam ranges ρ₁…ρ_M in angular order:
 
 ## 5. Runtime safety layer (Section 9)
 
-Off during training. When enabled: fires if an engaged give-way encounter is
-in extremis (DCPA < d_req, 0 ≤ TCPA < 5 s), the required alteration is
-inadmissible, and a full stop would let the target pass clear (≥ 1.76 m).
-Then full astern (S2 = −100) until stopped (≤ 0.05 m/s; at most 8 s), hold at
-zero thrust at least 2 s and at most 10 s, then return control. Interventions
-are never counted as learned behavior.
+**The reported layer** (decision 2026-10-25; `planning_records/SAFETY_V21_PLAN.md` section 15).
+- **Scope:** this one layer is presented, and no other configuration or earlier version is
+  described.
+- **Position:** it sits between the deployed policy and the actuators.
+- **When it is on:** off during training and in every validation-set evaluation. Learned behavior
+  is always reported with it off, and its interventions are never credited to the policy.
+- **Purpose:** to reduce own-vessel collisions. A higher success rate is welcome but is not its
+  purpose.
+- **Information:** onboard only:
+  - the estimated pose and motion;
+  - the LiDAR returns and the static points remembered from them;
+  - the map boundary;
+  - the target tracks.
+  Simulator truth never enters a decision.
+
+The layer has two parts.
+
+1. **Predictive safety filter** (`src/safety_v16.py`, on the sampled filter of `src/safety_v2.py`).
+   At every decision with a hazard in reach it forward-simulates, over 8 s with the identified
+   vessel model (section 1) and the targets at constant velocity from their tracks:
+   - **the plans:** the policy's command and a bank of alternative commands (a rudder-by-throttle
+     grid, plus braking when a target track is within 7 m), each followed by recovery maneuvers
+     (powered turns, low-propulsion continuation, braking);
+   - **the pass test:** a plan passes when the hull keeps a 0.15 m margin from the scan points,
+     the map boundary and the targets, plus small extra gaps (0.05 m to scan points, 0.02 m to
+     the boundary, 0.10 m to targets), and a short straight run-out at the end of the horizon
+     stays clear;
+   - **the choice:** if the policy's command passes, it is issued unchanged; otherwise the passing
+     command closest to the policy's is issued;
+   - **no passing plan:** the policy's command goes through unchecked;
+   - **partial hulls:** a target seen only in part is completed from its direction of motion and
+     known dimensions.
+2. **Permanent emergency stop** (`src/safety_estop.py`; `src/safety_v21.py`, class
+   `SafetyFilterV21EC` with `estop_window_s=2.5, use_static_points=False, braking_fallback=False`).
+   It runs only at decisions where the filter has no checked plan.
+   - **First commands:** the policy's, the filter's issued command, the rudder-by-throttle grid
+     and three full-astern rows.
+   - **Continuations:** each first command is followed by every continuation in a fixed bank (hold
+     the command; brake at once; turn then brake; turn; cruise then brake), rolled out for up to
+     2.5 s under two reverse-thrust models (weak and strong).
+   - **Trigger:** if every sequence is predicted to bring the collision hull (the hull inflated by
+     0.15 m, the geometry a collision is scored with) outside the map boundary or into contact
+     with a target within 2.5 s, the vessel commits to full astern with the rudder centred for
+     the rest of the episode. Each sequence's contact time takes the later of the two models.
+   - Remembered static points are not part of the trigger.
+   - **Targets after the stop:** once the vessel commits, every target brakes in a straight line
+     to rest at 0.471 m/s². This is an evaluation convention: the simulator's strongest own-ship
+     braking.
+
+**Outcomes and scoring.**
+- **Stopped:** after a commitment, an episode ends as "stopped" once the own ship is still (at
+  most 0.05 m/s and 1°/s) and every target has finished braking. A stop ranks like a timeout:
+  worse than a goal, better than a collision.
+- **Counted against the layer:** own-vessel collisions, that is panel, boundary, or a target
+  struck by the own ship, including contacts while braking after a stop.
+- **Not counted against it:** a target striking the stopped own ship. It is reported separately.
+- **Changed decisions:** the share of decisions at which the issued command differs from the
+  policy's, counting the held stop.
+- **Results:** Section 10, from the results files.
 
 ## 6. Scenario generation, curriculum and data sets (Section 8)
 

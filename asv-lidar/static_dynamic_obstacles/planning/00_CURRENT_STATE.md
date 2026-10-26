@@ -53,8 +53,11 @@ history or rationale only.
   - `BASELINE_V4_PLAN.md` (baseline-v4.3 was trained in full and not adopted).
   - `Paper3_Introduction_draft4.docx` (superseded by the current draft of Sections 1–3).
 - **Runtime safety-layer records:** the layer is not finalized, and the paper reports learned
-  behavior with it off. `SAFETY_LAYER_COMPLETE_SUMMARY.md` and `SAFETY_V20_PLAN.md` are the latest;
-  section 5 of `MASTER_ARTIFACT_FACTS.md` states the layer as it stands.
+  behavior with it off. `SAFETY_LAYER_COMPLETE_SUMMARY.md`, `SAFETY_V20_PLAN.md` and
+  `SAFETY_V21_PLAN.md` (2026-10-25: refinements of V16 and of V16 with the boundary-and-targets
+  stop, developed on the validation set; none promoted) are the latest. The two reference designs
+  remain V16 and V16 with that stop. Section 5 of `MASTER_ARTIFACT_FACTS.md` still describes the
+  original V1 emergency stop, not the reference designs.
 - **`archive/`:** finished or superseded documents, kept for history only.
 - **Decision records:** `PROJECT_STATE.md` (F-numbered findings and decisions) and
   `OPEN_PROBLEMS.md` (A-numbered items), in `static_dynamic_obstacles/`. The skeleton's table S1–S19
@@ -108,10 +111,26 @@ score +0.378).
   The encounter-specific VO is weakest in crossing (basin 0.55, channel 0.60) and overtaking
   (basin 0.741, channel 0.714, coupled 0.295).
 
+**Safety layer on test set v4: done 2026-10-25** (requested), deployed policy, all 1,000 episodes,
+in this runtime environment; record `planning_records/SAFETY_V21_PLAN.md` sections 12-13. The
+layer's purpose (decision 2026-10-25): fewer collisions made by the own vessel; success need not
+rise, and a target striking the stopped ship does not count against it.
+
+| Layer | Goals | Own-vessel collisions | Target strikes on the stopped ship | Stopped |
+|---|---|---|---|---|
+| Off | 865 | 135 | - | - |
+| V16 | 903 | 97 | - | - |
+| V16 + boundary-and-targets stop | 892 | 78 | 8 | 21 |
+| V16 + stop, detector on the scored collision hull (E1) | 868 | 70 | 9 | 52 |
+
+**Decided 2026-10-25: the paper reports the last row (E1) as its runtime safety layer, alone**:
+no other configuration and no earlier version is described, and the layer's purpose is to
+mitigate the collision rate (a higher success rate is welcome, not required). Results in
+`results/safety_dev/testset_v4_main/reports/ts4_final/`; record `SAFETY_V21_PLAN.md` section 15.
+
 **Still to run, in order:**
 1. The trajectory snapshots of each encounter type for the deployed policy.
-2. The safety-layer-on test-set evaluation, run only when requested.
-3. The field trials, whose design is open.
+2. The field trials, whose design is open.
 
 ## 4. Decisions in force
 
@@ -231,17 +250,15 @@ These are facts that earlier drafts or planning files had wrong; the current fil
 ## 7. Write-up state (2026-10-24)
 
 - **Paper draft:**
-  - Current file: `Paper3_Sections1-3_with_placeholders_rev24Oct_tracked.docx`, in
+  - Current file: `Paper3_Sections1-4_with_placeholders_rev25Oct_tracked.docx`, in
     `PhD/3 Second Journal Paper - Dynamic Obstacle/Revision/` (outside the repository).
-  - Sections 1–3 and Appendices B–F are drafted, with Discussion 6.2–6.3.
-  - Sections 4, 5, 6.1 and 7 and Appendices A and G are placeholders.
-  - Applied and checked against the code (2026-10-25): the ten corrections of 2026-10-22 and the
-    seventeen items of 2026-10-24 (the test-set composition, the fixed-layout branch of Algorithm
-    4, the multi-axis sentence with Appendix G, and decision S19: no ablation, Section 4 renumbered
-    to 4.1–4.5). Edit history: `planning/PAPER/PAPER3_PROMPTS.md`.
-  - Next: the Section 4 draft (blocks C, D and E of `planning/PAPER/PAPER3_PROMPTS.md`, written 2026-10-25 from
-    the twelve runs, the reward scale audit and comparators v2): 4.1, 4.2 and 4.3, Appendix G, and four
-    corrections elsewhere (3.2 resume of TQC seed 2, 3.4.3, 6.2 training budget, 1.2.2).
+  - Drafted: Sections 1–4.4, Appendices B–G (with Algorithm A1), Discussion 6.2–6.3. Placeholders:
+    Sections 4.5, 5, 6.1 and 7, Appendix A, Algorithm A3, Figures 4–6 (to insert).
+  - Applied and checked against the code and results (2026-10-26): the corrections of 2026-10-22
+    and 2026-10-24 and blocks C, D and E of 2026-10-25. Edit history:
+    `planning/PAPER/PAPER3_PROMPTS.md`.
+  - Next: block F (the runtime safety layer in 2.3.4, 4.5 and Algorithm A3; one comparator name,
+    LOS-DWA; the A2 tuning row).
 - **Section 4 (results)**, restated 2026-10-24 (skeleton S19; the draft carries the matching
   structure): 4.1 overall, 4.2 snapshots, 4.3 target behavior, 4.4 reward scale audit, 4.5 runtime
   safety layer.
@@ -256,7 +273,9 @@ These are facts that earlier drafts or planning files had wrong; the current fil
     Realized per-step order: boundary > COLREGs > obstacles > progress > path following > domain > smoothness >
     existence, against the weights' boundary > domain > obstacles > COLREGs > path following > progress >
     smoothness > existence; no term exceeds its weight.
-  - 4.5 and Section 5 wait for the safety-on evaluation and the field-trial design.
+  - 4.5 (runtime safety layer): decided 2026-10-25 (S10); Algorithm A3 in `planning/PAPER/PAPER3_ALGORITHMS.md`, and block F of
+    `planning/PAPER/PAPER3_PROMPTS.md` rewrites 2.3.4, writes 4.5 (Table 13) and A3, and adds the 6.2 statements.
+  - Section 5 waits for the field-trial design.
 - **Explainer artifact** (version checked 2026-10-25: 1792859529-ce15; no change block applied
   since 2026-10-24):
   - **Built:** Sections 0–8, 10 and 12. **Titled placeholders:** Section 9 (safety layer and
@@ -272,7 +291,7 @@ These are facts that earlier drafts or planning files had wrong; the current fil
     gradient steps.
   - **Sections 0 and 1** still frame the paper as a comparison of four learners, against the
     framing decision of 2026-10-10.
-  - **Next:** four change blocks, all ready, in `MASTER_ARTIFACT/MASTER_ARTIFACT_PROMPTS.md`:
+  - **Next:** six change blocks, all ready, in `MASTER_ARTIFACT/MASTER_ARTIFACT_PROMPTS.md`:
     - **B:** the results data of 2026-10-25 (all twelve runs, the deployed policy SAC seed 0, both
       comparators at v2, the reward audit), with Section 10's wording made plural for two
       comparators. Checked by rendering the page with the new data: every computed sentence holds.
@@ -282,6 +301,13 @@ These are facts that earlier drafts or planning files had wrong; the current fil
       `PAPER/PAPER3_SECTIONS1-2_REVISION_BRIEF.md` sections 1.1 and 1.3.
     - **E:** a new subsection 10.12 on the reward scale audit (Table R7) of the deployed policy;
       "Still to come" becomes 10.13.
+    - **F:** Section 9 built for the runtime safety layer decided on 2026-10-25, presenting this
+      one layer only, with the purpose stated as fewer own-vessel collisions. The layer is
+      described in `MASTER_ARTIFACT_FACTS.md` section 5, rewritten from the code and the decision
+      record.
+    - **G:** a new subsection 10.13 with the layer's test-set results, from the results files'
+      `safety_layer` block (`MASTER_ARTIFACT_RESULTS.md` section 18, generated from the reported
+      runs only); "Still to come" becomes 10.14.
 - **Decided 2026-10-24** (skeleton S19):
   - **Multi-axis results:** per-axis tables, the principal metrics in the main-text table and the
     full set in an appendix; no Pareto view and no weighted score.

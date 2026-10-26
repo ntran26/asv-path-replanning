@@ -14,7 +14,10 @@ the page carries numbers read from the runs and not retyped:
   * closest-approach and hull-clearance distributions (empirical CDFs) on target episodes;
   * the ideal compute budget (`results/baseline_v3/compute_budget.md`);
   * the reward scale audit of the deployed policy, Table R7
-    (`results/baseline_v3/reward_scale_audit.csv`, from `reward_scale_audit.py`).
+    (`results/baseline_v3/reward_scale_audit.csv`, from `reward_scale_audit.py`);
+  * the reported runtime safety layer on test set v4 with the deployed policy (decision
+    2026-10-25): the layer-on runs of the reported mode only, paired with the layer-off
+    outcomes of the same episodes (`results/safety_dev/testset_v4_main/`).
 
 Writes `planning/master_artifact_results.json` (chart data, counts not rates, so the page
 computes rates and Wilson intervals itself) and `planning/MASTER_ARTIFACT_RESULTS.md` (the
@@ -53,6 +56,8 @@ PAIRED = ROOT / "results" / "baseline_v3" / "paper_table_paired.csv"
 BUDGET = ROOT / "results" / "baseline_v3" / "compute_budget.md"
 AUDIT = ROOT / "results" / "baseline_v3" / "reward_scale_audit.csv"
 AUDIT_MD = ROOT / "results" / "baseline_v3" / "reward_scale_audit.md"
+SAFETY_DIR = ROOT / "results" / "safety_dev" / "testset_v4_main"
+SAFETY_MODE = "v21_e1_estop_bt"   # the reported layer (decision 2026-10-25); no other mode is read
 OUT_JSON = ROOT / "planning" / "master_artifact_results.json"
 OUT_MD = ROOT / "planning" / "MASTER_ARTIFACT_RESULTS.md"
 
@@ -266,6 +271,50 @@ def reward_audit():
             "scopes": scopes}
 
 
+def safety_layer():
+    # The reported runtime safety layer on test set v4 with the deployed policy: the layer-on
+    # episodes of the reported mode, paired by case with the layer-off outcomes of the same
+    # episodes. Own-vessel collisions are panel, boundary and target contacts by the own ship;
+    # a target striking the stopped own ship ("by_target") is reported apart and not counted
+    # against the layer; a stop ranks like a timeout.
+    files = sorted((SAFETY_DIR / "runs").glob("ts4_final_e1_c*/episodes.csv"))
+    paired = SAFETY_DIR / "reports" / "ts4_final" / "paired.csv"
+    if not files or not paired.exists():
+        return None
+    on = pd.concat([pd.read_csv(f) for f in files], ignore_index=True)
+    on = on[on["mode"] == SAFETY_MODE]
+    m = pd.read_csv(paired)[["case", "off", SAFETY_MODE]].merge(
+        on[["case", "stratum", "outcome", "steps", "safety_v2_steps"]], on="case", how="inner")
+    assert len(m) == len(on) and (m[SAFETY_MODE] == m["outcome"]).all()
+    fam = m["stratum"].str.split("|").str[0].map({"frozen": "decoupled", "paper2": "coupled"})
+    assert fam.notna().all()
+    keys = ("goal", "obstacle", "boundary", "target", "by_target", "stopped", "timeout")
+
+    def tally(outcomes):
+        o = outcomes.str.replace("collision:", "", regex=False)
+        c = {"n": int(len(o))}
+        c.update({k: int((o == k).sum()) for k in keys})
+        c["own_vessel"] = c["obstacle"] + c["boundary"] + c["target"]
+        return c
+
+    scopes = {}
+    for scope, sel in (("all", fam.notna()), ("decoupled", fam == "decoupled"), ("coupled", fam == "coupled")):
+        d = m[sel]
+        scopes[scope] = {"off": tally(d["off"]), "on": tally(d["outcome"]),
+                         "decisions": int(d["steps"].sum()), "changed_decisions": int(d["safety_v2_steps"].sum()),
+                         "episodes_changed": int((d["safety_v2_steps"] > 0).sum()),
+                         "gained": int(((d["off"] != "goal") & (d["outcome"] == "goal")).sum()),
+                         "lost": int(((d["off"] == "goal") & (d["outcome"] != "goal")).sum())}
+    return {"source": "results/safety_dev/testset_v4_main (runs ts4_final_e1_c01-c10; paired with the "
+                      "layer-off outcomes in reports/ts4_final/paired.csv)",
+            "layer": "predictive safety filter with a permanent emergency stop (decision 2026-10-25)",
+            "mode": SAFETY_MODE,
+            "counting": "own-vessel collisions = panel + boundary + target contacts by the own ship; a target "
+                        "striking the stopped own ship is reported apart and not counted against the layer; "
+                        "a stop ranks like a timeout",
+            "scopes": scopes}
+
+
 def pooled():
     if not PAPER_TABLE.exists():
         return None, None
@@ -413,7 +462,15 @@ def main() -> int:
             "validation_bands": bands,
             "cdf": {k: cdf(v) for k, v in frames_by.items()},
             "pooled_table": pool, "paired_vs_first": paired, "compute": budget(), "deployment": deployment,
-            "notes": NOTES, "reward_audit": reward_audit()}
+            "notes": NOTES, "reward_audit": reward_audit(), "safety_layer": safety_layer()}
+    sl = data["safety_layer"]
+    if sl:   # the layer-off side must be the deployed policy's own test-set run
+        dep = deployment.get("deployed") or {}
+        run = next((r for r in runs if r["learner"] == dep.get("learner") and r["seed"] == dep.get("seed")), None)
+        b, off = (run or {}).get("best", {}).get("all", {}), sl["scopes"]["all"]["off"]
+        same = bool(b) and all(b.get(k) == off[k] for k in ("n", "goal", "target", "obstacle", "boundary", "timeout"))
+        sl["checks"] = [f"Layer-off outcomes {'equal' if same else 'DIFFER FROM'} the deployed policy's test-set "
+                        f"run in every outcome count."]
     OUT_JSON.write_text(json.dumps(data, separators=(",", ":"), allow_nan=False), encoding="utf-8")
     OUT_MD.write_text(markdown(data), encoding="utf-8")
     print(f"-> {OUT_JSON} ({OUT_JSON.stat().st_size / 1024:.0f} kB)\n-> {OUT_MD}")
@@ -589,6 +646,25 @@ def markdown(data):
         for t in dense:
             cells = [next(r for r in v["rows"] if r["term"] == t)["per_step_when_active"] for v in aud["scopes"].values()]
             L.append(f"| {allr[t]['label']} | " + " | ".join(f(c, '.3f') for c in cells) + " |")
+        L.append("")
+    sl = data.get("safety_layer")
+    if sl:
+        L += ["## 18. Runtime safety layer on test set v4 (deployed policy)", "",
+              f"The {sl['layer']}, mode `{sl['mode']}`. From `{sl['source']}`. Counting: {sl['counting']}.", ""]
+        L += [f"- {c}" for c in sl.get("checks", [])] + [""]
+        L += ["| Scope | Layer | Episodes | Goals | Own-vessel collisions (panel / boundary / target) | "
+              "Target strikes on the stopped ship | Stopped | Timeouts |", "|---|---|---:|---:|---|---:|---:|---:|"]
+        for scope, v in sl["scopes"].items():
+            for side, lab in (("off", "off"), ("on", "on")):
+                c = v[side]
+                L.append(f"| {scope} | {lab} | {c['n']} | {c['goal']} | {c['own_vessel']} ({c['obstacle']} / "
+                         f"{c['boundary']} / {c['target']}) | {c['by_target']} | {c['stopped']} | {c['timeout']} |")
+        L += ["", "| Scope | Decisions changed | Episodes with a change | Goals gained / lost against layer off |",
+              "|---|---:|---:|---:|"]
+        for scope, v in sl["scopes"].items():
+            L.append(f"| {scope} | {v['changed_decisions']} of {v['decisions']} ({v['changed_decisions'] / v['decisions']:.3f}) | "
+                     f"{v['episodes_changed']} of {v['on']['n']} ({v['episodes_changed'] / v['on']['n']:.3f}) | "
+                     f"{v['gained']} / {v['lost']} |")
         L.append("")
     return "\n".join(L) + "\n"
 

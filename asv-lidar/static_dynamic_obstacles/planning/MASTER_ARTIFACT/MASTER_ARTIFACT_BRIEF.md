@@ -388,9 +388,35 @@ Use facts section 6.
   perception-degradation study: excluded from the paper, 2026-10-14.)
 
 ### 9. Safety layer and evaluation design (added)
-- The runtime stop safety layer (facts section 5): trigger, maneuver, hand-back; off in
-  training and in every validation-set evaluation; learned behavior always reported
-  with it off.
+- **The runtime safety layer** (facts section 5; decision 2026-10-25). Only the reported layer is
+  presented, with no other configuration and no earlier version.
+  - **Purpose:** fewer own-vessel collisions. A higher success rate is welcome but is not its
+    purpose, and the page says so.
+  - **Part 1, the predictive safety filter.** At every decision with a hazard in reach, it rolls
+    out the policy's command and a bank of alternatives, each followed by recovery maneuvers,
+    over 8 s with the identified model. It issues the policy's command when that clears with a
+    0.15 m margin; otherwise the passing command closest to it.
+  - **Part 2, the permanent emergency stop.** It acts only where the filter has no checked plan.
+    If every command and continuation is predicted to bring the hull, inflated by 0.15 m, out of
+    the map boundary or into contact with a target within 2.5 s, the vessel goes full astern
+    with the rudder centred for the rest of the episode. Remembered static points are not part
+    of the trigger.
+  - **Scoring:**
+    - own-vessel collisions count against the layer, contacts while braking after a stop
+      included;
+    - a target striking the stopped own ship is reported apart and does not count against it;
+    - a stop ranks like a timeout;
+    - after a stop the targets brake to rest at 0.471 m/s², stated as an evaluation convention.
+  - **When it is on:** off in training and in every validation-set evaluation. Learned behavior
+    is always reported with it off, and its interventions are never credited to the policy.
+- ▶ **Safety-layer widget** (labeled illustrative):
+  - **Scene:** the own ship, a panel, the boundary and a target.
+  - **The filter:** the policy's command and the fan of candidate plans with their recoveries,
+    each colored by whether it passes. The issued command is highlighted, and a slider moves
+    the target closer.
+  - **The stop:** past the point where every plan fails within 2.5 s, the widget shows the stop
+    committing.
+  - The widget implements the facts' rules in simplified form and says so.
 - ▶ **Fairness check widget:** for one test episode, the manoeuvres tried by
   the perfect-foresight checker (facts section 6.5), coloured by outcome, and
   the moment the target is first seen; an episode solvable only before that
@@ -401,8 +427,9 @@ Use facts section 6.
   results by encounter type and by decoupled / coupled family; validation-set
   learning curves for the four learners; COLREGs behavior shown by trajectory
   snapshots of each encounter type, **not** by per-rule compliance rates;
-  safety-layer intervention rate reported separately; by target behavior. No
-  values here: they are in Section 10. (The width sweep and the perception-quality
+  with the safety layer on, own-vessel collisions, target strikes on the stopped ship, stops
+  and the share of decisions the layer changed, reported separately from learned behavior; by
+  target behavior. No values here: they are in Section 10. (The width sweep and the perception-quality
   study are not part of the paper, decision 2026-10-14.)
 
 ### 10. Results in simulation (added 2026-10-22)
@@ -449,8 +476,8 @@ is across seeds and checkpoint choice. / Which results are still to come.
   encounter-specific VO at comparators v2, each with one line on its settings from its status
   string; the deployed policy and the rule that chose it (the better of SAC and TQC by
   three-seed mean success on the test set, then the seed with the best validation score);
-  COLREGs trajectory snapshots pending (for the deployed policy); safety-layer-on test-set
-  evaluation pending; field trials in Section 11.
+  COLREGs trajectory snapshots pending (for the deployed policy); the safety layer on the test
+  set, done once `safety_layer` is in the data (10.13); field trials in Section 11.
 
 **10.2 Headline success**
 - ▶ **Figure: success on test set v4** — horizontal dot plot, one row per method, grouped
@@ -580,10 +607,35 @@ is across seeds and checkpoint choice. / Which results are still to come.
 - **Section 7** says that the bounded weights fix how large each term can get, and points here
   for how large each gets.
 
-**10.13 Still to come**
-- The deployed policy and its rule; the trajectory snapshots of each encounter type for the deployed policy; the
-  safety-layer-on evaluation and its intervention rate, reported separately from learned
-  behavior; the field trials (Section 11). Each as a short `.planned`-style list item.
+**10.13 With the safety layer on** (added 2026-10-25)
+- **Data:** JSON `safety_layer`, from `results/safety_dev/testset_v4_main/`, the runs of the
+  reported mode only.
+  - Scopes: all, decoupled and coupled.
+  - For layer off and layer on: episodes, goals, own-vessel collisions (panel, boundary, target),
+    target strikes on the stopped ship, stops and timeouts.
+  - With the layer on: decisions changed, episodes with a change, and goals gained and lost
+    against layer off.
+  - The `checks` list confirms that the layer-off side is the deployed policy's own test-set run.
+- ▶ **Figure: layer off against layer on.** For each scope (All / Decoupled / Coupled), paired
+  100 % bars of how episodes end:
+  - goal;
+  - own-vessel collisions by type, in the colors of Figure 10.2;
+  - target strike on the stopped ship, hatched and labeled "not counted against the layer";
+  - stopped;
+  - timeout.
+- **Text from the data:**
+  - the purpose stated first: fewer own-vessel collisions, with success not the aim;
+  - own-vessel collisions off and on, as counts and rates, by type and by family;
+  - goals off and on, with the goals gained and lost;
+  - stops, and strikes on the stopped ship;
+  - the share of decisions changed and of episodes with a change.
+- **Framing:** the layer is named only as described in Section 9, and the deployed policy is
+  named. The numbers are the layer's, kept apart from every learned-behavior figure. No verdict
+  is passed beyond what the counts show.
+
+**10.14 Still to come**
+- The trajectory snapshots of each encounter type for the deployed policy; the field trials
+  (Section 11). Each as a short `.planned`-style list item, dropped once its data exists.
 
 **Takeaways** (three bullets, numbers rendered from the data): which learners succeed most often,
 with seed ranges, against the two classical comparators (v2); that coupled layouts and crossings are
