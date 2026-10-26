@@ -1,6 +1,6 @@
 # Explainer artifact: edit instructions (kept current)
 
-> **Kept current.** Last updated 2026-10-25 (comparators v2 done). This file holds the next edit instructions for the
+> **Kept current.** Last updated 2026-10-26 (safety layer decided). This file holds the next edit instructions for the
 > explainer artifact (https://claude.ai/artifact/S1Bm5Lf1199eXx2fC41hYF), each as a block to paste
 > into the chat that holds the artifact. The blocks name planning files by path. That chat reads
 > them from the synced project, so each push needs a Sync before the next block is sent. Only files
@@ -26,8 +26,10 @@ the blocks below has been applied yet.
   0.8, the worked cost example no longer favors the turn.
 - **Sections 0 and 1** still frame the paper as a comparison of four learners (block D).
 - **The reward scale audit (Table R7)** has no subsection yet (block E).
+- **Section 9** is still a titled placeholder. The runtime safety layer was decided on 2026-10-25
+  (block F). Its test-set results are in the results files and have no subsection yet (block G).
 
-## 2. Next: blocks B, C, D and E, in that order
+## 2. Next: blocks B to G, in order
 
 They need the comparators v2 commit synced (it comes after 576d4ed4). None needs attachments.
 
@@ -120,7 +122,7 @@ Update Sections 0 and 1 of the Master Artifact in place, with targeted edits onl
 Then check that the page names no deployed seed outside Section 10, that the rail and pager still work, and that the console is clean.
 ```
 
-### Block E: Section 10.12, how the deployed policy uses the reward (send last)
+### Block E: Section 10.12, how the deployed policy uses the reward (send after block D)
 
 The results files carry the reward scale audit (Table R7) of the deployed policy from 2026-10-25:
 the JSON's `reward_audit` block, and section 17 of `MASTER_ARTIFACT_RESULTS.md`. Block B has
@@ -145,6 +147,90 @@ Update the Master Artifact in place with targeted edits only (no full reprint). 
 Then check:
 - every number against planning/MASTER_ARTIFACT_RESULTS.md section 17;
 - the new figures are numbered after Figure 10.11;
+- the rail and pager still work;
+- the console is clean.
+```
+
+### Block F: Section 9, the safety layer and the evaluation design (send after block E)
+
+The runtime safety layer was decided on 2026-10-25. `MASTER_ARTIFACT_FACTS.md` section 5 now
+describes the reported layer, and the brief's Section 9 spec follows the instructions:
+- this one layer only;
+- its purpose is fewer own-vessel collisions, not a higher success rate;
+- a target striking the stopped own ship does not count against it.
+
+No attachments.
+
+```
+Replace the Section 9 placeholder of the Master Artifact ("Safety layer and evaluation design", at present a titled list in secs.js) with the built section, as specified under "### 9. Safety layer and evaluation design" in the project's planning/MASTER_ARTIFACT/MASTER_ARTIFACT_BRIEF.md.
+- Put it in a new module, sec9.js, before secs.js.
+- Remove Section 9 from the placeholder list, and its "Later stage" mark from the rail.
+- Follow the artifact's existing patterns: H2 subsections, figures, widgets with .seg controls, T(), AB() and XS(), the "In this section" box and three takeaways.
+- It must work in light and dark mode, at 375 px and by keyboard.
+
+The facts are in the project's planning/MASTER_ARTIFACT_FACTS.md: section 5 (the safety layer, rewritten 2026-10-25) and section 6.5 (the fairness check).
+- Present this one layer only, with no other configuration and no earlier version.
+- Its purpose is to reduce own-vessel collisions. A higher success rate is welcome but is not its purpose, and the section says so.
+- No result values appear in Section 9. For what the layer did on the test set, point to Section 10.13.
+
+Subsections:
+1. Why a safety layer, and what it is for:
+   - the purpose;
+   - its position between the policy and the actuators;
+   - onboard information only;
+   - off in training and in every validation-set evaluation;
+   - learned behavior always reported with it off, and never credited with its interventions.
+2. The predictive safety filter (facts 5, part 1), with a figure of the fan of candidate plans and their recoveries.
+3. The permanent emergency stop (facts 5, part 2):
+   - when it runs;
+   - the 2.5 s test over every command and continuation;
+   - the commitment to full astern with the rudder centred;
+   - remembered static points left out of the trigger;
+   - the targets' braking after the stop, named as an evaluation convention.
+4. How outcomes are counted (facts 5, "Outcomes and scoring"):
+   - own-vessel collisions count against the layer;
+   - a target striking the stopped own ship is reported apart;
+   - a stop ranks like a timeout;
+   - what a changed decision is.
+5. ▶ The safety-layer widget, as the brief specifies, labeled illustrative.
+6. The fairness check (facts 6.5) and ▶ its widget, as the brief specifies.
+7. What is measured, as the brief lists it, each item linked with XS() to the Section 10 subsection that reports it.
+
+Register the new terms through T(), with Section 9 as first use: safety filter, recovery maneuver, emergency stop, stopped, own-vessel collision, target strike on the stopped ship, changed decision.
+
+Then check:
+- Section 9 opens from the rail and from its Section 0 lane chip;
+- no number from the results file appears in Section 9;
+- the widgets work by mouse, touch and keyboard;
+- the console is clean.
+```
+
+### Block G: Section 10.13, with the safety layer on (send last)
+
+The results files carry the reported layer's test-set results:
+- **where:** the JSON's `safety_layer` block, and section 18 of `MASTER_ARTIFACT_RESULTS.md`;
+- **source:** the runs of the reported mode only;
+- **check:** the layer-off side is the deployed policy's own test-set run.
+
+The figures match the decision record. No attachments.
+
+```
+Update the Master Artifact in place with targeted edits only (no full reprint). This adds subsection 10.13, "With the safety layer on", as specified under "10.13 With the safety layer on" in the project's planning/MASTER_ARTIFACT/MASTER_ARTIFACT_BRIEF.md. "Still to come" becomes 10.14.
+
+1. Data. Replace the contents of the results-data block with the project's planning/master_artifact_results.json, verbatim. It now carries a safety_layer block; nothing else changed. planning/MASTER_ARTIFACT_RESULTS.md section 18 has the same numbers as text.
+2. New subsection 10.13 (H2 id 'safety'), after 10.12, with the figure and the text items the brief lists.
+   - Render every number from safety_layer. Generate each sentence so that it stays true if the data change.
+   - Present this one layer only, and state its purpose first: fewer own-vessel collisions, with a higher success rate welcome but not the aim.
+   - Use the outcome colors of Figure 10.2. Draw the target strikes on the stopped ship hatched, labeled "not counted against the layer".
+   - Name the deployed policy from deployment.deployed.
+3. Status board: the "Safety layer on" card shows Done when safety_layer exists, with one line from the data: own-vessel collisions, layer off against layer on.
+4. Still to come: drop the safety-layer item when safety_layer exists, and renumber the subsection to 10.14. Update the rail and any cross-reference that meant it.
+5. In Section 9, the "what is measured" item for the safety layer points to XS(10, 'safety').
+6. Register "own-vessel collision", "target strike on the stopped ship", "stopped" and "changed decision" in the nomenclature if they are not there yet.
+
+Then check:
+- every number against planning/MASTER_ARTIFACT_RESULTS.md section 18;
+- the figure numbers run on after those of 10.12;
 - the rail and pager still work;
 - the console is clean.
 ```

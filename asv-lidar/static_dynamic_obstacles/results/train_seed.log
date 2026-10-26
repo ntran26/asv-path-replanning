@@ -300,3 +300,9 @@ code matches comparators-v2 (digest 617782d1483005d7)
 2026-10-25 08:53:58    test set v4, encounter_vo_v2 exit 0 (results/test_set/v4/encounter_vo_v2/summary.txt)
 code matches comparators-v2 (digest 617782d1483005d7)
 2026-10-25 09:25:33    test set v4, los_dwa_v2 exit 0 (results/test_set/v4/los_dwa_v2/summary.txt)
+2026-10-25 15:28:13 == safety layer, test set v4 (on request): OFF, V16 and V16 + boundary-and-targets stop, deployed policy SAC seed 0 (10 processes)
+2026-10-25 16:44:09    test set v4 safety runs ts4_final_c01-c10 complete
+2026-10-25 16:44:13 == safety layer, test set v4: V16 + stop with the E1 detector (chosen on the validation set, objective of 2026-10-25: own-vessel collisions; 10 processes)
+2026-10-25 17:16:57    test set v4 E1 runs ts4_final_e1_c01-c10 complete
+2026-10-25 22:16:33 == safety layer, test set v4: V16 + stop, E1 detector with static points, W = 3.5 s (chosen on validation; 10 processes)
+2026-10-25 22:48:26    test set v4 runs ts4_final_e1s35_c01-c10 complete

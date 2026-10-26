@@ -1,6 +1,6 @@
 # Paper 3 results for the master artifact (generated)
 
-Generated 2026-10-25 09:44 by `tools/diagnostics/artifact_results.py` from the recorded result files; chart data in `master_artifact_results.json`. Safety layer off throughout. Test set v4: 1,000 episodes (664 decoupled, 336 coupled). Each run is represented by its best validation-set checkpoint; the final 3.0 M model is the selection-sensitivity check. Rates are fractions of episodes; the bracket after a run's success is its Wilson 95 % interval.
+Generated 2026-10-26 16:47 by `tools/diagnostics/artifact_results.py` from the recorded result files; chart data in `master_artifact_results.json`. Safety layer off throughout. Test set v4: 1,000 episodes (664 decoupled, 336 coupled). Each run is represented by its best validation-set checkpoint; the final 3.0 M model is the selection-sensitivity check. Rates are fractions of episodes; the bracket after a run's success is its Wilson 95 % interval.
 
 ## 1. Status
 
@@ -303,4 +303,25 @@ Order by per-step magnitude when active: bnd > col > obs > prog > pf > dom > smo
 | Progress r_prog | 1.452 | 1.460 | 1.437 | 1.464 | 1.381 |
 | Smoothness r_smooth | 0.304 | 0.303 | 0.307 | 0.303 | 0.308 |
 | Existence r_exist | 0.250 | 0.250 | 0.250 | 0.250 | 0.250 |
+
+## 18. Runtime safety layer on test set v4 (deployed policy)
+
+The predictive safety filter with a permanent emergency stop (decision 2026-10-25), mode `v21_e1_estop_bt`. From `results/safety_dev/testset_v4_main (runs ts4_final_e1_c01-c10; paired with the layer-off outcomes in reports/ts4_final/paired.csv)`. Counting: own-vessel collisions = panel + boundary + target contacts by the own ship; a target striking the stopped own ship is reported apart and not counted against the layer; a stop ranks like a timeout.
+
+- Layer-off outcomes equal the deployed policy's test-set run in every outcome count.
+
+| Scope | Layer | Episodes | Goals | Own-vessel collisions (panel / boundary / target) | Target strikes on the stopped ship | Stopped | Timeouts |
+|---|---|---:|---:|---|---:|---:|---:|
+| all | off | 1000 | 865 | 135 (70 / 12 / 53) | 0 | 0 | 0 |
+| all | on | 1000 | 868 | 70 (45 / 17 / 8) | 9 | 52 | 1 |
+| decoupled | off | 664 | 618 | 46 (14 / 5 / 27) | 0 | 0 | 0 |
+| decoupled | on | 664 | 609 | 18 (7 / 4 / 7) | 4 | 32 | 1 |
+| coupled | off | 336 | 247 | 89 (56 / 7 / 26) | 0 | 0 | 0 |
+| coupled | on | 336 | 259 | 52 (38 / 13 / 1) | 5 | 20 | 0 |
+
+| Scope | Decisions changed | Episodes with a change | Goals gained / lost against layer off |
+|---|---:|---:|---:|
+| all | 4795 of 53829 (0.089) | 361 of 1000 (0.361) | 39 / 36 |
+| decoupled | 2660 of 36134 (0.074) | 184 of 664 (0.277) | 14 / 23 |
+| coupled | 2135 of 17695 (0.121) | 177 of 336 (0.527) | 25 / 13 |
 

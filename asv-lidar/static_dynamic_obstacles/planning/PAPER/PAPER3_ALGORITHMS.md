@@ -18,7 +18,7 @@ w with a subscript a reward weight).
 | Algorithm 4 | Episode generation (one generator for the training, validation and test sets) | 2.3.5 |
 | Algorithm A1 | Encounter-specific VO comparator (after Thyri and Breivik 2022; decision S18), drafted 2026-10-25 from comparators v2, `src/classical/encounter_vo.py` | Appendix, referenced from 3.3 (shared inputs: one paragraph ahead of it) |
 | Algorithm A2 | LOS-DWA comparator (after Fox et al. 1997; no COLREGs) | Appendix, referenced from 3.3 |
-| Algorithm A3 | Runtime safety layer | Appendix, **[PENDING]** until the layer is finalized |
+| Algorithm A3 | Runtime safety layer: predictive filter and permanent emergency stop (decided 2026-10-25) | Appendix, referenced from 2.3.4 and 4.5 |
 
 Not boxed: the test-set fairness check (oracle feasibility) stays a paragraph of the evaluation
 design with its numbers (up to 574 manoeuvres per episode, 0.2 m clearance, 67 of 1,000 episodes
@@ -40,8 +40,8 @@ latch (state, latched class, side, σ, ψ_e, u_e, t_e, clearing count, ρ_pk), i
 **Ensure:** encounter class (one-hot), required turn sense σ, engagement state, turn admissible
 A, slowdown clears S_coast, stop clears S, lateral deficit Δy_req, action required a_req,
 proximity gate ρ and its peak ρ_pk, in extremis, and the heading and speed changes since
-engagement (the context branch of the observation; the reward gates; the runtime safety layer's
-trigger).
+engagement (the context branch of the observation; the reward gates). The runtime safety layer
+(Algorithm A3) does not read them: its filter and stop test the predicted geometry.
 
 ```
  1: 𝒞* ← CLASSIFY(p_OS, ψ_path, |v_OS|, p_TS, χ_TS, |v_TS|)              ▷ Eq. 6, bands widened 3° around the held class
@@ -100,7 +100,7 @@ being overtaken 0 (hold course and speed); none 0.
 - The room of lines 6–10 comes from the map boundary only; perceived static obstacles do not
   bound it in baseline-v3 (the static-obstacle option was tested in v4.3 and not adopted).
 - Lines 11–12: S (full astern) gates the reward's slowdown carve-out (R-2, with
-  `R2_SLOWDOWN_TEST = "stop"`) and the runtime safety layer; S_coast is the observation's
+  `R2_SLOWDOWN_TEST = "stop"`); S_coast is the observation's
   "slowdown clears" flag. The stop test reads the centroid track (the hull-fit view is off).
 - Sources: `src/colregs/context.py` (`ContextManager.update`, `_attach_admissibility`,
   `_hysteretic`, `_advance_state`, `_attach_gates`), `src/encounter.py` (classifier and hold),
@@ -695,11 +695,112 @@ of line 6 is the same law without the integral.
 
 ---
 
-## Algorithm A3. Runtime safety layer — [PENDING]
+## Algorithm A3. Runtime safety layer (one 2 Hz decision)
 
-To be written once the layer is finalized (skeleton S14 (4)). Current trigger and manoeuvre, for
-reference only: an engaged give-way encounter in extremis (DCPA < d_req and 0 ≤ TCPA < 5 s) whose
-required alteration is inadmissible (A = 0) and whose full-astern stop clears (S = 1) →
-full astern until the speed falls to at most 0.05 m/s (within 8 s), zero thrust for 2–10 s,
-return control. Off in training and in every result reported for the learned policy; in the field
-trials the same code also serves as an operator-latched stop.
+**Placement.** Appendix F, after Algorithm A2; referenced from Sections 2.3.4 and 4.5. Decided
+2026-10-25: the one layer the paper reports. No other configuration (no other stop window) and
+none of the layer's development versions is described; the text names neither.
+
+**Purpose.** Fewer collisions of the own ship than the policy alone makes. A higher success rate
+is welcome but is not the aim. A target that strikes the stopped own ship is counted separately,
+not as an own-vessel collision.
+
+**Require:** the policy's command a_SAC = [a_δ, a_n]; the layer's own snapshot (below), from
+onboard estimates only; the actuator history; the stored plan, if any; the stop flag.
+
+**Ensure:** the executed command; whether it differs from a_SAC; whether the stop is committed.
+
+```
+ 1: if the stop is committed then return [0, full astern]             ▷ permanent: rudder centred
+ 2: if no hazard is in reach (no track within 7 m; no static return within 7 m and not more than
+    1 m astern of the own ship's position; the boundary farther than 1.5 m) then return a_SAC
+ 3: first commands ← a_SAC; the grid rudder {−1, −0.5, 0, 0.5, 1} × propulsion {floor, cruise,
+    ceiling}; a command that rejoins the path; with a track within 7 m, full astern at rudder
+    {−1, 0, 1}
+ 4: recoveries ← hard port or hard starboard at cruise for 2 s, then the rudder centred; the rudder
+    centred at the propulsion floor; with a track within 7 m, full astern at rudder {−1, 0, 1}
+ 5: for each first command and each recovery do                          ▷ FILTER
+ 6:     roll out on the identified vessel model (rudder delay and servo lag, from the actuator
+        history): the first command for 1 s, then the recovery to 8 s; tracks at constant velocity
+ 7:     passes ← throughout, the hull inflated by its 0.15 m margin keeps 0.05 m from every static
+        return, 0.02 m from the map boundary and 0.10 m from every target hull; and a hull still
+        moving at 8 s has a clear run ahead of static returns (2.0 m, or 3 s at its final speed
+        if shorter)
+ 8:     clearance ← the smallest of those gaps over the rollout
+ 9: end for
+10: if a_SAC passes, with some recovery, with clearance ≥ 0.15 m then return a_SAC     ▷ untouched
+11: if some first command passes then
+12:     issue the passing first command nearest to a_SAC (rudder difference² + 2 × propulsion
+        difference², full astern counted as −1.5), among those whose clearance is at least
+        min(0.15 m, best clearance − 0.20 m); store its plan; return it
+13: search for a checked plan by the cross-entropy method (3 rounds, 64 sampled sequences,
+    8 elites); if a plan passes then issue its first command, store it and return it
+14: STOP TEST (no checked plan at this decision):                          ▷ EMERGENCY STOP
+15:     for each first command (a_SAC, the command the filter would issue, the grid of line 3 and
+        the full-astern rows), each continuation of a fixed bank (hold the command; stop; turn,
+        then stop; turn, cruise, then stop), over the window W = 2.5 s, under a weak reverse-thrust
+        model (25 % efficiency, 0.75 s delay) and, for sequences that brake, a strong one (50 %,
+        no delay) do
+16:         time to contact ← the first time at which the hull inflated by 0.15 m, the geometry by
+            which a collision is scored, leaves the map boundary or overlaps a target's hull on its
+            constant-velocity track (∞ if neither happens within W; remembered static returns
+            are not part of the test)
+17:     if the longest time to contact over all sequences and both models is ≤ W then
+18:         commit the stop; return [0, full astern]
+19: return the filter's own decision (the next command of a stored plan while it holds, else a_SAC)
+```
+
+**The layer's perception** (serves the layer only; the policy's observation is unchanged): a
+model-based observer of the own ship's motion (an issued-command model prior corrected by the
+sensed motion); remembered static returns, cleared only where fresh rays pass through them; target
+hypotheses admitted on observed motion and kept for a bounded time when a track is lost; and the
+hull of a partly seen target completed from its axis of motion.
+
+| Parameter | Value |
+|---|---|
+| Hazard in reach | a track within 7 m; a static return within 7 m and not more than 1 m astern of the own ship's position; the boundary within 1.5 m |
+| Filter rollout | first command held 1 s, recovery to 8 s, on the identified model with rudder delay and servo lag |
+| First commands | a_SAC; rudder {−1, −0.5, 0, 0.5, 1} × propulsion {floor, cruise, ceiling}; path rejoin; full astern at rudder {−1, 0, 1} with a track within 7 m |
+| Recoveries | hard port or starboard at cruise for 2 s, then centred; centred at the floor; full astern at rudder {−1, 0, 1} with a track within 7 m |
+| Hard gaps (inflated hull, 0.15 m margin) | 0.05 m to static returns, 0.02 m to the boundary, 0.10 m to target hulls |
+| Terminal run-out | 2.0 m, or 3 s at the final speed, clear of static returns ahead of a hull moving faster than 0.10 m/s at 8 s |
+| Policy kept | when its command passes with clearance ≥ 0.15 m |
+| Selection | nearest to a_SAC by rudder² + 2 × propulsion², within min(0.15 m, best − 0.20 m) of clearance |
+| Search | cross-entropy method, 3 rounds × 64 samples, 8 elites |
+| Stop: when tested | only at a decision without a checked plan |
+| Stop: window | W = 2.5 s (5 decisions) |
+| Stop: continuations | hold; stop; turn then stop; turn, cruise, then stop |
+| Stop: reverse thrust | weak 25 % with 0.75 s delay; strong 50 %, no delay (braking sequences) |
+| Stop: contact | hull + 0.15 m outside the map boundary, or overlapping a target hull; static returns not used |
+| Stop: action | full astern, rudder centred, for the rest of the episode |
+| Evaluation convention after a stop | targets brake in a straight line at 0.471 m/s² to rest; the episode ends stopped when the own ship is still (≤ 0.05 m/s, ≤ 1°/s) and every target has stopped; a target that strikes the stopped ship is scored apart from own-vessel collisions |
+
+**Notes for the text.**
+- **Two parts.** A predictive filter that replaces the policy's command only when it fails the
+  check, and a permanent stop tested only when the filter has no checked plan. The layer steers as
+  well as stops, so it is not a pure "take all way off" layer; Rule 8(e)'s second layer (taking all
+  way off) is its stop.
+- **Not a guarantee.** The banks, horizons and models are finite; the layer is evaluated
+  empirically (Section 4.5).
+- **Selection.** Chosen on the validation set; the test set had been used during the layer's
+  development (from 2026-10-10), so the test-set figures are not a fully held-out estimate for the
+  layer. Both statements belong in the paper.
+- **The target-strike count** depends on the target-braking convention above.
+- **Results (deployed policy, test set v4, layer off → on):** own-vessel collisions 135 → 70
+  (obstacle 70 → 45, boundary 12 → 17, target 53 → 8; decoupled 46 → 18, coupled 89 → 52); goals
+  865 → 868; stopped 52; target strikes on the stopped ship 9; timeouts 0 → 1; 8.9 % of decisions
+  and 36 % of episodes with a changed command (the held stop included). Paired: of the 135
+  collision episodes, 39 reach the goal, 32 end stopped, 3 end with a target strike and 61 still
+  collide; of the 865 goals, 829 stay goals and 20 become stops, 9 own-vessel collisions, 6 target
+  strikes and 1 a timeout. Validation set (270): own-vessel collisions 53 → 24, goals 217 → 222,
+  stops 23, changed decisions 13.5 % (4.6 % outside the episodes that end in a stop). The layer-off
+  run reproduces the test-set run of the deployed policy exactly.
+- **Field trials.** Which parts of the layer run on the vessel (the full layer, or only the
+  operator-latched stop) is part of the pending field-trial design.
+- Sources: `src/safety_v21.py` (`SafetyFilterV21EC(estop_window_s=2.5, use_static_points=False,
+  braking_fallback=False)`, `collision_escape_time`, `collision_contact_times`), its filter lineage
+  `src/safety_v16.py` back to `src/safety_v2.py` (constants), `src/safety_trajectory_search.py`,
+  `src/safety_estop.py` (`continuation_bank`, `_stop`), `src/safety_v20_contingency.py` (`WEAK`,
+  `STRONG`); `planning_records/SAFETY_V21_PLAN.md` section 15 and
+  `planning_records/SAFETY_ESTOP_PROTOCOL.md` (evaluation convention); report
+  `results/safety_dev/testset_v4_main/reports/ts4_final/`.
