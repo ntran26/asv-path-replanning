@@ -1,0 +1,23 @@
+{
+ "run_id": "july-2026-07-02-trial_2",
+ "geometry": "test_run case 1",
+ "safety": "shadow",
+ "lines": 110,
+ "superseded": 0,
+ "decisions": 55,
+ "errors": 0,
+ "pose_sync": {
+  "released": 55,
+  "stale": 0,
+  "superseded": 0
+ },
+ "shadow": {
+  "decisions": 55,
+  "changes": 30,
+  "first_change": 25,
+  "committed": 30,
+  "obs_mismatches": 0
+ },
+ "active_layer": null,
+ "operator_stops": []
+}

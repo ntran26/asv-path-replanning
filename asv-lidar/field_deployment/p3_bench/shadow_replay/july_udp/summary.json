@@ -1,0 +1,293 @@
+{
+ "tag": "july_udp",
+ "inproc": [
+  {
+   "run_dir": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\july_udp\\inproc\\july-2026-07-03-1",
+   "decisions": 49,
+   "shadow_decisions": 49,
+   "phantom": {
+    "decisions_with_dynamic_track": 32,
+    "decisions_with_context": 32,
+    "decisions_engaged": 6,
+    "decisions_target_branch_nonzero": 32
+   },
+   "would_change": 0,
+   "first_would_change": null,
+   "would_stop_at": null,
+   "why_counts": {
+    "no escape": 5,
+    "nominal": 44
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "log": "2026-07-03\\1.log"
+  },
+  {
+   "run_dir": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\july_udp\\inproc\\july-2026-07-03-2",
+   "decisions": 43,
+   "shadow_decisions": 43,
+   "phantom": {
+    "decisions_with_dynamic_track": 28,
+    "decisions_with_context": 28,
+    "decisions_engaged": 0,
+    "decisions_target_branch_nonzero": 28
+   },
+   "would_change": 7,
+   "first_would_change": 36,
+   "would_stop_at": 38,
+   "why_counts": {
+    "no escape": 6,
+    "nominal": 29,
+    "searched policy": 1,
+    "last certificate": 2,
+    "emergency stop": 5
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "log": "2026-07-03\\2.log"
+  },
+  {
+   "run_dir": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\july_udp\\inproc\\july-2026-07-03-3",
+   "decisions": 41,
+   "shadow_decisions": 41,
+   "phantom": {
+    "decisions_with_dynamic_track": 0,
+    "decisions_with_context": 0,
+    "decisions_engaged": 0,
+    "decisions_target_branch_nonzero": 0
+   },
+   "would_change": 0,
+   "first_would_change": null,
+   "would_stop_at": null,
+   "why_counts": {
+    "no escape": 18,
+    "nominal": 15,
+    "searched policy": 3,
+    "policy prefix repaired": 1,
+    "idle": 4
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "log": "2026-07-03\\3.log"
+  }
+ ],
+ "udp": [
+  {
+   "run_dir": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\july_udp\\udp\\july-2026-07-03-1",
+   "decisions": 49,
+   "shadow_decisions": 49,
+   "phantom": {
+    "decisions_with_dynamic_track": 32,
+    "decisions_with_context": 32,
+    "decisions_engaged": 6,
+    "decisions_target_branch_nonzero": 32
+   },
+   "would_change": 0,
+   "first_would_change": null,
+   "would_stop_at": null,
+   "why_counts": {
+    "no escape": 5,
+    "nominal": 44
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "bridge_exit": 0,
+   "elapsed_s": 129.5,
+   "console": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\july_udp\\udp\\july-2026-07-03-1.console.txt",
+   "log": "2026-07-03/1.log",
+   "same_as_inproc": {
+    "equal": true,
+    "first_difference": null,
+    "decisions": [
+     49,
+     49
+    ],
+    "shadow_decisions": [
+     49,
+     49
+    ]
+   },
+   "offline": {
+    "reproduced": true,
+    "compared": 49,
+    "first_difference": null
+   }
+  },
+  {
+   "run_dir": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\july_udp\\udp\\july-2026-07-03-2",
+   "decisions": 43,
+   "shadow_decisions": 43,
+   "phantom": {
+    "decisions_with_dynamic_track": 28,
+    "decisions_with_context": 28,
+    "decisions_engaged": 0,
+    "decisions_target_branch_nonzero": 28
+   },
+   "would_change": 7,
+   "first_would_change": 36,
+   "would_stop_at": 38,
+   "why_counts": {
+    "no escape": 6,
+    "nominal": 29,
+    "searched policy": 1,
+    "last certificate": 2,
+    "emergency stop": 5
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "bridge_exit": 0,
+   "elapsed_s": 52.79699999999866,
+   "console": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\july_udp\\udp\\july-2026-07-03-2.console.txt",
+   "log": "2026-07-03/2.log",
+   "same_as_inproc": {
+    "equal": true,
+    "first_difference": null,
+    "decisions": [
+     43,
+     43
+    ],
+    "shadow_decisions": [
+     43,
+     43
+    ]
+   },
+   "offline": {
+    "reproduced": true,
+    "compared": 43,
+    "first_difference": null
+   }
+  },
+  {
+   "run_dir": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\july_udp\\udp\\july-2026-07-03-3",
+   "decisions": 41,
+   "shadow_decisions": 41,
+   "phantom": {
+    "decisions_with_dynamic_track": 0,
+    "decisions_with_context": 0,
+    "decisions_engaged": 0,
+    "decisions_target_branch_nonzero": 0
+   },
+   "would_change": 0,
+   "first_would_change": null,
+   "would_stop_at": null,
+   "why_counts": {
+    "no escape": 18,
+    "nominal": 15,
+    "searched policy": 3,
+    "policy prefix repaired": 1,
+    "idle": 4
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "bridge_exit": 0,
+   "elapsed_s": 61.36000000000058,
+   "console": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\july_udp\\udp\\july-2026-07-03-3.console.txt",
+   "log": "2026-07-03/3.log",
+   "same_as_inproc": {
+    "equal": true,
+    "first_difference": null,
+    "decisions": [
+     41,
+     41
+    ],
+    "shadow_decisions": [
+     41,
+     41
+    ]
+   },
+   "offline": {
+    "reproduced": true,
+    "compared": 41,
+    "first_difference": null
+   }
+  }
+ ],
+ "git_head": "e1b09b5568fbf8f7727656e68909b0be729dde5b",
+ "timing_udp": [
+  {
+   "component": "observation",
+   "n": 130,
+   "p50_ms": 29.93530000003375,
+   "p95_ms": 58.5095899998123,
+   "p99_ms": 74.68170300027849,
+   "max_ms": 89.13439999923867
+  },
+  {
+   "component": "policy",
+   "n": 130,
+   "p50_ms": 2.7489499998409883,
+   "p95_ms": 3.8504750001266075,
+   "p99_ms": 4.042119001223909,
+   "max_ms": 4.116099999009748
+  },
+  {
+   "component": "command",
+   "n": 130,
+   "p50_ms": 0.1295000001846347,
+   "p95_ms": 0.276265000411513,
+   "p99_ms": 0.35466800047288416,
+   "max_ms": 0.41789999886532314
+  },
+  {
+   "component": "release_to_sent",
+   "n": 130,
+   "p50_ms": 34.30300000036368,
+   "p95_ms": 63.69788499914647,
+   "p99_ms": 78.91909299996769,
+   "max_ms": 95.28230000069016
+  },
+  {
+   "component": "lidar_line_to_sent",
+   "n": 130,
+   "p50_ms": 39.1247999996267,
+   "p95_ms": 75.87169499884112,
+   "p99_ms": 86.05766600085188,
+   "max_ms": 95.28230000069016
+  },
+  {
+   "component": "shadow_handoff",
+   "n": 130,
+   "p50_ms": 0.05274999966786709,
+   "p95_ms": 0.10882499982471926,
+   "p99_ms": 0.1296490000822814,
+   "max_ms": 0.1315000008617062
+  },
+  {
+   "component": "pose_wait",
+   "n": 130,
+   "p50_ms": 0.0,
+   "p95_ms": 16.712509999433678,
+   "p99_ms": 17.07515899939608,
+   "max_ms": 17.380900000716792
+  },
+  {
+   "component": "shadow_layer",
+   "n": 130,
+   "p50_ms": 148.73684999929537,
+   "p95_ms": 1550.2379499997915,
+   "p99_ms": 2061.7891440001745,
+   "max_ms": 2374.334500000259
+  },
+  {
+   "component": "shadow_behind_frame",
+   "n": 130,
+   "p50_ms": 2367.0451641082764,
+   "p95_ms": 11930.925536155699,
+   "p99_ms": 12872.59206533432,
+   "max_ms": 13311.30576133728
+  }
+ ],
+ "passed": true
+}

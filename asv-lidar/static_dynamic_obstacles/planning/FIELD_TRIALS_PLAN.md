@@ -1,6 +1,7 @@
 # Field trials (Paper 3, Section 5): design
 
-Date: 2026-11-04 (decisions 2026-11-05). Status: plan; the target platform (D-1) is still open. Decision S13(a) (2026-10-14) puts
+Date: 2026-11-04 (decisions and the bridge's bench results 2026-11-05). Status: plan; the target
+platform (D-1) is still open; the Paper 3 bridge is built (section 3). Decision S13(a) (2026-10-14) puts
 the field trials in this paper; this file is the design the `[PENDING — field-trial design]`
 markers of the draft wait for. The vessel-model calibration that precedes it is
 `FIELD_CALIBRATION_PLAN.md`.
@@ -27,9 +28,9 @@ markers of the draft wait for. The vessel-model calibration that precedes it is
 | Observation | the baseline-v3 70-value observation: 27 pooled LiDAR sectors, 7 map-boundary rays, ego motion, path terms, the tracked-target branch and the encounter-context branch, built by the simulator's own modules |
 | Decision rate | 2 Hz; rudder command limiter as in training (off, `RUDDER_COMMAND_LIMIT = False`) |
 | Speed | cruise 0.558 m/s at RPM 6; propulsion range 0-12 (no astern from the policy) |
-| Safety layer | E1 (V16 with the permanent stop, boundary-and-targets trigger, collision-hull detector, W = 2.5 s), in shadow mode (D-4) |
-| Operator stop | always armed on the bridge, independent of the layer |
-| Map | the basin's navigable polygon as in simulation, at the estimated pose |
+| Safety layer | E1 (V16 with the permanent stop, boundary-and-targets trigger, collision-hull detector, W = 2.5 s), in shadow mode (D-4), in a separate worker process off the command path |
+| Operator stop | always armed on the bridge, independent of the layer; plus a stop independent of the shore laptop (`FIELD_CALIBRATION_PLAN.md` P-12) |
+| Map | the basin's navigable polygon as in simulation, in the map frame registered on the landmark survey (`--origin map`, P-7), at the estimated pose |
 
 ## 3. Software before any trial: the Paper 3 bridge
 
@@ -52,6 +53,28 @@ vessel until a Paper 3 bridge exists:
 4. **Run time** on the shore laptop (`FIELD_CALIBRATION_PLAN.md` P-10).
 5. **Logging** (section 5): everything the sim-to-field comparison and the future-work field-data
    study need, on one clock.
+
+**Built 2026-11-05.** `field_deployment/udp_live_p3.py` (live) on `field_deployment/p3_bridge.py`
+(core); record and bench results `field_deployment/README_P3_BRIDGE.md`, summarised in
+`FIELD_CALIBRATION_PLAN.md` section 3a. The bridge subclasses the simulator's environment and
+replaces only its sensor models with the live data, so the observation is the simulator's own
+code (item 1). Items 2 and 3 pass: observation, action, issued command and every E1 decision
+exactly equal to the simulator on 32 runs (1,497 decisions); all 19 July logs replay in shadow
+mode. Item 5 is in place (per run: `decisions.jsonl`, `shadow.jsonl`, `telemetry.log`,
+`summary.json`).
+
+**Before the trials** (from the bench results):
+- **Phantom moving tracks.** In the target-free July logs a moving track is present on 42 % of
+  decisions, mostly at the basin wall, and it reaches the policy's target branch. In the trials
+  a phantom would compete with the real target in the tracker and the encounter classifier.
+  The registered map frame (P-7) is the expected fix; the dress rehearsal checks it (T-15), and
+  the family A runs report the remaining rate (section 6, Perception).
+- **Active mode.** E1 in the loop takes p99 0.89-2.06 s per decision on the development laptop,
+  above the 0.5 s interval. Shadow mode (D-4) is unaffected; the optional active block needs the
+  layer to meet T-14 on the shore laptop, besides the ESC reversal (P-8).
+- **Pose reference point** (hull or LiDAR) settled at S1-A; **telemetry resolution** raised
+  (P-1); **UDP ports and network** on the shore laptop (P-11); the UDP test repeated on the
+  field device.
 
 ## 4. Scenario set
 
@@ -126,7 +149,7 @@ simulation are compared like for like; no weighted scalar.
 | Motion | mean and minimum speed; rudder rate and reversals |
 | Encounter behaviour | encounter class and engagement time as perceived; first alteration (direction, size, time after engagement); passing side; speed reduction; shown as trajectory snapshots, with no per-rule compliance table (as in Section 4) |
 | Safety layer | decisions where it changed (or, in shadow mode, would have changed) the command; stops; reported apart from the policy |
-| Perception | track confirmation delay; target position and heading error of the track against ground truth; encounter-classification agreement with truth |
+| Perception | track confirmation delay; target position and heading error of the track against ground truth; encounter-classification agreement with truth; phantom moving tracks (share of decisions with a moving track that is not the target, from family A and from the decisions before the target enters the scan) |
 
 ## 7. Sim-to-field comparison
 
@@ -179,6 +202,6 @@ Decided 2026-11-05 (D-1, D-2, D-4, D-5); D-3 and D-6 follow the recommendation u
 | D-1 | **Target vessel** | **Open: the platform is not fixed**, and it may be smaller than the Bluefin. If its hull sits too low for the LiDAR's scan plane, panels are attached around it to make it detectable. Consequence to check on the bench: the tracker's admission gates and the safety layer's partial-hull completion assume a target of the own ship's size (1.73 x 0.50 m), so the detected footprint of the final target (with any panels) is measured and compared with those assumptions before the trials |
 | D-2 | **Target ground truth** | **Provided, after the two calibration sessions**; the method is fixed then. Target metrics (range, DCPA, passing side, tracker error) wait on it |
 | D-3 | Speed-changing targets | none; stated as a limitation |
-| D-4 | **Safety layer mode** | **Shadow mode**: the layer computes and logs every decision without acting; the operator stop is the physical safety. Learned behaviour is then reported as the policy's own, as in Section 4, and the layer's would-be interventions are measured on the water. An active block on the hardest scenarios is optional |
+| D-4 | **Safety layer mode** | **Shadow mode**: the layer computes and logs every decision without acting; the operator stop is the physical safety. Learned behaviour is then reported as the policy's own, as in Section 4, and the layer's would-be interventions are measured on the water. An active block on the hardest scenarios is optional, and possible only if the layer meets T-14 on the shore laptop (p99 0.89-2.06 s on the development laptop, 2026-11-05) and the ESC reverses (P-8) |
 | D-5 | **Trial sessions** | **Two after calibration**, more if needed; the plan of section 9 is sized for two |
 | D-6 | Static-obstacle material and contact tolerance | as Paper 2 |

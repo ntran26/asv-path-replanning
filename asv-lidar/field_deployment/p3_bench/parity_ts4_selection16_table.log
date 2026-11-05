@@ -1,0 +1,38 @@
+stopping table: {'installed': True, 'path': 'C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_stopping_profiles.pkl', 'entries': 602, 'max_cmps': 300}
+TS4:BAS-CR-CV-013 shadow: PASS decisions=13 outcome=collision:target layer_changed=8 stop_at=10 trace=- (37 s)
+TS4:BAS-CR-CV-013 active: PASS decisions=89 outcome=stopped layer_changed=78 stop_at=14 trace=True (44 s)
+TS4:BAS-CR-CV-037 shadow: PASS decisions=15 outcome=collision:target layer_changed=9 stop_at=10 trace=- (42 s)
+TS4:BAS-CR-CV-037 active: PASS decisions=21 outcome=stopped layer_changed=10 stop_at=16 trace=True (32 s)
+TS4:CH-HO-CV-088 shadow: PASS decisions=52 outcome=goal layer_changed=32 stop_at=26 trace=- (121 s)
+TS4:CH-HO-CV-088 active: PASS decisions=70 outcome=stopped layer_changed=51 stop_at=27 trace=True (102 s)
+TS4:P2-L1-CRP-FIX-05 shadow: PASS decisions=18 outcome=collision:target layer_changed=6 stop_at=15 trace=- (34 s)
+TS4:P2-L1-CRP-FIX-05 active: PASS decisions=83 outcome=stopped layer_changed=60 stop_at=29 trace=True (51 s)
+TS4:BAS-HO-NC-071 shadow: PASS decisions=50 outcome=goal layer_changed=26 stop_at=24 trace=- (25 s)
+TS4:BAS-HO-NC-071 active: PASS decisions=40 outcome=collision:by_target layer_changed=16 stop_at=24 trace=True (14 s)
+TS4:BAS-BO-CV-061 shadow: PASS decisions=29 outcome=goal layer_changed=3 stop_at=None trace=- (65 s)
+TS4:BAS-BO-CV-061 active: PASS decisions=29 outcome=collision:by_target layer_changed=18 stop_at=17 trace=True (40 s)
+TS4:BAS-HO-RE-081 shadow: PASS decisions=33 outcome=collision:target layer_changed=0 stop_at=None trace=- (17 s)
+TS4:BAS-HO-RE-081 active: PASS decisions=33 outcome=collision:target layer_changed=0 stop_at=None trace=True (11 s)
+TS4:BAS-CR-CV-051 shadow: PASS decisions=52 outcome=goal layer_changed=5 stop_at=None trace=- (68 s)
+TS4:BAS-CR-CV-051 active: PASS decisions=77 outcome=goal layer_changed=11 stop_at=None trace=True (96 s)
+TS4:P2-L1-CRS-VAR-08 shadow: PASS decisions=21 outcome=collision:target layer_changed=8 stop_at=18 trace=- (42 s)
+TS4:P2-L1-CRS-VAR-08 active: PASS decisions=50 outcome=collision:obstacle layer_changed=19 stop_at=None trace=True (87 s)
+TS4:P2-L2-CRP-VAR-14 shadow: PASS decisions=22 outcome=collision:obstacle layer_changed=6 stop_at=None trace=- (38 s)
+TS4:P2-L2-CRP-VAR-14 active: PASS decisions=36 outcome=collision:boundary layer_changed=13 stop_at=None trace=True (61 s)
+TS4:P2-L3-HO-FIX-05 shadow: PASS decisions=50 outcome=goal layer_changed=0 stop_at=None trace=- (31 s)
+TS4:P2-L3-HO-FIX-05 active: PASS decisions=50 outcome=goal layer_changed=0 stop_at=None trace=True (36 s)
+TS4:BAS-OT-RE-022 shadow: PASS decisions=49 outcome=goal layer_changed=35 stop_at=18 trace=- (31 s)
+TS4:BAS-OT-RE-022 active: PASS decisions=97 outcome=collision:boundary layer_changed=23 stop_at=81 trace=True (64 s)
+TS4:FS-NT-023 shadow: PASS decisions=34 outcome=collision:obstacle layer_changed=7 stop_at=None trace=- (63 s)
+TS4:FS-NT-023 active: PASS decisions=60 outcome=goal layer_changed=3 stop_at=None trace=True (43 s)
+TS4:BAS-NU-CV-004 shadow: PASS decisions=67 outcome=goal layer_changed=0 stop_at=None trace=- (25 s)
+TS4:BAS-NU-CV-004 active: PASS decisions=67 outcome=goal layer_changed=0 stop_at=None trace=True (15 s)
+TS4:BAS-BO-RE-006 shadow: PASS decisions=37 outcome=goal layer_changed=0 stop_at=None trace=- (15 s)
+TS4:BAS-BO-RE-006 active: PASS decisions=37 outcome=goal layer_changed=0 stop_at=None trace=True (11 s)
+TS4:CH-HO-NC-005 shadow: PASS decisions=58 outcome=goal layer_changed=0 stop_at=None trace=- (35 s)
+TS4:CH-HO-NC-005 active: PASS decisions=58 outcome=goal layer_changed=0 stop_at=None trace=True (27 s)
+{"runs": 32, "passed": 32, "trace_checked": 16, "trace_passed": 16, "decisions": 1497}
+{'component': 'observation', 'n': 1497, 'p50_ms': 24.143200000253273, 'p95_ms': 52.37452000110352, 'p99_ms': 70.87939600001845, 'max_ms': 139.11480000024312, 'mean_ms': 27.495202271206978}
+{'component': 'policy', 'n': 1497, 'p50_ms': 2.776399998765555, 'p95_ms': 4.134239999984857, 'p99_ms': 4.809807999408802, 'max_ms': 8.262200000899611, 'mean_ms': 2.81377615229468}
+{'component': 'layer', 'n': 600, 'p50_ms': 123.60874999922089, 'p95_ms': 1802.4849349989363, 'p99_ms': 2872.865107999569, 'max_ms': 3723.0650000001333, 'mean_ms': 320.4349629999918}
+{'component': 'layer_active', 'n': 897, 'p50_ms': 105.02570000062406, 'p95_ms': 1600.796919999993, 'p99_ms': 2726.4386160006684, 'max_ms': 3822.0339999988937, 'mean_ms': 328.85639799329556}
