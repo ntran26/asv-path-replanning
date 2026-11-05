@@ -1,0 +1,17 @@
+[FAKE VESSEL] Listening on {}:{} 0.0.0.0 15050
+[FAKE VESSEL] Waiting for START...
+[FAKE VESSEL] Got START from {}, streaming will start ('127.0.0.1', 15000)
+[FAKE VESSEL] End of log reached. Exiting.
+[P3] run july-2026-07-03-1: test_run case 1, safety=shadow, send=no
+[UDP] START sent to 127.0.0.1:15050; listening on 0.0.0.0:15000
+Max velocity: 0.283 m/s
+Max velocity: 0.400 m/s
+Max velocity: 0.447 m/s
+Max velocity: 0.634 m/s
+Max velocity: 0.823 m/s
+Max velocity: 1.071 m/s
+Max velocity: 1.213 m/s
+Max velocity: 1.415 m/s
+Max velocity: 1.417 m/s
+Max velocity: 1.455 m/s
+[P3] 49 decisions logged to C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\field_deployment\p3_bench\shadow_replay\july_udp\udp\july-2026-07-03-1; shadow: {'type': 'done', 'decisions': 49, 'changes': 0, 'first_change': None, 'committed': None, 'obs_mismatches': 0}

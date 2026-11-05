@@ -1,0 +1,311 @@
+{
+ "tag": "stale02",
+ "model_sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+ "stopping_table": {
+  "installed": true,
+  "path": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_stopping_profiles.pkl",
+  "entries": 602,
+  "max_cmps": 300
+ },
+ "cases": 3,
+ "runs": 6,
+ "passed": 6,
+ "trace_checked": 0,
+ "trace_passed": 0,
+ "decisions": 254,
+ "elapsed_s": 39.11848550000104,
+ "results": [
+  {
+   "case": "TS4:BAS-CR-CV-013",
+   "mode": "shadow",
+   "outcome": "collision:target",
+   "passed": true,
+   "decisions": 12,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 8,
+   "layer_stop_at": 10,
+   "first_mismatch": {},
+   "stale_frames": 3,
+   "elapsed_s": 7.070700400001442
+  },
+  {
+   "case": "TS4:BAS-CR-CV-013",
+   "mode": "active",
+   "outcome": "stopped",
+   "passed": true,
+   "decisions": 83,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 70,
+   "layer_stop_at": 23,
+   "first_mismatch": {},
+   "stale_frames": 15,
+   "elapsed_s": 11.285854599998856
+  },
+  {
+   "case": "TS4:BAS-HO-NC-071",
+   "mode": "shadow",
+   "outcome": "goal",
+   "passed": true,
+   "decisions": 49,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 1,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 9,
+   "elapsed_s": 10.028391899999406
+  },
+  {
+   "case": "TS4:BAS-HO-NC-071",
+   "mode": "active",
+   "outcome": "goal",
+   "passed": true,
+   "decisions": 49,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 2,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 9,
+   "elapsed_s": 4.96755420000045
+  },
+  {
+   "case": "TS4:P2-L1-CRP-FIX-05",
+   "mode": "shadow",
+   "outcome": "collision:target",
+   "passed": true,
+   "decisions": 17,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 2,
+   "layer_stop_at": 15,
+   "first_mismatch": {},
+   "stale_frames": 2,
+   "elapsed_s": 2.7729455000007874
+  },
+  {
+   "case": "TS4:P2-L1-CRP-FIX-05",
+   "mode": "active",
+   "outcome": "collision:by_target",
+   "passed": true,
+   "decisions": 44,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 29,
+   "layer_stop_at": 15,
+   "first_mismatch": {},
+   "stale_frames": 11,
+   "elapsed_s": 2.3916595000009693
+  }
+ ],
+ "telemetry": [
+  {
+   "case": "TS4:BAS-CR-CV-013",
+   "range_max_error_m": 0.04997946595923164,
+   "pose_max_error_m": 4.980611345573038e-07,
+   "heading_max_error_deg": 4.951116352458484e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 0.7989737979170269,
+     "mean_abs_error": 0.013189231140893187,
+     "true_spread": 0.04342108414756447
+    },
+    "v": {
+     "slope": 0.9109814505136763,
+     "mean_abs_error": 0.006044597802147762,
+     "true_spread": 0.023991094813751737
+    },
+    "r": {
+     "slope": 0.9092901990573243,
+     "mean_abs_error": 1.5412918947216299,
+     "true_spread": 5.7274421878060755
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 4.861767628483449e-07,
+    "v_fit": {
+     "slope": 0.9112986399800151,
+     "mean_abs_error": 0.006099634335660731
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.003116130828857422,
+    "boundary": 0.0038033723831176758,
+    "ego": 0.5200525522232056,
+    "path": 0.0447433665394783,
+    "target": 1.0,
+    "context": 1.0
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.002211505174636841,
+    "boundary": 0.0016979098320007325,
+    "ego": 0.29473305121064186,
+    "path": 0.023930838983505964,
+    "target": 0.5471097096800804,
+    "context": 0.5258069433271885
+   }
+  },
+  {
+   "case": "TS4:BAS-HO-NC-071",
+   "range_max_error_m": 0.049998078487588415,
+   "pose_max_error_m": 4.747754029921225e-07,
+   "heading_max_error_deg": 4.983363055544032e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 0.9951517394925251,
+     "mean_abs_error": 0.015186894317385775,
+     "true_spread": 0.09944766416828685
+    },
+    "v": {
+     "slope": 1.1373874336783651,
+     "mean_abs_error": 0.016023320738838186,
+     "true_spread": 0.08178223132571931
+    },
+    "r": {
+     "slope": 0.9376402421035279,
+     "mean_abs_error": 2.098204608798244,
+     "true_spread": 9.69012531550496
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 5.001360143808142e-07,
+    "v_fit": {
+     "slope": 1.139422634698467,
+     "mean_abs_error": 0.01628124758079326
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.012052536010742188,
+    "boundary": 0.009219050407409668,
+    "ego": 0.7991157174110413,
+    "path": 0.13539499044418335,
+    "target": 1.0,
+    "context": 1.0
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.0021885937832771462,
+    "boundary": 0.004046034305653674,
+    "ego": 0.26821475174832854,
+    "path": 0.04471828114796192,
+    "target": 0.4411491612170605,
+    "context": 0.42794817448296446
+   }
+  },
+  {
+   "case": "TS4:P2-L1-CRP-FIX-05",
+   "range_max_error_m": 0.04999300132847928,
+   "pose_max_error_m": 4.890860747508441e-07,
+   "heading_max_error_deg": 4.7098041022763937e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 0.9553196294843156,
+     "mean_abs_error": 0.015685852588185452,
+     "true_spread": 0.09166867309020578
+    },
+    "v": {
+     "slope": 1.0832023594670053,
+     "mean_abs_error": 0.019222623935787345,
+     "true_spread": 0.07336520747141335
+    },
+    "r": {
+     "slope": 0.9258868886007333,
+     "mean_abs_error": 2.4091208262851826,
+     "true_spread": 10.66684842774317
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 4.665990589458602e-07,
+    "v_fit": {
+     "slope": 1.0848604345801296,
+     "mean_abs_error": 0.01948704157118029
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.0030791759490966797,
+    "boundary": 0.006855487823486328,
+    "ego": 0.6105214357376099,
+    "path": 0.11674928665161133,
+    "target": 0.0,
+    "context": 0.0
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.0027721285820007323,
+    "boundary": 0.003685339291890462,
+    "ego": 0.20961608787377675,
+    "path": 0.04524807607134183,
+    "target": 0.0,
+    "context": 0.0
+   }
+  }
+ ],
+ "timing": [
+  {
+   "component": "observation",
+   "n": 254,
+   "p50_ms": 4.667650000556023,
+   "p95_ms": 6.601264999153499,
+   "p99_ms": 7.538107000691525,
+   "max_ms": 8.251900000686874,
+   "mean_ms": 4.425458267658141
+  },
+  {
+   "component": "policy",
+   "n": 254,
+   "p50_ms": 0.7791500001985696,
+   "p95_ms": 1.1092549996646992,
+   "p99_ms": 1.4730719998624406,
+   "max_ms": 2.4993999995786,
+   "mean_ms": 0.8018122047661299
+  },
+  {
+   "component": "layer",
+   "n": 78,
+   "p50_ms": 26.46809999987454,
+   "p95_ms": 302.51785999944326,
+   "p99_ms": 425.0728800003163,
+   "max_ms": 433.81700000099954,
+   "mean_ms": 64.41968974358576
+  },
+  {
+   "component": "layer_active",
+   "n": 176,
+   "p50_ms": 3.4527999996498693,
+   "p95_ms": 265.7001749998926,
+   "p99_ms": 424.0980999998101,
+   "max_ms": 449.7835000001942,
+   "mean_ms": 40.07479602273634
+  }
+ ],
+ "git_head": "e1b09b5568fbf8f7727656e68909b0be729dde5b",
+ "machine": {
+  "platform": "win32",
+  "cpu": 12,
+  "processor": "Intel64 Family 6 Model 154 Stepping 4, GenuineIntel"
+ }
+}

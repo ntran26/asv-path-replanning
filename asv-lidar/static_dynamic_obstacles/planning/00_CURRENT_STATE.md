@@ -39,8 +39,8 @@ the paper.
 | `MASTER_ARTIFACT/MASTER_ARTIFACT_OPEN_ITEMS.md` | questions raised while building the explainer, answered by ID |
 | `CURRICULUM_AND_DATA_BRIEF.md` | curriculum stages, scenario generation and data sets |
 | `PAPER/READING_LIST.md` | references, with verification status |
-| `FIELD_CALIBRATION_PLAN.md` | the vessel-model calibration: two basin sessions (identification, validation and dress rehearsal), thresholds, contingency (2026-11-04) |
-| `FIELD_TRIALS_PLAN.md` | the field-trial design for Section 5: the Paper 3 bridge, scenarios, metrics, sim-to-field comparison, procedure, open decisions D-1 to D-6 (2026-11-04) |
+| `FIELD_CALIBRATION_PLAN.md` | the vessel-model calibration: two basin sessions (identification, validation and dress rehearsal), thresholds, contingency (2026-11-04; bench results 2026-11-05) |
+| `FIELD_TRIALS_PLAN.md` | the field-trial design for Section 5: the Paper 3 bridge (built 2026-11-05), scenarios, metrics, sim-to-field comparison, procedure, decisions D-1 to D-6 (2026-11-05) |
 | `FUTURE_WORK_IDEAS.md` | ideas outside this paper (a sim-to-field conference paper) |
 | `MASTER_ARTIFACT/MASTER_ARTIFACT_PROMPTS.md` | the pending change blocks for the explainer artifact, with the log of blocks applied |
 | `PAPER/PAPER3_PROMPTS.md` | the pending change blocks for the paper draft |
@@ -132,9 +132,19 @@ mitigate the collision rate (a higher success rate is welcome, not required). Re
 
 **Still to run, in order:**
 1. The trajectory snapshots of each encounter type for the deployed policy.
-2. The field trials: designed in `FIELD_TRIALS_PLAN.md` (open decisions D-1 to D-6), after the two
-   calibration sessions of `FIELD_CALIBRATION_PLAN.md`. Both wait on the Paper 3 bridge (the
-   existing bridge builds the Paper 2 observation) and the bench checks (ESC reversal, run time).
+2. The field trials: designed in `FIELD_TRIALS_PLAN.md` (D-1 open: the target platform), after the
+   two calibration sessions of `FIELD_CALIBRATION_PLAN.md`.
+   - **Paper 3 bridge built (2026-11-05):** `field_deployment/udp_live_p3.py` and `p3_bridge.py`,
+     record `field_deployment/README_P3_BRIDGE.md`. Parity with the simulator exact on 16 test set
+     v4 episodes in shadow and active mode (32 runs, 1,497 decisions); all 19 July logs replayed
+     in shadow mode; command path p99 0.09 s. `src/`, `configs/` and `udp_live_rl.py` unchanged.
+   - **Findings carried into both plans:** phantom moving tracks on 42 % of decisions in the
+     target-free July logs, mostly at the basin wall (map registration P-7, checked at S2-C);
+     E1 p99 0.89-2.06 s per decision, so active mode does not run at 2 Hz on this laptop (shadow
+     mode unaffected); pose reference point unknown (hull centre or LiDAR, settled at S1-A);
+     telemetry resolution too coarse for the ego inputs (P-1, O-2); UDP ports 5000, 5001 and 5050
+     taken on this laptop.
+   - Still waiting on the bench checks (ESC reversal P-8, shore-laptop run time P-10).
 
 ## 4. Decisions in force
 
@@ -251,20 +261,21 @@ These are facts that earlier drafts or planning files had wrong; the current fil
   still describes Studies 1–2, and `00_PAPER3_INDEX_AND_PROTOCOL.md` mentions five learners and
   five seeds.
 
-## 7. Write-up state (2026-10-24)
+## 7. Write-up state (2026-11-05)
 
 - **Paper draft:**
-  - Current file: `Paper3_Sections1-4_with_placeholders_rev26Oct_tracked.docx` (outside the
-    repository; drafts are kept in `PhD/3 Second Journal Paper - Dynamic Obstacle/Revision/`).
+  - Current file: `Paper3_Sections1-4_clean_rev05Nov.docx` (outside the repository; drafts are
+    kept in `PhD/3 Second Journal Paper - Dynamic Obstacle/Revision/`): the single version with
+    every tracked change accepted (2026-11-05). The next round tracks its changes against it.
   - Drafted: Sections 1–4 (with 4.5, the runtime safety layer), Appendices B–G (Algorithms
-    A1–A3), Discussion 6.2–6.3. Placeholders: Sections 5, 6.1 and 7, Appendix A, Figures 4–6.
-  - Applied and checked against the code and results (2026-11-04): everything through block F.
-    Edit history: `planning/PAPER/PAPER3_PROMPTS.md`.
-  - **On hold (2026-11-04)** until the field-trial plan is final; the figures are reviewed first.
-  - Then: block G (Table 13's 0.361; the stop-latch clause after Eq. (18) removed; the
-    cross-entropy reference). Then 6.1 (writable for the two simulation questions), Appendix A
-    (needs a table of the identified parameters with their bootstrap spread), and Figures 4–5
-    redrawn from the twelve runs.
+    A1–A3), Discussion 6.2–6.3. Placeholders: Sections 5, 6.1 and 7, Appendix A, Figures 1–6
+    (Figures 4–6 final; Figures 1–3 drafts). References 1–77.
+  - Applied and checked against the code and results (2026-11-05): everything through block G
+    (Table 13's 0.361; the stop-latch clause removed; de Boer et al. as reference 67; the texts of
+    Figures 4–6). Edit history: `planning/PAPER/PAPER3_PROMPTS.md`.
+  - **On hold (2026-11-04)** until the field-trial plan is final. Then: the Figure 1–3 texts once
+    the drawings are final, 6.1 (writable for the two simulation questions), and Appendix A
+    (needs a table of the identified parameters with their bootstrap spread).
 - **Section 4 (results)**, restated 2026-10-24 (skeleton S19; the draft carries the matching
   structure): 4.1 overall, 4.2 snapshots, 4.3 target behavior, 4.4 reward scale audit, 4.5 runtime
   safety layer.
@@ -281,37 +292,16 @@ These are facts that earlier drafts or planning files had wrong; the current fil
     smoothness > existence; no term exceeds its weight.
   - 4.5 (runtime safety layer): written (block F, 2026-10-26; Table 13, Algorithm A3).
   - Section 5 waits for the field-trial design.
-- **Explainer artifact** (version checked 2026-11-05: 1793818813-fe0e; block B applied):
-  - **Built:** Sections 0–8, 10 and 12. **Titled placeholders:** Section 9 (safety layer and
-    evaluation design) and Section 11 (field trials and the vessel–computer link).
-  - **Section 10, "Results in simulation":** complete (10.1–10.12 and the takeaways). Every number
-    is rendered from the embedded results data of 2026-10-26: all twelve runs, the deployed policy
-    SAC seed 0, and both comparators at v2.
-  - **Section 4:** presents the encounter-specific VO with the comparators v1 values and its
-    domain-depth measure. COLREGs-VO appears only as the reactive target's rule, with the |α|, |β|
-    head-on test of section 5 above and the target's six departures from the rule's settings.
-  - **Removed 2026-10-24:** the width sweep and the perception study, from Sections 1, 6 and 8 and
-    the glossary. Section 5's list of non-default learner settings now includes the SAC and TQC
-    gradient steps.
-  - **Sections 0 and 1** still frame the paper as a comparison of four learners, against the
-    framing decision of 2026-10-10.
-  - **Next:** six change blocks, all ready, in `MASTER_ARTIFACT/MASTER_ARTIFACT_PROMPTS.md`:
-    - **B (applied 2026-11-05):** the results data of 2026-10-25 (all twelve runs, the deployed policy SAC seed 0, both
-      comparators at v2, the reward audit), with Section 10's wording made plural for two
-      comparators. Checked by rendering the page with the new data: every computed sentence holds.
-    - **C:** Section 4 at comparators v2. The course-change weight becomes 0.8 and the passing side
-      is judged on the engaged encounter; with 0.8 the worked cost example no longer favors the turn.
-    - **D:** Sections 0 and 1 aligned with the framing, after
-      `PAPER/PAPER3_SECTIONS1-2_REVISION_BRIEF.md` sections 1.1 and 1.3.
-    - **E:** a new subsection 10.12 on the reward scale audit (Table R7) of the deployed policy;
-      "Still to come" becomes 10.13.
-    - **F:** Section 9 built for the runtime safety layer decided on 2026-10-25, presenting this
-      one layer only, with the purpose stated as fewer own-vessel collisions. The layer is
-      described in `MASTER_ARTIFACT_FACTS.md` section 5, rewritten from the code and the decision
-      record.
-    - **G:** a new subsection 10.13 with the layer's test-set results, from the results files'
-      `safety_layer` block (`MASTER_ARTIFACT_RESULTS.md` section 18, generated from the reported
-      runs only); "Still to come" becomes 10.14.
+- **Explainer artifact** (version checked 2026-11-05: 1793854625-a135; all change blocks applied):
+  - **Built:** Sections 0–10 and 12. **Titled placeholder:** Section 11 (field trials), waiting
+    for the field-trial plan.
+  - **Section 10:** complete, 10.1–10.14, on the results data of 2026-10-26: all twelve runs, the
+    deployed policy SAC seed 0, both comparators at v2, 10.12 the reward scale audit, and 10.13 the
+    safety layer on, presenting the reported layer only.
+  - **Section 9:** the reported safety layer and the evaluation design. **Section 4:** at
+    comparators v2. **Sections 0 and 1:** framed as a formulation and a deployed policy.
+  - **Next:** nothing pending. A data refresh follows any regeneration of the results files; the
+    COLREGs snapshots and the field-trial plan will fill 10.14's items and Section 11.
 - **Decided 2026-10-24** (skeleton S19):
   - **Multi-axis results:** per-axis tables, the principal metrics in the main-text table and the
     full set in an appendix; no Pareto view and no weighted score.

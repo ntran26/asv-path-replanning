@@ -30,7 +30,7 @@ def main():
     ap.add_argument("--bind-ip", default="0.0.0.0")     # IP to bind
     ap.add_argument("--port", type=int, default=5050)     # UDP port to listen on
     ap.add_argument("--log", required=True)     # Path to log file to replay
-    ap.add_argument("--speed", default=1.0)     # Replay speed: 1x = real time
+    ap.add_argument("--speed", type=float, default=1.0)     # Replay speed: 1x = real time
     ap.add_argument("--ignore-rc", action="store_true")     # ignore RC line
     ap.add_argument("--loop", action="store_true")  # loop log forever
     args = ap.parse_args()

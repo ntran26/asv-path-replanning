@@ -1,0 +1,72 @@
+61 episodes; stopping table: {'installed': True, 'path': 'C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_stopping_profiles.pkl', 'entries': 602, 'max_cmps': 300}
+1/61 FS-BO-FIX-008: 29 decisions, layer max 138 ms
+2/61 FS-BO-VAR-R003: 9 decisions, layer max 1852 ms
+3/61 FS-CRP-FIX-002: 51 decisions, layer max 1468 ms
+4/61 FS-CRP-VAR-R004: 16 decisions, layer max 1534 ms
+5/61 FS-CRS-FIX-002: 27 decisions, layer max 1301 ms
+6/61 FS-CRS-VAR-R001: 22 decisions, layer max 1871 ms
+7/61 FS-HO-FIX-001: 51 decisions, layer max 139 ms
+8/61 FS-HO-VAR-R001: 55 decisions, layer max 199 ms
+9/61 FS-NT-001: 58 decisions, layer max 881 ms
+10/61 FS-NT-027: 49 decisions, layer max 288 ms
+11/61 FS-OT-FIX-002: 53 decisions, layer max 147 ms
+12/61 FS-OT-VAR-R002: 21 decisions, layer max 680 ms
+13/61 P2v2-L1-BO-FIX-05: 26 decisions, layer max 45 ms
+14/61 P2v2-L1-BO-VAR-20: 25 decisions, layer max 525 ms
+15/61 P2-L1-CRP-FIX-05: 18 decisions, layer max 490 ms
+16/61 P2v4-L1-CRP-VAR-R002: 18 decisions, layer max 368 ms
+17/61 P2-L1-CRS-FIX-05: 58 decisions, layer max 51 ms
+18/61 P2v4-L1-CRS-VAR-R002: 64 decisions, layer max 41 ms
+19/61 P2-L1-HO-FIX-03: 61 decisions, layer max 245 ms
+20/61 P2v4-L1-HO-FIX-R002: 55 decisions, layer max 984 ms
+21/61 P2-L1-NT-01: 63 decisions, layer max 132 ms
+22/61 P2-L1-OT-FIX-01: 46 decisions, layer max 262 ms
+23/61 P2v4-L1-OT-VAR-R001: 49 decisions, layer max 502 ms
+24/61 P2-L2-BO-FIX-05: 29 decisions, layer max 50 ms
+25/61 P2-L2-BO-VAR-20: 29 decisions, layer max 218 ms
+26/61 P2-L2-CRP-FIX-09: 19 decisions, layer max 463 ms
+27/61 P2v4-L2-CRP-VAR-R001: 58 decisions, layer max 494 ms
+28/61 P2-L2-CRS-FIX-17: 33 decisions, layer max 474 ms
+29/61 P2v4-L2-CRS-VAR-R001: 15 decisions, layer max 604 ms
+30/61 P2-L2-HO-VAR-04: 23 decisions, layer max 445 ms
+31/61 P2-L2-HO-VAR-20: 27 decisions, layer max 506 ms
+32/61 P2-L2-NT-01: 57 decisions, layer max 38 ms
+33/61 P2-L2-OT-FIX-01: 55 decisions, layer max 82 ms
+34/61 P2-L2-OT-VAR-20: 54 decisions, layer max 61 ms
+35/61 P2-L3-BO-FIX-09: 35 decisions, layer max 486 ms
+36/61 P2-L3-BO-VAR-02: 35 decisions, layer max 435 ms
+37/61 P2-L3-CRP-VAR-10: 53 decisions, layer max 308 ms
+38/61 P2v4-L3-CRP-FIX-R004: 48 decisions, layer max 145 ms
+39/61 P2-L3-CRS-FIX-05: 45 decisions, layer max 427 ms
+40/61 P2v4-L3-CRS-FIX-R001: 47 decisions, layer max 297 ms
+41/61 P2-L3-HO-FIX-05: 50 decisions, layer max 102 ms
+42/61 P2-L3-HO-FIX-19: 51 decisions, layer max 115 ms
+43/61 P2-L3-NT-01: 52 decisions, layer max 225 ms
+44/61 P2-L3-OT-FIX-05: 50 decisions, layer max 265 ms
+45/61 P2-L3-OT-VAR-20: 36 decisions, layer max 526 ms
+46/61 BAS-BO-CV-001: 39 decisions, layer max 34 ms
+47/61 BAS-BO-RE-R001: 37 decisions, layer max 29 ms
+48/61 BAS-CR-CV-003: 68 decisions, layer max 223 ms
+49/61 BAS-CR-RE-S006: 54 decisions, layer max 36 ms
+50/61 BAS-HO-CV-001: 53 decisions, layer max 37 ms
+51/61 BAS-HO-RE-099: 58 decisions, layer max 490 ms
+52/61 BAS-NU-CV-003: 59 decisions, layer max 26 ms
+53/61 BAS-NU-CV-S007: 56 decisions, layer max 46 ms
+54/61 BAS-OT-CV-003: 48 decisions, layer max 452 ms
+55/61 BAS-OT-RE-098: 49 decisions, layer max 32 ms
+56/61 CH-CR-CV-001: 56 decisions, layer max 96 ms
+57/61 CH-CR-RE-R001: 51 decisions, layer max 773 ms
+58/61 CH-HO-CV-001: 53 decisions, layer max 112 ms
+59/61 CH-HO-RE-099: 48 decisions, layer max 106 ms
+60/61 CH-OT-CV-003: 48 decisions, layer max 123 ms
+61/61 CH-OT-RE-100: 49 decisions, layer max 110 ms
+{'component': 'observation', 'n': 2590, 'p50_ms': 7.4, 'p95_ms': 23.5, 'p99_ms': 35.7, 'max_ms': 56.6, 'mean_ms': 9.1, 'share_over_500ms': 0.0}
+{'component': 'policy', 'n': 2590, 'p50_ms': 0.8, 'p95_ms': 2.1, 'p99_ms': 3.2, 'max_ms': 4.3, 'mean_ms': 1.0, 'share_over_500ms': 0.0}
+{'component': 'command', 'n': 2590, 'p50_ms': 0.0, 'p95_ms': 0.1, 'p99_ms': 0.2, 'max_ms': 0.9, 'mean_ms': 0.0, 'share_over_500ms': 0.0}
+{'component': 'command_path', 'n': 2590, 'p50_ms': 8.4, 'p95_ms': 25.9, 'p99_ms': 37.9, 'max_ms': 58.7, 'mean_ms': 10.2, 'share_over_500ms': 0.0}
+{'component': 'layer', 'n': 2590, 'p50_ms': 33.4, 'p95_ms': 293.4, 'p99_ms': 880.4, 'max_ms': 1871.1, 'mean_ms': 75.9, 'share_over_500ms': 0.0}
+{'component': 'layer_in_loop', 'n': 2590, 'p50_ms': 41.7, 'p95_ms': 302.2, 'p99_ms': 889.8, 'max_ms': 1897.6, 'mean_ms': 86.1, 'share_over_500ms': 0.0}
+{'component': 'worker_lag', 'n': 2590, 'p50_ms': 41.0, 'p95_ms': 318.0, 'p99_ms': 1291.9, 'max_ms': 7616.1, 'mean_ms': 111.2, 'share_over_500ms': 0.0}
+{'component': 'first_decision_observation', 'n': 61, 'p50_ms': 3.5, 'p95_ms': 33.0, 'p99_ms': 34.5, 'max_ms': 35.1, 'mean_ms': 7.5, 'share_over_500ms': 0.0}
+{'component': 'first_decision_layer', 'n': 61, 'p50_ms': 25.4, 'p95_ms': 113.0, 'p99_ms': 187.4, 'max_ms': 191.9, 'mean_ms': 44.8, 'share_over_500ms': 0.0}
+{'component': 'layer_with_context', 'n': 1808, 'p50_ms': 35.0, 'p95_ms': 369.6, 'p99_ms': 1049.9, 'max_ms': 1871.1, 'mean_ms': 87.0, 'share_over_500ms': 0.0}
