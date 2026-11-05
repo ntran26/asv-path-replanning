@@ -91,3 +91,17 @@ To regenerate with another policy (for example the SAC v4.3 run once it is evalu
 on test set v4):
     python tools/paper_snapshots.py --model runs/sac_formulation_seed0_bl4/best_model.zip --tag sacs0_bl4
 The replay check then needs those cases to be successes for that policy too.
+
+
+Revision 2026-11-04 (paper Figure 6)
+------------------------------------
+Panel (f) is now BAS-BO-CV-039 (basin, slanted leg, 0 panels, constant-velocity target):
+CPA 1.9 m at 9.5 s; speed 0.53-0.60 m/s from the onset to the CPA; until the overtaker is
+within d_req = 2.5 m it holds the path within 0.10 m and its speed within 0.074 m/s
+(colregs_compliance.py window). After the target is within 2.5 m it moves up to 0.52 m
+beyond the path band, and once passed it accelerates to about 0.9 m/s. No successful
+being-overtaken episode with a CPA of 1.2-4.5 m holds within 0.15 m and 0.15 m/s through the
+whole pass (0 of 29, to 4 s after the CPA). BAS-BO-RE-016 (turn of about 20 deg, 0.40 m/s at the
+CPA, reactive target) was replaced. Candidates: bo_candidates_2026-11-04.png (CV-039, CV-011,
+CV-081; the last two slow to 0.29-0.36 m/s near the CPA). Panel titles now read "Crossing from
+port" and "Crossing from starboard".

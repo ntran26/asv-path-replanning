@@ -39,6 +39,8 @@ the paper.
 | `MASTER_ARTIFACT/MASTER_ARTIFACT_OPEN_ITEMS.md` | questions raised while building the explainer, answered by ID |
 | `CURRICULUM_AND_DATA_BRIEF.md` | curriculum stages, scenario generation and data sets |
 | `PAPER/READING_LIST.md` | references, with verification status |
+| `FIELD_CALIBRATION_PLAN.md` | the vessel-model calibration: two basin sessions (identification, validation and dress rehearsal), thresholds, contingency (2026-11-04) |
+| `FIELD_TRIALS_PLAN.md` | the field-trial design for Section 5: the Paper 3 bridge, scenarios, metrics, sim-to-field comparison, procedure, open decisions D-1 to D-6 (2026-11-04) |
 | `FUTURE_WORK_IDEAS.md` | ideas outside this paper (a sim-to-field conference paper) |
 | `MASTER_ARTIFACT/MASTER_ARTIFACT_PROMPTS.md` | the pending change blocks for the explainer artifact, with the log of blocks applied |
 | `PAPER/PAPER3_PROMPTS.md` | the pending change blocks for the paper draft |
@@ -130,7 +132,9 @@ mitigate the collision rate (a higher success rate is welcome, not required). Re
 
 **Still to run, in order:**
 1. The trajectory snapshots of each encounter type for the deployed policy.
-2. The field trials, whose design is open.
+2. The field trials: designed in `FIELD_TRIALS_PLAN.md` (open decisions D-1 to D-6), after the two
+   calibration sessions of `FIELD_CALIBRATION_PLAN.md`. Both wait on the Paper 3 bridge (the
+   existing bridge builds the Paper 2 observation) and the bench checks (ESC reversal, run time).
 
 ## 4. Decisions in force
 
@@ -250,15 +254,17 @@ These are facts that earlier drafts or planning files had wrong; the current fil
 ## 7. Write-up state (2026-10-24)
 
 - **Paper draft:**
-  - Current file: `Paper3_Sections1-4_with_placeholders_rev25Oct_tracked.docx`, in
-    `PhD/3 Second Journal Paper - Dynamic Obstacle/Revision/` (outside the repository).
-  - Drafted: Sections 1–4.4, Appendices B–G (with Algorithm A1), Discussion 6.2–6.3. Placeholders:
-    Sections 4.5, 5, 6.1 and 7, Appendix A, Algorithm A3, Figures 4–6 (to insert).
-  - Applied and checked against the code and results (2026-10-26): the corrections of 2026-10-22
-    and 2026-10-24 and blocks C, D and E of 2026-10-25. Edit history:
-    `planning/PAPER/PAPER3_PROMPTS.md`.
-  - Next: block F (the runtime safety layer in 2.3.4, 4.5 and Algorithm A3; one comparator name,
-    LOS-DWA; the A2 tuning row).
+  - Current file: `Paper3_Sections1-4_with_placeholders_rev26Oct_tracked.docx` (outside the
+    repository; drafts are kept in `PhD/3 Second Journal Paper - Dynamic Obstacle/Revision/`).
+  - Drafted: Sections 1–4 (with 4.5, the runtime safety layer), Appendices B–G (Algorithms
+    A1–A3), Discussion 6.2–6.3. Placeholders: Sections 5, 6.1 and 7, Appendix A, Figures 4–6.
+  - Applied and checked against the code and results (2026-11-04): everything through block F.
+    Edit history: `planning/PAPER/PAPER3_PROMPTS.md`.
+  - **On hold (2026-11-04)** until the field-trial plan is final; the figures are reviewed first.
+  - Then: block G (Table 13's 0.361; the stop-latch clause after Eq. (18) removed; the
+    cross-entropy reference). Then 6.1 (writable for the two simulation questions), Appendix A
+    (needs a table of the identified parameters with their bootstrap spread), and Figures 4–5
+    redrawn from the twelve runs.
 - **Section 4 (results)**, restated 2026-10-24 (skeleton S19; the draft carries the matching
   structure): 4.1 overall, 4.2 snapshots, 4.3 target behavior, 4.4 reward scale audit, 4.5 runtime
   safety layer.
@@ -273,16 +279,14 @@ These are facts that earlier drafts or planning files had wrong; the current fil
     Realized per-step order: boundary > COLREGs > obstacles > progress > path following > domain > smoothness >
     existence, against the weights' boundary > domain > obstacles > COLREGs > path following > progress >
     smoothness > existence; no term exceeds its weight.
-  - 4.5 (runtime safety layer): decided 2026-10-25 (S10); Algorithm A3 in `planning/PAPER/PAPER3_ALGORITHMS.md`, and block F of
-    `planning/PAPER/PAPER3_PROMPTS.md` rewrites 2.3.4, writes 4.5 (Table 13) and A3, and adds the 6.2 statements.
+  - 4.5 (runtime safety layer): written (block F, 2026-10-26; Table 13, Algorithm A3).
   - Section 5 waits for the field-trial design.
-- **Explainer artifact** (version checked 2026-10-25: 1792859529-ce15; no change block applied
-  since 2026-10-24):
+- **Explainer artifact** (version checked 2026-11-05: 1793818813-fe0e; block B applied):
   - **Built:** Sections 0–8, 10 and 12. **Titled placeholders:** Section 9 (safety layer and
     evaluation design) and Section 11 (field trials and the vessel–computer link).
   - **Section 10, "Results in simulation":** complete (10.1–10.12 and the takeaways). Every number
-    is rendered from the embedded results data, still that of 2026-10-22: TQC over seeds 0–1, the
-    deployed policy pending, LOS-PID + DWA at v1, and the encounter-specific VO pending.
+    is rendered from the embedded results data of 2026-10-26: all twelve runs, the deployed policy
+    SAC seed 0, and both comparators at v2.
   - **Section 4:** presents the encounter-specific VO with the comparators v1 values and its
     domain-depth measure. COLREGs-VO appears only as the reactive target's rule, with the |α|, |β|
     head-on test of section 5 above and the target's six departures from the rule's settings.
@@ -292,7 +296,7 @@ These are facts that earlier drafts or planning files had wrong; the current fil
   - **Sections 0 and 1** still frame the paper as a comparison of four learners, against the
     framing decision of 2026-10-10.
   - **Next:** six change blocks, all ready, in `MASTER_ARTIFACT/MASTER_ARTIFACT_PROMPTS.md`:
-    - **B:** the results data of 2026-10-25 (all twelve runs, the deployed policy SAC seed 0, both
+    - **B (applied 2026-11-05):** the results data of 2026-10-25 (all twelve runs, the deployed policy SAC seed 0, both
       comparators at v2, the reward audit), with Section 10's wording made plural for two
       comparators. Checked by rendering the page with the new data: every computed sentence holds.
     - **C:** Section 4 at comparators v2. The course-change weight becomes 0.8 and the passing side

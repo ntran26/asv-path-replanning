@@ -1,5 +1,7 @@
 # 05_VESSEL_MODEL_AND_SIM2REAL — Part 2: basin test plan
 
+> **Carried forward (2026-11-04)** into `planning/FIELD_CALIBRATION_PLAN.md`, the plan of record for the two calibration sessions; this file is kept for history.
+
 Two sessions, which is the hard constraint. Session 1 identifies, session 2
 validates. **Session 2 must not become a second identification session** — with
 no independent check, the model's accuracy claim rests on the same data that

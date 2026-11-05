@@ -90,6 +90,7 @@ and the direct prior work.
 | | Reference | Kind | Why, and where it's used |
 |---|---|---|---|
 | ★ | Krasowski, H. & Althoff, M. (2024). Provable traffic rule compliance in safe reinforcement learning on the open sea. *IEEE Transactions on Intelligent Vehicles* 9(12):7617–7634 | cited (`02`, `PROJECT_BRIEF.md`) | The model for turning COLREGs into checkable predicates — `v_*` terms, the admissibility predicate, the emergency-stop safety layer as a safety layer |
+| | de Boer, P.-T., Kroese, D. P., Mannor, S. & Rubinstein, R. Y. (2005). A tutorial on the cross-entropy method. *Annals of Operations Research* 134:19–67 | cited (Paper 3, Section 2.3.4 and Algorithm A3, from 2026-11-04) | The trajectory search of the runtime safety layer (`src/safety_trajectory_search.py`, which also names Zheng et al., arXiv:2102.12124, for adapting the optimizer to safe control) |
 
 ## 8. Classical comparators (and the reactive target model)
 

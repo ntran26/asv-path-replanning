@@ -216,7 +216,9 @@ baseline-v2; state it, or describe the flag as "coasting slowdown clears".]**
   r_pf = −(1 − g_u q)   (Eq. 14)
 
 U_eff is U_ref except under a carve-out (Eq. 15); g_u = 1 while the runtime
-stop is latched.
+stop is latched. That latch is the in-extremis stop of `src/emergency_stop.py` (`env.estop`), which no
+reported run sets: the layer is off in training, and the stop of the reported layer
+(Algorithm A3) does not use it. The paper leaves the clause out (2026-11-04).
 
 **5.2 Speed-reference carve-outs** (while an encounter is engaged):
 

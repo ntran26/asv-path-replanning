@@ -37,9 +37,10 @@ sys.path[:0] = [str(ROOT / "src"), str(ROOT / "tools" / "tiers")]
 # and leg shape, each with the manoeuvre the formulation asks for (selection notes
 # in results/paper_snapshots/README.txt).
 DEFAULT_CASES = ("FS-NT-010", "P2-L3-HO-FIX-15", "CH-CR-CV-035",
-                 "P2-L2-CRS-VAR-10", "BAS-OT-CV-073", "BAS-BO-RE-016")
-TITLES = {"NT": "No target", "HO": "Head-on", "CRP": "Port crossing",
-          "CRS": "Starboard crossing", "OT": "Overtaking", "BO": "Being overtaken"}
+                 "P2-L2-CRS-VAR-10", "BAS-OT-CV-073", "BAS-BO-CV-039")
+TITLES = {"NT": "No target", "HO": "Head-on", "CRP": "Crossing from port",
+          "CRS": "Crossing from starboard", "OT": "Overtaking", "BO": "Being overtaken"}
+WRAPPED = {"CRP": "Crossing\nfrom port", "CRS": "Crossing\nfrom starboard"}
 LAYOUT = {"BAS": "basin", "CH": "channel", "FS": "coupled layout", "L1": "layout L1",
           "L2": "layout L2", "L3": "layout L3"}
 OWN, TGT = "#0969da", "#cf222e"
@@ -228,7 +229,9 @@ def main() -> None:
         sub = (f"{layout_of(case)}, {legs.get(case, '')} leg\n{n_pan} panel{'s' if n_pan != 1 else ''}"
                + (", varying speed" if "-VAR-" in case else ""))
         letter = "abcdefghijklmnopqrstuvwxyz"[k]
-        title = f"({letter}) {TITLES[code]}"
+        # Narrow panels: the two long crossing titles break onto two lines, bottom-aligned
+        # with the one-line titles (2026-11-05: they overlapped their neighbours).
+        title = f"({letter}) {WRAPPED.get(code, TITLES[code])}"
         draw(axes.flat[k], scene, steps, args.every, title, sub, cfg.MAP_WIDTH, cfg.MAP_HEIGHT)
         if k % cols:
             axes.flat[k].set_yticklabels([])
@@ -267,7 +270,8 @@ def main() -> None:
                bbox_to_anchor=(0.5, 0.16 / height), handlelength=2.0, columnspacing=1.2)
     fig.text(0.5, 0.04 / height, f"Hulls drawn every {args.every:g} s; equal numbers mark the same instant.",
              ha="center", fontsize=5.5, color="#424a53")
-    fig.tight_layout(w_pad=0.4, h_pad=0.8, rect=(0, 0.5 / height, 1, 1))
+    top = 1 - 0.14 / height if any(code_of(c, rec.loc[c, "crossing_side"]) in WRAPPED for c in cases) else 1
+    fig.tight_layout(w_pad=0.4, h_pad=0.8, rect=(0, 0.5 / height, 1, top))   # room for a two-line title
     pd.DataFrame(summary).to_csv(out / f"{args.name}_summary.csv", index=False)
     fig.savefig(out / f"{args.name}.pdf")
     fig.savefig(out / f"{args.name}.png", dpi=300)
