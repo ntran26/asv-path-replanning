@@ -32,15 +32,15 @@ import pandas as pd  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 TEST = ROOT / "results" / "test_set" / "v4"
-LEARNERS = [("SAC", "sac"), ("PPO", "ppo"), ("RecurrentPPO", "recurrent_ppo"), ("TQC", "tqc")]
-CLASSICAL = [("LOS-DWA", "los_dwa"), ("COLREGs-VO", "colregs_vo")]
+LEARNERS = [("SAC", "sac"), ("PPO", "ppo"), ("Recurrent PPO", "recurrent_ppo"), ("TQC", "tqc")]
+CLASSICAL = [("LOS-DWA", "los_dwa_v2"), ("Encounter-specific VO", "encounter_vo_v2")]   # comparators v2
 STYLE = {
     "SAC": dict(color="#2ca02c", marker="^", ls="-."),
     "PPO": dict(color="#1f77b4", marker="s", ls="--"),
-    "RecurrentPPO": dict(color="#9467bd", marker="o", ls="-"),
+    "Recurrent PPO": dict(color="#9467bd", marker="o", ls="-"),
     "TQC": dict(color="#ff7f0e", marker="v", ls=":"),
     "LOS-DWA": dict(color="#d62728", marker="D", ls=(0, (1, 1))),
-    "COLREGs-VO": dict(color="#8c564b", marker="P", ls=(0, (3, 1, 1, 1))),
+    "Encounter-specific VO": dict(color="#8c564b", marker="P", ls=(0, (3, 1, 1, 1))),
 }
 STAGES_M = [0.16, 0.36, 0.64, 1.0, 1.5, 2.0]          # stage 2-7 starts, baseline-v3
 CATS = [("none", "No\nencounter"), ("head_on", "Head-on"), ("crossing_port", "Crossing\nfrom port"),
@@ -104,9 +104,8 @@ def fig_a_bars(learners, classical, out):
                 ax.plot(x, row, "o", mfc="white", mec="k", ms=2.6, mew=0.6, lw=0, zorder=4)
             if len(per_seed) > 1:
                 ax.vlines(x, per_seed.min(0), per_seed.max(0), color="k", lw=0.8, zorder=3)
-    n = counts(learners[0][1][0])
     ax.set_xticks(range(len(CATS)))
-    ax.set_xticklabels([f"{lab}\n(n={k:,})" for (_, lab), k in zip(CATS, n)])
+    ax.set_xticklabels([lab for _, lab in CATS])                # decision 2026-11-04: no (n=...) line
     ax.axvline(len(CATS) - 1.5, color="grey", lw=0.8)
     ax.set_ylim(0, 1.0)
     ax.set_xlim(-0.5, len(CATS) - 0.5)
@@ -141,9 +140,8 @@ def fig_a_lines(learners, classical, out):
         vals = [rate(d, c) for c, _ in CATS]
         ax.plot(x[:-1], vals[:-1], color=st["color"], ls=st["ls"], marker=st["marker"], ms=4.5, lw=1.2, label=name)
         ax.plot(x[-1], vals[-1], st["marker"], color=st["color"], ms=5)
-    n = counts(learners[0][1][0])
     ax.set_xticks(x)
-    ax.set_xticklabels([f"{lab}\n(n={k:,})" for (_, lab), k in zip(CATS, n)])
+    ax.set_xticklabels([lab for _, lab in CATS])
     ax.axvline(len(CATS) - 1.5, color="grey", lw=0.8)
     ax.set_ylim(0.4, 1.0)
     ax.set_ylabel("Success rate")
@@ -154,7 +152,7 @@ def fig_a_lines(learners, classical, out):
 
 
 def fig_b(dev, out):
-    fig, ax = plt.subplots(figsize=(7.1, 3.1))
+    fig, ax = plt.subplots(figsize=(7.1, 4.0))            # taller: the curves were cramped (2026-11-04)
     for x in STAGES_M:
         ax.axvline(x, color="grey", ls="--", lw=0.6)
     edges = [0.0] + STAGES_M + [3.0]
@@ -171,15 +169,16 @@ def fig_b(dev, out):
         if len(runs) > 1:
             ax.fill_between(t, np.nanmin(mat, 0), np.nanmax(mat, 0), color=st["color"], alpha=0.15, lw=0)
         for r in runs:
-            ax.plot(r.timesteps / 1e6, r.goal_rate, st["marker"], mfc="none", mec=st["color"], ms=3, alpha=0.7, lw=0)
-        ax.plot(t, np.nanmean(mat, 0), color=st["color"], ls=st["ls"], marker=st["marker"], ms=3.5, lw=1.4,
+            ax.plot(r.timesteps / 1e6, r.goal_rate, st["marker"], mfc="none", mec=st["color"], ms=2.2, alpha=0.35, lw=0)
+        ax.plot(t, np.nanmean(mat, 0), color=st["color"], ls=st["ls"], marker=st["marker"], ms=4, lw=2.0,
                 label=legend_label(name, len(runs)))
     ax.set_xlabel("Training timesteps (million)")
     ax.set_ylabel("Validation-set success rate")
     ax.set_xlim(0, 3.05)
-    ax.set_ylim(0, 1.0)
+    vals = np.concatenate([r.goal_rate.to_numpy() for runs in dev.values() for r in runs])
+    ax.set_ylim(max(0.0, np.floor(vals.min() * 10) / 10 - 0.05), min(1.0, np.ceil(vals.max() * 10) / 10 + 0.02))
     ax.grid(alpha=0.3)
-    ax.legend(loc="lower center", bbox_to_anchor=(0.42, 0.02), ncol=4, frameon=True, framealpha=0.9)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.13), ncol=4, frameon=False)   # outside the plot
     fig.tight_layout()
     save(fig, out / "fig_b_learning_curves")
 

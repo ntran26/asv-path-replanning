@@ -8,19 +8,15 @@
 
 ## 1. State of the artifact
 
-The artifact was last checked on 2026-10-25, at version 1792859529-ce15 (13,104 lines). None of
-the blocks below has been applied yet.
+The artifact was last checked on 2026-11-05, at version 1793818813-fe0e (13,148 lines), after
+block B.
 
 - **Built:** Sections 0–8, 10 and 12. Sections 9 (safety layer and evaluation design) and 11
   (field trials) are titled placeholders.
-- **Section 10:** complete, but its embedded data dates from 2026-10-22:
-  - TQC over seeds 0–1;
-  - the deployed policy pending;
-  - LOS-PID + DWA at v1;
-  - the encounter-specific VO pending.
-
-  Block B brings in the data of 2026-10-25: all twelve runs, the deployed policy (SAC seed 0),
-  both comparators at v2, and the reward audit.
+- **Section 10:** complete, on the results data of 2026-10-26: all twelve runs, the deployed
+  policy (SAC seed 0), both comparators at v2 with Section 10's wording made plural for them, the
+  reward audit and the safety-layer results. The data is embedded verbatim. The safety-layer card
+  and the still-to-come item still read "pending" until block G.
 - **Section 4:** presents the encounter-specific VO with the comparators v1 values. Block C moves
   it to v2: course-change weight 0.8, and the passing side judged on the engaged encounter. With
   0.8, the worked cost example no longer favors the turn.
@@ -29,45 +25,9 @@ the blocks below has been applied yet.
 - **Section 9** is still a titled placeholder. The runtime safety layer was decided on 2026-10-25
   (block F). Its test-set results are in the results files and have no subsection yet (block G).
 
-## 2. Next: blocks B to G, in order
+## 2. Next: blocks C to G, in order (block B applied 2026-11-05)
 
 They need the comparators v2 commit synced (it comes after 576d4ed4). None needs attachments.
-
-### Block B: the results data of 2026-10-25, and two comparators in Section 10
-
-The current page was rendered locally with this data swapped in.
-- The charts, the status board, the still-to-come list and every computed sentence handle the
-  second comparator correctly.
-- All 1,080 pooled-table cells match `results/baseline_v3/paper_table.md`.
-- The console is clean.
-- What remains is hand-written wording that assumes one comparator.
-
-```
-Update the Master Artifact in place with targeted edits only (no full reprint).
-
-1. Data. Replace the contents of the <script type="application/json" id="results-data"> block with the project's planning/master_artifact_results.json, verbatim. The file now holds:
-   - all twelve runs;
-   - the deployed policy (SAC seed 0);
-   - both classical comparators at comparators v2: LOS-PID + DWA, and the encounter-specific VO, which now has test-set data;
-   - the reward scale audit that 10.12 will use.
-   planning/MASTER_ARTIFACT_RESULTS.md has the same numbers as text.
-
-2. Section 10 now has two classical comparators with data. The charts and the computed sentences already handle both. These hand-written phrases still assume one:
-   a. "In this section": "what the four learners and the classical comparator achieve" → "what the four learners and the two classical comparators achieve".
-   b. 10.1 callout, the comparator item. It renders as "The classical comparator. LOS-PID + DWA (v2) and Encounter-specific VO (v2) is deterministic: one run, so it has no seed spread and its result carries no seed range (Section 4.6)." With more than one comparator, make it plural: "The classical comparators. LOS-PID + DWA (v2) and the encounter-specific VO (v2) are deterministic: one run each, so neither has a seed spread or a seed range", and cite both sections, XS(4, 'dwa') and XS(4, 'esvo').
-   c. 10.2: "the classical comparator, being deterministic, gets a single bar" → "the classical comparators, being deterministic, get a single bar each". In Figure 10.1's caption: "Classical comparator: a hatched bar" → "Classical comparators: a hatched bar each". Show "A dashed row is still to run." only while some comparator has no test data.
-   d. The comparisons in 10.2 and 10.8, and the first takeaway, name only LOS-PID + DWA. Extend each to every comparator with data, computed the same way. On the present data:
-      - every SAC, TQC and PPO seed, and two of the three RecurrentPPO seeds, succeed more often than the encounter-specific VO (v2);
-      - the learned policies finish sooner and faster, and further from the reference path, than both comparators.
-      The first takeaway gives both comparators' success.
-   e. In running text, write the encounter-specific VO's name in lower case where it does not start a sentence ("the encounter-specific VO (v2)"). Keep the capital in labels, legends and table headers.
-   f. The status board's card for the encounter-specific VO has no description line. Give it one from its status string, as the card for LOS-PID + DWA has: "Tuned on the 120 decoupled validation episodes; passing side judged on the engaged encounter."
-
-3. Re-read every interpretive sentence in Section 10 against planning/MASTER_ARTIFACT_RESULTS.md, and correct any that no longer hold. Then confirm that:
-   - the status board, the seed counts and the deployed-policy line reflect the data;
-   - the still-to-come list no longer has the comparator items;
-   - the console is clean.
-```
 
 ### Block C: Section 4 at comparators v2
 
@@ -245,3 +205,4 @@ Then check:
 | 2026-10-24 | Width sweep and perception study removed; three small fixes | 1792804596-231b | applied in full |
 | 2026-10-24 | Section 4 rewritten for the encounter-specific VO (done without a block) | 1792804596-231b | values match facts 2.3–2.4; head-on test wrong; two flags open (block A) |
 | 2026-10-24 | Block A: Section 4 head-on test (\|β\| ≤ 22.5°), domain depth, reactive-target settings | 1792859529-ce15 | applied in full; Figure 4.6 caption and the opening of 4.9 also aligned |
+| 2026-11-05 | Block B: results data of 2026-10-26 (all twelve runs, deployed policy, both comparators at v2, reward audit, safety layer); two-comparator wording | 1793818813-fe0e | data verbatim; every changed sentence matches the results file; console clean; no overflow at 375 px |
