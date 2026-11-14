@@ -71,7 +71,10 @@ logical CPUs, 7.9 GB RAM, Windows 10 Pro 10.0.19045; Python 3.10.11 (python.org)
 from `static_dynamic_obstacles/requirements.txt` (torch 2.2.1+cpu). The clone was first checked
 out with `core.autocrlf=true`, which changed the bytes of tracked text files and disabled the
 stopping table (fingerprint mismatch); it was set to `false` and re-checked out before the runs
-below, after which the table installs (602 entries).
+below, after which the table installs (602 entries). After step 5 the same pinned packages
+(identical `pip freeze`) were installed into the base Python 3.10.11, which is first on the
+path, and the `.venv` was removed; shadow parity on the base install (`parity/personal_i7_base/`,
+36fb118cd) passed 16/16 runs, 600 decisions.
 
 - 2026-11-14, step 1, shadow (`parity/personal_i7_shadow/`, e35252f4c): 16/16 runs pass,
   600 decisions; per-case decision counts equal the university laptop's; stopping table on.
