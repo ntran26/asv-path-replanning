@@ -110,7 +110,12 @@ below, after which the table installs (602 entries).
   listens on 5050 at `--server-ip` (10.201.205.110 in July), and the command line keeps the July
   bridge's option names (`--shadow` is accepted for `--no-send`):
   `python udp_live_p3.py --server-ip 10.201.205.110 --layout L1 --run-id link-<date> --no-send`.
-  On the day, other applications are closed.
+  On the day, other applications are closed. First check on the day: frames arrive within
+  seconds of START. Unlike the July Ubuntu machine, this laptop's host firewall is on (no rule
+  for Python, Wi-Fi profile Public) and passes inbound UDP only as replies to START, so the
+  vessel-control laptop sends from 5050 after START. If frames do not arrive, an inbound allow
+  rule for the Python 3.10.11 interpreter (`%LOCALAPPDATA%\Programs\Python\Python310\python.exe`;
+  a venv's `python.exe` only starts it), added with administrator rights.
 
 ## 5. Conventions of this repository
 
