@@ -154,6 +154,7 @@ Windows 11, Python 3.10.11, one native thread). Outputs under `p3_bench/`.
 | --- | --- |
 | 16 test set v4 episodes (stops, target contacts, interventions, every class, L1-L3, a channel, a null encounter, a no-target leg) x {shadow, active} | **32/32 pass, 1,497 decisions**: observation (all 70 values), policy action, issued command, executed action and the layer's decision (branch, command, brake, stop, plan, every diagnostic) exactly equal; in shadow mode the worker's code path equal too (`parity/ts4_selection16_table/`, with the stopping table; `parity/ts4_selection16/` without it, same result) |
 | Simulator reference against the recorded E1 traces of the same episodes (`ts4_final_e1_*`) | 16/16 equal, decision by decision |
+| Same 16 episodes x {shadow, active} on the personal laptop (2026-11-14) | 32/32 pass, 1,497 decisions, recorded E1 traces 16/16 equal (`parity/personal_i7_shadow/`, `parity/personal_i7_active/`, with the stopping table) |
 | 3 episodes x {shadow, active} with the environment's staleness model on (p = 0.2, 49 stale frames) | 6/6 pass (`parity/stale02/`) |
 | Telemetry encoding, full precision | ranges within the 0.05 m quantisation, pose within 5e-7 m; decoded u, v, r against the simulator's motion: slopes 0.91-1.18 (signs agree); a LiDAR-point pose decoded with `--pose-point sensor` recovers the reference point within 5e-7 m |
 
@@ -166,7 +167,7 @@ vessel can show (S1-A: stationary at a known pose and heading).
 | Part | Result |
 | --- | --- |
 | A, in process, all 19 July logs (1,085 decisions) | pass: every frame decided, every observation finite and inside the space, one shadow decision per decision, the worker path's perception equal to the bridge's, no errors (`shadow_replay/july_inproc/`) |
-| B, UDP over loopback, `fake_vessel_replay.py` -> `udp_live_p3.py` (headless, worker), 2026-07-03 logs 1-3 (133 decisions) | pass: decisions and shadow decisions equal to part A's; the decision log alone reproduces every shadow decision offline (`shadow_replay/july_udp/`). **Provisional**: UTAS blocks UDP on this laptop's network; to be repeated on the field device |
+| B, UDP over loopback, `fake_vessel_replay.py` -> `udp_live_p3.py` (headless, worker), 2026-07-03 logs 1-3 (133 decisions) | pass: decisions and shadow decisions equal to part A's; the decision log alone reproduces every shadow decision offline (`shadow_replay/july_udp/`). Repeated 2026-11-14 on the personal laptop, bridge on its live port 5000 (`shadow_replay/udp_personal_i7/`): same result, part A and part B equal to the development laptop's |
 
 The July runs are open loop for Paper 3: the vessel followed the Paper 2 policy at RPM 12,
 about 1.1-1.3 m/s against the deployed policy's 0.56 m/s, with no target. Their shadow
@@ -185,10 +186,25 @@ Test set v4, 2 episodes per cell (61 episodes, 2,590 decisions, the first of eac
 | E1 in the loop (command path + layer) | 42 ms | 302 ms | 890 ms | 1.90 s | 1.9 % |
 | shadow worker, frame to decision at 2 Hz | 41 ms | 318 ms | 1.29 s | 7.6 s | 2.5 % |
 
+Personal laptop, 2026-11-14 (Intel Core i7-6600U, 2 cores / 4 logical CPUs, 7.9 GB, Windows 10,
+Python 3.10.11; `timing/personal_i7/`), same 61 episodes and 2,590 decisions:
+
+| Component | p50 | p95 | p99 | max | > 0.5 s |
+| --- | --- | --- | --- | --- | --- |
+| observation | 14.3 ms | 20.7 ms | 25.6 ms | 32.3 ms | 0 % |
+| policy | 1.2 ms | 2.0 ms | 2.7 ms | 4.8 ms | 0 % |
+| command path (observation + policy + command) | 15.6 ms | 22.1 ms | 27.2 ms | 34.2 ms | 0 % |
+| E1 layer, one decision | 60 ms | 480 ms | 872 ms | 1.65 s | 5.0 % |
+| E1 in the loop (command path + layer) | 76 ms | 496 ms | 887 ms | 1.67 s | 5.0 % |
+| shadow worker, frame to decision at 2 Hz | 75 ms | 783 ms | 2.08 s | 3.67 s | 6.9 % |
+
 July logs over loopback UDP (130 decisions): observation p99 75 ms (real scans hold about 550
 returns); frame release to `$CMD` sent p50 34 ms, p99 79 ms; LiDAR line to sent (pose-sync
 wait included) p99 86 ms; E1 layer p50 149 ms, p95 1.55 s, p99 2.06 s; the worker fell up to
-13 s behind the frames and caught up after each run.
+13 s behind the frames and caught up after each run. Personal laptop (`shadow_replay/
+udp_personal_i7/`, bridge on port 5000): observation p99 80 ms; frame release to `$CMD` sent
+p50 34 ms, p99 85 ms; LiDAR line to sent p50 39 ms, p99 92 ms, max 103 ms; E1 layer p50 83 ms,
+p95 759 ms, p99 962 ms.
 
 **T-14.** The command path meets it with a wide margin: p99 about 0.09 s from the LiDAR line
 to the command, against 0.5 s. **E1 in the loop does not**: its p99 is 0.89 s on test-set
@@ -205,7 +221,7 @@ vessel-link latency is not in these figures: the bench has no vessel.
 | Telemetry resolution (P-1, O-2) | at the July resolution (pose 0.1 m and 0.1 deg at 2 Hz, ego by pose differences), the observation moves from the simulator's on average by 0.11-0.16 (ego), 0.03-0.09 (path), up to 0.40 (target) and 0.53 (context), in normalised units | higher pose resolution, or an ego estimate from the IMU, before the trials; at 10 Hz the decoder's pose differences span 0.1 s and get noisier, so its velocity estimate needs changing with the rate (the bridge decimates the decisions, not the velocity) |
 | Pose point | the July bridge took the telemetry pose as the vessel reference point; whether the localisation reports the LiDAR's (0.86 m ahead) is not established | settle at S1-A, then `--pose-point` |
 | Map frame | `--origin start` assumes the telemetry axes are the basin's and the vessel sits on the path start at the first frame | `--origin map` with the P-7 registration |
-| UDP ports on this laptop | UDP 5000, 5001 and 5050 are held by system services (`nidmsrv.exe`, `lktsrv.exe`, `svchost.exe`); the July bridge listened on 5000 | free ports, or another laptop, before a session; UDP itself is blocked on this laptop's network (UTAS) |
+| UDP ports on this laptop | UDP 5000, 5001 and 5050 are held by system services (`nidmsrv.exe`, `lktsrv.exe`, `svchost.exe`); the July bridge listened on 5000 | free ports, or another laptop, before a session; UDP itself is blocked on this laptop's network (UTAS). Personal laptop (2026-11-14): 5000 free, 5050 held by `svchost.exe` (CDPSvc), which affects only a fake vessel on the same machine; no firewall prompt on first listen and no rule for `python.exe`, Wi-Fi profile Public, so an inbound Private-only rule and a Private test network are needed before step 6 of `UDP_BENCH_HANDOVER.md`; step 6 not run (loopback taken as the bench test); the link across devices is first tested at step 7, at the next basin booking |
 | Operator stop | the E key acts only while the bridge runs and has focus | a stop independent of the shore laptop belongs to the session's safety plan |
 | Active stop | full astern (S2 = -100) | void until P-8 (ESC reverse) and T-12 |
 | Target footprint (D-1) | the tracker's admission gates and the layer's hull completion assume a target of the own ship's size | measure the real target's detected footprint on the bench |

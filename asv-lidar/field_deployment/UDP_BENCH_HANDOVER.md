@@ -66,7 +66,50 @@ loopback UDP; E1 in the loop p99 0.89 s (test set) and 2.06 s (July logs).
 
 ## 4. Results
 
-(empty until the steps run)
+Personal laptop: Intel Core i7-6600U @ 2.60 GHz (Intel64 Family 6 Model 78), 2 cores / 4
+logical CPUs, 7.9 GB RAM, Windows 10 Pro 10.0.19045; Python 3.10.11 (python.org) in a `.venv`
+from `static_dynamic_obstacles/requirements.txt` (torch 2.2.1+cpu). The clone was first checked
+out with `core.autocrlf=true`, which changed the bytes of tracked text files and disabled the
+stopping table (fingerprint mismatch); it was set to `false` and re-checked out before the runs
+below, after which the table installs (602 entries).
+
+- 2026-11-14, step 1, shadow (`parity/personal_i7_shadow/`, e35252f4c): 16/16 runs pass,
+  600 decisions; per-case decision counts equal the university laptop's; stopping table on.
+- 2026-11-14, step 1, active (`parity/personal_i7_active/`, fefb19172): 16/16 runs pass,
+  897 decisions; recorded E1 traces 16/16 checked and equal; no mismatch. With the shadow runs,
+  32/32 and 1,497 decisions, as on the university laptop. `parity/personal_i7/` is an aborted
+  run from before the line-ending fix (it stopped at the first active case, whose trace was not
+  yet committed) and has no `summary.json`.
+- 2026-11-14, step 2: UDP 5000, 5001, 15000 and 15050 free; 5050 held by `svchost.exe`
+  (service CDPSvc, Connected Devices Platform). 5050 is the vessel's port on the vessel, so the
+  live link (bridge on 5000) is not affected; only the fake vessel moves to 15050 on this laptop.
+- 2026-11-14, step 3: no firewall prompt. Python listened on UDP and then TCP 0.0.0.0:5000
+  (90 s and 120 s); no prompt appeared and no rule for `python.exe` exists afterwards
+  (notification on listen enabled in all profiles; shell not elevated). The Wi-Fi profile is
+  Public. Loopback (steps 4-5) is unaffected; before step 6 an inbound rule for the venv's
+  `python.exe` on Private networks, and a Private profile for the test network, are needed on
+  this laptop.
+- 2026-11-14, step 4 (`shadow_replay/udp_personal_i7/`, e35252f4c, `--port 15050
+  --local-port 5000`): `PASSED`. Part A 19/19 logs, 1,085 decisions; 15 logs with a would-be
+  stop, would-change 424, pose stale 0. Part B, 2026-07-03 logs 1-3: 49, 43 and 41 decisions,
+  `same_as_A=True` and `offline=True` on each (would-change 0 / 7 / 0, first change - / 36 / -,
+  stop - / 38 / -), as on the university laptop. LiDAR line to sent p50 38.9 ms, p95 73.0 ms,
+  p99 91.9 ms, max 102.7 ms (n = 130); shadow layer p99 962 ms. Bridge, shadow worker and fake
+  vessel shared the 4 logical CPUs.
+- 2026-11-14, step 5 (`timing/personal_i7/`, fefb19172): 61 episodes, 2,590 decisions, run
+  alone after the active parity run. Command path p50 15.6 ms, p95 22.1 ms, p99 27.2 ms, max
+  34.2 ms, 0 % over 0.5 s (required limit met). E1 layer p99 872 ms (5.0 % over 0.5 s); E1 in
+  the loop p50 76 ms, p95 496 ms, p99 887 ms, max 1.67 s, 5.0 % over 0.5 s (not met); worker lag
+  p99 2.08 s, max 3.67 s, 6.9 % over 0.5 s. Background at the start: about 58 % CPU with no
+  Python running (a desktop chat application about 44 %, `dwm` about 13 %); Microsoft Store,
+  qBittorrent and Proton VPN closed, VPN off.
+- 2026-11-14, step 6: not run; the single-machine loopback test (step 4) stands as the bench
+  test of the UDP path. Inbound UDP from another host, the firewall rule and the network profile
+  are first exercised at step 7.
+- Step 7: scheduled for the start of the next basin booking, before any session, with
+  `python udp_live_p3.py --server-ip 10.201.205.110 --layout L1 --run-id link-<date> --no-send`.
+  Before that day: an inbound rule for the venv's `python.exe` on private networks only, the
+  vessel's network set to private, the VPN off and other applications closed.
 
 ## 5. Conventions of this repository
 
