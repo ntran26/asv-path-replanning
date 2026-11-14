@@ -1,3 +1,6 @@
 # Python bytecode caches: regenerated on every run, differ per interpreter.
 __pycache__/
 *.py[co]
+
+# Local virtual environment (see asv-lidar/static_dynamic_obstacles/requirements.txt).
+.venv/
