@@ -104,6 +104,19 @@ Live, on the shore laptop (one bridge process per run; the run identifier is the
 python udp_live_p3.py --server-ip 10.201.205.110 --layout L1 --run-id T1-A-L1-r1
 ```
 
+The link is the July one: the shore laptop runs the bridge, which listens on 5000 and sends to
+5050 on the laptop that controls the vessel (`--server-ip`). The command line keeps the July
+bridge's (`udp_live_rl.py`) names and defaults for the options both share: `--bind-ip`
+(0.0.0.0), `--local-port` (5000), `--server-ip`, `--server-port` (5050), `--test-case`,
+`--lidar-index0-deg`, `--rudder-sign`, `--no-pose-sync`, `--pose-wait-s` and the `--estop-*`
+options; `--model-path` keeps its name, with the deployed model as its default; `--shadow` is
+accepted for `--no-send`. Abbreviated options are refused, so a July option this bridge does
+not take stops it at start-up instead of matching a longer option (the July `--shadow` would
+otherwise have matched `--shadow-inline`, and commands would have been sent). Not carried over: `--record-log` (every received line is logged to
+`telemetry.log` in the run folder), `--record-video`, `--fixed-rpm` and the RPM, S2 and
+rudder-scale options (the command is resolved as the simulator resolves it), the Paper 2
+observation options and the display options.
+
 Geometry, one of: `--layout L1|L2|L3` (Paper 2's basin layouts, `paper2_set.LAYOUTS`),
 `--case <test set v4 ID>` (the simulated twin's map and path, e.g. `P2-L1-HO-FIX-11`),
 `--start x,y --goal x,y` (a basin leg), `--test-case N` (the July bridge's `test_run.py`).
@@ -221,7 +234,7 @@ vessel-link latency is not in these figures: the bench has no vessel.
 | Telemetry resolution (P-1, O-2) | at the July resolution (pose 0.1 m and 0.1 deg at 2 Hz, ego by pose differences), the observation moves from the simulator's on average by 0.11-0.16 (ego), 0.03-0.09 (path), up to 0.40 (target) and 0.53 (context), in normalised units | higher pose resolution, or an ego estimate from the IMU, before the trials; at 10 Hz the decoder's pose differences span 0.1 s and get noisier, so its velocity estimate needs changing with the rate (the bridge decimates the decisions, not the velocity) |
 | Pose point | the July bridge took the telemetry pose as the vessel reference point; whether the localisation reports the LiDAR's (0.86 m ahead) is not established | settle at S1-A, then `--pose-point` |
 | Map frame | `--origin start` assumes the telemetry axes are the basin's and the vessel sits on the path start at the first frame | `--origin map` with the P-7 registration |
-| UDP ports on this laptop | UDP 5000, 5001 and 5050 are held by system services (`nidmsrv.exe`, `lktsrv.exe`, `svchost.exe`); the July bridge listened on 5000 | free ports, or another laptop, before a session; UDP itself is blocked on this laptop's network (UTAS). Personal laptop (2026-11-14): 5000 free, 5050 held by `svchost.exe` (CDPSvc), which affects only a fake vessel on the same machine; no firewall prompt on first listen and no rule for `python.exe`, Wi-Fi profile Public, so an inbound Private-only rule and a Private test network are needed before step 6 of `UDP_BENCH_HANDOVER.md`; step 6 not run (loopback taken as the bench test); the link across devices is first tested at step 7, at the next basin booking |
+| UDP ports on this laptop | UDP 5000, 5001 and 5050 are held by system services (`nidmsrv.exe`, `lktsrv.exe`, `svchost.exe`); the July bridge listened on 5000 | free ports, or another laptop, before a session; UDP itself is blocked on this laptop's network (UTAS). Personal laptop (2026-11-14), the shore laptop for the link to the laptop that controls the vessel: 5000 free, 5050 held by `svchost.exe` (CDPSvc), which affects only a fake vessel on the same machine; UDP not restricted on its networks; step 6 of `UDP_BENCH_HANDOVER.md` not run (the link is not between two bench laptops; loopback taken as the bench test); the link is first tested at step 7, at the next basin booking, with the July ports |
 | Operator stop | the E key acts only while the bridge runs and has focus | a stop independent of the shore laptop belongs to the session's safety plan |
 | Active stop | full astern (S2 = -100) | void until P-8 (ESC reverse) and T-12 |
 | Target footprint (D-1) | the tracker's admission gates and the layer's hull completion assume a target of the own ship's size | measure the real target's detected footprint on the bench |

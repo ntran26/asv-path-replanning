@@ -81,14 +81,13 @@ below, after which the table installs (602 entries).
   run from before the line-ending fix (it stopped at the first active case, whose trace was not
   yet committed) and has no `summary.json`.
 - 2026-11-14, step 2: UDP 5000, 5001, 15000 and 15050 free; 5050 held by `svchost.exe`
-  (service CDPSvc, Connected Devices Platform). 5050 is the vessel's port on the vessel, so the
-  live link (bridge on 5000) is not affected; only the fake vessel moves to 15050 on this laptop.
+  (service CDPSvc, Connected Devices Platform). 5050 is the port of the laptop that controls the
+  vessel, so the live link (bridge on 5000, as in July) is not affected; only the fake vessel
+  moves to 15050 on this laptop.
 - 2026-11-14, step 3: no firewall prompt. Python listened on UDP and then TCP 0.0.0.0:5000
   (90 s and 120 s); no prompt appeared and no rule for `python.exe` exists afterwards
   (notification on listen enabled in all profiles; shell not elevated). The Wi-Fi profile is
-  Public. Loopback (steps 4-5) is unaffected; before step 6 an inbound rule for the venv's
-  `python.exe` on Private networks, and a Private profile for the test network, are needed on
-  this laptop.
+  Public. Loopback (steps 4-5) is unaffected; UDP is not restricted on this laptop's networks.
 - 2026-11-14, step 4 (`shadow_replay/udp_personal_i7/`, e35252f4c, `--port 15050
   --local-port 5000`): `PASSED`. Part A 19/19 logs, 1,085 decisions; 15 logs with a would-be
   stop, would-change 424, pose stale 0. Part B, 2026-07-03 logs 1-3: 49, 43 and 41 decisions,
@@ -103,13 +102,15 @@ below, after which the table installs (602 entries).
   p99 2.08 s, max 3.67 s, 6.9 % over 0.5 s. Background at the start: about 58 % CPU with no
   Python running (a desktop chat application about 44 %, `dwm` about 13 %); Microsoft Store,
   qBittorrent and Proton VPN closed, VPN off.
-- 2026-11-14, step 6: not run; the single-machine loopback test (step 4) stands as the bench
-  test of the UDP path. Inbound UDP from another host, the firewall rule and the network profile
-  are first exercised at step 7.
-- Step 7: scheduled for the start of the next basin booking, before any session, with
+- 2026-11-14, step 6: not run. The link is between this laptop and the laptop that controls
+  the vessel, not between two bench laptops; the single-machine loopback test (step 4) stands
+  as the bench test of the UDP path, and the link across devices is first exercised at step 7.
+- Step 7: scheduled for the start of the next basin booking, before any session. The July
+  set-up is kept: this laptop runs the bridge on 5000, the laptop that controls the vessel
+  listens on 5050 at `--server-ip` (10.201.205.110 in July), and the command line keeps the July
+  bridge's option names (`--shadow` is accepted for `--no-send`):
   `python udp_live_p3.py --server-ip 10.201.205.110 --layout L1 --run-id link-<date> --no-send`.
-  Before that day: an inbound rule for the venv's `python.exe` on private networks only, the
-  vessel's network set to private, the VPN off and other applications closed.
+  On the day, other applications are closed.
 
 ## 5. Conventions of this repository
 
