@@ -457,7 +457,10 @@ def status_lines(handler: FrameHandler, *, run_id, geometry, safety, send, stats
 
 # ---------------------------------------------------------------------------
 def build_parser() -> argparse.ArgumentParser:
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    # Network options, their defaults and the shared flags keep the July bridge's (udp_live_rl.py)
+    # names.  No abbreviations: a July option this bridge lacks must fail, not match a longer one.
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter,
+                                 allow_abbrev=False)
     ap.add_argument("--bind-ip", default="0.0.0.0")
     ap.add_argument("--local-port", type=int, default=5000)
     ap.add_argument("--server-ip", default="127.0.0.1")
@@ -487,7 +490,8 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--shadow-inline", action="store_true",
                     help="run the shadow layer in this process after each command, not in a worker")
     ap.add_argument("--full-filter-trace", action="store_true", help="keep the layer's bulky diagnostics")
-    ap.add_argument("--no-send", action="store_true", help="compute and log, but send no $CMD")
+    ap.add_argument("--no-send", "--shadow", dest="no_send", action="store_true",
+                    help="compute and log, but send no $CMD (--shadow: the July bridge's name)")
     ap.add_argument("--rudder-sign", type=float, default=pb.RUDDER_SIGN)
     ap.add_argument("--no-pose-sync", action="store_true")
     ap.add_argument("--pose-wait-s", type=float, default=p2.POSE_WAIT_S)
