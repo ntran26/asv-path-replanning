@@ -132,8 +132,11 @@ otherwise have matched `--shadow-inline`, and commands would have been sent). No
 rudder-scale options (the command is resolved as the simulator resolves it), the Paper 2
 observation options and the display options.
 
-Geometry, one of: `--layout L1|L2|L3` (Paper 2's basin layouts, `paper2_set.LAYOUTS`),
-`--case <test set v4 ID>` (the simulated twin's map and path, e.g. `P2-L1-HO-FIX-11`),
+Geometry, one of: `--scenario <name>` (a set-up by name through `static_dynamic_obstacles/src/setups.py`,
+the format `src/test_asv.py` also loads: a field test case, `easy_1` ... `hard_5`, with its target
+set-up printed at start-up, or a test set v4 ID),
+`--layout L1|L2|L3` (Paper 2's basin layouts, `paper2_set.LAYOUTS`),
+`--case <test set v4 ID>` (the simulated twin's map and path, e.g. `P2-L1-HO-FIX-03`),
 `--start x,y --goal x,y` (a basin leg), `--test-case N` (the July bridge's `test_run.py`).
 
 Shadow session on the bench, against a July log:

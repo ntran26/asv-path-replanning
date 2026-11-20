@@ -1,22 +1,31 @@
 """Watch a trained policy (PPO, RecurrentPPO, SAC or TQC) and optionally save it as MP4.
 
-    python test_asv.py --algo sac --seed 1                              # a random test set v4 episode
-    python test_asv.py --algo sac --seed 1 --scenario BAS-HO-CV-001     # a chosen one
-    python test_asv.py --algo ppo --seed 2 --set validation --encounter crossing --episodes 3
-    python test_asv.py --algo tqc --set training --episodes 2            # stage-7 training scenarios
-    python test_asv.py --model runs/sac_formulation_seed1_bl3/sac_2500000_steps.zip --scenario DV3-HO-CV-01
-    python test_asv.py --algo sac --seed 1 --scenario BAS-CR-CV-003 --save-mp4 --headless
+    python src/test_asv.py --algo sac --seed 1                              # a random test set v4 episode
+    python src/test_asv.py --algo sac --seed 1 --scenario BAS-HO-CV-001     # a chosen one
+    python src/test_asv.py --algo sac --scenario easy_1 medium_2 hard_5     # field test suite cases
+    python src/test_asv.py --algo sac --set field --encounter head_on       # every field head-on
+    python src/test_asv.py --algo ppo --seed 2 --set validation --encounter crossing --episodes 3
+    python src/test_asv.py --algo tqc --set training --episodes 2            # stage-7 training scenarios
+    python src/test_asv.py --model runs/sac_formulation_seed1_bl3/sac_2500000_steps.zip --scenario DV3-HO-CV-01
+    python src/test_asv.py --algo sac --seed 1 --scenario BAS-CR-CV-003 --save-mp4 --headless
 
-The policy is the run's best checkpoint (`runs/<algo>_formulation_seed<N>_bl3/best_model.zip`)
+Run from the project folder or anywhere else: paths are taken from the project root.  The
+policy is the run's best checkpoint (`runs/<algo>_formulation_seed<N>_bl3/best_model.zip`)
 unless `--model` names a run directory or a `.zip`; the learner is read from the run's
 `config.json` (`--algo` when there is none).  Actions are deterministic, and the safety layer
 is off unless `--safety on`.
 
-Scenario sets:
+Scenario sets (the test and field sets load through `setups.py`, the one format the field
+bridge also reads: a scenario, its episode seed and the plant it runs on):
 
 * **test** (default): test set v4, 1,000 episodes, run exactly as `tools/tiers/test_set.py`
-  runs them (each with its own episode seed).  IDs are its `test_id`s
-  (`results/test_set/v4/definition.csv`), e.g. BAS-HO-CV-001, FS-CRP-FIX-12.
+  runs them (each with its own episode seed; the plant drawn per episode seed).  IDs are its
+  `test_id`s (`results/test_set/v4/definition.csv`), e.g. BAS-HO-CV-001, FS-CRP-FIX-002.
+* **field**: the field test suite, 15 cases `easy_1`-`easy_5`, `medium_1`-`medium_5`,
+  `hard_1`-`hard_5` (`field_test_cases.py`: mode = open basin, layout L1, layouts L2/L3;
+  number = 1 head-on, 2 crossing from starboard, 3 crossing from port, 4 overtaking,
+  5 being overtaken), run as they were verified: the identified plant, each case's episode
+  seed.  `--plant randomised` draws the plant instead.
 * **validation**: the 270-episode validation set as the training evaluations run it
   (formulation overlay installed, episode i seeded 900,000 + i).  The decoupled part
   (120) is numbered here DEV-<HO|CR|OT|BO|NU|NT>-01..20; the coupled part (150) keeps
@@ -25,7 +34,7 @@ Scenario sets:
 * **training**: freshly generated stage-7 training scenarios (random seeds).
 
 `--encounter` (head_on, crossing, overtaking, being_overtaken, null, no_target) filters
-the test and validation sets; `--episodes N` picks N at random and prints their IDs, so
+the test, field and validation sets; `--episodes N` picks N at random and prints their IDs, so
 an episode can be replayed with `--scenario`.
 
 The window shows the field and the telemetry panel.  Keys: SPACE pause, N next episode,
@@ -43,7 +52,7 @@ import time
 from pathlib import Path
 from typing import Dict, List, Optional
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]          # the project folder (this file is in src/)
 LEARNERS = ("ppo", "recurrent_ppo", "sac", "tqc", "td3")
 ENCOUNTERS = ("head_on", "crossing", "overtaking", "being_overtaken", "null", "no_target")
 CLASS_CODES = {"head_on": "HO", "crossing": "CR", "overtaking": "OT", "being_overtaken": "BO",
@@ -58,11 +67,15 @@ def parse_args():
     ap.add_argument("--algo", choices=LEARNERS[:4], help="learner of the run to load (with --seed)")
     ap.add_argument("--seed", type=int, default=0, help="training seed of the run (default 0)")
     ap.add_argument("--model", help="a run directory (its best_model.zip) or a model .zip instead")
-    ap.add_argument("--set", choices=("test", "validation", "training"), default=None,
+    ap.add_argument("--set", choices=("test", "field", "validation", "training"), default=None,
                     help="scenario set (default test; implied by --scenario IDs)")
     ap.add_argument("--scenario", nargs="+", metavar="ID", help="episode IDs to run, in order")
     ap.add_argument("--encounter", choices=ENCOUNTERS, help="only episodes of this encounter type")
-    ap.add_argument("--episodes", type=int, default=1, help="episodes picked at random (default 1)")
+    ap.add_argument("--episodes", type=int, default=1,
+                    help="episodes picked at random (default 1; --set field without --episodes runs every case)")
+    ap.add_argument("--plant", choices=("set", "identified", "randomised"), default="set",
+                    help="vessel model: the set's own (default; test: randomised per episode seed, "
+                         "field: identified), or this one")
     ap.add_argument("--safety", choices=("off", "on"), default="off", help="safety layer (default off)")
     ap.add_argument("--save-mp4", nargs="?", const="auto", default=None, metavar="PATH",
                     help="save each episode as MP4 (default results/videos/<run>_<scenario>.mp4)")
@@ -76,7 +89,8 @@ def resolve_model(args) -> Path:
     if args.model:
         path = Path(args.model)
         if not path.is_absolute():
-            path = path if path.exists() else ROOT / "runs" / path
+            # as given from the current folder, else from the project folder, else under runs/
+            path = next((p for p in (path, ROOT / path, ROOT / "runs" / path) if p.exists()), ROOT / "runs" / path)
     elif args.algo:
         path = ROOT / "runs" / f"{args.algo}_formulation_seed{args.seed}_{args.tag}"
     else:
@@ -130,14 +144,6 @@ def install_overlay(baseline: Dict, cfg, tf) -> None:
         tf.STAGE_SCHEDULE = cfg.CURRICULUM_STAGE_FRACTIONS
 
 
-def test_set() -> List[Dict]:
-    sys.path.insert(0, str(ROOT / "tools" / "tiers"))
-    import test_set as ts
-    kept, _ = ts.build_v4()
-    return [{"id": it["test_id"], "built": it["built"], "seed": int(it["episode_seed"]), "class": it["class"],
-             "about": f"test set v4, {it['source']} {it['cell']} {it['variant']}"} for it in kept]
-
-
 def validation_set(tf, per_class: int, field_set, baseline: Dict) -> List[Dict]:
     """Built as the training evaluation builds it, once per formulation, then read from
     `results/validation_set/` (building takes several minutes)."""
@@ -171,15 +177,27 @@ def pick(items: List[Dict], args) -> List[Dict]:
     import numpy as np
     if args.scenario:
         by_id = {it["id"]: it for it in items}
-        missing = [s for s in args.scenario if s not in by_id]
+        missing = [s for s in args.scenario if s.split(":", 1)[-1] not in by_id]
         if missing:
             raise SystemExit(f"not in the {args.set} set: {', '.join(missing)} (e.g. {', '.join(list(by_id)[:3])})")
-        return [by_id[s] for s in args.scenario]
+        return [by_id[s.split(":", 1)[-1]] for s in args.scenario]
     pool = [it for it in items if args.encounter in (None, it["class"])]
     if not pool:
         raise SystemExit(f"no {args.encounter} episodes in the {args.set} set")
+    if args.set == "field" and args.episodes_given is False:
+        return pool                                     # the field suite: every case, in order
     rng = np.random.default_rng()
     return [pool[i] for i in rng.choice(len(pool), size=min(args.episodes, len(pool)), replace=False)]
+
+
+def set_of(ids: List[str]) -> str:
+    """The set named by --scenario IDs: field cases, validation (DEV-/DV3-) or the test set."""
+    import setups
+    sets = {("validation" if s.startswith(("DEV-", "DV3-")) else
+             "field" if setups.FIELD_NAME.match(s) else "test") for s in ids}
+    if len(sets) > 1:
+        raise SystemExit("--scenario: IDs from one set at a time (test, field or validation)")
+    return sets.pop()
 
 
 def outcome_of(info: Dict) -> str:
@@ -201,13 +219,13 @@ class _Clock:
 
 def main() -> int:
     args = parse_args()
+    args.episodes_given = any(a == "--episodes" or a.startswith("--episodes=") for a in sys.argv[1:])
     if args.headless:
         os.environ["SDL_VIDEODRIVER"] = "dummy"
+    if str(ROOT / "src") not in sys.path:
+        sys.path.insert(0, str(ROOT / "src"))
     if args.scenario and args.set is None:
-        ids = {("validation" if s.startswith(("DEV-", "DV3-")) else "test") for s in args.scenario}
-        if len(ids) > 1:
-            raise SystemExit("--scenario: IDs from one set at a time (test or validation)")
-        args.set = ids.pop()
+        args.set = set_of(args.scenario)
     args.set = args.set or "test"
     if args.set == "training" and (args.scenario or args.encounter):
         raise SystemExit("the training set is generated at random: no --scenario or --encounter")
@@ -216,22 +234,25 @@ def main() -> int:
     model_path = resolve_model(args)
     config = run_config(model_path)
     algo = learner_of(model_path, config, args.algo)
-    sys.path.insert(0, str(ROOT / "src"))
     os.chdir(ROOT)
     import numpy as np
     import constants as cfg
     import curriculum
+    import setups
     import train_formulation as tf
     baseline = baseline_of(config)
-    if args.set != "test":
+    if args.set not in ("test", "field"):
         # The validation and training scenarios as the training process builds and runs
-        # them; the test set runs without the overlay, as tools/tiers/test_set.py does.
+        # them; the test set and the field suite run without the overlay, as
+        # tools/tiers/test_set.py and tools/tiers/field_suite.py do.
         install_overlay(baseline, cfg, tf)
     curriculum.apply_stage(tf.PROPULSION_STAGE)
     from env import ASVLidarEnv
 
-    if args.set == "test":
-        chosen = pick(test_set(), args)
+    plant = {"vessel_randomisation": cfg.VESSEL_RANDOMISATION_SCALE}
+    if args.set in ("test", "field"):
+        chosen = pick(setups.suite(args.set), args)
+        plant = setups.env_kwargs(chosen[0], None if args.plant == "set" else args.plant)
     elif args.set == "validation":
         import formulation_v3
         per_class = int((config.get("eval_per_class") or 20))
@@ -241,13 +262,16 @@ def main() -> int:
         chosen = [{"id": f"TRAIN-S{TRAINING_STAGE}-{s}", "built": None, "seed": int(s), "class": "",
                    "about": f"training scenario, stage {TRAINING_STAGE}"} for s in seeds]
 
+    if args.plant != "set" and args.set not in ("test", "field"):
+        plant = setups.env_kwargs({"plant": args.plant})
     model = tf.ALGORITHMS[algo].load(str(model_path), device="cpu")
     label = run_label(model_path)
+    plant_name = "identified" if plant["vessel_randomisation"] is None else "randomised"
     print(f"{label}: {algo}, {model_path.relative_to(ROOT) if model_path.is_relative_to(ROOT) else model_path}; "
-          f"safety {args.safety}", flush=True)
+          f"safety {args.safety}; plant {plant_name}", flush=True)
     env = ASVLidarEnv(render_mode="human" if render else None, emergency_stop=args.safety == "on",
                       low_speed_start_frac=float(config.get("low_speed_start_frac") or 0.0)
-                      if args.set == "training" else 0.0)
+                      if args.set == "training" else 0.0, **plant)
     if args.set == "training":
         env.set_scenario_stage(TRAINING_STAGE)
     fps = args.fps or 1.0 / cfg.UPDATE_RATE
