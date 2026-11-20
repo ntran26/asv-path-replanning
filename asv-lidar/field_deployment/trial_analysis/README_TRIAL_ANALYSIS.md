@@ -4,7 +4,7 @@ Scripts that turn the trial sessions' logs into the Section 5 tables F1-F5 and t
 the field claims C-15 to C-20 (`static_dynamic_obstacles/planning/PAPER3_CLAIMS_AND_TABLES.md`),
 as `FIELD_TRIALS_PLAN.md` sections 6 and 7 define them. They read files only and open no
 socket: the bridge (`udp_live_p3.py`) writes the logs, and the analysis runs afterwards.
-Committed with the trial pre-registration, before session T1; nothing under
+Committed 2026-11-20, ahead of the trial pre-registration; nothing under
 `static_dynamic_obstacles/src/` or `configs/` changes.
 
 | File | Role |

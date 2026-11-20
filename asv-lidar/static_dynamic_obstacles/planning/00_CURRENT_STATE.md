@@ -74,15 +74,6 @@ validation checkpoint and as the final model. TQC seed 2 resumed from its 750k c
 disk filled on 2026-10-22, a documented interruption; its best checkpoint is 3.0 M (validation
 score +0.378).
 
-**RecurrentPPO seed 1 checkpoint audit (2026-10-28): already complete.** Both test set v4 runs
-completed on 2026-10-18 with 1,000 cases each, safety off, and set digest `a8c40beb234ea7f9`.
-The final model gains 31/1,000 successes overall (0.638 to 0.669), comprising +39/664 decoupled
-and -8/336 coupled. The best validation checkpoint at 1.6 M stays the headline; the final model
-is a selection-sensitivity diagnostic only. No evaluation was re-run or checkpoint reselected.
-Both workflow exits were 0, and no evaluation failure was found in the retained logs; the
-historical mid-training collapse is distinct from an evaluation failure. Evidence and comparison:
-[checkpoint audit](../results/baseline_v3/recurrent_ppo_seed1_checkpoint_audit.md).
-
 **Test set v4 success at the best checkpoint** (seed mean, seed range; from the results file,
 2026-10-25):
 
@@ -156,15 +147,14 @@ mitigate the collision rate (a higher success rate is welcome, not required). Re
      telemetry resolution too coarse for the ego inputs (P-1, O-2); UDP ports 5000, 5001 and 5050
      taken on this laptop.
    - Still waiting on the bench checks (ESC reversal P-8, shore-laptop run time P-10).
-   - **Trial analysis scripts written (2026-11-11, not committed):** `field_deployment/trial_analysis/`
+   - **Trial analysis scripts written (2026-11-11; committed 2026-11-20, 3bdc96ca8):** `field_deployment/trial_analysis/`
      (`README_TRIAL_ANALYSIS.md`): tables F1-F5 and the verdicts of C-15 (water part) to C-20 from
      the bridge logs, the run sheet and the ground-truth tracks; closed-loop twin with the target on
      its measured track; open-loop replay through both models; coverage report for C-19. Files
      only, no UDP. Self-tested on 12 simulated test set v4 episodes logged through the bridge core:
      rule checks 11/11 equal to `colregs_compliance.py`, twins reproduce 12/12 outcomes, clearances
      and classification agreement equal to the simulator's. The definitions that decide registered
-     verdicts are listed in the README for confirmation before the pre-registration. Committed with
-     the pre-registration, before T1.
+     verdicts are listed in the README for confirmation before the pre-registration.
    - **IMU case for the supervision meeting:** `planning/IMU_CASE_FOR_MEETING.md` (O-2: why the
      IMU, tied to the simulator's ego-noise assumption, and the fallback).
    - **UDP bench moved to a second laptop (2026-11-14):** the university network blocks UDP;
@@ -182,11 +172,11 @@ mitigate the collision rate (a higher success rate is welcome, not required). Re
      opens the next basin booking and is the first two-device UDP test, with the July link
      unchanged: the personal laptop (the shore laptop, O-10 decided; UDP unrestricted, as in
      July) on 5000 to the vessel-control laptop on 5050. `udp_live_p3.py` parser fixed
-     (uncommitted): the July `--shadow` prefix-matched `--shadow-inline` and would have sent
+     (pushed, 8619c840b): the July `--shadow` prefix-matched `--shadow-inline` and would have sent
      commands; `--shadow` is now an alias of `--no-send` and abbreviations are refused.
      Results pushed from that laptop (86fd2a7b6: handover note section 4, `README_P3_BRIDGE.md`,
      bench outputs); P-9 to P-11, O-10, section 3a and T-14 of `FIELD_CALIBRATION_PLAN.md`
-     updated (uncommitted).
+     updated (committed 2026-11-20, ae98498c9).
    - **Unused `src/` modules archived (2026-11-20):** `compare`, `rollout`, `train`,
      `train_ppo_baseline`, `train_sac_baseline`, `ship_v2`, `safety_fast_geometry`,
      `safety_reachability`, with their 5 tests, the `rollout`/`train` half of
