@@ -1,0 +1,407 @@
+[
+ {
+  "case": "medium_1",
+  "encounter": "head_on",
+  "side": "",
+  "layout": "L1",
+  "t_track_s": 9.5,
+  "track_range_m": 7.472648054301338,
+  "oracle_starts_s": [
+   9.5,
+   10.5,
+   11.5,
+   12.5,
+   13.5,
+   14.5,
+   15.5,
+   16.5,
+   17.5
+  ],
+  "oracle": {
+   "port": {
+    "rollouts": 243,
+    "goal_margin": 79,
+    "goal_margin_rule": 0
+   },
+   "speed": {
+    "rollouts": 54,
+    "goal_margin": 54,
+    "goal_margin_rule": 0
+   },
+   "stand_on": {
+    "rollouts": 9,
+    "goal_margin": 9,
+    "goal_margin_rule": 0
+   },
+   "starboard": {
+    "rollouts": 243,
+    "goal_margin": 195,
+    "goal_margin_rule": 0
+   }
+  },
+  "oracle_rule_examples": {},
+  "policy": {
+   "with_panels": {
+    "goals": 10,
+    "goals_rule": 0,
+    "first_manoeuvre": [
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port"
+    ],
+    "target_side_at_cpa": [
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard"
+    ]
+   },
+   "without_panels": {
+    "goals": 10,
+    "goals_rule": 0,
+    "first_manoeuvre": [
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port"
+    ],
+    "target_side_at_cpa": [
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard"
+    ]
+   }
+  }
+ },
+ {
+  "case": "medium_2",
+  "encounter": "crossing",
+  "side": "starboard",
+  "layout": "L1",
+  "t_track_s": 2.0,
+  "track_range_m": 5.698280439921499,
+  "oracle_starts_s": [
+   2.0,
+   3.0,
+   4.0,
+   5.0,
+   6.0,
+   7.0,
+   8.0,
+   9.0,
+   10.0
+  ],
+  "oracle": {
+   "port": {
+    "rollouts": 243,
+    "goal_margin": 15,
+    "goal_margin_rule": 0
+   },
+   "speed": {
+    "rollouts": 54,
+    "goal_margin": 12,
+    "goal_margin_rule": 0
+   },
+   "stand_on": {
+    "rollouts": 9,
+    "goal_margin": 2,
+    "goal_margin_rule": 0
+   },
+   "starboard": {
+    "rollouts": 243,
+    "goal_margin": 52,
+    "goal_margin_rule": 0
+   }
+  },
+  "oracle_rule_examples": {},
+  "policy": {
+   "with_panels": {
+    "goals": 10,
+    "goals_rule": 0,
+    "first_manoeuvre": [
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port"
+    ],
+    "target_side_at_cpa": [
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard"
+    ]
+   },
+   "without_panels": {
+    "goals": 9,
+    "goals_rule": 0,
+    "first_manoeuvre": [
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port"
+    ],
+    "target_side_at_cpa": [
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard"
+    ]
+   }
+  }
+ },
+ {
+  "case": "hard_5",
+  "encounter": "being_overtaken",
+  "side": "",
+  "layout": "L2",
+  "t_track_s": 1.0,
+  "track_range_m": 3.894137279315986,
+  "oracle_starts_s": [
+   1.0,
+   2.0,
+   3.0,
+   4.0,
+   5.0,
+   6.0,
+   7.0,
+   8.0,
+   9.0
+  ],
+  "oracle": {
+   "port": {
+    "rollouts": 243,
+    "goal_margin": 156,
+    "goal_margin_rule": 132
+   },
+   "speed": {
+    "rollouts": 54,
+    "goal_margin": 54,
+    "goal_margin_rule": 48
+   },
+   "stand_on": {
+    "rollouts": 9,
+    "goal_margin": 9,
+    "goal_margin_rule": 9
+   },
+   "starboard": {
+    "rollouts": 243,
+    "goal_margin": 5,
+    "goal_margin_rule": 5
+   }
+  },
+  "oracle_rule_examples": {
+   "port": "t0=1 s dpsi=-70 tau=+0 D=4",
+   "speed": "t0=1 s dpsi=+0 tau=-0.5 D=4",
+   "stand_on": "t0=1 s dpsi=+0 tau=+0 D=4",
+   "starboard": "t0=4 s dpsi=+20 tau=-1 D=8"
+  },
+  "policy": {
+   "with_panels": {
+    "goals": 10,
+    "goals_rule": 0,
+    "first_manoeuvre": [
+     "starboard",
+     "none",
+     "starboard",
+     "none",
+     "starboard",
+     "starboard",
+     "none",
+     "starboard",
+     "starboard",
+     "starboard"
+    ],
+    "target_side_at_cpa": [
+     "port",
+     "starboard",
+     "port",
+     "starboard",
+     "starboard",
+     "port",
+     "starboard",
+     "port",
+     "starboard",
+     "port"
+    ]
+   },
+   "without_panels": {
+    "goals": 10,
+    "goals_rule": 0,
+    "first_manoeuvre": [
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port"
+    ],
+    "target_side_at_cpa": [
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard"
+    ]
+   }
+  }
+ },
+ {
+  "case": "easy_1",
+  "encounter": "head_on",
+  "side": "",
+  "layout": "OPEN",
+  "t_track_s": 1.5,
+  "track_range_m": 12.320732037617134,
+  "oracle_starts_s": [
+   1.5,
+   2.5,
+   3.5,
+   4.5,
+   5.5,
+   6.5,
+   7.5,
+   8.5,
+   9.5
+  ],
+  "oracle": {
+   "port": {
+    "rollouts": 243,
+    "goal_margin": 2,
+    "goal_margin_rule": 0
+   },
+   "speed": {
+    "rollouts": 54,
+    "goal_margin": 0,
+    "goal_margin_rule": 0
+   },
+   "stand_on": {
+    "rollouts": 9,
+    "goal_margin": 0,
+    "goal_margin_rule": 0
+   },
+   "starboard": {
+    "rollouts": 243,
+    "goal_margin": 75,
+    "goal_margin_rule": 75
+   }
+  },
+  "oracle_rule_examples": {
+   "starboard": "t0=1.5 s dpsi=+20 tau=-1 D=8"
+  },
+  "policy": {
+   "with_panels": {
+    "goals": 10,
+    "goals_rule": 10,
+    "first_manoeuvre": [
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard"
+    ],
+    "target_side_at_cpa": [
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port"
+    ]
+   },
+   "without_panels": {
+    "goals": 10,
+    "goals_rule": 10,
+    "first_manoeuvre": [
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard",
+     "starboard"
+    ],
+    "target_side_at_cpa": [
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port",
+     "port"
+    ]
+   }
+  }
+ }
+]
