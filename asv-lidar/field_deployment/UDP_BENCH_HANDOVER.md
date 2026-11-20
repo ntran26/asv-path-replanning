@@ -119,6 +119,22 @@ path, and the `.venv` was removed; shadow parity on the base install (`parity/pe
   vessel-control laptop sends from 5050 after START. If frames do not arrive, an inbound allow
   rule for the Python 3.10.11 interpreter (`%LOCALAPPDATA%\Programs\Python\Python310\python.exe`;
   a venv's `python.exe` only starts it), added with administrator rights.
+- 2026-11-20, February 2026 logs (`data/test_1.log` to `test_4.log`: raw 10 Hz vessel streams
+  with no `#CONFIG` line and no IMU), shadow replay with `--test-case 0` (option added in
+  04d6fd731), fake vessel on 15050 and bridge on 5000: `PASSED` before and after the ego window.
+  Before it (`shadow_replay/feb_logs_personal_i7/`, 35736af0a): part A 4/4 logs, 418, 162, 156
+  and 443 decisions (1,179), equal to the university laptop's replay of the same logs; pose
+  stale 0; part B 4/4 with `same_as_A=True` and `offline=True`. With it
+  (`shadow_replay/feb_logs_personal_i7_ego/`, 76a984450, `--ego-window-s` 0.5 s): the same
+  decision counts and part-B result; `telemetry.ego_dt_s` median 0.500 s, p99 0.507 s, max
+  0.602 s (n = 1,176); the largest speed in the decisions fell from 2.03, 1.45, 2.33 and
+  2.24 m/s to 1.41, 1.08, 1.71 and 1.62 m/s. The console's "Max velocity" (2.367 m/s) comes from
+  `log_parser`'s decoder over 0.1 s and is not the bridge's ego estimate. The shadow layer
+  changed only on test_2 (would-change 124 -> 98, first would-stop at decision 38 -> 68) and
+  test_4 (would-change 401 -> 402). LiDAR line to sent p50 37.0 ms, p99 82.0 ms, max 111.2 ms
+  (n = 1,175) with other applications running; p99 below 0.5 s on both runs. Phantom dynamic
+  tracks on 36, 19, 19 and 46 % of decisions (no map registration, P-7), so the would-stops
+  under test-case-0 geometry carry no meaning. The outputs stay on that laptop, uncommitted.
 
 ## 5. Conventions of this repository
 
