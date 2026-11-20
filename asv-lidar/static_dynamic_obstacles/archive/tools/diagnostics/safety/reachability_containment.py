@@ -30,8 +30,8 @@ for _key in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
 import numpy as np
 import mpmath
 
-ROOT = Path(__file__).resolve().parents[3]
-sys.path[:0] = [str(ROOT / "src"), str(ROOT)]
+ROOT = Path(__file__).resolve().parents[4]      # the project folder (archived under archive/tools/diagnostics/safety)
+sys.path[:0] = [str(ROOT / "src"), str(ROOT / "archive" / "src"), str(ROOT)]   # safety_reachability.py, archived
 from safety_reachability import (ConditionalPlantTube, EnclosureFailure,
                                  IntervalBounds, PARAMETER_NAMES)
 
@@ -390,7 +390,7 @@ def main():
             bootstrap_count=len(bootstrap), deterministic_full_support=False, probability_claim=False,
             initial_servo_at_reset_rad=0., all_past_issued_commands_used=True),
         provenance=dict(own=provenance, target=target_provenance,
-            script_sha256=sha(Path(__file__)), core_sha256=sha(ROOT/"src/safety_reachability.py"),
+            script_sha256=sha(Path(__file__)), core_sha256=sha(ROOT/"archive/src/safety_reachability.py"),
             runtime=dict(python=platform.python_version(), numpy=np.__version__,
                          mpmath=mpmath.__version__, native_thread_environment={
                              key: os.environ[key] for key in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS",

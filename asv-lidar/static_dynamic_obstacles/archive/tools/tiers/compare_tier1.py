@@ -18,9 +18,10 @@ from pathlib import Path
 
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]      # the project folder (archived under archive/tools/tiers)
 RESULTS = ROOT / "results" / "tiers"
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "archive" / "src"))     # compare.py, archived 2026-11-20
 from compare import mcnemar_exact  # noqa: E402
 
 CLASS_ORDER = ["head_on", "crossing", "overtaking", "being_overtaken", "null", "no_target"]
