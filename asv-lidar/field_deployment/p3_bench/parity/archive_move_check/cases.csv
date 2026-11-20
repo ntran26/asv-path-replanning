@@ -1,0 +1,5 @@
+case,mode,outcome,passed,decisions,obs,action,command,layer,layer_worker,worker_obs,layer_changed,layer_stop_at,trace_passed,trace_mismatches,elapsed_s,first_mismatch
+TS4:BAS-CR-CV-013,shadow,collision:target,True,13,0,0,0,0,0,0,8,10,,,21.851808400002483,{}
+TS4:BAS-CR-CV-013,active,stopped,True,89,0,0,0,0,0,0,78,14,True,0,26.931586699996842,{}
+TS4:P2-L1-CRP-FIX-05,shadow,collision:target,True,18,0,0,0,0,0,0,6,15,,,17.403451300000597,{}
+TS4:P2-L1-CRP-FIX-05,active,stopped,True,83,0,0,0,0,0,0,60,29,True,0,36.03392900000108,{}

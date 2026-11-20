@@ -1,0 +1,25 @@
+{
+ "run_id": "july-2026-07-02-trial_7",
+ "geometry": "test_run case 3",
+ "safety": "shadow",
+ "lines": 83,
+ "backlog_frames": 0,
+ "backlog_max": 0,
+ "decisions": 41,
+ "frames_skipped": 0,
+ "errors": 0,
+ "pose_sync": {
+  "released": 41,
+  "stale": 0,
+  "superseded": 0
+ },
+ "shadow": {
+  "decisions": 41,
+  "changes": 9,
+  "first_change": 17,
+  "committed": 38,
+  "obs_mismatches": 0
+ },
+ "active_layer": null,
+ "operator_stops": []
+}
