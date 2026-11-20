@@ -19,9 +19,13 @@ line to command sent (pose-sync wait included), and the shadow layer per decisio
 The July runs had no target, so the layer is mostly idle here; the encounter-rich timing is
 `p3_timing.py`'s.
 
+Raw vessel logs without the July bridge's #CONFIG line (the February 2026 logs in data/) take
+their geometry from --test-case.
+
 Usage (from field_deployment/):
     python p3_shadow_replay.py
     python p3_shadow_replay.py --udp-logs 2026-07-03/1.log --skip-inproc
+    python p3_shadow_replay.py --logs "data/test_*.log" --udp-logs data/test_3.log --test-case 0
 Output: p3_bench/shadow_replay/<tag>/ (summary.json, timing.csv, the runs' own logs).
 """
 
@@ -50,6 +54,7 @@ from log_parser import BluefinStreamDecoder
 OUT_ROOT = os.path.join(pb.HERE, "p3_bench", "shadow_replay")
 TS_RE = re.compile(r"^\[(\d{2}):(\d{2}):(\d{2})\.(\d{6})\]")
 DEFAULT_UDP_LOGS = ("2026-07-03/1.log", "2026-07-03/2.log", "2026-07-03/3.log")
+FALLBACK_TEST_CASE: Optional[int] = None    # --test-case, for logs without a #CONFIG line
 
 
 def line_time(line: str) -> Optional[float]:
@@ -65,13 +70,17 @@ def log_test_case(path: str) -> int:
     with open(path, errors="ignore") as fh:
         first = fh.readline()
     m = re.search(r"test_case=(\d+)", first)
-    if not m:
-        raise ValueError(f"{path}: no test_case in its #CONFIG line")
-    return int(m.group(1))
+    if m:
+        return int(m.group(1))
+    if FALLBACK_TEST_CASE is not None:
+        return FALLBACK_TEST_CASE
+    raise ValueError(f"{path}: no test_case in its #CONFIG line (give --test-case)")
 
 
 def run_id_for(path: str) -> str:
-    return "july-" + os.path.relpath(path, pb.HERE).replace(os.sep, "-").replace("/", "-").replace(".log", "")
+    rel = os.path.relpath(path, pb.HERE).replace(os.sep, "/")
+    prefix = "july-" if rel.startswith("2026-07") else "log-"
+    return prefix + rel.replace("/", "-").replace(".log", "")
 
 
 def args_for(path: str, out_dir: str, extra: List[str] = ()) -> argparse.Namespace:
@@ -275,7 +284,11 @@ def main() -> int:
     ap.add_argument("--port", type=int, default=15050, help="the fake vessel's port")
     ap.add_argument("--local-port", type=int, default=15000, help="the bridge's port")
     ap.add_argument("--idle-exit-s", type=float, default=5.0)
+    ap.add_argument("--test-case", type=int, default=None,
+                    help="geometry for logs without a #CONFIG line (the July bridge's test_run case)")
     args = ap.parse_args()
+    global FALLBACK_TEST_CASE
+    FALLBACK_TEST_CASE = args.test_case
     out = os.path.join(OUT_ROOT, args.tag)
     os.makedirs(out, exist_ok=False)
     summary = {"tag": args.tag, "inproc": [], "udp": [], "git_head": pb.git_head()}
