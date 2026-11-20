@@ -1,0 +1,388 @@
+{
+  "rules": [
+    {
+      "run_id": "syn-P2-L1-HO-FIX-03",
+      "agree": true,
+      "differences": {},
+      "cpa_field": 1.4585,
+      "cpa_sim": 1.4585
+    },
+    {
+      "run_id": "syn-P2-L1-CRS-FIX-05",
+      "agree": true,
+      "differences": {},
+      "cpa_field": 2.8139,
+      "cpa_sim": 2.8139
+    },
+    {
+      "run_id": "syn-P2-L1-CRP-FIX-05",
+      "agree": true,
+      "differences": {},
+      "cpa_field": 1.5307,
+      "cpa_sim": 1.3027
+    },
+    {
+      "run_id": "syn-P2-L1-OT-FIX-01",
+      "agree": true,
+      "differences": {},
+      "cpa_field": 4.336,
+      "cpa_sim": 4.336
+    },
+    {
+      "run_id": "syn-P2-L2-HO-VAR-04",
+      "agree": true,
+      "differences": {},
+      "cpa_field": 3.0699,
+      "cpa_sim": 2.9786
+    },
+    {
+      "run_id": "syn-P2-L3-HO-FIX-05",
+      "agree": true,
+      "differences": {},
+      "cpa_field": 4.0732,
+      "cpa_sim": 4.0732
+    },
+    {
+      "run_id": "syn-BAS-HO-CV-001",
+      "agree": true,
+      "differences": {},
+      "cpa_field": 3.2948,
+      "cpa_sim": 3.2948
+    },
+    {
+      "run_id": "syn-BAS-CR-CV-003",
+      "agree": true,
+      "differences": {},
+      "cpa_field": 1.4705,
+      "cpa_sim": 1.4705
+    },
+    {
+      "run_id": "syn-BAS-CR-CV-005",
+      "agree": true,
+      "differences": {},
+      "cpa_field": 2.3862,
+      "cpa_sim": 2.3862
+    },
+    {
+      "run_id": "syn-BAS-OT-CV-003",
+      "agree": true,
+      "differences": {},
+      "cpa_field": 2.141,
+      "cpa_sim": 2.141
+    },
+    {
+      "run_id": "syn-BAS-BO-CV-001",
+      "agree": true,
+      "differences": {},
+      "cpa_field": 2.1669,
+      "cpa_sim": 2.1669
+    }
+  ],
+  "open_loop": [
+    {
+      "run_id": "syn-P2-L1-HO-FIX-03",
+      "horizon": "3 s",
+      "episode_heading_rms_deg": 0.518,
+      "episode_position_rms_m": 0.011,
+      "identified_heading_rms_deg": 2.27,
+      "identified_position_rms_m": 0.046,
+      "other_heading_rms_deg": 2.405,
+      "other_position_rms_m": 0.05
+    },
+    {
+      "run_id": "syn-P2-L1-CRS-FIX-05",
+      "horizon": "3 s",
+      "episode_heading_rms_deg": 0.484,
+      "episode_position_rms_m": 0.012,
+      "identified_heading_rms_deg": 0.977,
+      "identified_position_rms_m": 0.024,
+      "other_heading_rms_deg": 1.02,
+      "other_position_rms_m": 0.022
+    },
+    {
+      "run_id": "syn-P2-L1-CRP-FIX-05",
+      "horizon": "3 s",
+      "episode_heading_rms_deg": 0.619,
+      "episode_position_rms_m": 0.01,
+      "identified_heading_rms_deg": 3.463,
+      "identified_position_rms_m": 0.06,
+      "other_heading_rms_deg": 3.717,
+      "other_position_rms_m": 0.064
+    },
+    {
+      "run_id": "syn-P2-L1-OT-FIX-01",
+      "horizon": "3 s",
+      "episode_heading_rms_deg": 0.515,
+      "episode_position_rms_m": 0.015,
+      "identified_heading_rms_deg": 2.115,
+      "identified_position_rms_m": 0.04,
+      "other_heading_rms_deg": 2.418,
+      "other_position_rms_m": 0.044
+    },
+    {
+      "run_id": "syn-P2-L2-HO-VAR-04",
+      "horizon": "3 s",
+      "episode_heading_rms_deg": 0.507,
+      "episode_position_rms_m": 0.01,
+      "identified_heading_rms_deg": 2.341,
+      "identified_position_rms_m": 0.035,
+      "other_heading_rms_deg": 2.38,
+      "other_position_rms_m": 0.036
+    },
+    {
+      "run_id": "syn-P2-L3-HO-FIX-05",
+      "horizon": "3 s",
+      "episode_heading_rms_deg": 0.537,
+      "episode_position_rms_m": 0.016,
+      "identified_heading_rms_deg": 1.097,
+      "identified_position_rms_m": 0.035,
+      "other_heading_rms_deg": 1.328,
+      "other_position_rms_m": 0.031
+    },
+    {
+      "run_id": "syn-P2-L1-NT-01",
+      "horizon": "3 s",
+      "episode_heading_rms_deg": 0.445,
+      "episode_position_rms_m": 0.014,
+      "identified_heading_rms_deg": 0.457,
+      "identified_position_rms_m": 0.022,
+      "other_heading_rms_deg": 0.597,
+      "other_position_rms_m": 0.019
+    },
+    {
+      "run_id": "syn-BAS-HO-CV-001",
+      "horizon": "3 s",
+      "episode_heading_rms_deg": 0.223,
+      "episode_position_rms_m": 0.012,
+      "identified_heading_rms_deg": 0.278,
+      "identified_position_rms_m": 0.012,
+      "other_heading_rms_deg": 0.264,
+      "other_position_rms_m": 0.013
+    },
+    {
+      "run_id": "syn-BAS-CR-CV-003",
+      "horizon": "3 s",
+      "episode_heading_rms_deg": 0.294,
+      "episode_position_rms_m": 0.023,
+      "identified_heading_rms_deg": 1.767,
+      "identified_position_rms_m": 0.044,
+      "other_heading_rms_deg": 1.71,
+      "other_position_rms_m": 0.047
+    },
+    {
+      "run_id": "syn-BAS-CR-CV-005",
+      "horizon": "3 s",
+      "episode_heading_rms_deg": 0.417,
+      "episode_position_rms_m": 0.009,
+      "identified_heading_rms_deg": 0.624,
+      "identified_position_rms_m": 0.022,
+      "other_heading_rms_deg": 0.609,
+      "other_position_rms_m": 0.018
+    },
+    {
+      "run_id": "syn-BAS-OT-CV-003",
+      "horizon": "3 s",
+      "episode_heading_rms_deg": 0.436,
+      "episode_position_rms_m": 0.013,
+      "identified_heading_rms_deg": 2.708,
+      "identified_position_rms_m": 0.049,
+      "other_heading_rms_deg": 2.845,
+      "other_position_rms_m": 0.055
+    },
+    {
+      "run_id": "syn-BAS-BO-CV-001",
+      "horizon": "3 s",
+      "episode_heading_rms_deg": 0.728,
+      "episode_position_rms_m": 0.016,
+      "identified_heading_rms_deg": 0.615,
+      "identified_position_rms_m": 0.018,
+      "other_heading_rms_deg": 0.657,
+      "other_position_rms_m": 0.015
+    }
+  ],
+  "twins": [
+    {
+      "run_id": "syn-P2-L1-HO-FIX-03",
+      "sim_outcome": "goal",
+      "twin_outcome": "goal",
+      "outcome_equal": true,
+      "max_track_deviation_m": 1e-06,
+      "field_minus_sim_metrics": {
+        "min_target_range": -0.0,
+        "min_obstacle_clearance": 0.0,
+        "min_boundary_clearance": 0.0,
+        "path_efficiency": -0.0222,
+        "rms_cte": 0.0144,
+        "mean_speed": -0.0036
+      }
+    },
+    {
+      "run_id": "syn-P2-L1-CRS-FIX-05",
+      "sim_outcome": "goal",
+      "twin_outcome": "goal",
+      "outcome_equal": true,
+      "max_track_deviation_m": 1e-06,
+      "field_minus_sim_metrics": {
+        "min_target_range": -0.0,
+        "min_obstacle_clearance": -0.0,
+        "min_boundary_clearance": 0.0,
+        "path_efficiency": -0.0181,
+        "rms_cte": 0.0119,
+        "mean_speed": -0.0007
+      }
+    },
+    {
+      "run_id": "syn-P2-L1-CRP-FIX-05",
+      "sim_outcome": "collision:target",
+      "twin_outcome": "collision:target",
+      "outcome_equal": true,
+      "max_track_deviation_m": 0.183782,
+      "field_minus_sim_metrics": {
+        "min_target_range": 0.2809,
+        "min_obstacle_clearance": 0.0,
+        "min_boundary_clearance": 0.0,
+        "path_efficiency": -0.0232,
+        "rms_cte": -0.1018,
+        "mean_speed": -0.0089
+      }
+    },
+    {
+      "run_id": "syn-P2-L1-OT-FIX-01",
+      "sim_outcome": "goal",
+      "twin_outcome": "goal",
+      "outcome_equal": true,
+      "max_track_deviation_m": 1e-06,
+      "field_minus_sim_metrics": {
+        "min_target_range": 0.0,
+        "min_obstacle_clearance": 0.0,
+        "min_boundary_clearance": 0.0,
+        "path_efficiency": -0.0228,
+        "rms_cte": 0.0131,
+        "mean_speed": -0.0002
+      }
+    },
+    {
+      "run_id": "syn-P2-L2-HO-VAR-04",
+      "sim_outcome": "collision:obstacle",
+      "twin_outcome": "collision:obstacle",
+      "outcome_equal": true,
+      "max_track_deviation_m": 0.0,
+      "field_minus_sim_metrics": {
+        "min_target_range": 0.0582,
+        "min_obstacle_clearance": 0.0156,
+        "min_boundary_clearance": 0.0,
+        "path_efficiency": -0.0043,
+        "rms_cte": -0.0934,
+        "mean_speed": 0.0213
+      }
+    },
+    {
+      "run_id": "syn-P2-L3-HO-FIX-05",
+      "sim_outcome": "goal",
+      "twin_outcome": "goal",
+      "outcome_equal": true,
+      "max_track_deviation_m": 1e-06,
+      "field_minus_sim_metrics": {
+        "min_target_range": 0.0,
+        "min_obstacle_clearance": 0.0,
+        "min_boundary_clearance": 0.0,
+        "path_efficiency": -0.0185,
+        "rms_cte": 0.0143,
+        "mean_speed": 0.0015
+      }
+    },
+    {
+      "run_id": "syn-P2-L1-NT-01",
+      "sim_outcome": "goal",
+      "twin_outcome": "goal",
+      "outcome_equal": true,
+      "max_track_deviation_m": 1e-06,
+      "field_minus_sim_metrics": {
+        "min_obstacle_clearance": 0.0,
+        "min_boundary_clearance": 0.0,
+        "path_efficiency": -0.019,
+        "rms_cte": 0.0116,
+        "mean_speed": -0.0018
+      }
+    },
+    {
+      "run_id": "syn-BAS-HO-CV-001",
+      "sim_outcome": "goal",
+      "twin_outcome": "goal",
+      "outcome_equal": true,
+      "max_track_deviation_m": 1e-06,
+      "field_minus_sim_metrics": {
+        "min_target_range": 0.0,
+        "min_obstacle_clearance": 0.0,
+        "min_boundary_clearance": 0.0,
+        "path_efficiency": -0.0195,
+        "rms_cte": 0.0136,
+        "mean_speed": -0.0004
+      }
+    },
+    {
+      "run_id": "syn-BAS-CR-CV-003",
+      "sim_outcome": "goal",
+      "twin_outcome": "goal",
+      "outcome_equal": true,
+      "max_track_deviation_m": 1e-06,
+      "field_minus_sim_metrics": {
+        "min_target_range": 0.0,
+        "min_obstacle_clearance": 0.0,
+        "min_boundary_clearance": 0.0,
+        "path_efficiency": -0.0185,
+        "rms_cte": 0.0165,
+        "mean_speed": -0.0014
+      }
+    },
+    {
+      "run_id": "syn-BAS-CR-CV-005",
+      "sim_outcome": "goal",
+      "twin_outcome": "goal",
+      "outcome_equal": true,
+      "max_track_deviation_m": 1e-06,
+      "field_minus_sim_metrics": {
+        "min_target_range": -0.0,
+        "min_obstacle_clearance": -0.0,
+        "min_boundary_clearance": 0.0,
+        "path_efficiency": -0.0179,
+        "rms_cte": 0.0132,
+        "mean_speed": 0.0024
+      }
+    },
+    {
+      "run_id": "syn-BAS-OT-CV-003",
+      "sim_outcome": "goal",
+      "twin_outcome": "goal",
+      "outcome_equal": true,
+      "max_track_deviation_m": 1e-06,
+      "field_minus_sim_metrics": {
+        "min_target_range": 0.0,
+        "min_obstacle_clearance": 0.0,
+        "min_boundary_clearance": 0.0,
+        "path_efficiency": -0.0171,
+        "rms_cte": 0.012,
+        "mean_speed": 0.0036
+      }
+    },
+    {
+      "run_id": "syn-BAS-BO-CV-001",
+      "sim_outcome": "goal",
+      "twin_outcome": "goal",
+      "outcome_equal": true,
+      "max_track_deviation_m": 1e-06,
+      "field_minus_sim_metrics": {
+        "min_target_range": -0.0,
+        "min_boundary_clearance": 0.0753,
+        "path_efficiency": -0.0331,
+        "rms_cte": -0.018,
+        "mean_speed": -0.0063
+      }
+    }
+  ],
+  "summary": {
+    "rule_checks_agree": "11 / 11",
+    "twin_outcomes_equal": "12 / 12",
+    "twin_max_track_deviation_m": 0.183782
+  }
+}
