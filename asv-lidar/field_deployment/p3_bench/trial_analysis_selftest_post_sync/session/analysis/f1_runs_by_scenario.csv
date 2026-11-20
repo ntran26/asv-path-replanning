@@ -1,0 +1,12 @@
+scenario,family,encounter,layout,valid / runs,goals,contact panel,contact boundary,contact target,operator stops,would-be layer stops,"min target range m (median, range)",simulated twin cell
+A-L1,A,none,L1,1 / 1,1,0,0,0,0,0,,
+B-being_overtaken,B,being_overtaken,open,1 / 1,1,0,0,0,0,0,2.17 (2.17-2.17),
+B-crossing_port,B,crossing_port,open,2 / 2,2,0,0,0,0,0,1.93 (1.47-2.39),
+B-head_on,B,head_on,open,1 / 1,1,0,0,0,0,0,3.29 (3.29-3.29),
+B-overtaking,B,overtaking,open,1 / 1,1,0,0,0,0,0,2.14 (2.14-2.14),
+C-L1-CRP,C,crossing_port,L1,1 / 1,0,0,0,1,0,1,1.53 (1.53-1.53),L1-CRP: 2 / 11
+C-L1-CRS,C,crossing_starboard,L1,1 / 1,1,0,0,0,0,0,2.81 (2.81-2.81),L1-CRS: 7 / 12
+C-L1-HO,C,head_on,L1,1 / 1,1,0,0,0,0,0,1.46 (1.46-1.46),L1-HO: 10 / 10
+C-L1-OT,C,overtaking,L1,1 / 1,1,0,0,0,0,0,4.34 (4.34-4.34),L1-OT: 6 / 10
+C-L2-HO,C,head_on,L2,1 / 1,0,1,0,0,0,0,3.07 (3.07-3.07),L2-HO: 0 / 5
+C-L3-HO,C,head_on,L3,1 / 1,1,0,0,0,0,0,4.07 (4.07-4.07),L3-HO: 4 / 5

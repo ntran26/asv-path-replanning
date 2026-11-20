@@ -1,0 +1,144 @@
+{
+  "C-16": {
+    "per_type": {
+      "head_on": {
+        "runs": 1,
+        "eligible": 1,
+        "pass": 0,
+        "met": false
+      },
+      "crossing_starboard": {
+        "runs": 0,
+        "eligible": 0,
+        "pass": 0,
+        "met": false
+      },
+      "crossing_port": {
+        "runs": 2,
+        "eligible": 2,
+        "pass": 1,
+        "met": false
+      },
+      "overtaking": {
+        "runs": 1,
+        "eligible": 1,
+        "pass": 0,
+        "met": false
+      }
+    },
+    "met": false,
+    "rule": "at least 2 eligible runs pass in each of the four core types"
+  },
+  "C-17": {
+    "field_goals": 4,
+    "field_runs": 6,
+    "pooled_sim_rate": 0.5471698113207547,
+    "lower_bound": 1,
+    "met": true,
+    "variants": [
+      "FIX",
+      "VAR"
+    ],
+    "results": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\static_dynamic_obstacles\\results\\test_set\\v4\\sacs0_bl3_metrics\\episodes.csv",
+    "run_weighted_sim_rate": 0.5275252525252525,
+    "per_cell": [
+      {
+        "cell": "L1-CRP",
+        "field_goals": 0,
+        "field_runs": 1,
+        "sim_goals": 2,
+        "sim_episodes": 11
+      },
+      {
+        "cell": "L1-CRS",
+        "field_goals": 1,
+        "field_runs": 1,
+        "sim_goals": 7,
+        "sim_episodes": 12
+      },
+      {
+        "cell": "L1-HO",
+        "field_goals": 1,
+        "field_runs": 1,
+        "sim_goals": 10,
+        "sim_episodes": 10
+      },
+      {
+        "cell": "L1-OT",
+        "field_goals": 1,
+        "field_runs": 1,
+        "sim_goals": 6,
+        "sim_episodes": 10
+      },
+      {
+        "cell": "L2-HO",
+        "field_goals": 0,
+        "field_runs": 1,
+        "sim_goals": 0,
+        "sim_episodes": 5
+      },
+      {
+        "cell": "L3-HO",
+        "field_goals": 1,
+        "field_runs": 1,
+        "sim_goals": 4,
+        "sim_episodes": 5
+      }
+    ],
+    "rule": "field goals >= binom.ppf(0.05, runs, pooled simulated rate)"
+  },
+  "C-20": {
+    "runs": 12,
+    "would_change_rate_median": 0.0,
+    "runs_with_stop_commitment": 1,
+    "descriptive": true
+  },
+  "C-15 water": {
+    "decisions": 574,
+    "observations_outside_space": 0,
+    "first_outside": [],
+    "command_path_p99_s": 0.07400214701017829,
+    "met": true
+  },
+  "C-18 closed loop": {
+    "outcome_agreement": [
+      {
+        "model": "calibrated",
+        "field_success": false,
+        "twin_success": false,
+        "runs": 2
+      },
+      {
+        "model": "calibrated",
+        "field_success": true,
+        "twin_success": false,
+        "runs": 1
+      },
+      {
+        "model": "calibrated",
+        "field_success": true,
+        "twin_success": true,
+        "runs": 9
+      },
+      {
+        "model": "training",
+        "field_success": false,
+        "twin_success": false,
+        "runs": 2
+      },
+      {
+        "model": "training",
+        "field_success": true,
+        "twin_success": false,
+        "runs": 1
+      },
+      {
+        "model": "training",
+        "field_success": true,
+        "twin_success": true,
+        "runs": 9
+      }
+    ],
+    "descriptive": true
+  }
+}
