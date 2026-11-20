@@ -1,0 +1,25 @@
+{
+ "run_id": "july-2026-07-02-calibration",
+ "geometry": "test_run case 1",
+ "safety": "shadow",
+ "lines": 458,
+ "backlog_frames": 0,
+ "backlog_max": 0,
+ "decisions": 227,
+ "frames_skipped": 0,
+ "errors": 0,
+ "pose_sync": {
+  "released": 227,
+  "stale": 0,
+  "superseded": 0
+ },
+ "shadow": {
+  "decisions": 227,
+  "changes": 67,
+  "first_change": 25,
+  "committed": 167,
+  "obs_mismatches": 0
+ },
+ "active_layer": null,
+ "operator_stops": []
+}

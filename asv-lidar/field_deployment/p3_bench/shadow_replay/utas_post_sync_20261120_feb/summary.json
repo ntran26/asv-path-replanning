@@ -1,0 +1,111 @@
+{
+ "tag": "utas_post_sync_20261120_feb",
+ "inproc": [
+  {
+   "run_dir": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\utas_post_sync_20261120_feb\\inproc\\log-data-test_1",
+   "decisions": 418,
+   "shadow_decisions": 418,
+   "phantom": {
+    "decisions_with_dynamic_track": 149,
+    "decisions_with_context": 149,
+    "decisions_engaged": 11,
+    "decisions_target_branch_nonzero": 149
+   },
+   "would_change": 407,
+   "first_would_change": 11,
+   "would_stop_at": 11,
+   "why_counts": {
+    "no escape": 10,
+    "nominal": 1,
+    "emergency stop": 407
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "log": "data\\test_1.log"
+  },
+  {
+   "run_dir": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\utas_post_sync_20261120_feb\\inproc\\log-data-test_2",
+   "decisions": 162,
+   "shadow_decisions": 162,
+   "phantom": {
+    "decisions_with_dynamic_track": 31,
+    "decisions_with_context": 31,
+    "decisions_engaged": 0,
+    "decisions_target_branch_nonzero": 31
+   },
+   "would_change": 98,
+   "first_would_change": 64,
+   "would_stop_at": 68,
+   "why_counts": {
+    "nominal": 20,
+    "idle": 40,
+    "searched policy": 1,
+    "no escape": 3,
+    "brake": 1,
+    "last certificate": 3,
+    "emergency stop": 94
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "log": "data\\test_2.log"
+  },
+  {
+   "run_dir": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\utas_post_sync_20261120_feb\\inproc\\log-data-test_3",
+   "decisions": 156,
+   "shadow_decisions": 156,
+   "phantom": {
+    "decisions_with_dynamic_track": 30,
+    "decisions_with_context": 30,
+    "decisions_engaged": 12,
+    "decisions_target_branch_nonzero": 30
+   },
+   "would_change": 139,
+   "first_would_change": 17,
+   "would_stop_at": 17,
+   "why_counts": {
+    "nominal": 16,
+    "no escape": 1,
+    "emergency stop": 139
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "log": "data\\test_3.log"
+  },
+  {
+   "run_dir": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\utas_post_sync_20261120_feb\\inproc\\log-data-test_4",
+   "decisions": 443,
+   "shadow_decisions": 443,
+   "phantom": {
+    "decisions_with_dynamic_track": 204,
+    "decisions_with_context": 204,
+    "decisions_engaged": 25,
+    "decisions_target_branch_nonzero": 204
+   },
+   "would_change": 402,
+   "first_would_change": 41,
+   "would_stop_at": 44,
+   "why_counts": {
+    "no escape": 12,
+    "nominal": 29,
+    "brake": 1,
+    "last certificate": 2,
+    "emergency stop": 399
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "log": "data\\test_4.log"
+  }
+ ],
+ "udp": [],
+ "git_head": "6af9c88d79b92995001f803748b3ce890923e2f9",
+ "timing_udp": [],
+ "passed": true
+}
