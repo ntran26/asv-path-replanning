@@ -1,0 +1,1457 @@
+{
+ "tag": "utas_post_sync_20261120",
+ "model_sha256": "993db1568929639903547a70087e5e913954318b9111f5a28413423a27c2bdc8",
+ "stopping_table": {
+  "installed": true,
+  "path": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_stopping_profiles.pkl",
+  "entries": 602,
+  "max_cmps": 300
+ },
+ "cases": 16,
+ "runs": 32,
+ "passed": 32,
+ "trace_checked": 16,
+ "trace_passed": 16,
+ "decisions": 1497,
+ "elapsed_s": 488.82667650000076,
+ "results": [
+  {
+   "case": "TS4:BAS-CR-CV-013",
+   "mode": "shadow",
+   "outcome": "collision:target",
+   "passed": true,
+   "decisions": 13,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 8,
+   "layer_stop_at": 10,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "elapsed_s": 10.375403899997764
+  },
+  {
+   "case": "TS4:BAS-CR-CV-013",
+   "mode": "active",
+   "outcome": "stopped",
+   "passed": true,
+   "decisions": 89,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 78,
+   "layer_stop_at": 14,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "trace_decisions": 89,
+   "trace_mismatches": 0,
+   "trace_first": null,
+   "trace_length_equal": true,
+   "trace_passed": true,
+   "elapsed_s": 14.566152199993667
+  },
+  {
+   "case": "TS4:BAS-CR-CV-037",
+   "mode": "shadow",
+   "outcome": "collision:target",
+   "passed": true,
+   "decisions": 15,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 9,
+   "layer_stop_at": 10,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "elapsed_s": 31.706034800001362
+  },
+  {
+   "case": "TS4:BAS-CR-CV-037",
+   "mode": "active",
+   "outcome": "stopped",
+   "passed": true,
+   "decisions": 21,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 10,
+   "layer_stop_at": 16,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "trace_decisions": 21,
+   "trace_mismatches": 0,
+   "trace_first": null,
+   "trace_length_equal": true,
+   "trace_passed": true,
+   "elapsed_s": 12.57309140000143
+  },
+  {
+   "case": "TS4:CH-HO-CV-088",
+   "mode": "shadow",
+   "outcome": "goal",
+   "passed": true,
+   "decisions": 52,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 32,
+   "layer_stop_at": 26,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "elapsed_s": 37.097232000000076
+  },
+  {
+   "case": "TS4:CH-HO-CV-088",
+   "mode": "active",
+   "outcome": "stopped",
+   "passed": true,
+   "decisions": 70,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 51,
+   "layer_stop_at": 27,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "trace_decisions": 70,
+   "trace_mismatches": 0,
+   "trace_first": null,
+   "trace_length_equal": true,
+   "trace_passed": true,
+   "elapsed_s": 41.33236890000262
+  },
+  {
+   "case": "TS4:P2-L1-CRP-FIX-05",
+   "mode": "shadow",
+   "outcome": "collision:target",
+   "passed": true,
+   "decisions": 18,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 6,
+   "layer_stop_at": 15,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "elapsed_s": 10.938927299997886
+  },
+  {
+   "case": "TS4:P2-L1-CRP-FIX-05",
+   "mode": "active",
+   "outcome": "stopped",
+   "passed": true,
+   "decisions": 83,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 60,
+   "layer_stop_at": 29,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "trace_decisions": 83,
+   "trace_mismatches": 0,
+   "trace_first": null,
+   "trace_length_equal": true,
+   "trace_passed": true,
+   "elapsed_s": 22.32125379999343
+  },
+  {
+   "case": "TS4:BAS-HO-NC-071",
+   "mode": "shadow",
+   "outcome": "goal",
+   "passed": true,
+   "decisions": 50,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 26,
+   "layer_stop_at": 24,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "elapsed_s": 7.653378599999996
+  },
+  {
+   "case": "TS4:BAS-HO-NC-071",
+   "mode": "active",
+   "outcome": "collision:by_target",
+   "passed": true,
+   "decisions": 40,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 16,
+   "layer_stop_at": 24,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "trace_decisions": 40,
+   "trace_mismatches": 0,
+   "trace_first": null,
+   "trace_length_equal": true,
+   "trace_passed": true,
+   "elapsed_s": 3.3986309000028996
+  },
+  {
+   "case": "TS4:BAS-BO-CV-061",
+   "mode": "shadow",
+   "outcome": "goal",
+   "passed": true,
+   "decisions": 29,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 3,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "elapsed_s": 15.111993800004711
+  },
+  {
+   "case": "TS4:BAS-BO-CV-061",
+   "mode": "active",
+   "outcome": "collision:by_target",
+   "passed": true,
+   "decisions": 29,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 18,
+   "layer_stop_at": 17,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "trace_decisions": 29,
+   "trace_mismatches": 0,
+   "trace_first": null,
+   "trace_length_equal": true,
+   "trace_passed": true,
+   "elapsed_s": 8.259148800003459
+  },
+  {
+   "case": "TS4:BAS-HO-RE-081",
+   "mode": "shadow",
+   "outcome": "collision:target",
+   "passed": true,
+   "decisions": 33,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 0,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "elapsed_s": 3.396374800002377
+  },
+  {
+   "case": "TS4:BAS-HO-RE-081",
+   "mode": "active",
+   "outcome": "collision:target",
+   "passed": true,
+   "decisions": 33,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 0,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "trace_decisions": 33,
+   "trace_mismatches": 0,
+   "trace_first": null,
+   "trace_length_equal": true,
+   "trace_passed": true,
+   "elapsed_s": 2.0666252999944845
+  },
+  {
+   "case": "TS4:BAS-CR-CV-051",
+   "mode": "shadow",
+   "outcome": "goal",
+   "passed": true,
+   "decisions": 52,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 5,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "elapsed_s": 13.819308300000557
+  },
+  {
+   "case": "TS4:BAS-CR-CV-051",
+   "mode": "active",
+   "outcome": "goal",
+   "passed": true,
+   "decisions": 77,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 11,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "trace_decisions": 77,
+   "trace_mismatches": 0,
+   "trace_first": null,
+   "trace_length_equal": true,
+   "trace_passed": true,
+   "elapsed_s": 23.039833000002545
+  },
+  {
+   "case": "TS4:P2-L1-CRS-VAR-08",
+   "mode": "shadow",
+   "outcome": "collision:target",
+   "passed": true,
+   "decisions": 21,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 8,
+   "layer_stop_at": 18,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "elapsed_s": 13.204093899999862
+  },
+  {
+   "case": "TS4:P2-L1-CRS-VAR-08",
+   "mode": "active",
+   "outcome": "collision:obstacle",
+   "passed": true,
+   "decisions": 50,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 19,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "trace_decisions": 50,
+   "trace_mismatches": 0,
+   "trace_first": null,
+   "trace_length_equal": true,
+   "trace_passed": true,
+   "elapsed_s": 43.99751980000292
+  },
+  {
+   "case": "TS4:P2-L2-CRP-VAR-14",
+   "mode": "shadow",
+   "outcome": "collision:obstacle",
+   "passed": true,
+   "decisions": 22,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 6,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "elapsed_s": 21.87071069999365
+  },
+  {
+   "case": "TS4:P2-L2-CRP-VAR-14",
+   "mode": "active",
+   "outcome": "collision:boundary",
+   "passed": true,
+   "decisions": 36,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 13,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "trace_decisions": 36,
+   "trace_mismatches": 0,
+   "trace_first": null,
+   "trace_length_equal": true,
+   "trace_passed": true,
+   "elapsed_s": 28.306275200004166
+  },
+  {
+   "case": "TS4:P2-L3-HO-FIX-05",
+   "mode": "shadow",
+   "outcome": "goal",
+   "passed": true,
+   "decisions": 50,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 0,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "elapsed_s": 7.791409700002987
+  },
+  {
+   "case": "TS4:P2-L3-HO-FIX-05",
+   "mode": "active",
+   "outcome": "goal",
+   "passed": true,
+   "decisions": 50,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 0,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "trace_decisions": 50,
+   "trace_mismatches": 0,
+   "trace_first": null,
+   "trace_length_equal": true,
+   "trace_passed": true,
+   "elapsed_s": 21.616184799997427
+  },
+  {
+   "case": "TS4:BAS-OT-RE-022",
+   "mode": "shadow",
+   "outcome": "goal",
+   "passed": true,
+   "decisions": 49,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 35,
+   "layer_stop_at": 18,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "elapsed_s": 7.990551399998367
+  },
+  {
+   "case": "TS4:BAS-OT-RE-022",
+   "mode": "active",
+   "outcome": "collision:boundary",
+   "passed": true,
+   "decisions": 97,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 23,
+   "layer_stop_at": 81,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "trace_decisions": 97,
+   "trace_mismatches": 0,
+   "trace_first": null,
+   "trace_length_equal": true,
+   "trace_passed": true,
+   "elapsed_s": 14.697214200001326
+  },
+  {
+   "case": "TS4:FS-NT-023",
+   "mode": "shadow",
+   "outcome": "collision:obstacle",
+   "passed": true,
+   "decisions": 34,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 7,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "elapsed_s": 16.115112999999837
+  },
+  {
+   "case": "TS4:FS-NT-023",
+   "mode": "active",
+   "outcome": "goal",
+   "passed": true,
+   "decisions": 60,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 3,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "trace_decisions": 60,
+   "trace_mismatches": 0,
+   "trace_first": null,
+   "trace_length_equal": true,
+   "trace_passed": true,
+   "elapsed_s": 11.494319900004484
+  },
+  {
+   "case": "TS4:BAS-NU-CV-004",
+   "mode": "shadow",
+   "outcome": "goal",
+   "passed": true,
+   "decisions": 67,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 0,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "elapsed_s": 6.22299980000389
+  },
+  {
+   "case": "TS4:BAS-NU-CV-004",
+   "mode": "active",
+   "outcome": "goal",
+   "passed": true,
+   "decisions": 67,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 0,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "trace_decisions": 67,
+   "trace_mismatches": 0,
+   "trace_first": null,
+   "trace_length_equal": true,
+   "trace_passed": true,
+   "elapsed_s": 4.3628275000010035
+  },
+  {
+   "case": "TS4:BAS-BO-RE-006",
+   "mode": "shadow",
+   "outcome": "goal",
+   "passed": true,
+   "decisions": 37,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 0,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "elapsed_s": 3.8182934999931604
+  },
+  {
+   "case": "TS4:BAS-BO-RE-006",
+   "mode": "active",
+   "outcome": "goal",
+   "passed": true,
+   "decisions": 37,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 0,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "trace_decisions": 37,
+   "trace_mismatches": 0,
+   "trace_first": null,
+   "trace_length_equal": true,
+   "trace_passed": true,
+   "elapsed_s": 2.700979699999152
+  },
+  {
+   "case": "TS4:CH-HO-NC-005",
+   "mode": "shadow",
+   "outcome": "goal",
+   "passed": true,
+   "decisions": 58,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 0,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "elapsed_s": 10.883530699997209
+  },
+  {
+   "case": "TS4:CH-HO-NC-005",
+   "mode": "active",
+   "outcome": "goal",
+   "passed": true,
+   "decisions": 58,
+   "obs": 0,
+   "action": 0,
+   "command": 0,
+   "layer": 0,
+   "layer_worker": 0,
+   "worker_obs": 0,
+   "layer_changed": 0,
+   "layer_stop_at": null,
+   "first_mismatch": {},
+   "stale_frames": 0,
+   "trace_decisions": 58,
+   "trace_mismatches": 0,
+   "trace_first": null,
+   "trace_length_equal": true,
+   "trace_passed": true,
+   "elapsed_s": 9.521006499999203
+  }
+ ],
+ "telemetry": [
+  {
+   "case": "TS4:BAS-CR-CV-013",
+   "range_max_error_m": 0.049973730748309464,
+   "pose_max_error_m": 4.852052866155532e-07,
+   "heading_max_error_deg": 4.99547240906395e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 0.9951327325587724,
+     "mean_abs_error": 0.009559268207394323,
+     "true_spread": 0.06625596629504418
+    },
+    "v": {
+     "slope": 0.9086736369525469,
+     "mean_abs_error": 0.007406064391053652,
+     "true_spread": 0.022475583812464384
+    },
+    "r": {
+     "slope": 0.9047391661868714,
+     "mean_abs_error": 0.90852486280748,
+     "true_spread": 3.2663363475317646
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 4.698464985963824e-07,
+    "v_fit": {
+     "slope": 0.9080557132992156,
+     "mean_abs_error": 0.007454382580760776
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.003116130828857422,
+    "boundary": 0.0059629082679748535,
+    "ego": 0.2787896692752838,
+    "path": 0.16366347670555115,
+    "target": 1.0,
+    "context": 1.0
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.0022959492423317647,
+    "boundary": 0.003539031202142889,
+    "ego": 0.15947858718308536,
+    "path": 0.087719712914391,
+    "target": 0.20315972444686023,
+    "context": 0.4379418736154383
+   }
+  },
+  {
+   "case": "TS4:BAS-CR-CV-037",
+   "range_max_error_m": 0.049986845155489235,
+   "pose_max_error_m": 4.61833973286474e-07,
+   "heading_max_error_deg": 4.933275477014831e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 0.9298388153844895,
+     "mean_abs_error": 0.015446226117797975,
+     "true_spread": 0.12484745862996428
+    },
+    "v": {
+     "slope": 1.0038340179898921,
+     "mean_abs_error": 0.010660251152158295,
+     "true_spread": 0.03434773459317426
+    },
+    "r": {
+     "slope": 0.9407261679030567,
+     "mean_abs_error": 1.14071705385097,
+     "true_spread": 4.476209524129009
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 4.843532686038543e-07,
+    "v_fit": {
+     "slope": 1.004266692131907,
+     "mean_abs_error": 0.010736196406318895
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.0029484033584594727,
+    "boundary": 0.014272809028625488,
+    "ego": 0.2900356650352478,
+    "path": 0.16326656937599182,
+    "target": 1.0,
+    "context": 1.0
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.002023316346682035,
+    "boundary": 0.004676314500661997,
+    "ego": 0.13523908661535153,
+    "path": 0.0569828599691391,
+    "target": 0.39838199890576875,
+    "context": 0.41675307830938924
+   }
+  },
+  {
+   "case": "TS4:CH-HO-CV-088",
+   "range_max_error_m": 0.04999978599026034,
+   "pose_max_error_m": 4.947814939981754e-07,
+   "heading_max_error_deg": 4.967095605934446e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 0.9949313626750049,
+     "mean_abs_error": 0.012465051540915977,
+     "true_spread": 0.14266866914224724
+    },
+    "v": {
+     "slope": 1.1667666724704224,
+     "mean_abs_error": 0.013064563510902865,
+     "true_spread": 0.07592981027567182
+    },
+    "r": {
+     "slope": 0.9653189380853957,
+     "mean_abs_error": 1.339082367658265,
+     "true_spread": 7.1588380265503355
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 4.996662865686119e-07,
+    "v_fit": {
+     "slope": 1.167963717822819,
+     "mean_abs_error": 0.01316092798123651
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.3643909692764282,
+    "boundary": 0.01896834373474121,
+    "ego": 0.3054399788379669,
+    "path": 0.10847306996583939,
+    "target": 1.0,
+    "context": 1.0
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.009364863634109497,
+    "boundary": 0.004547377824783325,
+    "ego": 0.1310534730926156,
+    "path": 0.0396152338758111,
+    "target": 0.20277048036456108,
+    "context": 0.35177006185054777
+   }
+  },
+  {
+   "case": "TS4:P2-L1-CRP-FIX-05",
+   "range_max_error_m": 0.04999952158868304,
+   "pose_max_error_m": 4.993223257088175e-07,
+   "heading_max_error_deg": 4.911960331810405e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 0.9807633661510923,
+     "mean_abs_error": 0.01496543425503747,
+     "true_spread": 0.10592538691748167
+    },
+    "v": {
+     "slope": 1.0647131218641128,
+     "mean_abs_error": 0.018123510650042727,
+     "true_spread": 0.06202957995605059
+    },
+    "r": {
+     "slope": 0.9304487028373616,
+     "mean_abs_error": 2.4870801759878116,
+     "true_spread": 9.66427121334891
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 4.82498298204348e-07,
+    "v_fit": {
+     "slope": 1.0661200441179928,
+     "mean_abs_error": 0.018364013682809044
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.003121614456176758,
+    "boundary": 0.011960387229919434,
+    "ego": 0.2846561074256897,
+    "path": 0.10716743767261505,
+    "target": 0.0,
+    "context": 0.0
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.00263943150639534,
+    "boundary": 0.003808598965406418,
+    "ego": 0.13279466680251062,
+    "path": 0.03964295459445566,
+    "target": 0.0,
+    "context": 0.0
+   }
+  },
+  {
+   "case": "TS4:BAS-HO-NC-071",
+   "range_max_error_m": 0.049999302313271876,
+   "pose_max_error_m": 4.968418347850445e-07,
+   "heading_max_error_deg": 4.923479934859643e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 0.9954684239269944,
+     "mean_abs_error": 0.015206705116022047,
+     "true_spread": 0.11086584960610923
+    },
+    "v": {
+     "slope": 1.140010366970398,
+     "mean_abs_error": 0.017444020450558047,
+     "true_spread": 0.087931662245771
+    },
+    "r": {
+     "slope": 0.9478687330266573,
+     "mean_abs_error": 2.0825278339876387,
+     "true_spread": 10.446096059214398
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 4.983425778704031e-07,
+    "v_fit": {
+     "slope": 1.1421593975305835,
+     "mean_abs_error": 0.017752302960370617
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.006370663642883301,
+    "boundary": 0.008822083473205566,
+    "ego": 0.30971020460128784,
+    "path": 0.16543711721897125,
+    "target": 0.22212707996368408,
+    "context": 1.0
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.0021538535753885904,
+    "boundary": 0.0031825887660185495,
+    "ego": 0.14712621566529074,
+    "path": 0.04614333973343795,
+    "target": 0.05225386548166474,
+    "context": 0.16579603434850773
+   }
+  },
+  {
+   "case": "TS4:BAS-BO-CV-061",
+   "range_max_error_m": 0.049998942579652095,
+   "pose_max_error_m": 4.937467945609342e-07,
+   "heading_max_error_deg": 4.922938501294993e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 1.0181662152945004,
+     "mean_abs_error": 0.011413832236967696,
+     "true_spread": 0.1590077940809709
+    },
+    "v": {
+     "slope": 1.1605410838601613,
+     "mean_abs_error": 0.021280753774477232,
+     "true_spread": 0.09909747730139815
+    },
+    "r": {
+     "slope": 0.9541490986701524,
+     "mean_abs_error": 2.00347825080899,
+     "true_spread": 9.584884731961244
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 4.993803912611838e-07,
+    "v_fit": {
+     "slope": 1.1621112996465783,
+     "mean_abs_error": 0.02148982217262243
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.0030708909034729004,
+    "boundary": 0.007674694061279297,
+    "ego": 0.24806177616119385,
+    "path": 0.08752509206533432,
+    "target": 0.9087006449699402,
+    "context": 1.0
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.0020324013851307056,
+    "boundary": 0.003020805341226083,
+    "ego": 0.12458344466156429,
+    "path": 0.04084942413976899,
+    "target": 0.15333820161996065,
+    "context": 0.4592723763651318
+   }
+  },
+  {
+   "case": "TS4:BAS-HO-RE-081",
+   "range_max_error_m": 0.04999893088040963,
+   "pose_max_error_m": 4.972168046180059e-07,
+   "heading_max_error_deg": 4.764509071719658e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 0.9655931053870247,
+     "mean_abs_error": 0.0063094796352361855,
+     "true_spread": 0.06523592419906066
+    },
+    "v": {
+     "slope": 1.1208185191799762,
+     "mean_abs_error": 0.006512998153408796,
+     "true_spread": 0.04268116778422971
+    },
+    "r": {
+     "slope": 0.9749197271369333,
+     "mean_abs_error": 0.5466550098195717,
+     "true_spread": 5.413087584611753
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 5.010984409636876e-07,
+    "v_fit": {
+     "slope": 1.1217288210094103,
+     "mean_abs_error": 0.006551304379567557
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.009110450744628906,
+    "boundary": 0.009468436241149902,
+    "ego": 0.30334341526031494,
+    "path": 0.19395682215690613,
+    "target": 1.0,
+    "context": 1.0
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.0024164242129172046,
+    "boundary": 0.0038690393970858667,
+    "ego": 0.12997421129576622,
+    "path": 0.06658014625070556,
+    "target": 0.15183632268059638,
+    "context": 0.22387700888418383
+   }
+  },
+  {
+   "case": "TS4:BAS-CR-CV-051",
+   "range_max_error_m": 0.04999989910227853,
+   "pose_max_error_m": 4.989135575783621e-07,
+   "heading_max_error_deg": 4.902480839064083e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 0.9918049833300508,
+     "mean_abs_error": 0.011053267993643933,
+     "true_spread": 0.13185328195911206
+    },
+    "v": {
+     "slope": 1.1500480765540468,
+     "mean_abs_error": 0.01683408155886222,
+     "true_spread": 0.08449939690846658
+    },
+    "r": {
+     "slope": 0.9509114725759602,
+     "mean_abs_error": 1.9163559141432984,
+     "true_spread": 8.906919742825199
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 4.972643057321591e-07,
+    "v_fit": {
+     "slope": 1.151403370552433,
+     "mean_abs_error": 0.017019631115013256
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.0031076669692993164,
+    "boundary": 0.009722769260406494,
+    "ego": 0.2535097599029541,
+    "path": 0.15561005473136902,
+    "target": 1.0,
+    "context": 1.0
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.001653134822845459,
+    "boundary": 0.003355557918548584,
+    "ego": 0.13620465412735938,
+    "path": 0.049386965734884145,
+    "target": 0.17574374534189702,
+    "context": 0.28469844684004786
+   }
+  },
+  {
+   "case": "TS4:P2-L1-CRS-VAR-08",
+   "range_max_error_m": 0.04999244497702815,
+   "pose_max_error_m": 4.771411123982716e-07,
+   "heading_max_error_deg": 4.780697508977028e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 0.9524135463989859,
+     "mean_abs_error": 0.015759671872461644,
+     "true_spread": 0.09056200543839157
+    },
+    "v": {
+     "slope": 1.0228954574958826,
+     "mean_abs_error": 0.007656978383147226,
+     "true_spread": 0.02916477895886703
+    },
+    "r": {
+     "slope": 0.9263116914820422,
+     "mean_abs_error": 0.5870663284854185,
+     "true_spread": 2.5008297372992914
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 4.838917204708082e-07,
+    "v_fit": {
+     "slope": 1.022578615178614,
+     "mean_abs_error": 0.007680378497048691
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.003122687339782715,
+    "boundary": 0.007399439811706543,
+    "ego": 0.23902010917663574,
+    "path": 0.14265163242816925,
+    "target": 1.0535368919372559,
+    "context": 0.5202556848526001
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.0026862778161701405,
+    "boundary": 0.0035682069627862227,
+    "ego": 0.13413746419705844,
+    "path": 0.0561929976469592,
+    "target": 0.24406707129980387,
+    "context": 0.1168166283322008
+   }
+  },
+  {
+   "case": "TS4:P2-L2-CRP-VAR-14",
+   "range_max_error_m": 0.04999778473395722,
+   "pose_max_error_m": 4.994263562707602e-07,
+   "heading_max_error_deg": 4.97882297167962e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 0.9636862117068821,
+     "mean_abs_error": 0.016645574312428947,
+     "true_spread": 0.08966611995257595
+    },
+    "v": {
+     "slope": 1.1751403187707135,
+     "mean_abs_error": 0.01395960096282465,
+     "true_spread": 0.053256508607462366
+    },
+    "r": {
+     "slope": 0.9438317690957951,
+     "mean_abs_error": 1.833191386294935,
+     "true_spread": 9.512795757285936
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 4.910671957958357e-07,
+    "v_fit": {
+     "slope": 1.1788822870853974,
+     "mean_abs_error": 0.014148426974671901
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.0031229257583618164,
+    "boundary": 0.010921359062194824,
+    "ego": 0.2593626379966736,
+    "path": 0.16080713272094727,
+    "target": 0.25530314445495605,
+    "context": 1.0
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.002518615126609802,
+    "boundary": 0.004269218444824219,
+    "ego": 0.1143381167203188,
+    "path": 0.03360360637307167,
+    "target": 0.08361166566610337,
+    "context": 0.36991072073578835
+   }
+  },
+  {
+   "case": "TS4:P2-L3-HO-FIX-05",
+   "range_max_error_m": 0.04999546357780371,
+   "pose_max_error_m": 4.990045177066804e-07,
+   "heading_max_error_deg": 4.928271550852514e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 1.0048925116619625,
+     "mean_abs_error": 0.01273885109949986,
+     "true_spread": 0.1327425388408633
+    },
+    "v": {
+     "slope": 1.1570363275462112,
+     "mean_abs_error": 0.01997173379444894,
+     "true_spread": 0.08776463769938062
+    },
+    "r": {
+     "slope": 0.931244962989918,
+     "mean_abs_error": 2.5913333879882043,
+     "true_spread": 10.454994471114171
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 4.979499355073358e-07,
+    "v_fit": {
+     "slope": 1.1590993844873156,
+     "mean_abs_error": 0.020250293761838022
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.007968723773956299,
+    "boundary": 0.016089677810668945,
+    "ego": 0.2868943512439728,
+    "path": 0.13685549795627594,
+    "target": 0.34087812900543213,
+    "context": 1.0
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.002114567905664444,
+    "boundary": 0.004097929845253627,
+    "ego": 0.12730396911501884,
+    "path": 0.03889848659552323,
+    "target": 0.03617570557010671,
+    "context": 0.08297577849589288
+   }
+  },
+  {
+   "case": "TS4:BAS-OT-RE-022",
+   "range_max_error_m": 0.049999578330758965,
+   "pose_max_error_m": 4.989061581639476e-07,
+   "heading_max_error_deg": 4.982525751984213e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 0.9931361177496222,
+     "mean_abs_error": 0.012941272385973639,
+     "true_spread": 0.1389182038430422
+    },
+    "v": {
+     "slope": 1.1711458633064076,
+     "mean_abs_error": 0.02073426738286924,
+     "true_spread": 0.11066828745255795
+    },
+    "r": {
+     "slope": 0.9581160734573573,
+     "mean_abs_error": 2.0226951166752074,
+     "true_spread": 10.083252772068722
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 5.003440062267828e-07,
+    "v_fit": {
+     "slope": 1.1732811105138876,
+     "mean_abs_error": 0.021024426575614315
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.8374999761581421,
+    "boundary": 0.008656024932861328,
+    "ego": 0.3076796531677246,
+    "path": 0.15014609694480896,
+    "target": 1.0,
+    "context": 1.0
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.01960866501990785,
+    "boundary": 0.003365892045041348,
+    "ego": 0.13363995101857692,
+    "path": 0.04154788294529661,
+    "target": 0.12244687958600674,
+    "context": 0.4305763190731089
+   }
+  },
+  {
+   "case": "TS4:FS-NT-023",
+   "range_max_error_m": 0.04999733426192687,
+   "pose_max_error_m": 4.902163919240365e-07,
+   "heading_max_error_deg": 4.966678943674196e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 0.9574802327108315,
+     "mean_abs_error": 0.012719587562189587,
+     "true_spread": 0.10763741664902293
+    },
+    "v": {
+     "slope": 1.0440170803070632,
+     "mean_abs_error": 0.007714827394565439,
+     "true_spread": 0.04850111547984591
+    },
+    "r": {
+     "slope": 0.948511561348295,
+     "mean_abs_error": 1.608866455397795,
+     "true_spread": 7.798015263957056
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 4.977516825377393e-07,
+    "v_fit": {
+     "slope": 1.04507984244195,
+     "mean_abs_error": 0.007825688518613172
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.003111600875854492,
+    "boundary": 0.009649157524108887,
+    "ego": 0.26616355776786804,
+    "path": 0.2803431451320648,
+    "target": 0.0,
+    "context": 0.0
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.0027374345809221268,
+    "boundary": 0.004557652398943901,
+    "ego": 0.13476555771194398,
+    "path": 0.08182320461492054,
+    "target": 0.0,
+    "context": 0.0
+   }
+  },
+  {
+   "case": "TS4:BAS-NU-CV-004",
+   "range_max_error_m": 0.0499998255426668,
+   "pose_max_error_m": 4.933529815787097e-07,
+   "heading_max_error_deg": 4.946136300532089e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 0.9837504798252814,
+     "mean_abs_error": 0.010568391505282663,
+     "true_spread": 0.14123293024159972
+    },
+    "v": {
+     "slope": 1.1511080882489835,
+     "mean_abs_error": 0.01333582086364265,
+     "true_spread": 0.08802215741020526
+    },
+    "r": {
+     "slope": 0.975718929330755,
+     "mean_abs_error": 0.9596304569919506,
+     "true_spread": 7.2778571813621395
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 4.997369238424199e-07,
+    "v_fit": {
+     "slope": 1.1519141564274398,
+     "mean_abs_error": 0.013435026164404458
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.0144805908203125,
+    "boundary": 0.01038128137588501,
+    "ego": 0.3174586892127991,
+    "path": 0.19242455065250397,
+    "target": 1.1653376817703247,
+    "context": 1.0
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.0018858588658846342,
+    "boundary": 0.0036550155052771935,
+    "ego": 0.1336262513525211,
+    "path": 0.05499447023925873,
+    "target": 0.2662049812766222,
+    "context": 0.09785195245192602
+   }
+  },
+  {
+   "case": "TS4:BAS-BO-RE-006",
+   "range_max_error_m": 0.0499967120341136,
+   "pose_max_error_m": 4.995685367603642e-07,
+   "heading_max_error_deg": 4.7298104277615494e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 0.9815789829952878,
+     "mean_abs_error": 0.011229927871597017,
+     "true_spread": 0.123578306967901
+    },
+    "v": {
+     "slope": 1.147917687749969,
+     "mean_abs_error": 0.01214202145141118,
+     "true_spread": 0.07325918684975213
+    },
+    "r": {
+     "slope": 0.9602401491977578,
+     "mean_abs_error": 1.1221360334003336,
+     "true_spread": 7.591750337894631
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 4.882677160367166e-07,
+    "v_fit": {
+     "slope": 1.1493447586573122,
+     "mean_abs_error": 0.012284072336135035
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.003641963005065918,
+    "boundary": 0.005219817161560059,
+    "ego": 0.23982584476470947,
+    "path": 0.14514382183551788,
+    "target": 1.6055452823638916,
+    "context": 1.0
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.0009475231170654296,
+    "boundary": 0.0029168639864240375,
+    "ego": 0.1193536922867809,
+    "path": 0.04837293603590557,
+    "target": 0.3369985874210085,
+    "context": 0.529553883416312
+   }
+  },
+  {
+   "case": "TS4:CH-HO-NC-005",
+   "range_max_error_m": 0.04999819394552585,
+   "pose_max_error_m": 4.99884960092345e-07,
+   "heading_max_error_deg": 4.999357656743086e-07,
+   "ego_fit": {
+    "u": {
+     "slope": 0.9757059964616598,
+     "mean_abs_error": 0.012711340987881991,
+     "true_spread": 0.1222610063433794
+    },
+    "v": {
+     "slope": 1.140650486433005,
+     "mean_abs_error": 0.0144336875423277,
+     "true_spread": 0.08165786508300474
+    },
+    "r": {
+     "slope": 0.9575544714391726,
+     "mean_abs_error": 1.784479387920364,
+     "true_spread": 9.020649313281826
+    }
+   },
+   "sensor_point": {
+    "pose_max_error_m": 5.039824175767649e-07,
+    "v_fit": {
+     "slope": 1.14188038768713,
+     "mean_abs_error": 0.014616840522815004
+    }
+   },
+   "field_resolution_obs_max_abs_diff": {
+    "lidar": 0.003099977970123291,
+    "boundary": 0.010889828205108643,
+    "ego": 0.4303503930568695,
+    "path": 0.16097037494182587,
+    "target": 1.0,
+    "context": 1.0
+   },
+   "field_resolution_obs_mean_abs_diff": {
+    "lidar": 0.0010040998458862305,
+    "boundary": 0.004035612302167075,
+    "ego": 0.14693427817629917,
+    "path": 0.04881399374322167,
+    "target": 0.0968716386705637,
+    "context": 0.07297738940854158
+   }
+  }
+ ],
+ "timing": [
+  {
+   "component": "observation",
+   "n": 1497,
+   "p50_ms": 6.513599997560959,
+   "p95_ms": 18.7913399990066,
+   "p99_ms": 29.604415997164306,
+   "max_ms": 475.1322999945842,
+   "mean_ms": 8.78055116897893
+  },
+  {
+   "component": "policy",
+   "n": 1497,
+   "p50_ms": 0.891399999090936,
+   "p95_ms": 1.637619995744899,
+   "p99_ms": 2.1906159975333126,
+   "max_ms": 66.24140000349144,
+   "mean_ms": 1.071028657385754
+  },
+  {
+   "component": "layer",
+   "n": 600,
+   "p50_ms": 29.9795000028098,
+   "p95_ms": 462.02002500358503,
+   "p99_ms": 991.0473710022776,
+   "max_ms": 8701.959600002738,
+   "mean_ms": 110.60513033337581
+  },
+  {
+   "component": "layer_active",
+   "n": 897,
+   "p50_ms": 28.66590000485303,
+   "p95_ms": 640.6984799978077,
+   "p99_ms": 1111.9629439964754,
+   "max_ms": 1862.4665000024834,
+   "mean_ms": 121.39916733544237
+  }
+ ],
+ "git_head": "6af9c88d79b92995001f803748b3ce890923e2f9",
+ "machine": {
+  "platform": "win32",
+  "cpu": 12,
+  "processor": "Intel64 Family 6 Model 154 Stepping 4, GenuineIntel"
+ }
+}
