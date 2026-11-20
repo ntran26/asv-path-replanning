@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-_spec = importlib.util.spec_from_file_location("train_asv", Path(__file__).resolve().parents[1] / "train_asv.py")
+_spec = importlib.util.spec_from_file_location("train_asv", Path(__file__).resolve().parents[1] / "src" / "train_asv.py")
 train_asv = importlib.util.module_from_spec(_spec)
 sys.modules["train_asv"] = train_asv      # the dataclass looks its module up
 _spec.loader.exec_module(train_asv)
@@ -102,4 +102,5 @@ def test_running_trainers_are_recognised_from_their_command_lines():
     assert train_asv._run_name(["python", "src/train_formulation.py", "--resume",
                                 "runs/tqc_formulation_seed0_bl3"]) == "tqc_formulation_seed0_bl3"
     assert train_asv._run_name(["python", "train_asv.py", "--algo", "ppo", "--seed", "2"]) == "ppo_formulation_seed2_bl3"
+    assert train_asv._run_name(["python", "src/train_asv.py", "--algo", "sac", "--seed", "1"]) == "sac_formulation_seed1_bl3"
     assert train_asv._run_name(["bash", "results/run_bl3_3m.sh", "sac", "1"]) is None

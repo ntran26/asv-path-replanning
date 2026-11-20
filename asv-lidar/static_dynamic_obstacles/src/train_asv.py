@@ -1,10 +1,12 @@
 """Train one learner on the frozen formulation (baseline-v3): PPO, RecurrentPPO, SAC or TQC.
 
-    python train_asv.py --algo sac --seed 1                            # new run to 3.0 M
-    python train_asv.py --algo ppo --seed 2 --timesteps 1000000        # a shorter run
-    python train_asv.py --algo sac --seed 1 --resume                   # continue, empty replay buffer
-    python train_asv.py --algo sac --seed 1 --resume --replay-buffer   # continue on the saved buffer
-    python train_asv.py --algo tqc --seed 0 --resume --timesteps 3500000   # continue past the budget
+    python src/train_asv.py --algo sac --seed 1                            # new run to 3.0 M
+    python src/train_asv.py --algo ppo --seed 2 --timesteps 1000000        # a shorter run
+    python src/train_asv.py --algo sac --seed 1 --resume                   # continue, empty replay buffer
+    python src/train_asv.py --algo sac --seed 1 --resume --replay-buffer   # continue on the saved buffer
+    python src/train_asv.py --algo tqc --seed 0 --resume --timesteps 3500000   # continue past the budget
+
+Run from the project folder or anywhere else: paths are taken from the project root.
 
 A front end to `src/train_formulation.py` with the settings of the paper runs
 (`results/run_bl3_3m.sh`), so a run started here is the same experiment:
@@ -36,7 +38,7 @@ Output goes to `runs/<algo>_formulation_seed<N>_bl3/`, the console and
 `results/train_seed.log`.  Training stops with the terminal (or Ctrl+C) and
 continues from the last checkpoint (every 250,000 steps) with `--resume`.
 Evaluation and test set v4 are separate steps, printed at the end; a policy is
-watched with `test_asv.py`.
+watched with `src/test_asv.py`.
 """
 from __future__ import annotations
 
@@ -51,7 +53,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]          # the project folder (this file is in src/)
 CONFIG = Path("configs") / "baseline_v3.json"
 TAG = "bl3"
 BUDGET = 2_500_000                 # the frozen run budget; the stage schedule's 100 %
@@ -325,7 +327,7 @@ def main() -> int:
           f"--tag {p.run_id} --safety off --processes 4")
     print(f"  final-model check python tools/tiers/test_set.py --version 4 --model {rel}/final_model.zip "
           f"--tag {p.run_id}_final --safety off --processes 4")
-    print(f"  watch the policy python test_asv.py --model {rel}")
+    print(f"  watch the policy python src/test_asv.py --model {rel}")
     return 0
 
 

@@ -98,6 +98,16 @@ def _xy(text: str) -> Tuple[float, float]:
 
 
 def scenario_from_args(args) -> Tuple[object, Optional[int], str]:
+    if getattr(args, "scenario", None):
+        import setups                       # the one set-up format, shared with src/test_asv.py
+        setup = setups.load(args.scenario)
+        if setup["set"] == "field":
+            import field_test_cases as ftc
+            s = ftc.TestCase().field_sheet(setup["id"])
+            print(f"[P3] field case {setup['id']}: {s['encounter']}, {s['layout']}; own ship passes "
+                  f"{s['own_at_t0']} at cruise, heading {s['own_heading_deg']} deg, at t = 0; target from "
+                  f"{s['target_start']}, heading {s['target_heading_deg']} deg, {s['target_speed_mps']} m/s")
+        return setup["built"], setup["seed"], f"{setup['set']} {setup['id']}"
     if args.case:
         built, seed = pb.load_test_case(args.case)
         return built, seed, f"test set v4 {args.case}"
@@ -107,7 +117,7 @@ def scenario_from_args(args) -> Tuple[object, Optional[int], str]:
         return test_case_scenario(args.test_case), None, f"test_run case {args.test_case}"
     if args.start and args.goal:
         return pb.field_scenario(_xy(args.start), _xy(args.goal), case_id="leg"), None, "leg"
-    raise SystemExit("give --case, --layout, --test-case, or --start and --goal")
+    raise SystemExit("give --scenario, --case, --layout, --test-case, or --start and --goal")
 
 
 def test_case_scenario(number: int):
@@ -555,7 +565,10 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--run-id", default=None, help="run identifier from the run sheet (default: time stamp)")
     ap.add_argument("--out-dir", default=os.path.join(pb.HERE, "p3_runs"))
     g = ap.add_argument_group("geometry")
-    g.add_argument("--case", default=None, help="test set v4 ID, e.g. P2-L1-HO-FIX-11")
+    g.add_argument("--scenario", default=None,
+                   help="a set-up by name (static_dynamic_obstacles/src/setups.py): a field test case, e.g. "
+                        "easy_1, medium_5, hard_3, or a test set v4 ID, e.g. P2-L1-HO-FIX-03")
+    g.add_argument("--case", default=None, help="test set v4 ID, e.g. P2-L1-HO-FIX-03")
     g.add_argument("--layout", default=None, help="L1, L2 or L3")
     g.add_argument("--test-case", type=int, default=None, help="the July bridge's test_run case")
     g.add_argument("--start", default=None, help="x,y in the map frame")

@@ -26,8 +26,8 @@ F96 (baseline-v2), F102 (the frozen suite, suite 3.4), F107 (baseline-v3); `OPEN
 |---|---|
 | The frozen formulation, and the planned learners × seeds | `configs/baseline_v3.json` (`campaign` block: 4 learners × seeds 0–2; `configs/baseline_v1.json` and `_v2.json` are kept for the record) |
 | Train and evaluate one run | `results/train_seed.sh` |
-| Train one run from Python (new, continue, extend) | `train_asv.py` (section 3, *From Python*) |
-| Watch a policy in a window, or save an episode as MP4 | `test_asv.py` (section 3, *Watching a policy*); videos in `results/videos/` |
+| Train one run from Python (new, continue, extend) | `src/train_asv.py` (section 3, *From Python*) |
+| Watch a policy in a window, or save an episode as MP4 (test set, field suite, validation, training) | `src/test_asv.py` (section 3, *Watching a policy*); videos in `results/videos/` |
 | Status of every planned run | `python tools/run_status.py` |
 | One folder per run | `runs/<learner>_formulation_seed<N>_bl3/` |
 | Training output of a run | `runs/<learner>_formulation_seed<N>_bl3.log` |
@@ -159,7 +159,7 @@ benchmark, against 8.7 pinned and 6.7 unpinned; about 14-16 in training;
 `run_bl3_3m.sh`'s TQC default) and SAC pinned with 4 threads too (14.7, against 10.3
 pinned and 10.8 unpinned, 2026-10-12; about 17-22 in training). `run_bl3_3m.sh` pins
 SAC by default but keeps PyTorch's default threads, so SAC seed 2 from the shell is
-`THREADS=4 bash results/run_bl3_3m.sh sac 2`; `train_asv.py` applies both settings.
+`THREADS=4 bash results/run_bl3_3m.sh sac 2`; `src/train_asv.py` applies both settings.
 
 **Safety layer in evaluations (decision, 2026-10-07).** Runs evaluate with the
 safety layer off only: `train_seed.sh` passes `--eval-safety-override off` to the
@@ -176,18 +176,19 @@ another:
 bash results/train_seed.sh ppo 1 && bash results/train_seed.sh recurrent_ppo 1
 ```
 
-**From Python (2026-10-13): `train_asv.py`.** The same training as `run_bl3_3m.sh`
+**From Python (2026-10-13; in `src/` since 2026-11-20): `src/train_asv.py`.** The same training as `run_bl3_3m.sh`
 (baseline-v3, stages on the 2.5 M schedule, validation set every 200,000 steps with the
 safety layer off, the 2.5 M evaluation for SAC and TQC, the measured CPU setting),
-started from Python:
+started from Python (from the project folder or anywhere else; paths are taken from the
+project root):
 
 ```bash
-python train_asv.py --algo sac --seed 2                              # new run to 3.0 M
-python train_asv.py --algo ppo --seed 3 --timesteps 1000000          # shorter: stops partway through the curriculum
-python train_asv.py --algo sac --seed 2 --resume                     # continue; empty replay buffer, refilled first
-python train_asv.py --algo sac --seed 2 --resume --replay-buffer     # continue on the buffer saved with the checkpoint
-python train_asv.py --algo tqc --seed 0 --resume --timesteps 3500000 # continue past the budget
-python train_asv.py --algo tqc --seed 1 --dry-run                    # print what would run
+python src/train_asv.py --algo sac --seed 2                              # new run to 3.0 M
+python src/train_asv.py --algo ppo --seed 3 --timesteps 1000000          # shorter: stops partway through the curriculum
+python src/train_asv.py --algo sac --seed 2 --resume                     # continue; empty replay buffer, refilled first
+python src/train_asv.py --algo sac --seed 2 --resume --replay-buffer     # continue on the buffer saved with the checkpoint
+python src/train_asv.py --algo tqc --seed 0 --resume --timesteps 3500000 # continue past the budget
+python src/train_asv.py --algo tqc --seed 1 --dry-run                    # print what would run
 ```
 
 It refuses to start a run whose folder exists (`--resume`, or `--tag` for a separate
@@ -199,18 +200,24 @@ started in its own window and continued with `--resume` after any stop. The
 evaluations and test set v4 are not part of it: the commands are printed at the end
 (`bash results/train_seed.sh <algo> <seed>`, then `tools/tiers/test_set.py --version 4`).
 
-**Watching a policy: `test_asv.py`.** Loads any of the four learners (a run's
+**Watching a policy: `src/test_asv.py`.** Loads any of the four learners (a run's
 `best_model.zip` by default) and runs episodes in the renderer window, with the
 telemetry panel (SPACE pause, N next episode, 1-7 panel blocks, ESC quit):
 
 ```bash
-python test_asv.py --algo sac --seed 1                               # a random test set v4 episode
-python test_asv.py --algo sac --seed 1 --scenario BAS-HO-CV-001      # a chosen one
-python test_asv.py --algo ppo --seed 2 --set validation --encounter crossing --episodes 3
-python test_asv.py --algo tqc --set training --episodes 2             # stage-7 training scenarios
-python test_asv.py --algo sac --seed 1 --scenario BAS-CR-CV-003 --save-mp4 --headless
+python src/test_asv.py --algo sac --seed 1                               # a random test set v4 episode
+python src/test_asv.py --algo sac --seed 1 --scenario BAS-HO-CV-001      # a chosen one
+python src/test_asv.py --algo sac --scenario easy_1 medium_2 hard_5      # field test suite cases
+python src/test_asv.py --algo sac --set field                            # the whole field suite
+python src/test_asv.py --algo ppo --seed 2 --set validation --encounter crossing --episodes 3
+python src/test_asv.py --algo tqc --set training --episodes 2             # stage-7 training scenarios
+python src/test_asv.py --algo sac --seed 1 --scenario BAS-CR-CV-003 --save-mp4 --headless
 ```
 
+The test set and the field test suite load through `src/setups.py`, one format for both
+(a scenario, its episode seed and the plant it runs on), which the field bridge also reads
+(`udp_live_p3.py --scenario <name>`). Field cases (`easy_1`-`hard_5`, `src/field_test_cases.py`)
+run as they were verified: the identified plant (`--plant randomised` draws it instead).
 Test set v4 episodes run exactly as `tools/tiers/test_set.py` runs them, and validation
 episodes as the training evaluations do (checked 2026-10-13: outcomes and step counts
 identical for PPO and RecurrentPPO). The validation set is built once (several minutes)
