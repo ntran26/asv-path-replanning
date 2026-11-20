@@ -1,6 +1,7 @@
 # Vessel-model calibration: two basin sessions
 
-Date: 2026-11-04; bench results of the Paper 3 bridge added 2026-11-05 (section 3a). Status:
+Date: 2026-11-04; bench results of the Paper 3 bridge added 2026-11-05 (section 3a); turns at
+the cruise setting (RPM 6) added 2026-11-14 (S1-D, S1-E). Status:
 plan, before booking. It carries forward the part-2 basin plan
 (`planning_records/PART2_BASIN_PLAN.md`, 2026-09) with the changes of section 1, and is the plan
 of record for the calibration sessions. The field trials that follow are planned in
@@ -34,6 +35,10 @@ RQ4, Study 3) stays out of the paper. The calibration serves four uses:
 **Changes from the part-2 plan:**
 - Crash stops (S1-C2) extended with stops from a steady turn, the residual yaw and sway that
   carried the stopped hull into walls in simulation.
+- Turning circles (S1-D) and a 20/20 zig-zag (S1-E) at the cruise setting, RPM 6, beside those
+  at RPM 12. The deployed policy cruises at RPM 6 and commands RPM 0-12, while the July model
+  was identified at RPM 12 (18 of 20 runs) and the turning priors are set at RPM 12; without
+  these runs the vessel's turning would not be measured at the speed it runs at in the trials.
 - Session 2's closed-loop block (S2-C) no longer compares two retrained policies. It runs the
   deployed policy on the static layouts as the field-trial dress rehearsal and the closed-loop
   check of the calibrated simulator.
@@ -49,7 +54,7 @@ holdout runs better than the previous model) rests on four assumptions:
 
 | Gap | Current state | Fixed by |
 | --- | --- | --- |
-| Sustained turns | **priors, not measurements**: turn rate 2.2/5.0/7.7/10.0 deg/s at 25-100 % helm, radius 3.05 L, speed ratio 0.82 imposed as constraints; the July runs hold no sustained turn | S1-D turning circles |
+| Sustained turns | **priors, not measurements**: turn rate 2.2/5.0/7.7/10.0 deg/s at 25-100 % helm (RPM 12), radius 3.05 L, speed ratio 0.82 imposed as constraints; the July runs hold no sustained turn, and none at the cruise setting (RPM 6) | S1-D turning circles at RPM 12 and 6 |
 | Thrust vs RPM | `T12` anchored at one operating point; square law assumed | S1-C RPM sweep and coast-downs |
 | Actuator decomposition | `rud_rate`, `rud_tau`, `rud_delay` trade off freely; 0.73 s is an effective lump of latency, servo and estimator lag | S1-B servo steps with an independent rudder measurement |
 | Reverse thrust and its delay | **absent**: no July run commands astern; the simulator assumes efficiency 0.5 with no delay | S1-C2 crash stops |
@@ -70,9 +75,9 @@ uncertainty; S2-A measures day-to-day variation.
 | P-6 | Analysis pre-registered: empty tables, metric definitions, thresholds (section 7) and the committed fit script | session 1's mid-session check runs that script unchanged |
 | P-7 | Landmark survey of fixed facility features for scan-to-map registration; furniture at the far end excluded; the bridge then runs with the registered map frame (`--origin map`) | registration anchors the pose without external instrumentation; it is also the expected fix for the phantom moving tracks at the basin wall (section 3a) |
 | P-8 | Reverse on the bench: the ESC accepts negative S2, dead band, ramp, current on a direct +62 to -100 reversal | **if the ESC cannot reverse, S1-C2 is void and the safety layer's stop does not exist on the water** |
-| P-9 | Paper 3 bridge (`FIELD_TRIALS_PLAN.md` section 3), at least for S2-C. **Done 2026-11-05** (section 3a); the UDP test is repeated on the field device | the existing bridge builds the Paper 2 observation |
-| P-10 | Run time per decision on the shore laptop, with communication: the command path (observation, policy, command) and, for the optional active block only, the E1 layer in the loop; p99 below the 0.5 s decision interval | otherwise the policy, or the layer, cannot run at 2 Hz. Development laptop (section 3a): command path met, E1 in the loop not met |
-| P-11 | Shore laptop and network: free UDP ports for the bridge and the vessel link, UDP allowed on the session network | on the development laptop UDP 5000, 5001 and 5050 are held by system services (the July bridge listened on 5000), and the university network blocks UDP |
+| P-9 | Paper 3 bridge (`FIELD_TRIALS_PLAN.md` section 3), at least for S2-C. **Done 2026-11-05** (section 3a). Repeated 2026-11-14 on the personal laptop (shore-laptop candidate, O-10; `field_deployment/UDP_BENCH_HANDOVER.md`, section 4): parity 32/32 runs and 1,497 decisions equal; the 19 July logs in process and three over UDP loopback equal to the in-process run and reproduced offline, so the UDP replay is no longer provisional. No separate two-device test (handover step 6 not run); UDP across devices is first exercised by the vessel link (handover step 7) at the next basin booking | the existing bridge builds the Paper 2 observation |
+| P-10 | Run time per decision on the shore laptop, with communication: the command path (observation, policy, command) and, for the optional active block only, the E1 layer in the loop; p99 below the 0.5 s decision interval | otherwise the policy, or the layer, cannot run at 2 Hz. Development laptop (section 3a): command path met, E1 in the loop not met. Personal laptop (2026-11-14, 2 cores, other applications holding about half the CPU): command path p99 0.03 s on test-set streams and 0.09 s from the LiDAR line to the sent command on the July logs over UDP loopback, met; E1 in the loop p99 0.89 s with 5 % of decisions above 0.5 s, not met. Active mode therefore runs at 2 Hz on neither laptop; shadow mode is unaffected. The vessel-link latency is not in these figures |
+| P-11 | Shore laptop and network: free UDP ports for the bridge and the vessel link, UDP allowed on the session network | on the development laptop UDP 5000, 5001 and 5050 are held by system services (the July bridge listened on 5000), and the university network blocks UDP. Personal laptop (2026-11-14), the shore laptop, linked to the laptop that controls the vessel with the July ports and command line (bridge on 5000, the vessel-control laptop on 5050; `udp_live_p3.py` keeps the July option names and accepts `--shadow` for `--no-send`): UDP 5000 (bridge), 5001, 15000 and 15050 free; 5050 held by the Connected Devices Platform service, which matters only for a fake vessel on the same laptop; UDP not restricted on its networks. No two-device bench test (handover step 6 not run); the vessel link (handover step 7: START reaches the vessel, frames and pose pair at 2 Hz, no `$CMD` sent) is scheduled for the start of the next basin booking, before any session |
 | P-12 | An operator stop independent of the shore laptop (radio-control override or vessel-side kill), tested on the bench | the bridge's stop key acts only while the bridge runs and its window has focus |
 
 ## 3a. Bench results of the Paper 3 bridge (2026-11-05)
@@ -89,8 +94,9 @@ Record: `field_deployment/README_P3_BRIDGE.md`, outputs under `field_deployment/
   safety-layer decision); the simulator side equals the recorded E1 test-set traces in 16/16
   episodes; with the staleness model on, 6/6.
 - **Shadow replay:** all 19 July logs in process (1,085 decisions) without error; three over UDP
-  loopback with `fake_vessel_replay.py`, equal to the in-process run (provisional until repeated
-  on the field device).
+  loopback with `fake_vessel_replay.py`, equal to the in-process run; repeated 2026-11-14 on the
+  personal laptop with the same result (P-9), so no longer provisional. UDP from a second device
+  is first exercised by the vessel-link check at the next basin booking.
 - **Run time (P-10, T-14):** command path p99 0.04 s on test-set streams and 0.09 s from the
   LiDAR line to the sent command on the July logs. E1 in the loop p99 0.89 s (test set) and
   2.06 s (July logs): **active mode does not run at 2 Hz on this laptop**; shadow mode is
@@ -106,7 +112,7 @@ Record: `field_deployment/README_P3_BRIDGE.md`, outputs under `field_deployment/
 | UDP ports and network on the development laptop | P-11 |
 | Operator stop depends on the shore laptop's bridge window | P-12 |
 
-## 4. Session 1: identification (about 4 h)
+## 4. Session 1: identification (about 4 h 50 min)
 
 Ordered by irreversibility; the priority block S1-D comes before the discretionary ones.
 
@@ -116,12 +122,15 @@ Ordered by irreversibility; the priority block S1-D comes before the discretiona
 | S1-B Actuators (limiter off) | 35 min | Rudder steps 0 to +/-25, 50, 100 % and +/-100 to -/+100 %, 5 repeats each; one 10 %/s ramp | servo rate, first-order lag and transport delay, separately |
 | S1-C Surge | 45 min | Acceleration from rest at RPM 6, 9, 12, 15, 18, 21, 24 (2 runs each); coast-downs from RPM 9, 15, 21 (3 runs each) | thrust curve and drag, separately |
 | S1-C2 Crash stops | 30 min | From straight settled speed at RPM 9, 12, 15 (3 runs each); **from a steady turn at RPM 12, helm 50 % and 100 %, both signs (2 runs each)**; full astern, rudder centred, as the reported layer's stop; logged to rest; side camera on a marked line | reverse efficiency, thrust delay, astern overshoot, head reach; heading change, yaw-rate decay and lateral drift from the stop command to rest |
-| S1-D Turning circles (priority 1) | 70 min | Helm 25, 50, 75, 100 %, both signs, RPM 12, two full turns each from settled speed; helm 50 and 100 % at RPM 18 | steady turn rate, radius, speed loss, advance, transfer, tactical diameter; drift-moment asymmetry |
-| S1-E Zig-zags | 30 min | 20/20 (3 repeats) and 10/10 (2 repeats), both initial directions, RPM 12 | overshoot angles, yaw inertia and damping |
+| S1-D Turning circles (priority 1) | 90 min | Helm 25, 50, 75, 100 %, both signs, RPM 12, two full turns each from settled speed; **helm 50 and 100 %, both signs, at the cruise setting RPM 6**, two full turns each; helm 50 and 100 % at RPM 18 | steady turn rate, radius, speed loss, advance, transfer, tactical diameter; drift-moment asymmetry; the turn at the speed the trials run at |
+| S1-E Zig-zags | 40 min | 20/20 (3 repeats) and 10/10 (2 repeats), both initial directions, RPM 12; **20/20 at RPM 6 (2 repeats), both initial directions** | overshoot angles, yaw inertia and damping, at RPM 12 and at the cruise setting |
 | S1-F Mid-session check | 25 min | The committed fit script on the day's data; thresholds of section 7; anything failing is reshot | keeps session 2 free for validation |
 
 If a full turning circle does not fit the basin at RPM 12, the largest settled arc is logged (a
-settled 180 deg arc still yields steady rate and speed) and the constraint is recorded.
+settled 180 deg arc still yields steady rate and speed) and the constraint is recorded. The
+current model puts the radius at about the same value at RPM 6 as at RPM 12 (5.2 m at full helm,
+12 m at helm 50 %), with the turn rate halved: one full turn takes about 71 s at full helm and
+143 s at helm 50 %, which sets the 20 min the RPM 6 circles add to S1-D.
 
 ## 5. Session 2: validation and dress rehearsal (about 4 h)
 
@@ -160,7 +169,7 @@ it was not fitted on.
 | T-1 | servo rate limit | S1-B | resolved to +/-20 %, separated from delay |
 | T-2 | transport delay | S1-B | resolved to +/-0.1 s |
 | T-3 | thrust curve exponent | S1-C | fitted, not assumed; at least 5 RPM points usable |
-| T-4 | steady turn rate at full helm | S1-D | measured at 3 or more helm settings, both signs |
+| T-4 | steady turn rate at full helm | S1-D | measured at 3 or more helm settings, both signs, at RPM 12; and at helm 100 %, both signs, at RPM 6 |
 | T-5 | turning radius | S1-D | measured; replaces the 1.5-4 L prior band |
 | T-6 | zig-zag overshoot | S1-E | both manoeuvres, 2 or more valid repeats |
 | T-7 | black-wall return rate | S1-A | resolved against bearing at 3 or more headings |
@@ -170,7 +179,7 @@ it was not fitted on.
 | T-11 | crash-stop head reach from RPM 12 | S1-C2 | measured; at most 1.5 Lpp (2.36 m), or recorded as failing |
 | T-12 | reverse response against the detector | S1-C2 | efficiency and onset inside the weak-strong bracket (0.25-0.5, 0-0.75 s), or recorded as outside with its consequence for the layer |
 | T-13 | drift after a stop from a turn | S1-C2 | heading change and lateral drift to rest measured at helm 50 and 100 %, both signs |
-| T-14 | run time on the shore laptop | P-10 | command path p99 below 0.5 s per decision with communication (required); E1 in the loop p99 below 0.5 s (required only for the optional active block; not met on the development laptop) |
+| T-14 | run time on the shore laptop | P-10 | command path p99 below 0.5 s per decision with communication (required); E1 in the loop p99 below 0.5 s (required only for the optional active block; not met on the development laptop, nor on the personal laptop, p99 0.89 s with 5 % of decisions above 0.5 s, 2026-11-14) |
 | T-15 | phantom moving tracks | S2-C | on the target-free runs, the share of decisions with a moving track and the shadow layer's stop commitments reported; the trials start only if the registered map frame removes the wall phantoms, or the remaining rate is recorded with its effect on the target branch |
 
 ## 8. Contingency ordering
@@ -181,10 +190,13 @@ If session 1 runs short, drop in this order (last dropped is most valuable):
 3. S1-C2 straight stops at RPM 9 and 15 (keep RPM 12) and the helm-50 % stops from a turn (keep
    helm 100 %);
 4. S1-B ramp (keep the steps);
-5. S1-D RPM 18 circles (keep RPM 12, every helm setting, both signs).
+5. S1-D RPM 18 circles (keep RPM 12, every helm setting, both signs), which lie above the
+   policy's propulsion range;
+6. S1-E 20/20 at RPM 6, then the S1-D helm-50 % circles at RPM 6 (keep helm 100 % at RPM 6,
+   both signs).
 
-**Never dropped:** S1-A, S1-D at RPM 12, S1-B steps, S1-C2 at RPM 12 (straight and from a turn),
-S1-F. A block lost entirely is recovered in S2-D at the cost of S2-C, never by refitting on
+**Never dropped:** S1-A, S1-D at RPM 12, S1-D at RPM 6 helm 100 % (both signs), S1-B steps,
+S1-C2 at RPM 12 (straight and from a turn), S1-F. A block lost entirely is recovered in S2-D at the cost of S2-C, never by refitting on
 session-2 validation data.
 
 ## 9. Open items
@@ -200,4 +212,4 @@ session-2 validation data.
 | O-7 | Is a direct full-ahead-to-full-astern reversal safe for motor, gearbox and battery? | if a ramp is needed, the layer's stop and the simulator's stop distances change |
 | O-8 | Basin booking dates and lead time; risk assessment | schedule |
 | O-9 | Does the localisation report the hull reference point or the LiDAR's position (0.86 m ahead)? | the bridge's `--pose-point` setting; a wrong choice shifts every range and boundary ray by up to 0.86 m |
-| O-10 | Which laptop is the shore laptop, and does it have free UDP ports and a network that passes UDP (P-11)? | the live bridge cannot connect otherwise; P-10 is measured on it |
+| O-10 | Which laptop is the shore laptop, and does it have free UDP ports and a network that passes UDP (P-11)? | the live bridge cannot connect otherwise; P-10 is measured on it. Decided 2026-11-14: the personal laptop (Intel i7-6600U, 2 cores, 4 threads, 7.9 GB, Windows 10), linked to the laptop that controls the vessel as in July; parity exact, bridge port free, UDP not restricted, command path met, E1 in the loop not met (as on the development laptop, which the university network and its held ports exclude). The link is first tested by handover step 7 at the next basin booking; on the day, other applications closed |
