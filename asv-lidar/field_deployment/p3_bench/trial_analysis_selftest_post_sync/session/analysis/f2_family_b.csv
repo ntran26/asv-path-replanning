@@ -1,0 +1,6 @@
+run_id,encounter,valid,outcome,reached_cpa_without_stop,first_manoeuvre,max_lateral_m,max_course_alteration_deg,first_alteration_after_engagement_s,target_side_at_cpa,crossed_ahead,cpa_m,speed_reduction_mps,rule,rule_compliant
+syn-BAS-HO-CV-001,head_on,True,goal,True,port,2.9073565253119034,30.453884250424977,4.5,starboard,0.0,3.2947980087218047,0.021562964858420686,Rule 14,0.0
+syn-BAS-CR-CV-003,crossing_port,True,goal,True,port,1.7409355776095077,49.78108000541857,5.0,starboard,0.0,1.4705403003531814,0.2419549382543592,crossing from port,1.0
+syn-BAS-CR-CV-005,crossing_port,True,goal,True,starboard,1.1911818373138807,20.722779938230843,3.0,port,1.0,2.3861536101427756,0.0,crossing from port,0.0
+syn-BAS-OT-CV-003,overtaking,True,goal,True,starboard,3.056567148635469,36.72417103826268,2.5,port,0.0,2.1409526556003056,0.0075116051472762235,Rule 13,0.0
+syn-BAS-BO-CV-001,being_overtaken,True,goal,True,none,0.26239705760710774,15.14162865846049,,port,0.0,2.166892979573595,0.2405869872941498,Rule 17,0.0

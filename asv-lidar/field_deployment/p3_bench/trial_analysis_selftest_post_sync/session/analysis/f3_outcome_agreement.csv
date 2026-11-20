@@ -1,0 +1,7 @@
+model,field_success,twin_success,runs
+calibrated,False,False,2
+calibrated,True,False,1
+calibrated,True,True,9
+training,False,False,2
+training,True,False,1
+training,True,True,9
