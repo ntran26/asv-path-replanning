@@ -1,6 +1,6 @@
 # Paper 3 draft: edit instructions (kept current)
 
-> **Kept current.** Last updated 2026-11-05. This file holds the next edit instructions for the
+> **Kept current.** Last updated 2026-11-14. This file holds the next edit instructions for the
 > Paper 3 draft, each as a block to paste into the chat that writes the paper. The blocks name
 > planning files by path; that chat reads them from the synced project, so each push needs a Sync
 > before the next block is sent. Only files outside `planning/` are attached: the .docx draft,
@@ -25,18 +25,101 @@ Changes off, checked on 2026-11-05 against `Paper3_Sections1-4_with_placeholders
   Availability); comments 0, 1 and 4–9 (comments 8 and 9: which parts of the layer run on the
   vessel; comment 4 gives the reference history).
 
-## 2. Next: on hold until the field-trial plan is final (2026-11-05)
+## 2. Next: block H, Sections 5.1 and 5.2 and the field role of the safety layer (2026-11-11)
 
-No block is pending. The next round starts from the clean file and is written once the
-field-trial plan is final. Queued for it:
+Requested 2026-11-11; amended 2026-11-14 (gyro bias tied to the IMU marker; turns at the
+cruise setting added to the calibration). The field-trial and calibration plans are final apart from the open
+platform items (target vessel D-1, ground-truth method D-2, IMU O-2, telemetry O-1/P-1, pose
+reference point O-9, shore laptop P-10/P-11, independent stop P-12), which the text marks
+[PENDING]. 5.3, 5.4, 6.1 and 6.2 are out of this block except for the 5.3 phrase in H4.
+
+**Attachments** (six). The planning files are attached as well as synced, because the synced
+project lacks the 2026-11-07 registration of C-15 to C-20 (uncommitted), and `field_deployment/`
+is outside `planning/`:
+1. `Paper3_Sections1-4_clean_rev05Nov.docx` (`PhD/3 Second Journal Paper - Dynamic Obstacle/Revision/`)
+2. `static_dynamic_obstacles/planning/FIELD_TRIALS_PLAN.md`
+3. `static_dynamic_obstacles/planning/FIELD_CALIBRATION_PLAN.md` (the 2026-11-14 version, with the
+   RPM 6 turns; uncommitted)
+4. `field_deployment/README_P3_BRIDGE.md`
+5. `static_dynamic_obstacles/planning/PAPER3_CLAIMS_AND_TABLES.md` (working copy)
+6. `field_deployment/trial_analysis/README_TRIAL_ANALYSIS.md` (working copy, uncommitted)
+
+Output: `Paper3_Sections1-5_rev11Nov_tracked.docx`.
+
+Checked on 2026-11-11 against the code and the plans:
+- Training applies no per-beam range noise, beam dropout, grazing no-return or aft mask:
+  `LIDAR_DROPOUT_P = 0.0`, `LIDAR_NO_RETURN_GRAZING_DEG = 0.0` and `LIDAR_AFT_MASK_HALF_DEG = 0.0`
+  in `src/constants.py` and `configs/baseline_v3.json`; ranges are exact ray casts with the 1 m
+  dead zone. "Which training does not model" therefore holds for range noise, dropout, the
+  black-wall return rate and aft self-occlusion; 2.3.1 already says so.
+- The trial families (A no target, B open basin, C on the reference layouts) contain no channel
+  layout, so the 5.1 channel sentence and the last sentence of 2.1.3 change (H2, H5).
+- The bench figures in H2 are those of `README_P3_BRIDGE.md` (development laptop, 2026-11-05):
+  parity 32/32 runs and 1,497 decisions; staleness 6/6; July logs 19 replays and 1,085 decisions;
+  command path p99 37.9 ms on test-set streams and 86 ms from the LiDAR line to the sent command
+  on the July logs; E1 in the loop p99 0.89 s and 2.06 s; phantom tracks on 42 % of decisions,
+  61 % of them within 1 m of the map boundary or beyond, stops in 15 of 19 replays.
+- Since 2026-11-14 session 1 runs turning circles at helm 50 and 100 %, both signs, and a 20/20
+  zig-zag (2 repeats, both initial directions) at the cruise setting RPM 6, beside the RPM 12 sets
+  (four helm settings, both signs; 20/20 and 10/10 zig-zags) and the RPM 18 pair; the crash stops
+  stay at RPM 9-15 and the surge sweep starts at RPM 6. Session 1 is about 4 h 50 min ("about
+  5 h"), session 2 about 4 h. The coverage groups of `README_TRIAL_ANALYSIS.md` include the RPM 6
+  turns; H3(c) names the two speeds and gives no numbers.
+- Gyro bias exists only if an IMU is fitted (O-2 open), so H3(a) ties it to the IMU marker.
+- The "Definitions fixed here" table of `README_TRIAL_ANALYSIS.md` is not yet confirmed: H3
+  describes the comparison levels and leaves the counting rules, seed counts and the twin's
+  success rule to the pre-registration.
+
+```
+Apply the following changes to the attached Paper3_Sections1-4_clean_rev05Nov.docx as tracked changes dated 11 November 2026 (author "Claude"), keeping comments 0, 1 and 4–7, and save the result as Paper3_Sections1-5_rev11Nov_tracked.docx. The block writes Sections 5.1 and 5.2 from the attached field-trial plan (FIELD_TRIALS_PLAN.md, sections 2–7 and 10), calibration plan (FIELD_CALIBRATION_PLAN.md, sections 1–7 and 9), bridge record (README_P3_BRIDGE.md), claim ledger (PAPER3_CLAIMS_AND_TABLES.md, Part 1 section 2 and the F tables of Part 2) and trial-analysis record (README_TRIAL_ANALYSIS.md); where a synced copy differs, the attached copy holds. Sections 5.3 and 5.4 stay placeholders except for H4. Report each change in a short revision-log addendum, with every number in 5.1 and 5.2 traced to its file and section.
+
+Rules for the new text: methods only, in the present tense, as a design that the sessions carry out; no field result, since none exists yet; impersonal voice; American spelling (localization, behavior, maneuver, centered), although the attached files use British spelling; COLREGs-aware, never compliant; "rule-consistent" for the track-based conditions of Section 3.4.3, although the analysis code calls them compliance; validation set, coupled and decoupled as in the draft. No internal identifiers in the paper text: no E1, D-4, P-7, S1-A, T-14, C-20 or file names; write "the runtime safety layer (Section 2.3.4)", "the pre-committed thresholds", "the dress rehearsal". The safety layer's would-be interventions are always reported apart from the policy. Open platform items are written as highlighted markers, not stated.
+
+H1. Section 2.3.4, last paragraph. Delete "In the field trials, the same code also serves as an operator-latched stop (Section 5)." At the end of the paragraph, after "…between learned behavior and externally enforced intervention.", add: "In the field trials, the layer runs in shadow mode: it decides at every decision step and every decision is logged, but none of its commands reaches the vessel, and an operator stop is the physical safety (Section 5.1)." Delete comment 8, which this resolves.
+
+H2. Section 5.1 (Platform and setup): replace the placeholder with method text covering, in this order:
+ (a) The vessel, its two-dimensional LiDAR and the 10 × 25 m basin of the previous study [13]; the deployed policy (SAC seed 0, the best validation checkpoint) is used unchanged, and the bridge refuses any other file (it checks the checkpoint's hash and its configuration against the code).
+ (b) The shore-side bridge makes one decision per LiDAR frame at 2 Hz. The observation is built by the simulator's own environment code with only its sensor models replaced by the measured scan, the estimated pose and the measured ego motion, so the map gate, the 27 pooled sectors, the seven boundary rays, clustering, tracking, the encounter classification and latch, and the 70-value observation are the code of Section 2.3, unchanged; no physics or target is simulated. The command mapping is the training one (Section 2.1.1): no rudder command limiter, propulsion from zero to twice the cruise setting, no astern from the policy.
+ (c) Localization: a scan-to-map pose anchored on surveyed fixed features of the facility, with the bridge running in the registered map frame, so that the navigable polygon is the map's, as in simulation (Section 2.1.3). Markers: [PENDING — IMU on the vessel and its clock]; [PENDING — telemetry rate and pose resolution]; [PENDING — pose reference point, hull or LiDAR, settled in the first calibration session].
+ (d) The safety layer in shadow mode. The layer of Section 2.3.4 runs in a separate process off the command path, so it never delays a command. It decides at every decision and each decision is logged; its brake request is cleared, and its model of its own rudder is advanced with the command actually issued, so that it judges the vessel the policy is steering; its first would-be stop is permanent, as an active stop would be, so later decisions report the stop. The learned behavior on the water is therefore the policy's own, as in Section 4, and the layer's would-be interventions are measured on the water and reported apart. The operator stop on the bridge is always armed, and a second stop does not depend on the shore laptop [PENDING — independent stop, tested on the bench]. An optional block with the layer active is run only if the layer decides within the 0.5 s decision interval on the shore laptop (its 99th percentile was 0.89–2.06 s per decision on a development computer) and the speed controller reverses [PENDING — reversal test]; otherwise no active run is made.
+ (e) Bench checks, stated as bench results and not as field results: replaying 16 test-set episodes through the bridge in shadow and in active mode, 32 runs and 1,497 decisions, gives the simulator's observation, action, issued command and every safety-layer decision exactly; all 19 logs of the July 2026 campaign replay in shadow mode (1,085 decisions) without error; the command path's 99th percentile is 0.04 s per decision on test-set streams and 0.09 s from the LiDAR frame to the sent command on the July logs, on a development computer [PENDING — the shore laptop's figures].
+ (f) Phantom moving tracks, as a bench finding that conditions the trials (in 5.1 or in 5.4, at the author's choice; never as a trial result): in the July logs, which hold no target and were run open loop by the previous study's policy at about twice the deployed cruise speed, 42 % of decisions carry a moving track, 61 % of them within 1 m of the map boundary or beyond it, and the shadow layer would commit a stop in 15 of the 19 replays. The trials start only once the dress rehearsal shows that the registered map frame removes them; otherwise their remaining rate is reported with its effect on the target branch.
+ (g) What is logged per decision on one clock: the raw ranges, the pose and ego estimates fed to perception, the observation, the policy action, the issued command, the tracks and encounter contexts, every safety-layer decision, and operator stops; target ground truth, video and the run sheet are kept beside them [PENDING — target ground-truth method, fixed after the calibration sessions].
+ (h) Pre-registration: the scenario list and order, the metric definitions, the analysis scripts and the empty result tables are committed before the first trial session; invalid runs are kept and reported as invalid.
+ Replace "Channel layouts can be staged inside the basin with virtual boundaries (Section 2.1.3); which layouts are run is part of the pending trial design." with a sentence stating that the trials use the three fixed reference layouts (the previous study's basin layouts [13], with 1.0 m panels) and open basin legs, that no channel layout is run on the water, and that Section 5.3 gives the scenarios. Delete comment 9, which (d) resolves.
+
+H3. Section 5.2: retitle it "Vessel-model calibration and sim-to-field comparison" and replace the placeholder with method text covering:
+ (a) Two basin calibration sessions before the trials, the first of about 5 h and the second of about 4 h. The first identifies: a sensing baseline, stationary at surveyed poses mid-basin and near the light and the matte black walls (gyro bias if an IMU is fitted [PENDING — IMU on the vessel and its clock]; localization drift at rest, range noise, the return rate against the black wall, aft self-occlusion; training models none of these LiDAR effects, Section 2.3.1); rudder steps that separate servo rate, lag and transport delay; a surge sweep from rest at 6–24 RPM and coast-downs, for the thrust curve and drag; crash stops at full astern with the rudder centered, from straight runs at 9, 12 and 15 RPM and from a steady turn at 12 RPM; turning circles of two full turns from settled speed, at four helm settings at 12 RPM and at helm 50 and 100 % at the cruise setting of 6 RPM, each to both sides, and at helm 50 and 100 % at 18 RPM; and 20/20 and 10/10 zig-zags at 12 RPM and a 20/20 zig-zag at 6 RPM. It ends with a check against pre-committed acceptance thresholds, so that a failed block is repeated the same day. The second session validates on data the fit has not seen: repeatability without refitting; an open-loop replay holdout that includes three crash stops; and a closed-loop dress rehearsal of the deployed policy through the bridge, in the trial configuration, on the reference layouts and an open leg with no target.
+ (b) The fit uses the first session only, and the validation the second only; if a block has to be refitted with second-session data, the paper says so. The July 2026 logs remain the provenance of the model used in training; they lie at about twice the cruise speed (Section 2.1.2), so the first session's surge sweep starts at the cruise setting, and turning circles and a zig-zag are also run at it, the speed of the trials.
+ (c) The four uses of the calibration: model provenance (an archived identification data set and the standard maneuvering quantities, reported in Appendix A); coverage, the identified dynamics against the plant randomization the policy trained on, with the turns compared at 12 RPM and at the cruise setting, and with the field results read as out-of-distribution transfer if they lie outside it; a calibrated analysis model for the comparison in (d); and the safety layer's physical assumptions, the measured reverse response and the drift after a stop from a turn against the weak and strong reverse models of its stop test (Section 2.3.4). The training simulator stays frozen: the calibrated model is an analysis model only, and no result of Section 4 changes.
+ (d) The sim-to-field comparison at three levels. Open loop: the logged command sequences replayed through the training model and the calibrated model, with heading and position error against horizon. Closed-loop twin: each run re-simulated from its logged start, with the target scripted along its measured track and the same frozen policy, in both models and over several sensor-noise seeds, compared by outcome agreement and by each metric's field value against the twins' distribution. Population: field successes per family and cell against the test set's same cells, reported as counts with the small-sample caveat. If the calibrated twin reproduces the field better than the training model, the gap is attributed to the dynamics; otherwise, to perception, localization or disturbance; either outcome is reported. Do not state the counting rules, the number of seeds or the twin's success rule: they are fixed at the pre-registration [PENDING — analysis definitions, confirmed at pre-registration].
+ This resolves [TBC — logs for the replay]; delete that marker.
+
+H4. Section 5.3: replace "run by the deployed policy with the latched stop available to the operator" with "run by the deployed policy with the operator stop armed and the runtime safety layer in shadow mode (Section 5.1)". The rest of 5.3 and its [PENDING] marker stay.
+
+H5. Section 2.1.3, last sentence: replace "Because the boundary is virtual, every channel width used here can also be staged inside the physical basin (Section 5)." with "Because the boundary is virtual, a channel narrower than the basin could also be staged inside it; the field trials of Section 5 run no channel layout."
+
+H6. Marker lists at the end: delete the two [CHECK] entries of 26 October on the operator-latched stop and the [TBC — logs for the model replay] entry; add the [PENDING] markers of H2 and H3 under Sections 3–7, dated 11 November 2026; extend the header line's history with "Sections 5.1 and 5.2 written and the field role of the safety layer settled 11 November 2026".
+```
+
+Queued after block H:
 - Figures 1–3: the placeholder texts follow the final drawings (drafts in the liaison scratchpad;
   the author returns to them). Figure 1's dashed outline is the own ship's domain, so "the
   target's asymmetric ship domain" becomes the own ship's; Figure 2 uses "required turn sense",
   which resolves [CHECK — Figure 2 placeholder terminology]; Figure 3 adds the ego and path
   branches.
-- Section 6.1 (block H; writable now for the two simulation questions).
-- Appendix A (needs a table of the identified parameters with their bootstrap spread).
-- Sections 5 and 7, the abstract and the conclusion, after the field trials.
+- Section 6.1 (block I; writable now for the two simulation questions); 6.2 to state that the
+  water runs use constant-velocity targets only and no channel layout.
+- Section 5.3 from `FIELD_TRIALS_PLAN.md` section 4 once D-1 is fixed; 5.4 after the trials.
+- Appendix A (needs a table of the identified parameters with their bootstrap spread; F4 after
+  the calibration).
+- Section 7, the abstract and the conclusion, after the field trials.
+- Length (held 2026-11-14): the clean rev05Nov runs to over 40 single-spaced pages (about 26,300
+  words of main text, half of it Section 2). Candidates that keep the content: Algorithms 1–4,
+  the 2.2.4 width derivation, Table 3a and Table 10 to the appendices; the repeats in 1.3, of the
+  training-target behavior, of the tracker settings and of the curriculum prose against Table 8
+  removed; Appendices F and G to supplementary material; the literature review compressed. One
+  block after block H, once the venue is chosen.
 
 ## 3. Log of applied blocks
 
