@@ -1,0 +1,13 @@
+run_id,session,scenario_id,family,encounter,layout,repeat,valid,outcome,notes
+syn-P2-L1-HO-FIX-03,synthetic,C-L1-HO,C,head_on,L1,1,1,goal,"simulated P2-L1-HO-FIX-03, seed 470002"
+syn-P2-L1-CRS-FIX-05,synthetic,C-L1-CRS,C,crossing_starboard,L1,1,1,goal,"simulated P2-L1-CRS-FIX-05, seed 470044"
+syn-P2-L1-CRP-FIX-05,synthetic,C-L1-CRP,C,crossing_port,L1,1,1,contact_target,"simulated P2-L1-CRP-FIX-05, seed 470024"
+syn-P2-L1-OT-FIX-01,synthetic,C-L1-OT,C,overtaking,L1,1,1,goal,"simulated P2-L1-OT-FIX-01, seed 470060"
+syn-P2-L2-HO-VAR-04,synthetic,C-L2-HO,C,head_on,L2,1,1,contact_panel,"simulated P2-L2-HO-VAR-04, seed 470103"
+syn-P2-L3-HO-FIX-05,synthetic,C-L3-HO,C,head_on,L3,1,1,goal,"simulated P2-L3-HO-FIX-05, seed 470204"
+syn-P2-L1-NT-01,synthetic,A-L1,A,none,L1,1,1,goal,"simulated P2-L1-NT-01, seed 480000"
+syn-BAS-HO-CV-001,synthetic,B-head_on,B,head_on,open,1,1,goal,"simulated BAS-HO-CV-001, seed 400000"
+syn-BAS-CR-CV-003,synthetic,B-crossing_port,B,crossing_port,open,1,1,goal,"simulated BAS-CR-CV-003, seed 400102"
+syn-BAS-CR-CV-005,synthetic,B-crossing_port,B,crossing_port,open,1,1,goal,"simulated BAS-CR-CV-005, seed 400104"
+syn-BAS-OT-CV-003,synthetic,B-overtaking,B,overtaking,open,1,1,goal,"simulated BAS-OT-CV-003, seed 400202"
+syn-BAS-BO-CV-001,synthetic,B-being_overtaken,B,being_overtaken,open,1,1,goal,"simulated BAS-BO-CV-001, seed 400300"
