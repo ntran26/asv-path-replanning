@@ -1,0 +1,7 @@
+extending: [('easy_5', 'OPEN', 7), ('medium_1', 'L1', 37), ('medium_2', 'L1', 66), ('medium_3', 'L1', 295), ('medium_5', 'L1', 16), ('hard_5', 'L2', 46)]
+easy_5 OPEN: 20 more candidates, 2 kept (robust [10, 10]) (119 s)
+medium_5 L1: 42 more candidates, 2 kept (robust [10, 10]) (192 s)
+hard_5 L2: 235 more candidates, 0 kept (robust []) (645 s)
+medium_3 L1: 163 more candidates, 0 kept (robust []) (830 s)
+medium_1 L1: 252 more candidates, 0 kept (robust []) (901 s)
+medium_2 L1: 211 more candidates, 0 kept (robust []) (940 s)

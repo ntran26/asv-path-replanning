@@ -124,6 +124,16 @@ reported as a range.
 Being overtaken needs a target faster than the own ship's 0.56 m/s, and overtaking a target slower
 than it (decision D-1).
 
+**Field test suite (2026-11-20).** Fifteen named scenarios, `easy_1`-`easy_5` (open basin,
+family B), `medium_1`-`medium_5` (L1) and `hard_1`-`hard_5` (L2 or L3), numbered by encounter
+(1 head-on, 2 crossing from starboard, 3 crossing from port, 4 overtaking, 5 being overtaken):
+`src/field_test_cases.py`, built by `tools/tiers/field_suite.py`, record
+`results/field_suite/README.md`. Each reaches the goal in simulation on 10 of 10 noise seeds on
+the identified plant and in 8-10 of 10 runs with a randomised plant and a perturbed start and
+target launch; 12 of 15 meet the Section 3.4.3 rule conditions on the nominal run. At 3 repeats
+the suite is 45 runs. The families, repeats and tiers above apply unchanged. The bridge loads a
+case by name (`udp_live_p3.py --scenario easy_1`).
+
 ## 5. Measurement
 
 - **Own ship:** scan-to-map pose anchored on surveyed landmarks, with the IMU
