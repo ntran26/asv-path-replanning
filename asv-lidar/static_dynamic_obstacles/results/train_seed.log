@@ -306,3 +306,5 @@ code matches comparators-v2 (digest 617782d1483005d7)
 2026-10-25 17:16:57    test set v4 E1 runs ts4_final_e1_c01-c10 complete
 2026-10-25 22:16:33 == safety layer, test set v4: V16 + stop, E1 detector with static points, W = 3.5 s (chosen on validation; 10 processes)
 2026-10-25 22:48:26    test set v4 runs ts4_final_e1s35_c01-c10 complete
+2026-11-20 18:27:54 == ppos0_srcmove: training 0 -> 4,096 steps via train_asv.py (baseline-v3; CPU unpinned, default threads)
+2026-11-20 18:46:57    ppos0_srcmove: trained to 0.004096 M -> runs\ppo_formulation_seed0_srcmove_smoke
