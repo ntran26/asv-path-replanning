@@ -40,6 +40,7 @@ from __future__ import annotations
 import p3_bridge as pb  # first: puts the simulator's modules ahead of this directory's
 
 import argparse
+import collections
 import dataclasses
 import json
 import math
@@ -49,12 +50,13 @@ import queue
 import socket
 import sys
 import time
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Callable, Deque, Dict, List, Optional, Tuple
 
 import numpy as np
 
 import constants as cfg
 import emergency_stop as estop_mod
+import log_parser
 import scenario as scn
 import tracking
 from log_parser import BluefinStreamDecoder
@@ -244,19 +246,102 @@ class WorkerShadow:
 # ---------------------------------------------------------------------------
 # One frame, from pose sync to logged decision
 # ---------------------------------------------------------------------------
+class EgoWindow:
+    """Ego motion (surge, sway, yaw rate) from the pose lines over about one decision interval.
+
+    `BluefinStreamDecoder` differences each pose line against the one before it.  At the July
+    rate (2 Hz) that spans the 0.5 s decision interval.  At the vessel's 10 Hz stream (the
+    February 2026 logs) it spans 0.1 s, and with the pose quantised to 0.1 m the position is
+    unchanged on 26-62 % of consecutive samples, so the speed jumps between zero and up to about
+    1.4 times the speed over 1 s.  This keeps the pose lines of the last few seconds and
+    differences the newest against the one whose age is nearest `window_s`, with the decoder's
+    own time base, conventions and arithmetic; at 2 Hz that is the previous line, so the result
+    is the decoder's.  `window_s = 0` gives the decoder's consecutive differences at any rate.
+    The yaw rate comes from the pose heading; the separate `HDG` readings are not used (their
+    offset from the pose heading drifts within a run).
+    """
+
+    def __init__(self, window_s: float, *, keep_s: float = 5.0) -> None:
+        self.window_s = max(0.0, float(window_s))
+        self.keep_s = max(float(keep_s), 2.0 * self.window_s)
+        self._t0: Optional[float] = None
+        self._poses: Deque[Tuple[float, float, float, float]] = collections.deque()
+        self._vel: Tuple[float, ...] = (0, 0, 0, 0, 0, 0)       # (vx, vy, speed, u, v_port, yaw rate)
+        self.dt_s = float("nan")                                # span of the last estimate
+        self.mismatches = 0                                     # frames whose pose is not the newest line's
+
+    def _time(self, ts: str) -> float:
+        sec = log_parser._ts_to_seconds(ts)
+        if self._t0 is None:
+            self._t0 = sec
+        return sec - self._t0
+
+    def feed(self, line: str) -> None:
+        """Every received line, in arrival order, as the decoder sees them."""
+        line = line.strip()
+        if not line or BluefinStreamDecoder._re_rc.match(line) or BluefinStreamDecoder._re_hdg.match(line):
+            return
+        m = BluefinStreamDecoder._re_pose.match(line)
+        if m:
+            t = self._time(m.group("ts"))
+            x, y, yaw_deg = float(m.group("x")), -float(m.group("y")), -float(m.group("yaw"))
+            self._update(t, x, y, yaw_deg)
+            self._poses.append((t, x, y, yaw_deg))
+            while len(self._poses) > 2 and t - self._poses[0][0] > self.keep_s:
+                self._poses.popleft()
+            return
+        m = BluefinStreamDecoder._re_lidar.match(line)
+        if m:
+            self._time(m.group("ts"))
+
+    def _update(self, t: float, x: float, y: float, yaw_deg: float) -> None:
+        best = None
+        for prev in reversed(self._poses):
+            dt = t - prev[0]
+            if dt <= 1e-6:
+                continue
+            if best is not None and dt - self.window_s > abs(best[0] - self.window_s):
+                break                       # older lines only move further from the window
+            if best is None or abs(dt - self.window_s) < abs(best[0] - self.window_s):
+                best = (dt, prev)
+        if best is None:
+            return                          # as the decoder: keep the last velocity
+        dt, (_, prev_x, prev_y, prev_yaw) = best
+        vx = (x - prev_x) / dt
+        vy = (y - prev_y) / dt
+        spd = np.hypot(vx, vy)
+        yaw_rate = (log_parser._wrap_180(yaw_deg - prev_yaw)) / dt
+        yaw_rad = np.deg2rad(yaw_deg)
+        u_body = vx * np.sin(yaw_rad) + vy * np.cos(yaw_rad)
+        v_body = -vx * np.cos(yaw_rad) + vy * np.sin(yaw_rad)
+        self._vel = (vx, vy, spd, u_body, v_body, yaw_rate)
+        self.dt_s = float(dt)
+
+    def apply(self, frame):
+        """The frame with this window's ego motion, if its pose is the newest pose line's."""
+        if not self._poses or tuple(self._poses[-1][1:]) != (frame.x_m, frame.y_m, frame.yaw_deg):
+            self.mismatches += 1
+            return frame
+        vx, vy, spd, u, v, r = self._vel
+        return dataclasses.replace(frame, vx_mps=vx, vy_mps=vy, speed_mps=spd, u_body_mps=u,
+                                   v_body_mps=v, yaw_rate=r)
+
+
 class FrameHandler:
     """Per-frame processing shared by the live loop and the bench replay (`p3_shadow_replay.py`)."""
 
     def __init__(self, *, bridge: pb.Bridge, policy: pb.Policy, run_id: str, run_dir: str, start_xy,
                  transform: Optional[pb.PoseTransform], map_rotation: float, lidar_index0_deg: float,
                  latch: estop_mod.EmergencyStop, safety_mode: str, compact: bool, config: Dict,
-                 shadow=None, pose_point: str = "origin", min_interval_s: float = 0.4) -> None:
+                 shadow=None, pose_point: str = "origin", min_interval_s: float = 0.4,
+                 ego_window_s: float = cfg.UPDATE_RATE) -> None:
         self.bridge, self.policy, self.run_id = bridge, policy, run_id
         self.start_xy, self.transform, self.map_rotation = start_xy, transform, map_rotation
         self.lidar_index0_deg = lidar_index0_deg
         self.latch, self.safety_mode, self.compact, self.config = latch, safety_mode, compact, config
         self.shadow = shadow
         self.pose_point, self.min_interval_s = pose_point, float(min_interval_s)
+        self.ego = EgoWindow(ego_window_s)
         self.skipped = 0
         self.decisions = open(os.path.join(run_dir, "decisions.jsonl"), "a", encoding="utf-8", buffering=1)
         self.raw = open(os.path.join(run_dir, "telemetry.log"), "a", encoding="utf-8", buffering=1)
@@ -273,6 +358,7 @@ class FrameHandler:
 
     def note_line(self, line: str, now: float) -> None:
         self.raw.write(line + "\n")
+        self.ego.feed(line)
         stripped = line.strip()
         if stripped and not any(rx.match(stripped) for rx in RECOGNISED):
             self.other_lines.append({"t_wall": now, "line": stripped})        # IMU, or anything new
@@ -294,6 +380,7 @@ class FrameHandler:
         if self.t_prev is not None and frame.t_sec - self.t_prev < self.min_interval_s:
             self.skipped += 1
             return None
+        frame = self.ego.apply(frame)
         if self.transform is None:
             self.transform = pb.PoseTransform.anchored((frame.x_m, frame.y_m), self.start_xy, self.map_rotation)
         sensor = pb.frame_to_sensor(frame, self.transform, lidar_index0_deg=self.lidar_index0_deg,
@@ -332,7 +419,7 @@ class FrameHandler:
             "ts": frame.ts_str, "seq": frame.seq, "x": frame.x_m, "y": frame.y_m, "yaw": frame.yaw_deg,
             "u": frame.u_body_mps, "v_port": frame.v_body_mps, "yaw_rate": frame.yaw_rate, "speed": frame.speed_mps,
             "s1": frame.s1, "s2": frame.s2, "hdg_ref": frame.hdg_ref_deg, "pose_fresh": bool(fresh),
-            "pose_age_s": pose_age_s, "pose_wait_s": pose_wait_s, "imu": None}
+            "pose_age_s": pose_age_s, "pose_wait_s": pose_wait_s, "ego_dt_s": self.ego.dt_s, "imu": None}
         record["other_lines"], self.other_lines = self.other_lines, []
         record["operator_stop"] = {"state": self.latch.state,
                                    "reason": self.latch.events[-1].reason if self.latch.active else ""}
@@ -485,6 +572,9 @@ def build_parser() -> argparse.ArgumentParser:
                          "assumption) or the LiDAR, LIDAR_OFFSET_M ahead of it")
     ap.add_argument("--min-decision-interval", type=float, default=0.4,
                     help="s; frames closer than this to the last decision are logged but not acted on")
+    ap.add_argument("--ego-window-s", type=float, default=cfg.UPDATE_RATE,
+                    help="s; surge, sway and yaw rate from the pose lines this far apart (nearest line), "
+                         "the decision interval by default; 0: consecutive lines, as the decoder")
     ap.add_argument("--model-path", default=pb.DEFAULT_MODEL)
     ap.add_argument("--safety", choices=("shadow", "active", "off"), default="shadow")
     ap.add_argument("--shadow-inline", action="store_true",
@@ -542,7 +632,8 @@ def setup(args, *, shadow_kind: Optional[str] = None):
                            start_xy=path_start(built), transform=transform, map_rotation=args.map_rotation,
                            lidar_index0_deg=args.lidar_index0_deg, latch=make_latch(args),
                            safety_mode=args.safety, compact=compact, config=config, shadow=shadow,
-                           pose_point=args.pose_point, min_interval_s=args.min_decision_interval)
+                           pose_point=args.pose_point, min_interval_s=args.min_decision_interval,
+                           ego_window_s=args.ego_window_s)
     return handler, run_dir, geometry
 
 

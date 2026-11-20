@@ -57,7 +57,22 @@ Conventions at the field boundary (`frame_to_sensor`):
 * every released frame is processed in order (a backlog is caught up, never dropped), and a
   frame closer than `--min-decision-interval` (0.4 s) to the last decision is logged but not
   acted on, so a faster telemetry stream (P-1) is decimated to the 2 Hz the policy and the
-  tracker assume.
+  tracker assume;
+* the ego motion (surge, sway, yaw rate) is the difference between the newest pose line and
+  the one whose age is nearest `--ego-window-s` (0.5 s, the decision interval), with the
+  decoder's conventions and arithmetic (`EgoWindow` in `udp_live_p3.py`, 2026-11-20), not the
+  decoder's difference between consecutive lines. At 2 Hz that is the previous line: on the
+  19 July logs every frame's ego motion equals the decoder's, and the shadow replay (in process,
+  all 19 logs; over UDP loopback, three) gives decisions and shadow decisions equal to the
+  2026-11-05 run. At the vessel's 10 Hz stream (the February 2026 logs, `data/test_1-4.log`)
+  consecutive lines are 0.1 s apart and the 0.1 m pose is unchanged on 26-62 % of them: the
+  decoder's speed read zero on 18-46 % of the frames moving faster than 0.2 m/s, which the
+  operator stop takes for "stopped", and peaked at 2.2-2.3 m/s against at most 1.8 m/s over
+  1 s. Over 0.5 s the speed's error against the speed over 1 s is 0.08-0.10 m/s RMS (decoder
+  0.39-0.44), no moving frame reads zero, and the in-process replay of the four logs passes
+  (1,179 decisions). The `HDG` lines (0.01 deg, 10 Hz) are logged but not used: their rate
+  follows the pose heading's (slope 0.93-1.01), while their offset from it drifts within a run
+  (standard deviation 4-102 deg), so they come from another heading source, not yet identified.
 
 ### Safety layer in shadow mode (D-4)
 
@@ -231,7 +246,7 @@ vessel-link latency is not in these figures: the bench has no vessel.
 | --- | --- | --- |
 | E1 run time (T-14) | p99 0.89-2.06 s per decision, above the 0.5 s interval | active mode (`--safety active`) does not run at 2 Hz on this laptop; the optional active block (D-4) needs a faster layer or computer, measured again on the shore laptop |
 | Phantom tracks | on the July logs (no target), 42 % of decisions carry a dynamic track; 61 % of these lie within 1 m of the map boundary or outside it, 35 % elsewhere, 4 % near a panel; median speed 0.23 m/s, p90 0.65 m/s. They reach the target branch, and the shadow layer would commit a stop in 15 of 19 replays (as early as decision 2, on a phantom 3.3 m away given 1.08 m/s) | most look like basin-wall returns surviving the gate under the start-anchored map frame and 0.1 m / 0.1 deg poses; registration on the landmark survey (P-7, `--origin map`) and the S2-C dress rehearsal must show them gone before the trials |
-| Telemetry resolution (P-1, O-2) | at the July resolution (pose 0.1 m and 0.1 deg at 2 Hz, ego by pose differences), the observation moves from the simulator's on average by 0.11-0.16 (ego), 0.03-0.09 (path), up to 0.40 (target) and 0.53 (context), in normalised units | higher pose resolution, or an ego estimate from the IMU, before the trials; at 10 Hz the decoder's pose differences span 0.1 s and get noisier, so its velocity estimate needs changing with the rate (the bridge decimates the decisions, not the velocity) |
+| Telemetry resolution (P-1, O-2) | at the July resolution (pose 0.1 m and 0.1 deg at 2 Hz, ego by pose differences), the observation moves from the simulator's on average by 0.11-0.16 (ego), 0.03-0.09 (path), up to 0.40 (target) and 0.53 (context), in normalised units | higher pose resolution, or an ego estimate from the IMU, before the trials. The rate itself is set on the vessel: the July logs carry frames exactly 0.5 s apart by the vessel's own time stamps, with `hey` lines and no `HDG` or RC lines; the February logs (radio-controlled) 0.1 s apart, with `HDG` and RC lines and no `hey`; a receiver cannot thin a stream that regularly or remove line types, so the difference is the onboard program's mode or setting. Since 2026-11-20 the ego estimate spans the decision interval at either rate (`--ego-window-s`) |
 | Pose point | the July bridge took the telemetry pose as the vessel reference point; whether the localisation reports the LiDAR's (0.86 m ahead) is not established | settle at S1-A, then `--pose-point` |
 | Map frame | `--origin start` assumes the telemetry axes are the basin's and the vessel sits on the path start at the first frame | `--origin map` with the P-7 registration |
 | UDP ports on this laptop | UDP 5000, 5001 and 5050 are held by system services (`nidmsrv.exe`, `lktsrv.exe`, `svchost.exe`); the July bridge listened on 5000 | free ports, or another laptop, before a session; UDP itself is blocked on this laptop's network (UTAS). Personal laptop (2026-11-14), the shore laptop for the link to the laptop that controls the vessel: 5000 free, 5050 held by `svchost.exe` (CDPSvc), which affects only a fake vessel on the same machine; UDP not restricted on its networks; step 6 of `UDP_BENCH_HANDOVER.md` not run (the link is not between two bench laptops; loopback taken as the bench test); the link is first tested at step 7, at the next basin booking, with the July ports |
