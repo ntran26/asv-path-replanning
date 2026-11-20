@@ -1,0 +1,367 @@
+{
+ "tag": "feb_logs_personal_i7_ego",
+ "inproc": [
+  {
+   "run_dir": "D:\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\feb_logs_personal_i7_ego\\inproc\\log-data-test_1",
+   "decisions": 418,
+   "shadow_decisions": 418,
+   "phantom": {
+    "decisions_with_dynamic_track": 149,
+    "decisions_with_context": 149,
+    "decisions_engaged": 11,
+    "decisions_target_branch_nonzero": 149
+   },
+   "would_change": 407,
+   "first_would_change": 11,
+   "would_stop_at": 11,
+   "why_counts": {
+    "no escape": 10,
+    "nominal": 1,
+    "emergency stop": 407
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "log": "data\\test_1.log"
+  },
+  {
+   "run_dir": "D:\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\feb_logs_personal_i7_ego\\inproc\\log-data-test_2",
+   "decisions": 162,
+   "shadow_decisions": 162,
+   "phantom": {
+    "decisions_with_dynamic_track": 31,
+    "decisions_with_context": 31,
+    "decisions_engaged": 0,
+    "decisions_target_branch_nonzero": 31
+   },
+   "would_change": 98,
+   "first_would_change": 64,
+   "would_stop_at": 68,
+   "why_counts": {
+    "nominal": 20,
+    "idle": 40,
+    "searched policy": 1,
+    "no escape": 3,
+    "brake": 1,
+    "last certificate": 3,
+    "emergency stop": 94
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "log": "data\\test_2.log"
+  },
+  {
+   "run_dir": "D:\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\feb_logs_personal_i7_ego\\inproc\\log-data-test_3",
+   "decisions": 156,
+   "shadow_decisions": 156,
+   "phantom": {
+    "decisions_with_dynamic_track": 30,
+    "decisions_with_context": 30,
+    "decisions_engaged": 12,
+    "decisions_target_branch_nonzero": 30
+   },
+   "would_change": 139,
+   "first_would_change": 17,
+   "would_stop_at": 17,
+   "why_counts": {
+    "nominal": 16,
+    "no escape": 1,
+    "emergency stop": 139
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "log": "data\\test_3.log"
+  },
+  {
+   "run_dir": "D:\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\feb_logs_personal_i7_ego\\inproc\\log-data-test_4",
+   "decisions": 443,
+   "shadow_decisions": 443,
+   "phantom": {
+    "decisions_with_dynamic_track": 204,
+    "decisions_with_context": 204,
+    "decisions_engaged": 25,
+    "decisions_target_branch_nonzero": 204
+   },
+   "would_change": 402,
+   "first_would_change": 41,
+   "would_stop_at": 44,
+   "why_counts": {
+    "no escape": 12,
+    "nominal": 29,
+    "brake": 1,
+    "last certificate": 2,
+    "emergency stop": 399
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "log": "data\\test_4.log"
+  }
+ ],
+ "udp": [
+  {
+   "run_dir": "D:\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\feb_logs_personal_i7_ego\\udp\\log-data-test_1",
+   "decisions": 418,
+   "shadow_decisions": 418,
+   "phantom": {
+    "decisions_with_dynamic_track": 149,
+    "decisions_with_context": 149,
+    "decisions_engaged": 11,
+    "decisions_target_branch_nonzero": 149
+   },
+   "would_change": 407,
+   "first_would_change": 11,
+   "would_stop_at": 11,
+   "why_counts": {
+    "no escape": 10,
+    "nominal": 1,
+    "emergency stop": 407
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "bridge_exit": 0,
+   "elapsed_s": 276.85900000017136,
+   "console": "D:\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\feb_logs_personal_i7_ego\\udp\\log-data-test_1.console.txt",
+   "log": "data/test_1.log",
+   "same_as_inproc": {
+    "equal": true,
+    "first_difference": null,
+    "decisions": [
+     418,
+     418
+    ],
+    "shadow_decisions": [
+     418,
+     418
+    ]
+   },
+   "offline": {
+    "reproduced": true,
+    "compared": 418,
+    "first_difference": null
+   }
+  },
+  {
+   "run_dir": "D:\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\feb_logs_personal_i7_ego\\udp\\log-data-test_2",
+   "decisions": 162,
+   "shadow_decisions": 162,
+   "phantom": {
+    "decisions_with_dynamic_track": 31,
+    "decisions_with_context": 31,
+    "decisions_engaged": 0,
+    "decisions_target_branch_nonzero": 31
+   },
+   "would_change": 98,
+   "first_would_change": 64,
+   "would_stop_at": 68,
+   "why_counts": {
+    "nominal": 20,
+    "idle": 40,
+    "searched policy": 1,
+    "no escape": 3,
+    "brake": 1,
+    "last certificate": 3,
+    "emergency stop": 94
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "bridge_exit": 0,
+   "elapsed_s": 121.59400000004098,
+   "console": "D:\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\feb_logs_personal_i7_ego\\udp\\log-data-test_2.console.txt",
+   "log": "data/test_2.log",
+   "same_as_inproc": {
+    "equal": true,
+    "first_difference": null,
+    "decisions": [
+     162,
+     162
+    ],
+    "shadow_decisions": [
+     162,
+     162
+    ]
+   },
+   "offline": {
+    "reproduced": true,
+    "compared": 162,
+    "first_difference": null
+   }
+  },
+  {
+   "run_dir": "D:\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\feb_logs_personal_i7_ego\\udp\\log-data-test_3",
+   "decisions": 156,
+   "shadow_decisions": 156,
+   "phantom": {
+    "decisions_with_dynamic_track": 30,
+    "decisions_with_context": 30,
+    "decisions_engaged": 12,
+    "decisions_target_branch_nonzero": 30
+   },
+   "would_change": 139,
+   "first_would_change": 17,
+   "would_stop_at": 17,
+   "why_counts": {
+    "nominal": 16,
+    "no escape": 1,
+    "emergency stop": 139
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "bridge_exit": 0,
+   "elapsed_s": 116.375,
+   "console": "D:\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\feb_logs_personal_i7_ego\\udp\\log-data-test_3.console.txt",
+   "log": "data/test_3.log",
+   "same_as_inproc": {
+    "equal": true,
+    "first_difference": null,
+    "decisions": [
+     156,
+     156
+    ],
+    "shadow_decisions": [
+     156,
+     156
+    ]
+   },
+   "offline": {
+    "reproduced": true,
+    "compared": 156,
+    "first_difference": null
+   }
+  },
+  {
+   "run_dir": "D:\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\feb_logs_personal_i7_ego\\udp\\log-data-test_4",
+   "decisions": 443,
+   "shadow_decisions": 443,
+   "phantom": {
+    "decisions_with_dynamic_track": 204,
+    "decisions_with_context": 204,
+    "decisions_engaged": 25,
+    "decisions_target_branch_nonzero": 204
+   },
+   "would_change": 402,
+   "first_would_change": 41,
+   "would_stop_at": 44,
+   "why_counts": {
+    "no escape": 12,
+    "nominal": 29,
+    "brake": 1,
+    "last certificate": 2,
+    "emergency stop": 399
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "bridge_exit": 0,
+   "elapsed_s": 294.8599999998696,
+   "console": "D:\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\feb_logs_personal_i7_ego\\udp\\log-data-test_4.console.txt",
+   "log": "data/test_4.log",
+   "same_as_inproc": {
+    "equal": true,
+    "first_difference": null,
+    "decisions": [
+     443,
+     443
+    ],
+    "shadow_decisions": [
+     443,
+     443
+    ]
+   },
+   "offline": {
+    "reproduced": true,
+    "compared": 443,
+    "first_difference": null
+   }
+  }
+ ],
+ "git_head": "76a984450be36aea5c9af16e7c88df56735c3ff0",
+ "timing_udp": [
+  {
+   "component": "observation",
+   "n": 1175,
+   "p50_ms": 29.419399797916412,
+   "p95_ms": 61.34617985226213,
+   "p99_ms": 72.74256790056823,
+   "max_ms": 100.76180007308722
+  },
+  {
+   "component": "policy",
+   "n": 1175,
+   "p50_ms": 1.7169001512229443,
+   "p95_ms": 5.0051300320774255,
+   "p99_ms": 9.199704313650727,
+   "max_ms": 11.905800085514784
+  },
+  {
+   "component": "command",
+   "n": 1175,
+   "p50_ms": 0.08019991219043732,
+   "p95_ms": 0.21051024086773387,
+   "p99_ms": 0.39558984339237213,
+   "max_ms": 1.6864999197423458
+  },
+  {
+   "component": "release_to_sent",
+   "n": 1175,
+   "p50_ms": 37.031699903309345,
+   "p95_ms": 69.33257030323148,
+   "p99_ms": 81.6961937956512,
+   "max_ms": 111.18120001628995
+  },
+  {
+   "component": "lidar_line_to_sent",
+   "n": 1175,
+   "p50_ms": 37.03980008140206,
+   "p95_ms": 69.74898995831607,
+   "p99_ms": 82.0185536891222,
+   "max_ms": 111.18120001628995
+  },
+  {
+   "component": "shadow_handoff",
+   "n": 1175,
+   "p50_ms": 0.034500379115343094,
+   "p95_ms": 0.06933007389307021,
+   "p99_ms": 0.11691219173371792,
+   "max_ms": 0.318900216370821
+  },
+  {
+   "component": "pose_wait",
+   "n": 1175,
+   "p50_ms": 0.0,
+   "p95_ms": 0.0,
+   "p99_ms": 0.0,
+   "max_ms": 33.96679973229766
+  },
+  {
+   "component": "shadow_layer",
+   "n": 1175,
+   "p50_ms": 0.2135997638106346,
+   "p95_ms": 67.7113800309598,
+   "p99_ms": 739.1002718452364,
+   "max_ms": 950.6661999039352
+  },
+  {
+   "component": "shadow_behind_frame",
+   "n": 1175,
+   "p50_ms": 16.658782958984375,
+   "p95_ms": 100.0556468963623,
+   "p99_ms": 1322.3346853256223,
+   "max_ms": 1881.1702728271484
+  }
+ ],
+ "passed": true
+}

@@ -1,0 +1,25 @@
+{
+ "run_id": "log-data-test_2",
+ "geometry": "test_run case 0",
+ "safety": "shadow",
+ "lines": 2344,
+ "backlog_frames": 0,
+ "backlog_max": 0,
+ "decisions": 162,
+ "frames_skipped": 598,
+ "errors": 0,
+ "pose_sync": {
+  "released": 760,
+  "stale": 0,
+  "superseded": 0
+ },
+ "shadow": {
+  "decisions": 162,
+  "changes": 98,
+  "first_change": 64,
+  "committed": 69,
+  "obs_mismatches": 0
+ },
+ "active_layer": null,
+ "operator_stops": []
+}

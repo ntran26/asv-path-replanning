@@ -1,0 +1,17 @@
+case,mode,outcome,passed,decisions,obs,action,command,layer,layer_worker,worker_obs,layer_changed,layer_stop_at,trace_passed,trace_mismatches,elapsed_s,first_mismatch
+TS4:BAS-CR-CV-013,shadow,collision:target,True,13,0,0,0,0,0,0,8,10,,,13.480361300054938,{}
+TS4:BAS-CR-CV-037,shadow,collision:target,True,15,0,0,0,0,0,0,9,10,,,15.025661200284958,{}
+TS4:CH-HO-CV-088,shadow,goal,True,52,0,0,0,0,0,0,32,26,,,54.379721499979496,{}
+TS4:P2-L1-CRP-FIX-05,shadow,collision:target,True,18,0,0,0,0,0,0,6,15,,,11.805282200220972,{}
+TS4:BAS-HO-NC-071,shadow,goal,True,50,0,0,0,0,0,0,26,24,,,9.600252800155431,{}
+TS4:BAS-BO-CV-061,shadow,goal,True,29,0,0,0,0,0,0,3,,,,23.77991840010509,{}
+TS4:BAS-HO-RE-081,shadow,collision:target,True,33,0,0,0,0,0,0,0,,,,6.159099199809134,{}
+TS4:BAS-CR-CV-051,shadow,goal,True,52,0,0,0,0,0,0,5,,,,23.527073500212282,{}
+TS4:P2-L1-CRS-VAR-08,shadow,collision:target,True,21,0,0,0,0,0,0,8,18,,,20.064079700037837,{}
+TS4:P2-L2-CRP-VAR-14,shadow,collision:obstacle,True,22,0,0,0,0,0,0,6,,,,19.124143899884075,{}
+TS4:P2-L3-HO-FIX-05,shadow,goal,True,50,0,0,0,0,0,0,0,,,,12.59056320041418,{}
+TS4:BAS-OT-RE-022,shadow,goal,True,49,0,0,0,0,0,0,35,18,,,15.531472300179303,{}
+TS4:FS-NT-023,shadow,collision:obstacle,True,34,0,0,0,0,0,0,7,,,,31.11174670001492,{}
+TS4:BAS-NU-CV-004,shadow,goal,True,67,0,0,0,0,0,0,0,,,,11.416188099887222,{}
+TS4:BAS-BO-RE-006,shadow,goal,True,37,0,0,0,0,0,0,0,,,,7.05438909959048,{}
+TS4:CH-HO-NC-005,shadow,goal,True,58,0,0,0,0,0,0,0,,,,20.229911000002176,{}
