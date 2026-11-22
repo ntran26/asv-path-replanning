@@ -1,0 +1,34 @@
+[
+  {
+    "timesteps": 0,
+    "stage": 0,
+    "fixed_rpm": true,
+    "delta": 3.0,
+    "floor": 9.0,
+    "ceil": 15.0
+  },
+  {
+    "timesteps": 700000,
+    "stage": 1,
+    "fixed_rpm": false,
+    "delta": 3.0,
+    "floor": 9.0,
+    "ceil": 15.0
+  },
+  {
+    "timesteps": 800000,
+    "stage": 2,
+    "fixed_rpm": false,
+    "delta": 4.0,
+    "floor": 8.0,
+    "ceil": 16.0
+  },
+  {
+    "timesteps": 900000,
+    "stage": 3,
+    "fixed_rpm": false,
+    "delta": 6.0,
+    "floor": 6.0,
+    "ceil": 18.0
+  }
+]

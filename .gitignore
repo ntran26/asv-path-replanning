@@ -5,22 +5,16 @@ __pycache__/
 # Local virtual environment (see asv-lidar/static_dynamic_obstacles/requirements.txt).
 .venv/
 
-# Bulky outputs kept on disk but not tracked (2026-11-22), to keep the repository small enough
-# to browse. Files already tracked under these paths stay tracked; add a new one with
-# `git add -f`. Earlier versions of everything here remain in the history.
+# Bulky outputs kept on disk but not tracked (2026-11-22, revised 2026-11-23), to keep the
+# repository small enough to browse. Files already tracked under these paths stay tracked; add a
+# new one with `git add -f`. Every file untracked on 2026-11-22 is in commit 7e66c2bfa
+# (asv-lidar/static_dynamic_obstacles/results/safety_dev/README.md). Model files, videos and
+# references are tracked again since 2026-11-23.
 asv-lidar/static_dynamic_obstacles/results/safety_dev/**/runs/
 asv-lidar/static_dynamic_obstacles/results/safety_dev/**/traces/
 asv-lidar/static_dynamic_obstacles/results/safety_dev/**/attempts/
 asv-lidar/static_dynamic_obstacles/runs/
 asv-lidar/static_dynamic_obstacles/results/test_set/v3/images/
-asv-lidar/static_obstacles/models/_archive_staged_curriculum/
-asv-lidar/static_obstacles/models/**/*_steps.zip
-asv-lidar/static_obstacles/models/**/best_model_*.zip
-*.mp4
-*.mov
-*.MOV
-*.avi
-/References/*.pdf
 /asv-lidar/static_dynamic_obstacles/results/safety_dev/cancelled/v4_cancelled_full_sweep_20261002T115051Z.zip
 /asv-lidar/static_dynamic_obstacles/results/safety_dev/cancelled/v4_cancelled_full_sweep_20261002T115051Z/v5_frozen_b/episodes.jsonl
 /asv-lidar/static_dynamic_obstacles/results/safety_dev/cancelled/v4_cancelled_full_sweep_20261002T115051Z/v5_frozen_r/episodes.jsonl
