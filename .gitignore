@@ -4,3 +4,44 @@ __pycache__/
 
 # Local virtual environment (see asv-lidar/static_dynamic_obstacles/requirements.txt).
 .venv/
+
+# Bulky outputs kept on disk but not tracked (2026-11-22), to keep the repository small enough
+# to browse. Files already tracked under these paths stay tracked; add a new one with
+# `git add -f`. Earlier versions of everything here remain in the history.
+asv-lidar/static_dynamic_obstacles/results/safety_dev/**/runs/
+asv-lidar/static_dynamic_obstacles/results/safety_dev/**/traces/
+asv-lidar/static_dynamic_obstacles/results/safety_dev/**/attempts/
+asv-lidar/static_dynamic_obstacles/runs/
+asv-lidar/static_dynamic_obstacles/results/test_set/v3/images/
+asv-lidar/static_obstacles/models/_archive_staged_curriculum/
+asv-lidar/static_obstacles/models/**/*_steps.zip
+asv-lidar/static_obstacles/models/**/best_model_*.zip
+*.mp4
+*.mov
+*.MOV
+*.avi
+/References/*.pdf
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/cancelled/v4_cancelled_full_sweep_20261002T115051Z.zip
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/cancelled/v4_cancelled_full_sweep_20261002T115051Z/v5_frozen_b/episodes.jsonl
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/cancelled/v4_cancelled_full_sweep_20261002T115051Z/v5_frozen_r/episodes.jsonl
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/cancelled/v4_stopped_full_sweep_20261002T132311Z.zip
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/cancelled/v4_stopped_full_sweep_20261002T132311Z/support/original_completion_map_20261002T132245Z_116a97b9.csv
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/cancelled/v4_stopped_full_sweep_20261002T132311Z/v5_frozen_b/episodes.jsonl
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/cancelled/v4_stopped_full_sweep_20261002T132311Z/v5_frozen_r/episodes.jsonl
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/development_v6_budget150/offline/broad_v6_50_failure_classification/episodes.json
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/development_v6_budget150/offline/broad_v6_50_failure_classification/failures.json
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/quick_v5_budget100/original_completion_map_20261002T115449Z_3eb15692.csv
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/quick_v5_budget100/original_completion_map_20261002T120051Z_4a451bbe.csv
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/quick_v5_budget100/original_completion_map_20261002T132245Z_116a97b9.csv
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/suite_cache/3bbbc6d2619b4502b137/dev_legacy.pkl
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/suite_cache/3bbbc6d2619b4502b137/dev_width.pkl
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/suite_cache/3bbbc6d2619b4502b137/field_deployment.pkl
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/suite_cache/3bbbc6d2619b4502b137/field_validation.pkl
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/suite_cache/3bbbc6d2619b4502b137/frozen_b.pkl
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/suites/v5_frozen_b/episodes.jsonl
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/suites/v5_frozen_r/episodes.jsonl
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/trigger_counterfactual/steps.csv
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/trigger_counterfactual/v7_nohold/steps.csv
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/v20_development/saved_state_replay/g2g3_v3/part1.json
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/v20_development/saved_state_replay/g2g3_v3/part2.json
+/asv-lidar/static_dynamic_obstacles/results/safety_dev/v5_soft_regression_tradeoffs_choices.jsonl
