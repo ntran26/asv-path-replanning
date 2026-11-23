@@ -160,15 +160,42 @@ names the table, figure or record that decides it.
 - **Q1:** does the deployed policy complete the navigation task with encounter-consistent
   behaviour, including in channels and among static obstacles where the room to manoeuvre is
   limited? (formerly RQ1)
-- **Q2:** which learner should be deployed, and which learner differences remain meaningful
-  across training seeds and target behaviours? (formerly RQ5)
+- **Q2:** how does the deployed policy compare with the baselines trained or tuned on the same
+  task: three further deep reinforcement learning learners under the same protocol, and two
+  classical comparators? (restated 2026-11-23; formerly "which learner should be deployed, and
+  which learner differences remain meaningful across training seeds and target behaviours?",
+  RQ5)
 - **Q3:** how does the deployed policy perform in physical basin trials? (replaces RQ4)
 
 RQ2 (ablation), RQ3 (perception degradation) and RQ6 (width sweep) are dropped.
 
+**Deployed-policy framing (decision 2026-11-23).** The paper reports the formulation and the
+deployed policy first. Its results come first in Section 4.1, followed by one comparison table
+against the baselines. The other learners are baselines, not a study of their own. The following
+leave the main text for the appendices:
+- the per-run table (Table 10);
+- the learning curves of the four learners (Figure 5);
+- the run histories;
+- the account of recurrent PPO seed 1.
+
+**Why SAC.** SAC is the learner of the authors' two earlier studies on the same vessel:
+- **P1** (ICMCR 2026, doi 10.1109/ICMCR69541.2026.11533898): SAC 90.0-95.5 % against PPO
+  49.4-67.4 % success over 1,000 randomised static-obstacle episodes, across five reward
+  weightings. That study used raw LiDAR beams and rudder-only control.
+- **P2** (Drones 2026, 10, 680, reference [13] of the draft): SAC chosen for continuous rudder and
+  propulsion control, off-policy sample efficiency over randomised layouts, and entropy-driven
+  exploration. Against a like-for-like PPO baseline it reached 92.4 % against 90.5 % (three seeds
+  each, 500 episodes).
+
+That evidence covers path following and static obstacles only, so it motivates the choice of
+learner; it is not a result of this paper. TQC appears in neither study. Between SAC and TQC, the
+registered rule decides (C-12), and the draft keeps saying that this rule used the test set.
+
 **Contributions** (Section 1.3, in order): 1 the formulation; 2 the geometric framework for
-constrained encounter responses; 3 the deployed policy, chosen and benchmarked; 4 the
-evaluation design; 5 the physical encounter trials. Contribution 2 is a design component of the
+constrained encounter responses; 3 the deployed policy (SAC, the learner of P1 and P2),
+benchmarked against three further learners and two classical comparators under one protocol
+(restated 2026-11-23; formerly "the deployed policy, chosen and benchmarked"); 4 the evaluation
+design; 5 the physical encounter trials. Contribution 2 is a design component of the
 formulation and carries no tested claim (its width thresholds are design reasoning, Section
 2.2.4).
 
@@ -181,14 +208,14 @@ collected); *withdrawn* or *dropped*, with the date.
 
 | # | Claim | Question; contribution | Evidence | Prediction (registered) | Status |
 |---|---|---|---|---|---|
-| C-1 | The deployed policy completes the navigation task (path following, static-obstacle avoidance and a two-vessel encounter) more often than both classical comparators on the same test-set episodes, in the decoupled and the coupled families, from onboard perception (pooled range returns, target tracks, a map boundary at the estimated pose) | Q1; 3 | Table 9; exact McNemar tests (Section 4.1); Appendix G intervals | September 2026 draft, restated 2026-10-10: the deployed policy exceeds every classical comparator's success overall; per-cell intervals reported; differences to the other learners reported with seed variability | **supported**: 0.865 against LOS-DWA 0.770 (176 against 81 episodes completed by one only, p = 3.0 × 10⁻⁹) and the encounter-specific VO 0.675 (249 against 59, p = 6.3 × 10⁻²⁹); decoupled 0.931 against 0.870 and 0.774, coupled 0.735 against 0.571 and 0.479. The learner family was chosen on the test set, stated in 6.2 |
+| C-1 | The deployed policy completes the navigation task (path following, static-obstacle avoidance and a two-vessel encounter) more often than both classical comparators on the same test-set episodes, in the decoupled and the coupled families, from onboard perception (pooled range returns, target tracks, a map boundary at the estimated pose) | Q1, Q2; 3 | Table 9; exact McNemar tests (Section 4.1); Appendix G intervals | September 2026 draft, restated 2026-10-10: the deployed policy exceeds every classical comparator's success overall; per-cell intervals reported; differences to the other learners reported with seed variability | **supported**: 0.865 against LOS-DWA 0.770 (176 against 81 episodes completed by one only, p = 3.0 × 10⁻⁹) and the encounter-specific VO 0.675 (249 against 59, p = 6.3 × 10⁻²⁹); decoupled 0.931 against 0.870 and 0.774, coupled 0.735 against 0.571 and 0.479. The learner family was chosen on the test set, stated in 6.2 |
 | C-7 | Rule 8(e) in two layers: the learned policy can slacken speed; the engineered runtime safety layer (the predictive filter with a permanent emergency stop, Algorithm A3) reduces the deployed policy's own-vessel collisions, is reported apart, and is not credited to the policy | Q1; 1 | Table 13 (Section 4.5): test set and validation set, layer off and on; Figure 6(c) for the learned slowdown | September 2026 draft: validation-set intervention rate at most 5 %; learned behaviour reported with the layer off | **supported; prediction not met**: own-vessel collisions 135 → 70 on the test set (target 53 → 8, obstacle 70 → 45, boundary 12 → 17), goals 865 → 868, 52 stops, 9 target strikes on the stopped own ship; validation set 53 → 24. The layer changes 13.5 % of validation decisions (4.6 % outside the 23 episodes that end in a stop), 8.9 % of test decisions and 36.1 % of test episodes. Stated limits (6.2): the test set was used during the layer's development, the layer gives no guarantee, the strike count depends on the braking convention |
 | C-8 | One policy, without a separate model, handles basin geometry (slanted legs, oblique walls) and parallel-walled channels | Q1; 1 | Section 4.1: decoupled success by stratum | September 2026 draft: basin success within 0.10 of channel success, over the classes both strata hold (head-on, crossing, overtaking) | **supported**: deployed policy 0.906 (basin, 254 episodes) against 0.938 (channel, 240) over the shared classes, 0.927 against 0.938 over all decoupled episodes; SAC three-seed pool 0.905 against 0.893; every method within 0.03 except the encounter-specific VO (0.800 against 0.729). The draft reports all decoupled episodes; the registered measure gives the same conclusion |
 | C-9 | Every test episode admits a solution: some manoeuvre within the policy's action space, started once the target is first tracked, reaches the goal with clearance, so failures on the test set are not infeasibility artefacts | Q1; 4 | Test set v4 construction: the oracle feasibility test (`src/oracle_feasibility.py`), episodes that no controller can solve replaced in place (`planning_records/BASELINE_V4_PLAN.md` section 5e); Section 3.4.1 | September 2026 draft: every evaluation episode passes the feasibility filter | **supported by construction**. Stated limit (6.2): the oracle knows the target's motion, so it shows that a solution exists, not that the policy's observations suffice to find it |
 | C-10 | Encounter-consistent behaviour is shown per encounter type by trajectory snapshots of the deployed policy; each encounter panel passes the track-based rule conditions of Section 3.4.3. No compliance rate is claimed | Q1; 1, 4 | Figure 6; `tools/diagnostics/colregs_compliance.py`; `results/paper_snapshots/README.txt` | none (the violation-rate table R2 was dropped on 2026-10-08, before any rate was reported) | **supported, post hoc**: six selected successful episodes, stated as a selection. When being overtaken, the own ship gives a little room near the CPA in all 29 successful being-overtaken episodes with a CPA of 1.2-4.5 m, stated as the competition between stand-on course keeping and the ship-domain term (6.2) |
-| C-11 | The off-policy learners (SAC, TQC) succeed more often than the on-policy learners (PPO, recurrent PPO) at every seed; the gap lies mainly in target collisions and ship-domain intrusions, while obstacle collisions are similar | Q2; 3 | Tables 9 and 10 | none for the direction (the protocol registered only that learner differences are reported with seed variability, and that about 0.05 is the edge of separability at three seeds) | **supported, post hoc**: lowest off-policy seed 0.815, highest on-policy seed 0.757; target collisions 0.063 and 0.067 against 0.154 and 0.184; domain intrusions 0.112 and 0.125 against 0.239 and 0.251; obstacle collisions 0.065-0.082 for all four |
-| C-12 | SAC is deployed by the registered rule, and no ranking between SAC and TQC is claimed | Q2; 3 | Table 10; Section 3.2 | 2026-10-10: the better three-seed mean of SAC and TQC on the test set, the seed by validation score; the final models checked beside the best checkpoints (2026-10-15) | **supported**: SAC 0.846 (0.827-0.865) against TQC 0.830 (0.815-0.838), inside the seed spread; SAC seed 0 by validation score (+0.411); the final models choose SAC as well (0.841 against 0.830) |
-| C-13 | Target behaviour: in the decoupled family, reactive targets leave the off-policy learners' success unchanged; in the coupled family, a target that changes speed once lowers every method's success, the off-policy learners' most; against the noncompliant head-on target the deployed policy completes 60 of 66 episodes | Q2; 4 | Table 11 | none for the direction (the table, R3, was registered in the September 2026 draft) | **supported, post hoc, descriptive**: deployed policy 0.941 → 0.922 (reactive, decoupled) and 0.808 → 0.620 (speed change, coupled); differences below about 0.05 are not interpreted (66 head-on episodes per run) |
+| C-11 | Baseline result, not a headline claim (restated 2026-11-23): among the learned baselines, the off-policy learners (SAC, TQC) succeed more often than the on-policy learners (PPO, recurrent PPO) at every seed; the gap lies mainly in target collisions and ship-domain intrusions, while obstacle collisions are similar. This agrees with the authors' earlier SAC-over-PPO results [P1, P2], made with earlier formulations, and the formulation was developed with PPO | Q2; 3 | Table 9; per-run results in Appendix G (formerly Table 10) | none for the direction (the protocol registered only that learner differences are reported with seed variability, and that about 0.05 is the edge of separability at three seeds) | **supported, post hoc**: lowest off-policy seed 0.815, highest on-policy seed 0.757; target collisions 0.063 and 0.067 against 0.154 and 0.184; domain intrusions 0.112 and 0.125 against 0.239 and 0.251; obstacle collisions 0.065-0.082 for all four. Reported in one paragraph of Section 4.1 |
+| C-12 | SAC, the learner of the authors' earlier studies [P1, P2], is deployed by the registered rule, and no ranking between SAC and TQC is claimed | Q2; 3 | Section 3.2; Table 9; per-run results in Appendix G (formerly Table 10). P1 and P2 motivate SAC (section "Why SAC" above); the rule, which used the test set, decided between SAC and TQC | 2026-10-10: the better three-seed mean of SAC and TQC on the test set, the seed by validation score; the final models checked beside the best checkpoints (2026-10-15) | **supported**: SAC 0.846 (0.827-0.865) against TQC 0.830 (0.815-0.838), inside the seed spread; SAC seed 0 by validation score (+0.411); the final models choose SAC as well (0.841 against 0.830) |
+| C-13 | Target behaviour of the deployed policy (restated 2026-11-23 around the deployed policy; formerly worded for the off-policy learners): in the decoupled family, reactive targets leave its success essentially unchanged; in the coupled family, a target that changes speed once lowers it more than it lowers the classical comparators'; against the noncompliant head-on target it completes 60 of 66 episodes. The other learners appear in Table 11 only | Q1, Q2; 4 | Table 11 | none for the direction (the table, R3, was registered in the September 2026 draft) | **supported, post hoc, descriptive**: deployed policy 0.941 → 0.922 (reactive, decoupled) and 0.808 → 0.620 (speed change, coupled), against LOS-DWA 0.564 → 0.553 and the encounter-specific VO 0.455 → 0.427; noncompliant head-on 60 of 66 against 65 of 66 with a constant-velocity target; differences below about 0.05 are not interpreted (66 head-on episodes per run) |
 | C-14 | Under the deployed policy no reward term exceeds its weight and a collision outweighs the COLREGs group by an order of magnitude; the realised order departs from the order of the weights in three places | -; 1 | Table 12 (Section 4.4) | 2026-10-24 (S19): the realised order is checked against the magnitude hierarchy; no outcome predicted | **supported**: COLREGs integral −24.67 in collision episodes against the −300 of a collision; the departures are the domain term (second by weight, sixth realised), the COLREGs group above the obstacle term (reversed in the coupled family) and progress above path following |
 | C-2 | Width-dependent manoeuvre-mode switch | (RQ6) | - | - | **withdrawn 2026-10-14**: width sweep excluded; the thresholds stay as design reasoning (2.2.4) and the untested narrow channels as a limitation (6.2) |
 | C-3 | Comparator admissibility widths | (RQ6) | - | - | **withdrawn 2026-10-14**, with C-2 |
@@ -276,7 +303,7 @@ history.
 | R7 reward scale audit | Table 12 | C-14 |
 | R8 Around the Clock | dropped 2026-09-24 (Tier A out of the paper) | - |
 | R9 domain randomisation in the field | withdrawn 2026-11-05; tables F1-F5 below | C-6 withdrawn |
-| (new) | Table 10 (each run at its best checkpoint and as its final model); Figure 5 (validation-set learning curves) | C-11, C-12 |
+| (new) | Each run at its best checkpoint and as its final model, and the validation-set learning curves: Table 10 and Figure 5 of the 2026-11-05 draft, moved to the appendices (Appendix G and Appendix B) under the deployed-policy framing of 2026-11-23; Section 4.1 keeps one sentence on each | C-11, C-12 |
 | (new) | Table 13 (runtime safety layer, layer off and on) | C-7 |
 
 ### Section 5 tables (registered empty; filled only from the trial sessions)

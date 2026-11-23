@@ -1,6 +1,6 @@
 # Paper 3 draft: edit instructions (kept current)
 
-> **Kept current.** Last updated 2026-11-14. This file holds the next edit instructions for the
+> **Kept current.** Last updated 2026-11-23. This file holds the next edit instructions for the
 > Paper 3 draft, each as a block to paste into the chat that writes the paper. The blocks name
 > planning files by path; that chat reads them from the synced project, so each push needs a Sync
 > before the next block is sent. Only files outside `planning/` are attached: the .docx draft,
@@ -108,7 +108,7 @@ Queued after block H:
   target's asymmetric ship domain" becomes the own ship's; Figure 2 uses "required turn sense",
   which resolves [CHECK — Figure 2 placeholder terminology]; Figure 3 adds the ego and path
   branches.
-- Section 6.1 (block I; writable now for the two simulation questions); 6.2 to state that the
+- Section 6.1 (block J, after block I; writable now for the two simulation questions); 6.2 to state that the
   water runs use constant-velocity targets only and no channel layout.
 - Section 5.3 from `FIELD_TRIALS_PLAN.md` section 4 once D-1 is fixed; 5.4 after the trials.
 - Appendix A (needs a table of the identified parameters with their bootstrap spread; F4 after
@@ -116,12 +116,130 @@ Queued after block H:
 - Section 7, the abstract and the conclusion, after the field trials.
 - Length (held 2026-11-14): the clean rev05Nov runs to over 40 single-spaced pages (about 26,300
   words of main text, half of it Section 2). Candidates that keep the content: Algorithms 1–4,
-  the 2.2.4 width derivation, Table 3a and Table 10 to the appendices; the repeats in 1.3, of the
+  the 2.2.4 width derivation, Table 3a and Table 10 (Table 10 is in block I) to the appendices; the repeats in 1.3, of the
   training-target behavior, of the tracker settings and of the curriculum prose against Table 8
   removed; Appendices F and G to supplementary material; the literature review compressed. One
   block after block H, once the venue is chosen.
 
-## 3. Log of applied blocks
+## 3. Next: block I, deployed-policy framing (2026-11-23)
+
+Requested 2026-11-23. The paper reports the formulation and the deployed policy first. The other
+learners and the classical methods are baselines, described enough to justify the choice of
+learner, with one comparison table.
+
+The block touches Sections 1.3, 3, 4.1, 4.3 and 6, Appendices B, F and G, and the references. It
+leaves Section 2 and Sections 4.2, 4.4, 4.5 and 5 unchanged. Block H touches only Sections 2.1.3,
+2.3.4 and 5, so the two blocks are independent: either can run first, the second on the first's
+output after its changes are accepted. Section 6.1 moves to block J.
+
+**Attachments** (four):
+1. `Paper3_Sections1-4_clean_rev05Nov.docx`, or block H's output with its changes accepted.
+2. `static_dynamic_obstacles/planning/PAPER3_CLAIMS_AND_TABLES.md`. Attach it until the
+   2026-11-23 version is pushed and synced. It holds the restated Q2, C-11, C-12 and C-13 and the
+   section "Why SAC".
+3. `PhD/Publications/Autonomous_Surface_Vessels_Path_Following_and_Static_Obstacle_Collision_Avoidance_using_Deep_Reinforcement_Learning.pdf`
+   (Paper 1, ICMCR 2026).
+4. `PhD/Publications/Deep Reinforcement Learning Control for Path Following and Static Obstacle Avoidance for Autonomous Surface Vessels.pdf`
+   (Paper 2, reference [13]).
+
+Output: `Paper3_Sections1-4_rev23Nov_tracked.docx`, or `Sections1-5` if block H has been applied.
+
+Checked on 2026-11-23 against the two papers:
+- **Paper 1, Table III:** over 1,000 randomized static-obstacle episodes, SAC succeeds in
+  90.0-95.5 % and PPO in 49.4-67.4 %, across five reward weightings (0.5-0.9). The study used raw
+  LiDAR beams and rudder-only control.
+- **Paper 2, Section 3.3.2:** it restates the Paper 1 figures.
+- **Paper 2, Section 2.5.1:** it gives three reasons for SAC: continuous rudder and propulsion
+  commands, off-policy sample efficiency over randomized layouts, and entropy-driven exploration.
+- **Paper 2, Section 2.5.2 and Table 5:** a PPO baseline with the same observation, action, reward,
+  terminations and curriculum, over 500 episodes. The three SAC seeds reach 92.4 % and the three
+  PPO seeds 90.5 %; the deployed SAC policy alone reaches 95.0 %.
+- **Paper 1 reference details:** the authors are those of [13] in the same order; the venue is the
+  2026 4th International Conference on Mechatronics, Control and Robotics (ICMCR), Tokyo, Japan,
+  20-22 March 2026, pages 81-87, doi 10.1109/ICMCR69541.2026.11533898. The location and dates
+  come from the DOI's Crossref record; the pages match the PDF.
+- **Paper 1 contradicts itself:** its abstract names λ = 0.5 as the best trade-off, but its text
+  names 0.7. The block cites only the success ranges.
+
+```
+Apply the following changes to the attached Paper 3 draft as tracked changes dated 23 November 2026 (author "Claude"), keeping every existing comment, and save the result as Paper3_Sections1-4_rev23Nov_tracked.docx (Sections1-5 if Section 5 is already written). The block reframes the paper around the formulation and the deployed policy: the deployed policy is reported first, and the other learners and the classical methods are baselines, described as far as they justify the choice of learner and summarized in one comparison table. Follow the attached claim ledger (PAPER3_CLAIMS_AND_TABLES.md, Part 1: the central questions, the section "Why SAC", and rows C-1, C-11, C-12 and C-13). Change no number that is already in the draft, and add no number except the Paper 1 and Paper 2 figures given in I3. Report each change in a short revision-log addendum, and give the main-text word count (Sections 1-7) before and after.
+
+Rules: impersonal voice; American spelling; COLREGs-aware, never compliant; validation set, coupled and decoupled as in the draft. No internal identifiers in the paper text: no claim numbers, file names or code names. Keep these three statements, which the reframing must not lose:
+- The choice between SAC and TQC used the test set, and the field trials are the independent evaluation.
+- The SAC three-seed mean and seed range are reported beside the deployed seed.
+- The formulation was developed with PPO.
+
+I1. Section 1.3, first paragraph.
+- Replace "Four learners—PPO, recurrent PPO, soft actor–critic (SAC), and truncated quantile critics (TQC)—are trained on the same frozen formulation; the deployed policy is the better of SAC and TQC on the held-out test set, and the remaining learners and two classical methods serve as baselines on the same set." with "The deployed policy is trained with soft actor–critic (SAC), the learner of the authors' earlier studies on the same vessel [P1,13]; three further deep reinforcement learning learners, trained on the same frozen formulation under one protocol, and two classical methods serve as baselines on the same held-out test set."
+- Replace the central-question sentence with: "The central questions are whether the deployed policy completes the navigation task while producing encounter-consistent behavior, including in channels and among static obstacles where the room to maneuver is limited; how it compares with the learned and classical baselines on the same episodes; and how it performs in physical basin trials."
+Here and below, [P1] stands for the new reference of I10.
+
+I2. Section 1.3, contribution 3. Replace the bullet with: "A deployed policy and its benchmark. The deployed policy is trained with SAC, the learner of the authors' earlier studies [P1,13], and is benchmarked on the held-out test set. The baselines are PPO, recurrent PPO and truncated quantile critics (TQC), trained under the same protocol (3.0 million environment steps, three training seeds, checkpoints selected on a separate validation set), and two classical methods: an encounter-specific velocity-obstacle method [31], and line-of-sight guidance with proportional–integral–derivative heading control and a dynamic-window avoidance layer [21]. All of them use the same perception pipeline. Seed variability is reported with every learner result."
+In the paragraph "The remainder of the paper…", replace "Section 3 describes the learners, the training protocol, the classical comparators, and the evaluation design." with "Section 3 describes the deployed learner and the baselines, the training protocol, and the evaluation design."
+
+I3. Section 3.
+- Retitle it "Training, baselines, and evaluation design", and retitle 3.1 "Deployed learner, baselines, and policy architecture". Adjust the section's opening paragraph to match.
+- Replace the first paragraph of 3.1 with a paragraph that makes these points, in this order:
+  (a) The deployed policy is trained with SAC [70], an off-policy maximum-entropy actor–critic method.
+  (b) SAC is the learner of the authors' earlier studies on the same vessel. It was chosen there for continuous rudder and propulsion commands, for the sample efficiency of off-policy learning over randomized layouts, and for entropy-driven exploration [13].
+  (c) In the first study, with raw LiDAR beams and rudder-only control, SAC completed 90.0–95.5 % of 1,000 randomized static-obstacle episodes against 49.4–67.4 % for PPO, across five reward weightings [P1].
+  (d) In the second study, against a PPO baseline trained on the same observation, action, reward and curriculum, the three SAC seeds reached 92.4 % against 90.5 % for PPO on 500 episodes [13].
+  (e) Both studies concern path following among static obstacles without a target vessel, so they motivate the choice for this task rather than establish it.
+  (f) Three further learners are therefore trained on the frozen formulation under the same protocol as baselines: proximal policy optimization (PPO) [68], recurrent PPO with long short-term memory (LSTM) [69], and TQC [71], a distributional variant of SAC.
+  (g) Keep the existing statements, shortened: the library versions [72]; training from scratch with no warm start from [13], whose observation and reward differ; library defaults except the common discount and reward normalization, with every setting in Appendix B (the PPO rollout and Kullback–Leibler settings and the SAC/TQC warm-up go there only); no setting tuned per learner or per seed; and "The formulation was developed with PPO, but it refers to no learning algorithm."
+- Keep the network paragraph, and make clear that it is the deployed policy's network, shared by the baselines.
+
+I4. Section 3.2. Keep, in about half the length:
+- the protocol: three seeds, 3.0 × 10⁶ steps on the curriculum of Section 2.3.5, 10 simulators;
+- validation every 2 × 10⁵ steps with the layer off, scored as goal rate − 2 × collision rate, with each seed represented by its best checkpoint;
+- the final models evaluated beside them, as decided before any final model was tested;
+- "Every trained seed is reported";
+- the two-step deployment rule and the sentence that the test set decides the deployed learner family as well as measuring it, with the field trials as the independent evaluation.
+Move to Appendix B: the run histories (seed 0 trained to 2.5 × 10⁶ steps and continued; TQC seed 2 resumed from its 7.5 × 10⁵-step checkpoint; the extra SAC and TQC check at 2.5 × 10⁶ steps) and the retraining rule (only for a documented defect; seeds added for every learner).
+
+I5. Section 3.3, about half the length.
+Keep:
+- that both comparators see only what the policy sees and act through the same actuator limits;
+- the shared LOS guidance [73];
+- one or two sentences each on what LOS-DWA does: a dynamic window simulated through the identified vessel model, knowing obstacles but no rules;
+- and what the encounter-specific VO does: this study's interpretation of [31], not their implementation, which reads the formulation's encounter assessment and convention and treats the passing side as a hard constraint while engaged;
+- that both are tuned on the decoupled part of the validation set with the learners' score and fixed before the test set;
+- the sentence on Kuwata et al. [19].
+Move to Appendix F, beside Algorithms A1 and A2, where they are not already there:
+- the mechanics (the 9 m and 1.0 m triggers, the 56 candidates, the rejection gaps, the scoring terms, the candidate sweep and the domain penalty);
+- the tuning grids and scores.
+
+I6. Section 4, opening paragraph. Shorten it. Keep the reporting conventions in one sentence, then state the deployed policy and why in two sentences: SAC is retained by the rule of Section 3.2 (three-seed mean 0.846 against 0.830 for TQC), and seed 0 has the best validation score of the SAC seeds (+0.411). Drop the comparison of seed 0's test-set success with the other SAC seeds here; 4.1 gives it.
+
+I7. Section 4.1, rewritten in this order.
+(a) The deployed policy first. Give its success overall, decoupled and coupled; its collisions by type; its ship-domain intrusions; and its hull-to-hull clearance, all from Table 9. Give beside them the SAC three-seed mean and range (0.846, 0.827–0.865), so that the single seed is read against its family. Then the coupled episodes as its main difficulty, with obstacle collisions as the main coupled failure, and the basin and channel comparison.
+(b) Against the classical comparators: keep the LOS-DWA and encounter-specific VO comparisons with their exact McNemar tests, overall, decoupled and coupled. Shorten the VO paragraph to its overall result, its boundary-collision rate and its clearance; move its per-type figures and its weakest case to the notes of Appendix G.
+(c) Against the learned baselines, one paragraph:
+- every off-policy seed succeeds more often than every on-policy seed (lowest 0.815 against highest 0.757);
+- the gap lies in target collisions and domain intrusions, not obstacle collisions;
+- this agrees with the authors' earlier SAC-over-PPO results [P1,13], obtained with earlier formulations, although the formulation was developed with PPO;
+- the SAC and TQC means differ by less than their seed spread, so no ranking between them is claimed;
+- the final models change no conclusion and would also select SAC (one sentence, pointing to the per-run table now in Appendix G);
+- every SAC and TQC run reaches its best validation score at 2.8 × 10⁶ steps or later (one sentence, pointing to the learning curves now in Appendix B).
+(d) Encounter types (Figure 4) for the deployed policy, with the other methods in one sentence.
+Keep Table 9 as the single comparison table. Order its columns as deployed policy, SAC (three seeds), TQC, PPO, recurrent PPO, LOS-DWA and encounter-specific VO, and give the seed range under each learner's success.
+Move Table 10 to Appendix G and Figure 5 to Appendix B, with their notes and captions. Remove the paragraph on recurrent PPO seed 1 and keep it as one sentence in the note of the moved table.
+
+I8. Section 4.3. Report the deployed policy and the two classical comparators in the prose, and leave the other learners to Table 11. Keep:
+- the noncompliant head-on result (60 of 66 against 65 of 66);
+- the speed-change result (0.808 to 0.620, against LOS-DWA 0.564 to 0.553 and the encounter-specific VO 0.455 to 0.427);
+- the episodes without a target;
+- the note that differences below about 0.05 are not interpreted.
+
+I9. Section 6.
+- 6.1 placeholder: restate the three central questions as in I1.
+- 6.2: shorten the learner sentences to one: three seeds give a limited estimate of training variability, so no ranking between SAC and TQC is drawn. Keep the sentence that the deployed learner family is chosen on the test set and that the field trials are the independent evaluation.
+- 6.3: keep "Choosing the deployed learner on a second held-out set…".
+
+I10. References. Add Paper 1 at its first citation, renumbering the later references and every citation to them: "Tran, N.H.; Nguyen, H.D.; King, P.; Tran, M. Autonomous surface vessels path following and static obstacle collision avoidance using deep reinforcement learning. In Proceedings of the 2026 4th International Conference on Mechatronics, Control and Robotics (ICMCR), Tokyo, Japan, 20–22 March 2026; pp. 81–87. https://doi.org/10.1109/ICMCR69541.2026.11533898." Renumber the tables and figures that follow the moved ones, and update every cross-reference.
+```
+
+## 4. Log of applied blocks
 
 1. **2026-10-22, ten corrections** (3.1 learner settings; Algorithm 3 centroid and track deletion;
    3.4.1 crossing counts and the coupled composition; 3.4.3 metric list; 6.2 "entirely above";
