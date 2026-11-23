@@ -1,6 +1,6 @@
 # PORTING MANIFEST — Paper 2 → Paper 3
 
-**Produced at:** commit `986245c73d62cde2cb1dedf16166783ecdf233c8` (branch `master`, tree clean).
+**Produced at:** commit `99f08f49ae495bddab7d905eff2d35a8c20d554a` (branch `master`, tree clean).
 **Reference read:** `static_obstacles/src/` (read-only). Nothing under `static_obstacles/` was written.
 **Authoritative spec:** `planning_records/01_PERCEPTION_AND_OBSERVATION.md`.
 

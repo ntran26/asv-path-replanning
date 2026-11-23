@@ -151,7 +151,7 @@ simulation claims (section 1) carry their evidence. The field claims (section 2)
 pre-registered here, their thresholds confirmed by the author on 2026-11-07, before calibration session 1. After
 sign-off a claim may be weakened or withdrawn, but not added or moved to fit a result. The
 earlier drafts (2026-09-18 to 2026-10-25, with claims C-2 to C-6 and tables R1 to R9 in full)
-are in git history, last in commit 8e5cbc0b8.
+are in git history, last in commit 3b207bd07.
 
 Every claim in the abstract, Section 6.1 and the conclusion maps to a row here; **Evidence**
 names the table, figure or record that decides it.

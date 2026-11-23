@@ -136,7 +136,7 @@ Queued after block H:
    policy only, the 6.1 marker deleted, the 6.2 limitation and a 6.3 ablation sentence, the marker
    list). Applied in `Paper3_Sections1-3_with_placeholders_rev24Oct_tracked.docx`; checked on
    2026-10-25, all seventeen present, no ablation, 3.4.4, Section 4.6, Table R6 or random-policy
-   reference left outside 6.2–6.3. The full text of both blocks is in commit a2eedbcf.
+   reference left outside 6.2–6.3. The full text of both blocks is in commit a32381c7.
 
 3. **2026-10-25, blocks C, D and E, sent together** (Section 4 introduction, 4.1–4.4 with Tables
    9–12 and Figures 4–6 placeholders, Appendix G Tables A6–A8, Algorithm A1, the 3.3 tuning text,
@@ -148,7 +148,7 @@ Queued after block H:
    rates in the table notes; "q" in Algorithm A1 is written "domain distance" and "/π" as "/180°".
    Flags raised by the log, both taken into block F: the comparator named "LOS-DWA" (3.3,
    Appendix F) and "LOS-PID + DWA" (21 times, Section 4); Algorithm A2's tuning row without the
-   earlier build. The full text of blocks C, D and E is in commit 237f049b.
+   earlier build. The full text of blocks C, D and E is in commit 690a175c.
 
 4. **2026-10-26, block F** (the runtime safety layer: 2.3.4 rewritten, Algorithm A3, Section 4.5
    with Table 13, and the 1.3, Algorithm 1, 2.2.4 and 6.2 edits; LOS-DWA throughout; the A2
@@ -156,7 +156,7 @@ Queued after block H:
    2026-11-04: every item as given, Table 13 equal to `planning/MASTER_ARTIFACT_RESULTS.md`
    section 18. Comments 8 and 9 added (which parts of the layer run on the vessel). The log's
    three flags are block G; its "not checkable" items are confirmed by
-   `planning_records/SAFETY_V21_PLAN.md`. The full text of block F is in commit eb02b1fc.
+   `planning_records/SAFETY_V21_PLAN.md`. The full text of block F is in commit d43db7e0.
 
 5. **2026-11-05, block G** (G1 Table 13's 0.361 and 36.1 % in 4.5; G2 the stop-latch clause after
    Eq. (18) removed; G3 de Boer et al. (2005) as reference 67, cited in 2.3.4 and Algorithm A3,

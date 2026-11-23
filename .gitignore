@@ -7,9 +7,9 @@ __pycache__/
 
 # Bulky outputs kept on disk but not tracked (2026-11-22, revised 2026-11-23), to keep the
 # repository small enough to browse. Files already tracked under these paths stay tracked; add a
-# new one with `git add -f`. Every file untracked on 2026-11-22 is in commit 7e66c2bfa
-# (asv-lidar/static_dynamic_obstacles/results/safety_dev/README.md). Model files, videos and
-# references are tracked again since 2026-11-23.
+# new one with `git add -f`. Model files, videos and references are tracked again since
+# 2026-11-23. Where the untracked files are kept: asv-lidar/static_dynamic_obstacles/results/
+# safety_dev/README.md and history_rewrite_2026-11-23/README.md.
 asv-lidar/static_dynamic_obstacles/results/safety_dev/**/runs/
 asv-lidar/static_dynamic_obstacles/results/safety_dev/**/traces/
 asv-lidar/static_dynamic_obstacles/results/safety_dev/**/attempts/

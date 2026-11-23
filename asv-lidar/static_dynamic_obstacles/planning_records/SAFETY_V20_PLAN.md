@@ -21,7 +21,7 @@ Starting point: [complete safety record](SAFETY_LAYER_COMPLETE_SUMMARY.md) (sect
 | `runs/sac_formulation_seed0_bl3/kept_best_3M/best_model.zip` | SHA-256 | `993db156...c2bdc8`, equal to summary section 2.3 |
 | Same `config.json` | SHA-256 | `a4df64a9...ed44`, equal |
 | `configs/baseline_v3.json` | Formulation digest recomputed with `baseline_config.digest` | `03a9c0c22f53ee0b`, equal (the raw file SHA-256 is a different quantity) |
-| `src/constants.py` | SHA-256 | `4f7fadaf...ce089`, **differs** from the summary's `3d71c76d...`. Commit `2e427e5` (2026-10-04, after the evidence cutoff) replaced section-sign characters in comments, docstrings and one error string; the abstract syntax tree is identical once string literals are blanked. The summary's hash equals the file at commit `fa5e004`. No runtime value changed. The file is not edited. |
+| `src/constants.py` | SHA-256 | `4f7fadaf...ce089`, **differs** from the summary's `3d71c76d...`. Commit `6ab70e3` (2026-10-04, after the evidence cutoff) replaced section-sign characters in comments, docstrings and one error string; the abstract syntax tree is identical once string literals are blanked. The summary's hash equals the file at commit `296bc20`. No runtime value changed. The file is not edited. |
 | Runtime | Python 3.13 present; torch and stable-baselines3 absent; PyPI reachable; `download.pytorch.org` refused by the egress proxy; Python 3.11 installed | Phase 2 needs a pinned environment (section 10.1). Historical runs used Python 3.10 on Windows, so fresh OFF and V16 runs in the phase-2 environment are the only valid pairing references. |
 
 ## 2. New saved-data evidence that shapes the design

@@ -11,7 +11,7 @@ The paper and thesis numbers come from the reports. The C-7 result is `testset_v
 
 ## Kept on disk only
 
-Since commit e2ab0473e, the following are not tracked:
+Since commit 22515c2fd, the following are not tracked:
 - the per-episode folders (`runs/`, `traces/`, `attempts/`) of the development runs and of the earlier test-set runs;
 - 24 large intermediate files listed in the repository `.gitignore`.
 
@@ -19,15 +19,19 @@ This includes the other two run sets behind `reports/ts4_final`:
 - `ts4_final_c01`-`c10`: off, V16, V16 + stop;
 - `ts4_final_e1s35_c01`-`c10`.
 
-Each of these files is unchanged in commit 7e66c2bfa, the parent of e2ab0473e.
+Where a removed file is now:
+- **Never 1 MiB or larger:** unchanged in commit f04f2e0a9, the parent of 22515c2fd.
+- **Any version of 1 MiB or more:** removed from the history on 2026-11-23 (see `history_rewrite_2026-11-23/` at the repository root). The current version is on disk, unchanged, as an OneDrive online-only file. Every version not on disk was saved first in `PhD/asv_git_purged_files/`, listed in `MANIFEST.tsv` there.
 
-List them:
+List the removed files still in the history:
 
-    git diff --name-only --diff-filter=D 7e66c2bfa e2ab0473e -- asv-lidar/static_dynamic_obstacles/results/safety_dev
+    git diff --name-only --diff-filter=D f04f2e0a9 22515c2fd -- asv-lidar/static_dynamic_obstacles/results/safety_dev
 
-Restore one path, or a folder, exactly:
+Restore one of them, or a folder, exactly:
 
-    git restore --source=7e66c2bfa -- <path>
+    git restore --source=f04f2e0a9 -- <path>
+
+The removed files that are no longer in the history are listed in `PhD/asv_git_purged_files/purge_paths.txt`.
 
 ## Re-running
 
@@ -62,7 +66,7 @@ Paired report:
 
 ## Reproducibility check (2026-11-23)
 
-Ten recorded episodes were re-run from a clean checkout of e2ab0473e, with `kept_best_3M/` added:
+Ten recorded episodes were re-run from a clean checkout of 22515c2fd, with `kept_best_3M/` added:
 - test set v4, cases BAS-HO-NC-041 and BAS-CR-CV-013, in modes off, `v16_estop_bt` and `v21_e1_estop_bt`;
 - validation set, cases DVD-HO-01 and DVD-HO-07, in modes `v21_estop_off` and `v21_e1_estop_bt`.
 

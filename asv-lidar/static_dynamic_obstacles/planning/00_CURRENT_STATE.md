@@ -147,7 +147,7 @@ mitigate the collision rate (a higher success rate is welcome, not required). Re
      telemetry resolution too coarse for the ego inputs (P-1, O-2); UDP ports 5000, 5001 and 5050
      taken on this laptop.
    - Still waiting on the bench checks (ESC reversal P-8, shore-laptop run time P-10).
-   - **Trial analysis scripts written (2026-11-11; committed 2026-11-20, 3bdc96ca8):** `field_deployment/trial_analysis/`
+   - **Trial analysis scripts written (2026-11-11; committed 2026-11-20, c9e721315):** `field_deployment/trial_analysis/`
      (`README_TRIAL_ANALYSIS.md`): tables F1-F5 and the verdicts of C-15 (water part) to C-20 from
      the bridge logs, the run sheet and the ground-truth tracks; closed-loop twin with the target on
      its measured track; open-loop replay through both models; coverage report for C-19. Files
@@ -158,13 +158,13 @@ mitigate the collision rate (a higher success rate is welcome, not required). Re
    - **IMU case for the supervision meeting:** `planning/IMU_CASE_FOR_MEETING.md` (O-2: why the
      IMU, tied to the simulator's ego-noise assumption, and the fallback).
    - **UDP bench moved to a second laptop (2026-11-14):** the university network blocks UDP;
-     `field_deployment/UDP_BENCH_HANDOVER.md` (pushed, af38f4176) lists the checks for P-9 part B,
+     `field_deployment/UDP_BENCH_HANDOVER.md` (pushed, 6afd95a66) lists the checks for P-9 part B,
      P-10 and P-11 on a personal laptop, which becomes the shore-laptop candidate (O-10).
      Steps 1-5 passed there the same day (i7-6600U, 2 cores): parity 32/32 runs and 1,497
      decisions equal; UDP loopback replay equal to in process and reproduced offline; LiDAR line
      to sent p99 92 ms, command path p99 27 ms; E1 in the loop p99 0.89 s (5 % above 0.5 s), as on
      the UTAS laptop, so active mode runs at 2 Hz on neither. The 16 E1 traces active parity needs
-     were pushed (fefb19172); the clone needs `core.autocrlf false` (CRLF breaks the stopping-table
+     were pushed (177df6007); the clone needs `core.autocrlf false` (CRLF breaks the stopping-table
      fingerprint). The UTAS July figure of 2.06 s was measured while another timing run overlapped
      it (the personal laptop alone: 0.96 s), so it is an upper figure. Steps 6-7 (two devices,
      vessel link) wait for a second device, a network other than the university's and the basin
@@ -172,25 +172,25 @@ mitigate the collision rate (a higher success rate is welcome, not required). Re
      opens the next basin booking and is the first two-device UDP test, with the July link
      unchanged: the personal laptop (the shore laptop, O-10 decided; UDP unrestricted, as in
      July) on 5000 to the vessel-control laptop on 5050. `udp_live_p3.py` parser fixed
-     (pushed, 8619c840b): the July `--shadow` prefix-matched `--shadow-inline` and would have sent
+     (pushed, a9d30cf27): the July `--shadow` prefix-matched `--shadow-inline` and would have sent
      commands; `--shadow` is now an alias of `--no-send` and abbreviations are refused.
-     Results pushed from that laptop (86fd2a7b6: handover note section 4, `README_P3_BRIDGE.md`,
+     Results pushed from that laptop (f4effb7c4: handover note section 4, `README_P3_BRIDGE.md`,
      bench outputs); P-9 to P-11, O-10, section 3a and T-14 of `FIELD_CALIBRATION_PLAN.md`
-     updated (committed 2026-11-20, ae98498c9).
+     updated (committed 2026-11-20, bdb639e63).
    - **Unused `src/` modules archived (2026-11-20):** `compare`, `rollout`, `train`,
      `train_ppo_baseline`, `train_sac_baseline`, `ship_v2`, `safety_fast_geometry`,
      `safety_reachability`, with their 5 tests, the `rollout`/`train` half of
      `test_ported_harness.py`, `tools/tiers/compare_tier1.py` and the reachability runner, to
      `archive/` (`archive/INDEX.md`; archived tests run with `pytest -c archive/pytest.ini --rootdir archive archive/tests`). The
      bridge reaches none of them; parity 4/4 after the move. `tools/diagnostics/` not yet sorted.
-   - **Entry scripts in `src/` and one set-up format (2026-11-20, 76a984450):**
+   - **Entry scripts in `src/` and one set-up format (2026-11-20, 45d1e566a):**
      `src/train_asv.py`, `src/test_asv.py` (moved with `git mv`; paths from the project root,
      runnable from any folder; `tests/test_train_asv.py` follows). `src/setups.py` loads a set-up
      by name, test set v4 IDs and field cases alike (scenario, episode seed, plant), for
      `test_asv.py` (`--set field`, `--scenario easy_1`, `--plant`) and the bridge
      (`udp_live_p3.py --scenario <name>`). Checked: field cases and test-set episodes replay
      with their recorded outcomes and step counts.
-   - **Field test suite (2026-11-20, 629600efd):** `src/field_test_cases.py` (TestCase
+   - **Field test suite (2026-11-20, 48512f19a):** `src/field_test_cases.py` (TestCase
      interface as the July `test_run.py`; `list`, `sheet`, `run`), built by
      `tools/tiers/field_suite.py`, record `results/field_suite/README.md`: easy (open basin),
      medium (L1), hard (L2/L3) x encounters 1-5 (HO, CRS, CRP, OT, BO), 15 cases, each 10/10 on
@@ -203,7 +203,7 @@ mitigate the collision rate (a higher success rate is welcome, not required). Re
      head-on draws the same); hard_5 by the policy (standing on is feasible; being overtaken is
      rule-consistent in 0-21 % of test-set episodes for every SAC/TQC seed and checkpoint, 100 %
      for the rule-based comparator).
-   - **Bridge ego estimate over the decision interval (2026-11-20, c7e2b4cdc):** at the
+   - **Bridge ego estimate over the decision interval (2026-11-20, 560647fd8):** at the
      vessel's 10 Hz stream (February 2026 logs) the decoder's consecutive pose differences read
      zero speed on 18-46 % of moving frames (the operator stop's "stopped") and peaked at
      2.2-2.3 m/s. `udp_live_p3.EgoWindow` differences over about 0.5 s (`--ego-window-s`):
