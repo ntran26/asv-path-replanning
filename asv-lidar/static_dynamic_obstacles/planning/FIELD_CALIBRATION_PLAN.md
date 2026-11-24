@@ -2,7 +2,8 @@
 
 Date: 2026-11-04; bench results of the Paper 3 bridge added 2026-11-05 (section 3a); turns at
 the cruise setting (RPM 6) added 2026-11-14 (S1-D, S1-E). Status:
-plan, before booking. It carries forward the part-2 basin plan
+plan, before booking; the session-by-session protocol with expected results, from the
+data-collection session of 2026-11-26 on, is `FIELD_SESSIONS_PLAN.md` (2026-11-24). It carries forward the part-2 basin plan
 (`planning_records/PART2_BASIN_PLAN.md`, 2026-09) with the changes of section 1, and is the plan
 of record for the calibration sessions. The field trials that follow are planned in
 `FIELD_TRIALS_PLAN.md`.
@@ -78,7 +79,7 @@ uncertainty; S2-A measures day-to-day variation.
 | P-9 | Paper 3 bridge (`FIELD_TRIALS_PLAN.md` section 3), at least for S2-C. **Done 2026-11-05** (section 3a). Repeated 2026-11-14 on the personal laptop (shore-laptop candidate, O-10; `field_deployment/UDP_BENCH_HANDOVER.md`, section 4): parity 32/32 runs and 1,497 decisions equal; the 19 July logs in process and three over UDP loopback equal to the in-process run and reproduced offline, so the UDP replay is no longer provisional. No separate two-device test (handover step 6 not run); UDP across devices is first exercised by the vessel link (handover step 7) at the next basin booking | the existing bridge builds the Paper 2 observation |
 | P-10 | Run time per decision on the shore laptop, with communication: the command path (observation, policy, command) and, for the optional active block only, the E1 layer in the loop; p99 below the 0.5 s decision interval | otherwise the policy, or the layer, cannot run at 2 Hz. Development laptop (section 3a): command path met, E1 in the loop not met. Personal laptop (2026-11-14, 2 cores, other applications holding about half the CPU): command path p99 0.03 s on test-set streams and 0.09 s from the LiDAR line to the sent command on the July logs over UDP loopback, met; E1 in the loop p99 0.89 s with 5 % of decisions above 0.5 s, not met. Active mode therefore runs at 2 Hz on neither laptop; shadow mode is unaffected. The vessel-link latency is not in these figures |
 | P-11 | Shore laptop and network: free UDP ports for the bridge and the vessel link, UDP allowed on the session network | on the development laptop UDP 5000, 5001 and 5050 are held by system services (the July bridge listened on 5000), and the university network blocks UDP. Personal laptop (2026-11-14), the shore laptop, linked to the laptop that controls the vessel with the July ports and command line (bridge on 5000, the vessel-control laptop on 5050; `udp_live_p3.py` keeps the July option names and accepts `--shadow` for `--no-send`): UDP 5000 (bridge), 5001, 15000 and 15050 free; 5050 held by the Connected Devices Platform service, which matters only for a fake vessel on the same laptop; UDP not restricted on its networks. No two-device bench test (handover step 6 not run); the vessel link (handover step 7: START reaches the vessel, frames and pose pair at 2 Hz, no `$CMD` sent) is scheduled for the start of the next basin booking, before any session |
-| P-12 | An operator stop independent of the shore laptop (radio-control override or vessel-side kill), tested on the bench | the bridge's stop key acts only while the bridge runs and its window has focus |
+| P-12 | An operator stop independent of the shore laptop (radio-control override or vessel-side kill), tested on the bench. **The radio-control override (2026-11-24)**: the manual safety layer for every run | the bridge's stop key acts only while the bridge runs and its window has focus |
 
 ## 3a. Bench results of the Paper 3 bridge (2026-11-05)
 
@@ -131,6 +132,16 @@ settled 180 deg arc still yields steady rate and speed) and the constraint is re
 current model puts the radius at about the same value at RPM 6 as at RPM 12 (5.2 m at full helm,
 12 m at helm 50 %), with the turn rate halved: one full turn takes about 71 s at full helm and
 143 s at helm 50 %, which sets the 20 min the RPM 6 circles add to S1-D.
+
+**Full circles fit (O-3, 2026-11-24).** The February 2026 radio-control log
+`field_deployment/data/test_4.log` holds two sustained full-rudder turns of more than two
+circles each: radius 2.4 m at 0.85 m/s and 3.9 m at 1.34 m/s, both at about 19 deg/s, the larger
+spanning 8.6 x 8.3 m; `test_1.log` crosses 10.9 m sideways, so the basin is wider than the
+simulator's 10 m map. The model's full-helm prior (radius 5.3 m, 10.0 deg/s at RPM 12) turns
+about half as fast as these, so the circles are expected well inside the model's values; a
+setting whose circle would leave the basin (helm 25 % at RPM 12 has a model radius of 28 m) is
+run as the largest settled arc. Procedure and expected values per block:
+`FIELD_SESSIONS_PLAN.md` section 5.
 
 ## 5. Session 2: validation and dress rehearsal (about 4 h)
 
@@ -205,7 +216,7 @@ session-2 validation data.
 | --- | --- | --- |
 | O-1 | Can the vessel telemetry exceed 2 Hz, and by how much, and at what pose resolution? | decides whether S1-B separates the actuator terms, and how close the bridge's ego inputs come to the simulator's |
 | O-2 | Is the IMU installed, raw at 100 Hz or more, on the bridge clock? Installed on the Bluefin (2026-11-23); its line format and rate are first seen in a data-collection session on 2026-11-26, recorded with `field_deployment/udp_raw_logger.py` (no decoder, so an unknown line type cannot stop the recording) | surge and yaw-rate identification; field ego estimate |
-| O-3 | Does a full turning circle fit the basin at RPM 12? | tactical-diameter quantities available or not |
+| O-3 | Does a full turning circle fit the basin at RPM 12? **Yes at full rudder (2026-11-24):** the February radio-control circles measured radius 2.4-3.9 m and spanned at most 8.6 x 8.3 m (section 4) | tactical-diameter quantities available or not |
 | O-4 | Rudder position feedback, or the P-3 camera method? | S1-B decisive or lumped |
 | O-5 | Is the black wall still present and matte? | registration design |
 | O-6 | Does the ESC reverse, with what dead band and ramp (P-8)? | **the layer's stop on the water** |

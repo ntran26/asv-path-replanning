@@ -1,0 +1,52 @@
+Plant: src/ship.py with the identified v3 parameters (no randomisation), dt = 0.05 s
+Actuator in the model: transport delay 0.73 s, first-order lag 0.90 s, rate limit 2985 deg/s (effectively none)
+
+STRAIGHT, from rest: steady speed; time and distance to 90 % of it
+  RPM  6: 0.56 m/s; 14.0 s, 4.4 m
+  RPM  9: 0.84 m/s;  9.3 s, 4.4 m
+  RPM 12: 1.12 m/s;  7.0 s, 4.4 m
+  RPM 15: 1.40 m/s;  5.6 s, 4.4 m
+  RPM 18: 1.67 m/s;  4.7 s, 4.5 m
+  RPM 21: 1.95 m/s;  4.0 s, 4.4 m
+  RPM 24: 2.23 m/s;  3.5 s, 4.4 m
+
+COAST-DOWN from steady speed: time to half speed; time and distance to 0.1 m/s
+  from RPM  9 (0.84 m/s): half speed 6.3 s; 0.1 m/s after 46.6 s and 11.3 m
+  from RPM 12 (1.12 m/s): half speed 4.7 s; 0.1 m/s after 48.2 s and 12.8 m
+  from RPM 15 (1.40 m/s): half speed 3.8 s; 0.1 m/s after 49.1 s and 14.0 m
+  from RPM 21 (1.95 m/s): half speed 2.7 s; 0.1 m/s after 50.2 s and 15.7 m
+
+TURNS: steady rate, radius, speed in the turn (ratio to straight), advance and transfer at 90 deg,
+       tactical diameter, time for 360 deg, footprint of the first full turn (along x across the
+       initial heading), heading change before the transfer reaches 8 m
+  RPM  6 helm  50 %:  2.5 deg/s, R 12.0 m, 0.53 m/s (0.94), adv 12.4, trans 10.8, TD 23.9 m, 360 deg in 141 s, footprint 12.5 x 24.0 m,  77 deg in 8 m
+  RPM  6 helm 100 %:  5.1 deg/s, R  5.3 m, 0.46 m/s (0.83), adv  5.9, trans  4.3, TD 10.5 m, 360 deg in  69 s, footprint  5.9 x 10.5 m, 132 deg in 8 m
+  RPM  6 helm -100 %:  5.1 deg/s, R  5.3 m (the model is symmetric)
+  RPM 12 helm  25 %:  2.2 deg/s, R 28.4 m, 1.10 m/s (0.99), adv 29.5, trans 26.9, TD 56.8 m, 360 deg in 162 s, footprint 29.5 x 56.8 m,  47 deg in 8 m
+  RPM 12 helm  50 %:  5.0 deg/s, R 12.1 m, 1.06 m/s (0.95), adv 13.5, trans 11.0, TD 24.3 m, 360 deg in  72 s, footprint 13.6 x 24.3 m,  76 deg in 8 m
+  RPM 12 helm  75 %:  7.7 deg/s, R  7.4 m, 0.99 m/s (0.89), adv  8.9, trans  6.4, TD 14.8 m, 360 deg in  47 s, footprint  9.0 x 14.9 m, 103 deg in 8 m
+  RPM 12 helm 100 %: 10.0 deg/s, R  5.3 m, 0.93 m/s (0.83), adv  6.9, trans  4.5, TD 10.7 m, 360 deg in  36 s, footprint  7.0 x 10.8 m, 129 deg in 8 m
+  RPM 12 helm -100 %: 10.0 deg/s, R  5.3 m (the model is symmetric)
+  RPM 18 helm  50 %:  7.4 deg/s, R 12.2 m, 1.58 m/s (0.95), adv 14.6, trans 11.1, TD 24.5 m, 360 deg in  49 s, footprint 14.6 x 24.5 m,  76 deg in 8 m
+  RPM 18 helm 100 %: 14.9 deg/s, R  5.4 m, 1.40 m/s (0.84), adv  7.9, trans  4.7, TD 10.9 m, 360 deg in  25 s, footprint  8.0 x 11.0 m, 127 deg in 8 m
+  RPM 18 helm -100 %: 14.9 deg/s, R  5.4 m (the model is symmetric)
+
+ZIG-ZAGS: first and second overshoot, period, largest lateral excursion and distance run
+          up to the second overshoot (from the first helm order)
+  RPM 12 20/20: overshoots 4.8 and 5.2 deg, period 15.9 s, lateral 1.5 m, 13.8 m run
+  RPM 12 10/10: overshoots 2.1 and 2.2 deg, period 16.0 s, lateral 0.7 m, 14.5 m run
+  RPM  6 20/20: overshoots 2.4 and 2.9 deg, period 24.4 s, lateral 0.8 m, 10.1 m run
+
+CRASH STOPS, full astern (S2 = -100, -24 rpm units) with the rudder centred; strong reverse model (efficiency 0.5, no
+onset delay) and weak (0.25, 0.75 s onset), the safety layer's bracket: time and head reach to
+zero surge; then time to rest (sway < 0.02 m/s, yaw < 0.5 deg/s), lateral drift, heading change
+  RPM  9 straight         strong from 0.84 m/s: surge 0 after  1.7 s, head reach 0.67 m; rest after  1.7 s, lateral 0.00 m, heading change   0 deg
+  RPM  9 straight         weak   from 0.84 m/s: surge 0 after  3.5 s, head reach 1.59 m; rest after  3.5 s, lateral 0.00 m, heading change   0 deg
+  RPM 12 straight         strong from 1.12 m/s: surge 0 after  2.1 s, head reach 1.09 m; rest after  2.1 s, lateral 0.00 m, heading change   0 deg
+  RPM 12 straight         weak   from 1.12 m/s: surge 0 after  4.1 s, head reach 2.27 m; rest after  4.1 s, lateral 0.00 m, heading change   0 deg
+  RPM 15 straight         strong from 1.40 m/s: surge 0 after  2.4 s, head reach 1.55 m; rest after  2.4 s, lateral 0.00 m, heading change   0 deg
+  RPM 15 straight         weak   from 1.40 m/s: surge 0 after  4.6 s, head reach 2.92 m; rest after  4.6 s, lateral 0.00 m, heading change   0 deg
+  RPM 12 turn, helm 50 %  strong from 1.06 m/s: surge 0 after  2.0 s, head reach 0.97 m; rest after 75.6 s, lateral 0.77 m, heading change 121 deg
+  RPM 12 turn, helm 50 %  weak   from 1.06 m/s: surge 0 after  4.0 s, head reach 2.07 m; rest after 61.1 s, lateral 0.46 m, heading change 116 deg
+  RPM 12 turn, helm 100 % strong from 0.93 m/s: surge 0 after  1.7 s, head reach 0.74 m; rest after 80.9 s, lateral 1.46 m, heading change  95 deg
+  RPM 12 turn, helm 100 % weak   from 0.93 m/s: surge 0 after  3.6 s, head reach 1.65 m; rest after 67.7 s, lateral 0.35 m, heading change 162 deg

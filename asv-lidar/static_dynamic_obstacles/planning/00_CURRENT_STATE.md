@@ -41,6 +41,7 @@ the paper.
 | `PAPER/READING_LIST.md` | references, with verification status |
 | `FIELD_CALIBRATION_PLAN.md` | the vessel-model calibration: two basin sessions (identification, validation and dress rehearsal), thresholds, contingency (2026-11-04; bench results 2026-11-05; RPM 6 turns 2026-11-14) |
 | `FIELD_TRIALS_PLAN.md` | the field-trial design for Section 5: the Paper 3 bridge (built 2026-11-05), scenarios, metrics, sim-to-field comparison, procedure, decisions D-1 to D-6 (2026-11-05) |
+| `FIELD_SESSIONS_PLAN.md` | the session-by-session experimental plan (2026-11-24): D0 data collection on 2026-11-26 (S1a the same day if it passes), S1b, S2, then trials T1 target only (easy), T2 L1 (medium), T3 L3 and L2 (hard); set-up, procedure, expected result per experiment (model predictions from `tools/diagnostics/manoeuvre_predictions.py`, simulated field-suite results), bench items B-1 to B-7 |
 | `FUTURE_WORK_IDEAS.md` | ideas outside this paper (a sim-to-field conference paper) |
 | `REPO_RESTRUCTURE_PLAN.md` | main code into `src/` (field deployment in `src/field_deployment/`), tools by purpose, superseded code to `archive/`; Paper 3 project only; held until after the calibration sessions (decided 2026-11-20) |
 | `MASTER_ARTIFACT/MASTER_ARTIFACT_PROMPTS.md` | the pending change blocks for the explainer artifact, with the log of blocks applied |
@@ -163,6 +164,14 @@ mitigate the collision rate (a higher success rate is welcome, not required). Re
      line format and rate. Recorded with `field_deployment/udp_raw_logger.py` (handshake and raw
      log, no decoder, standard library only). `udp_live_p3.py` no longer stops on a bracketed line
      that is not a 720-value scan (it logs and skips it); decisions on the July logs unchanged.
+   - **Field sessions plan (2026-11-24):** `planning/FIELD_SESSIONS_PLAN.md`, every route drawn in
+     `planning/field_sessions_figures/` (10 m x 25 m basin, as trained). Calibration commands from
+     `field_deployment/udp_manoeuvre.py` (as the policy sends them; basin fence; radio control as the
+     back-up and the manual safety layer). Both ships start from rest in every field-facing
+     simulation, the target released at a per-case offset (`results/field_suite/both_from_rest/`):
+     12 of 15 cases 10/10, `easy_2` 8/10, `medium_2` and `medium_4` 9/10. `medium_3` re-picked under
+     that protocol (generator seed 980324; `results/field_suite/repick_medium_3/`). No retraining;
+     test set v4 figures stay under their stated convention.
    - **UDP bench moved to a second laptop (2026-11-14):** the university network blocks UDP;
      `field_deployment/UDP_BENCH_HANDOVER.md` (pushed, 6afd95a66) lists the checks for P-9 part B,
      P-10 and P-11 on a personal laptop, which becomes the shore-laptop candidate (O-10).

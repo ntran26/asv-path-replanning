@@ -1,0 +1,405 @@
+name,layout,code,generator_seed,episode_seed,source,digest,target_x,target_y,target_heading,target_speed,dcpa_m,tcpa_s,cruise_goals,cruise_min_range,offset_s,match_m,designed_range_m,designed_s_m,rest_goals,rest_failures,rest_min_range_median,rule_rule_compliant,rule_first_manoeuvre,rule_target_side_at_cpa,rule_crossed_ahead,rule_cpa_m,rest_robust_goals,rest_robust_failures,stage,cruise_failure
+medium_3,L1,CRP,867062,887062,original,7b8e9f3f3e143bbb22fa5e1f950e98c772b96610181189a5f0f5d293589503a1,1.5713671590235556,6.109574614427394,81.8492618398163,0.4103980448180506,0.06955623082014223,8.30677949802996,10.0,1.479400396347046,2.0,0.12580764293670654,1.479400396347046,3.261363983154297,3.0,collision:target;collision:obstacle;collision:target;collision:target;collision:target;collision:target;collision:target,1.6395909376987938,0.0,none,port,0.0,1.365446418808123,6.0,collision:target;collision:obstacle;collision:target;collision:obstacle,evaluated,
+medium_3,L1,CRP,867099,887099,original,d2c6a50433936575803a08ef1e768ea181829a8cf960998d8854c98b13dc6719,2.907120081567281,9.22998278598419,156.83312015554986,0.3745755373600941,0.9005113775467346,8.17128375662439,10.0,2.316988468170166,-7.0,0.5103025436401367,2.316988468170166,4.88024377822876,9.0,collision:obstacle,2.487787482130406,0.0,starboard,port,1.0,2.333923452229362,6.0,collision:obstacle;collision:obstacle;collision:target;collision:obstacle,evaluated,
+medium_3,L1,CRP,867137,887137,original,7e7952670443a49567b7e76cef01f6acdb3dbca2082815f51ce0473f6501dad5,1.5633540196517601,6.316737485445023,85.1307757570767,0.4520686712487175,0.22968966905926674,8.01495110881772,10.0,1.7934240102767944,-8.0,0.5725291967391968,1.7934240102767944,3.0636024475097656,2.0,collision:obstacle;collision:target;collision:obstacle;collision:obstacle;collision:obstacle;collision:target;collision:boundary;collision:obstacle,1.7833137600449114,1.0,none,starboard,0.0,2.2015601675557503,8.0,collision:obstacle;collision:target,evaluated,
+medium_3,L1,CRP,867276,887276,original,c19bef49ab338cadc244c4336542a3d70ee71247ff8490a0ace9cc5aeb417340,1.3513217845786842,8.210128825125974,136.924915215464,0.37745098768377544,1.6518328794172992,8.032077709274539,10.0,3.2474920749664307,-5.0,0.4133644104003906,3.2474920749664307,4.379347324371338,8.0,collision:obstacle;collision:obstacle,3.5253098645514465,0.0,starboard,port,1.0,3.522584584363801,9.0,collision:obstacle,evaluated,
+medium_3,L1,CRP,980000,985000,new,a27b0068838967d4d25f5a9bf34857414440df1c6b36f5059076c6aecbd79c35,2.6826263338167253,10.705771120509366,97.33635396517674,0.3663535684919068,2.495855475729701,12.266184015235183,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980001,985001,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980002,985002,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980003,985003,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980004,985004,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980005,985005,new,e0fb7411abcf492340f2e73965797edbf63004b9023b4182d4f41c7f287026ef,1.97986782723952,9.874400803339114,100.09558214340582,0.46304256209224226,2.112456980902153,10.39793819134759,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980006,985006,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980007,985007,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980008,985008,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980009,985009,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980010,985010,new,67385a5b0f1dbd0f7f02c68db9b13e7a3cf0e08b31c3c1b33364d08163242e34,1.571352952282406,9.467058956386122,77.9803325665852,0.3381769274381243,1.3531202973451164,13.751720915587832,1.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980011,985011,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980012,985012,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980013,985013,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980014,985014,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980015,985015,new,9af389cc505515d5a359aaaacbfb91ea0abd0c7a7c90f82952676de602016c6c,1.6474942738825504,8.452845240292037,71.39121058976379,0.3750934901546214,1.4594013678742555,12.619922966607668,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980016,985016,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980017,985017,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980018,985018,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980019,985019,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980020,985020,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980021,985021,new,8fe984b17f832ae9d43be81a8fae5726d96733691c590dfab53a24a1a327d7d9,2.9747924189705985,8.627666103612867,143.7207678865613,0.35474727596416666,0.36602100759825396,7.955752980792374,1.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980022,985022,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980023,985023,new,ed624d216c94339cc64c26bad742759b8fc2a6598a9f734388f1a120f0d663c2,1.886398033352305,8.54865801978655,153.24801207472757,0.3359085757475138,1.930019868981374,8.021444396729859,6.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980024,985024,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980025,985025,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980026,985026,new,a3e309fdafe68cca83957a53c2663533d2780f35632979789193e8480c8b69da,2.0585129117018592,11.144312154236069,101.84507182907747,0.3778705848707214,2.0553800857810196,12.757777053191653,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980027,985027,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980028,985028,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980029,985029,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980030,985030,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980031,985031,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980032,985032,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980033,985033,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980034,985034,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980035,985035,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980036,985036,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980037,985037,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980038,985038,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980039,985039,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980040,985040,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980041,985041,new,73f97b45f1386302dbeea0126125db661bb4e01420b613ffaf7db3f8b8a3b441,1.3616706683423776,8.38172596143664,121.73687479138606,0.4052570963769489,0.7184003186127985,8.653238439069066,1.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980042,985042,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980043,985043,new,e0c39a41a5c579a18fe76b4125a18a1e426ededf1df356268949f37cc7f575d1,1.2051848889160781,10.414957931185068,159.67137123316243,0.41826461064760007,2.4794442629161693,9.248365364732129,10.0,4.246351718902588,-5.0,0.43119192123413086,4.246351718902588,5.302462100982666,9.0,collision:obstacle,4.471139962564786,0.0,starboard,port,0.0,4.472280270996886,8.0,collision:obstacle;collision:obstacle,evaluated,
+medium_3,L1,CRP,980044,985044,new,b58253a52e2be9ab68b3dae7b2c5850df5204cb3ba13cddca5e971daf8da8558,3.06725204427025,9.844389719742873,105.00951108600424,0.38876240608059087,2.2049188349977107,10.248775332224819,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980045,985045,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980046,985046,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980047,985047,new,595f5a03bf6f4402c8120b6901a080234e4477d9b7e8e5b64ef2106045df0e9f,1.9566023981311016,9.045625642805511,154.78677484422758,0.3446914135707172,1.8284728255112506,8.447751207656712,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980048,985048,new,50f8e6ac6a615011c260fe499884cd178be8fda0eb108a626d421d369cf31182,2.1333896848559784,10.620365858694917,108.95242288141935,0.5119253894974802,2.4066175725225385,10.053226073307819,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980049,985049,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980050,985050,new,ecccbde183979e00aecc27de06e08f2cf2ef9180e0bd5d2211ea5f96f5a67b31,1.2775175016392173,10.852175991209574,159.668089302562,0.613758402684943,2.02189369333941,8.13784061869162,2.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980051,985051,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980052,985052,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980053,985053,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980054,985054,new,52ad5e3888ad1e3c62689b8502c25fb90bee831b89254708acd4dee0aec81d01,1.2130648568952513,8.517669781350985,143.67569508158255,0.398430912210168,1.9676641225817089,7.993436713889388,4.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980055,985055,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980056,985056,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980057,985057,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980058,985058,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980059,985059,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980060,985060,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980061,985061,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980062,985062,new,7e55ba14aba43f80137e1cc98de066def9a109b3d4717eca43f672270502466c,1.9208949895965324,11.195825860351059,97.56212357801036,0.37304447719501926,2.1528657838193435,13.29875440572933,2.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980063,985063,new,bb8668a2a610488b5f817b3aad534578515afb9376fc6d25382417dbe2e5048e,2.127939288944038,11.259718021245138,113.07064324344658,0.41303578699690685,1.7818202200273483,11.70492007132384,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980064,985064,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980065,985065,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980066,985066,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980067,985067,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980068,985068,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980069,985069,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980070,985070,new,0413b81acade36b2afef8276a986e2c8c344027faa19d3673100755b24b50714,2.6067214496920084,10.646123566080474,98.63844450270621,0.3752103128008872,2.419150892369098,12.034830734392882,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980071,985071,new,d5dba79426d473abaef8155de629634ce0fc7c87f976640861a67812abd12e38,2.0689725124019533,10.97831558525742,163.11719698580958,0.6086732654547594,1.5214622752940823,8.075636928386047,5.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980072,985072,new,5b55f51c506d26d123057a57b49df6f4751168eb7d65b09e4221c4f146147964,1.8491377889229828,6.167294130284557,85.41640785882126,0.4036257087010118,0.029442610655761037,7.889565399087269,10.0,1.538888692855835,2.0,0.11472010612487793,1.538888692855835,3.1417765617370605,1.0,collision:target;collision:target;collision:target;collision:obstacle;collision:target;collision:obstacle;collision:target;collision:target;collision:target,1.584144328229075,1.0,none,starboard,0.0,1.854286515722397,3.0,collision:target;collision:target;collision:obstacle;collision:target;collision:target;collision:obstacle;collision:target,evaluated,
+medium_3,L1,CRP,980073,985073,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980074,985074,new,0999fe3bfd3c447655c1a282285008794e3e93b652fad6d55bebcc8c2196617c,1.575426174650996,8.63354060035411,73.69922897911944,0.3861757637819585,1.5756724515668628,12.520040210758108,1.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980075,985075,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980076,985076,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980077,985077,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980078,985078,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980079,985079,new,57230063ec179e13a3ade79dc6edd8e90e3bbe0fd9d35490d12b01010f3b4ca4,2.887340108600954,11.493237184119415,119.36866082547374,0.40362584458458006,2.0886132668002673,11.389797581278106,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980080,985080,new,e4589561c8cfd2e5e4ef3834c557df0c5b215d344031a1815cb7ac39124f4343,2.3528606871746653,11.354428672430753,102.13297219857665,0.3883935575114635,2.497713672140416,12.627988866371835,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980081,985081,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980082,985082,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980083,985083,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980084,985084,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980085,985085,new,2c60e6a7aea4ce19a67ff93180a4d8088b805e27575b20f0af910c8e65122aaa,1.6856589927359797,9.297227417660327,157.4354539817619,0.3405759645621755,2.197073645862159,8.73456692502812,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980086,985086,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980087,985087,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980088,985088,new,7ed38975d03b08f45a75136cd962a378b8fc958007e6ec91e6e6fab913307da9,1.536167714511791,7.692185866299547,118.46365911204683,0.3559302076660347,0.9340090754924799,8.327636692778183,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980089,985089,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980090,985090,new,d4140cf8428d89a4b724ad462c2460cc8d75547b6ec041b47de88f4c1afee570,1.9422220665979415,11.273676357569025,120.06782254636052,0.4100651526254015,1.1353175890507523,11.517425067390912,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980091,985091,new,54baaef8070988dc3c1ca23480897eb5c69614664a2dc8af1df4f81345108a5b,1.3591873613353078,9.273968462340719,68.74813313947537,0.4022356212445296,2.1987998141070824,14.05197809880788,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980092,985092,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980093,985093,new,865bf4d6994f36a09938cc0c4500b80bd7c80ad6e66f74d595dddf2e539d5c76,1.909284958788457,10.353224550322443,106.57286449835954,0.4126853216407441,1.551489042609058,11.199247823483994,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980094,985094,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980095,985095,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980096,985096,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980097,985097,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980098,985098,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980099,985099,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980100,985100,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980101,985101,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980102,985102,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980103,985103,new,0d8caa50b2e052a1c1fa710786953e433591af5221969ca80d36b644bfbd04e3,1.6470812980966367,9.083701522784468,138.26317885577527,0.41959799019716615,1.0302974295171052,8.491038882257579,10.0,2.825023889541626,-5.0,0.3796803951263428,2.825023889541626,5.020533084869385,10.0,,3.0844412580046914,0.0,starboard,port,1.0,3.026732043973826,6.0,collision:obstacle;collision:obstacle;collision:obstacle;collision:obstacle,evaluated,
+medium_3,L1,CRP,980104,985104,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980105,985105,new,20d306065853e6bedc8ceeabdd6f9063d67717824205bed8a191aec0a3c08885,1.8554554725898953,11.468888534876665,115.58359708411928,0.33590606709874254,0.8585642260523207,12.981525219090715,4.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980106,985106,new,d149c16ef5c147da99e5646cd747113b18ef684fba8c5a6697a6e236ce8bab0d,2.587476267078713,11.422270319114066,165.84821209280022,0.42243105984639523,1.3990640558862104,9.889143463151262,1.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980107,985107,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980108,985108,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980109,985109,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980110,985110,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980111,985111,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980112,985112,new,ab291fccf2340831eeda859e24a685071e9465aa1f1fded076bca9242240a5e4,1.2158207889117372,11.16515389168131,147.39292037193692,0.5204692347883662,1.1598943758764082,9.511446508693139,2.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980113,985113,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980114,985114,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980115,985115,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980116,985116,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980117,985117,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980118,985118,new,119e8b29b4dd1f4e77da3a4d4031627fd68e80ace2354dd4706a770af12c41a1,2.8204388033792656,9.824756975295928,165.01964968030842,0.44064947183942,1.2652346767503437,8.100973234412352,1.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980119,985119,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980120,985120,new,fd40a4dd5105497a05e6550a3d040eaf8dd1f2b52fe3208543cbb2bf540ec396,3.5058938084783824,9.571902428362936,169.6466705319799,0.39067252011339615,0.9274745213602944,8.1069301487299,4.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980121,985121,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980122,985122,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980123,985123,new,bb8c201558789e410aa72f58da924248c7ddd511ad9228512133ce2cf0b2d519,1.5780755508204898,10.151931778720408,159.25183773528542,0.44735314658076186,2.0718538491733796,8.68771316661937,1.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980124,985124,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980125,985125,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980126,985126,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980127,985127,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980128,985128,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980129,985129,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980130,985130,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980131,985131,new,ec944ced19267896c09fdffe00a57ab557833bf8ad1dd8d5aeee4c5e975185fb,1.4252916544504535,9.399919291403915,91.61211516319571,0.34181934470882924,0.7525259804596709,12.349106499658905,1.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980132,985132,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980133,985133,new,684f5a8b2c7af1fd2c77fdb3c77e4fafa134a656d9ed2a00f681bc6261e7ded1,1.5579694495732772,10.730960971326791,110.81118851561794,0.33929622690168376,0.5777801900034002,12.503126466960698,4.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980134,985134,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980135,985135,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980136,985136,new,c0fb9b3962292d9a78090ff75e2ce4f7a8b3fa11a38aa386922a4a54ae422a94,1.390664736548247,10.999183483051592,164.06098098223654,0.46518821763367174,2.4463320514492133,9.256646144652255,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980137,985137,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980138,985138,new,0907864fc5cb22da9e42a2882d6470989a62d5b7282da19f8607a0f1c5fb35b0,2.8576545288092596,10.217431728959166,112.73971236022075,0.3745968952687382,1.7016692658078836,10.62162758115217,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980139,985139,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980140,985140,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980141,985141,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980142,985142,new,8ea8ce1e77d2653e7615ec4edfee60c9b52effa79de32d2075824cf67e46a777,2.884059537286845,10.215243893213021,163.2909463340776,0.4179109225849704,1.0776234088244976,8.711181479071314,9.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980143,985143,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980144,985144,new,0809b9a048722ee124ea9126fa645310dbcd58f16309bdb741d253e7a59c9326,2.9680131096246756,11.716190488045736,131.8385090066081,0.6186051008882599,2.331224623633893,8.978405673470402,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980145,985145,new,d7aa29035a818597f26b54f700e4f0188e05c9d0f9ce56b4c92ab5a70ce5b62f,1.901700430675012,9.076565527490876,135.65306720864587,0.4687848948518327,0.47208901479109416,8.10263306486717,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980146,985146,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980147,985147,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980148,985148,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980149,985149,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980150,985150,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980151,985151,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980152,985152,new,5fb1a8084289dbd4857237c18cc31b86e925277416e4f2bd0d9151a0d322fdfd,3.511493516656244,10.163635057039725,115.07066910445414,0.36765197947033723,2.1017990086566205,10.18966634068218,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980153,985153,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980154,985154,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980155,985155,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980156,985156,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980157,985157,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980158,985158,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980159,985159,new,7fd55899eb662ae7e10d2f397c2234f4c6d2188058866597290252085dfbfe44,2.3873674690569153,9.30832121273747,144.14389519258896,0.4599182352997712,0.4781377721859098,7.993155743883554,1.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980160,985160,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980161,985161,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980162,985162,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980163,985163,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980164,985164,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980165,985165,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980166,985166,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980167,985167,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980168,985168,new,d12fd2197355352d3d2849ffadbc63163d2dfdd336d6b885b244152548cdd3a4,1.9171076560414586,11.12549685622493,166.24643174100515,0.47436050311286443,2.060300605647236,9.17821763455561,3.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980169,985169,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980170,985170,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980171,985171,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980172,985172,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980173,985173,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980174,985174,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980175,985175,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980176,985176,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980177,985177,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980178,985178,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980179,985179,new,433f3d5a18728ff970d15404fcd9c263a3a767f7ad4333ca4a68e60d874aac89,1.6130628262787106,10.689138650943526,97.71627421625662,0.4360774055578318,2.212241336017623,12.030466727134149,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980180,985180,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980181,985181,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980182,985182,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980183,985183,new,671bca33c4bd6ed2bf5d20b4714dfdfbf1e082d773ad3b624c655384ec9355fd,3.189138572058838,10.444862028574185,108.00008110061717,0.3906926734465999,2.4658267193515164,10.694935747165959,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980184,985184,new,562ef6bec2d324803646ec833ea4902116b7ba0073be002f057f3657e9f7da31,1.8210535467435385,9.461347982529281,80.9033105625024,0.3601365248018754,1.7245082520213804,12.894724906661262,1.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980185,985185,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980186,985186,new,2c0c82df3037b2d5462c840a0a5981b7217baca7c1759f28a42c0cd0dac5facd,2.8428561365723657,10.20567839267263,168.0926245994023,0.4730723948842491,1.366504065716232,8.16359360345353,10.0,2.8987631797790527,-4.0,0.2761099338531494,2.8987631797790527,4.825649738311768,5.0,collision:obstacle;collision:obstacle;collision:obstacle;collision:obstacle;collision:obstacle,3.101147884069617,1.0,starboard,port,0.0,3.1062351892052367,8.0,collision:obstacle;collision:obstacle,evaluated,
+medium_3,L1,CRP,980187,985187,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980188,985188,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980189,985189,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980190,985190,new,a6be3d5fb202101ffbb6194eaecbfd62e99097cd74bbd22b8e0aef53c31feee7,1.9699651908248637,8.845671532504566,74.65283682841691,0.35009111604011517,1.566019584830036,12.730126282053828,4.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980191,985191,new,561e284d9e1794367fd18ea760761840caf480df5418168736248f01d5ac50ea,2.0749301385562644,10.474451492727798,150.56249319336501,0.5712850917755147,0.6487124452013384,8.185118476904485,5.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980192,985192,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980193,985193,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980194,985194,new,de9893afdf9fa68a59c4de46f50c92f4fb80cd043e79d466edf122cdea7df75b,2.3061397012812757,9.406653567722001,165.063595382286,0.3594811508231145,1.925942048827929,8.395887893438942,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980195,985195,new,cfcb864372fe5cfb9526301181c8bea292e424655b82848eb618cae8e7223b35,1.2723760273202502,9.758496330842881,156.4084111704349,0.3838476861415549,2.3840781440578485,8.962362959528017,10.0,4.043515205383301,-6.0,0.2514982223510742,4.043515205383301,4.837167739868164,8.0,collision:obstacle;collision:obstacle,4.168209759100131,0.0,starboard,port,0.0,4.175503885845361,9.0,collision:obstacle,evaluated,
+medium_3,L1,CRP,980196,985196,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980197,985197,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980198,985198,new,301bb9e94f641e68eba18a8d17ff4c191666b9b2b62175a92521a41ab2eedc9e,1.68293532894897,10.59048483375182,109.62939748777154,0.5711576428780776,2.3112499779211917,9.657116681143616,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980199,985199,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980200,985200,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980201,985201,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980202,985202,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980203,985203,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980204,985204,new,cf2f10a0d79b6238a5851f8505b8de838bf8a5f896725f1c795a4087c5200667,1.5083586881728137,8.75450849987163,133.81992362767522,0.46910811729950735,0.842715417413322,7.991107631154248,3.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980205,985205,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980206,985206,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980207,985207,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980208,985208,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980209,985209,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980210,985210,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980211,985211,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980212,985212,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980213,985213,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980214,985214,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980215,985215,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980216,985216,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980217,985217,new,857da9cba2bb295eef48a9f6dcb24a7ce2aadee8f859e0d27ee2a67631d1ff13,2.3135417585235634,8.052612431516119,120.40348998190495,0.35265651570015266,0.17322416320552286,8.305968620392743,4.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980218,985218,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980219,985219,new,2bfc1f779c44dc135619cfa685de38437e13fece7203321728e6fbc62c066489,1.9771169089380187,10.792899473097165,153.71702524094556,0.4789576505156683,1.1094012100332056,9.138842677322335,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980220,985220,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980221,985221,new,64e0560f86b6fcfc116334852df88c52012f4dbd858095bc620c71b22e37ae19,1.5663637963506984,10.964955871308403,159.8165286252384,0.5089274976732238,1.8870300988561761,8.959006420281975,2.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980222,985222,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980223,985223,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980224,985224,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980225,985225,new,e1269d841e73c6680e1009e7e93fc7b29cb9def36d5a9287bfad791998afc1a3,2.6038603705713115,9.130809447594064,157.6865511648405,0.3582549808250043,1.2908619513475013,8.234875940575378,6.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980226,985226,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980227,985227,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980228,985228,new,d10fc92b4716335bc1791bb632961f4fdad0060f0bd6bc5a526aca947023aa45,1.3407389102486382,9.695183706060297,98.54861056316575,0.5020455558034702,1.8708339982369688,10.335363720337643,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980229,985229,new,091c46a78ba862ff180641f2e1a1651d0c104aff8ac454315a440dcca89debf5,1.9117648485771506,9.639622569769708,83.56115785553385,0.4191169077908181,2.431152828173995,11.940850649706563,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980230,985230,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980231,985231,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980232,985232,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980233,985233,new,94b4424773b37524d2ec0b8bff1369d7faf8358d3732a9c52b3a05632a47d370,1.8987121728733065,10.335148690326793,103.50810863341337,0.48614004090177804,2.260419734140971,10.471718383134602,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980234,985234,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980235,985235,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980236,985236,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980237,985237,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980238,985238,new,5408bdcc18a415421cb9f9dc5500963acf377c6644d0117135c7030c4d51279e,2.0082918238258607,10.677311708828077,88.02002748200111,0.3403997953593701,2.04641947372261,13.900655091821198,1.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980239,985239,new,92469d85f0583eafdfe450f8aab1d1fa3e4c7d2d68d1e0b5dc781ddb8baad795,1.9997261350995155,11.304615942180838,115.43060459840692,0.3970721760529253,1.4163750056219961,11.91055712893506,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980240,985240,new,886f965dbc912a856f38a405b29ac25175e193fa83045c0de0ed4ac1b7baaa97,2.1643439124728348,11.139951107297687,163.5827445390766,0.603514521404762,1.4484052424461984,8.226910787523737,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980241,985241,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980242,985242,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980243,985243,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980244,985244,new,27e472014a0c3b20dc0863d8c1b6a1f181ad15983dd862812b1f5b71f395e693,1.5183301006556544,10.633150020398482,151.473546372982,0.38143822022378643,1.6865368046519278,10.041319853116509,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980245,985245,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980246,985246,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980247,985247,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980248,985248,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980249,985249,new,365cd7bc4e62f3e362b539d5aec044b8de03e79c546f38d62f608add0fa4e654,3.1556182550308827,10.402745571134446,168.48481440228844,0.4143001857385707,1.119475977282216,8.814402190726641,5.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980250,985250,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980251,985251,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980252,985252,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980253,985253,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980254,985254,new,6953a05caeffd9027e0630e0f643e5fffb4ee914934422263faaf294306d46cc,1.8026022802385249,11.135879423855272,168.21061877390744,0.3985727867392274,2.404063236598556,9.850264232571389,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980255,985255,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980256,985256,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980257,985257,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980258,985258,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980259,985259,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980260,985260,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980261,985261,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980262,985262,new,7cf9ace52675e3b1975efe53eac5672da998ac59243c348ff28a0514e4a5080d,2.2257904665330637,8.315949541635042,71.2985342394044,0.385902323925716,1.9433583699636048,11.657846444830327,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980263,985263,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980264,985264,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980265,985265,new,a174bdae6536e8e7366ab753033fee125d37fef7f9a8dbd2b48dfa11b8fa088f,1.6238644654167964,7.0939623282502495,103.32199863859634,0.3541231826839289,0.5568646536970654,8.374674576810625,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980266,985266,new,85c6b80613958cf1be86d6c1c6831c35912f2cff2f2263c53b77dcf78f6d75bc,1.6261702540974912,8.73196206161472,131.95157147557046,0.35033787175350994,1.1022101965762034,8.930232149865088,2.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980267,985267,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980268,985268,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980269,985269,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980270,985270,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980271,985271,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980272,985272,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980273,985273,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980274,985274,new,b2030194cc89dd12227f2adb7d07dabebf7c68549f3b1825d017b02c2da83666,2.040544970983226,8.426818166280494,137.3052694005933,0.38477204686260674,0.9222189402531467,7.966901804798328,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980275,985275,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980276,985276,new,2cc5e2c4d367bfc69cf9878354296703586c9075cb00bea633b6b1992353212c,1.7167949919700618,9.050683624744526,85.40236533557028,0.4204746557309629,1.8366641791468665,11.256929049181139,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980277,985277,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980278,985278,new,ff0f26e680aeea2c57afd43985632053964babd520fe8811c8bee3680f06ad20,2.1640048475765523,10.76237940091325,110.27349405598261,0.48869062322286233,2.271837335700303,10.379409460073498,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980279,985279,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980280,985280,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980281,985281,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980282,985282,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980283,985283,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980284,985284,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980285,985285,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980286,985286,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980287,985287,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980288,985288,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980289,985289,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980290,985290,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980291,985291,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980292,985292,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980293,985293,new,9712e4bffc8de80fc1ca2bb95292400d6abac8d2a84383a29a96e4a4de8261a9,2.9857074623778717,11.146996335030579,117.07339108069243,0.4126302241008377,2.2344724003562253,10.938084715804518,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980294,985294,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980295,985295,new,bdfda7f3e87fd348ca925d2bba5c734ed3e241664233e974ec1ef7f1a7d2785e,2.713825769302569,11.660042399536128,115.69193094671792,0.4091701658194721,2.2850438552011503,11.740508496029003,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980296,985296,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980297,985297,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980298,985298,new,daa9eb0991596271a80605a0e901cdfb47233dd33069c9038876baf0738cb397,1.507518368908599,9.545070912364318,135.33491456733668,0.48855201697196393,0.5903232584555631,8.562106495759108,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980299,985299,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980300,985300,new,2ccf42cebedab98ff12dbb06100cf6d0b4e92e0316863ea0977c7b002380ea40,2.036370414400537,11.440411576964287,100.34368818817414,0.3471742012729075,1.9556390259350611,13.693908958651296,2.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980301,985301,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980302,985302,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980303,985303,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980304,985304,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980305,985305,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980306,985306,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980307,985307,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980308,985308,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980309,985309,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980310,985310,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980311,985311,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980312,985312,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980313,985313,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980314,985314,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980315,985315,new,2255b4df7f6ec39903cd0d86b9a5070936bd0f17378c45a3983a8b799d7135ac,2.1357966297879427,11.093166346318144,116.02338640826352,0.35869790135705965,1.123182059755724,12.06299768164024,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980316,985316,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980317,985317,new,6f00043251e9457c9926c1f46155c040aadc62b2bbf20cf7eeea10d381334464,2.2445254375026287,9.458640507112264,145.0766618255337,0.4187915690316878,0.7460986866077018,8.485661000681832,1.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980318,985318,new,761a81b9f0456572773e88511265a9f763c349e1d3695094563ff9f502cc64c5,1.5141998157475518,11.311253320842116,156.25852249556655,0.5508321312786701,1.5095952678854172,9.0546501543973,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980319,985319,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980320,985320,new,32764b707cbbd9fd020947017dcbcca2dc8e05c7f2316f3e47c900cdc0f5c5da,1.242838969925054,11.02179013758537,149.11256436003703,0.7201969287837932,0.8790533995822589,7.894066548708315,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980321,985321,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980322,985322,new,97a271d45a4e6c4536487815be6d3d28b317056e9fc7696db8b9ae7352712c56,2.2442232236258857,10.311859859438947,156.91557974099993,0.403561121135726,1.3217175655771887,9.181549241928339,5.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980323,985323,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980324,985324,new,3b3810629cb777f9e375e3dfd1aa228eeccb2ebc6e9bd5822e85f4367f5fce2d,2.315067491082897,9.00023785781374,143.80917536675716,0.3388011259641848,0.9732001857362588,8.691275584435523,10.0,2.78187894821167,-7.0,0.3390772342681885,2.78187894821167,5.000579357147217,10.0,,2.84823389466617,0.0,starboard,port,1.0,2.8955953322175976,10.0,,evaluated,
+medium_3,L1,CRP,980325,985325,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980326,985326,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980327,985327,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980328,985328,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980329,985329,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980330,985330,new,27d6cf3436662f6d2868fc73ce2d2d1dcfb616951e6acecaab307f5544f95251,2.069405712456743,9.775848987457518,70.60008342945821,0.35999464499045997,2.442674482606236,14.319061199102146,6.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980331,985331,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980332,985332,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980333,985333,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980334,985334,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980335,985335,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980336,985336,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980337,985337,new,441012e3330ae338f63b4866f0f4466479d82d87df6e26b591a08b370f367bc6,1.673305976423138,9.762894433728679,91.54299655646032,0.39963935290368274,1.7383553335766389,11.888441080019794,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980338,985338,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980339,985339,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980340,985340,new,d53f5866253c3f51158126f0e06638219acb814747aca44d1996cff22374d966,2.225524989763054,10.295601705911682,156.97952984422818,0.5208173060682589,1.124561342251541,8.204289924988167,3.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980341,985341,new,0bda59c2efc4d9efca3aca34681251343d71b1f1de70d3a1c4b7cea192f8915e,1.4492242167752858,9.664423409554422,149.6372818552172,0.3460506951939475,1.9458750309952009,9.399937544137359,4.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980342,985342,new,a10a6f2d5f9ab9ca184db957478471fd058f927b7c4ff42f06c1096dda266949,2.5377295648473415,9.476595547466673,161.90857661484205,0.37289476887973994,1.5016060802502773,8.399274434979484,5.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980343,985343,new,90a678e811061f051c959e443c9db7240774414fd23c6cc1730a4c0fc09a7382,2.0108174393563365,11.369879632093255,114.34410711127944,0.45973591727294416,1.9715099787019208,11.24290692702988,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980344,985344,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980345,985345,new,caa5830d194fcdec8cdd42a8a3217868381d4ab467b737a870518683a4e5fdc7,1.697352465311194,10.52831544849042,155.78434411252658,0.49380634746635915,1.5587877278220978,8.760368472454633,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980346,985346,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980347,985347,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980348,985348,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980349,985349,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980350,985350,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980351,985351,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980352,985352,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980353,985353,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980354,985354,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980355,985355,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980356,985356,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980357,985357,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980358,985358,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980359,985359,new,fa3dc311f67c0ae82ac0cfd3423ab710961112dfc1cee62d020a1dda14f184a8,1.6622696945742073,8.96784217817147,156.66306196921795,0.3726321403547019,2.1664045664363507,8.128444906680468,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980360,985360,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980361,985361,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980362,985362,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980363,985363,new,8bbeaa60755d70f0b4b4805a742b5c0f2e598792f0c50ac53e9309567ae577a1,1.7612537345135661,10.729708692765454,164.93905510922357,0.47457803978456914,2.163796063757201,8.844661666872842,1.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980364,985364,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980365,985365,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980366,985366,new,395a0b35c2b64579a5d8dd837f056b36576ebc91410765bfead04dc63559a840,2.8709148648249943,10.484138441749943,117.26370389532562,0.3459868973252362,1.389205151758495,11.073657640978332,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980367,985367,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980368,985368,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980369,985369,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980370,985370,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980371,985371,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980372,985372,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980373,985373,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980374,985374,new,667f682bb193a55241a0b32df5298226ad4ebde3dcbe69739a42064171f6772c,1.7499431701040313,11.3893536048296,106.337512228203,0.3411383797508627,1.2955755950067274,13.4671354153861,6.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980375,985375,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980376,985376,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980377,985377,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980378,985378,new,081c5ea0a86fbe91e723eb053f6ae24aeee624f3ebd39ec52772a1b8d1aa797c,1.8387707780040288,11.294160689540757,158.8431887104514,0.5090111261301408,1.4848404120639913,9.249922267832345,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980379,985379,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980380,985380,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980381,985381,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980382,985382,new,88c8d87d9ccea7c936e49a41d4db47316ba383d99da0ca99f11a2eae283c3e9e,1.9239782308704836,11.192777253830299,158.3699012155789,0.38240646699981073,1.6383859826686775,10.334798596246715,4.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980383,985383,new,c6f079137c47eaa22f60d2eb68d125aa66916e55190e019a37af2458e4a6e97f,3.2266160264624104,10.756739023612754,106.75218568382995,0.3465289978177238,2.3591245690157883,11.69260697932807,0.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980384,985384,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980385,985385,new,b0cfad845160adecf60dc440719ffb6fd552efd745ed1ecc10bc5203467a69cb,1.486461832566886,8.393201297119067,74.0282500061118,0.498695390896196,2.485931827185622,10.749404109055114,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980386,985386,new,49cb272fe7ae5660f165988f024fa0f1e4ad942ae27513147847b6b9f19ebafb,2.461356410858925,9.418991651555935,90.30221233319583,0.39489595249787846,2.1990628781231725,10.980536612774829,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980387,985387,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980388,985388,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980389,985389,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980390,985390,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980391,985391,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980392,985392,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980393,985393,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980394,985394,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980395,985395,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980396,985396,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,
+medium_3,L1,CRP,980397,985397,new,9ec59aa81b813082c27024535f3bf6b8d50ee7b0394312d450f7e19003916450,1.845754600391798,6.262927709958835,85.74623174041005,0.34134568144364286,0.363242413677545,8.366882455694213,1.0,,,,,,,,,,,,,,,,cruise,collision:target
+medium_3,L1,CRP,980398,985398,new,101cb62b3631f6f044caa238d91b9ceb198812a6c6a1ae565014974a9a783b4a,1.5228487485237114,9.587848916014872,154.3691948021076,0.5000209349751149,1.8094901128778218,7.895978658518399,0.0,,,,,,,,,,,,,,,,cruise,collision:obstacle
+medium_3,L1,CRP,980399,985399,new,,,,,,,,,,,,,,,,,,,,,,,,not field feasible,

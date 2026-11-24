@@ -130,7 +130,8 @@ family B), `medium_1`-`medium_5` (L1) and `hard_1`-`hard_5` (L2 or L3), numbered
 `src/field_test_cases.py`, built by `tools/tiers/field_suite.py`, record
 `results/field_suite/README.md`. Each reaches the goal in simulation on 10 of 10 noise seeds on
 the identified plant and in 8-10 of 10 runs with a randomised plant and a perturbed start and
-target launch; 12 of 15 meet the Section 3.4.3 rule conditions on the nominal run. At 3 repeats
+target launch; 11 of 15 meet the Section 3.4.3 rule conditions on the nominal run (`medium_3` was
+re-picked on 2026-11-24 for the start from rest; `results/field_suite/README.md`). At 3 repeats
 the suite is 45 runs. The families, repeats and tiers above apply unchanged. The bridge loads a
 case by name (`udp_live_p3.py --scenario easy_1`).
 
@@ -196,6 +197,13 @@ reportable.
 
 ## 9. Sessions
 
+**Revised 2026-11-24.** The trials run in two stages: encounters with the target alone in the
+open basin first (`easy_1`-`easy_5`, session T1), then with static obstacles added (`medium_1`-
+`medium_5` on L1, T2; `hard_1`-`hard_5` on L3 and L2, T3). At 3 runs per case that is three
+sessions, and more add repeats (D-5). Protocol, expected results and
+run validity: `FIELD_SESSIONS_PLAN.md` sections 7-10. The tiers of section 4 no longer set the
+session order. The earlier plan, for the record:
+
 Two trial sessions of about 4 h after the calibration sessions (decision D-5), at roughly 6-8
 min per run including reset:
 - **Session T1:** tier 1 (24 runs).
@@ -213,5 +221,5 @@ Decided 2026-11-05 (D-1, D-2, D-4, D-5); D-3 and D-6 follow the recommendation u
 | D-2 | **Target ground truth** | **Provided, after the two calibration sessions**; the method is fixed then. Target metrics (range, DCPA, passing side, tracker error) wait on it |
 | D-3 | Speed-changing targets | none; stated as a limitation |
 | D-4 | **Safety layer mode** | **Shadow mode**: the layer computes and logs every decision without acting; the operator stop is the physical safety. Learned behaviour is then reported as the policy's own, as in Section 4, and the layer's would-be interventions are measured on the water. An active block on the hardest scenarios is optional, and possible only if the layer meets T-14 on the shore laptop (p99 0.89-2.06 s on the development laptop, 2026-11-05) and the ESC reverses (P-8) |
-| D-5 | **Trial sessions** | **Two after calibration**, more if needed; the plan of section 9 is sized for two |
+| D-5 | **Trial sessions** | **Three or more after calibration (revised 2026-11-24)**: target only (T1), then static obstacles on L1 (T2) and on L3 and L2 (T3), further sessions for repeats (`FIELD_SESSIONS_PLAN.md`); first decided as two (2026-11-05) |
 | D-6 | Static-obstacle material and contact tolerance | as Paper 2 |

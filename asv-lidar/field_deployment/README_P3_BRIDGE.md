@@ -15,6 +15,7 @@ the July runs.
 | `p3_timing.py` | Run time per decision on this computer (P-10, T-14) |
 | `p3_stopping_profiles.pkl` | Precomputed stopping profiles (built by `python p3_bridge.py --build-stopping-table`) |
 | `udp_raw_logger.py` | Handshake and raw log only, no decoder, no command; standard library only (data-collection sessions, a new line type such as the IMU's) |
+| `udp_manoeuvre.py` | Scripted calibration manoeuvres over the same link (hold, coast, rudder steps, ramp, turn, zig-zag on the measured heading, crash stop with `--allow-astern`, a command sequence from a file); raw telemetry with every `#CMD` on one clock; Ctrl+C, a telemetry watchdog and a time limit send zero commands; standard library only; `--selftest` (`planning/FIELD_SESSIONS_PLAN.md`, B-2) |
 | `p3_bench/` | Bench outputs |
 
 ## What the bridge runs

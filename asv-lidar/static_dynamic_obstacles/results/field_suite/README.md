@@ -50,7 +50,7 @@ policy (SAC seed 0, `runs/sac_formulation_seed0_bl3/best_model.zip`) in simulati
 | easy_5 | open | 0.93 | 10/10 | 10/10 | met | 1.68 |
 | medium_1 | L1 | 0.68 | 10/10 | 10/10 | **not met**: first turn to port, starboard-to-starboard passing | 3.72 |
 | medium_2 | L1 | 0.40 | 10/10 | 10/10 | **not met**: first turn to port, crosses ahead of the target | 2.36 |
-| medium_3 | L1 | 0.45 | 10/10 | 8/10 | met | 1.74 |
+| medium_3 | L1 | 0.34 | 10/10 | 8/10 | **not met**: first turn to starboard, crosses ahead of the target (re-picked 2026-11-24 for the start from rest; see below) | 2.80 |
 | medium_4 | L1 | 0.29 | 10/10 | 10/10 | met | 2.76 |
 | medium_5 | L1 | 0.98 | 10/10 | 10/10 | met | 4.50 |
 | hard_1 | L3 | 0.57 | 10/10 | 10/10 | met | 3.08 |
@@ -59,8 +59,15 @@ policy (SAC seed 0, `runs/sac_formulation_seed0_bl3/best_model.zip`) in simulati
 | hard_4 | L2 | 0.23 | 10/10 | 10/10 | met | 3.35 |
 | hard_5 | L2 | 0.94 | 10/10 | 10/10 | **not met**: changes speed while being overtaken (stand-on allows 0.15 m/s; lateral departure 0.74 m, inside the 1 m allowed) | 3.33 |
 
-medium_3's two robust failures are a target contact and a panel contact (perturbed start,
-randomised plant).
+**medium_3 re-picked 2026-11-24** for the start from rest (`planning/FIELD_SESSIONS_PLAN.md`
+section 7.1; `tools/tiers/field_suite_repick.py`, `results/field_suite/repick_medium_3/`). With both
+ships starting from rest and the target released at the offset that keeps the designed
+encounter, the earlier case (generator seed 867137, target 0.45 m/s, rule conditions met) reached
+the goal on 2-4 of 10 seeds. The cell's 4 kept candidates and 400 new draws (generator seeds
+980,000-980,399, episode seeds 985,000-985,399) were run under that protocol; 2 reached the goal on
+10 of 10 seeds from rest, and the selection rule (most robust from rest, then the rule conditions,
+then the smallest DCPA) took generator seed 980324: 10/10 and 10/10 robust from rest. The three
+rule-consistent candidates reached 1-5 of 10 from rest, so no case in this cell meets both.
 
 ## Findings
 
@@ -68,7 +75,8 @@ randomised plant).
   blocks.** Of 260 and 226 valid draws, the deployed policy reached the goal while meeting the
   rule conditions in none: it turns to port first (the (5, 8) panel sits on the leg) and passes
   starboard to starboard, or crosses ahead of the give-way target. L1 crossing from port has
-  rule-consistent successes, but none above 8/10 under perturbation.
+  rule-consistent successes, but none above 8/10 under perturbation, and none above 5/10 with
+  both ships from rest (re-pick of 2026-11-24).
 - **L2 being overtaken** has no rule-consistent success in 244 draws: the successful runs break
   the stand-on condition (lateral departure within 1 m and speed held within 0.15 m/s while
   the target closes); in hard_5 it is the speed. L3 being overtaken drew no

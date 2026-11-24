@@ -1,0 +1,412 @@
+{
+ "seeds": 10,
+ "launch_delay_s": 6.5,
+ "elapsed_s": 247,
+ "summary": [
+  {
+   "case": "easy_1",
+   "condition": "cruise",
+   "goal": "10/10",
+   "min_target_range_median_m": 2.12,
+   "min_target_range_min_m": 1.17,
+   "time_median_s": 25.0,
+   "failures": ""
+  },
+  {
+   "case": "easy_1",
+   "condition": "rest",
+   "goal": "10/10",
+   "min_target_range_median_m": 2.74,
+   "min_target_range_min_m": 2.5,
+   "time_median_s": 27.5,
+   "failures": ""
+  },
+  {
+   "case": "easy_1",
+   "condition": "delayed",
+   "goal": "10/10",
+   "min_target_range_median_m": 2.47,
+   "min_target_range_min_m": 1.99,
+   "time_median_s": 28.5,
+   "failures": ""
+  },
+  {
+   "case": "easy_2",
+   "condition": "cruise",
+   "goal": "10/10",
+   "min_target_range_median_m": 2.47,
+   "min_target_range_min_m": 2.31,
+   "time_median_s": 29.5,
+   "failures": ""
+  },
+  {
+   "case": "easy_2",
+   "condition": "rest",
+   "goal": "10/10",
+   "min_target_range_median_m": 4.24,
+   "min_target_range_min_m": 3.27,
+   "time_median_s": 31.5,
+   "failures": ""
+  },
+  {
+   "case": "easy_2",
+   "condition": "delayed",
+   "goal": "10/10",
+   "min_target_range_median_m": 3.4,
+   "min_target_range_min_m": 2.91,
+   "time_median_s": 56.5,
+   "failures": ""
+  },
+  {
+   "case": "easy_3",
+   "condition": "cruise",
+   "goal": "10/10",
+   "min_target_range_median_m": 2.01,
+   "min_target_range_min_m": 1.87,
+   "time_median_s": 29.0,
+   "failures": ""
+  },
+  {
+   "case": "easy_3",
+   "condition": "rest",
+   "goal": "10/10",
+   "min_target_range_median_m": 2.78,
+   "min_target_range_min_m": 2.66,
+   "time_median_s": 35.5,
+   "failures": ""
+  },
+  {
+   "case": "easy_3",
+   "condition": "delayed",
+   "goal": "7/10",
+   "min_target_range_median_m": 1.87,
+   "min_target_range_min_m": 1.18,
+   "time_median_s": 30.0,
+   "failures": "collision:target"
+  },
+  {
+   "case": "easy_4",
+   "condition": "cruise",
+   "goal": "10/10",
+   "min_target_range_median_m": 2.89,
+   "min_target_range_min_m": 2.77,
+   "time_median_s": 25.0,
+   "failures": ""
+  },
+  {
+   "case": "easy_4",
+   "condition": "rest",
+   "goal": "10/10",
+   "min_target_range_median_m": 2.92,
+   "min_target_range_min_m": 2.78,
+   "time_median_s": 26.5,
+   "failures": ""
+  },
+  {
+   "case": "easy_4",
+   "condition": "delayed",
+   "goal": "10/10",
+   "min_target_range_median_m": 2.7,
+   "min_target_range_min_m": 2.36,
+   "time_median_s": 27.5,
+   "failures": ""
+  },
+  {
+   "case": "easy_5",
+   "condition": "cruise",
+   "goal": "10/10",
+   "min_target_range_median_m": 1.65,
+   "min_target_range_min_m": 1.39,
+   "time_median_s": 20.0,
+   "failures": ""
+  },
+  {
+   "case": "easy_5",
+   "condition": "rest",
+   "goal": "9/10",
+   "min_target_range_median_m": 1.48,
+   "min_target_range_min_m": 1.19,
+   "time_median_s": 20.5,
+   "failures": "collision:boundary"
+  },
+  {
+   "case": "easy_5",
+   "condition": "delayed",
+   "goal": "9/10",
+   "min_target_range_median_m": 1.67,
+   "min_target_range_min_m": 1.25,
+   "time_median_s": 26.0,
+   "failures": "collision:boundary"
+  },
+  {
+   "case": "medium_1",
+   "condition": "cruise",
+   "goal": "10/10",
+   "min_target_range_median_m": 4.01,
+   "min_target_range_min_m": 3.72,
+   "time_median_s": 29.5,
+   "failures": ""
+  },
+  {
+   "case": "medium_1",
+   "condition": "rest",
+   "goal": "10/10",
+   "min_target_range_median_m": 2.16,
+   "min_target_range_min_m": 1.88,
+   "time_median_s": 27.0,
+   "failures": ""
+  },
+  {
+   "case": "medium_1",
+   "condition": "delayed",
+   "goal": "10/10",
+   "min_target_range_median_m": 2.72,
+   "min_target_range_min_m": 2.43,
+   "time_median_s": 26.5,
+   "failures": ""
+  },
+  {
+   "case": "medium_2",
+   "condition": "cruise",
+   "goal": "10/10",
+   "min_target_range_median_m": 2.38,
+   "min_target_range_min_m": 2.16,
+   "time_median_s": 29.0,
+   "failures": ""
+  },
+  {
+   "case": "medium_2",
+   "condition": "rest",
+   "goal": "8/10",
+   "min_target_range_median_m": 1.05,
+   "min_target_range_min_m": 0.93,
+   "time_median_s": 30.5,
+   "failures": "collision:target"
+  },
+  {
+   "case": "medium_2",
+   "condition": "delayed",
+   "goal": "10/10",
+   "min_target_range_median_m": 2.62,
+   "min_target_range_min_m": 2.48,
+   "time_median_s": 32.0,
+   "failures": ""
+  },
+  {
+   "case": "medium_3",
+   "condition": "cruise",
+   "goal": "10/10",
+   "min_target_range_median_m": 1.79,
+   "min_target_range_min_m": 1.55,
+   "time_median_s": 34.0,
+   "failures": ""
+  },
+  {
+   "case": "medium_3",
+   "condition": "rest",
+   "goal": "10/10",
+   "min_target_range_median_m": 3.43,
+   "min_target_range_min_m": 3.28,
+   "time_median_s": 36.0,
+   "failures": ""
+  },
+  {
+   "case": "medium_3",
+   "condition": "delayed",
+   "goal": "8/10",
+   "min_target_range_median_m": 2.49,
+   "min_target_range_min_m": 1.38,
+   "time_median_s": 29.5,
+   "failures": "collision:obstacle;collision:target"
+  },
+  {
+   "case": "medium_4",
+   "condition": "cruise",
+   "goal": "10/10",
+   "min_target_range_median_m": 2.88,
+   "min_target_range_min_m": 2.69,
+   "time_median_s": 29.5,
+   "failures": ""
+  },
+  {
+   "case": "medium_4",
+   "condition": "rest",
+   "goal": "3/10",
+   "min_target_range_median_m": 4.52,
+   "min_target_range_min_m": 1.41,
+   "time_median_s": 28.0,
+   "failures": "collision:obstacle;collision:target"
+  },
+  {
+   "case": "medium_4",
+   "condition": "delayed",
+   "goal": "10/10",
+   "min_target_range_median_m": 3.08,
+   "min_target_range_min_m": 2.94,
+   "time_median_s": 33.0,
+   "failures": ""
+  },
+  {
+   "case": "medium_5",
+   "condition": "cruise",
+   "goal": "10/10",
+   "min_target_range_median_m": 4.73,
+   "min_target_range_min_m": 4.37,
+   "time_median_s": 13.0,
+   "failures": ""
+  },
+  {
+   "case": "medium_5",
+   "condition": "rest",
+   "goal": "10/10",
+   "min_target_range_median_m": 2.39,
+   "min_target_range_min_m": 1.91,
+   "time_median_s": 15.5,
+   "failures": ""
+  },
+  {
+   "case": "medium_5",
+   "condition": "delayed",
+   "goal": "10/10",
+   "min_target_range_median_m": 4.37,
+   "min_target_range_min_m": 2.56,
+   "time_median_s": 20.0,
+   "failures": ""
+  },
+  {
+   "case": "hard_1",
+   "condition": "cruise",
+   "goal": "10/10",
+   "min_target_range_median_m": 3.12,
+   "min_target_range_min_m": 3.03,
+   "time_median_s": 24.0,
+   "failures": ""
+  },
+  {
+   "case": "hard_1",
+   "condition": "rest",
+   "goal": "10/10",
+   "min_target_range_median_m": 3.08,
+   "min_target_range_min_m": 3.03,
+   "time_median_s": 26.5,
+   "failures": ""
+  },
+  {
+   "case": "hard_1",
+   "condition": "delayed",
+   "goal": "10/10",
+   "min_target_range_median_m": 3.17,
+   "min_target_range_min_m": 3.03,
+   "time_median_s": 28.5,
+   "failures": ""
+  },
+  {
+   "case": "hard_2",
+   "condition": "cruise",
+   "goal": "10/10",
+   "min_target_range_median_m": 2.77,
+   "min_target_range_min_m": 2.73,
+   "time_median_s": 24.5,
+   "failures": ""
+  },
+  {
+   "case": "hard_2",
+   "condition": "rest",
+   "goal": "10/10",
+   "min_target_range_median_m": 3.16,
+   "min_target_range_min_m": 3.06,
+   "time_median_s": 27.5,
+   "failures": ""
+  },
+  {
+   "case": "hard_2",
+   "condition": "delayed",
+   "goal": "10/10",
+   "min_target_range_median_m": 2.74,
+   "min_target_range_min_m": 2.63,
+   "time_median_s": 28.0,
+   "failures": ""
+  },
+  {
+   "case": "hard_3",
+   "condition": "cruise",
+   "goal": "10/10",
+   "min_target_range_median_m": 3.1,
+   "min_target_range_min_m": 3.01,
+   "time_median_s": 23.5,
+   "failures": ""
+  },
+  {
+   "case": "hard_3",
+   "condition": "rest",
+   "goal": "10/10",
+   "min_target_range_median_m": 2.75,
+   "min_target_range_min_m": 2.29,
+   "time_median_s": 25.5,
+   "failures": ""
+  },
+  {
+   "case": "hard_3",
+   "condition": "delayed",
+   "goal": "10/10",
+   "min_target_range_median_m": 3.6,
+   "min_target_range_min_m": 3.52,
+   "time_median_s": 28.5,
+   "failures": ""
+  },
+  {
+   "case": "hard_4",
+   "condition": "cruise",
+   "goal": "10/10",
+   "min_target_range_median_m": 3.24,
+   "min_target_range_min_m": 3.03,
+   "time_median_s": 27.0,
+   "failures": ""
+  },
+  {
+   "case": "hard_4",
+   "condition": "rest",
+   "goal": "10/10",
+   "min_target_range_median_m": 3.83,
+   "min_target_range_min_m": 3.65,
+   "time_median_s": 31.0,
+   "failures": ""
+  },
+  {
+   "case": "hard_4",
+   "condition": "delayed",
+   "goal": "10/10",
+   "min_target_range_median_m": 3.32,
+   "min_target_range_min_m": 3.09,
+   "time_median_s": 33.0,
+   "failures": ""
+  },
+  {
+   "case": "hard_5",
+   "condition": "cruise",
+   "goal": "10/10",
+   "min_target_range_median_m": 3.36,
+   "min_target_range_min_m": 3.07,
+   "time_median_s": 14.5,
+   "failures": ""
+  },
+  {
+   "case": "hard_5",
+   "condition": "rest",
+   "goal": "1/10",
+   "min_target_range_median_m": 1.47,
+   "min_target_range_min_m": 0.98,
+   "time_median_s": 6.5,
+   "failures": "collision:target"
+  },
+  {
+   "case": "hard_5",
+   "condition": "delayed",
+   "goal": "10/10",
+   "min_target_range_median_m": 4.27,
+   "min_target_range_min_m": 4.27,
+   "time_median_s": 18.0,
+   "failures": ""
+  }
+ ]
+}
