@@ -108,8 +108,7 @@ def replay_inproc(path: str, out_dir: str) -> Dict:
             t0 = t if t0 is None else t0
             now = t - t0
             stats["lines"] += 1
-            handler.note_line(line, now)
-            frame = sync.push(line, now)
+            frame = handler.take(line, now, sync)
             if frame is not None:
                 handler.handle(frame, fresh=sync.last_fresh, pose_age_s=sync.last_pose_age_s,
                                pose_wait_s=sync.last_wait_s, t_release=time.perf_counter(),

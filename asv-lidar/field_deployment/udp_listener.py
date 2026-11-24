@@ -146,7 +146,11 @@ def main():
         if log is not None:
             log.write(line + "\n")
         
-        decoded = decoder.feed(line)
+        try:
+            decoded = decoder.feed(line)
+        except Exception as e:      # a line the decoder cannot read (an IMU record, say): logged, skipped
+            decoded = None
+            print(f"[LISTENER] line not decoded ({type(e).__name__}): {line.strip()[:120]}")
         if decoded is not None:
             rx_frames += 1
             if not paused:

@@ -1,0 +1,32 @@
+{
+ "tag": "recheck_20261124",
+ "inproc": [
+  {
+   "run_dir": "C:\\Users\\hntran\\OneDrive - University of Tasmania\\Documents\\PhD\\asv-path-replanning\\asv-lidar\\field_deployment\\p3_bench\\shadow_replay\\recheck_20261124\\inproc\\july-2026-07-03-1",
+   "decisions": 49,
+   "shadow_decisions": 49,
+   "phantom": {
+    "decisions_with_dynamic_track": 32,
+    "decisions_with_context": 32,
+    "decisions_engaged": 6,
+    "decisions_target_branch_nonzero": 32
+   },
+   "would_change": 0,
+   "first_would_change": null,
+   "would_stop_at": null,
+   "why_counts": {
+    "no escape": 5,
+    "nominal": 44
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "log": "2026-07-03\\1.log"
+  }
+ ],
+ "udp": [],
+ "git_head": "868a64468faa456f0faf53f5668524d668c81d34",
+ "timing_udp": [],
+ "passed": true
+}

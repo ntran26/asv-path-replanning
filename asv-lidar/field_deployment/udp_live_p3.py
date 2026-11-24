@@ -47,6 +47,7 @@ import math
 import multiprocessing as mp
 import os
 import queue
+import re
 import socket
 import sys
 import time
@@ -88,8 +89,34 @@ def _paper2_bridge():
 
 p2 = _paper2_bridge()
 
-RECOGNISED = (BluefinStreamDecoder._re_rc, BluefinStreamDecoder._re_hdg, BluefinStreamDecoder._re_pose,
-              BluefinStreamDecoder._re_lidar)
+LINE_KINDS = (("rc", BluefinStreamDecoder._re_rc), ("hdg", BluefinStreamDecoder._re_hdg),
+              ("pose", BluefinStreamDecoder._re_pose), ("lidar", BluefinStreamDecoder._re_lidar))
+RECOGNISED = tuple(rx for _, rx in LINE_KINDS)
+LIDAR_RAW_BEAMS = 720       # values in a vessel LiDAR line (0.5 deg over 360 deg), as the decoder assumes
+OTHER_LINES_MAX = 2000      # unrecognised lines kept per decision record (all are in telemetry.log)
+_INTEGER = re.compile(r"[-+]?\d+")
+
+
+def not_decodable(line: str, raw_beams: int = LIDAR_RAW_BEAMS) -> Optional[str]:
+    """Why a line the decoder would read as a LiDAR scan must not reach it, or None.
+
+    `BluefinStreamDecoder` reads every `[time][...]` line as a scan.  A bracketed line of another
+    kind (an IMU record, say) would raise inside the decoder (values that are not integers, an
+    empty list) or pass as a scan of the wrong size, stretched to 720 beams.  Every LiDAR line
+    logged so far (53,058 in the April, May, July and February 2026 logs and the bench runs)
+    holds exactly 720 integers, so this rejects none of them.  raw_beams = 0 accepts any count.
+    """
+    m = BluefinStreamDecoder._re_lidar.match(line.strip())
+    if m is None:
+        return None
+    values = [p for p in (v.strip() for v in m.group("body").split(",")) if p]
+    if not values:
+        return "an empty bracketed list"
+    if not all(_INTEGER.fullmatch(p) for p in values):
+        return "bracketed values that are not integers"
+    if raw_beams and len(values) != raw_beams:
+        return f"{len(values)} bracketed integers, not the {raw_beams} of a LiDAR scan"
+    return None
 
 
 def _xy(text: str) -> Tuple[float, float]:
@@ -344,7 +371,7 @@ class FrameHandler:
                  transform: Optional[pb.PoseTransform], map_rotation: float, lidar_index0_deg: float,
                  latch: estop_mod.EmergencyStop, safety_mode: str, compact: bool, config: Dict,
                  shadow=None, pose_point: str = "origin", min_interval_s: float = 0.4,
-                 ego_window_s: float = cfg.UPDATE_RATE) -> None:
+                 ego_window_s: float = cfg.UPDATE_RATE, lidar_raw_beams: int = LIDAR_RAW_BEAMS) -> None:
         self.bridge, self.policy, self.run_id = bridge, policy, run_id
         self.start_xy, self.transform, self.map_rotation = start_xy, transform, map_rotation
         self.lidar_index0_deg = lidar_index0_deg
@@ -365,13 +392,59 @@ class FrameHandler:
         self.frames = 0
         self.errors = 0
         self.last: Optional[pb.Decision] = None
+        self.lidar_raw_beams = int(lidar_raw_beams)
+        self.line_kinds: collections.Counter = collections.Counter()
+        self.not_decoded = 0                # lines kept from the decoder (`not_decodable`)
+        self.decode_errors = 0              # lines the decoder raised on
+        self.other_dropped = 0
+        self._noticed: set = set()
 
-    def note_line(self, line: str, now: float) -> None:
+    def _keep_other(self, item: Dict) -> None:
+        if len(self.other_lines) < OTHER_LINES_MAX:
+            self.other_lines.append(item)
+        else:
+            self.other_dropped += 1
+
+    def _notice(self, why: str, line: str) -> None:
+        if why not in self._noticed and len(self._noticed) < 20:
+            self._noticed.add(why)
+            print(f"[P3] line not decoded ({why}), kept in telemetry.log; first one: {line[:120]}")
+
+    def note_line(self, line: str, now: float) -> Optional[str]:
+        """Log a received line as received.  Returns why it must not be decoded, or None."""
         self.raw.write(line + "\n")
-        self.ego.feed(line)
         stripped = line.strip()
-        if stripped and not any(rx.match(stripped) for rx in RECOGNISED):
-            self.other_lines.append({"t_wall": now, "line": stripped})        # IMU, or anything new
+        why = not_decodable(stripped, self.lidar_raw_beams)
+        if why is not None:
+            self.not_decoded += 1
+            self.line_kinds["not decoded"] += 1
+            self._keep_other({"t_wall": now, "line": stripped, "not_decoded": why})
+            self._notice(why, stripped)
+            return why
+        self.ego.feed(line)
+        kind = next((k for k, rx in LINE_KINDS if rx.match(stripped)), "other") if stripped else "empty"
+        self.line_kinds[kind] += 1
+        if kind == "other":
+            self._keep_other({"t_wall": now, "line": stripped})        # IMU, or anything new
+        return None
+
+    def take(self, line: str, now: float, pose_sync) -> Optional[object]:
+        """One received line (socket or log): logged, then decoded if it can be.
+
+        Returns the frame `pose_sync` releases, or None.  A line the decoder cannot use is logged
+        and counted, never raised, so an unexpected line type cannot stop a session.  Such a line
+        still gives `pose_sync` an empty line, so a frame held for its pose times out on time.
+        """
+        if self.note_line(line, now) is not None:
+            line = ""
+        try:
+            return pose_sync.push(line, now)
+        except Exception as exc:
+            self.decode_errors += 1
+            why = f"decoder error, {type(exc).__name__}"
+            self._keep_other({"t_wall": now, "line": line.strip(), "not_decoded": f"{why}: {exc}"})
+            self._notice(why, line.strip())
+            return None
 
     def handle(self, frame, *, fresh: bool, pose_age_s: float, pose_wait_s: float, t_release: float,
                send: Callable[[str], bool]) -> Optional[pb.Decision]:
@@ -431,6 +504,8 @@ class FrameHandler:
             "s1": frame.s1, "s2": frame.s2, "hdg_ref": frame.hdg_ref_deg, "pose_fresh": bool(fresh),
             "pose_age_s": pose_age_s, "pose_wait_s": pose_wait_s, "ego_dt_s": self.ego.dt_s, "imu": None}
         record["other_lines"], self.other_lines = self.other_lines, []
+        if self.other_dropped:
+            record["other_lines_dropped"], self.other_dropped = self.other_dropped, 0
         record["operator_stop"] = {"state": self.latch.state,
                                    "reason": self.latch.events[-1].reason if self.latch.active else ""}
         record["sent"] = bool(sent)
@@ -527,9 +602,13 @@ def status_lines(handler: FrameHandler, *, run_id, geometry, safety, send, stats
     d = handler.last
     lines = [f"run {run_id}  {geometry}  safety={safety}  send={'yes' if send else 'no'}",
              f"lines={stats['lines']} decisions={handler.frames} backlog={stats['backlog_frames']} "
-             f"stale={pose_sync.stale}/{pose_sync.released} errors={handler.errors}"]
+             f"stale={pose_sync.stale}/{pose_sync.released} errors={handler.errors} "
+             f"not_decoded={handler.not_decoded + handler.decode_errors}"]
     if d is None:
-        return lines + ["waiting for the first LiDAR frame ..."]
+        k = handler.line_kinds
+        return lines + ["waiting for the first LiDAR frame ...",
+                        f"lines so far: pose {k['pose']}, LiDAR {k['lidar']}, other {k['other']}, "
+                        f"not decoded {handler.not_decoded + handler.decode_errors}"]
     env, c, s = handler.bridge.env, d.command, d.sensor
     x, y, h = env.estimated_pose()
     lines += [f"t={s.t:.2f}s  pose x={x:+.2f} y={y:+.2f} hdg={h:6.1f}  "
@@ -578,6 +657,9 @@ def build_parser() -> argparse.ArgumentParser:
                         "map: telemetry is in the map frame up to --map-rotation and --map-offset")
     g.add_argument("--map-rotation", type=float, default=0.0, help="deg, clockwise, telemetry -> map")
     g.add_argument("--map-offset", default="0,0", help="dx,dy, m, applied after the rotation (--origin map)")
+    ap.add_argument("--lidar-raw-beams", type=int, default=LIDAR_RAW_BEAMS,
+                    help="values in a vessel LiDAR line; a bracketed line of another length or with values "
+                         "that are not integers (an IMU record, say) is logged, not decoded; 0: any length")
     ap.add_argument("--lidar-index0-deg", type=float, default=0.0,
                     help="bearing of the decoder's beam 0, deg clockwise from the bow (July logs: 0)")
     ap.add_argument("--pose-point", choices=("origin", "sensor"), default="origin",
@@ -646,7 +728,7 @@ def setup(args, *, shadow_kind: Optional[str] = None):
                            lidar_index0_deg=args.lidar_index0_deg, latch=make_latch(args),
                            safety_mode=args.safety, compact=compact, config=config, shadow=shadow,
                            pose_point=args.pose_point, min_interval_s=args.min_decision_interval,
-                           ego_window_s=args.ego_window_s)
+                           ego_window_s=args.ego_window_s, lidar_raw_beams=args.lidar_raw_beams)
     return handler, run_dir, geometry
 
 
@@ -655,6 +737,8 @@ def finish(handler: FrameHandler, run_dir: str, *, args, geometry: str, stats: D
     layer = handler.bridge.layer
     summary = {"run_id": handler.run_id, "geometry": geometry, "safety": args.safety, **stats,
                "decisions": handler.frames, "frames_skipped": handler.skipped, "errors": handler.errors,
+               "line_kinds": dict(handler.line_kinds), "lines_not_decoded": handler.not_decoded,
+               "decode_errors": handler.decode_errors,
                "pose_sync": {"released": pose_sync.released, "stale": pose_sync.stale,
                              "superseded": pose_sync.superseded},
                "shadow": shadow,
@@ -721,8 +805,7 @@ def main() -> int:
                 line = msg.decode("utf-8", errors="replace").rstrip("\r\n")
                 stats["lines"] += 1
                 last_line = now
-                handler.note_line(line, now)
-                released = pose_sync.push(line, now)
+                released = handler.take(line, now, pose_sync)
                 if released is not None:
                     released_frames.append((released, now, pose_sync.last_fresh, pose_sync.last_pose_age_s,
                                             pose_sync.last_wait_s))

@@ -14,6 +14,7 @@ the July runs.
 | `p3_shadow_replay.py` | Bench shadow session on the July logs, in process and over UDP with `fake_vessel_replay.py` |
 | `p3_timing.py` | Run time per decision on this computer (P-10, T-14) |
 | `p3_stopping_profiles.pkl` | Precomputed stopping profiles (built by `python p3_bridge.py --build-stopping-table`) |
+| `udp_raw_logger.py` | Handshake and raw log only, no decoder, no command; standard library only (data-collection sessions, a new line type such as the IMU's) |
 | `p3_bench/` | Bench outputs |
 
 ## What the bridge runs
@@ -156,6 +157,34 @@ bridge. A frame the bridge cannot process is logged and answered with `$CMD,0.00
 
 The start-up takes about half a minute for the imports and as long again for the shadow
 worker; START goes to the vessel only once both are ready.
+
+### Unexpected line types (added 2026-11-23)
+
+The decoder (`log_parser.BluefinStreamDecoder`) reads four line types: pose, LiDAR scan, `HDG`
+and RC. Any other line is skipped, except one in the scan's shape: every `[time][...]` line is
+read as a scan. A bracketed line of another kind, such as an IMU record, would make the decoder
+raise (values that are not integers, an empty list), which stopped the bridge, or would pass as a
+scan when its values are integers (six values stretched to 720 beams). The bridge therefore keeps
+from the decoder any bracketed line that is not 720 integers (`--lidar-raw-beams`, 0 for any
+length), and catches any decoder error. Such a line is still written to `telemetry.log`, listed
+under `other_lines` in the next decision record with the reason, counted in `summary.json`
+(`lines_not_decoded`, `decode_errors`, `line_kinds`) and printed once per reason. All 53,058
+LiDAR lines of the April, May, July and February logs and the bench runs hold 720 integers, so
+the change leaves their decisions unchanged. If a new firmware appends fields to the pose line,
+the decoder no longer finds a pose, the bridge makes no decision, and the display shows the
+count of pose, LiDAR and other lines received while it waits. The July bridge
+(`udp_live_rl.py`, unchanged) still stops on such a bracketed line.
+
+`udp_raw_logger.py` records a session with no decoder at all: the handshake, then every datagram
+as received, written to disk before anything reads it, with its arrival time in a CSV beside it.
+It prints each new line kind with an example and with what the decoder would do with it (read,
+ignored, taken as a scan, decoder error). It needs only Python 3.6 or later and no other file, so
+it can be copied on its own to any machine. `--selftest` runs a loopback test with a stand-in
+vessel, and `--check <log>` gives the line kinds of a saved log.
+
+```bash
+python3 udp_raw_logger.py --server-ip 10.201.205.110 --out imu_test_1.log
+```
 
 ## Logs (one clock)
 
