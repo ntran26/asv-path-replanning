@@ -1,0 +1,95 @@
+
+Mass and inertia (Blue02.m values kept in dynamics.py)
+------------------------------------------------------
+m = 64.55 kg, X_udot-equivalent m_x = 3.662 kg, Y_vdot-equivalent m_y = 62.7366 kg, I_z + J_z = 10.2347 kg m^2
+M = diag(m11, m22, m33) = diag(68.212, 127.287, 10.2347)
+Munk moment coefficient (m11 - m22) = -59.075 kg
+L = 1.725 m, B = 0.5 m, draft d = 0.193 m; rudder area A_R = 0.0091 m^2 (A_R/(L d) = 2.73 %)
+
+Rudder geometry and the sign of the rudder sway force
+-----------------------------------------------------
+x_R = -0.8625 m, x_H = -0.776 m, a_H = 0.443853; |x_R + a_H x_H| = 1.2069 m
+MMG (Yasukawa and Yoshimura 2015): Y_R = -(1 + a_H) F_N cos(delta), N_R = -(x_R + a_H x_H) F_N cos(delta)
+  -> rudder force acts at x = (x_R + a_H x_H)/(1 + a_H) = -0.836 m (aft of midship): Y_R and N_R of opposite sign
+dynamics.py: N_R = -|x_R + a_H x_H| k_R F_N cos(delta)
+  -> equivalent point of action x = +0.836 m (forward of midship): Y_R and N_R of the same sign
+Blue02.m line 117: NR = -(0.646875 + 0.443853*0.7569)*FN*cos(del), same sign as YR (line 116)
+
+Rudder normal force at full helm (40 deg), straight running, no drift
+---------------------------------------------------------------------
+RPM  6.0: u = 0.558 m/s, rudder inflow u_R = 0.445 m/s, F_N = 1.56 N, k_R F_N = 3.39 N, Y_R = -3.75 N, N_R = -3.14 N m
+RPM 12.0: u = 1.116 m/s, rudder inflow u_R = 0.884 m/s, F_N = 6.16 N, k_R F_N = 13.40 N, Y_R = -14.82 N, N_R = -12.39 N m
+
+Surge: thrust and steady speed
+------------------------------
+T(rpm) = T12 (rpm/12)^2 = 16.0623 (rpm/12)^2 N (t_boost = 0)
+steady straight speed = (rpm/12) sqrt(T12/X_uu) = (rpm/12) x 1.1164 m/s = 0.0930 m/s per rpm-unit
+  RPM  4.5: thrust   2.26 N, steady speed 0.419 m/s
+  RPM  6.0: thrust   4.02 N, steady speed 0.558 m/s
+  RPM  7.5: thrust   6.27 N, steady speed 0.698 m/s
+  RPM 12.0: thrust  16.06 N, steady speed 1.116 m/s
+  RPM 24.0: thrust  64.25 N, steady speed 2.233 m/s
+coast-down time constant at speed u: M11/(X_uu u) = 5.29/u s
+braking force of the simulator's full astern (S2 = -100 -> -24 rpm-units): 32.12 N; at -12 rpm-units: 8.03 N (REVERSE_THRUST_EFFICIENCY = 0.5)
+
+Equivalent nondimensional hull coefficients (MMG scaling 0.5 rho L d U^2 and 0.5 rho L^2 d U^2)
+-----------------------------------------------------------------------------------------------
+0.5 rho L d = 166.46 kg/m, 0.5 rho L^2 d = 287.15 kg, 0.5 rho L^3 d = 495.33 kg m
+-Y_v u v      -> Y'_v  = -Y_v/(0.5 rho L d)     = -0.0055
+-Y_vv v|v|    -> cross-flow drag coefficient C_D = Y_vv/(0.5 rho L d) = 1.327
+-N_r u r      -> N'_r  = -N_r/(0.5 rho L^3 d)   = -0.00210
+drift moment, total coefficient on u v: -N_uv + (m11 - m22) = +83.97 -59.07 = +24.89 kg -> N'_v equivalent = +0.0867
+-X_uu u|u|    -> C_T = X_uu/(0.5 rho S) with S = 0.7614 m^2 (Blue02.m Sw) = 0.0339
+
+Steady full-helm turn (60 s from straight running), force balance
+-----------------------------------------------------------------
+RPM  6.0 helm +100.0 %: u 0.457 m/s (ratio 0.818), v -0.0833 m/s, r +5.06 deg/s, R 5.26 m, rudder -40.0 deg
+   drift angle beta = atan(-v/u): midship +10.33 deg, bow (x = +0.8625 m) +0.89 deg  (positive: velocity to port of the heading)
+   rudder angle -40.0 deg, inflow angle -22.6 deg, angle of attack -17.4 deg; a stern rudder (MMG sign) would leave the hull 3.94 N of sway force to supply instead of 1.57 N
+   sway: Y_R +1.18, Y_v +0.04, Y_vv +1.53, Coriolis -m11 u r -2.75 N
+   yaw:  N_R +0.99, N_r -0.042, N_rr -0.0001, N_uv -3.20, Munk +2.25 N m
+   surge: thrust +4.02, X_uu -2.69, X_vv -0.351, X_rr -0.001, X_rud -0.037, Coriolis m22 v r -0.937 N
+RPM  6.0 helm -100.0 %: u 0.457 m/s (ratio 0.818), v +0.0833 m/s, r -5.06 deg/s, R 5.26 m, rudder +40.0 deg
+   drift angle beta = atan(-v/u): midship -10.33 deg, bow (x = +0.8625 m) -0.89 deg  (positive: velocity to port of the heading)
+   rudder angle +40.0 deg, inflow angle +22.6 deg, angle of attack +17.4 deg; a stern rudder (MMG sign) would leave the hull -3.94 N of sway force to supply instead of -1.57 N
+   sway: Y_R -1.18, Y_v -0.04, Y_vv -1.53, Coriolis -m11 u r +2.75 N
+   yaw:  N_R -0.99, N_r +0.042, N_rr +0.0001, N_uv +3.20, Munk -2.25 N m
+   surge: thrust +4.02, X_uu -2.69, X_vv -0.351, X_rr -0.001, X_rud -0.037, Coriolis m22 v r -0.937 N
+RPM 12.0 helm +100.0 %: u 0.917 m/s (ratio 0.822), v -0.1656 m/s, r +10.00 deg/s, R 5.34 m, rudder -40.0 deg
+   drift angle beta = atan(-v/u): midship +10.23 deg, bow (x = +0.8625 m) +0.94 deg  (positive: velocity to port of the heading)
+   rudder angle -40.0 deg, inflow angle -22.5 deg, angle of attack -17.5 deg; a stern rudder (MMG sign) would leave the hull 15.65 N of sway force to supply instead of 6.20 N
+   sway: Y_R +4.72, Y_v +0.14, Y_vv +6.06, Coriolis -m11 u r -10.92 N
+   yaw:  N_R +3.95, N_r -0.166, N_rr -0.0005, N_uv -12.75, Munk +8.97 N m
+   surge: thrust +16.06, X_uu -10.84, X_vv -1.389, X_rr -0.005, X_rud -0.147, Coriolis m22 v r -3.680 N
+RPM 12.0 helm -100.0 %: u 0.917 m/s (ratio 0.822), v +0.1656 m/s, r -10.00 deg/s, R 5.34 m, rudder +40.0 deg
+   drift angle beta = atan(-v/u): midship -10.23 deg, bow (x = +0.8625 m) -0.94 deg  (positive: velocity to port of the heading)
+   rudder angle +40.0 deg, inflow angle +22.5 deg, angle of attack +17.5 deg; a stern rudder (MMG sign) would leave the hull -15.65 N of sway force to supply instead of -6.20 N
+   sway: Y_R -4.72, Y_v -0.14, Y_vv -6.06, Coriolis -m11 u r +10.92 N
+   yaw:  N_R -3.95, N_r +0.166, N_rr +0.0005, N_uv +12.75, Munk -8.97 N m
+   surge: thrust +16.06, X_uu -10.84, X_vv -1.389, X_rr -0.005, X_rud -0.147, Coriolis m22 v r -3.680 N
+
+Linear yaw response at cruise: 10 % helm step at RPM 6, first-order (Nomoto) fit
+--------------------------------------------------------------------------------
+RPM  6.0: K = r_ss/delta = 0.099 1/s (K L/U = 0.304), 63 % at t = 1.30 s (transport delay 0.75 s, servo lag 0.90 s), apparent T = 0.55 s including the servo lag
+RPM 12.0: K = r_ss/delta = 0.195 1/s (K L/U = 0.301), 63 % at t = 1.15 s (transport delay 0.75 s, servo lag 0.90 s), apparent T = 0.40 s including the servo lag
+
+Yaw decay with the rudder centred (from the RPM-12 full-helm turn)
+------------------------------------------------------------------
+thrust held at RPM 12         : r from 10.0 deg/s, half after 1.3 s, below 0.5 deg/s after 4.2 s, heading change 3 deg, final u 1.06 m/s
+thrust cut to 0               : r from 10.0 deg/s, half after 1.1 s, below 0.5 deg/s after 5.6 s, heading change 9 deg, final u 0.45 m/s
+full astern (efficiency 0.5)  : r from 10.0 deg/s, half after 0.8 s, below 0.5 deg/s after 2.0 s, heading change 8 deg, final u 0.00 m/s
+yaw damping left at zero surge: N_rr r|r| only; at r = 10 deg/s it is 0.527 mN m against M33 = 10.2347 kg m^2
+
+Randomisation: bootstrap vectors and sample_params(scale = 1.0)
+---------------------------------------------------------------
+28 bootstrap vectors of 17 parameters
+  T12      : identified   16.0623; draws 5-95 %   14.8724 ..   18.0811
+  X_uu     : identified   12.8879; draws 5-95 %   11.5584 ..   15.1067
+  k_R      : identified    2.1764; draws 5-95 %    1.2014 ..    2.4951
+  N_r      : identified    1.0380; draws 5-95 %    0.1479 ..    7.9668
+  N_uv     : identified  -83.9691; draws 5-95 %  -86.3383 ..  -60.8719
+  Y_vv     : identified  220.9760; draws 5-95 %  207.3921 ..  236.2328
+  rud_delay: identified    0.7301; draws 5-95 %    0.6692 ..    0.7723
+  rud_tau  : identified    0.8952; draws 5-95 %    0.8199 ..    0.9758
+  steady speed at RPM 6 over the draws: 5-95 % 0.532 .. 0.582 m/s
+  full-helm steady turn at RPM 6 over 200 draws: yaw rate 4.97 .. 8.08 deg/s (5-95 % 5.01 .. 6.93), radius 2.29 .. 5.40 m (5-95 % 3.14 .. 5.29), speed ratio 0.64 .. 0.82

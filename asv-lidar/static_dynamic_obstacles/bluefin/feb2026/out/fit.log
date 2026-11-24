@@ -1,0 +1,26 @@
+C:\Users\hntran\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\numpy\lib\nanfunctions.py:1563: RuntimeWarning: All-NaN slice encountered
+  return function_base._ureduce(a,
+J(v3, N_rr tied) = 2.34701   one evaluation 1.7 s
+    gen    0  best J = 2.29841  spread = 24.3221
+    gen   25  best J = 1.85505  spread = 0.0459
+    gen   50  best J = 1.78292  spread = 0.0098
+    gen   75  best J = 1.77719  spread = 0.0014
+    gen   79  best J = 1.77719  spread = 0.0012
+    polish 0: J = 1.77719
+    polish 1: J = 1.77719
+    polish 2: J = 1.77719
+    polish 3: J = 1.77719
+    polish 4: J = 1.77719
+start 0 (v3): J = 1.77719
+    gen    0  best J = 2.68678  spread = 10.3505
+    gen   25  best J = 1.98036  spread = 0.0556
+    gen   50  best J = 1.89752  spread = 0.0182
+    gen   75  best J = 1.87711  spread = 0.0037
+    gen   79  best J = 1.87624  spread = 0.0032
+    polish 0: J = 1.87624
+    polish 1: J = 1.87606
+    polish 2: J = 1.87606
+    polish 3: J = 1.87478
+    polish 4: J = 1.87102
+start 1 (random): J = 1.87102
+wrote C:\Users\hntran\OneDrive - University of Tasmania\Documents\PhD\asv-path-replanning\asv-lidar\static_dynamic_obstacles\bluefin\feb2026\out\candidate.json  (497 s)
