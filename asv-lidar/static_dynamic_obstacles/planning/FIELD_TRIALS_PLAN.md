@@ -1,7 +1,7 @@
 # Field trials (Paper 3, Section 5): design
 
 Date: 2026-11-04 (decisions and the bridge's bench results 2026-11-05). Status: plan; the target
-platform (D-1) is still open; the Paper 3 bridge is built (section 3). Decision S13(a) (2026-10-14) puts
+platform (D-1) is fixed (2026-11-23), its dimensions pending; the Paper 3 bridge is built (section 3). Decision S13(a) (2026-10-14) puts
 the field trials in this paper; this file is the design the `[PENDING — field-trial design]`
 markers of the draft wait for. The vessel-model calibration that precedes it is
 `FIELD_CALIBRATION_PLAN.md`.
@@ -209,7 +209,7 @@ Decided 2026-11-05 (D-1, D-2, D-4, D-5); D-3 and D-6 follow the recommendation u
 
 | Id | Decision | Status |
 | --- | --- | --- |
-| D-1 | **Target vessel** | **Open: the platform is not fixed**, and it may be smaller than the Bluefin. If its hull sits too low for the LiDAR's scan plane, panels are attached around it to make it detectable. Consequence to check on the bench: the tracker's admission gates and the safety layer's partial-hull completion assume a target of the own ship's size (1.73 x 0.50 m), so the detected footprint of the final target (with any panels) is measured and compared with those assumptions before the trials |
+| D-1 | **Target vessel** | **Platform fixed 2026-11-23; dimensions pending.** A low twin-hull catamaran of two PVC pipes (in the manner of a small WAM-V), whose hulls sit below the LiDAR's scan plane. A vertical pipe in the middle of its deck is the LiDAR's target, so the LiDAR returns only that pipe. The bridge therefore draws a virtual hull, with the measured outline, at the tracked pipe centre before perception, so that the scan the policy sees holds the target's outline as in simulation. To fix once the dimensions arrive: the outline and the pipe's position on it; where the virtual hull's heading comes from (the track's velocity while the target moves; the run sheet's heading when it is slow or stopped); whether the pipe's own returns are kept inside the outline; the logging of the drawn hull beside the measured scan. Consequence to check on the bench: the tracker's admission gates and the safety layer's partial-hull completion assume a target of the own ship's size (1.73 x 0.50 m), so the target's outline is compared with those assumptions before the trials |
 | D-2 | **Target ground truth** | **Provided, after the two calibration sessions**; the method is fixed then. Target metrics (range, DCPA, passing side, tracker error) wait on it |
 | D-3 | Speed-changing targets | none; stated as a limitation |
 | D-4 | **Safety layer mode** | **Shadow mode**: the layer computes and logs every decision without acting; the operator stop is the physical safety. Learned behaviour is then reported as the policy's own, as in Section 4, and the layer's would-be interventions are measured on the water. An active block on the hardest scenarios is optional, and possible only if the layer meets T-14 on the shore laptop (p99 0.89-2.06 s on the development laptop, 2026-11-05) and the ESC reverses (P-8) |

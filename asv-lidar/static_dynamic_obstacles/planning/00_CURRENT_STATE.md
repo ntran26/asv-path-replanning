@@ -134,8 +134,10 @@ mitigate the collision rate (a higher success rate is welcome, not required). Re
 **Still to run, in order:**
 1. ~~The trajectory snapshots of each encounter type for the deployed policy.~~ Done: Figure 6
    (`results/paper_snapshots/`, revised 2026-11-04); the explainer's 10.14 still lists them.
-2. The field trials: designed in `FIELD_TRIALS_PLAN.md` (D-1 open: the target platform), after the
-   two calibration sessions of `FIELD_CALIBRATION_PLAN.md`.
+2. The field trials: designed in `FIELD_TRIALS_PLAN.md`, after the two calibration sessions of
+   `FIELD_CALIBRATION_PLAN.md`. Target platform fixed 2026-11-23 (D-1): a low PVC twin-hull
+   catamaran with a vertical pipe for the LiDAR, and a virtual hull of its measured outline drawn
+   at the tracked pipe; dimensions pending.
    - **Paper 3 bridge built (2026-11-05):** `field_deployment/udp_live_p3.py` and `p3_bridge.py`,
      record `field_deployment/README_P3_BRIDGE.md`. Parity with the simulator exact on 16 test set
      v4 episodes in shadow and active mode (32 runs, 1,497 decisions); all 19 July logs replayed
@@ -157,6 +159,10 @@ mitigate the collision rate (a higher success rate is welcome, not required). Re
      verdicts are listed in the README for confirmation before the pre-registration.
    - **IMU case for the supervision meeting:** `planning/IMU_CASE_FOR_MEETING.md` (O-2: why the
      IMU, tied to the simulator's ego-noise assumption, and the fallback).
+   - **IMU installed on the Bluefin (2026-11-23); data-collection session 2026-11-26** to see its
+     line format and rate. Recorded with `field_deployment/udp_raw_logger.py` (handshake and raw
+     log, no decoder, standard library only). `udp_live_p3.py` no longer stops on a bracketed line
+     that is not a 720-value scan (it logs and skips it); decisions on the July logs unchanged.
    - **UDP bench moved to a second laptop (2026-11-14):** the university network blocks UDP;
      `field_deployment/UDP_BENCH_HANDOVER.md` (pushed, 6afd95a66) lists the checks for P-9 part B,
      P-10 and P-11 on a personal laptop, which becomes the shore-laptop candidate (O-10).

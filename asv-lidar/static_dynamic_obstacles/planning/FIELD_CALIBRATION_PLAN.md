@@ -204,7 +204,7 @@ session-2 validation data.
 | Id | Question | Consequence |
 | --- | --- | --- |
 | O-1 | Can the vessel telemetry exceed 2 Hz, and by how much, and at what pose resolution? | decides whether S1-B separates the actuator terms, and how close the bridge's ego inputs come to the simulator's |
-| O-2 | Is the IMU installed, raw at 100 Hz or more, on the bridge clock? | surge and yaw-rate identification; field ego estimate |
+| O-2 | Is the IMU installed, raw at 100 Hz or more, on the bridge clock? Installed on the Bluefin (2026-11-23); its line format and rate are first seen in a data-collection session on 2026-11-26, recorded with `field_deployment/udp_raw_logger.py` (no decoder, so an unknown line type cannot stop the recording) | surge and yaw-rate identification; field ego estimate |
 | O-3 | Does a full turning circle fit the basin at RPM 12? | tactical-diameter quantities available or not |
 | O-4 | Rudder position feedback, or the P-3 camera method? | S1-B decisive or lumped |
 | O-5 | Is the black wall still present and matte? | registration design |
