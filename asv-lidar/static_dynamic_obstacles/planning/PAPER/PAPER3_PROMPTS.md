@@ -9,59 +9,29 @@
 
 ## 1. State of the draft
 
-Current file: `Paper3_Sections1-5_rev11Nov_tracked.docx` (saved to Downloads; its place is
-`PhD/3 Second Journal Paper - Dynamic Obstacle/Revision/`): block H (Sections 5.1 and 5.2) as
-tracked changes dated 11 November 2026 on block I's output with its changes accepted, checked on
-2026-11-23 (log, entry 8). The next round accepts these changes first.
+Current file: `Paper3_Sections1-5_rev23Nov_tracked.docx` in `PhD/3 Second Journal Paper -
+Dynamic Obstacle/Revision/`: block K (the shore laptop in 5.1) as tracked changes dated
+23 November 2026 on block H's output with its changes accepted, checked on 2026-11-24 (log,
+entry 9). The next round accepts these changes first.
 
 - **Drafted:** Sections 1–4 (4.5 included), 5.1–5.2, Appendices B–G (Algorithms A1–A3),
   Discussion 6.2–6.3.
 - **Placeholders:** the opening of Section 5, 5.3, 5.4, 6.1 and 7; Appendix A; Figures 1–6 (to insert; Figures 4–6 are
   final, Figures 1–3 are drafts).
-- **Applied and checked:** everything through block G, the clean version, block I and block H
-  (log, entries 1–8).
+- **Applied and checked:** everything through block G, the clean version, and blocks I, H and K
+  (log, entries 1–9).
 - **References:** 1–78, first cited in order; 62 is Paper 1 (ICMCR 2026), 68 de Boer et al.
   (2005), 69–72 SAC, PPO, LSTM and TQC.
 - **Markers left:** [PENDING — field-trial design] (1.2.4, 1.3, 5, 5.3); eight [PENDING] platform
   markers in 5.1–5.2 (IMU, telemetry, pose reference point, independent stop, reversal test,
-  shore laptop's figures, target ground truth, analysis definitions); [CHECK — wall-margin
+  latency of the link to the vessel, target ground truth, analysis definitions); [CHECK — wall-margin
   convention]; [CHECK — Figure 2 placeholder terminology]; [VERIFY] (1.2.5); two [CITE]; [TBC —
   repository and DOI] and [CHECK — identification data] (Data Availability); comments 0, 1 and
   4–7 (comment 4 gives the reference history).
 
-## 2. Next: block K, the shore laptop in Section 5.1 (2026-11-23)
+## 2. Next
 
-Block H's text uses the development laptop's run times and leaves the shore laptop's figures
-pending. The shore laptop is chosen and measured: the personal laptop, linked to the laptop that
-controls the vessel as in July (`FIELD_CALIBRATION_PLAN.md` P-10, P-11 and T-14, 2026-11-14;
-`field_deployment/README_P3_BRIDGE.md`, "Run time" and the parity table). On it the command path
-meets the 0.5 s interval (p99 27.2 ms on test-set streams; LiDAR line to sent command p99 92 ms on
-the July logs over loopback UDP, which the plan gives as 0.03 s and 0.09 s), the parity replay
-passes again (32/32, 1,497 decisions), and E1 in the loop does not meet it (p99 0.887 s, 5.0 % of
-decisions above 0.5 s). The vessel-link latency is in none of these figures, and the laptop-to-laptop
-link is not tested on the bench. K3 ties "the July 2026 logs" of 5.2 to the identification data
-of Section 2.1.2, which do not name the campaign.
-
-**Attachment** (one): `Paper3_Sections1-5_rev11Nov_tracked.docx`, moved from Downloads to
-`PhD/3 Second Journal Paper - Dynamic Obstacle/Revision/`.
-
-Output: `Paper3_Sections1-5_rev23Nov_tracked.docx`.
-
-```
-First accept every tracked change in the attached Paper3_Sections1-5_rev11Nov_tracked.docx. Then apply the following changes as tracked changes dated 23 November 2026 (author "Claude"), keeping comments 0, 1 and 4–7, and save the result as Paper3_Sections1-5_rev23Nov_tracked.docx. The shore laptop has now been chosen and measured, so two sentences of Section 5.1 change. Report each change in a short revision-log addendum.
-
-K1. Section 5.1, safety-layer paragraph. Replace "An optional block with the layer active is run only if the layer decides within the 0.5 s decision interval on the shore laptop, where its 99th percentile was 0.89–2.06 s per decision on a development computer, and if the speed controller reverses [PENDING — reversal test]; otherwise, no active run is made." with "An optional block with the layer active would need the layer to decide within the 0.5 s decision interval on the shore laptop and the speed controller to reverse [PENDING — reversal test]. On the shore laptop, the layer's 99th percentile is 0.89 s per decision, with 5 % of decisions above the interval, so the first condition is not met, and no active run is made unless it is."
-
-K2. Section 5.1, bench paragraph.
-- Replace "Replaying 16 test-set episodes through the bridge in shadow and in active mode, 32 runs and 1,497 decisions, gives" with "Replaying 16 test-set episodes through the bridge in shadow and in active mode, 32 runs and 1,497 decisions, on a development computer and again on the shore laptop, gives".
-- Replace "The 99th percentile of the command path is 0.04 s per decision on test-set streams and 0.09 s from the LiDAR frame to the sent command on the July logs, on a development computer [PENDING — the shore laptop's figures]." with "On the shore laptop, the 99th percentile of the command path is 0.03 s per decision on test-set streams and 0.09 s from the LiDAR frame to the sent command on the July logs replayed through the bridge's network interface; the link to the vessel is not included [PENDING — latency of the link to the vessel]."
-
-K3. Section 5.2, second paragraph. Replace "The July 2026 logs remain the provenance of the model used in training." with "The field logs from which the training model was identified (Section 2.1.2), those of the July 2026 campaign, remain its provenance."
-
-K4. Marker list at the end: replace the entry "[PENDING — the shore laptop's figures] (11 November 2026): Section 5.1." with "[PENDING — latency of the link to the vessel] (23 November 2026): Section 5.1."
-```
-
-Queued after block K:
+No block is pending. Queued:
 - Figures 1–3: the placeholder texts follow the final drawings (drafts in the liaison scratchpad;
   the author returns to them). Figure 1's dashed outline is the own ship's domain, so "the
   target's asymmetric ship domain" becomes the own ship's; Figure 2 uses "required turn sense",
@@ -185,6 +155,16 @@ Queued after block K:
    - Revision-log flag, not edited: a facts file of that chat asks the paper not to name the
      identification data files; the text names the July 2026 campaign, not files, as 2.1.2 and
      5.1 already do.
+
+9. **2026-11-23, block K** (the shore laptop in 5.1: the active-block condition, the parity
+   replay repeated on it, its command-path figures 0.03 s and 0.09 s with the link to the vessel
+   excluded; the July 2026 campaign tied to the identification data of 2.1.2; the marker list).
+   Output `Paper3_Sections1-5_rev23Nov_tracked.docx`, checked 2026-11-24: rejecting the
+   23 November changes gives back block H's text with its changes accepted (788 blocks, 0
+   differences); the four changes are exactly K1–K4 and nothing else changed; comments 0, 1 and
+   4–7 kept. The revision log's sources (O-10, P-9, P-10, T-14 and the bridge record's run-time and
+   parity tables) hold. The header's history line is not extended for this block. Main-text words
+   20,841 to 20,893 by the revision log's count.
 
 ### Text of block G (sent 2026-11-05)
 
@@ -418,4 +398,36 @@ H5. Section 2.1.3, last sentence: replace "Because the boundary is virtual, ever
 H6. Four carry-overs from the 23 November revision. (a) Section 4.1, last paragraph: replace "against 0.859–0.901 for the other encounter types" with "against 0.859–0.901 for the head-on, overtaking, and being-overtaken episodes", as in the 5 November text (Figure 4 also has a no-encounter group). (b) Table 9, header of the third column: "SAC (three seeds)". (c) Section 1.3, contribution 3: "PPO, recurrent PPO, and truncated quantile critics (TQC)", with the serial comma used elsewhere. (d) Appendix B heading: "Learner settings and training runs", since it now holds the run histories and Figure A1.
 
 H7. Marker lists at the end: delete the two [CHECK] entries of 26 October on the operator-latched stop and the [TBC — logs for the model replay] entry; add the [PENDING] markers of H2 and H3 under Sections 3–7, dated 11 November 2026; extend the header line's history with "Sections 5.1 and 5.2 written and the field role of the safety layer settled 11 November 2026".
+```
+
+### Text of block K (sent 2026-11-23)
+
+Block H's text uses the development laptop's run times and leaves the shore laptop's figures
+pending. The shore laptop is chosen and measured: the personal laptop, linked to the laptop that
+controls the vessel as in July (`FIELD_CALIBRATION_PLAN.md` P-10, P-11 and T-14, 2026-11-14;
+`field_deployment/README_P3_BRIDGE.md`, "Run time" and the parity table). On it the command path
+meets the 0.5 s interval (p99 27.2 ms on test-set streams; LiDAR line to sent command p99 92 ms on
+the July logs over loopback UDP, which the plan gives as 0.03 s and 0.09 s), the parity replay
+passes again (32/32, 1,497 decisions), and E1 in the loop does not meet it (p99 0.887 s, 5.0 % of
+decisions above 0.5 s). The vessel-link latency is in none of these figures, and the laptop-to-laptop
+link is not tested on the bench. K3 ties "the July 2026 logs" of 5.2 to the identification data
+of Section 2.1.2, which do not name the campaign.
+
+**Attachment** (one): `Paper3_Sections1-5_rev11Nov_tracked.docx`, moved from Downloads to
+`PhD/3 Second Journal Paper - Dynamic Obstacle/Revision/`.
+
+Output: `Paper3_Sections1-5_rev23Nov_tracked.docx`.
+
+```
+First accept every tracked change in the attached Paper3_Sections1-5_rev11Nov_tracked.docx. Then apply the following changes as tracked changes dated 23 November 2026 (author "Claude"), keeping comments 0, 1 and 4–7, and save the result as Paper3_Sections1-5_rev23Nov_tracked.docx. The shore laptop has now been chosen and measured, so two sentences of Section 5.1 change. Report each change in a short revision-log addendum.
+
+K1. Section 5.1, safety-layer paragraph. Replace "An optional block with the layer active is run only if the layer decides within the 0.5 s decision interval on the shore laptop, where its 99th percentile was 0.89–2.06 s per decision on a development computer, and if the speed controller reverses [PENDING — reversal test]; otherwise, no active run is made." with "An optional block with the layer active would need the layer to decide within the 0.5 s decision interval on the shore laptop and the speed controller to reverse [PENDING — reversal test]. On the shore laptop, the layer's 99th percentile is 0.89 s per decision, with 5 % of decisions above the interval, so the first condition is not met, and no active run is made unless it is."
+
+K2. Section 5.1, bench paragraph.
+- Replace "Replaying 16 test-set episodes through the bridge in shadow and in active mode, 32 runs and 1,497 decisions, gives" with "Replaying 16 test-set episodes through the bridge in shadow and in active mode, 32 runs and 1,497 decisions, on a development computer and again on the shore laptop, gives".
+- Replace "The 99th percentile of the command path is 0.04 s per decision on test-set streams and 0.09 s from the LiDAR frame to the sent command on the July logs, on a development computer [PENDING — the shore laptop's figures]." with "On the shore laptop, the 99th percentile of the command path is 0.03 s per decision on test-set streams and 0.09 s from the LiDAR frame to the sent command on the July logs replayed through the bridge's network interface; the link to the vessel is not included [PENDING — latency of the link to the vessel]."
+
+K3. Section 5.2, second paragraph. Replace "The July 2026 logs remain the provenance of the model used in training." with "The field logs from which the training model was identified (Section 2.1.2), those of the July 2026 campaign, remain its provenance."
+
+K4. Marker list at the end: replace the entry "[PENDING — the shore laptop's figures] (11 November 2026): Section 5.1." with "[PENDING — latency of the link to the vessel] (23 November 2026): Section 5.1."
 ```
