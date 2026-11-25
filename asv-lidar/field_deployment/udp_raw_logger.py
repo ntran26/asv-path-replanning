@@ -6,10 +6,10 @@ writes every datagram it receives, unchanged, to a log file.  Nothing is decoded
 file and no command is ever sent, so a new line type (an IMU line, a longer pose line, binary
 data) cannot stop the recording.
 
-    python3 udp_raw_logger.py --server-ip 10.201.205.110 --out imu_test_1.log
-    python3 udp_raw_logger.py --server-ip 10.201.205.110 --out imu_test_1.log --no-summary
-    python3 udp_raw_logger.py --check imu_test_1.log        (line kinds of a saved log; no network)
-    python3 udp_raw_logger.py --selftest                    (loopback test of this machine; no vessel)
+    python udp_raw_logger.py --server-ip 10.201.205.110 --out imu_test_1.log
+    python udp_raw_logger.py --server-ip 10.201.205.110 --out imu_test_1.log --no-summary
+    python udp_raw_logger.py --check imu_test_1.log        (line kinds of a saved log; no network)
+    python udp_raw_logger.py --selftest                    (loopback test of this machine; no vessel)
 
 Needs only Python 3.6 or later: no numpy, pygame, model or simulator, and no other file of this
 repository, so the file can be copied on its own to any machine.  Stop with Ctrl+C; each

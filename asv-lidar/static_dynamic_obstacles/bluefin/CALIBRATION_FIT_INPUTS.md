@@ -93,7 +93,7 @@ manoeuvre, its events (switch times, overshoots, the stop) and how it ended.
 8. **Uncertainty**: a run-level bootstrap within S1 (number of resamples fixed), and the day-to-day
    comparison of S1 with S2-A as the honest width.
 9. **The coverage report**: each identified quantity against the training randomisation
-   (`explain_numbers.txt`: full-helm radius at RPM 6 over 200 draws 2.29-5.40 m, steady speed at
+   (`explain/explain_numbers.txt`: full-helm radius at RPM 6 over 200 draws 2.29-5.40 m, steady speed at
    RPM 6 0.532-0.582 m/s, and the parameter ranges).
 10. **Acceptance** of the analysis model: `acceptance.py` A1-A4, A6 and A7 (A5 only if it is used for
     randomisation).

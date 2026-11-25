@@ -7,8 +7,8 @@ knows ship manoeuvring but not this code. It covers the equations in Fossen's ma
 the MMG modular form, each force term, the actuator and the integration, the identified parameters
 and their uncertainty, the training randomisation and the reverse braking, and what is measured,
 assumed or inherited. Every number is taken from the code, from `REPORT.md` and `REVIEW.md`, or
-from `explain_numbers.py`, which derives the remaining ones from the frozen code
-(`explain_numbers.txt` holds its output).
+from `explain/explain_numbers.py`, which derives the remaining ones from the frozen code
+(`explain/explain_numbers.txt` holds its output).
 
 | File | Role |
 | --- | --- |
@@ -150,7 +150,7 @@ U v, and 0.5 rho L^2 d U^2 N'_R (r L / U) to U r. `REPORT.md` defect 1 records t
 speed-independent forms (-Y_v v, -N_r r) made every fit collapse; with the u factor the yaw damping
 N_r u r and the drift moment N_uv u v are of the same order and separable.
 
-**Equivalent nondimensional values** (`explain_numbers.txt`), dividing by 0.5 rho L d = 166.46 kg/m,
+**Equivalent nondimensional values** (`explain/explain_numbers.txt`), dividing by 0.5 rho L d = 166.46 kg/m,
 0.5 rho L^2 d = 287.15 kg and 0.5 rho L^3 d = 495.33 kg m:
 
 | v3 term | Equivalent | Reading |
@@ -200,7 +200,7 @@ plant, but a structural point for the calibration fit (`feb2026/REPORT_FEB2026.m
 | Rudder yaw moment | -\|x_R + a_H x_H\| k_R F_N cos delta | arm 1.207 m | rudder and induced hull moment | through k_R |
 | Rudder inflow race | k_race sqrt(n/12) | 0.0135 m/s | propeller slipstream over the rudder | no (0-0.21) |
 
-**The balance in a steady full-helm turn** at RPM 12 (`explain_numbers.txt`): u = 0.917 m/s
+**The balance in a steady full-helm turn** at RPM 12 (`explain/explain_numbers.txt`): u = 0.917 m/s
 (0.82 of straight running), v = -0.166 m/s, r = 10.0 deg/s, radius 5.34 m. Yaw: rudder +3.95 N m
 and Munk +8.97 N m against the drift moment -12.75 N m; the yaw-rate damping N_r contributes
 -0.17 N m. The turn is held by the drift moment, not by yaw-rate damping. Sway: rudder +4.72 N and
@@ -242,7 +242,7 @@ revision 7 (`REVIEW.md` section 8.4).
 K = r_ss / delta = 0.099 1/s (0.195 1/s at RPM 12; K L / U = 0.31 at both, the expected speed
 scaling) and reaches 63 % of it 1.30 s after the step (1.15 s at RPM 12), of which 0.75 s is the
 transport delay. With a 0.90 s servo lag in that path, the response time is set by the actuator,
-not by the hull (`explain_numbers.txt`).
+not by the hull (`explain/explain_numbers.txt`).
 
 ## 7. Identification and the identified parameters
 
@@ -301,7 +301,7 @@ baseline-v3 (`VESSEL_RANDOMISATION_SCALE` = 1.0), on a random stream separate fr
 
 Blending whole vectors keeps the correlation of k_R, N_r and N_uv: independent draws from the
 intervals land off the solution manifold and give unstable or wrong-way plants (`REPORT.md`
-section 9). Over 2000 draws (`explain_numbers.txt`), the 5-95 % ranges are T12 14.9-18.1 N,
+section 9). Over 2000 draws (`explain/explain_numbers.txt`), the 5-95 % ranges are T12 14.9-18.1 N,
 X_uu 11.6-15.1, k_R 1.20-2.50, N_r 0.15-7.97, N_uv -86.3 to -60.9, rud_delay 0.67-0.77 s and
 rud_tau 0.82-0.98 s; steady speed at RPM 6 is 0.532-0.582 m/s. Over 200 draws the full-helm
 steady turn at RPM 6 spans 4.97-8.08 deg/s and radius 2.29-5.40 m (5-95 %: 3.14-5.29 m), speed

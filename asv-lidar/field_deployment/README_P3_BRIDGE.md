@@ -106,7 +106,9 @@ simulation warms that cache over many steps; a bridge starts cold, and surge mea
 bridge and its worker serve them in the function's place at start-up, after checking a
 fingerprint of the sources and constants it depends on (`stopping.py`, `ship.py`,
 `emergency_stop.py`, `constants.py`, `bluefin/*.py|*.json` and the stop-test constants) and
-recomputing some entries. A key outside the table still goes to the function. After any change
+recomputing some entries. Only model sources sit at the top level of
+`static_dynamic_obstacles/bluefin/`: a script added there changes the fingerprint and the table is
+refused (explainers and analyses go in subfolders, as `bluefin/explain/` since 2026-11-25). A key outside the table still goes to the function. After any change
 to those sources the bridge warns and runs without it; rebuild with
 
 ```bash
@@ -184,7 +186,7 @@ it can be copied on its own to any machine. `--selftest` runs a loopback test wi
 vessel, and `--check <log>` gives the line kinds of a saved log.
 
 ```bash
-python3 udp_raw_logger.py --server-ip 10.201.205.110 --out imu_test_1.log
+python udp_raw_logger.py --server-ip 10.201.205.110 --out imu_test_1.log
 ```
 
 ## Logs (one clock)
@@ -216,6 +218,7 @@ Windows 11, Python 3.10.11, one native thread). Outputs under `p3_bench/`.
 | 16 test set v4 episodes (stops, target contacts, interventions, every class, L1-L3, a channel, a null encounter, a no-target leg) x {shadow, active} | **32/32 pass, 1,497 decisions**: observation (all 70 values), policy action, issued command, executed action and the layer's decision (branch, command, brake, stop, plan, every diagnostic) exactly equal; in shadow mode the worker's code path equal too (`parity/ts4_selection16_table/`, with the stopping table; `parity/ts4_selection16/` without it, same result) |
 | Simulator reference against the recorded E1 traces of the same episodes (`ts4_final_e1_*`) | 16/16 equal, decision by decision |
 | Same 16 episodes x {shadow, active} on the personal laptop (2026-11-14) | 32/32 pass, 1,497 decisions, recorded E1 traces 16/16 equal (`parity/personal_i7_shadow/`, `parity/personal_i7_active/`, with the stopping table) |
+| Same on the Ubuntu lab laptop (2026-11-25, Python 3.10.11, B-8) | 32/32 pass, 1,497 decisions, every count equal to the UTAS laptop's; run without the stopping table (refused at b210f6939, see the stopping-table note). Recorded E1 traces 0/16 exactly equal: in 2-31 decisions per active run one filter clearance differs in the 15th-17th significant digit (the Linux maths library against the Windows one), with observation, action, command, changed and brake equal. The trace check now compares float diagnostics within 1e-9 (`TRACE_FLOAT_TOL`); a rerun with the table and the tolerance follows |
 | 3 episodes x {shadow, active} with the environment's staleness model on (p = 0.2, 49 stale frames) | 6/6 pass (`parity/stale02/`) |
 | Telemetry encoding, full precision | ranges within the 0.05 m quantisation, pose within 5e-7 m; decoded u, v, r against the simulator's motion: slopes 0.91-1.18 (signs agree); a LiDAR-point pose decoded with `--pose-point sensor` recovers the reference point within 5e-7 m |
 

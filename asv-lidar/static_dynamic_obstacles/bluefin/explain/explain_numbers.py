@@ -1,13 +1,16 @@
-"""Derived numbers quoted in `MODEL_EXPLAINED.md`, computed from the frozen v3 model.
+"""Derived numbers quoted in `../MODEL_EXPLAINED.md`, computed from the frozen v3 model.
 
-Reads `dynamics.py`, `ship_model_v3.py` and `../src/ship.py` without changing them, and prints:
+Kept in this subfolder because the bridge's stopping-table fingerprint hashes every .py and
+.json file at the top level of `bluefin/` (`field_deployment/p3_bridge.py`).
+
+Reads `../dynamics.py`, `../ship_model_v3.py` and `../../src/ship.py` without changing them, and prints:
 the mass matrix and Coriolis coefficients, the rudder geometry and its effective lever arm,
 the equivalent nondimensional (MMG) hull derivatives, steady speeds, the force balance in a
 steady full-helm turn (including the drift angle at midship and at the bow), the linear yaw
 response at cruise (first-order Nomoto fit), the yaw decay with the rudder centred at speed and
 at rest, and the bootstrap spread of the randomisation draws.
 
-    python bluefin/explain_numbers.py > bluefin/explain_numbers.txt
+    python bluefin/explain/explain_numbers.py > bluefin/explain/explain_numbers.txt
 """
 
 from __future__ import annotations
@@ -19,7 +22,7 @@ import sys
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path[:0] = [os.path.join(HERE, "..", "src"), HERE]
+sys.path[:0] = [os.path.join(HERE, "..", "..", "src"), os.path.join(HERE, "..")]
 
 import dynamics as dyn  # noqa: E402
 import ship_model_v3 as v3  # noqa: E402

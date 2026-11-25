@@ -6,11 +6,11 @@ The same link as every bridge here (START to the vessel-control laptop on 5050, 
 port 5000, commands as `$CMD,<vessel rudder>,<S2>`), so it replaces radio control for the
 identification blocks: every command is known, timed and repeatable, and the log holds it.
 
-    python3 udp_manoeuvre.py --server-ip 10.201.205.110 --out S1b-B-01.log steps --rpm 0 --rudder 25 50 100
-    python3 udp_manoeuvre.py --server-ip 10.201.205.110 --out S1b-D-01.log turn --rpm 12 --rudder 100 --heading-change 720
-    python3 udp_manoeuvre.py --server-ip 10.201.205.110 --out S1b-E-01.log zigzag --rpm 12 --delta 20 --psi 20
-    python3 udp_manoeuvre.py --server-ip 10.201.205.110 --out S1b-C2-01.log stop --rpm 12 --allow-astern
-    python3 udp_manoeuvre.py --selftest
+    python udp_manoeuvre.py --server-ip 10.201.205.110 --out S1b-B-01.log steps --rpm 0 --rudder 25 50 100
+    python udp_manoeuvre.py --server-ip 10.201.205.110 --out S1b-D-01.log turn --rpm 12 --rudder 100 --heading-change 720
+    python udp_manoeuvre.py --server-ip 10.201.205.110 --out S1b-E-01.log zigzag --rpm 12 --delta 20 --psi 20
+    python udp_manoeuvre.py --server-ip 10.201.205.110 --out S1b-C2-01.log stop --rpm 12 --allow-astern
+    python udp_manoeuvre.py --selftest
 
 Manoeuvres (each starts when Enter is pressed, after the telemetry is flowing):
   hold      a constant command for a time (straight runs, speed points, steady turns)

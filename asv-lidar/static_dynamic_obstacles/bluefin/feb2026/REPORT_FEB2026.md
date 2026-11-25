@@ -130,7 +130,7 @@ measured state):
 
 In sustained turns a constant-yaw-rate extrapolation beats v3 up to 5 s.
 
-**Coverage of the training randomisation** (`bluefin/explain_numbers.txt`): over 200 draws of
+**Coverage of the training randomisation** (`bluefin/explain/explain_numbers.txt`): over 200 draws of
 `sample_params(scale = 1.0)` the full-helm radius at RPM 6 spans 2.29-5.40 m (5-95 %:
 3.14-5.29 m). The starboard turn (3.9 m) lies inside, the port turn (2.4 m) at the lowest draw.
 

@@ -95,12 +95,20 @@ def comparable(details: Dict) -> Dict:
     return strip(pb.jsonable(pb.without_keys(details, pb.COMPACT_DROP)))
 
 
-def first_difference(a, b, path=""):
+# Tolerance for float diagnostics when a run is compared with the recorded E1 traces only. The
+# traces were recorded on Windows; on Linux the maths library rounds the last digits of a few
+# filter clearances differently (B-8, 2026-11-25: 15th-17th significant digit). Everything that
+# reaches a command (observation, action, command, changed and brake) is still compared exactly,
+# and the bridge-against-simulator comparison on one machine stays exact (tol = 0).
+TRACE_FLOAT_TOL = 1e-9
+
+
+def first_difference(a, b, path="", tol=0.0):
     if isinstance(a, dict) and isinstance(b, dict):
         for k in sorted(set(a) | set(b)):
             if k not in a or k not in b:
                 return f"{path}.{k}: present on one side only"
-            d = first_difference(a[k], b[k], f"{path}.{k}")
+            d = first_difference(a[k], b[k], f"{path}.{k}", tol)
             if d:
                 return d
         return None
@@ -108,11 +116,15 @@ def first_difference(a, b, path=""):
         if len(a) != len(b):
             return f"{path}: lengths {len(a)} and {len(b)}"
         for i, (x, y) in enumerate(zip(a, b)):
-            d = first_difference(x, y, f"{path}[{i}]")
+            d = first_difference(x, y, f"{path}[{i}]", tol)
             if d:
                 return d
         return None
-    return None if a == b else f"{path}: {a!r} vs {b!r}"
+    if a == b:
+        return None
+    if tol and isinstance(a, float) and isinstance(b, float) and abs(a - b) <= tol * max(1.0, abs(a), abs(b)):
+        return None
+    return f"{path}: {a!r} vs {b!r}"
 
 
 # ---------------------------------------------------------------------------
@@ -277,7 +289,8 @@ def compare_trace(sim: Dict, trace: List[Dict]) -> Dict:
             problems.append("command")
         if row["decision"].changed != rec["changed"] or row["decision"].brake != rec["brake"]:
             problems.append("changed/brake")
-        d = first_difference(comparable(row["decision"].details), comparable(rec["filter"]), "filter")
+        d = first_difference(comparable(row["decision"].details), comparable(rec["filter"]), "filter",
+                             TRACE_FLOAT_TOL)
         if d:
             problems.append(d)
         if problems:

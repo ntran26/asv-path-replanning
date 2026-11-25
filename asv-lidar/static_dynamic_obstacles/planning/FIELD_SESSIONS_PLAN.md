@@ -68,8 +68,9 @@ autonomous run.
 
 - Bluefin with the IMU fitted; charged batteries (at least two sets); the radio-control
   transmitter.
-- The vessel-control laptop (port 5050) and the shore computer (port 5000): the Ubuntu machine for
-  D0, the personal laptop for the bridge (O-10). The vessel-control laptop's IP address noted
+- The vessel-control laptop (port 5050) and the shore computer (port 5000): the Ubuntu lab laptop for
+  every session, calibration and trials alike (O-10, changed 2026-11-25; the bridge there after B-8);
+  the personal laptop (Windows) as its back-up, with a current clone and its bench environment. The vessel-control laptop's IP address noted
   before the session (10.201.205.110 in July).
 - Network as in July (P-11).
 - Tape measure, floor or wall marks for start positions, a protractor at the rudder post (P-3),
@@ -115,9 +116,10 @@ the radio-control override) when:
 | B-2 | Scripted manoeuvre sender `field_deployment/udp_manoeuvre.py`: hold, coast, rudder steps, ramp, turn (to a heading change), zig-zag (switching on the measured heading), crash stop (only with `--allow-astern`), a command sequence from a file; raw telemetry with every command on one clock; Ctrl+C, a telemetry watchdog and a time limit send zero commands; standard library only | S1a, S1b, S2-B | **built 2026-11-24**: `--selftest` passes; driven against the identified plant over UDP it gave 20/20 overshoots of 5.0 and 5.5 deg (model 4.8, 5.2 at full resolution; the difference is the 0.1 deg pose and the 10 Hz switching), 360 deg at full helm in 36.1 s (model 36 s), and a stop detected 1.1 s after the plant came to rest. First use on the vessel: a short hold, then a short turn that reports which side it turned to (the rudder sign) |
 | B-3 | IMU lines decoded in the bridge, and the ego motion taken from the IMU (O-2) | S2-C, trials | after D0 shows the format |
 | B-4 | Virtual hull of the target (D-1) in the bridge: the measured outline drawn at the tracked pipe; logged beside the scan | T1 | waits on the target's dimensions |
-| B-5 | Target ground-truth method (D-2) | T1 | fixed after the calibration sessions |
+| B-5 | Ground-truth method (D-2): both ships and any static obstacles, estimated by the operators during each trial's set-up; known to the operators only, never to the policy (2026-11-25) | T1 | measurement details fixed after the calibration sessions |
 | B-6 | Pre-registration of the trials: scenario order, metric definitions, analysis scripts (`field_deployment/trial_analysis/`, its README definitions confirmed), empty tables | T1 | scripts written; definitions to confirm |
 | B-7 | Start procedure for the trial cases: both ships start from rest at their marks, and the target is released at a set offset from the own ship (section 7.1) | T1 | **simulated 2026-11-24** (`tools/diagnostics/field_suite_both_from_rest.py`, `results/field_suite/both_from_rest/`): offsets chosen per case; 12 of 15 cases reach the goal on 10 of 10 seeds, the rest `easy_2` 8/10, `medium_2` 9/10, `medium_4` 9/10 (`medium_3` re-picked under this protocol, section 7.1). To confirm with the target's measured acceleration (S2-D) |
+| B-8 | The Paper 3 bridge on the Ubuntu lab laptop (O-10, changed 2026-11-25): Python 3.10.11 with the full pinned set of `static_dynamic_obstacles/requirements.txt` and no venv, the same version as on the UTAS and personal laptops (one Python version on all three computers, decided 2026-11-25; Ubuntu's system Python 3.12 stays for the operating system and is not used for the project); then the bench repeated there: parity (32 runs, 1,497 decisions), the July logs in process and over UDP loopback, the stopping-table check, and the run time (P-10: command path, E1 in the loop) | S2-C, trials | **Python done 2026-11-25**: 3.10.11 built from the python.org source, the command `python` (`python3` stays the system 3.12), the 15 pins equal, torch 2.2.1+cpu; both lab tools' self-tests passed on it, so D0 is not held. **Parity 2026-11-25**: 32/32 runs and 1,497 decisions, every count equal to the UTAS laptop's. Two findings, both fixed the same day: the stopping table was refused on every clone (an explainer script at the top level of `bluefin/` changed its fingerprint; moved to `bluefin/explain/`, fingerprint restored, 602 entries accepted), and the recorded E1 traces differed only in the last digits of three filter clearances (Linux against Windows maths library; float diagnostics now compared within 1e-9, commands still exact). Still to run after the pull: parity again (traces, with the table), the July replays and the run time (P-10) |
 | P-1 | Telemetry at 10 Hz or more, pose finer than 0.1 m and 0.1 deg | S1b | D0 shows the present setting (O-1) |
 | P-3 | Rudder angle measured independently (feedback, or the camera on a protractor) | S1-B | open (O-4) |
 | P-5 | One clock for IMU, LiDAR and commands | S1 | D0 measures the offset |
@@ -139,11 +141,11 @@ the radio-control override) when:
 
 - The Ubuntu machine with `udp_raw_logger.py` (copied on its own, or downloaded from the
   repository; an old clone there must not be updated with `git pull`, since the history was
-  rewritten on 2026-11-23). `python3 udp_raw_logger.py --selftest` passed beforehand.
+  rewritten on 2026-11-23). `python udp_raw_logger.py --selftest` passed beforehand.
 - The vessel in the water at a marked position, the vessel-control laptop running, radio control
   available.
 - One log per experiment:
-  `python3 udp_raw_logger.py --server-ip <vessel-control IP> --out D0-<n>.log`, stopped with
+  `python udp_raw_logger.py --server-ip <vessel-control IP> --out D0-<n>.log`, stopped with
   Ctrl+C. Only one receiving program at a time (both use port 5000).
 
 ### 4.3 Experiments
@@ -160,7 +162,7 @@ the radio-control override) when:
 
 ### 4.4 After D0
 
-- `python3 udp_raw_logger.py --check D0-<n>.log` for each log: the kinds, counts and rates by the
+- `python udp_raw_logger.py --check D0-<n>.log` for each log: the kinds, counts and rates by the
   vessel's own time stamps, which answer the rate question for the IMU directly.
 - The logs brought back unchanged; then the IMU decoder (B-3), the fit script's reader (P-6) and
   the decisions on P-1 and O-1.

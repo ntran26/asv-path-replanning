@@ -140,7 +140,9 @@ case by name (`udp_live_p3.py --scenario easy_1`).
 - **Own ship:** scan-to-map pose anchored on surveyed landmarks, with the IMU
   (`FIELD_CALIBRATION_PLAN.md` P-5, P-7).
 - **Target ground truth** (decision D-2): target metrics (range, DCPA, passing side) need the
-  target's true track, independent of the own ship's tracker, which is itself under test.
+  target's true track, independent of the own ship's tracker, which is itself under test. The
+  ground truth of both ships and of any static obstacles is estimated by the operators during
+  each trial's set-up (2026-11-25); it never reaches the policy.
 - **Logged per run, on one clock:** raw LiDAR ranges, pose and IMU, the observation vector,
   the policy action, the issued command after the layer and the bridge, the tracker's tracks and
   the encounter context, every safety-layer decision (branch, predicted clearances, stop
@@ -218,7 +220,7 @@ Decided 2026-11-05 (D-1, D-2, D-4, D-5); D-3 and D-6 follow the recommendation u
 | Id | Decision | Status |
 | --- | --- | --- |
 | D-1 | **Target vessel** | **Platform fixed 2026-11-23; dimensions pending.** A low twin-hull catamaran of two PVC pipes (in the manner of a small WAM-V), whose hulls sit below the LiDAR's scan plane. A vertical pipe in the middle of its deck is the LiDAR's target, so the LiDAR returns only that pipe. The bridge therefore draws a virtual hull, with the measured outline, at the tracked pipe centre before perception, so that the scan the policy sees holds the target's outline as in simulation. To fix once the dimensions arrive: the outline and the pipe's position on it; where the virtual hull's heading comes from (the track's velocity while the target moves; the run sheet's heading when it is slow or stopped); whether the pipe's own returns are kept inside the outline; the logging of the drawn hull beside the measured scan. Consequence to check on the bench: the tracker's admission gates and the safety layer's partial-hull completion assume a target of the own ship's size (1.73 x 0.50 m), so the target's outline is compared with those assumptions before the trials |
-| D-2 | **Target ground truth** | **Provided, after the two calibration sessions**; the method is fixed then. Target metrics (range, DCPA, passing side, tracker error) wait on it |
+| D-2 | **Target ground truth** | **Provided, after the two calibration sessions**; the method is fixed then. Target metrics (range, DCPA, passing side, tracker error) wait on it. **Decided 2026-11-25:** the ground truth of both ships and of any static obstacles is estimated by the operators as part of each trial's set-up, which replicates the predefined simulated scenario; it is known to the operators only and never reaches the policy, whose view of the target remains the LiDAR track. The measurement details are fixed after the calibration sessions |
 | D-3 | Speed-changing targets | none; stated as a limitation |
 | D-4 | **Safety layer mode** | **Shadow mode**: the layer computes and logs every decision without acting; the operator stop is the physical safety. Learned behaviour is then reported as the policy's own, as in Section 4, and the layer's would-be interventions are measured on the water. An active block on the hardest scenarios is optional, and possible only if the layer meets T-14 on the shore laptop (p99 0.89-2.06 s on the development laptop, 2026-11-05) and the ESC reverses (P-8) |
 | D-5 | **Trial sessions** | **Three or more after calibration (revised 2026-11-24)**: target only (T1), then static obstacles on L1 (T2) and on L3 and L2 (T3), further sessions for repeats (`FIELD_SESSIONS_PLAN.md`); first decided as two (2026-11-05) |
