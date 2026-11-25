@@ -209,29 +209,54 @@ python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-5.log
   - the basin's edges in the pose frame;
   - the pose origin and the axis directions. The February logs put the origin at the bottom right
     in some runs and the bottom middle in others, so the frame is read again today.
-- **Fence for S1a:** the extremes of the pose over the log, each pushed out by 1 m to the wall
-  (pose frame: for a raw line `[ts]A,B,C`, x = B and y = -A):
+- **Fence for S1a: the planned 10 m x 25 m box, not the whole basin.** Every manoeuvre is planned
+  in a basin 10 m wide and 25 m long, kept as the safe area although the real basin is wider (the
+  February logs crossed 10.9 m). `udp_manoeuvre.py` enforces that box with `--fence=` and its
+  1.5 m margin (`--fence-margin-m`, default 1.5), as set out in FIELD_SESSIONS_PLAN.md
+  (decision of 2026-11-24).
+  - D0-5 gives the real basin's edges: the extremes of the pose over the log, each pushed out by
+    1 m to the wall (pose frame: for a raw line `[ts]A,B,C`, x = B and y = -A).
+  - The command then places the 10 m x 25 m box inside those edges. The shorter measured side is
+    taken as the width.
+  - Along each side, the box is centred on the measured basin, moved by `OFF_W` (across the
+    width) or `OFF_L` (along the length), in metres in the pose frame, 0 by default.
+  - Where the measured basin is no wider than 10 m (or no longer than 25 m), the measured edges
+    are the fence on that side.
+  - **The placement is decided on the day:** centred unless the operators choose an offset (for
+    example, to keep the box clear of a ladder or the black wall). Then set `OFF_W` or `OFF_L` at
+    the start of the command and run it again.
 
   ```bash
-  python -c "import sys, udp_manoeuvre as m; p=[(float(g['x']), -float(g['y'])) for g in (m.RE_POSE.match(l.strip()) for l in open(sys.argv[1], errors='ignore')) if g]; xs, ys = [a for a, b in p], [b for a, b in p]; print('pose lines', len(p), '| x', min(xs), 'to', max(xs), '| y', min(ys), 'to', max(ys)); print('--fence=%.1f,%.1f,%.1f,%.1f' % (min(xs)-1, max(xs)+1, min(ys)-1, max(ys)+1))" 2026-11-26/D0-5.log
+  OFF_W=0 OFF_L=0 python -c 'import os, sys, udp_manoeuvre as m; p = [(float(g["x"]), -float(g["y"])) for g in (m.RE_POSE.match(l.strip()) for l in open(sys.argv[1], errors="ignore")) if g]; lo = [min(c) - 1 for c in zip(*p)]; hi = [max(c) + 1 for c in zip(*p)]; ext = [b - a for a, b in zip(lo, hi)]; w = 0 if ext[0] <= ext[1] else 1; size = {w: 10.0, 1 - w: 25.0}; off = {w: float(os.environ.get("OFF_W", 0)), 1 - w: float(os.environ.get("OFF_L", 0))}; box = [(lo[i], hi[i]) if ext[i] <= size[i] else ((lo[i] + hi[i]) / 2 + off[i] - size[i] / 2, (lo[i] + hi[i]) / 2 + off[i] + size[i] / 2) for i in (0, 1)]; print("pose lines %d; measured basin x %.1f to %.1f (%.1f m), y %.1f to %.1f (%.1f m); width along %s" % (len(p), lo[0], hi[0], ext[0], lo[1], hi[1], ext[1], "xy"[w])); print("--fence=%.1f,%.1f,%.1f,%.1f" % (box[0][0], box[0][1], box[1][0], box[1][1])); [print("WARNING: the box leaves the measured basin along %s" % "xy"[i]) for i in (0, 1) if box[i][0] < lo[i] - 1e-9 or box[i][1] > hi[i] + 1e-9]' 2026-11-26/D0-5.log
   ```
 
-  Output of the same command on a rehearsal log (the July log `2026-07-03/1.log`, not a basin
-  frame):
+  Output on 2026-11-25:
+  - On a synthetic log of a 12 m x 26 m basin, with marks 1 m from each wall:
 
-  ```
-  pose lines 31 | x 0.1 to 1.3 | y 0.0 to 14.6
-  --fence=-0.9,2.3,-1.0,15.6
-  ```
+    ```
+    pose lines 15; measured basin x 0.0 to 12.0 (12.0 m), y 0.0 to 26.0 (26.0 m); width along x
+    --fence=1.0,11.0,0.5,25.5
+    ```
 
-  - Check the result against the marks: the box should be about as wide and as long as the
-    measured basin. Any pose taken while moving between marks lies inside the four, so it does
-    not widen the box. A jump in the pose (a localisation glitch) would: if the box is clearly
-    too large, read the pose at each noted time instead.
-  - Write the `--fence=...` string on the run sheet. Below it is `<FENCE>`.
-  - Open point for the day: every manoeuvre is planned in a 10 m x 25 m basin, while the real
-    basin is wider (the February logs crossed 10.9 m). The fence from D0-5 is the real basin; the
-    routes in section 7 keep to the planned 10 m.
+    The same log with `OFF_W=2` gives `--fence=3.0,13.0,0.5,25.5` and
+    `WARNING: the box leaves the measured basin along x`. An offset that pushes the box outside
+    the basin is wrong; reduce it.
+  - On the July rehearsal log (`2026-07-03/1.log`, a stretch of path, not a basin frame), the
+    measured area is narrower than the box on both sides, so the measured edges come back:
+
+    ```
+    pose lines 31; measured basin x -0.9 to 2.3 (3.2 m), y -1.0 to 15.6 (16.6 m); width along x
+    --fence=-0.9,2.3,-1.0,15.6
+    ```
+
+  - Check the measured basin against the tape: the measured width and length should match the
+    real basin to within about half a metre. Any pose taken while moving between marks lies
+    inside the four, so it does not widen the measurement. A jump in the pose (a localisation
+    glitch) would: if the measurement is clearly too large, read the pose at each noted time
+    instead.
+  - Write the `--fence=...` string and the offsets used on the run sheet. Below it is `<FENCE>`.
+    The routes in section 7 (run-up along x = 2.5 m and x = 7.5 m of the 10 m width) are measured
+    from the box's edge, not from the basin wall.
 
 ### 5.6 After each experiment
 
@@ -458,7 +483,8 @@ its log kept.
 Session D0 and S1a, 2026-11-26. Vessel-control IP: ________ Network: ________ Commit: ________
 Vessel software version: ________ Telemetry mode (rate, resolution): ________
 Basin state (water level, wind or draught from the doors): ________
-Fence (`--fence=`): ________ Rudder sign: ________
+Measured basin (D0-5): ________ Fence (`--fence=`, 10 m x 25 m box): ________
+Offsets OFF_W / OFF_L: ____ / ____ Rudder sign: ________
 
 | Run identifier | Start | End | Settings (helm, RPM or throttle, mark) | Battery V | Deviation | Valid? (reason if not) |
 | --- | --- | --- | --- | --- | --- | --- |
