@@ -120,16 +120,61 @@ repeated before them. The third check:
 ## 5. D0-1 to D0-5 (on the day)
 
 Before each experiment, the vessel is at its mark, the operator states the run identifier, and the
-recorder notes the start time. After each, run `--check` on its log (section 5.6).
+recorder notes the start time on a stopwatch started with the logger. After each, run `--check` on
+its log (section 5.7).
 
-### 5.1 D0-1 Link (5 min)
+| Test | Time | Where | What is done | Why |
+| --- | --- | --- | --- | --- |
+| D0-1 Link | 2 min | S, at rest | nothing: record | the laptop and the vessel talk over UDP; which lines arrive, how often |
+| D0-2 Rest and push | 2 min | S, at rest | one sharp push at the stern at 1:00 | IMU at rest (bias, noise); the push times the IMU clock against the pose clock |
+| D0-3 Modes | 1 min per mode | S, at rest | change the vessel's telemetry mode between runs | the fastest stream rate and the finest pose the vessel can send |
+| D0-4 Manual driving | about 15 min | from S | straights and turns by radio control (figure 3) | the IMU against the pose while moving: data for the IMU decoder |
+| D0-5 Basin frame | about 5 min | four marks M1-M4 | 30 s still at each (figure 4) | where the walls are in the vessel's coordinates: the fence for S1a |
+
+### 5.0 Where the vessel is: the frame and the start mark S
+
+![D0 frame and start mark](d0_figures/d0_fig1_frame_and_marks.png)
+
+*Figure 1. The basin frame, the start mark S and the S1a fence.*
+
+- **Frame** (as in the plan's figures): the basin seen from above, with the near end at the
+  bottom. The near end is the launch end, where the shore computer stands.
+  - x runs across from the left wall, y along from the near end; left and right are as seen from
+    the near end, looking up the basin.
+  - The planned box is 10 m x 25 m. The real basin is wider (the February logs crossed 10.9 m),
+    so the box sits centred across it and x = 5 m is the real basin's centreline.
+  - The dashed line is the S1a fence, 1.5 m inside the box.
+- **Start mark S = (5, 2):** on the centreline, 2 m from the near-end wall, measured with the tape
+  from the wall to mid-hull. Mid-hull is the pose reference point, 0.86 m behind the bow. The bow
+  points up the basin (+y). Mark the spot on the edge (tape or chalk on the wall's top) so every
+  run starts from the same place.
+- **Why 2 m and not 1 m:** the hull is 1.725 m long with the reference point at mid-hull, so at
+  y = 1 m the stern would be 0.14 m from the wall; at y = 2 m it is 1.1 m clear. (5, 2) is also
+  where the own ship starts in the simulated field cases.
+- **Start the vessel program with the vessel at S, bow up the basin.** In the February logs the
+  pose origin was at the bottom right in some runs and the bottom middle in others, which
+  suggests the localisation sets its origin where it is started. If so, starting at S makes the
+  pose frame the basin frame shifted by (5, 2). D0-5 confirms or corrects this; it is not known
+  until then.
+- **"At rest"** means floating free with nobody touching it. If the vessel drifts, a tether may
+  hold it near the mark, but any tether hangs slack while recording.
+
+### 5.1 D0-1 Link (2 min)
+
+![D0-1 to D0-3 at S, and the push](d0_figures/d0_fig2_rest_and_push.png)
+
+*Figure 2. D0-1 to D0-3 at S; where and when to push in D0-2.*
 
 ```bash
 python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-1.log --duration-s 120
 ```
 
-- **Procedure:** vessel at rest at the mid-basin mark; start the logger; record 2 min (it stops by
-  itself).
+- **Purpose:**
+  - prove that the shore laptop and the vessel-control laptop talk over UDP (`START` out, `hey`
+    and telemetry back);
+  - see which line types the vessel now sends and how often, in particular the new IMU lines.
+- **Where:** at S, at rest, bow up the basin.
+- **Procedure:** start the logger; record 2 min (it stops by itself). Nobody touches the vessel.
 - **Expected:**
   - `[RAW] first datagram after` a few seconds; `hey` lines in the table, and `vessel answered
     hey` in the meta file;
@@ -145,70 +190,136 @@ python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-1.log --duration-s
   format, and recorded as such. The logger keeps everything; only the bridges would need the
   decoder change (B-3).
 
-### 5.2 D0-2 At rest, with the yaw push (6 min)
+### 5.2 D0-2 At rest, with one push (2 min)
 
 ```bash
-python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-2.log --duration-s 360
+python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-2.log --duration-s 120
 ```
 
-- **Procedure:** vessel at rest at a marked spot, heading noted.
-  - 0:00-5:00: untouched.
-  - About 5:00: one sharp yaw push by hand at the hull. The recorder notes the time to the second.
-  - 5:00-6:00: untouched.
+- **Purpose:**
+  - **IMU at rest:** what the gyro reads when nothing rotates (its bias) and how much it
+    fluctuates (its noise). The IMU decoder (B-3) subtracts the bias.
+  - **Pose at rest:** whether the localisation stays steady when nothing moves.
+  - **Clock offset (P-5):** one sharp rotation appears in both the IMU's yaw rate and the pose
+    heading. The time between the two is how far apart their clocks are, which the model fit must
+    correct, or it reads as actuator lag.
+- **Where:** at S, at rest, bow up the basin (figure 2).
+- **Procedure:**
+  - 0:00-1:00: hands off.
+  - **At 1:00: one push.** From the near-end wall, push the **stern sideways**, sharply (about
+    0.3 s), by hand or with a pole, hard enough to turn the hull 10-20 deg. The bow swings the
+    other way: the hull rotates about its middle, which is what the gyro and the pose heading
+    both see. The recorder notes the time of the push to the second.
+  - 1:00-2:00: hands off.
+- **Not at mid-side:** a push at the middle of the side makes the hull drift sideways with almost
+  no rotation. The gyro hardly sees it and the heading does not change. A slow or long push
+  smears the time of the event; it must be one short, sharp shove.
+- **Why 2 min is enough** (decision of 2026-11-26; the plan had 5 min at rest):
+  - 1 min at rest gives about 6,000 IMU samples at 100 Hz, enough for the gyro bias and noise;
+  - the push needs only a quiet stretch on either side;
+  - localisation drift over minutes (T-8) is measured later, in S1-A, with 5 min at each of three
+    positions.
 - **Expected:**
-  - gyro bias and noise in the IMU lines;
+  - the gyro steady around a small constant (its bias) before and after the push;
   - the pose steady within its 0.1 m and 0.1 deg resolution, with no jumps;
-  - the push visible in both the IMU yaw rate and the pose heading. Their time difference is the
-    clock offset (P-5), read after the session.
+  - at 1:00, a spike in the IMU yaw rate and a 10-20 deg step in the pose heading. Both are read
+    after the session, once the IMU line format is known.
 
-### 5.3 D0-3 Telemetry modes (5 min; only if the vessel program has a rate setting)
+### 5.3 D0-3 Telemetry modes (1 min per mode; only if the vessel program has a rate setting)
 
 ```bash
 python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-3a.log --duration-s 60
 ```
 
-- One log per mode (`D0-3a`, `D0-3b`, ...), vessel at rest. Note each mode's setting on the run
-  sheet.
-- **Expected:** the highest rate the stream sustains (the status line's rate, and `--check`), the
-  pose resolution in each mode, and whether the IMU's rate depends on the mode.
+- **Purpose:** the vessel program has streamed at 2 Hz (July) and 10 Hz (February). This finds
+  the fastest rate it sustains now, the pose resolution in each mode, and whether the IMU's rate
+  depends on the mode. That decides P-1 (telemetry at 10 Hz or more, pose finer than 0.1 m) for
+  S1b.
+- **Where:** at S, at rest.
+- **Procedure:** one log per mode (`D0-3a`, `D0-3b`, ...). The mode is changed on the
+  vessel-control laptop between logs; note each mode's setting on the run sheet.
+- **Expected:** the rate per line kind in the status line and in `--check`, and the number of
+  decimals in the pose lines.
 - If there is no rate setting, skip D0-3 and note "no rate setting".
 
-### 5.4 D0-4 Manual driving (15 min)
+### 5.4 D0-4 Manual driving (about 15 min)
+
+![D0-4 manual driving](d0_figures/d0_fig3_manual_driving.png)
+
+*Figure 3. D0-4: the straight runs (a) and the turns (b), in order 1, 2, 3a, 3b, 4.*
 
 ```bash
 python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-4.log
 ```
 
-- **Procedure, under radio control:**
-  - straight runs along the basin at two steady throttle settings;
-  - gentle and hard turns to both sides;
-  - stops by cutting the throttle.
+- **Purpose:**
+  - the IMU while moving, against the pose: does the IMU yaw rate follow the turn rate from the
+    pose (sign and scale), and does the forward acceleration match the change in speed? This is
+    the data for writing the IMU decoder and the ego-motion estimate (B-3);
+  - first numbers on the steady speed per throttle setting, on how the vessel slows with the
+    throttle cut, and on the full-stick turning circle.
+- **Where:** from S. The safety person drives by radio control; the logger runs throughout; Ctrl+C
+  at the end.
+- **Procedure** (figure 3; the recorder notes the start time of each leg and the throttle used):
+  1. **Slow straight (throttle A, about walking pace):** from S up the centreline. Cut the
+     throttle at mid-basin (y = 12) and let the vessel coast. The model coasts about 11 m before
+     it is nearly stopped; steer away from the far wall if needed.
+  2. **Turn round slowly** at the far end, by any means.
+  3. **Faster straight (throttle B):** down the basin at x = 6.5. Cut the throttle at y = 16 and
+     coast (about 13 m in the model).
+  4. **3a, full stick right:** run up along x = 2.6 (2.4 m left of the centreline). At y = 7, full
+     stick right for one full turn, then centre the stick. Throttle no higher than about 0.85 m/s,
+     where February's circle was 2.4 m in radius (4.8 m across), which fits inside the fence.
+  5. **3b, full stick left:** run up along x = 7.4. At y = 14, full stick left for one full turn.
+  6. **4, gentle S-bends:** at slow throttle and half stick, alternating sides, from y = 17. Cut
+     the throttle by y = 21.
 
-  The recorder notes each segment's start time and setting. Stop the logger with Ctrl+C at the
-  end.
+  The circles start on the side opposite the turn so that they open across the basin (the plan's
+  route for full-rudder circles). Any leg can be cut short if the vessel nears a wall.
 - **Expected:**
-  - the IMU yaw rate follows the pose-derived yaw rate (sign and scale);
-  - the surge acceleration matches the change of the pose-derived speed;
-  - `RC` lines (about 1 Hz) carry the stick positions.
+  - the IMU yaw rate rising and falling with the turns, with the opposite sign for 3a and 3b;
+  - the surge acceleration matching the change of the pose-derived speed;
+  - `RC` lines (about 1 Hz) carrying the stick positions.
 
-  February reference (radio control, `data/test_4.log`): full-rudder circles of radius 2.4 m at
+  February reference (radio control, `data/test_4.log`): full-stick circles of radius 2.4 m at
   0.85 m/s and 3.9 m at 1.34 m/s, both at about 19 deg/s; straight runs up to 1.62 m/s.
 - If time is left at the end of the booking and S1a does not run, repeat D0-4 with more variety
   (it serves the IMU decoder, B-3).
 
-### 5.5 D0-5 Basin frame (5 min)
+### 5.5 D0-5 Basin frame (about 5 min)
+
+![D0-5 four marks](d0_figures/d0_fig4_basin_frame.png)
+
+*Figure 4. D0-5: the four marks, each 1 m from a real wall.*
 
 ```bash
 python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-5.log
 ```
 
-- **Procedure:** hold the vessel for about 30 s at each of four marks: 1 m from the left wall,
-  1 m from the right wall, 1 m from the near end, and 1 m from the far end. The recorder notes the
-  time and the mark for each. Ctrl+C at the end.
+- **Purpose:** the vessel reports its position in its own coordinates (the pose frame), whose
+  origin and axes are not known (the February logs put the origin in different places). D0-5
+  places the vessel at four known points near the walls, so the walls can be located in the pose
+  frame. That gives:
+  - the S1a fence (below);
+  - the pose origin and axis directions (whether starting at S puts the origin at S);
+  - later, the bridge's map registration.
+- **Where:** four marks, each 1 m from a REAL wall, taped from the wall to mid-hull (figure 4):
+  - M1: 1 m from the left wall, at mid-length, bow up the basin;
+  - M2: 1 m from the right wall, at mid-length, bow up the basin;
+  - M3: 1 m from the near end, on the centreline, the hull parallel to the wall (bow to the
+    right), so neither end of the hull is near the wall;
+  - M4: 1 m from the far end, on the centreline, likewise.
+- **Procedure:** start the logger. Drive to M1 under radio control and hold the vessel still
+  there for about 30 s; then M2, M3 and M4 in turn. The recorder notes the time and the mark at
+  each. Ctrl+C at the end.
 - **Expected:**
-  - the basin's edges in the pose frame;
-  - the pose origin and the axis directions. The February logs put the origin at the bottom right
-    in some runs and the bottom middle in others, so the frame is read again today.
+  - four clusters of nearly constant pose, one per mark;
+  - M1 and M2 differ mainly in one pose axis, the real width less 2 m apart; M3 and M4 differ
+    mainly in the other, the real length less 2 m apart. This gives the axis directions;
+  - if the vessel program was started at S, the pose near (0, 0) at S, and M3 about 1 m from
+    S's pose along the length axis.
+### 5.6 The S1a fence from D0-5
+
 - **Fence for S1a: the planned 10 m x 25 m box, not the whole basin.** Every manoeuvre is planned
   in a basin 10 m wide and 25 m long, kept as the safe area although the real basin is wider (the
   February logs crossed 10.9 m). `udp_manoeuvre.py` enforces that box with `--fence=` and its
@@ -258,7 +369,7 @@ python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-5.log
     The routes in section 7 (run-up along x = 2.5 m and x = 7.5 m of the 10 m width) are measured
     from the box's edge, not from the basin wall.
 
-### 5.6 After each experiment
+### 5.7 After each experiment
 
 ```bash
 python udp_raw_logger.py --check 2026-11-26/D0-1.log
@@ -282,7 +393,7 @@ S1a starts only if all four hold:
 
 | Condition | How to check | Result |
 | --- | --- | --- |
-| The link ran for 5 min with no gap longer than 1 s | the largest gap in D0-2 (6 min), command below | |
+| The link ran for 5 min with no gap longer than 1 s | the largest gap in D0-4 (about 15 min), command below | |
 | IMU lines are present and carry the vessel's time stamps | `--check` on D0-1: an IMU kind with a rate (a rate needs the vessel's stamps) | |
 | The basin frame is read (D0-5) | a `<FENCE>` string written down and checked against the marks | |
 | At least 90 min of basin time and a fresh battery set remain | the clock; the battery sets | |
@@ -290,7 +401,7 @@ S1a starts only if all four hold:
 Largest gap between datagrams in a log:
 
 ```bash
-python -c "import csv, sys; t = [float(r['t_since_start_s']) for r in csv.DictReader(open(sys.argv[1] + '.arrivals.csv'))]; print('datagrams %d, span %.1f s, largest gap %.2f s' % (len(t), t[-1] - t[0], max(b - a for a, b in zip(t, t[1:]))))" 2026-11-26/D0-2.log
+python -c "import csv, sys; t = [float(r['t_since_start_s']) for r in csv.DictReader(open(sys.argv[1] + '.arrivals.csv'))]; print('datagrams %d, span %.1f s, largest gap %.2f s' % (len(t), t[-1] - t[0], max(b - a for a, b in zip(t, t[1:]))))" 2026-11-26/D0-4.log
 ```
 
 Output on the rehearsal log: `datagrams 61, span 15.1 s, largest gap 0.50 s`. A gap of 0.50 s is
@@ -323,6 +434,13 @@ Stops:
 
 ### 7.1 First check on the vessel (rudder sign)
 
+- **Purpose:** before any scripted manoeuvre, prove that the vessel obeys `$CMD` from the laptop
+  (hold) and that a positive rudder turns it to starboard (turn). If the sign were wrong, every
+  later command would steer the wrong way.
+- **Where:** both runs start at S, bow up the basin. The hold ends about 3-4 m up the centreline;
+  bring the vessel back to S by radio control before the turn. The turn ends about 10 m up the
+  basin.
+
 ```bash
 ... --out 2026-11-26/S1a-CHK-01.log hold --rpm 6 --duration-s 10
 ... --out 2026-11-26/S1a-CHK-02.log turn --rpm 6 --rudder 50 --duration-s 5
@@ -346,16 +464,30 @@ Stops:
 
 ### 7.2 S1-A Sensing baseline (25 min)
 
+![S1-A rest positions (plan figure)](../static_dynamic_obstacles/planning/field_sessions_figures/cal_01_rest_positions.png)
+
+*Plan figure: S1-A rest positions P1, P2, P3.*
+
+- **Purpose:** the sensors with the vessel still, at three places:
+  - how far the localisation drifts over 5 min (T-8);
+  - how noisy the LiDAR ranges are, and whether the matte black wall returns the beam (T-7);
+  - whether the reported position is mid-hull or the LiDAR, 0.86 m ahead (O-9), by comparing the
+    pose with the taped marks.
+- **Where** (plan figure above): P1 mid-basin (5, 12.5), P2 near one side wall (2, 12.5), P3 near
+  the other (8, 12.5), each taped to mid-hull, bow up the basin. Note which side wall is the
+  black one.
+- **Why 5 min here** (and not 2 as in D0-2): drift is the measurement, and it needs minutes to
+  show. If time is short, 3 min each still gives a drift rate, with less precision.
+
 At rest, so the logger is used (no command needed):
 
 ```bash
 python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/S1a-A-01.log --duration-s 330
 ```
 
-- Three runs, `S1a-A-01` to `S1a-A-03`, at the three rest marks: mid-basin, near the light wall,
-  near the black wall (figure `cal_01_rest_positions.png`).
-- At each: heading noted, 5 min untouched, one sharp yaw push at about 5:00 (time noted), then
-  30 s.
+- Three runs, `S1a-A-01` to `S1a-A-03`, at P1, P2 and P3.
+- At each: heading noted, 5 min untouched, then one push at about 5:00 (time noted), then 30 s.
+  The push is as in D0-2: the stern, sideways, sharply (figure 2).
 - **Expected:**
   - gyro bias;
   - localisation drift at rest (T-8);
@@ -365,13 +497,21 @@ python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/S1a-A-01.log --durati
 
 ### 7.3 Coast-downs (20 min)
 
+![S1-C straight runs and coast-downs (plan figure)](../static_dynamic_obstacles/planning/field_sessions_figures/cal_02_surge_coast.png)
+
+*Plan figure: straight runs and coast-downs.*
+
+- **Purpose:** how quickly the vessel slows with no thrust. That is the water resistance (drag)
+  in the vessel model, which sets how far it carries on when the propulsion stops.
+- **Where:** from S, bow up the basin, along the centreline (plan figure above).
+
 ```bash
 ... --out 2026-11-26/S1a-C-01.log coast --rpm 12 --runup-s 10
 ... --out 2026-11-26/S1a-C-04.log coast --rpm 9 --runup-s 12
 ```
 
-- Three runs each (`S1a-C-01` to `-03` at RPM 12, `-04` to `-06` at RPM 9), started at one end of
-  the basin, along its length (figure `cal_02_surge_coast.png`).
+- Three runs each (`S1a-C-01` to `-03` at RPM 12, `-04` to `-06` at RPM 9), each started at S;
+  bring the vessel back to S by radio control between runs.
 - The coast lasts 20 s (`--coast-s` default).
 - **Expected (model):**
   - from RPM 12 (1.12 m/s): half speed after 4.7 s; 0.1 m/s after 48 s and 12.8 m;
@@ -381,6 +521,17 @@ python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/S1a-A-01.log --durati
 
 ### 7.4 Full-rudder turning circles (30 min)
 
+![S1-D turning circles (plan figure)](../static_dynamic_obstacles/planning/field_sessions_figures/cal_03_turning_circles.png)
+
+*Plan figure: full-rudder circles, model and February measurement, with the fence.*
+
+- **Purpose:** the steady turn rate and radius at full rudder, at two speeds and both sides. These
+  set the steering part of the vessel model, which at present predicts a 5.3 m radius, against
+  February's measured 2.4-3.9 m.
+- **Where:** the run-up starts at the near end on the side opposite the turn (plan figure above):
+  starboard turns (`--rudder 100`) from (2.5, 2), port turns (`--rudder -100`) from (7.5, 2), bow
+  up the basin.
+
 ```bash
 ... --out 2026-11-26/S1a-D-01.log turn --rpm 6 --rudder 100 --heading-change 720
 ... --out 2026-11-26/S1a-D-03.log turn --rpm 6 --rudder -100 --heading-change 720
@@ -389,9 +540,8 @@ python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/S1a-A-01.log --durati
 ```
 
 - Two runs each (`S1a-D-01` to `-08`).
-- Run-up along the side opposite the turn, so the circle opens across the basin (figure
-  `cal_03_turning_circles.png`): starboard turns (`--rudder 100`) along x = 2.5 m, port turns
-  (`--rudder -100`) along x = 7.5 m of the 10 m width.
+- The run-up along the side opposite the turn makes the circle open across the basin, not into
+  the nearer wall.
 - At RPM 6, add `--max-s 240` before the subcommand: two full turns take about 140 s in the model,
   plus the 14 s run-up, close to the 180 s default.
 - **Expected:**
@@ -409,13 +559,21 @@ python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/S1a-A-01.log --durati
 
 ### 7.5 First zig-zag (15 min)
 
+![S1-E zig-zags (plan figure)](../static_dynamic_obstacles/planning/field_sessions_figures/cal_05_zigzags.png)
+
+*Plan figure: zig-zags.*
+
+- **Purpose:** how quickly the hull answers a rudder change and how far it overshoots before
+  turning back. This is the dynamic part of the steering model, which the steady circles do not
+  show.
+- **Where:** from S, bow up the basin (plan figure above).
+
 ```bash
 ... --out 2026-11-26/S1a-E-01.log zigzag --rpm 12 --delta 20 --psi 20 --switches 2
 ... --out 2026-11-26/S1a-E-02.log zigzag --rpm 12 --delta -20 --psi 20 --switches 2
 ```
 
-- From one end of the basin, both initial sides: `--delta 20` starts to starboard, `--delta -20`
-  to port (figure `cal_05_zigzags.png`). A dry run on 2026-11-25 confirmed that `--delta -20` gives
+- Both initial sides: `--delta 20` starts to starboard, `--delta -20` to port. A dry run on 2026-11-25 confirmed that `--delta -20` gives
   `first helm -50` (20 deg of the 40 deg maximum) and sends `$CMD,50.00,50.00`.
 - Two switches give the first and second overshoots; four do not fit in 25 m.
 - **Expected (model, 20/20 at RPM 12):**
@@ -444,10 +602,10 @@ its log kept.
 1. **Clock and IMU check, repeated** (section 2.4 item 4), so drift over the session is measured:
 
    ```bash
-   python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/END-1.log --duration-s 90
+   python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/END-1.log --duration-s 120
    ```
 
-   30 s at rest, one sharp yaw push (time noted), 60 s at rest.
+   As D0-2, at S: 1 min at rest, one push at the stern at 1:00 (time noted), 1 min at rest.
 2. Vessel out, batteries off, the end time noted.
 
 ## 10. After the session
@@ -488,17 +646,17 @@ Offsets OFF_W / OFF_L: ____ / ____ Rudder sign: ________
 
 | Run identifier | Start | End | Settings (helm, RPM or throttle, mark) | Battery V | Deviation | Valid? (reason if not) |
 | --- | --- | --- | --- | --- | --- | --- |
-| D0-1 | | | rest, mid-basin | | | |
-| D0-2 | | | rest; push at ____ | | | |
+| D0-1 | | | rest at S | | | |
+| D0-2 | | | rest at S; push at ____ (about 1:00) | | | |
 | D0-3a | | | mode: | | | |
 | D0-3b | | | mode: | | | |
 | D0-4 | | | RC: throttle settings ____ / ____ | | | |
-| D0-5 | | | marks at ____ / ____ / ____ / ____ | | | |
+| D0-5 | | | M1 ____ M2 ____ M3 ____ M4 ____ (times) | | | |
 | S1a-CHK-01 | | | hold, RPM 6, 10 s | | | |
 | S1a-CHK-02 | | | turn, RPM 6, helm 50 %, 5 s; side: | | | |
-| S1a-A-01 | | | rest, mid-basin; push at ____ | | | |
-| S1a-A-02 | | | rest, light wall; push at ____ | | | |
-| S1a-A-03 | | | rest, black wall; push at ____ | | | |
+| S1a-A-01 | | | rest at P1 (5, 12.5); push at ____ | | | |
+| S1a-A-02 | | | rest at P2 (2, 12.5), ____ wall; push at ____ | | | |
+| S1a-A-03 | | | rest at P3 (8, 12.5), ____ wall; push at ____ | | | |
 | S1a-C-01 | | | coast, RPM 12 | | | |
 | S1a-C-02 | | | coast, RPM 12 | | | |
 | S1a-C-03 | | | coast, RPM 12 | | | |
@@ -515,6 +673,6 @@ Offsets OFF_W / OFF_L: ____ / ____ Rudder sign: ________
 | S1a-D-08 | | | turn, RPM 12, helm -100 % | | | |
 | S1a-E-01 | | | zig-zag 20/20, RPM 12, starboard first | | | |
 | S1a-E-02 | | | zig-zag 20/20, RPM 12, port first | | | |
-| END-1 | | | rest; push at ____ | | | |
+| END-1 | | | rest at S; push at ____ (about 1:00) | | | |
 
 Block times (start and end): D0 ______ S1-A ______ coast ______ circles ______ zig-zag ______

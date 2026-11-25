@@ -396,24 +396,62 @@ and would have sent commands.
 - `NO TELEMETRY FOR > 1.5 s` appears on the display when the stream stops: an abort condition
   (FIELD_SESSIONS_PLAN.md section 2.5).
 
-### 5.5 Bench-only options
+### 5.5 Recording the display: `--record-video`
+
+Added 2026-11-26, with the July bridge's option names:
+
+```bash
+python udp_live_p3.py --server-ip 10.201.205.110 --scenario easy_1 --run-id T1-easy_1-r1 --record-video
+```
+
+- **What is recorded:** the operator panel as shown (status lines, map, path, track, LiDAR
+  returns, tracks, the `OPERATOR STOP` and `NO TELEMETRY` banners), as MP4.
+- **Where:** `p3_runs/<run-id>/display.mp4` by default (`--out-video` for another file).
+- **Frame rate:** `--video-fps`, 10 by default.
+- **Never on the command path:** a frame is copied from the window at most once per 1/fps, and the
+  colour conversion and encoding run in a writer thread. If the writer falls behind, a frame is
+  dropped and counted, not queued.
+- **Needs the window:** `--record-video` with `--headless` is refused
+  (`--record-video records the window, which --headless turns off`).
+- **Summary:** `summary.json` gains a `video` entry: path, fps, frames, frames dropped, video
+  length and wall time.
+- If OpenCV cannot open the file, the run goes on without a video and the reason is printed.
+- The video is finalised when the bridge ends: Esc, the window closed, Ctrl+C, or a bench stop.
+
+Checked on 2026-11-26 against the mock vessel (July log `2026-07-03/1.log`, `--test-case 1
+--no-send`):
+
+```
+[VIDEO] recording the panel to .../p3_runs/p3-rec/display.mp4 at 10 fps
+[VIDEO] saved .../p3_runs/p3-rec/display.mp4: 291 frames (29.1 s at 10 fps), 0 dropped
+[P3] 49 decisions logged to .../p3_runs/p3-rec; ...
+```
+
+- Video length 29.1 s against 29.1 s of wall time (real time), 1280 x 720.
+- All 49 decisions (observation, action, command) identical to a run without recording.
+- LiDAR line to command sent p95 72 ms with recording against 70 ms without (run-to-run noise).
+- After the change, `p3_shadow_replay.py` part B passed again on 2026-07-03 logs 1-3 (49, 43 and
+  41 decisions), with actions and commands equal to the run before it.
+
+### 5.6 Bench-only options
 
 - `--headless`: no window, and therefore no E key. Never on the water.
 - `--max-frames N`: stop after N decisions.
 - `--idle-exit-s S`: stop when no line has arrived for S seconds after the first one.
 
-### 5.6 Outputs: `p3_runs/<run-id>/`
+### 5.7 Outputs: `p3_runs/<run-id>/`
 
 | File | Holds |
 | --- | --- |
 | `telemetry.log` | every received line, as received (unknown lines included) |
 | `decisions.jsonl` | per decision: sensor input, observation, action, command, tracks and encounter contexts, timings |
 | `shadow.jsonl` | every shadow-layer decision |
-| `summary.json` | run identifier, geometry, safety mode, lines, decisions, skipped frames, errors, lines not decoded |
+| `summary.json` | run identifier, geometry, safety mode, lines, decisions, skipped frames, errors, lines not decoded; `video` with `--record-video` |
+| `display.mp4` | the operator panel, with `--record-video` only |
 
 `--out-dir` changes the parent folder (default `field_deployment/p3_runs/`).
 
-### 5.7 Unknown lines (IMU)
+### 5.8 Unknown lines (IMU)
 
 A bracketed line that is not 720 integers (an IMU record, say) is logged in `telemetry.log` and
 skipped, not decoded; a labelled line (`IMU:...`) counts as `other`. The run carries on. Checked
@@ -546,7 +584,25 @@ python rl_log_viewer.py 2026-07-03/1.log --test-case 1
   - F shows the full LiDAR list; M toggles the map;
   - O re-zeros the origin; C clears the path; G toggles follow mode; W/A/S/D pan;
   - P takes a snapshot; Esc quits.
-- Not run for this guide (they open a window).
+- Video: `--record --out-video <file>.mp4 --video-fps <n>`. The MP4 is finalised when the window
+  is closed (Esc); at the end of a log the viewer pauses rather than closing.
+- Checked on 2026-11-26 with SDL's dummy display and the window closed after a set time:
+  - `log_viewer.py 2026-07-03/1.log --rate 2 --record` works: 243 frames at 20 fps, 12.2 s,
+    1200 x 600.
+  - `rl_log_viewer.py` stops at start-up on every run, with or without `--test-case`, before any
+    recording: `NameError: name 'start_xy' is not defined` (line 782; the name is used but never
+    set in `main()`). A known fault, not yet fixed.
+
+### 7.4 Videos from the other scripts
+
+| Script | Video option | State (2026-11-26, Ubuntu) |
+| --- | --- | --- |
+| `udp_live_p3.py` | `--record-video` | works (section 5.5) |
+| `udp_live_rl.py` (July) | `--record-video`, `--out-video`, `--video-fps` | works: `--shadow` against the mock vessel, 270 frames at 10 fps, 27.0 s, 1280 x 720 |
+| `log_viewer.py` | `--record` | works (section 7.3) |
+| `rl_log_viewer.py` | `--record` | stops at start-up (section 7.3) |
+| `static_dynamic_obstacles/src/test_asv.py` (simulator) | `--save-mp4` | does not run on Linux: the run's `config.json` records its baseline path as `configs\baseline_v3.json`, which is not found on Linux; past that, imageio needs its ffmpeg backend (`imageio[ffmpeg]`), which is not in the pinned requirements |
+| `udp_raw_logger.py`, `udp_manoeuvre.py` | none | no display; the raw logs hold everything |
 
 ## 8. Bench tools
 
@@ -607,6 +663,8 @@ Checked in the code on the UTAS laptop (2026-11-25).
 - the scenario is chosen by name (`--scenario`);
 - map registration options (`--origin`, `--map-rotation`, `--map-offset`, `--pose-point`);
 - one output folder per run (`p3_runs/<run-id>/`) in place of one `--record-log` file;
+- `--record-video` keeps the July name but writes `display.mp4` into the run folder, from a
+  writer thread (added 2026-11-26);
 - unknown lines are logged and skipped;
 - the rendering.
 
@@ -642,4 +700,5 @@ python udp_manoeuvre.py --server-ip <IP> --out 2026-11-26/S1a-CHK-02.log --fence
 python fake_vessel_replay.py --log 2026-07-03/1.log --port 5050
 python udp_live_p3.py --test-case 1 --run-id bench-0703-1 --no-send --headless --idle-exit-s 5
 python udp_live_p3.py --server-ip <IP> --layout L1 --run-id link-<date> --no-send
+python udp_live_p3.py --server-ip <IP> --scenario easy_1 --run-id T1-easy_1-r1 --record-video
 ```
