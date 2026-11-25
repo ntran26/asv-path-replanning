@@ -24,7 +24,9 @@ Per LiDAR frame (2 Hz):
 - everything is logged on the frame's clock under `<out-dir>/<run-id>/`: `decisions.jsonl`
   (sensor input, observation, action, command, tracks and encounter contexts, timings),
   `shadow.jsonl` (every shadow decision), `telemetry.log` (every received line as received)
-  and `summary.json`.
+  and `summary.json`; with --record-video also `display.mp4`, the operator panel as shown
+  (the July bridge's option names; frames are encoded in a writer thread, never on the
+  command path).
 
 Operator stop (the only physical stop in shadow mode): E latches full astern (S2 = -100) until
 the measured surge reads stopped, then zero propulsion; R hands control back after the minimum
@@ -529,6 +531,66 @@ class FrameHandler:
 
 
 # ---------------------------------------------------------------------------
+# Display recording
+# ---------------------------------------------------------------------------
+class VideoRecorder:
+    """The operator panel to MP4 (OpenCV, mp4v), as the July bridge's --record-video.
+
+    A frame is copied from the window at most once per 1/fps; the colour conversion and the
+    encoding run in a writer thread, so recording never delays a command.  When the writer falls
+    behind, the newest frame is dropped and counted rather than queued without bound.
+    """
+
+    def __init__(self, path: str, fps: float, size) -> None:
+        import queue
+        import threading
+        import cv2
+        self.cv2, self.queue_mod = cv2, queue
+        self.path, self.fps = path, float(fps)
+        self.period = 1.0 / self.fps
+        self.writer = cv2.VideoWriter(path, cv2.VideoWriter_fourcc(*"mp4v"), self.fps, (int(size[0]), int(size[1])))
+        if not self.writer.isOpened():
+            raise RuntimeError(f"cv2.VideoWriter could not open {path}")
+        self.frames = self.dropped = 0
+        self.next_due: Optional[float] = None
+        self.t_first: Optional[float] = None
+        self.t_last: Optional[float] = None
+        self.queue = queue.Queue(maxsize=max(2, int(2 * self.fps)))
+        self.thread = threading.Thread(target=self._write, name="video-writer", daemon=True)
+        self.thread.start()
+
+    def offer(self, pg, surface) -> None:
+        now = time.perf_counter()
+        if self.next_due is not None and now < self.next_due:
+            return
+        self.next_due = max(now, (self.next_due or now) + self.period)
+        self.t_first = now if self.t_first is None else self.t_first
+        self.t_last = now
+        try:
+            self.queue.put_nowait(pg.surfarray.array3d(surface))     # a copy, (width, height, 3) RGB
+        except self.queue_mod.Full:
+            self.dropped += 1
+
+    def _write(self) -> None:
+        while True:
+            frame = self.queue.get()
+            if frame is None:
+                return
+            bgr = self.cv2.cvtColor(np.ascontiguousarray(frame.transpose(1, 0, 2)), self.cv2.COLOR_RGB2BGR)
+            self.writer.write(bgr)
+            self.frames += 1
+
+    def close(self) -> Dict:
+        self.queue.put(None)
+        self.thread.join(timeout=60.0)
+        self.writer.release()
+        wall = 0.0 if self.t_first is None else self.t_last - self.t_first + self.period
+        return {"path": os.path.abspath(self.path), "fps": self.fps, "frames": self.frames,
+                "dropped": self.dropped, "video_s": round(self.frames / self.fps, 2),
+                "wall_s": round(wall, 2)}
+
+
+# ---------------------------------------------------------------------------
 # Display
 # ---------------------------------------------------------------------------
 class Display:
@@ -542,6 +604,7 @@ class Display:
         self.screen = pygame.display.set_mode((1280, 720))
         self.font = pygame.font.SysFont("consolas", 17) or pygame.font.Font(None, 17)
         self.clock = pygame.time.Clock()
+        self.recorder: Optional[VideoRecorder] = None
 
     def events(self) -> List[str]:
         out = []
@@ -592,6 +655,8 @@ class Display:
             pg.draw.circle(screen, (255, 255, 255), w2s((x, y_)), 5)
             pg.draw.line(screen, (255, 255, 255), w2s((x, y_)), w2s((x + 0.9 * math.sin(a), y_ + 0.9 * math.cos(a))), 2)
         pg.display.flip()
+        if self.recorder is not None:
+            self.recorder.offer(pg, screen)
         self.clock.tick(60)
 
     def close(self) -> None:
@@ -685,6 +750,11 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--estop-max-brake-s", type=float, default=8.0)
     ap.add_argument("--estop-auto-release-s", type=float, default=0.0)
     ap.add_argument("--headless", action="store_true", help="no window (bench only: no E key)")
+    ap.add_argument("--record-video", action="store_true",
+                    help="record the operator panel to MP4 (the July bridge's option; needs the window)")
+    ap.add_argument("--out-video", default=None,
+                    help="MP4 file for --record-video (default <out-dir>/<run-id>/display.mp4)")
+    ap.add_argument("--video-fps", type=float, default=10.0, help="frames per second for --record-video")
     ap.add_argument("--max-frames", type=int, default=0, help="stop after this many decisions (bench)")
     ap.add_argument("--idle-exit-s", type=float, default=0.0,
                     help="stop when no line has arrived for this long after the first line (bench)")
@@ -753,7 +823,12 @@ def finish(handler: FrameHandler, run_dir: str, *, args, geometry: str, stats: D
 
 
 def main() -> int:
-    args = build_parser().parse_args()
+    ap = build_parser()
+    args = ap.parse_args()
+    if args.record_video and args.headless:
+        ap.error("--record-video records the window, which --headless turns off")
+    if args.record_video and args.video_fps <= 0:
+        ap.error("--video-fps must be positive")
     handler, run_dir, geometry = setup(args)
     print(f"[P3] run {handler.run_id}: {geometry}, safety={args.safety}, send={'no' if args.no_send else 'yes'}")
     if args.safety == "active":
@@ -776,6 +851,14 @@ def main() -> int:
     pose_sync = p2.PoseSync(decoder, enabled=not args.no_pose_sync, wait_s=args.pose_wait_s)
     display = None if args.headless else Display(f"Paper 3 bridge [{handler.run_id}] safety={args.safety}")
     stats = {"lines": 0, "backlog_frames": 0, "backlog_max": 0}
+    if display is not None and args.record_video:
+        out_video = args.out_video or os.path.join(run_dir, "display.mp4")
+        try:
+            display.recorder = VideoRecorder(out_video, args.video_fps, display.screen.get_size())
+            print(f"[VIDEO] recording the panel to {os.path.abspath(out_video)} at {args.video_fps:g} fps")
+        except Exception as exc:                 # the run goes on without a video
+            stats["video"] = {"error": f"{type(exc).__name__}: {exc}"}
+            print(f"[VIDEO] not recording: {type(exc).__name__}: {exc}")
     last_line: Optional[float] = None
     running = True
     try:
@@ -834,6 +917,12 @@ def main() -> int:
         pass
     finally:
         sock.close()
+        if display is not None and display.recorder is not None:
+            stats["video"] = display.recorder.close()
+            display.recorder = None
+            print(f"[VIDEO] saved {stats['video']['path']}: {stats['video']['frames']} frames "
+                  f"({stats['video']['video_s']} s at {stats['video']['fps']:g} fps), "
+                  f"{stats['video']['dropped']} dropped")
         summary = finish(handler, run_dir, args=args, geometry=geometry, stats=stats, pose_sync=pose_sync)
         if display is not None:
             display.close()
