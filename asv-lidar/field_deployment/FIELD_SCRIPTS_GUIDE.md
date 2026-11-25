@@ -197,18 +197,41 @@ Rudder is in percent of full rudder in the simulator's convention: positive turn
 
 ### 4.3 Subcommands, one example each
 
-Replace `<IP>` with the vessel-control laptop's address and `<FENCE>` with the box from D0-5.
+| Subcommand | What it does |
+| --- | --- |
+| `hold` | a constant command for a time |
+| `coast` | run-up at an RPM (`--runup-s`), then zero propulsion for `--coast-s` (default 20 s) |
+| `steps` | rudder steps 0 -> +a -> 0 -> -a -> 0 per amplitude, `--repeats` (5), `--hold-s` (4 s); `--reversal` adds +a -> -a -> +a -> 0 |
+| `ramp` | rudder ramp at `--rate` %/s to `--to`, to minus `--to`, back to 0 |
+| `turn` | run-up, then a fixed rudder until `--heading-change` (deg) or `--duration-s`; then `--after-s` straight. Reports the side the vessel turned to |
+| `zigzag` | run-up, then a delta/psi zig-zag switching on the measured heading. `--delta` in degrees of the 40 deg maximum; negative starts to port |
+| `stop` | run-up (optionally into a turn with `--rudder`, `--turn-s`), then full astern, rudder centred, until the measured speed reads below `--stop-speed` (0.08 m/s), 1-8 s; needs `--allow-astern` |
+| `sequence` | a fixed command sequence from a CSV file, zero-order hold |
 
-| Subcommand | What it does | Example |
-| --- | --- | --- |
-| `hold` | a constant command for a time | `python udp_manoeuvre.py --server-ip <IP> --out 2026-11-26/S1a-CHK-01.log --fence=<FENCE> hold --rpm 6 --duration-s 10` |
-| `coast` | run-up at an RPM (`--runup-s`), then zero propulsion for `--coast-s` (default 20 s) | `... coast --rpm 12 --runup-s 10` |
-| `steps` | rudder steps 0 -> +a -> 0 -> -a -> 0 per amplitude, `--repeats` (5), `--hold-s` (4 s); `--reversal` adds +a -> -a -> +a -> 0 | `... steps --rpm 0 --rudder 25 50 100 --repeats 5 --reversal` |
-| `ramp` | rudder ramp at `--rate` %/s to `--to`, to minus `--to`, back to 0 | `... ramp --rpm 0 --rate 10 --to 100` |
-| `turn` | run-up, then a fixed rudder until `--heading-change` (deg) or `--duration-s`; then `--after-s` straight. Reports the side the vessel turned to | `... turn --rpm 12 --rudder 100 --heading-change 720` |
-| `zigzag` | run-up, then a delta/psi zig-zag switching on the measured heading. `--delta` in degrees of the 40 deg maximum; negative starts to port | `... zigzag --rpm 12 --delta 20 --psi 20 --switches 2` |
-| `stop` | run-up (optionally into a turn with `--rudder`, `--turn-s`), then full astern, rudder centred, until the measured speed reads below `--stop-speed` (0.08 m/s), 1-8 s; needs `--allow-astern` | `... --allow-astern stop --rpm 12` |
-| `sequence` | a fixed command sequence from a CSV file, zero-order hold | `... sequence --file seq.csv` |
+Complete commands, one per subcommand. They use three shell variables, set once in the session's
+terminal (D0_OPERATIONS_2026-11-26.md sections 3 and 5.6):
+
+```bash
+IP=10.201.205.110
+SIGN=-1
+FENCE=1.0,11.0,0.5,25.5
+```
+
+(`FENCE` here is an example; on the day it comes from D0-5.) Then:
+
+```bash
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/example-hold.log hold --rpm 6 --duration-s 10
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/example-coast.log coast --rpm 12 --runup-s 10
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/example-steps.log steps --rpm 0 --rudder 25 50 100 --repeats 5 --reversal
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/example-ramp.log ramp --rpm 0 --rate 10 --to 100
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/example-turn.log turn --rpm 12 --rudder 100 --heading-change 720
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/example-zigzag.log zigzag --rpm 12 --delta 20 --psi 20 --switches 2
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --allow-astern --out 2026-11-26/example-stop.log stop --rpm 12
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/example-sequence.log sequence --file seq.csv
+```
+
+`stop` needs `--allow-astern`, which is not used until the ESC reversal bench test (P-8) has
+passed.
 
 Sequence-file format: a header line, then one row per change, `t_s,rudder_pct,rpm`. Example (the
 self-test's file):
@@ -678,27 +701,37 @@ with no policy, standard library only. They use the same handshake, ports and `$
 2. **Mock vessel to the bridge over loopback** (no vessel): section 6.1. Passed on 2026-11-25 (49
    decisions, 0 errors); the bench version is `p3_shadow_replay.py` part B (section 7.1).
 3. **On the day, the raw logger's handshake with the vessel-control laptop:**
-   `python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-1.log`.
+   `python udp_raw_logger.py --server-ip $IP --out 2026-11-26/D0-1.log`.
    - Pass: `[RAW] first datagram after` a few seconds, `hey` lines, LiDAR and pose lines at a
      steady rate.
    - Nothing arriving means a wrong IP, a different network, or the vessel program not running.
      The logger repeats `START` every 2 s until data arrives.
 4. **Later (calibration session 2, trials), the bridge against the vessel with `--no-send`:**
    UDP_BENCH_HANDOVER.md step 7.
-   `python udp_live_p3.py --server-ip <IP> --layout L1 --run-id link-<date> --no-send`.
+   `python udp_live_p3.py --server-ip $IP --layout L1 --run-id link-2026-11-26 --no-send`.
    Pass: frames and pose lines arrive and pair at the vessel's rate; no `$CMD` sent.
 
 ## 12. Quick reference
 
+Set once in the session's terminal (`FENCE` from D0-5):
+
+```bash
+IP=10.201.205.110
+SIGN=-1
+FENCE=1.0,11.0,0.5,25.5
+```
+
+Then, from `field_deployment/`:
+
 ```bash
 python udp_raw_logger.py --selftest
-python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-1.log
+python udp_raw_logger.py --server-ip $IP --out 2026-11-26/D0-1.log --duration-s 120
 python udp_raw_logger.py --check 2026-11-26/D0-1.log
 python udp_manoeuvre.py --selftest
-python udp_manoeuvre.py --server-ip <IP> --out 2026-11-26/S1a-CHK-01.log --fence=<FENCE> hold --rpm 6 --duration-s 10
-python udp_manoeuvre.py --server-ip <IP> --out 2026-11-26/S1a-CHK-02.log --fence=<FENCE> turn --rpm 6 --rudder 50 --duration-s 5
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-CHK-01.log hold --rpm 6 --duration-s 10
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-CHK-02.log turn --rpm 6 --rudder 50 --duration-s 5
 python fake_vessel_replay.py --log 2026-07-03/1.log --port 5050
 python udp_live_p3.py --test-case 1 --run-id bench-0703-1 --no-send --headless --idle-exit-s 5
-python udp_live_p3.py --server-ip <IP> --layout L1 --run-id link-<date> --no-send
-python udp_live_p3.py --server-ip <IP> --scenario easy_1 --run-id T1-easy_1-r1 --record-video
+python udp_live_p3.py --server-ip $IP --layout L1 --run-id link-2026-11-26 --no-send
+python udp_live_p3.py --server-ip $IP --scenario easy_1 --run-id T1-easy_1-r1 --record-video
 ```

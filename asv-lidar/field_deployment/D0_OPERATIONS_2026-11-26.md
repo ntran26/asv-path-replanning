@@ -12,6 +12,12 @@ The scripts are described in full in `FIELD_SCRIPTS_GUIDE.md`. Every command her
 vessel was run on the laptop on 2026-11-25 (Python 3.10.11, repository at b87cc9bed); the quoted
 output is from those runs. Steps that need the vessel are marked **on the day**.
 
+**Copying commands.** Every command here is complete and on one line. Copy it from this Markdown
+file opened on the laptop (any text editor, or `code D0_OPERATIONS_2026-11-26.md`), not from the
+PDF: in the PDF, long commands wrap onto several lines and would not paste as one command. The
+commands use three shell variables, `IP`, `SIGN` and `FENCE`, set once in the session's terminal
+(sections 3 and 5.6).
+
 Contents:
 1. Before leaving
 2. Roles
@@ -61,10 +67,21 @@ the operator and safety roles are held by different people.
    The Wi-Fi line (`wlp2s0`) must show an address on the vessel-control laptop's network. At home
    on 2026-11-25 it showed `192.168.0.213/24`, the home network, which is wrong for the basin.
 2. **Vessel-control laptop's IP.** Read it on that laptop (10.201.205.110 in July) and write it on
-   the run sheet. Below it is `<IP>`. Check that it answers (**on the day**):
+   the run sheet. Then store it in the terminal used for the whole session, so every command in
+   this document can be copied and run as written. Replace the address if it differs from July's:
 
    ```bash
-   ping -c 3 <IP>
+   IP=10.201.205.110
+   SIGN=-1
+   echo "IP=$IP SIGN=$SIGN"
+   ```
+
+   `SIGN` is the rudder sign; -1 is the bridges' value, checked on the vessel in section 7.1. A
+   variable lives only in the terminal where it was set: if another terminal is opened, set it
+   there again. Check that the vessel-control laptop answers (**on the day**):
+
+   ```bash
+   ping -c 3 $IP
    ```
 
    A ping that fails does not settle it (the other laptop may drop pings); the logger's handshake
@@ -166,7 +183,7 @@ its log (section 5.7).
 *Figure 2. D0-1 to D0-3 at S; where and when to push in D0-2.*
 
 ```bash
-python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-1.log --duration-s 120
+python udp_raw_logger.py --server-ip $IP --out 2026-11-26/D0-1.log --duration-s 120
 ```
 
 - **Purpose:**
@@ -193,7 +210,7 @@ python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-1.log --duration-s
 ### 5.2 D0-2 At rest, with one push (2 min)
 
 ```bash
-python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-2.log --duration-s 120
+python udp_raw_logger.py --server-ip $IP --out 2026-11-26/D0-2.log --duration-s 120
 ```
 
 - **Purpose:**
@@ -228,7 +245,7 @@ python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-2.log --duration-s
 ### 5.3 D0-3 Telemetry modes (1 min per mode; only if the vessel program has a rate setting)
 
 ```bash
-python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-3a.log --duration-s 60
+python udp_raw_logger.py --server-ip $IP --out 2026-11-26/D0-3a.log --duration-s 60
 ```
 
 - **Purpose:** the vessel program has streamed at 2 Hz (July) and 10 Hz (February). This finds
@@ -249,7 +266,7 @@ python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-3a.log --duration-
 *Figure 3. D0-4: the straight runs (a) and the turns (b), in order 1, 2, 3a, 3b, 4.*
 
 ```bash
-python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-4.log
+python udp_raw_logger.py --server-ip $IP --out 2026-11-26/D0-4.log
 ```
 
 - **Purpose:**
@@ -293,7 +310,7 @@ python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-4.log
 *Figure 4. D0-5: the four marks, each 1 m from a real wall.*
 
 ```bash
-python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-5.log
+python udp_raw_logger.py --server-ip $IP --out 2026-11-26/D0-5.log
 ```
 
 - **Purpose:** the vessel reports its position in its own coordinates (the pose frame), whose
@@ -365,7 +382,17 @@ python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/D0-5.log
     inside the four, so it does not widen the measurement. A jump in the pose (a localisation
     glitch) would: if the measurement is clearly too large, read the pose at each noted time
     instead.
-  - Write the `--fence=...` string and the offsets used on the run sheet. Below it is `<FENCE>`.
+  - Write the `--fence=...` string and the offsets used on the run sheet, then store the four
+    numbers (the part after `--fence=`) in the session's terminal. With the synthetic example
+    above, that would be:
+
+    ```bash
+    FENCE=1.0,11.0,0.5,25.5
+    echo "FENCE=$FENCE"
+    ```
+
+    Every S1a command uses `--fence=${FENCE:?set FENCE first}`, which refuses to run while
+    `FENCE` is unset.
     The routes in section 7 (run-up along x = 2.5 m and x = 7.5 m of the 10 m width) are measured
     from the box's edge, not from the basin wall.
 
@@ -395,7 +422,7 @@ S1a starts only if all four hold:
 | --- | --- | --- |
 | The link ran for 5 min with no gap longer than 1 s | the largest gap in D0-4 (about 15 min), command below | |
 | IMU lines are present and carry the vessel's time stamps | `--check` on D0-1: an IMU kind with a rate (a rate needs the vessel's stamps) | |
-| The basin frame is read (D0-5) | a `<FENCE>` string written down and checked against the marks | |
+| The basin frame is read (D0-5) | `FENCE` set (section 5.6) and checked against the marks | |
 | At least 90 min of basin time and a fresh battery set remain | the clock; the battery sets | |
 
 Largest gap between datagrams in a log:
@@ -412,11 +439,16 @@ booking, and note which condition failed.
 
 ## 7. S1a (about 90 min; on the day)
 
-All S1a commands use the same start. Below it is written `...`:
+Every command below is complete: copy it and run it from `field_deployment/` in the terminal
+where `IP`, `SIGN` (section 3) and `FENCE` (section 5.6) were set. Check them first:
 
 ```bash
-python udp_manoeuvre.py --server-ip <IP> --fence=<FENCE> --out 2026-11-26/<run id>.log
+echo "IP=$IP FENCE=$FENCE SIGN=$SIGN"
 ```
+
+The three must all be filled in (for example `IP=10.201.205.110 FENCE=1.0,11.0,0.5,25.5 SIGN=-1`).
+If `FENCE` is not set, the commands refuse to run (`FENCE: set FENCE first`): an empty
+`--fence=` would otherwise mean no fence at all.
 
 How every run goes:
 1. The vessel is at its start mark; the safety person is ready on the transmitter.
@@ -441,9 +473,16 @@ Stops:
   bring the vessel back to S by radio control before the turn. The turn ends about 10 m up the
   basin.
 
+Hold, 10 s at RPM 6:
+
 ```bash
-... --out 2026-11-26/S1a-CHK-01.log hold --rpm 6 --duration-s 10
-... --out 2026-11-26/S1a-CHK-02.log turn --rpm 6 --rudder 50 --duration-s 5
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-CHK-01.log hold --rpm 6 --duration-s 10
+```
+
+Turn, rudder +50 % for 5 s (back at S first):
+
+```bash
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-CHK-02.log turn --rpm 6 --rudder 50 --duration-s 5
 ```
 
 - **Hold:** S2 25 sent (`$CMD,0.00,25.00`); the vessel moves ahead slowly. Model: steady speed
@@ -458,9 +497,15 @@ Stops:
   - model: about 2.5 deg/s at steady state (helm 50 %, RPM 6). The February turns were about
     twice as fast;
   - it reports `turning side=starboard (heading increasing), as_expected=True`. If it reports
-    `port ... as_expected=False`, the sign is reversed: repeat as `S1a-CHK-03` with
-    `--rudder-sign 1` added before the subcommand, and use that setting for every later S1a
-    command.
+    `port ... as_expected=False`, the sign is reversed. Set `SIGN=1`, which every later command
+    then uses, and repeat the turn as `S1a-CHK-03` (back at S first):
+
+    ```bash
+    SIGN=1
+    python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-CHK-03.log turn --rpm 6 --rudder 50 --duration-s 5
+    ```
+
+    It must now report `side=starboard ... as_expected=True`. Note the sign on the run sheet.
 
 ### 7.2 S1-A Sensing baseline (25 min)
 
@@ -481,8 +526,22 @@ Stops:
 
 At rest, so the logger is used (no command needed):
 
+P1, mid-basin (5, 12.5):
+
 ```bash
-python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/S1a-A-01.log --duration-s 330
+python udp_raw_logger.py --server-ip $IP --out 2026-11-26/S1a-A-01.log --duration-s 330
+```
+
+P2, near one side wall (2, 12.5):
+
+```bash
+python udp_raw_logger.py --server-ip $IP --out 2026-11-26/S1a-A-02.log --duration-s 330
+```
+
+P3, near the other side wall (8, 12.5):
+
+```bash
+python udp_raw_logger.py --server-ip $IP --out 2026-11-26/S1a-A-03.log --duration-s 330
 ```
 
 - Three runs, `S1a-A-01` to `S1a-A-03`, at P1, P2 and P3.
@@ -505,9 +564,20 @@ python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/S1a-A-01.log --durati
   in the vessel model, which sets how far it carries on when the propulsion stops.
 - **Where:** from S, bow up the basin, along the centreline (plan figure above).
 
+From RPM 12, three runs (each from S):
+
 ```bash
-... --out 2026-11-26/S1a-C-01.log coast --rpm 12 --runup-s 10
-... --out 2026-11-26/S1a-C-04.log coast --rpm 9 --runup-s 12
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-C-01.log coast --rpm 12 --runup-s 10
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-C-02.log coast --rpm 12 --runup-s 10
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-C-03.log coast --rpm 12 --runup-s 10
+```
+
+From RPM 9, three runs (each from S):
+
+```bash
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-C-04.log coast --rpm 9 --runup-s 12
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-C-05.log coast --rpm 9 --runup-s 12
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-C-06.log coast --rpm 9 --runup-s 12
 ```
 
 - Three runs each (`S1a-C-01` to `-03` at RPM 12, `-04` to `-06` at RPM 9), each started at S;
@@ -532,18 +602,38 @@ python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/S1a-A-01.log --durati
   starboard turns (`--rudder 100`) from (2.5, 2), port turns (`--rudder -100`) from (7.5, 2), bow
   up the basin.
 
+RPM 6, starboard (full rudder +100), two runs from (2.5, 2):
+
 ```bash
-... --out 2026-11-26/S1a-D-01.log turn --rpm 6 --rudder 100 --heading-change 720
-... --out 2026-11-26/S1a-D-03.log turn --rpm 6 --rudder -100 --heading-change 720
-... --out 2026-11-26/S1a-D-05.log turn --rpm 12 --rudder 100 --heading-change 720
-... --out 2026-11-26/S1a-D-07.log turn --rpm 12 --rudder -100 --heading-change 720
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --max-s 240 --out 2026-11-26/S1a-D-01.log turn --rpm 6 --rudder 100 --heading-change 720
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --max-s 240 --out 2026-11-26/S1a-D-02.log turn --rpm 6 --rudder 100 --heading-change 720
 ```
 
-- Two runs each (`S1a-D-01` to `-08`).
+RPM 6, port (full rudder -100), two runs from (7.5, 2):
+
+```bash
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --max-s 240 --out 2026-11-26/S1a-D-03.log turn --rpm 6 --rudder -100 --heading-change 720
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --max-s 240 --out 2026-11-26/S1a-D-04.log turn --rpm 6 --rudder -100 --heading-change 720
+```
+
+RPM 12, starboard, two runs from (2.5, 2):
+
+```bash
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-D-05.log turn --rpm 12 --rudder 100 --heading-change 720
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-D-06.log turn --rpm 12 --rudder 100 --heading-change 720
+```
+
+RPM 12, port, two runs from (7.5, 2):
+
+```bash
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-D-07.log turn --rpm 12 --rudder -100 --heading-change 720
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-D-08.log turn --rpm 12 --rudder -100 --heading-change 720
+```
+
 - The run-up along the side opposite the turn makes the circle open across the basin, not into
   the nearer wall.
-- At RPM 6, add `--max-s 240` before the subcommand: two full turns take about 140 s in the model,
-  plus the 14 s run-up, close to the 180 s default.
+- The RPM 6 commands carry `--max-s 240`: two full turns take about 140 s in the model, plus the
+  14 s run-up, close to the 180 s default.
 - **Expected:**
 
   | Setting | Model (current simulator plant) | February 2026, radio control |
@@ -568,9 +658,16 @@ python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/S1a-A-01.log --durati
   show.
 - **Where:** from S, bow up the basin (plan figure above).
 
+Starboard first (from S):
+
 ```bash
-... --out 2026-11-26/S1a-E-01.log zigzag --rpm 12 --delta 20 --psi 20 --switches 2
-... --out 2026-11-26/S1a-E-02.log zigzag --rpm 12 --delta -20 --psi 20 --switches 2
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-E-01.log zigzag --rpm 12 --delta 20 --psi 20 --switches 2
+```
+
+Port first (from S):
+
+```bash
+python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-E-02.log zigzag --rpm 12 --delta -20 --psi 20 --switches 2
 ```
 
 - Both initial sides: `--delta 20` starts to starboard, `--delta -20` to port. A dry run on 2026-11-25 confirmed that `--delta -20` gives
@@ -602,7 +699,7 @@ its log kept.
 1. **Clock and IMU check, repeated** (section 2.4 item 4), so drift over the session is measured:
 
    ```bash
-   python udp_raw_logger.py --server-ip <IP> --out 2026-11-26/END-1.log --duration-s 120
+   python udp_raw_logger.py --server-ip $IP --out 2026-11-26/END-1.log --duration-s 120
    ```
 
    As D0-2, at S: 1 min at rest, one push at the stern at 1:00 (time noted), 1 min at rest.
@@ -627,7 +724,7 @@ its log kept.
    - the IMU line format (one example line);
    - the telemetry mode;
    - the largest gap;
-   - the `<FENCE>` string and the pose frame's origin and axes;
+   - the fence (`$FENCE`) and the pose frame's origin and axes;
    - the rudder-sign result;
    - which S1a blocks ran;
    - any deviation.
