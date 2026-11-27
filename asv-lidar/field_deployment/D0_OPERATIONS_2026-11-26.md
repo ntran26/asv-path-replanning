@@ -120,6 +120,13 @@ the operator and safety roles are held by different people.
 
    Expected: `[SELFTEST] PASSED: handshake, 14 datagrams logged byte for byte ...`.
 
+6. **The window.** `udp_raw_logger.py` and `udp_manoeuvre.py` open a display window by default
+   (FIELD_SCRIPTS_GUIDE.md sections 3.4 and 4.8). It shows the status, the track, the heading and
+   the LiDAR returns, and for the manoeuvre sender the fence and the last command. It only shows:
+   - Enter and Ctrl+C work in the terminal, not in the window;
+   - closing the window does not stop the recording;
+   - `--no-render` before the subcommand (or anywhere in the logger's command) runs without it.
+
 All logs go in `2026-11-26/`, one file per run, named by the run identifier (D0-1 ... D0-5;
 S1a-CHK-01, S1a-A-01, ...). An existing name is never overwritten (`_2` is added). Only one
 program receives at a time: stop the logger (Ctrl+C) before the manoeuvre sender starts, and the
@@ -355,28 +362,26 @@ python udp_raw_logger.py --server-ip $IP --out 2026-11-26/D0-5.log
     the start of the command and run it again.
 
   ```bash
-  OFF_W=0 OFF_L=0 python -c 'import os, sys, udp_manoeuvre as m; p = [(float(g["x"]), -float(g["y"])) for g in (m.RE_POSE.match(l.strip()) for l in open(sys.argv[1], errors="ignore")) if g]; lo = [min(c) - 1 for c in zip(*p)]; hi = [max(c) + 1 for c in zip(*p)]; ext = [b - a for a, b in zip(lo, hi)]; w = 0 if ext[0] <= ext[1] else 1; size = {w: 10.0, 1 - w: 25.0}; off = {w: float(os.environ.get("OFF_W", 0)), 1 - w: float(os.environ.get("OFF_L", 0))}; box = [(lo[i], hi[i]) if ext[i] <= size[i] else ((lo[i] + hi[i]) / 2 + off[i] - size[i] / 2, (lo[i] + hi[i]) / 2 + off[i] + size[i] / 2) for i in (0, 1)]; print("pose lines %d; measured basin x %.1f to %.1f (%.1f m), y %.1f to %.1f (%.1f m); width along %s" % (len(p), lo[0], hi[0], ext[0], lo[1], hi[1], ext[1], "xy"[w])); print("--fence=%.1f,%.1f,%.1f,%.1f" % (box[0][0], box[0][1], box[1][0], box[1][1])); [print("WARNING: the box leaves the measured basin along %s" % "xy"[i]) for i in (0, 1) if box[i][0] < lo[i] - 1e-9 or box[i][1] > hi[i] + 1e-9]' 2026-11-26/D0-5.log
+  OFF_W=0 OFF_L=0 python -c 'import os, sys, udp_manoeuvre as m; p = [(-float(g["x"]), float(g["y"])) for g in (m.RE_POSE.match(l.strip()) for l in open(sys.argv[1], errors="ignore")) if g]; lo = [min(c) - 1 for c in zip(*p)]; hi = [max(c) + 1 for c in zip(*p)]; ext = [b - a for a, b in zip(lo, hi)]; w = 0 if ext[0] <= ext[1] else 1; size = {w: 10.0, 1 - w: 25.0}; off = {w: float(os.environ.get("OFF_W", 0)), 1 - w: float(os.environ.get("OFF_L", 0))}; box = [(lo[i], hi[i]) if ext[i] <= size[i] else ((lo[i] + hi[i]) / 2 + off[i] - size[i] / 2, (lo[i] + hi[i]) / 2 + off[i] + size[i] / 2) for i in (0, 1)]; print("pose lines %d; measured basin x %.1f to %.1f (%.1f m), y %.1f to %.1f (%.1f m); width along %s" % (len(p), lo[0], hi[0], ext[0], lo[1], hi[1], ext[1], "xy"[w])); print("--fence=%.1f,%.1f,%.1f,%.1f" % (box[0][0], box[0][1], box[1][0], box[1][1])); [print("WARNING: the box leaves the measured basin along %s" % "xy"[i]) for i in (0, 1) if box[i][0] < lo[i] - 1e-9 or box[i][1] > hi[i] + 1e-9]' 2026-11-26/D0-5.log
   ```
 
-  Output on 2026-11-25:
-  - On a synthetic log of a 12 m x 26 m basin, with marks 1 m from each wall:
+  The command reads the pose in the vessel's layout since November 2026 (x = -B, y = A for a pose
+  line `[ts]A,B,C`, as `--pose-map nov2026` in the tools): x across the basin from the left wall,
+  y up the basin from the near end. Output on the D0-5 log of 2026-11-26, recomputed on
+  2026-11-27:
 
-    ```
-    pose lines 15; measured basin x 0.0 to 12.0 (12.0 m), y 0.0 to 26.0 (26.0 m); width along x
-    --fence=1.0,11.0,0.5,25.5
-    ```
+  ```
+  pose lines 486; measured basin x -0.7 to 14.1 (14.8 m), y -2.0 to 22.8 (24.8 m); width along x
+  --fence=1.7,11.7,-2.0,22.8
+  ```
 
-    The same log with `OFF_W=2` gives `--fence=3.0,13.0,0.5,25.5` and
-    `WARNING: the box leaves the measured basin along x`. An offset that pushes the box outside
-    the basin is wrong; reduce it.
-  - On the July rehearsal log (`2026-07-03/1.log`, a stretch of path, not a basin frame), the
-    measured area is narrower than the box on both sides, so the measured edges come back:
-
-    ```
-    pose lines 31; measured basin x -0.9 to 2.3 (3.2 m), y -1.0 to 15.6 (16.6 m); width along x
-    --fence=-0.9,2.3,-1.0,15.6
-    ```
-
+  - The 10 m box is centred across the measured 14.8 m width. The measured length, 24.8 m, is
+    under 25 m, so the measured ends are kept.
+  - In that run the vessel was driven round the edge rather than held at M1-M4. The 1 m the
+    command adds to the extremes therefore assumes a distance from the walls that was not
+    measured, so the box needs checking before use.
+  - An offset that pushes the box outside the measured basin prints
+    `WARNING: the box leaves the measured basin along x` (or y); reduce it.
   - Check the measured basin against the tape: the measured width and length should match the
     real basin to within about half a metre. Any pose taken while moving between marks lies
     inside the four, so it does not widen the measurement. A jump in the pose (a localisation
@@ -454,8 +459,9 @@ How every run goes:
 1. The vessel is at its start mark; the safety person is ready on the transmitter.
 2. Start the command. Wait for `[MAN] telemetry flowing`.
 3. If the fence line says `OUTSIDE`, do not press Enter: move the vessel or correct the fence.
-4. Press Enter to start.
-5. Ctrl+C stops at once (three zero commands).
+4. Click on the terminal (the window may have the keyboard focus), then press Enter to start.
+   The window's banner `PRESS ENTER IN THE TERMINAL TO START` disappears when the run starts.
+5. Ctrl+C in the terminal stops at once (three zero commands).
 
 Stops:
 - A fence trip cuts propulsion and prints `TAKE OVER BY RADIO CONTROL`; the safety person takes

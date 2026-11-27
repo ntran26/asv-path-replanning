@@ -28,14 +28,15 @@ Contents:
 
 | Job | Script | Sends commands? | Needs |
 | --- | --- | --- | --- |
-| Record the raw telemetry (D0, at-rest blocks, any new line format) | `udp_raw_logger.py` | never | standard library only |
-| Calibration manoeuvres with exact, timed commands (S1, S2-B) | `udp_manoeuvre.py` | yes (`--dry-run`: no) | standard library only |
+| Record the raw telemetry (D0, at-rest blocks, any new line format) | `udp_raw_logger.py` | never | standard library; the window (on by default) also needs pygame and `telemetry_view.py` |
+| Calibration manoeuvres with exact, timed commands (S1, S2-B) | `udp_manoeuvre.py` | yes (`--dry-run`: no) | standard library; the window (on by default) also needs pygame and `telemetry_view.py` |
 | The deployed policy on the vessel (S2-C, trials) | `udp_live_p3.py` | yes (`--no-send`: no) | the pinned Python environment, the policy |
 | A stand-in vessel replaying a log over UDP (bench) | `fake_vessel_replay.py` | - | standard library only |
 | The bridge on saved logs, in process and over UDP (bench) | `p3_shadow_replay.py` | no | the pinned environment |
 | Bridge against simulator, decision by decision (bench) | `p3_parity_replay.py` | no | the pinned environment |
 | Run time per decision (bench) | `p3_timing.py` | no | the pinned environment |
-| Offline viewer of a raw log | `log_viewer.py`, `rl_log_viewer.py` | no | pygame |
+| Replay a saved log in the live window, with the full trajectory at the end | `log_replay_view.py` | no | pygame, `telemetry_view.py` |
+| Offline viewer of a raw log (July tools) | `log_viewer.py`, `rl_log_viewer.py` | no | pygame |
 
 Only one program can receive at a time: the logger, the manoeuvre sender and the bridge all listen
 on UDP 5000. Stop one (Ctrl+C) before starting the next.
@@ -53,9 +54,30 @@ on UDP 5000. Stop one (Ctrl+C) before starting the next.
   - Vessel rudder = `--rudder-sign` x rudder, with `--rudder-sign` -1 by default: the vessel's
     rudder sign is opposite to the simulator's.
   - S2 = RPM / 24 x 100. RPM 6 (cruise) is S2 25, RPM 12 is S2 50, and S2 = -100 is full astern.
-- Pose frame used by the decoder (`log_parser.BluefinStreamDecoder`) and by `udp_manoeuvre.py`:
-  for a pose line `[ts]A,B,C`, x = B, y = -A and heading = -C. The `--fence` box is written in
-  this frame.
+- **Pose layout** (`--pose-map` in `udp_raw_logger.py`, `udp_manoeuvre.py`, `log_replay_view.py`
+  and `telemetry_view.py`; since 2026-11-27). A pose line `[ts]A,B,C` is read as:
+
+  | Layout | x | y | Heading | For |
+  | --- | --- | --- | --- | --- |
+  | `nov2026` (default) | -B | A | -C | the vessel's output since November 2026 |
+  | `july` | B | -A | -C | the July 2026 and February 2026 logs; `log_parser.BluefinStreamDecoder` |
+
+  - The heading is in degrees, clockwise from +y, in both layouts.
+  - **Why `nov2026`:** in the D0 logs of 2026-11-26, read with the July layout, the vessel moves
+    stern first (course over ground minus heading about 180 deg in D0-4 and D0-6). With
+    `nov2026`, course and heading agree (within about 20 deg over 30 s windows), and the track
+    turns the same way as the heading and the gyro.
+  - **Checked against the videos:**
+    - D0-5's loop starts in front of the camera at the near end, goes up the left (black) wall
+      and comes back down the right, as the video shows;
+    - in D0-2 the vessel sits at the near end, centred, and the push turns it counter-clockwise
+      seen from above, as the gyro says.
+  - **The frame:** x across the basin from the left wall, y up the basin from the near end, the
+    frame of the D0 plan.
+  - The `--fence` box of `udp_manoeuvre.py` is written in the frame of the chosen layout; heading
+    changes and speeds are the same under both.
+  - The Paper 3 bridge (`udp_live_p3.py`, through `log_parser`) still reads the July layout, so
+    it must be changed before it runs on the vessel.
 - Network: the July set-up (P-11). The Ubuntu laptop's firewall (ufw) is disabled and stays so;
   UDP 5000, 5001 and 5050 are free on it (checked 2026-11-25).
 
@@ -154,6 +176,40 @@ Output for the rehearsal log:
 The rates come from the vessel's time stamps, so `--check` answers the rate question for every
 line kind, the IMU's included, directly from the file.
 
+### 3.4 The window (on by default)
+
+Added 2026-11-26. The logger opens a window beside the terminal, drawn by `telemetry_view.py`
+(pygame), and keeps every terminal message as before.
+
+![Raw logger window](field_scripts_figures/raw_logger_window.png)
+
+*The raw logger's window, rehearsal against the mock vessel streaming the July log
+`2026-07-03/1.log` (bench ports 15000/15050).*
+
+- **Left panel:**
+  - the file name and the elapsed time;
+  - the datagrams with their rate and data volume, and the time since the last datagram;
+  - whether the vessel answered `hey`;
+  - the line kinds, each with its count and rate;
+  - the last console messages.
+  - A banner reads `NO TELEMETRY FOR ... s` when no time-stamped line has arrived for 1.5 s,
+    and the status reads "waiting for the vessel" before the first datagram.
+- **Right panel, the pose frame** (x right, y up; the decoder's convention of section 2):
+  - the track, and the hull at the current pose and heading;
+  - the latest LiDAR returns, drawn from the pose point. The LiDAR's offset is not applied,
+    since whether the pose is mid-hull or the LiDAR is still open (O-9).
+  - The view only grows, so the map does not jump.
+- **Options:** `--no-render` (terminal only), `--render-fps` (redraws per second, 10) and
+  `--pose-map` (section 2; `nov2026` by default). The recording is raw under any layout.
+- **The window is optional:** without pygame, without a screen, or without `telemetry_view.py`
+  beside the logger (a copied-alone file), one `[VIEW] no display (...)` line is printed and the
+  recording goes on unchanged. An error while drawing closes the window, never the recording.
+- **Closing the window does not stop the recording.** Ctrl+C in the terminal stops it.
+- Checked on 2026-11-26 against the mock vessel:
+  - one draw takes 6-9 ms (at 10 draws per second), and every datagram was recorded;
+  - the fallbacks behave as described: pygame blocked, the module missing, a drawing error
+    injected, and `--no-render`.
+
 ## 4. `udp_manoeuvre.py`: scripted calibration manoeuvres
 
 Exact rudder and propulsion commands sent over UDP at exact times, with the raw telemetry logged on
@@ -183,7 +239,8 @@ Output on 2026-11-25:
 | `--rudder-sign` | -1 | vessel rudder = sign x rudder, as the bridges |
 | `--rpm-max` | 24 | S2 = rpm / rpm-max x 100 |
 | `--cmd-rate` | 2 Hz | the current command is repeated this often (changes go out at once) |
-| `--fence=XMIN,XMAX,YMIN,YMAX` | none | the basin box in the pose frame (section 2). Written with `=`, because a negative first value would otherwise read as an option |
+| `--fence=XMIN,XMAX,YMIN,YMAX` | none | the basin box in the pose frame of `--pose-map` (section 2). Written with `=`, because a negative first value would otherwise read as an option |
+| `--pose-map` | `nov2026` | the pose layout (section 2): `nov2026` for the vessel since November 2026, `july` for the July and February logs |
 | `--fence-margin-m` | 1.5 m | the manoeuvre stops when the pose comes this close to an edge (the pose is the hull reference point; the bow is 0.86 m ahead) |
 | `--watchdog-s` | 1.5 s | abort when telemetry (or, for turn, zigzag and stop, pose lines) stops this long; 0 turns it off |
 | `--max-s` | 180 s | abort a manoeuvre running longer than this |
@@ -336,6 +393,48 @@ That line is from a dry run against a replayed log, where the heading does not f
 so its verdict means nothing there. On the vessel, `turn --rudder 50` must report
 `side=starboard (heading increasing), as_expected=True`. Otherwise, rerun with `--rudder-sign 1`
 and check again.
+
+### 4.8 The window (on by default)
+
+Added 2026-11-26, like the logger's (section 3.4), with the manoeuvre's own state.
+
+![Manoeuvre sender window](field_scripts_figures/manoeuvre_window.png)
+
+*The manoeuvre sender's window, `hold --rpm 6` as a dry run with `--fence=-3,4,-1,20`, against
+the mock vessel streaming the July log.*
+
+- **Left panel:**
+  - the manoeuvre, and `DRY RUN: no command is sent` (amber) or `COMMANDS ARE SENT to <IP>`
+    (green);
+  - the phase, the last `$CMD` sent, and the rudder, RPM and S2;
+  - the heading change, the speed and the telemetry age;
+  - the fence state: `inside` (green) or `OUTSIDE the margin` (red);
+  - the last console messages.
+- **Banners:**
+  - `WAITING FOR TELEMETRY`;
+  - `PRESS ENTER IN THE TERMINAL TO START`;
+  - `NO TELEMETRY FOR ... s`;
+  - after a fence trip, `FENCE: TAKE OVER BY RADIO CONTROL` in red, kept on screen for 2 s
+    after the run ends.
+- **Right panel:** as the logger's, plus the fence (red) and the line its margin draws inside it.
+- **The window shows; it never commands.** Enter starts and Ctrl+C stops, both in the terminal.
+  The window may take the keyboard focus when it opens: click on the terminal before pressing
+  Enter. Enter in the window does nothing.
+- **Command timing.** Drawing runs between receives, at most `--render-fps` times a second.
+  Measured on 2026-11-26 with `steps --rpm 0 --rudder 25 50 100 --repeats 2 --hold-s 1` (dry run,
+  25 rudder changes, 1.0 s apart):
+
+  | Run | Change interval error, mean / max | Keepalive interval, mean / max |
+  | --- | --- | --- |
+  | window on | 21.5 / 35.8 ms | 507 / 517 ms |
+  | `--no-render` | 18.5 / 22.8 ms | 505 / 511 ms |
+
+  A draw can delay a command by about one draw, about 13 ms at most. Every command's actual send
+  time is in `<out>.commands.csv` and in the log's `#CMD` lines, so the analysis uses the true
+  times either way. For the rudder steps of S1-B, where the transport delay is resolved to
+  +/-0.1 s (T-2), `--no-render` removes that extra delay.
+- **Optional, as the logger's:** without pygame, a screen or `telemetry_view.py`, one warning is
+  printed and the manoeuvre runs unchanged. The self-test (`--selftest`) runs without a window.
 
 ## 5. `udp_live_p3.py`: the Paper 3 bridge
 
@@ -503,6 +602,26 @@ stamps). It reads no commands, so the receiving program runs with `--no-send` or
 | `--loop` | off | start the log again at its end |
 | `--ignore-rc` | off | leave out the `RC` lines |
 
+**Ports: on the shore computer, never test on 5000 and 5050 while a session may be live.** Linux
+lets two programs bind UDP 5000. The vessel's datagrams then go to the test program instead of
+the live logger, which loses them without any error. On 2026-11-26 a mock test during D0 left 7
+gaps (about 75 s) in `D0-1.log`. Before any mock test, check that nothing is running:
+
+```bash
+pgrep -af "udp_raw_logger|udp_manoeuvre|udp_live_p3" || echo "no field tool running"
+ss -ulpn | grep -E ':(5000|5050)\b' || echo "UDP 5000/5050 free"
+```
+
+Then test on the bench ports, 15050 for the mock vessel and 15000 for the receiver, for example:
+
+```bash
+python fake_vessel_replay.py --log 2026-07-03/1.log --port 15050
+python udp_raw_logger.py --server-ip 127.0.0.1 --server-port 15050 --local-port 15000 --out mock_test.log --duration-s 15
+```
+
+The examples below were run on 2026-11-25, when no session was live, on the field ports as
+quoted.
+
 ### 6.1 Mock vessel to the bridge (two terminals)
 
 Terminal 1:
@@ -551,6 +670,41 @@ python udp_manoeuvre.py --server-ip 127.0.0.1 --out mock_hold.log --dry-run hold
 
 Section 3.2 and section 4.5 show their output. Restart terminal 1 for each run: the mock vessel
 streams the log once and exits (unless `--loop`).
+
+### 6.3 The Paper 3 test pair: mock vessel and raw logger
+
+`fake_vessel_replay.py` and `udp_raw_logger.py` form the pair for testing the UDP connection and
+the log layouts without the vessel, as `fake_vessel_replay.py` and `udp_listener.py` did in July.
+- **The mock vessel** waits for `START` and streams any log with the vessel's stamps, at the
+  log's pace. That includes the vessel's own logs (`RAW_LOG.log`, `D0-n-RAW.log`), whose IMU
+  (`GYRO`, `ACCEL`, `QUAT`) and `SRVO` lines and 10 Hz LiDAR are denser than what the vessel sent
+  the shore computer on 2026-11-26 (`hey`, pose and LiDAR at 2 Hz).
+- **The raw logger** records every datagram, prints the line kinds and draws the window.
+- **For the policy's view of the same stream,** use `udp_live_p3.py --no-send` instead of the
+  logger (section 6.1).
+
+On the bench ports (check that nothing live is running, as above), two terminals:
+
+```bash
+python fake_vessel_replay.py --log 2026-11-26/D0-4-RAW.log --port 15050
+```
+
+```bash
+python udp_raw_logger.py --server-ip 127.0.0.1 --server-port 15050 --local-port 15000 --out mock_raw_test.log --duration-s 25
+```
+
+Result on 2026-11-27, against `--check` of the recording:
+
+```
+  pose (3 values)                        2039      85.1  read
+  stamped, other                          908      38.0  ignored
+  LiDAR scan (720)                        240      10.0  read
+```
+
+- 3,187 datagrams in 25 s (about 127 a second), every line recorded.
+- The window drew in 7-9 ms, with the bow along the track under `--pose-map nov2026`.
+- The mock vessel streams the whole log and then exits; stop it earlier with Ctrl+C in its
+  terminal.
 
 ## 7. Replaying and viewing saved logs
 
@@ -616,11 +770,49 @@ python rl_log_viewer.py 2026-07-03/1.log --test-case 1
     recording: `NameError: name 'start_xy' is not defined` (line 782; the name is used but never
     set in `main()`). A known fault, not yet fixed.
 
-### 7.4 Videos from the other scripts
+### 7.4 `log_replay_view.py`: replay a log in the live window
+
+Added 2026-11-27. Offline (no network, no command): it plays any stamped log at the pace of its
+stamps through the same window as the live tools (`telemetry_view.py`). Accepted logs:
+- the shore computer's logs: `udp_raw_logger.py`, `udp_manoeuvre.py`, and a bridge's
+  `telemetry.log`;
+- the vessel's own logs: `RAW_LOG.log`, `datalogs/laser_*.log`, `D0-n-RAW.log`. Their IMU and
+  `SRVO` lines are counted in the panel and skipped.
+
+```bash
+python log_replay_view.py 2026-11-26/D0-5.log
+python log_replay_view.py 2026-11-26/D0-5-RAW.log --rate 4 --full-track
+python log_replay_view.py 2026-11-26/D0-4.log --rate 0 --full-track --save-png d0_4_track.png --exit-at-end
+python log_replay_view.py 2026-07-03/1.log --pose-map july
+```
+
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `--rate` | 1.0 | replay speed; 0 plays as fast as the window draws |
+| `--pose-map` | `nov2026` | the pose layout (section 2); `july` for the July and February logs |
+| `--full-track` | off | when the log ends, draw the whole trajectory fitted to the window and keep the window open until it is closed |
+| `--start-s`, `--end-s` | 0 | replay part of the log (seconds from its first stamp; 0 for the end) |
+| `--fence=...`, `--fence-margin-m` | none, 1.5 | draw a fence, as `udp_manoeuvre.py` |
+| `--save-png` | none | save the final view |
+| `--exit-at-end` | off | end when the log ends, after `--save-png` |
+
+Keys: Space pauses, and Esc or closing the window quits.
+
+Checked on 2026-11-27, with `--rate 0 --full-track --save-png --exit-at-end`:
+- `D0-5.log`: 889 lines in 0.6 s;
+- `D0-5-RAW.log`: 33,955 lines in 1.7 s;
+- `D0-6-RAW.log`: 39,061 lines in 1.8 s;
+- `2026-07-03/1.log` with `--pose-map july`: 98 lines in 0.5 s.
+
+D0-5's full trajectory is the loop of the video: up the left wall, across the far end and down
+the right.
+
+### 7.5 Videos from the other scripts
 
 | Script | Video option | State (2026-11-26, Ubuntu) |
 | --- | --- | --- |
 | `udp_live_p3.py` | `--record-video` | works (section 5.5) |
+| `log_replay_view.py` | `--save-png` (the final view) | works (section 7.4); no video |
 | `udp_live_rl.py` (July) | `--record-video`, `--out-video`, `--video-fps` | works: `--shadow` against the mock vessel, 270 frames at 10 fps, 27.0 s, 1280 x 720 |
 | `log_viewer.py` | `--record` | works (section 7.3) |
 | `rl_log_viewer.py` | `--record` | stops at start-up (section 7.3) |
@@ -692,7 +884,9 @@ Checked in the code on the UTAS laptop (2026-11-25).
 - the rendering.
 
 **New calibration tools:** `udp_raw_logger.py` and `udp_manoeuvre.py` are standalone programs
-with no policy, standard library only. They use the same handshake, ports and `$CMD` format.
+with no policy, standard library only; since 2026-11-26 both open a window by default
+(`telemetry_view.py`, pygame), which is optional and never affects the recording. They use the
+same handshake, ports and `$CMD` format.
 
 ## 11. Testing the UDP connection, in order
 
@@ -730,8 +924,10 @@ python udp_raw_logger.py --check 2026-11-26/D0-1.log
 python udp_manoeuvre.py --selftest
 python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-CHK-01.log hold --rpm 6 --duration-s 10
 python udp_manoeuvre.py --server-ip $IP --fence=${FENCE:?set FENCE first} --rudder-sign $SIGN --out 2026-11-26/S1a-CHK-02.log turn --rpm 6 --rudder 50 --duration-s 5
-python fake_vessel_replay.py --log 2026-07-03/1.log --port 5050
-python udp_live_p3.py --test-case 1 --run-id bench-0703-1 --no-send --headless --idle-exit-s 5
+python fake_vessel_replay.py --log 2026-07-03/1.log --port 15050
+python udp_live_p3.py --test-case 1 --run-id bench-0703-1 --no-send --headless --idle-exit-s 5 --server-port 15050 --local-port 15000
 python udp_live_p3.py --server-ip $IP --layout L1 --run-id link-2026-11-26 --no-send
 python udp_live_p3.py --server-ip $IP --scenario easy_1 --run-id T1-easy_1-r1 --record-video
+python log_replay_view.py 2026-11-26/D0-5.log --full-track
+python fake_vessel_replay.py --log 2026-11-26/D0-4-RAW.log --port 15050
 ```
