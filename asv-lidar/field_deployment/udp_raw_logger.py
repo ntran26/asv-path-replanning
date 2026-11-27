@@ -255,7 +255,8 @@ def record(args, *, on_bound=None, stop_event=None, out=sys.stdout):
         try:
             import telemetry_view
             view_box[0] = telemetry_view.open_view("Raw logger  " + os.path.basename(out_path), say,
-                                                   fps=getattr(args, "render_fps", 10.0))
+                                                   fps=getattr(args, "render_fps", 10.0),
+                                                   pose_map=getattr(args, "pose_map", "nov2026"))
         except Exception as exc:
             say("[VIEW] no display (%s: %s); recording continues without the window" % (type(exc).__name__, exc))
 
@@ -552,6 +553,10 @@ def build_parser():
     ap.add_argument("--no-render", dest="render", action="store_false",
                     help="no window: terminal only (the window is on by default)")
     ap.add_argument("--render-fps", type=float, default=10.0, help="window redraws per second")
+    ap.add_argument("--pose-map", choices=("nov2026", "july"), default="nov2026",
+                    help="how the window reads a pose line [ts]A,B,C: nov2026 x=-B, y=A, heading=-C (the "
+                         "vessel since November 2026); july x=B, y=-A, heading=-C (July and February logs). "
+                         "The recording is raw either way")
     ap.add_argument("--check", metavar="LOG", default=None, help="print the line kinds of a saved log and exit")
     ap.add_argument("--selftest", action="store_true", help="loopback test with a stand-in vessel, then exit")
     return ap

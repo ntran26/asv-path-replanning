@@ -13,8 +13,14 @@ rate-limited (--render-fps, 10 by default), so it adds at most a few millisecond
 already waits on the socket.  Closing the window closes the display only; the recording goes on
 until Ctrl+C in the terminal.
 
-Conventions (log_parser.BluefinStreamDecoder): a pose line `[ts]A,B,C` gives x = B, y = -A and
-heading -C deg, clockwise from +y; a LiDAR line holds 720 ranges in decimetres (0: no return),
+Pose layout (--pose-map): a pose line `[ts]A,B,C` is read as
+  nov2026 (default): x = -B, y = A, heading = -C   the vessel's output since November 2026 (checked
+                     on the D0 logs and videos of 2026-11-26: x across the basin from the left wall,
+                     y up the basin from the near end, heading clockwise from +y);
+  july:              x = B, y = -A, heading = -C   log_parser.BluefinStreamDecoder, the July 2026
+                     and February 2026 logs.
+With the July layout the November logs show the vessel moving stern first (position and heading
+180 deg apart).  A LiDAR line holds 720 ranges in decimetres (0: no return),
 reversed so that beam i lies i x 0.5 deg clockwise from the bow; a return at range r on bearing
 a is drawn at (x + r sin a, y + r cos a), from the pose point (the LiDAR offset is not applied,
 O-9).
@@ -30,9 +36,21 @@ RE_POSE = re.compile(
     r"(?P<y>[-+]\d+\.\d+),(?P<x>[-+]\d+\.\d+),(?P<yaw>[-+]\d+\.\d+)\s*$")
 RE_LIDAR = re.compile(r"^\[(?P<ts>\d{2}:\d{2}:\d{2}\.\d{6})\]\[(?P<body>[\d,\s]*)\]\s*$")
 LIDAR_UNIT_M = 0.1
+POSE_MAPS = {
+    "nov2026": lambda a, b, c: (-b, a, -c),
+    "july": lambda a, b, c: (b, -a, -c),
+}
+
+
+def read_pose(line, pose_map="nov2026"):
+    """(x, y, heading_deg) from a pose line under the given layout, or None."""
+    m = RE_POSE.match(line.strip())
+    if m is None:
+        return None
+    return POSE_MAPS[pose_map](float(m.group("y")), float(m.group("x")), float(m.group("yaw")))
 LIDAR_BEAMS = 720
 LOA, BEAM = 1.725, 0.50
-TRAIL_MAX = 6000
+TRAIL_MAX = 50000
 
 BG, PANEL, INK, DIM = (18, 20, 26), (28, 31, 40), (232, 234, 240), (150, 156, 170)
 GRID, GRID_TXT = (40, 44, 55), (110, 116, 130)
@@ -43,8 +61,9 @@ FENCE, MARGIN, WARN, ALERT = (220, 90, 90), (150, 80, 80), (255, 200, 60), (255,
 class TelemetryView:
     """The window.  Create with `TelemetryView.open(...)`; returns None (with a reason) if it cannot."""
 
-    def __init__(self, pg, screen, title, fps, fence, fence_margin_m):
+    def __init__(self, pg, screen, title, fps, fence, fence_margin_m, pose_map="nov2026"):
         self.pg, self.screen, self.title = pg, screen, title
+        self.pose_map = pose_map
         self.period = 1.0 / max(1.0, float(fps))
         self.fence = fence                    # (xmin, xmax, ymin, ymax) in the pose frame, or None
         self.margin = float(fence_margin_m or 0.0)
@@ -62,7 +81,7 @@ class TelemetryView:
         self.frames = 0
 
     @classmethod
-    def open(cls, title, fps=10.0, fence=None, fence_margin_m=0.0, size=(1180, 720)):
+    def open(cls, title, fps=10.0, fence=None, fence_margin_m=0.0, size=(1180, 720), pose_map="nov2026"):
         try:
             import os
             os.environ.setdefault("PYGAME_HIDE_SUPPORT_PROMPT", "1")
@@ -71,7 +90,7 @@ class TelemetryView:
             pygame.font.init()
             screen = pygame.display.set_mode(size)
             pygame.display.set_caption(title)
-            return cls(pygame, screen, title, fps, fence, fence_margin_m), None
+            return cls(pygame, screen, title, fps, fence, fence_margin_m, pose_map), None
         except Exception as exc:              # no pygame, no screen (SSH, no DISPLAY), any other failure
             return None, "%s: %s" % (type(exc).__name__, exc)
 
@@ -89,7 +108,7 @@ class TelemetryView:
             self.t_last_line = time.monotonic() if now is None else now
         m = RE_POSE.match(s)
         if m:
-            x, y, h = float(m.group("x")), -float(m.group("y")), -float(m.group("yaw"))
+            x, y, h = POSE_MAPS[self.pose_map](float(m.group("y")), float(m.group("x")), float(m.group("yaw")))
             self.pose = (x, y, h)
             if not self.trail or (x - self.trail[-1][0]) ** 2 + (y - self.trail[-1][1]) ** 2 > 1e-4:
                 self.trail.append((x, y))
@@ -185,7 +204,8 @@ class TelemetryView:
             if abs(gy / 5.0 - round(gy / 5.0)) < 1e-6:
                 scr.blit(self.small.render("%g" % gy, True, GRID_TXT), (rect.left - 30, p0[1] - 7))
             gy += step
-        scr.blit(self.small.render("pose frame, m (x right, y up)", True, GRID_TXT), (rect.left, rect.bottom + 20))
+        scr.blit(self.small.render("pose frame, m (x right, y up), layout %s" % self.pose_map, True, GRID_TXT),
+                 (rect.left, rect.bottom + 20))
 
         if self.fence is not None:
             x0, x1, y0, y1 = self.fence
@@ -269,9 +289,10 @@ class SafeView:
         return 0 if self.view is None else self.view.frames
 
 
-def open_view(title, say, fps=10.0, fence=None, fence_margin_m=0.0):
+def open_view(title, say, fps=10.0, fence=None, fence_margin_m=0.0, pose_map="nov2026", size=(1180, 720)):
     """A SafeView, or None with the reason printed once."""
-    view, why = TelemetryView.open(title, fps=fps, fence=fence, fence_margin_m=fence_margin_m)
+    view, why = TelemetryView.open(title, fps=fps, fence=fence, fence_margin_m=fence_margin_m, size=size,
+                                   pose_map=pose_map)
     if view is None:
         say("[VIEW] no display (%s); recording continues without the window" % why)
         return None

@@ -67,8 +67,15 @@ from datetime import datetime, timezone
 HELLO = "START"
 ZERO = (0.0, 0.0)
 
-# The pose format of log_parser.BluefinStreamDecoder (copied: standard library only); the decoder
-# reads x as given, y and yaw negated, and so does this program.
+# The pose format of log_parser.BluefinStreamDecoder (copied: standard library only).  A pose line
+# [ts]A,B,C is read by --pose-map: nov2026 (default) x = -B, y = A, heading = -C, the vessel's output
+# since November 2026 (D0 logs and videos of 2026-11-26: x across the basin from the left wall, y up
+# the basin from the near end); july x = B, y = -A, heading = -C, the July decoder.  Heading changes
+# and speeds are the same under both; the --fence box is written in the chosen frame.
+POSE_MAPS = {
+    "nov2026": lambda a, b, c: (-b, a, -c),
+    "july": lambda a, b, c: (b, -a, -c),
+}
 RE_POSE = re.compile(
     r"^\[(?P<ts>\d{2}:\d{2}:\d{2}\.\d{6})\]"
     r"(?P<y>[-+]\d+\.\d+),(?P<x>[-+]\d+\.\d+),(?P<yaw>[-+]\d+\.\d+)\s*$")
@@ -112,8 +119,9 @@ class FenceStop(Abort):
 class PoseTrack:
     """Heading change (unwrapped) and speed over a window, from the vessel's pose lines and stamps."""
 
-    def __init__(self, speed_window_s):
+    def __init__(self, speed_window_s, pose_map="nov2026"):
         self.window = float(speed_window_s)
+        self.pose_map = POSE_MAPS[pose_map]
         self.history = []               # (t_vessel, x, y)
         self.heading = None             # deg, decoder convention
         self.unwrapped = 0.0
@@ -125,7 +133,7 @@ class PoseTrack:
         if m is None:
             return False
         t = stamp_seconds(m.group("ts"))
-        x, y, hdg = float(m.group("x")), -float(m.group("y")), -float(m.group("yaw"))
+        x, y, hdg = self.pose_map(float(m.group("y")), float(m.group("x")), float(m.group("yaw")))
         if self.heading is not None:
             self.unwrapped += wrap180(hdg - self.heading)
         self.heading = hdg
@@ -346,7 +354,7 @@ class Runner:
     def __init__(self, args, out=sys.stdout):
         self.a = args
         self.out = out
-        self.track = PoseTrack(args.speed_window_s)
+        self.track = PoseTrack(args.speed_window_s, getattr(args, "pose_map", "nov2026"))
         self.sock = None
         self.command = None             # (rudder_pct, rpm)
         self.phase = "waiting"
@@ -578,7 +586,8 @@ class Runner:
                 if a.fence:
                     fence = tuple(float(v) for v in a.fence.split(","))
                 self.view = telemetry_view.open_view("Manoeuvre  " + os.path.basename(self.path), self.say,
-                                                     fps=a.render_fps, fence=fence, fence_margin_m=a.fence_margin_m)
+                                                     fps=a.render_fps, fence=fence, fence_margin_m=a.fence_margin_m,
+                                                     pose_map=a.pose_map)
             except Exception as exc:
                 self.say("[VIEW] no display (%s: %s); the run goes on without the window" % (type(exc).__name__, exc))
                 self.view = None
@@ -924,7 +933,7 @@ def common_args(p, suppress):
     p.add_argument("--status-s", type=float, default=d(2.0))
     p.add_argument("--tail-s", type=float, default=d(3.0), help="telemetry kept after the final zero command")
     p.add_argument("--fence", default=d(None), metavar="XMIN,XMAX,YMIN,YMAX",
-                   help="the basin in the pose frame (x as sent, y negated, as log_parser reads it), "
+                   help="the basin in the pose frame of --pose-map (nov2026 by default), "
                         "e.g. the assumed 10 m x 25 m; a manoeuvre is stopped when the pose comes within "
                         "--fence-margin-m of an edge. Write it with '=' (--fence=-10,0,0,25), since a "
                         "negative first value would otherwise read as an option")
@@ -937,6 +946,9 @@ def common_args(p, suppress):
     p.add_argument("--no-render", dest="render", action="store_false", default=d(True),
                    help="no window: terminal only (the window is on by default)")
     p.add_argument("--render-fps", type=float, default=d(10.0), help="window redraws per second")
+    p.add_argument("--pose-map", choices=("nov2026", "july"), default=d("nov2026"),
+                   help="pose layout: nov2026 x=-B, y=A, heading=-C (the vessel since November 2026); july "
+                        "x=B, y=-A, heading=-C (July and February logs). Sets the frame of --fence")
 
 
 def build_parser():
