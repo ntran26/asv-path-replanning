@@ -11,8 +11,14 @@ data) cannot stop the recording.
     python udp_raw_logger.py --check imu_test_1.log        (line kinds of a saved log; no network)
     python udp_raw_logger.py --selftest                    (loopback test of this machine; no vessel)
 
-Needs only Python 3.6 or later: no numpy, pygame, model or simulator, and no other file of this
-repository, so the file can be copied on its own to any machine.  Stop with Ctrl+C; each
+Needs only Python 3.6 or later: no numpy, model or simulator, and no other file of this repository,
+so the file can be copied on its own to any machine.
+
+Display (on by default; --no-render turns it off): a window with the status, the track, the
+heading and the latest LiDAR returns in the pose frame, drawn by telemetry_view.py (pygame) at
+--render-fps.  It is optional: without pygame, without a screen, or without telemetry_view.py
+beside this file, one warning is printed and the recording goes on unchanged; an error while
+drawing closes the window, never the recording.  Closing the window does not stop the recording.  Stop with Ctrl+C; each
 datagram is on disk as soon as it arrives.
 
 Files (an existing name is never overwritten: _2, _3, ... is added):
@@ -195,12 +201,16 @@ def utc_now():
 
 def record(args, *, on_bound=None, stop_event=None, out=sys.stdout):
     """Run the handshake and record until Ctrl+C, --duration-s or `stop_event`.  Returns the meta dict."""
+    view_box = [None]                       # the window, when there is one
+
     def say(text):
         try:
             out.write(text + "\n")
             out.flush()
         except Exception:
             pass
+        if view_box[0] is not None:
+            view_box[0].note(text)
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -241,6 +251,13 @@ def record(args, *, on_bound=None, stop_event=None, out=sys.stdout):
     say("[RAW] recording to %s" % os.path.abspath(out_path))
     say("[RAW] listening on %s:%d; handshake '%s' to %s:%d; no command is ever sent; Ctrl+C stops"
         % (args.bind_ip, local_port, args.hello, server[0], server[1]))
+    if getattr(args, "render", False):
+        try:
+            import telemetry_view
+            view_box[0] = telemetry_view.open_view("Raw logger  " + os.path.basename(out_path), say,
+                                                   fps=getattr(args, "render_fps", 10.0))
+        except Exception as exc:
+            say("[VIEW] no display (%s: %s); recording continues without the window" % (type(exc).__name__, exc))
 
     kinds = Kinds() if not args.no_summary else None
     summary_errors = 0
@@ -257,6 +274,26 @@ def record(args, *, on_bound=None, stop_event=None, out=sys.stdout):
     deadline = t_start + args.duration_s if args.duration_s > 0 else None
     sock.settimeout(0.2)
     stopped_by = "ctrl+c"
+
+    def view_status():
+        now_ = time.monotonic()
+        lines = [os.path.basename(out_path), "elapsed %.0f s" % (now_ - t_start)]
+        if t_first is None:
+            lines.append(("waiting for the vessel (START sent %d x)" % hellos, (255, 200, 60)))
+        else:
+            span = (t_last - t_first) if t_last is not None else 0.0
+            lines.append("datagrams %d  (%.1f/s)  %.0f kB" % (n, (n - 1) / span if n > 1 and span > 0 else 0.0,
+                                                            n_bytes / 1e3))
+            lines.append("last datagram %.1f s ago" % (now_ - t_last))
+        lines.append("vessel answered hey: %s" % ("yes" if hey_seen else "no"))
+        if kinds is not None and kinds.rows:
+            lines.append("line kinds:")
+            for kind, row in sorted(kinds.rows.items(), key=lambda kv: -kv[1]["count"])[:7]:
+                rate = kinds.rate(row)
+                lines.append("  %-20s %6d %s" % (kind[:20], row["count"], "" if rate is None else "%5.1f/s" % rate))
+        lines.append(("no command is ever sent", (150, 156, 170)))
+        lines.append(("Ctrl+C in the terminal stops", (150, 156, 170)))
+        return lines
 
     def hello():
         nonlocal hellos, t_hello
@@ -318,6 +355,12 @@ def record(args, *, on_bound=None, stop_event=None, out=sys.stdout):
                         summary_errors += 1
                         if summary_errors == 1:
                             say("[RAW] summary error (the recording continues): %r" % (exc,))
+                # 3. Then the window, if any (SafeView: no error reaches this loop).
+                if view_box[0] is not None:
+                    for line in data.decode("utf-8", errors="replace").splitlines():
+                        view_box[0].feed(line, now)
+            if view_box[0] is not None:
+                view_box[0].tick(view_status)
 
             if now - t_status >= args.status_s:
                 t_status = now
@@ -336,6 +379,9 @@ def record(args, *, on_bound=None, stop_event=None, out=sys.stdout):
     except KeyboardInterrupt:
         stopped_by = "ctrl+c"
     finally:
+        if view_box[0] is not None:
+            view_box[0].close()
+            view_box[0] = None
         sock.close()
         log.close()
         arrivals.close()
@@ -492,7 +538,7 @@ def build_parser():
                                  allow_abbrev=False)
     ap.add_argument("--bind-ip", default="0.0.0.0")
     ap.add_argument("--local-port", type=int, default=5000)
-    ap.add_argument("--server-ip", default="127.0.0.1", help="the vessel-control computer")
+    ap.add_argument("--server-ip", default="192.168.8.198", help="the vessel-control computer")
     ap.add_argument("--server-port", type=int, default=5050)
     ap.add_argument("--hello", default=HELLO, help="handshake text (default START, as in July)")
     ap.add_argument("--hello-every-s", type=float, default=2.0,
@@ -503,6 +549,9 @@ def build_parser():
     ap.add_argument("--no-summary", action="store_true", help="no line kinds: record and status line only")
     ap.add_argument("--status-s", type=float, default=2.0, help="seconds between status lines")
     ap.add_argument("--table-s", type=float, default=10.0, help="seconds between line-kind tables; 0: at the end only")
+    ap.add_argument("--no-render", dest="render", action="store_false",
+                    help="no window: terminal only (the window is on by default)")
+    ap.add_argument("--render-fps", type=float, default=10.0, help="window redraws per second")
     ap.add_argument("--check", metavar="LOG", default=None, help="print the line kinds of a saved log and exit")
     ap.add_argument("--selftest", action="store_true", help="loopback test with a stand-in vessel, then exit")
     return ap

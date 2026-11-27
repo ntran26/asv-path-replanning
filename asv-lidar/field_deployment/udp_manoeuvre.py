@@ -42,6 +42,14 @@ Files (an existing name is never overwritten: _2, _3, ... is added):
   <out>.meta.json      options, manoeuvre, events (switch times, overshoots, stop), how it ended
 
 Needs only Python 3.6 or later and no other file of this repository.
+
+Display (on by default; --no-render turns it off): a window with the manoeuvre, its phase, the
+last command, the heading change, the speed and the fence, beside a map of the track, the heading,
+the latest LiDAR returns and the fence in the pose frame (telemetry_view.py, pygame, at
+--render-fps).  It is optional: without pygame, without a screen, or without telemetry_view.py
+beside this file, one warning is printed and everything else runs unchanged; an error while
+drawing closes the window, never the manoeuvre.  The window shows; it never commands: Enter in
+the terminal starts, Ctrl+C in the terminal stops.  Closing the window does not stop the run.
 """
 
 import argparse
@@ -351,6 +359,9 @@ class Runner:
         self.n_cmd = 0
         self.events = []
         self.ended = None
+        self.view = None                # telemetry_view.SafeView when the window is open
+        self.last_text = None           # the last $CMD text, for the window
+        self.waiting_enter = False
 
     def say(self, text):
         try:
@@ -358,6 +369,47 @@ class Runner:
             self.out.flush()
         except Exception:
             pass
+        if self.view is not None:
+            self.view.note(text)
+
+    def view_status(self):
+        a = self.a
+        lines = [describe(a)[:52],
+                 ("DRY RUN: no command is sent", (255, 200, 60)) if a.dry_run
+                 else ("COMMANDS ARE SENT to %s" % a.server_ip, (120, 230, 140)),
+                 "phase: %s" % self.phase]
+        if self.command is not None:
+            text, s2 = self.message(*self.command)
+            lines.append("last command: %s" % (self.last_text or text))
+            lines.append("rudder %+.0f %%   rpm %.1f   S2 %.1f" % (self.command[0], self.command[1], s2))
+        else:
+            lines.append("last command: none yet")
+        u = self.track.speed()
+        lines.append("heading change %+.1f deg" % self.track.unwrapped)
+        lines.append("speed %s" % ("-" if u is None else "%.2f m/s" % u))
+        if self.t_last_rx is not None:
+            lines.append("telemetry age %.2f s" % (time.monotonic() - self.t_last_rx))
+        inside = self.inside_fence()
+        if inside is None:
+            lines.append("fence: none" if getattr(a, "fence_box", None) is None else "fence: no pose yet")
+        else:
+            lines.append(("fence: inside (margin %.1f m)" % a.fence_margin_m, (120, 230, 140)) if inside
+                         else ("fence: OUTSIDE the margin", (255, 90, 90)))
+        if self.ended:
+            lines.append(("ended: %s" % self.ended, (255, 200, 60)))
+        lines.append(("Enter starts, Ctrl+C stops (in the terminal)", (150, 156, 170)))
+        return lines
+
+    def view_banner(self):
+        if self.ended and "fence" in self.ended and not self.a.allow_astern:
+            return ("FENCE: TAKE OVER BY RADIO CONTROL", (255, 90, 90))
+        if self.ended:
+            return None
+        if self.t_first_rx is None:
+            return ("WAITING FOR TELEMETRY", (255, 200, 60))
+        if self.waiting_enter:
+            return ("PRESS ENTER IN THE TERMINAL TO START", (255, 200, 60))
+        return None
 
     def event(self, kind, **data):
         t = None if self.t_manoeuvre is None else round(time.monotonic() - self.t_manoeuvre, 3)
@@ -391,6 +443,7 @@ class Runner:
         self.cmd_fh.flush()
         self.t_last_sent = now
         self.n_cmd += 1
+        self.last_text = text
         if reason != "keepalive":
             self.say("[CMD] %6.2f s  %-10s %s  (%s)" % (0.0 if self.t_manoeuvre is None else now - self.t_manoeuvre,
                                                      phase, text, reason))
@@ -410,6 +463,7 @@ class Runner:
 
     # -- telemetry -------------------------------------------------------------------------
     def receive(self, timeout):
+        self.render()                   # at most --render-fps times a second; a no-op without a window
         self.sock.settimeout(timeout)
         try:
             data, _ = self.sock.recvfrom(65535)
@@ -431,9 +485,15 @@ class Runner:
                 if RE_STAMP.match(line.strip()):
                     self.t_last_rx = now        # telemetry; the `hey` answers to commands do not count
                 self.track.feed(line, now)
+                if self.view is not None:
+                    self.view.feed(line, now)
         except Exception:
             pass
         return True
+
+    def render(self):
+        if self.view is not None:
+            self.view.tick(self.view_status, self.view_banner())
 
     def drain(self, until):
         """Receive until the monotonic time `until` (at least one short wait)."""
@@ -511,6 +571,17 @@ class Runner:
         self.say("[MAN] logging to %s" % os.path.abspath(self.path))
         self.say("[MAN] %s; vessel %s:%d; %s" % (describe(a), a.server_ip, a.server_port,
                                                  "DRY RUN: no command is sent" if a.dry_run else "commands are sent"))
+        if getattr(a, "render", False):
+            try:
+                import telemetry_view
+                fence = None
+                if a.fence:
+                    fence = tuple(float(v) for v in a.fence.split(","))
+                self.view = telemetry_view.open_view("Manoeuvre  " + os.path.basename(self.path), self.say,
+                                                     fps=a.render_fps, fence=fence, fence_margin_m=a.fence_margin_m)
+            except Exception as exc:
+                self.say("[VIEW] no display (%s: %s); the run goes on without the window" % (type(exc).__name__, exc))
+                self.view = None
         try:
             # 1. Handshake, until telemetry flows.
             hellos, t_hello = 0, -1e9
@@ -559,12 +630,14 @@ class Runner:
             else:
                 go = start_event
             last_status = time.monotonic()
+            self.waiting_enter = True
             while not go.is_set():
                 self.receive(0.1)
                 if time.monotonic() - last_status >= 5.0:
                     last_status = time.monotonic()
                     self.say("[MAN] waiting for Enter; datagrams %d, pose lines %d" % (self.n_rx, self.track.count))
             # 3. The manoeuvre.
+            self.waiting_enter = False
             self.t_manoeuvre = time.monotonic()
             self.event("manoeuvre start", manoeuvre=a.manoeuvre)
             steps = self.generator()
@@ -645,6 +718,12 @@ class Runner:
         self.close_files(meta)
         self.say("[MAN] ended (%s): %d datagrams, %d commands; %s" % (self.ended, self.n_rx, self.n_cmd,
                                                                      os.path.abspath(self.path)))
+        if self.view is not None:
+            self.view.tick(self.view_status, self.view_banner(), force=True)
+            if "fence" in str(self.ended):
+                time.sleep(2.0)         # keep the take-over banner on screen a moment
+            self.view.close()
+            self.view = None
         return meta
 
 
@@ -750,7 +829,7 @@ def selftest():
     def run_case(argv, silent_after_s=None, name=None):
         vessel = ToyVessel(silent_after_s)
         vessel.start()
-        args = build_parser().parse_args(["--server-ip", "127.0.0.1", "--server-port", str(vessel.port),
+        args = build_parser().parse_args(["--server-ip", "127.0.0.1", "--server-port", str(vessel.port), "--no-render",
                                           "--local-port", "0", "--out", os.path.join(folder, (name or argv[0]) + ".log")] + argv)
         finalise(args)
         go = threading.Event()
@@ -780,7 +859,7 @@ def selftest():
 
     # stop without --allow-astern is refused; with it, astern until stopped
     try:
-        args = build_parser().parse_args(["--server-ip", "127.0.0.1", "stop", "--rpm", "6"])
+        args = build_parser().parse_args(["--server-ip", "127.0.0.1", "--no-render", "stop", "--rpm", "6"])
         finalise(args)
         problems.append("stop: accepted without --allow-astern")
     except SystemExit:
@@ -855,6 +934,9 @@ def common_args(p, suppress):
     p.add_argument("--allow-astern", action="store_true", default=d(False),
                    help="permit negative S2 (only after the ESC test P-8)")
     p.add_argument("--dry-run", action="store_true", default=d(False), help="log the commands but send none")
+    p.add_argument("--no-render", dest="render", action="store_false", default=d(True),
+                   help="no window: terminal only (the window is on by default)")
+    p.add_argument("--render-fps", type=float, default=d(10.0), help="window redraws per second")
 
 
 def build_parser():

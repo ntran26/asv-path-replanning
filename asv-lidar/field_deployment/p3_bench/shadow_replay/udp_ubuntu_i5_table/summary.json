@@ -1,0 +1,181 @@
+{
+ "tag": "udp_ubuntu_i5_table",
+ "inproc": [],
+ "udp": [
+  {
+   "run_dir": "/home/nam/asv-path-replanning/asv-lidar/field_deployment/p3_bench/shadow_replay/udp_ubuntu_i5_table/udp/july-2026-07-03-1",
+   "decisions": 49,
+   "shadow_decisions": 49,
+   "phantom": {
+    "decisions_with_dynamic_track": 32,
+    "decisions_with_context": 32,
+    "decisions_engaged": 6,
+    "decisions_target_branch_nonzero": 32
+   },
+   "would_change": 0,
+   "first_would_change": null,
+   "would_stop_at": null,
+   "why_counts": {
+    "no escape": 5,
+    "nominal": 44
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "bridge_exit": 0,
+   "elapsed_s": 35.60272807199908,
+   "console": "/home/nam/asv-path-replanning/asv-lidar/field_deployment/p3_bench/shadow_replay/udp_ubuntu_i5_table/udp/july-2026-07-03-1.console.txt",
+   "log": "2026-07-03/1.log",
+   "offline": {
+    "reproduced": true,
+    "compared": 49,
+    "first_difference": null
+   }
+  },
+  {
+   "run_dir": "/home/nam/asv-path-replanning/asv-lidar/field_deployment/p3_bench/shadow_replay/udp_ubuntu_i5_table/udp/july-2026-07-03-2",
+   "decisions": 43,
+   "shadow_decisions": 43,
+   "phantom": {
+    "decisions_with_dynamic_track": 28,
+    "decisions_with_context": 28,
+    "decisions_engaged": 0,
+    "decisions_target_branch_nonzero": 28
+   },
+   "would_change": 7,
+   "first_would_change": 36,
+   "would_stop_at": 38,
+   "why_counts": {
+    "no escape": 6,
+    "nominal": 29,
+    "searched policy": 1,
+    "last certificate": 2,
+    "emergency stop": 5
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "bridge_exit": 0,
+   "elapsed_s": 32.568891568000254,
+   "console": "/home/nam/asv-path-replanning/asv-lidar/field_deployment/p3_bench/shadow_replay/udp_ubuntu_i5_table/udp/july-2026-07-03-2.console.txt",
+   "log": "2026-07-03/2.log",
+   "offline": {
+    "reproduced": true,
+    "compared": 43,
+    "first_difference": null
+   }
+  },
+  {
+   "run_dir": "/home/nam/asv-path-replanning/asv-lidar/field_deployment/p3_bench/shadow_replay/udp_ubuntu_i5_table/udp/july-2026-07-03-3",
+   "decisions": 41,
+   "shadow_decisions": 41,
+   "phantom": {
+    "decisions_with_dynamic_track": 0,
+    "decisions_with_context": 0,
+    "decisions_engaged": 0,
+    "decisions_target_branch_nonzero": 0
+   },
+   "would_change": 0,
+   "first_would_change": null,
+   "would_stop_at": null,
+   "why_counts": {
+    "no escape": 18,
+    "nominal": 15,
+    "searched policy": 3,
+    "policy prefix repaired": 1,
+    "idle": 4
+   },
+   "pose_stale": 0,
+   "backlog_frames": 0,
+   "passed": true,
+   "problems": [],
+   "bridge_exit": 0,
+   "elapsed_s": 31.613111545999345,
+   "console": "/home/nam/asv-path-replanning/asv-lidar/field_deployment/p3_bench/shadow_replay/udp_ubuntu_i5_table/udp/july-2026-07-03-3.console.txt",
+   "log": "2026-07-03/3.log",
+   "offline": {
+    "reproduced": true,
+    "compared": 41,
+    "first_difference": null
+   }
+  }
+ ],
+ "git_head": "b87cc9bed9ae9d2dca3da75e7d0b4c37478e79d2",
+ "timing_udp": [
+  {
+   "component": "observation",
+   "n": 130,
+   "p50_ms": 16.62417399984406,
+   "p95_ms": 41.973667749789456,
+   "p99_ms": 45.491444980634675,
+   "max_ms": 50.015520999295404
+  },
+  {
+   "component": "policy",
+   "n": 130,
+   "p50_ms": 1.307466499383736,
+   "p95_ms": 1.822868750332418,
+   "p99_ms": 2.5682949302790776,
+   "max_ms": 3.34828999984893
+  },
+  {
+   "component": "command",
+   "n": 130,
+   "p50_ms": 0.06837650016677799,
+   "p95_ms": 0.10204820000581094,
+   "p99_ms": 0.16316896988428176,
+   "max_ms": 0.2220719998149434
+  },
+  {
+   "component": "release_to_sent",
+   "n": 130,
+   "p50_ms": 20.20523599912849,
+   "p95_ms": 46.44786680046309,
+   "p99_ms": 48.34210853061449,
+   "max_ms": 54.36363999979221
+  },
+  {
+   "component": "lidar_line_to_sent",
+   "n": 130,
+   "p50_ms": 21.42172049934743,
+   "p95_ms": 46.89490649961953,
+   "p99_ms": 50.60119647034296,
+   "max_ms": 54.36363999979221
+  },
+  {
+   "component": "shadow_handoff",
+   "n": 130,
+   "p50_ms": 0.02608700015116483,
+   "p95_ms": 0.035899599879485315,
+   "p99_ms": 0.06259376143134428,
+   "max_ms": 0.06534200110763777
+  },
+  {
+   "component": "pose_wait",
+   "n": 130,
+   "p50_ms": 0.0,
+   "p95_ms": 5.952211400290253,
+   "p99_ms": 6.135455239800649,
+   "max_ms": 6.199941999511793
+  },
+  {
+   "component": "shadow_layer",
+   "n": 130,
+   "p50_ms": 63.66856499971618,
+   "p95_ms": 499.2097221498625,
+   "p99_ms": 648.6336701298933,
+   "max_ms": 673.1841319997329
+  },
+  {
+   "component": "shadow_behind_frame",
+   "n": 130,
+   "p50_ms": 84.32257175445557,
+   "p95_ms": 546.0674285888672,
+   "p99_ms": 823.6254286766041,
+   "max_ms": 1043.341875076294
+  }
+ ],
+ "passed": true
+}

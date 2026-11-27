@@ -1,0 +1,31 @@
+{
+ "run_id": "july-2026-07-03-2",
+ "geometry": "test_run case 2",
+ "safety": "shadow",
+ "lines": 86,
+ "backlog_frames": 0,
+ "backlog_max": 0,
+ "decisions": 43,
+ "frames_skipped": 0,
+ "errors": 0,
+ "line_kinds": {
+  "pose": 43,
+  "lidar": 43
+ },
+ "lines_not_decoded": 0,
+ "decode_errors": 0,
+ "pose_sync": {
+  "released": 43,
+  "stale": 0,
+  "superseded": 0
+ },
+ "shadow": {
+  "decisions": 43,
+  "changes": 7,
+  "first_change": 36,
+  "committed": 39,
+  "obs_mismatches": 0
+ },
+ "active_layer": null,
+ "operator_stops": []
+}

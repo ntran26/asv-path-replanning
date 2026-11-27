@@ -1,0 +1,64 @@
+{
+ "program": "udp_raw_logger.py",
+ "log": "/home/nam/asv-path-replanning/asv-lidar/field_deployment/2026-11-26/D0-5.log",
+ "started_utc": "2026-11-26T00:24:58.544+00:00",
+ "options": {
+  "bind_ip": "0.0.0.0",
+  "local_port": 5000,
+  "server_ip": "192.168.8.198",
+  "server_port": 5050,
+  "hello": "START",
+  "hello_every_s": 2.0,
+  "out": "2026-11-26/D0-5.log",
+  "duration_s": 0.0,
+  "no_summary": false,
+  "status_s": 2.0,
+  "table_s": 10.0,
+  "render": true,
+  "render_fps": 10.0,
+  "check": null,
+  "selftest": false
+ },
+ "python": "3.10.11",
+ "finished_utc": "2026-11-26T00:29:13.472+00:00",
+ "stopped_by": "ctrl+c",
+ "datagrams": 1379,
+ "bytes": 1187346,
+ "handshakes_sent": 1,
+ "vessel_answered_hey": true,
+ "seconds_to_first_datagram": 0.00013400299940258265,
+ "seconds_recorded": 254.0460717370006,
+ "summary_errors": 0,
+ "line_kinds": {
+  "hey": {
+   "verdict": "ignored",
+   "count": 490,
+   "example": "hey",
+   "first_arrival": 35072.179596596,
+   "last_arrival": 35325.856444245,
+   "first_vessel": null,
+   "last_vessel": null,
+   "rate_per_s": 1.9276493086850341
+  },
+  "pose (3 values)": {
+   "verdict": "read",
+   "count": 486,
+   "example": "[11:24:58.510102]+000.0,-005.9,-000.6",
+   "first_arrival": 35072.194244784,
+   "last_arrival": 35325.858737808,
+   "first_vessel": 41098.510102,
+   "last_vessel": 41353.008801,
+   "rate_per_s": 1.9057071879176621
+  },
+  "LiDAR scan (720)": {
+   "verdict": "read",
+   "count": 403,
+   "example": "[11:24:59.007072][  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  ",
+   "first_arrival": 35072.195222589,
+   "last_arrival": 35325.856811487,
+   "first_vessel": 41099.007072,
+   "last_vessel": 41353.007126,
+   "rate_per_s": 1.5826768288797515
+  }
+ }
+}
