@@ -40,9 +40,12 @@ Contents:
 | Run time per decision (bench) | `p3_timing.py` | no | the pinned environment |
 | Replay a saved log in the live window, with the full trajectory at the end | `log_replay_view.py` | no | pygame, `telemetry_view.py` |
 | Offline viewer of a raw log (July tools) | `log_viewer.py`, `rl_log_viewer.py` | no | pygame |
+| The vessel's ROS 2 topics received directly and served to the tools above as the vessel's lines (section 2.1) | `ros2_relay.py` | forwards the tools' `$CMD` only with `--vessel` | `python3` with ROS 2 Jazzy loaded; the vessel's network and `ROS_DOMAIN_ID` |
+| A relay log against the vessel's own log of the same run | `ros2_relay_check.py` | no | numpy |
 
 Only one program can receive at a time: the logger, the manoeuvre sender and the bridge all listen
-on UDP 5000. Stop one (Ctrl+C) before starting the next.
+on UDP 5000. Stop one (Ctrl+C) before starting the next. Through the ROS 2 relay (section 2.1)
+several can, each on its own `--local-port`.
 
 ## 2. The link to the vessel
 
@@ -92,18 +95,22 @@ on UDP 5000. Stop one (Ctrl+C) before starting the next.
     - `log_replay_view.py` replays the vessel's logs.
 - **Where the vessel's lines come from** (the vessel's ROS 2 Jazzy recording
   `rosbag2_2026_11_26-11_08_31`, 11:08:31-11:36:31, read with the `rosbags` library on
-  2026-11-27):
+  2026-11-27 and with ROS 2 Jazzy's own reader on 2026-11-28):
 
   | Line | ROS 2 source | Units and frame | Rate in the bag | Rate in the vessel's log | Rate over UDP |
   | --- | --- | --- | --- | --- | --- |
   | pose `[ts]A,B,C` | `/map_odom` (`map -> base_link`) | A = x, B = y (m, map frame, x forward and y left at SLAM start), C = yaw (deg, counter-clockwise) | 86 Hz | up to about 85/s | 2 Hz |
-  | LiDAR `[ts][r0..r719]` | `/scan` (`lidar_frame`, -179 to +180 deg, 720 beams) | ranges x 10 (dm), 0 for no return, same beam order | 10 Hz | 10/s | 2 Hz (less after Wi-Fi loss) |
-  | `GYRO,x,y,z` | `/imu/data_raw` (`imu_frame`) | deg/s; z counter-clockwise | 100 Hz | about 9.5/s | not sent |
+  | LiDAR `[ts][r0..r719]` | `/scan` (`lidar_frame`, -179 to +180 deg, 720 beams) | ranges x 10, truncated (0.1 m steps); 0 for no return and for returns of 1.0 m or less; same beam order | 10 Hz | 10/s | 2 Hz (less after Wi-Fi loss) |
+  | `GYRO`, `ACCEL`, `QUAT`, `SRVO` | no topic in the bag: an on-board IMU and the servo values, through `amsl_skipper` (`/imu/data_raw` is another IMU) | deg/s, z counter-clockwise; m/s^2 without gravity; unit quaternion; servo values | - | about 9.5/s | not sent |
 
-  - **Match quality:**
-    - pose against `/map_odom`: median error 0.04 m and 0.0 deg over 7,210 samples;
-    - scans against `/scan`: 400 of 400 identical;
-    - gyro against `/imu/data_raw`: correlation 0.995.
+  - **Match quality** (2026-11-28, `ros2_relay_check.py`, `p3_bench/relay_check/summary.json`):
+    - pose lines: 144,207 of 144,207 in the bag's span written identically from `/map_odom`;
+    - LiDAR lines: 16,743 of 16,747 identical from `/scan`; the other four have the same values
+      (three written in a burst 0.4-0.6 s late as the vessel's log started, one without the
+      padding spaces);
+    - `GYRO` against `/imu/data_raw`: yaw rate correlation 0.975 (slope 0.98), as two sensors on
+      one hull would give; acceleration correlation below 0.3, the quaternions' headings
+      unrelated, and different steps (0.0625 against 0.112 deg/s): not the same sensor.
   - **`/tf_static`:**
     - `base_link -> lidar_frame`: 0.63 m forward and **yaw 180 deg**, so the LiDAR is mounted
       facing aft;
@@ -147,6 +154,109 @@ on UDP 5000. Stop one (Ctrl+C) before starting the next.
     it must be changed before it runs on the vessel.
 - Network: the July set-up (P-11). The Ubuntu laptop's firewall (ufw) is disabled and stays so;
   UDP 5000, 5001 and 5050 are free on it (checked 2026-11-25).
+
+### 2.1 The ROS 2 relay: `ros2_relay.py`
+
+With ROS 2 Jazzy on the shore laptop (installed 2026-11-28; Python 3.12), the laptop can subscribe
+to the vessel's topics itself instead of taking `amsl_skipper`'s 2 Hz stream. `ros2_relay.py`
+does that and serves the field tools as the vessel's UDP link does: a tool sends START to the
+relay (127.0.0.1:5051), the relay answers `hey` and streams lines in the vessel's own format. The
+logger, the manoeuvre sender and the bridge run unchanged apart from
+`--server-ip 127.0.0.1 --server-port 5051`.
+
+| | The vessel's UDP stream | The relay |
+| --- | --- | --- |
+| Pose lines | 2/s | every `/map_odom` message, about 86/s |
+| LiDAR lines | 2/s, 15-30 % lost on Wi-Fi | 2/s by default (`--lidar-hz 0`: every scan, 10/s) |
+| IMU lines | none | `/imu/data_raw` at 10/s (`--imu-hz 0`: 100/s) |
+| Servo lines (`SRVO`) | none | none (no ROS topic carries them) |
+| `hey` | about 2/s | 2/s, and in reply to each START |
+| Tools listening at once | one (port 5000) | several, each on its own `--local-port` |
+
+- **The same text as the vessel's own log.** On the recording of 2026-11-26 the relay's lines
+  reproduce the vessel's pose lines and LiDAR lines character for character (counts in section 2
+  under "Match quality"; `p3_bench/relay_check/`).
+- **IMU lines are `/imu/data_raw`**, converted to the vessel's units (deg/s), not the vessel's
+  on-board IMU behind its `GYRO` lines: the yaw rates agree, the accelerations and quaternions do
+  not. `log_parser` reads them as it reads the vessel's.
+- **LiDAR at 2/s by default.** The bridge decides on every LiDAR line and skips one less than
+  0.4 s after the last decision's, so the relay passes one scan per 0.5 s on average, never two
+  closer than 0.425 s: from scans 0.098 s apart, intervals of 0.49 or 0.59 s.
+- **Pose layout.** `--pose-layout vessel` (default) writes the vessel's layout (`nov2026`).
+  `--pose-layout july` writes -A, -B, C, which the bridge's decoder (still in the July layout)
+  reads as the same position and heading that `nov2026` gives; this is for the bridge only.
+- **Commands** from the tools go to the vessel only with `--vessel IP:5050`, from a separate
+  socket; without it they are counted and dropped. Whether `amsl_skipper` accepts `$CMD` from a
+  sender that never sent START is not known yet (a question for the operator).
+- **ROS 2 network.** Same `ROS_DOMAIN_ID` as the vessel; discovery runs by multicast over the
+  basin Wi-Fi. Not yet tried with the vessel. Every 10 s the relay prints its rates; with no
+  `/map_odom` message it names the domain to check.
+- **Bench test (2026-11-28, this laptop):** the recording played on a private domain
+  (`ROS_DOMAIN_ID=77`, localhost only) into two relays, the raw logger on one and the bridge in
+  no-send mode on the other (`--pose-layout july`), 127 s: the logger received 10,944 pose lines
+  (86/s), 1,277 LiDAR lines (10/s) and IMU lines (10/s each), and its log matched the vessel's
+  own log of those minutes (pose 99.99 %, LiDAR 99.92 % identical); the bridge made 254
+  decisions, 0.494-0.598 s apart, every pose fresh.
+
+Self-test (no ROS needed): formats, the parser, the LiDAR gate, handshake, two tools, command
+forwarding:
+
+```bash
+python3 ros2_relay.py --selftest
+```
+
+On the day. Terminal 1, the relay (`VESSEL_DOMAIN` from the operator; `IP` as in section 12):
+
+```bash
+cd ~/asv-path-replanning/asv-lidar/field_deployment
+source /opt/ros/jazzy/setup.bash
+export ROS_DOMAIN_ID=${VESSEL_DOMAIN:?set VESSEL_DOMAIN first}
+ros2 topic hz /map_odom
+mkdir -p $(date +%F)
+python3 ros2_relay.py --vessel $IP:5050 --log $(date +%F)/relay-01.log
+```
+
+(`ros2 topic hz` should show about 86 Hz; stop it with Ctrl+C before starting the relay.)
+Terminal 2, a tool on the relay:
+
+```bash
+cd ~/asv-path-replanning/asv-lidar/field_deployment
+python udp_raw_logger.py --server-ip 127.0.0.1 --server-port 5051 --out $(date +%F)/R-01.log --duration-s 120
+```
+
+For the bridge, the relay runs with `--pose-layout july` until the bridge reads `nov2026`:
+
+```bash
+python3 ros2_relay.py --vessel $IP:5050 --pose-layout july --log $(date +%F)/relay-02.log
+python udp_live_p3.py --server-ip 127.0.0.1 --server-port 5051 --layout L1 --run-id relay-link-01 --no-send
+```
+
+A recorded bag as a raw log (stamps: the bag's arrival times), and the check against the vessel's
+own log of the same run:
+
+```bash
+source /opt/ros/jazzy/setup.bash
+python3 ros2_relay.py --bag ~/rosbag2_2026_11_26-11_08_31 --log relay_from_bag.log --lidar-hz 0
+python ros2_relay_check.py relay_from_bag.log 2026-11-26/RAW_LOG.log
+```
+
+Bench replay without the vessel (private domain, bench ports), three terminals:
+
+```bash
+source /opt/ros/jazzy/setup.bash
+export ROS_DOMAIN_ID=77 ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
+python3 ros2_relay.py --listen-port 15051
+```
+
+```bash
+python udp_raw_logger.py --server-ip 127.0.0.1 --server-port 15051 --local-port 15000 --out relay_bench.log --duration-s 60
+```
+
+```bash
+source /opt/ros/jazzy/setup.bash
+export ROS_DOMAIN_ID=77 ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
+ros2 bag play ~/rosbag2_2026_11_26-11_08_31 --start-offset 900 --playback-duration 60
+```
 
 ## 3. `udp_raw_logger.py`: raw telemetry logger
 
@@ -998,4 +1108,7 @@ python udp_live_p3.py --server-ip $IP --layout L1 --run-id link-2026-11-26 --no-
 python udp_live_p3.py --server-ip $IP --scenario easy_1 --run-id T1-easy_1-r1 --record-video
 python log_replay_view.py 2026-11-26/D0-5.log --full-track
 python fake_vessel_replay.py --log 2026-11-26/D0-4-RAW.log --port 15050
+python3 ros2_relay.py --selftest
+python3 ros2_relay.py --vessel $IP:5050 --log $(date +%F)/relay-01.log
+python udp_raw_logger.py --server-ip 127.0.0.1 --server-port 5051 --out $(date +%F)/R-01.log --duration-s 120
 ```

@@ -1,15 +1,15 @@
 {
  "program": "udp_raw_logger.py",
- "log": "/home/nam/asv-path-replanning/asv-lidar/field_deployment/2026-11-26/D0-1.log",
- "started_utc": "2026-11-25T23:29:14.630+00:00",
+ "log": "/home/nam/asv-path-replanning/asv-lidar/field_deployment/2026-11-26/D0-1-1.log",
+ "started_utc": "2026-11-26T00:13:10.804+00:00",
  "options": {
   "bind_ip": "0.0.0.0",
   "local_port": 5000,
-  "server_ip": "192.168.8.197",
+  "server_ip": "192.168.8.198",
   "server_port": 5050,
   "hello": "START",
   "hello_every_s": 2.0,
-  "out": "2026-11-26/D0-1.log",
+  "out": "2026-11-26/D0-1-1.log",
   "duration_s": 0.0,
   "no_summary": false,
   "status_s": 2.0,
@@ -20,45 +20,45 @@
   "selftest": false
  },
  "python": "3.10.11",
- "finished_utc": "2026-11-25T23:33:37.543+00:00",
+ "finished_utc": "2026-11-26T00:15:11.290+00:00",
  "stopped_by": "ctrl+c",
- "datagrams": 1334,
- "bytes": 1391955,
+ "datagrams": 668,
+ "bytes": 560180,
  "handshakes_sent": 1,
  "vessel_answered_hey": true,
- "seconds_to_first_datagram": 0.30469299600008526,
- "seconds_recorded": 261.90854009800023,
+ "seconds_to_first_datagram": 0.46980222299316665,
+ "seconds_recorded": 119.73574892099714,
  "summary_errors": 0,
  "line_kinds": {
   "hey": {
    "verdict": "ignored",
-   "count": 326,
+   "count": 239,
    "example": "hey",
-   "first_arrival": 31729.420822826,
-   "last_arrival": 31963.917153952,
+   "first_arrival": 34364.777358764,
+   "last_arrival": 34483.821657999,
    "first_vessel": null,
    "last_vessel": null,
-   "rate_per_s": 1.3859491892236497
+   "rate_per_s": 1.999255752097587
   },
   "LiDAR scan (720)": {
    "verdict": "read",
-   "count": 473,
-   "example": "[10:29:16.605804][  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  ",
-   "first_arrival": 31729.42973435,
-   "last_arrival": 31963.917500762,
-   "first_vessel": 37756.605804,
-   "last_vessel": 37991.105656,
-   "rate_per_s": 2.0127944473073627
+   "count": 190,
+   "example": "[11:13:12.007073][  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  ",
+   "first_arrival": 34364.787084169,
+   "last_arrival": 34483.821945919,
+   "first_vessel": 40392.007073,
+   "last_vessel": 40511.007108,
+   "rate_per_s": 1.5882348269897928
   },
   "pose (3 values)": {
    "verdict": "read",
-   "count": 535,
-   "example": "[10:29:16.608031]-000.4,-005.9,-013.9",
-   "first_arrival": 31729.433251075,
-   "last_arrival": 31963.918153633,
-   "first_vessel": 37756.608031,
-   "last_vessel": 37991.107735,
-   "rate_per_s": 2.2771883754702427
+   "count": 239,
+   "example": "[11:13:12.009011]+000.0,-005.9,-023.1",
+   "first_arrival": 34364.789492143,
+   "last_arrival": 34483.823659371,
+   "first_vessel": 40392.009011,
+   "last_vessel": 40511.008891,
+   "rate_per_s": 2.000002016808828
   }
  }
 }

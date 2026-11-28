@@ -1,0 +1,85 @@
+{
+ "relay_log": "the raw logger's log of the bench test of 2026-11-28 (ros2 bag play --start-offset 900 --playback-duration 130, ROS_DOMAIN_ID=77, relay --lidar-hz 0 --stamp header)",
+ "vessel_log": "2026-11-26/RAW_LOG.log",
+ "relay_lines": {
+  "pose": 10940,
+  "LiDAR": 1277,
+  "GYRO": 1277,
+  "ACCEL": 1277,
+  "QUAT": 1277,
+  "SRVO": 0
+ },
+ "vessel_lines": {
+  "pose": 147146,
+  "LiDAR": 17064,
+  "GYRO": 16561,
+  "ACCEL": 16562,
+  "QUAT": 16562,
+  "SRVO": 16562
+ },
+ "pose": {
+  "vessel_lines_in_span": 10939,
+  "identical": 10938,
+  "share": 0.9999085839656275,
+  "vessel_minus_relay_stamp_s": {
+   "median": 0.004440500000782777,
+   "p5": -0.0019183000018529127,
+   "p95": 0.015252450003754347
+  },
+  "first_misses_s_of_day": [
+   41013.961
+  ]
+ },
+ "lidar": {
+  "vessel_lines_in_span": 1276,
+  "identical": 1275,
+  "share": 0.9992163009404389,
+  "vessel_minus_relay_stamp_s": {
+   "median": 0.10048200000164798,
+   "p5": 0.09702139999644714,
+   "p95": 0.10240510000294308
+  },
+  "first_misses_s_of_day": [
+   41013.926
+  ]
+ },
+ "gyro_deg_s": {
+  "relay_samples": 1277,
+  "vessel_samples_in_span": 1208,
+  "x": {
+   "corr": 0.9145577226795657,
+   "slope_vessel_on_relay": 0.9544688409220508,
+   "rms_diff": 0.9064570605856278
+  },
+  "y": {
+   "corr": 0.14905309840781789,
+   "slope_vessel_on_relay": 0.6576698625356692,
+   "rms_diff": 2.300951146272685
+  },
+  "z": {
+   "corr": 0.9851437989586274,
+   "slope_vessel_on_relay": 1.0180000600357102,
+   "rms_diff": 2.1968553228195042
+  }
+ },
+ "accel_m_s2": {
+  "relay_samples": 1277,
+  "vessel_samples_in_span": 1208,
+  "x": {
+   "corr": 0.2690927103488473,
+   "slope_vessel_on_relay": 0.7574397082919686,
+   "rms_diff": 0.19115665931513004
+  },
+  "y": {
+   "corr": -0.06787144259959538,
+   "slope_vessel_on_relay": -0.18670382918779524,
+   "rms_diff": 0.1552366895587475
+  },
+  "z": {
+   "corr": -0.12305074175543969,
+   "slope_vessel_on_relay": -0.6350479844918617,
+   "rms_diff": 0.21194203355674412
+  }
+ },
+ "note": "IMU: relay = ROS /imu/data_raw, vessel = its on-board IMU (no ROS topic); SRVO has no ROS source"
+}
