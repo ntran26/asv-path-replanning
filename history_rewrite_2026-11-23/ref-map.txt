@@ -1,3 +1,0 @@
-old                                      new                                      ref
-ba8288d37c480f73347962e8d4e997cb1c8dbf83 615f5ea5b840520a69220f16c4813d0cb441521b refs/heads/master
-e7dbd81866647d58dce7dc7a64823bea93cb0a88 53646ec9692ad9c4ee508723cc7977c82f58884a refs/tags/baseline-v1
