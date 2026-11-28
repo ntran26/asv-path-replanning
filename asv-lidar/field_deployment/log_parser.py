@@ -9,6 +9,17 @@ Log file format:
 
 Parse values: Position and Lidar
 
+The vessel's own log (RAW_LOG, datalogs/laser_*.log; checked on the D0 logs of 2026-11-26) adds
+IMU and servo lines, `[HH:MM:SS.ffffff]<counter ms>,<KIND>,<values>`:
+- GYRO,x,y,z   angular rate, deg/s (z: yaw, counter-clockwise positive; 1/16 deg/s steps)
+- ACCEL,x,y,z  linear acceleration, m/s^2, gravity removed (0.01 steps)
+- QUAT,x,y,z,w orientation quaternion, unit norm (its heading drifts; not a heading reference)
+- SRVO,s1,s2,f1,f2  servo values (about 1000-2000) and two flags
+about 9.5 Hz each, with pose lines at up to about 85 Hz (repeated in bursts) and LiDAR at 10 Hz.
+BluefinStreamDecoder.raw_format() reads it: the IMU and servo values ride on each frame, the pose is
+read in the November 2026 layout, and speeds come from poses about 0.5 s apart.  The defaults keep
+the July 2026 behaviour (July layout, consecutive-pose speeds, IMU lines skipped).
+
 Outputs:
 - Lidar ranges (full and snipped)
 - Position (X,Y)
@@ -71,6 +82,14 @@ class BluefinFrame:
     s1: Optional[int] = None
     s2: Optional[int] = None
     seq: Optional[int] = None
+
+    # The vessel's raw-log lines (None when the stream carries none): the latest value of each
+    gyro_dps: Optional[Tuple[float, float, float]] = None
+    accel_mps2: Optional[Tuple[float, float, float]] = None
+    quat_xyzw: Optional[Tuple[float, float, float, float]] = None
+    srvo: Optional[Tuple[int, int, int, int]] = None
+    imu_t_sec: Optional[float] = None
+    imu_counter_ms: Optional[int] = None
 
 # Helper Functions
 
@@ -136,13 +155,23 @@ def _downsample_stride(arr: np.ndarray, out_n: int) -> np.ndarray:
     return arr[idx]
 
 # Streaming Decoder
+# Pose layouts: a pose line [ts]A,B,C as (x, y, heading deg clockwise from +y).
+#   july    x = B,  y = -A, heading = -C   July 2026 and February 2026 logs (the default here)
+#   nov2026 x = -B, y = A,  heading = -C   the vessel's output since November 2026 (D0 logs and
+#                                          videos of 2026-11-26; as --pose-map in the field tools)
+POSE_MAPS = {
+    "july": lambda a, b, c: (b, -a, -c),
+    "nov2026": lambda a, b, c: (-b, a, -c),
+}
+
+
 class BluefinStreamDecoder:
     """
     A decoder that takes lines and outputs BluefinFrame objects
     Output a frame when there is a LiDAR line
     """
 
-    """
+    r"""
     Regex patterns matching the line formats
         re.compile(pattern): pre-compile regex to run faster
         r"..": raw string
@@ -181,6 +210,12 @@ class BluefinStreamDecoder:
         r"^\[(?P<ts>\d{2}:\d{2}:\d{2}\.\d{6})\]\[(?P<body>.*)\]\s*$"
     )
 
+    # The vessel's raw log: [ts]<counter ms>,<GYRO|ACCEL|QUAT|SRVO>,<values>
+    _re_vessel = re.compile(
+        r"^\[(?P<ts>\d{2}:\d{2}:\d{2}\.\d{6})\](?P<counter>\d+),(?P<kind>GYRO|ACCEL|QUAT|SRVO),"
+        r"(?P<vals>[-+0-9.,]+)\s*$"
+    )
+
     def __init__(
             self,
             *,
@@ -188,7 +223,9 @@ class BluefinStreamDecoder:
             lidar_angle_offset_deg: float = 0,
             lidar_max_m: float = 16,
             lidar_unit_scale: float = 0.1,
-            lidar_out_of_range: bool = True) -> None:
+            lidar_out_of_range: bool = True,
+            pose_map: str = "july",
+            velocity_window_s: float = 0.0) -> None:
         """
         lidar_out_beams:
             Output beam count after optional downsampling
@@ -200,7 +237,24 @@ class BluefinStreamDecoder:
             Convert integers to meters (dm -> m)
         lidar_out_of_range:
             if True, replace zeros with lidar_max_m
+        pose_map:
+            "july" (default) or "nov2026": how a pose line [ts]A,B,C is read (POSE_MAPS)
+        velocity_window_s:
+            0 (default): velocity and yaw rate from consecutive pose lines, as in July;
+            > 0: from the pose about this long before (the vessel's raw log repeats pose lines
+            in bursts about 1 ms apart, with 0.1 m steps, so consecutive differences are noise)
         """
+        if pose_map not in POSE_MAPS:
+            raise ValueError("pose_map must be one of %s" % sorted(POSE_MAPS))
+        self.pose_map = pose_map
+        self._pose_fn = POSE_MAPS[pose_map]
+        self.velocity_window_s = float(velocity_window_s)
+        self._pose_hist = []            # (t, x, y, unwrapped yaw) within the window
+        self._yaw_unwrapped = None
+        # The vessel's raw-log values, latched
+        self._gyro = self._accel = self._quat = self._srvo = None
+        self._imu_t = None
+        self._imu_counter = None
         self.lidar_out_beams = int(lidar_out_beams)
         self.lidar_angle_offset_deg = float(lidar_angle_offset_deg)
         self.lidar_max_m = float(lidar_max_m)
@@ -224,6 +278,14 @@ class BluefinStreamDecoder:
         self._last_vel: Tuple[float, float, float, float] = (0, 0, 0, 0, 0, 0)  # add u and v
         self._max_spd: Optional[float] = 0
 
+    @classmethod
+    def raw_format(cls, **kw) -> "BluefinStreamDecoder":
+        """A decoder for the vessel's raw log (and a stream in its format): November 2026 pose
+        layout, speeds over 0.5 s.  Any argument may still be given."""
+        kw.setdefault("pose_map", "nov2026")
+        kw.setdefault("velocity_window_s", 0.5)
+        return cls(**kw)
+
     # Pose + velocity state
     def _real_time(self, ts_str: str) -> float:
         """
@@ -245,6 +307,31 @@ class BluefinStreamDecoder:
         if not line:
             return None
         
+        # 0a. The vessel's IMU and servo lines (raw log)
+        m = self._re_vessel.match(line)
+        if m:
+            try:
+                vals = [float(v) for v in m.group("vals").split(",") if v != ""]
+            except ValueError:
+                return None
+            kind = m.group("kind")
+            if kind == "GYRO" and len(vals) == 3:
+                self._gyro = tuple(vals)
+            elif kind == "ACCEL" and len(vals) == 3:
+                self._accel = tuple(vals)
+            elif kind == "QUAT" and len(vals) == 4:
+                self._quat = tuple(vals)
+            elif kind == "SRVO" and len(vals) == 4:
+                self._srvo = tuple(int(v) for v in vals)
+            else:
+                return None
+            # Time since the run's origin, without setting it: the origin stays the first pose,
+            # LiDAR, RC or HDG line, as before IMU lines were read
+            sec = _ts_to_seconds(m.group("ts"))
+            self._imu_t = None if self._t0 is None else sec - self._t0
+            self._imu_counter = int(m.group("counter"))
+            return None
+
         # 0. RC line
         m = self._re_rc.match(line)
         if m:
@@ -266,9 +353,34 @@ class BluefinStreamDecoder:
             ts_str = m.group("ts")
             t = self._real_time(ts_str)
 
-            x = float(m.group("x"))
-            y = -float(m.group("y"))
-            yaw_deg = -float(m.group("yaw"))
+            x, y, yaw_deg = self._pose_fn(float(m.group("y")), float(m.group("x")), float(m.group("yaw")))
+
+            # Velocity over a window (raw-log streams): from the pose about velocity_window_s ago
+            if self.velocity_window_s > 0:
+                if self._yaw_unwrapped is None:
+                    self._yaw_unwrapped = yaw_deg
+                else:
+                    self._yaw_unwrapped += _wrap_180(yaw_deg - self._last_pose[2])
+                self._pose_hist.append((t, x, y, self._yaw_unwrapped))
+                while len(self._pose_hist) > 2 and t - self._pose_hist[1][0] >= self.velocity_window_s:
+                    self._pose_hist.pop(0)
+                t0, x0, y0, h0 = self._pose_hist[0]
+                dt = t - t0
+                if dt >= 0.5 * self.velocity_window_s:
+                    vx = (x - x0) / dt
+                    vy = (y - y0) / dt
+                    spd = np.hypot(vx, vy)
+                    yaw_rate = (self._yaw_unwrapped - h0) / dt
+                    yaw_rad = np.deg2rad(yaw_deg)
+                    u_body = vx * np.sin(yaw_rad) + vy * np.cos(yaw_rad)
+                    v_body = -vx * np.cos(yaw_rad) + vy * np.sin(yaw_rad)
+                    self._last_vel = (vx, vy, spd, u_body, v_body, yaw_rate)
+                    if spd > self._max_spd:
+                        self._max_spd = spd
+                        print(f"Max velocity: {spd:.3f} m/s")
+                self._last_pose = (x, y, yaw_deg)
+                self._last_pose_t = t
+                return None
 
             # Velocity and heading rate
             if self._last_pose is not None and self._last_pose_t is not None:
@@ -335,7 +447,13 @@ class BluefinStreamDecoder:
                 hdg_ref_deg = self._last_hdg_ref,
                 s1 = self._last_s1,
                 s2 = self._last_s2,
-                seq = self._last_seq
+                seq = self._last_seq,
+                gyro_dps = self._gyro,
+                accel_mps2 = self._accel,
+                quat_xyzw = self._quat,
+                srvo = self._srvo,
+                imu_t_sec = self._imu_t,
+                imu_counter_ms = self._imu_counter
             )
         return None
         

@@ -31,7 +31,8 @@ Console: a status line every few seconds (datagrams, rate, time since the last o
 of line kinds.  The first line of each new kind is printed in full when it arrives, so a new IMU
 line shows its format at once.  Beside each kind is what the bridges' decoder
 (`log_parser.BluefinStreamDecoder`) would do with it:
-  read                  a LiDAR scan (720 integers), pose, HDG or RC line, as in July
+  read                  a LiDAR scan (720 integers), pose, HDG or RC line, as in July, or one of the
+                        vessel's own IMU/servo lines (GYRO, ACCEL, QUAT, SRVO)
   ignored               the decoder skips the line (a `hey` line, a labelled IMU line, ...)
   taken as a scan       a bracketed list of integers that is not 720 long: the decoder would
                         read it as a LiDAR scan
@@ -68,6 +69,10 @@ RE_RC = re.compile(
     r"S1:(?P<s1>\d+)\s*S2:(?P<s2>\d+)\s*RC\s*$")
 RE_LIDAR = re.compile(
     r"^\[(?P<ts>\d{2}:\d{2}:\d{2}\.\d{6})\]\[(?P<body>.*)\]\s*$")
+# The vessel's own log adds IMU and servo lines; log_parser reads them since 2026-11-27.
+RE_VESSEL = re.compile(
+    r"^\[(?P<ts>\d{2}:\d{2}:\d{2}\.\d{6})\](?P<counter>\d+),(?P<kind>GYRO|ACCEL|QUAT|SRVO),"
+    r"(?P<vals>[-+0-9.,]+)\s*$")
 
 RE_TS = re.compile(r"^\[(\d{2}):(\d{2}):(\d{2})\.(\d+)\]")
 RE_INT = re.compile(r"[-+]?\d+")
@@ -100,6 +105,9 @@ def classify(line):
         return "HDG", "read"
     if RE_POSE.match(s):
         return "pose (3 values)", "read"
+    m = RE_VESSEL.match(s)
+    if m:
+        return "vessel %s (%d values)" % (m.group("kind"), len([v for v in m.group("vals").split(",") if v])), "read"
     m = RE_LIDAR.match(s)
     if m:
         values = [p.strip() for p in m.group("body").split(",")]
@@ -440,9 +448,10 @@ SAMPLE_LINES = [
     "IMU,0.012,-0.034,9.810",
     "[10:00:00.080000][01935] HDG:350.75",
     "[10:00:00.090000][01936] S1:1500 S2:1500 RC",
+    "[10:00:00.095000]006685016,GYRO,+000.250000,+000.062500,-000.062500",
 ]
 SAMPLE_VERDICTS = ["ignored", "read", "read", "ignored", "decoder error", "taken as a scan", "decoder error",
-                   "ignored", "decoder error", "ignored", "read", "read"]
+                   "ignored", "decoder error", "ignored", "read", "read", "read"]
 
 
 def selftest():
@@ -454,7 +463,8 @@ def selftest():
         here = os.path.dirname(os.path.abspath(__file__))
         sys.path.insert(0, here)
         from log_parser import BluefinStreamDecoder as D
-        for name, mine in (("_re_hdg", RE_HDG), ("_re_pose", RE_POSE), ("_re_rc", RE_RC), ("_re_lidar", RE_LIDAR)):
+        for name, mine in (("_re_hdg", RE_HDG), ("_re_pose", RE_POSE), ("_re_rc", RE_RC), ("_re_lidar", RE_LIDAR),
+                           ("_re_vessel", RE_VESSEL)):
             if getattr(D, name).pattern != mine.pattern:
                 problems.append("format %s differs from log_parser's" % name)
         print("[SELFTEST] formats equal to log_parser's" if not problems else "[SELFTEST] " + "; ".join(problems))
