@@ -100,8 +100,8 @@ the operator and safety roles are held by different people.
    UDP 5000 free
    ```
 
-4. **Python and the working folder.** Python 3.10.11 is the command `python`. On this laptop
-   `python3` is Ubuntu's own 3.12; the tools also run on it, but the project uses `python`.
+4. **Python and the working folder.** The command `python` is Python 3.12.3 (Ubuntu's own,
+   also `python3`; 3.10.11 until 2026-11-28).
 
    ```bash
    cd ~/asv-path-replanning/asv-lidar/field_deployment
@@ -110,7 +110,7 @@ the operator and safety roles are held by different people.
    mkdir -p 2026-11-26
    ```
 
-   Expected: `Python 3.10.11`. Write the commit (b87cc9bed or later) on the run sheet. Do not run
+   Expected: `Python 3.12.3`. Write the commit (b87cc9bed or later) on the run sheet. Do not run
    `git pull` at the basin.
 5. **Self-test, once more:**
 

@@ -23,7 +23,7 @@ this note.
   `static_dynamic_obstacles/runs/sac_formulation_seed0_bl3/best_model.zip`, the stopping table
   `field_deployment/p3_stopping_profiles.pkl`, the July logs `field_deployment/2026-07-0*/` and
   test set v4 (`static_dynamic_obstacles/results/test_set/v4/definition.*`) are tracked.
-- Python 3.10 with `static_dynamic_obstacles/requirements.txt` (numpy 1.26.4, torch 2.2.1,
+- Python 3.12 (3.10 until 2026-11-28) with `static_dynamic_obstacles/requirements.txt` (numpy 1.26.4, torch 2.2.1,
   gymnasium 0.29.1, stable-baselines3 2.3.2, sb3-contrib 2.3.0, pandas 2.2.1), plus the versions
   on the university laptop of the packages the bridge also imports: pygame 2.5.2,
   opencv-python 4.11.0.86, scipy 1.15.3, matplotlib 3.8.3.

@@ -1,5 +1,10 @@
 # Paper 3 -- package versions the tests and runs were made with (F76).
-# Python 3.10.
+# The runs were made on Python 3.10.  The project's Python is 3.12 since 2026-11-28 (the version
+# ROS 2 Jazzy uses), with these same pins: on the Ubuntu laptop the full test suite, the decoding
+# of every field log and the parity bench gave the same results on 3.12.3 as on 3.10.11.
+# torch is the CPU build: --extra-index-url https://download.pytorch.org/whl/cpu, torch==2.2.1+cpu.
+# On 3.12, protobuf 3.19.6 (pinned by tensorboard 2.10.1) runs its pure-Python version: TensorBoard
+# writes are slower and print deprecation warnings; results are unaffected.
 numpy==1.26.4
 torch==2.2.1
 gymnasium==0.29.1

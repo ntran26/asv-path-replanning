@@ -45,10 +45,14 @@ SIM_ROOT = FIELD_DIR.parent / "static_dynamic_obstacles"
 SIM_SRC = SIM_ROOT / "src"
 
 # The simulator's sources first (field_deployment carries Paper 2 modules of the same names);
-# the diagnostics, the identified model and the bridge after them.
+# the identified model next, ahead of the installed packages (its `validate` shares a name with
+# configobj's module, which Ubuntu's Python 3.12 installs system-wide); the diagnostics and the
+# bridge after them.
 if str(SIM_SRC) not in sys.path:
     sys.path.insert(0, str(SIM_SRC))
-for _extra in (SIM_ROOT / "tools" / "diagnostics", SIM_ROOT / "bluefin", FIELD_DIR):
+if str(SIM_ROOT / "bluefin") not in sys.path:
+    sys.path.insert(sys.path.index(str(SIM_SRC)) + 1, str(SIM_ROOT / "bluefin"))
+for _extra in (SIM_ROOT / "tools" / "diagnostics", FIELD_DIR):
     if str(_extra) not in sys.path:
         sys.path.append(str(_extra))
 

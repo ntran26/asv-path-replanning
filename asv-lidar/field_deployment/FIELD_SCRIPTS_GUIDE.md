@@ -1,14 +1,17 @@
 # Field scripts: how to use them (calibration and field trials)
 
-Written 2026-11-25 on the Ubuntu lab laptop (host SIMDELL; Python 3.10.11; repository at
-b87cc9bed), the shore computer for every basin session. Every command below that needs no vessel
+Written 2026-11-25 on the Ubuntu lab laptop (host SIMDELL; Python 3.10.11 then, Python 3.12.3
+since 2026-11-28; repository at b87cc9bed), the shore computer for every basin session. Every command below that needs no vessel
 was run on that laptop before it was written down; the quoted output is from those runs (paths
 shortened). Steps that need the vessel are marked **on the day**.
 
 Each script's own `--help` and docstring remain the reference; this guide shows how the scripts
-fit together. All commands run from `asv-lidar/field_deployment/` with `python` (3.10.11, the
-version on all three computers). On the Ubuntu laptop `python3` is Ubuntu's own 3.12 and is not
-used for the project.
+fit together. All commands run from `asv-lidar/field_deployment/` with `python`. The project's
+single Python version is 3.12 since 2026-11-28 (3.10.11 before; the Windows laptops follow). On
+the Ubuntu laptop `python` and `python3` are both Ubuntu's own 3.12.3, the interpreter ROS 2
+Jazzy also uses; the pinned packages of `static_dynamic_obstacles/requirements.txt` are installed
+for it in the user site (`python -m pip install --user --break-system-packages ...`), with no
+venv.
 
 Contents:
 1. Overview: which script for which job
@@ -54,6 +57,70 @@ on UDP 5000. Stop one (Ctrl+C) before starting the next.
   - Vessel rudder = `--rudder-sign` x rudder, with `--rudder-sign` -1 by default: the vessel's
     rudder sign is opposite to the simulator's.
   - S2 = RPM / 24 x 100. RPM 6 (cruise) is S2 25, RPM 12 is S2 50, and S2 = -100 is full astern.
+- **What the vessel sends and what it logs** (D0, 2026-11-26).
+
+  | | Sent to the shore computer (UDP) | Vessel's own log (`RAW_LOG`, `datalogs/laser_*.log`) |
+  | --- | --- | --- |
+  | Lines | `hey`, pose, LiDAR | pose, LiDAR, `GYRO`, `ACCEL`, `QUAT`, `SRVO` |
+  | Rate | 2 Hz each, exactly every 0.500 s | pose up to about 85/s (repeated in bursts), LiDAR 10/s, IMU and `SRVO` about 9.5/s each |
+  | Stamps | the sender's own | the logger's own |
+
+  - **The UDP stream is a 2 Hz sample of the same data:**
+    - each received pose equals the vessel's current pose (99-100 % identical within +/-0.1 s),
+      stamped about 2.4 ms later;
+    - each received scan equals a logged scan from about 50 ms before;
+    - no received line appears word for word in the vessel's log.
+  - **Nothing was lost on the shore computer and nothing was trimmed:** the logger writes every
+    datagram as received. The IMU never reached the shore because the vessel did not send it. The
+    one real loss is 15-30 % of the LiDAR scans, whose 2.9 kB datagrams are split into two packets
+    and dropped on Wi-Fi.
+  - **Raw-format line:** `[HH:MM:SS.ffffff]<counter ms>,<KIND>,<values>`
+    - `GYRO,x,y,z`: deg/s, z is yaw, counter-clockwise positive, 1/16 deg/s steps;
+    - `ACCEL,x,y,z`: m/s^2, gravity removed, 0.01 steps;
+    - `QUAT,x,y,z,w`: unit norm; its heading drifts, so it is not a heading reference;
+    - `SRVO,s1,s2,f1,f2`: servo values and two flags.
+  - **Reading the raw format:**
+    - `log_parser.BluefinStreamDecoder.raw_format()` (since 2026-11-27) reads it: the latest IMU
+      and servo values ride on each frame (`gyro_dps`, `accel_mps2`, `quat_xyzw`, `srvo`,
+      `imu_t_sec`); poses are read in the `nov2026` layout; speeds come from poses 0.5 s apart.
+    - The decoder's defaults are unchanged (July layout, consecutive-pose speeds, IMU lines
+      skipped). On 2026-11-27 the defaults gave frames identical to the earlier decoder on 40
+      logs (63,359 frames), and the July shadow replay through the bridge was identical in all
+      19 logs (1,085 decisions).
+    - `udp_raw_logger.py` names these lines `vessel GYRO`, `vessel ACCEL`, `vessel QUAT` and
+      `vessel SRVO` in its table, marked `read`.
+    - `log_replay_view.py` replays the vessel's logs.
+- **Where the vessel's lines come from** (the vessel's ROS 2 Jazzy recording
+  `rosbag2_2026_11_26-11_08_31`, 11:08:31-11:36:31, read with the `rosbags` library on
+  2026-11-27):
+
+  | Line | ROS 2 source | Units and frame | Rate in the bag | Rate in the vessel's log | Rate over UDP |
+  | --- | --- | --- | --- | --- | --- |
+  | pose `[ts]A,B,C` | `/map_odom` (`map -> base_link`) | A = x, B = y (m, map frame, x forward and y left at SLAM start), C = yaw (deg, counter-clockwise) | 86 Hz | up to about 85/s | 2 Hz |
+  | LiDAR `[ts][r0..r719]` | `/scan` (`lidar_frame`, -179 to +180 deg, 720 beams) | ranges x 10 (dm), 0 for no return, same beam order | 10 Hz | 10/s | 2 Hz (less after Wi-Fi loss) |
+  | `GYRO,x,y,z` | `/imu/data_raw` (`imu_frame`) | deg/s; z counter-clockwise | 100 Hz | about 9.5/s | not sent |
+
+  - **Match quality:**
+    - pose against `/map_odom`: median error 0.04 m and 0.0 deg over 7,210 samples;
+    - scans against `/scan`: 400 of 400 identical;
+    - gyro against `/imu/data_raw`: correlation 0.995.
+  - **`/tf_static`:**
+    - `base_link -> lidar_frame`: 0.63 m forward and **yaw 180 deg**, so the LiDAR is mounted
+      facing aft;
+    - `base_link -> imu_frame`: 0.30 m forward, 0.13 m to starboard, no rotation.
+  - **What this means for the decoding:**
+    - The pose is the hull's (`base_link`), not the LiDAR's. In the drawing frame (x right,
+      y up, heading clockwise from +y), the ROS pose is x = -B, y = A, heading = -C: the
+      `nov2026` layout.
+    - With the LiDAR facing aft, `/scan` beam 0 points about 1 deg off the bow. The decoder
+      reverses the beams, which puts them clockwise from the bow, so the July beam convention
+      still holds.
+  - **The vessel's control node** (`amsl_skipper`) opens the UDP port and the serial link to the
+    low-level controller (`/rosout`). The bag does not record what it sends or at what rate;
+    the 2 Hz pose-and-LiDAR stream without IMU is its setting.
+  - **Signs of an overloaded on-board computer:** the EKF logged "Failed to meet update rate" 15
+    times, and RViz and slam_toolbox dropped LiDAR messages because their queues were full.
+    RViz was running on the vessel.
 - **Pose layout** (`--pose-map` in `udp_raw_logger.py`, `udp_manoeuvre.py`, `log_replay_view.py`
   and `telemetry_view.py`; since 2026-11-27). A pose line `[ts]A,B,C` is read as:
 
@@ -850,7 +917,8 @@ the table after a deliberate change to the vessel model; it is not run in the fi
   (hard-coded addresses). Reference only.
 - `test_run.py`: the July bridge's test cases (`TestCase`, `--test-case N`): the path and obstacle
   geometry used when replaying the July logs.
-- `log_parser.py`: the July decoder (`BluefinStreamDecoder`), shared by every bridge.
+- `log_parser.py`: the decoder (`BluefinStreamDecoder`), shared by every bridge. July defaults;
+  `BluefinStreamDecoder.raw_format()` for the vessel's raw format (section 2).
 - `policy_render.py`, `lidar_pooling.py`, `asv_lidar.py`, `ship_model.py`, `rl_env.py`: support
   modules of the July bridge and viewers.
 
